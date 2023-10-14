@@ -1,0 +1,9 @@
+file(GLOB SRC_FILES
+    "domain/*.cpp"
+    "domain/stage_1_ast/*.cpp"
+    "domain/stage_2_sketch/*.cpp"
+    "problem/*.cpp"
+    "problem/stage_1_ast/*.cpp"
+    "problem/stage_2_sketch/*.cpp")
+add_library(parsers STATIC ${SRC_FILES})
+target_link_libraries(parsers formalism)

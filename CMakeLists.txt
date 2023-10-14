@@ -66,6 +66,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 add_compile_definitions(BOOST_PHOENIX_STL_TUPLE_H_)
 
 include_directories(include/)
+include_directories("${PROJECT_SOURCE_DIR}")
 
 add_subdirectory(src)
 

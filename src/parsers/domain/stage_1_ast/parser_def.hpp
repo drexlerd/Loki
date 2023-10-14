@@ -1,17 +1,17 @@
 #ifndef SRC_PARSER_EMPLOYEE_DEF_HPP_
 #define SRC_PARSER_EMPLOYEE_DEF_HPP_
 
-
-#include "ast.hpp"
-#include "ast_adapted.hpp"
-#include "error_handler.hpp"
-#include "parser_api.hpp"
-
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 
-namespace mimir::pddl { namespace parser
-{
+#include "src/parsers/domain/common/error_handler.hpp"
+
+#include "ast.hpp"
+#include "ast_adapted.hpp"
+#include "parser_api.hpp"
+
+
+namespace mimir::parsers::domain::stage_1::parser {
     namespace x3 = boost::spirit::x3;
     namespace ascii = boost::spirit::x3::ascii;
 
@@ -66,9 +66,9 @@ namespace mimir::pddl { namespace parser
     struct NameClass : x3::annotate_on_success {};
     struct DomainnameClass : x3::annotate_on_success {};
     struct DomainDescriptionClass : x3::annotate_on_success, error_handler_base {};
-}}
+}
 
-namespace mimir::pddl
+namespace mimir::parsers::domain::stage_1
 {
     parser::domain_description_type const& domain_description()
     {

@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "../include/parser.hpp"
+#include "src/parsers/domain/driver.hpp"
 
 using namespace std;
 
@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
     string domain_file = argv[1];
 
     // 1. Parse the domain
-    mimir::pddl::parser::DomainParser domain_parser(domain_file);
+    mimir::parsers::domain::Driver domain_parser(domain_file);
     domain_parser.parse();
     return 0;
 }

@@ -1,14 +1,14 @@
-#ifndef SRC_PARSER_AST_HPP_
-#define SRC_PARSER_AST_HPP_
-
-
-#include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
-#include <boost/spirit/home/x3/support/ast/variant.hpp>
+#ifndef SRC_PARSERS_DOMAIN_STAGE_1_AST_AST_HPP_
+#define SRC_PARSERS_DOMAIN_STAGE_1_AST_AST_HPP_
 
 #include <map>
 #include <vector>
 
-namespace mimir::pddl { namespace ast
+#include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
+#include <boost/spirit/home/x3/support/ast/variant.hpp>
+
+
+namespace mimir::parsers::domain::stage_1::ast
 {
     ///////////////////////////////////////////////////////////////////////////
     //  The AST
@@ -31,7 +31,7 @@ namespace mimir::pddl { namespace ast
     struct DomainDescription : x3::position_tagged {
         DomainName domain_name;
     };
-}}
+}
 
 
 #endif

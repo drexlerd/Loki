@@ -1,5 +1,10 @@
-#ifndef INCLUDE_PARSER_HPP_
-#define INCLUDE_PARSER_HPP_
+#ifndef SRC_PARSERS_DOMAIN_DRIVER_HPP_
+#define SRC_PARSERS_DOMAIN_DRIVER_HPP_
+
+#include <memory>
+
+#include "src/formalism/domain.hpp"
+
 
 
 // Older versions of LibC++ does not have filesystem (e.g., ubuntu 18.04), use the experimental version
@@ -19,16 +24,20 @@
 #  endif
 #endif
 
-namespace mimir::pddl::parser {
-class DomainParser {
+
+
+namespace mimir::parsers::domain {
+class Driver {
 private:
-    const fs::path m_domain_file;
+    const fs::path m_sketch_path;
 
 public:
-    DomainParser(const fs::path& domain_file);
-    void parse();
+    Driver(const fs::path& sketch_path);
+
+    formalism::DomainDescription parse();
 };
 
 }
+
 
 #endif

@@ -1,3 +1,3 @@
-file(GLOB SRC_FILES "*.cpp")
-add_library(pddl STATIC ${SRC_FILES})
+add_subdirectory(formalism)
+add_subdirectory(parsers)
 
