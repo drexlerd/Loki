@@ -4,37 +4,21 @@
 #include <memory>
 
 #include "src/formalism/domain.hpp"
-
-
-
-// Older versions of LibC++ does not have filesystem (e.g., ubuntu 18.04), use the experimental version
-// https://stackoverflow.com/questions/55474690/stdfilesystem-has-not-been-declared-after-including-experimental-filesystem
-#ifndef __has_include
-  static_assert(false, "__has_include not supported");
-#else
-#  if __cplusplus >= 201703L && __has_include(<filesystem>)
-#    include <filesystem>
-     namespace fs = std::filesystem;
-#  elif __has_include(<experimental/filesystem>)
-#    include <experimental/filesystem>
-     namespace fs = std::experimental::filesystem;
-#  elif __has_include(<boost/filesystem.hpp>)
-#    include <boost/filesystem.hpp>
-     namespace fs = boost::filesystem;
-#  endif
-#endif
-
+#include "src/parsers/common/config.hpp"
 
 
 namespace mimir::parsers::domain {
 class Driver {
-private:
-    const fs::path m_sketch_path;
-
 public:
-    Driver(const fs::path& sketch_path);
+     /// @brief Root call.
+     formalism::DomainDescription parse(
+          const std::string& source);
 
-    formalism::DomainDescription parse();
+     /// @brief Nested call.
+     formalism::DomainDescription parse(
+        iterator_type& iter,
+        iterator_type end,
+        error_handler_type& error_handler);
 };
 
 }

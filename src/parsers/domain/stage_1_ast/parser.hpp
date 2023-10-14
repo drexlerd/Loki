@@ -8,13 +8,11 @@
 
 namespace mimir::parsers::domain::stage_1::parser {
 
-struct ParseAstResult {
-    ast::DomainDescription domain_description;
-    error_handler_type error_handler;
-};
-
-extern ParseAstResult parse_ast(const std::string& domain_file_content);
-
+/// @brief Parses the content from iter to end
+extern ast::DomainDescription parse_ast(
+    iterator_type& iter,
+    iterator_type end,
+    error_handler_type& error_handler);
 
 }
 

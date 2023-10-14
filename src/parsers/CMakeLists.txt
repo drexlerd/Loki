@@ -1,4 +1,5 @@
 file(GLOB SRC_FILES
+    "common/*.cpp"
     "domain/*.cpp"
     "domain/stage_1_ast/*.cpp"
     "domain/stage_2_sketch/*.cpp"

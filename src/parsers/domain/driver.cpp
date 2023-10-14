@@ -2,31 +2,37 @@
 
 #include <fstream>
 
+#include "src/parsers/common/error_handler.hpp"
 #include "common/error_handler.hpp"
 #include "stage_1_ast/parser.hpp"
 
 
 namespace mimir::parsers::domain {
 
-Driver::Driver(const fs::path& sketch_path)
-    : m_sketch_path(sketch_path) { }
+formalism::DomainDescription Driver::parse(const std::string& source) {
+    iterator_type iter(source.begin());
+    iterator_type const end(source.end());
 
-formalism::DomainDescription Driver::parse() {
-    std::ifstream sketch_stream(this->m_sketch_path.c_str());
-    if (sketch_stream.is_open()) {
-        std::stringstream buffer;
-        buffer << sketch_stream.rdbuf();
-        std::string source = buffer.str();
+    // Our error handler
+    mimir::parsers::error_handler_type error_handler(iter, end, std::cerr); // Our error handler
 
-        // Stage 1 parse
-        auto result = stage_1::parser::parse_ast(source);
-
-        // Stage 2 parse
-        // TODO
-
-        return formalism::DomainDescription(nullptr);
-    }
-    throw std::runtime_error("extended sketch file does not exist");
+    return parse(iter, end, error_handler);
 }
+
+formalism::DomainDescription Driver::parse(
+    iterator_type& iter,
+    iterator_type end,
+    error_handler_type& error_handler) {
+    assert(in_bounds(iter, end, error_handler));
+
+    // Stage 1 parse
+    auto root_node = stage_1::parser::parse_ast(iter, end, error_handler);
+
+    // Stage 2 parse
+    // TODO
+
+    return formalism::DomainDescription(nullptr);
+}
+
 
 }
