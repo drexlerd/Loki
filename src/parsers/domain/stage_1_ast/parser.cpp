@@ -8,7 +8,7 @@
 #include <fstream>
 
 #include "src/parsers/common/config.hpp"
-#include "src/parsers/common/error_handler.hpp"
+#include "src/parsers/common/utility.hpp"
 #include "src/parsers/domain/common/error_handler.hpp"
 
 #include "ast.hpp"
@@ -21,7 +21,7 @@ ast::DomainDescription parse_ast(
     iterator_type& iter,
     iterator_type end,
     error_handler_type& error_handler) {
-    assert(in_bounds(iter, end, error_handler));
+    assert(in_bounds(error_handler, iter, end));
 
     // Our AST
     mimir::parsers::domain::stage_1::ast::DomainDescription ast;

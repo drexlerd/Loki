@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 
     // 1. Parse the domain
     mimir::parsers::domain::Driver domain_parser;
-    domain_parser.parse(mimir::parsers::read_file(domain_file));
+    domain_parser.parse(domain_file, mimir::parsers::read_file(domain_file));
     return 0;
 }
 
