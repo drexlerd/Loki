@@ -2,7 +2,6 @@
 
 #include <fstream>
 
-#include "src/parsers/common/utility.hpp"
 #include "common/error_handler.hpp"
 #include "stage_1_ast/parser.hpp"
 
@@ -10,23 +9,19 @@
 namespace mimir::parsers::domain {
 
 formalism::DomainDescription Driver::parse(
-    const std::string& filename,
-    const std::string& source) {
+    const std::string& source,
+    const std::string& filename) {
+
     iterator_type iter(source.begin());
     iterator_type const end(source.end());
 
-    // Our error handler
-    mimir::parsers::error_handler_type error_handler(iter, end, std::cerr, filename);
-
-    return parse(filename, source, iter, end);
+    return parse(iter, end, filename);
 }
 
 formalism::DomainDescription Driver::parse(
-    const std::string& filename,
-    const std::string& source,
     iterator_type& iter,
-    iterator_type end) {
-    assert(in_bounds(source, iter, end));
+    iterator_type end,
+    const std::string& filename) {
 
     // Our error handler
     mimir::parsers::error_handler_type error_handler(iter, end, std::cerr, filename);

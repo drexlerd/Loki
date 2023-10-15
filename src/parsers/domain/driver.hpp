@@ -12,15 +12,14 @@ class Driver {
 public:
      /// @brief Root call.
      formalism::DomainDescription parse(
-          const std::string& filename,
-          const std::string& source);
+          const std::string& source,
+          const std::string& filename="");
 
      /// @brief Nested call.
      formalism::DomainDescription parse(
-          const std::string& filename,
-          const std::string& source,
           iterator_type& iter,
-          iterator_type end);
+          iterator_type end,
+          const std::string& filename="");
 };
 
 }
