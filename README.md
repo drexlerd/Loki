@@ -12,12 +12,12 @@ cmake --build build -j16
 A successful parse:
 
 ```console
-./build/executable/parser benchmarks/gripper/success.pddl
+./build/exe/exe benchmarks/gripper/success.pddl
 ```
 
 A failed parse:
 
 ```console
-./build/executable/parser benchmarks/gripper/fail.pddl
+./build/exe/exe benchmarks/gripper/fail.pddl
 ```
 

@@ -70,7 +70,7 @@ include_directories("${PROJECT_SOURCE_DIR}")
 
 add_subdirectory(src)
 
-add_subdirectory(executable)
+add_subdirectory(exe)
 
 #if (ENABLE_TESTING)
 #    add_subdirectory(tests)
