@@ -13,7 +13,7 @@ namespace loki::domain
 
     struct error_handler_domain : common::error_handler_base {
         error_handler_domain() : common::error_handler_base() {
-            id_map[""] = "";
+            id_map["name"] = "Name";
         }
     };
 }

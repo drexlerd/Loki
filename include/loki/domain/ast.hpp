@@ -16,10 +16,11 @@ namespace loki::domain::ast
     namespace x3 = boost::spirit::x3;
 
     struct Name;
+    struct DomainName;
     struct DomainDescription;
 
 
-    struct Name : x3::position_tagged {
+    struct Name: x3::position_tagged {
         char alpha;
         std::string suffix;
     };
@@ -28,8 +29,29 @@ namespace loki::domain::ast
         Name name;
     };
 
+    /* Requirements */
+    struct RequirementDefinitions : x3::position_tagged {
+        // TODO: do we want to add a separate node for each requirement?
+        std::vector<Name> names;
+    };
+
+    /* Types */
+    struct TypeDefinitions : x3::position_tagged {
+        // TODO: add subtypes
+        std::vector<Name> names;
+    };
+
+    /* Constants */
+    struct ConstantDefinitions : x3::position_tagged {
+        // TODO: add subtypes
+        std::vector<Name> names;
+    };
+
     struct DomainDescription : x3::position_tagged {
         DomainName domain_name;
+        RequirementDefinitions requirements;
+        TypeDefinitions types;
+        ConstantDefinitions constants;
     };
 }
 

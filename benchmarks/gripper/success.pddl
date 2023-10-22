@@ -1,2 +1,5 @@
 (define (domain gripper-strips)
+(:requirements asd)
+(:types t1 t2 t3)
+(:constants o1 o2 o3)
 )
