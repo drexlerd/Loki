@@ -138,6 +138,7 @@ namespace loki::domain::ast
         TypedListOfVariables typed_list_of_variables;
     };
 
+
     /* <function typed list (atomic function skeleton)> */
     struct FunctionSymbol : x3::position_tagged {
         Name name;

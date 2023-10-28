@@ -10,45 +10,66 @@
 \begin{document}
 \maketitle
 
+\section{Domain}
+
 % https://tex.stackexchange.com/questions/24886/which-package-can-be-used-to-write-bnf-grammars
 \begin{grammar}
     \newcommand{\plus}{\textsuperscript{+}}
     \newcommand{\typing}{\textsuperscript{:typing~}}
     \newcommand{\fluents}{\textsuperscript{:fluents~}}
 
-    <domain> ::= ( define ( domain <name> )\newline
-    [<require-def>] \newline
-    [<types-def>] \newline
-    [<constants-def>] \newline
-    [<predicates-def>] )
+    <digit> ::= 0..9
 
-    <require-def> ::= :strip | :typing
+    <letter> ::= a..z | A..Z
 
-    <types-def> ::= ( :types <typed list(name)> )
-
-    <constants-def> ::= ( :constants <typed list(name)> )
-
-    <predicates-def> ::= ( :predicates <atomic formula skeleton>* )
-
-    <atomic formula skeleton> ::= ( <name> <typed list (variable)> )
-
-    <typed list (x)> ::= x*
-
-    <typed list (x)> ::= x\plus - <type> <typed list (x)>
-
-    <type> ::= <name> | ( either <type>\plus )
-
-    <type> ::= ( <type> )
+    <any char> ::= <letter> | <digit> | - | _
 
     <name> ::= <letter> <any char>*
 
     <variable> ::= ?<name>
 
-    <any char> ::= <letter> | <digit> | - | _
 
-    <letter> ::= a..z | A..Z
 
-    <digit> ::= 0..9
+    <type> ::= <name> | ( either <type>\plus )
+
+    <type> ::= ( <type> )
+
+    <typed list (x)> ::= x*
+
+    <typed list (x)> ::= x\plus - <type> <typed list (x)>
+
+
+    <atomic formula skeleton> ::= ( <name> <typed list (variable)> )
+
+
+
+    <function symbol> ::= <name>
+
+    <function type> ::= <digit>
+
+    <atomic function skeleton> ::= ( <function symbol> <typed list (variable)> )
+
+    <function typed list (x)> ::= x*
+
+    <function typed list (x)> ::= x\plus - <function type> <function typed list (x)>
+
+
+
+    <require-def> ::= :strip | :typing
+
+    <types-def> ::= ( :types <typed list (name)> )
+
+    <constants-def> ::= ( :constants <typed list (name)> )
+
+    <predicates-def> ::= ( :predicates <atomic formula skeleton>* )
+
+    <functions-def> ::= ( :functions <function typed list (atomic function skeleton)> )
+
+    <domain> ::= ( define ( domain <name> )\newline
+    [<require-def>] \newline
+    [<types-def>] \newline
+    [<constants-def>] \newline
+    [<predicates-def>] )
 
 \end{grammar}
 

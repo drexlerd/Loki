@@ -149,7 +149,7 @@ namespace loki::domain::parser {
 
     const auto function_symbol_def = name;
     const auto function_type_def = number;
-    const auto atomic_function_skeleton_def = function_symbol > typed_list_of_variables;
+    const auto atomic_function_skeleton_def = lit('(') > function_symbol > typed_list_of_variables > lit(')');
     const auto function_typed_list_of_atomic_function_skeletons_recursively_def = +atomic_function_skeleton > lit('-') > function_type > function_typed_list_of_atomic_function_skeletons_recursively;
     const auto function_typed_list_of_atomic_function_skeletons_def = ((*atomic_function_skeleton_def) | function_typed_list_of_atomic_function_skeletons_recursively);
 
