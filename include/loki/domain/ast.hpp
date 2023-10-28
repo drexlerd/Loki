@@ -17,6 +17,7 @@ namespace loki::domain::ast
 
     struct Name;
     struct Variable;
+    struct Number;
 
     struct FluentType;
     struct EitherType;
@@ -28,11 +29,18 @@ namespace loki::domain::ast
 
     struct AtomicFormulaSkeleton;
 
+    struct AtomicFunctionSkeleton;
+    struct FunctionSymbol;
+    struct FunctionType;
+    struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively;
+    struct FunctionTypedListOfAtomicFunctionSkeletons;
+
     struct DomainName;
     struct Requirements;
     struct Types;
     struct Constants;
     struct Predicates;
+    struct Functions;
     struct DomainDescription;
 
     /* <name> */
@@ -46,6 +54,11 @@ namespace loki::domain::ast
     struct Variable: x3::position_tagged {
         char question_mark;
         Name name;
+    };
+
+    /* <number> */
+    struct Number : x3::position_tagged {
+        int value;
     };
 
 
@@ -119,10 +132,38 @@ namespace loki::domain::ast
     };
 
 
-    /* <atomic formula skeleton> */
-    struct AtomicFormulaSkeleton {
-        Name predicate;
+    /* <atomic function skeleton> */
+    struct AtomicFormulaSkeleton : x3::position_tagged {
+        Name name;
+        TypedListOfVariables typed_list_of_variables;
+    };
+
+    /* <function typed list (atomic function skeleton)> */
+    struct FunctionSymbol : x3::position_tagged {
+        Name name;
+    };
+
+    struct FunctionType : x3::position_tagged {
+        Number number;
+    };
+
+    struct AtomicFunctionSkeleton : x3::position_tagged {
+        FunctionSymbol function_symbol;
         TypedListOfVariables arguments;
+    };
+
+    struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively : x3::position_tagged {
+        std::vector<AtomicFunctionSkeleton> atomic_function_skeleton;
+        FunctionType function_type;
+        x3::forward_ast<FunctionTypedListOfAtomicFunctionSkeletonsRecursively> function_typed_list_of_atomic_function_skeletons_recursively;
+    };
+
+    struct FunctionTypedListOfAtomicFunctionSkeletons : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<std::vector<AtomicFunctionSkeleton>>,
+            x3::forward_ast<FunctionTypedListOfAtomicFunctionSkeletonsRecursively>> {
+        using base_type::base_type;
+        using base_type::operator=;
     };
 
 
@@ -139,8 +180,14 @@ namespace loki::domain::ast
 
 
     /* <predicates-def> */
-    struct Predicates {
+    struct Predicates : x3::position_tagged {
         std::vector<AtomicFormulaSkeleton> atomic_formula_skeletons;
+    };
+
+
+    /* <functions-def> */
+    struct Functions : x3::position_tagged {
+        FunctionTypedListOfAtomicFunctionSkeletons function_types_list_of_atomic_function_skeletons;
     };
 
 
@@ -155,6 +202,7 @@ namespace loki::domain::ast
         Types types;
         Constants constants;
         Predicates predicates;
+        Functions functions;
     };
 }
 
