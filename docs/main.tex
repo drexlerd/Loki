@@ -1,0 +1,53 @@
+\documentclass[]{article}
+
+\usepackage{amsmath}
+\usepackage{syntax}
+
+\title{Grammar Definition}
+\author{Dominik Drexler}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+% https://tex.stackexchange.com/questions/24886/which-package-can-be-used-to-write-bnf-grammars
+\begin{grammar}
+    \newcommand{\plus}{\textsuperscript{+}}
+    \newcommand{\typing}{\textsuperscript{:typing~}}
+    \newcommand{\fluents}{\textsuperscript{:fluents~}}
+
+    <domain> ::= ( define ( domain <name> )\newline
+    [<require-def>] \newline
+    [<types-def>] \newline
+    [<constants-def>] )
+
+    <require-def> ::= :strip | :typing
+
+    <types-def> ::= <typed list(name)>
+
+    <constants-def> ::= <typed list(name)>
+
+    <typed list (x)> ::= x*
+
+    <typed list (x)> ::= x\plus - <type> <typed list (x)>
+
+    <type> ::= <name> | ( either <type>\plus )
+
+    <type> ::= ( <type> )
+
+    <name> ::= <letter> <any char>*
+
+    <any char> ::= <letter> | <digit> | - | _
+
+    <letter> ::= a..z | A..Z
+
+    <digit> ::= 0..9
+
+\end{grammar}
+
+\nocite{mcdermott-et-al-1998}
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}
