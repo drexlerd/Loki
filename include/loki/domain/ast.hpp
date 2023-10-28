@@ -16,28 +16,40 @@ namespace loki::domain::ast
     namespace x3 = boost::spirit::x3;
 
     struct Name;
-    struct DomainName;
+    struct Variable;
 
     struct FluentType;
     struct EitherType;
     struct Type;
-    struct ParentType;
-    struct Types;
+    struct TypedListOfNamesRecursively;
+    struct TypedListOfNames;
+    struct TypedListOfVariablesRecursively;
+    struct TypedListOfVariables;
 
+    struct AtomicFormulaSkeleton;
+
+    struct DomainName;
+    struct Requirements;
+    struct Types;
+    struct Constants;
+    struct Predicates;
     struct DomainDescription;
 
-
+    /* <name> */
     struct Name: x3::position_tagged {
         char alpha;
         std::string suffix;
     };
 
-    struct DomainName : x3::position_tagged {
+
+    /* <variable> */
+    struct Variable: x3::position_tagged {
+        char question_mark;
         Name name;
     };
 
 
-    /* Requirements */
+    /* <require-def> */
     struct StripsRequirement : x3::position_tagged {
     };
 
@@ -58,9 +70,8 @@ namespace loki::domain::ast
     };
 
 
-    /* Types */
+    /* <typed list (name)> */
     struct FluentType : x3::position_tagged {
-        // requirement :fluents
         x3::forward_ast<Type> type;
     };
 
@@ -77,28 +88,65 @@ namespace loki::domain::ast
         using base_type::operator=;
     };
 
-    struct ParentType : x3::position_tagged {
-        std::vector<Name> type_names;
+    struct TypedListOfNamesRecursively : x3::position_tagged {
+        std::vector<Name> names;
         Type type;
-        x3::forward_ast<ParentType> parent_type;
+        x3::forward_ast<TypedListOfNamesRecursively> typed_list_of_names_recursively;
     };
 
-    struct Types : x3::position_tagged,
+    struct TypedListOfNames : x3::position_tagged,
         x3::variant<
             x3::forward_ast<std::vector<Name>>,
-            x3::forward_ast<ParentType>> {
+            x3::forward_ast<TypedListOfNamesRecursively>> {
         using base_type::base_type;
         using base_type::operator=;
     };
 
 
-    /* Constants */
-    struct Constants : x3::position_tagged,
-    x3::variant<
-            x3::forward_ast<std::vector<Name>>,
-            x3::forward_ast<ParentType>> {
+    /* <typed list (variable)> */
+    struct TypedListOfVariablesRecursively : x3::position_tagged {
+        std::vector<Variable> variables;
+        Type type;
+        x3::forward_ast<TypedListOfVariablesRecursively> typed_list_of_variables_recursively;
+    };
+
+    struct TypedListOfVariables : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<std::vector<Variable>>,
+            x3::forward_ast<TypedListOfVariablesRecursively>> {
         using base_type::base_type;
         using base_type::operator=;
+    };
+
+
+    /* <atomic formula skeleton> */
+    struct AtomicFormulaSkeleton {
+        Name predicate;
+        TypedListOfVariables arguments;
+    };
+
+
+    /* <types-def> */
+    struct Types : x3::position_tagged {
+        TypedListOfNames typed_list_of_names;
+    };
+
+
+    /* <constants-def> */
+    struct Constants : x3::position_tagged {
+        TypedListOfNames typed_list_of_names;
+    };
+
+
+    /* <predicates-def> */
+    struct Predicates {
+        std::vector<AtomicFormulaSkeleton> atomic_formula_skeletons;
+    };
+
+
+    /* <domain> */
+    struct DomainName : x3::position_tagged {
+        Name name;
     };
 
     struct DomainDescription : x3::position_tagged {
@@ -106,6 +154,7 @@ namespace loki::domain::ast
         Requirements requirements;
         Types types;
         Constants constants;
+        Predicates predicates;
     };
 }
 

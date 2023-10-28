@@ -19,13 +19,18 @@
     <domain> ::= ( define ( domain <name> )\newline
     [<require-def>] \newline
     [<types-def>] \newline
-    [<constants-def>] )
+    [<constants-def>] \newline
+    [<predicates-def>] )
 
     <require-def> ::= :strip | :typing
 
-    <types-def> ::= <typed list(name)>
+    <types-def> ::= ( :types <typed list(name)> )
 
-    <constants-def> ::= <typed list(name)>
+    <constants-def> ::= ( :constants <typed list(name)> )
+
+    <predicates-def> ::= ( :predicates <atomic formula skeleton>* )
+
+    <atomic formula skeleton> ::= ( <name> <typed list (variable)> )
 
     <typed list (x)> ::= x*
 
@@ -36,6 +41,8 @@
     <type> ::= ( <type> )
 
     <name> ::= <letter> <any char>*
+
+    <variable> ::= ?<name>
 
     <any char> ::= <letter> | <digit> | - | _
 
