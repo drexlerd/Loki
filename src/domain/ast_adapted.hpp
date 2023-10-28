@@ -10,9 +10,15 @@
 // to make them a first-class fusion citizens
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Name, alpha, suffix)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::DomainName, name)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::RequirementDefinitions, names)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypeDefinitions, names)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstantDefinitions, names)
+
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Requirements, requirements)
+
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypeName, name)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FluentType, type)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EitherType, types)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ParentType, type_names, type, parent_type)
+
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Constants, names)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::DomainDescription, domain_name, requirements, types, constants)
 
 

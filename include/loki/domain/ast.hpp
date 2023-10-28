@@ -17,6 +17,14 @@ namespace loki::domain::ast
 
     struct Name;
     struct DomainName;
+
+    struct TypeName;
+    struct FluentType;
+    struct EitherType;
+    struct Type;
+    struct ParentType;
+    struct Types;
+
     struct DomainDescription;
 
 
@@ -29,29 +37,76 @@ namespace loki::domain::ast
         Name name;
     };
 
+
     /* Requirements */
-    struct RequirementDefinitions : x3::position_tagged {
-        // TODO: do we want to add a separate node for each requirement?
-        std::vector<Name> names;
+    struct StripsRequirement : x3::position_tagged {
     };
 
+    struct TypingRequirement : x3::position_tagged {
+    };
+
+    struct Requirement : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<StripsRequirement>,
+            x3::forward_ast<TypingRequirement>> {
+        // TODO: add more requirements
+        using base_type::base_type;
+        using base_type::operator=;
+    };
+
+    struct Requirements : x3::position_tagged {
+        std::vector<Requirement> requirements;
+    };
+
+
     /* Types */
-    struct TypeDefinitions : x3::position_tagged {
-        // TODO: add subtypes
-        std::vector<Name> names;
+    struct TypeName : x3::position_tagged {
+        Name name;
+    };
+
+    struct FluentType : x3::position_tagged {
+        // requirement :fluents
+        x3::forward_ast<Type> type;
+    };
+
+    struct EitherType : x3::position_tagged {
+        std::vector<x3::forward_ast<Type>> types;
+    };
+
+    struct Type : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<TypeName>,
+            x3::forward_ast<FluentType>,
+            x3::forward_ast<EitherType>> {
+        using base_type::base_type;
+        using base_type::operator=;
+    };
+
+    struct ParentType : x3::position_tagged {
+        std::vector<TypeName> type_names;
+        Type type;
+        x3::forward_ast<ParentType> parent_type;
+    };
+
+    struct Types : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<std::vector<TypeName>>,
+            x3::forward_ast<ParentType>> {
+        using base_type::base_type;
+        using base_type::operator=;
     };
 
     /* Constants */
-    struct ConstantDefinitions : x3::position_tagged {
+    struct Constants : x3::position_tagged {
         // TODO: add subtypes
         std::vector<Name> names;
     };
 
     struct DomainDescription : x3::position_tagged {
         DomainName domain_name;
-        RequirementDefinitions requirements;
-        TypeDefinitions types;
-        ConstantDefinitions constants;
+        Requirements requirements;
+        Types types;
+        Constants constants;
     };
 }
 
