@@ -65,10 +65,6 @@ namespace loki::domain::parser {
     x3::rule<RequirementsClass, ast::Requirements> const
         requirements = "requirements";
 
-
-    x3::rule<TypeNameClass, ast::TypeName> const
-        type_name = "type_name";
-
     x3::rule<FluentTypeClass, ast::FluentType> const
         fluent_type = "fluent_type";
 
@@ -105,14 +101,13 @@ namespace loki::domain::parser {
     const auto requirement_def = strips_requirement | typing_requirement;
     const auto requirements_def = lit('(') >> lit(":requirements") >> *requirement >> lit(')');
 
-    const auto type_name_def = name;
     const auto fluent_type_def = lit('(') >> lit("fluent") > type > lit(')');
     const auto either_type_def = lit('(') >> +type > lit(')');
-    const auto type_def = type_name | fluent_type | either_type;
-    const auto parent_type_def = +type_name > lit('-') > type >> parent_type;
-    const auto types_def = lit('(') > lit(":types") >> ((*type_name) | parent_type) > lit(')');
+    const auto type_def = name | fluent_type | either_type;
+    const auto parent_type_def = +name > lit('-') > type >> parent_type;
+    const auto types_def = lit('(') > lit(":types") >> ((*name) | parent_type) > lit(')');
 
-    const auto constants_def = lit('(') > lit(":constants") > *name > lit(')');
+    const auto constants_def = lit('(') > lit(":constants") >> ((*name) | parent_type) > lit(')');
 
     const auto domain_description_def =
         lit('(') > lit("define")
@@ -125,7 +120,7 @@ namespace loki::domain::parser {
     BOOST_SPIRIT_DEFINE(
         name, domain_name,
         strips_requirement, typing_requirement, requirement, requirements,
-        type_name, fluent_type, either_type, type, parent_type, types,
+        fluent_type, either_type, type, parent_type, types,
         constants, domain_description)
 
 
@@ -141,7 +136,6 @@ namespace loki::domain::parser {
     struct RequirementClass : x3::annotate_on_success {};
     struct RequirementsClass : x3::annotate_on_success {};
 
-    struct TypeNameClass : x3::annotate_on_success {};
     struct FluentTypeClass : x3::annotate_on_success {};
     struct EitherTypeClass : x3::annotate_on_success {};
     struct TypeClass : x3::annotate_on_success {};

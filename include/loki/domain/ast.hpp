@@ -18,7 +18,6 @@ namespace loki::domain::ast
     struct Name;
     struct DomainName;
 
-    struct TypeName;
     struct FluentType;
     struct EitherType;
     struct Type;
@@ -60,10 +59,6 @@ namespace loki::domain::ast
 
 
     /* Types */
-    struct TypeName : x3::position_tagged {
-        Name name;
-    };
-
     struct FluentType : x3::position_tagged {
         // requirement :fluents
         x3::forward_ast<Type> type;
@@ -75,7 +70,7 @@ namespace loki::domain::ast
 
     struct Type : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<TypeName>,
+            x3::forward_ast<Name>,
             x3::forward_ast<FluentType>,
             x3::forward_ast<EitherType>> {
         using base_type::base_type;
@@ -83,23 +78,27 @@ namespace loki::domain::ast
     };
 
     struct ParentType : x3::position_tagged {
-        std::vector<TypeName> type_names;
+        std::vector<Name> type_names;
         Type type;
         x3::forward_ast<ParentType> parent_type;
     };
 
     struct Types : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<std::vector<TypeName>>,
+            x3::forward_ast<std::vector<Name>>,
             x3::forward_ast<ParentType>> {
         using base_type::base_type;
         using base_type::operator=;
     };
 
+
     /* Constants */
-    struct Constants : x3::position_tagged {
-        // TODO: add subtypes
-        std::vector<Name> names;
+    struct Constants : x3::position_tagged,
+    x3::variant<
+            x3::forward_ast<std::vector<Name>>,
+            x3::forward_ast<ParentType>> {
+        using base_type::base_type;
+        using base_type::operator=;
     };
 
     struct DomainDescription : x3::position_tagged {
