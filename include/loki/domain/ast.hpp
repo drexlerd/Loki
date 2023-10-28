@@ -24,7 +24,7 @@ namespace loki::domain::ast
     struct Type;
     struct TypedListOfNamesRecursively;
     struct TypedListOfNames;
-    struct TypedListOfVariablesRecursively;
+    struct TypedListOfVariablesRecursively;  // :typing
     struct TypedListOfVariables;
 
     struct AtomicFormulaSkeleton;
@@ -32,15 +32,38 @@ namespace loki::domain::ast
     struct AtomicFunctionSkeleton;
     struct FunctionSymbol;
     struct FunctionType;
-    struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively;
+    struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively;  // :typing
     struct FunctionTypedListOfAtomicFunctionSkeletons;
+
+    struct GoalDescriptorAtomicFormula;
+    struct GoalDescriptorLiteral;  // :negative-preconditions
+    struct GoalDescriptorOr;  // :disjunctive-preconditions
+    struct GoalDescriptorNot;  // :disjunctive-preconditions
+    struct GoalDescriptorImply;  // dijunctive-preconditions
+    struct GoalDescriptorExists;  // :existential-preconditions
+    struct GoalDescriptorForall;  // :fluents
+    struct GoalDescriptor;
+
+    struct ConstraintGoalDescriptorForall;
+    struct ConstraintGoalDescriptorAtEnd;
+    struct ConstraintGoalDescriptorAlways;
+    struct ConstraintGoalDescriptorSometime;
+    struct ConstraintGoalDescriptorWithin;
+    struct ConstraintGoalDescriptorAtMostOnce;
+    struct ConstraintGoalDescriptorSometimeAfter;
+    struct ConstraintGoalDescriptorAlwaysWithin;
+    struct ConstraintGoalDescriptorHoldDuring;
+    struct ConstraintGoalDescriptorHoldAfter;
+    struct ConstraintGoalDescriptor;
+    struct ConstraintGoalDescriptorAnd;
 
     struct DomainName;
     struct Requirements;
     struct Types;
     struct Constants;
     struct Predicates;
-    struct Functions;
+    struct Functions;  // :fluents
+    struct Constraints;  // :constraints
     struct DomainDescription;
 
     /* <name> */
@@ -163,6 +186,49 @@ namespace loki::domain::ast
         x3::variant<
             x3::forward_ast<std::vector<AtomicFunctionSkeleton>>,
             x3::forward_ast<FunctionTypedListOfAtomicFunctionSkeletonsRecursively>> {
+        using base_type::base_type;
+        using base_type::operator=;
+    };
+
+
+    /* Goal Descriptors */
+    struct GoalDescriptorAtomicFormula : x3::position_tagged {
+        // TODO: atomic formula
+    };
+
+    struct GoalDescriptorLiteral : x3::position_tagged {
+
+    };
+
+    struct GoalDescriptorOr : x3::position_tagged {
+
+    };
+
+    struct GoalDescriptorNot : x3::position_tagged {
+
+    };
+
+    struct GoalDescriptorImply : x3::position_tagged {
+
+    };
+
+    struct GoalDescriptorExists : x3::position_tagged {
+
+    };
+
+    struct GoalDescriptorForall : x3::position_tagged {
+
+    };
+
+    struct GoalDescriptor : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<GoalDescriptorAtomicFormula>,
+            x3::forward_ast<GoalDescriptorLiteral>,
+            x3::forward_ast<GoalDescriptorOr>,
+            x3::forward_ast<GoalDescriptorNot>,
+            x3::forward_ast<GoalDescriptorImply>,
+            x3::forward_ast<GoalDescriptorExists>,
+            x3::forward_ast<GoalDescriptorForall>> {
         using base_type::base_type;
         using base_type::operator=;
     };
