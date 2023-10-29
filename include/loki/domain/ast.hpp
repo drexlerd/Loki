@@ -696,7 +696,7 @@ namespace loki::domain::ast
         boost::optional<Predicates> predicates;
         boost::optional<Functions> functions;
         boost::optional<Constraints> constraints;
-        std::vector<Structure> structures;
+        //std::vector<Structure> structures;
     };
 }
 

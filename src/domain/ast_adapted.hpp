@@ -82,7 +82,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Predicates, atomic_formula_skeleton
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Functions, function_types_list_of_atomic_function_skeletons)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Constraints, constraint_goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Structure, action)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::DomainDescription, domain_name, requirements, types, constants, predicates, functions, constraints, structures)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::DomainDescription, domain_name, requirements, types, constants, predicates, functions, constraints)
 
 
 #endif

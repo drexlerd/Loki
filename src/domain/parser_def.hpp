@@ -496,7 +496,7 @@ namespace loki::domain::parser {
            >> predicates
            >> -functions
            >> -constraints
-           >> *structure
+           //>> *structure
         > lit(')');
 
     BOOST_SPIRIT_DEFINE(
