@@ -110,12 +110,11 @@ namespace loki::domain::ast
     struct ConditionalEffect;
     struct Effect;
 
-    // TODO
     struct ActionSymbol;
     struct ActionBody;
 
-    // TODO
     struct Action;
+    // TODO
     struct DurativeAction;                       // :durative-actions
     struct DerivedPredicate;                     // :derived-predicates
 
@@ -629,6 +628,23 @@ namespace loki::domain::ast
     };
 
 
+    /* <action-def> */
+    struct ActionSymbol : x3::position_tagged {
+        Name name;
+    };
+
+    struct ActionBody : x3::position_tagged {
+        boost::optional<PreconditionGoalDescriptor> precondition_goal_descriptor;
+        boost::optional<Effect> effect;
+    };
+
+    struct Action : x3::position_tagged {
+        ActionSymbol action_symbol;
+        TypedListOfVariables typed_list_of_variables;
+        ActionBody action_body;
+    };
+
+
 
     /* <types-def> */
     struct Types : x3::position_tagged {
@@ -660,6 +676,13 @@ namespace loki::domain::ast
     };
 
 
+    /* <structure-def> */
+    struct Structure : x3::position_tagged {
+        Action action;
+        // TODO add other structure in a variant.
+    };
+
+
     /* <domain> */
     struct DomainName : x3::position_tagged {
         Name name;
@@ -673,6 +696,7 @@ namespace loki::domain::ast
         boost::optional<Predicates> predicates;
         boost::optional<Functions> functions;
         boost::optional<Constraints> constraints;
+        std::vector<Structure> structures;
     };
 }
 

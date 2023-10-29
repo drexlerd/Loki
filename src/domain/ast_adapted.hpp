@@ -70,6 +70,10 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::SimpleEffectFluent, assign_operator
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConditionalEffectForall, typed_list_of_variables, effect)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConditionalEffectWhen, goal_descriptor, effect)
 
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ActionSymbol, name)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ActionBody, precondition_goal_descriptor, effect)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Action, action_symbol, typed_list_of_variables, action_body)
+
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::DomainName, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Requirements, requirements)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Types, typed_list_of_names)
@@ -77,7 +81,8 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Constants, typed_list_of_names)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Predicates, atomic_formula_skeletons)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Functions, function_types_list_of_atomic_function_skeletons)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Constraints, constraint_goal_descriptor)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::DomainDescription, domain_name, requirements, types, constants, predicates, functions, constraints)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Structure, action)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::DomainDescription, domain_name, requirements, types, constants, predicates, functions, constraints, structures)
 
 
 #endif

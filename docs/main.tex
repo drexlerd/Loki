@@ -149,7 +149,7 @@
 
     <f-exp> ::= <f-exp number> | <f-exp binary op> | <f-exp minus> | <f-exp head>
 
-
+    % Preconditions
     <GD atom> ::= <atom>
 
     <GD literal> ::=\negativepreconditions{} <literal>
@@ -170,7 +170,6 @@
 
     <GD> ::= <GD atom> | <GD literal> | <GD and> | <GD or> | <GD not> | <GD imply> | <GD exists> | <GD forall> | <GD f-comp>
 
-    % Preconditions
     <pref-name> ::= name
 
     <pre-GD simple> ::= <GD>
@@ -185,6 +184,16 @@
 
 
     % Effects
+    <assign-op> ::= assign
+
+    <assign-op> ::= scale-up
+
+    <assign-op> ::= scale-down
+
+    <assign-op> ::= increase
+
+    <assign-op> ::= decrease
+
     <simple-effect-literal> ::= <literal>
 
     <simple-effect-fluent> ::=\fluents ( <assign-op> <f-head> <f-exp> )
@@ -200,17 +209,6 @@
     <effect and> ::= ( and <effect>* )
 
     <effect> ::= <simple-effect> | <cond-effect> | <effect and>
-
-
-    <assign-op> ::= assign
-
-    <assign-op> ::= scale-up
-
-    <assign-op> ::= scale-down
-
-    <assign-op> ::= increase
-
-    <assign-op> ::= decrease
 \end{grammar}
 
 \section{Problem}

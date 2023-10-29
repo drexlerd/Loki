@@ -129,6 +129,14 @@ namespace loki::domain::parser {
     struct ConditionalEffectClass;
     struct EffectClass;
 
+    struct ActionSymbolClass;
+    struct ActionBodyClass;
+
+    struct ActionClass;
+    // TODO
+    struct DurativeActionClass;
+    struct DerivedPredicateClass;
+
     struct DomainNameClass;
     struct RequirementsClass;
     struct TypesClass;
@@ -136,6 +144,7 @@ namespace loki::domain::parser {
     struct PredicatesClass;
     struct FunctionsClass;
     struct ConstraintsClass;
+    struct StructureClass;
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -327,6 +336,14 @@ namespace loki::domain::parser {
     x3::rule<EffectClass, ast::Effect> const
         effect = "effect";
 
+    x3::rule<ActionSymbolClass, ast::ActionSymbol> const
+        action_symbol = "action_symbol";
+    x3::rule<ActionBodyClass, ast::ActionBody> const
+        action_body = "action_body";
+
+    x3::rule<ActionClass, ast::Action> const
+        action = "action";
+
     x3::rule<DomainNameClass, ast::DomainName> const
         domain_name = "domain_name";
     x3::rule<RequirementsClass, ast::Requirements> const
@@ -341,6 +358,8 @@ namespace loki::domain::parser {
         functions = "functions";
     x3::rule<ConstraintsClass, ast::Constraints> const
         constraints = "constraints";
+    x3::rule<StructureClass, ast::Structure> const
+        structure = "structure";
     domain_description_type const domain_description = "domain_description";
 
 
@@ -451,6 +470,14 @@ namespace loki::domain::parser {
     const auto conditional_effect_def = conditional_effect_forall | conditional_effect_when;
     const auto effect_def = simple_effect | conditional_effect | *effect;
 
+    const auto action_symbol_def = name;
+    const auto action_body_def = -(lit(":precondition") >> (lit('(') >> lit(')') >> x3::attr(boost::optional<ast::PreconditionGoalDescriptor>{}) ) | precondition_goal_descriptor)
+                                >> -(lit(":effects") >> (lit('(') >> lit(')') >> x3::attr(boost::optional<ast::Effect>{}) ) | effect);
+    const auto action_def = lit('(') >> lit(":action") >> action_symbol
+                                     >> lit(":parameters") >> lit('(') >> typed_list_of_variables >> lit(')')
+                                     >> action_body
+                            >> lit(')');
+
     const auto domain_name_def = lit('(') >> lit("domain") > name > lit(')');
     const auto requirements_def = lit('(') >> lit(":requirements") >> *requirement >> lit(')');
     const auto types_def = lit('(') >> lit(":types") >> typed_list_of_names > lit(')');
@@ -458,6 +485,7 @@ namespace loki::domain::parser {
     const auto predicates_def = lit('(') >> lit(":predicates") >> *atomic_formula_skeleton > lit(')');
     const auto functions_def = lit('(') >> lit(":functions") >> *function_typed_list_of_atomic_function_skeletons > lit(')');
     const auto constraints_def = lit('(') >> lit(":constraints") > constraint_goal_descriptor > lit(')');
+    const auto structure_def = action;
 
     const auto domain_description_def =
         lit('(') > lit("define")
@@ -468,6 +496,7 @@ namespace loki::domain::parser {
            >> predicates
            >> -functions
            >> -constraints
+           >> *structure
         > lit(')');
 
     BOOST_SPIRIT_DEFINE(
@@ -500,11 +529,12 @@ namespace loki::domain::parser {
         assign_operator_assign, assign_operator_scale_up, assign_operator_scale_down,
         assign_operator_increase, assign_operator_decrease, assign_operator,
         simple_effect_literal, simple_effect_fluent, simple_effect, conditional_effect_forall,
-        conditional_effect_when, conditional_effect, effect
+        conditional_effect_when, conditional_effect, effect,
+        action_symbol, action_body, action
     )
 
     BOOST_SPIRIT_DEFINE(
-        domain_name, types, constants, predicates, functions, constraints, domain_description
+        domain_name, types, constants, predicates, functions, constraints, structure, domain_description
     )
 
 
@@ -611,6 +641,13 @@ namespace loki::domain::parser {
     struct ConditionalEffectClass : x3::annotate_on_success {};
     struct EffectClass : x3::annotate_on_success {};
 
+    struct ActionSymbolClass : x3::annotate_on_success {};
+    struct ActionBodyClass : x3::annotate_on_success {};
+
+    struct ActionClass : x3::annotate_on_success {};
+    struct DurativeActionClass : x3::annotate_on_success {};
+    struct DerivedPredicateClass : x3::annotate_on_success {};
+
     struct DomainNameClass : x3::annotate_on_success {};
     struct RequirementsClass : x3::annotate_on_success {};
     struct TypesClass : x3::annotate_on_success {};
@@ -618,6 +655,7 @@ namespace loki::domain::parser {
     struct PredicatesClass : x3::annotate_on_success {};
     struct FunctionsClass : x3::annotate_on_success {};
     struct ConstraintsClass : x3::annotate_on_success {};
+    struct StructureClass : x3::annotate_on_success {};
     struct DomainDescriptionClass : x3::annotate_on_success, error_handler_domain {};
 }
 
