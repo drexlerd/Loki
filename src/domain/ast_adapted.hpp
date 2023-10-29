@@ -30,10 +30,11 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaOfTerms, predicate, te
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Atom, atomic_formula_of_terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::NegatedAtom, atomic_formula_of_terms)
 
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionHead, function_symbol, terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionExpressionNumber, number)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionExpressionBinaryOp, binary_operator, function_expression_left, function_expression_right)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionExpressionMinus, function_expression)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionExpressionHead, function_symbol, terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionExpressionHead, function_head)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorAtom, atom)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorLiteral, literal)
@@ -57,6 +58,17 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorSometimeBef
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorAlwaysWithin, number, goal_descriptor_left, goal_descriptor_right)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorHoldDuring, number_left, number_right, goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorHoldAfter, number, goal_descriptor)
+
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreferenceName, name)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorSimple, goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorAnd, precondition_goal_descriptors)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorPreference, preference_name, goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorForall, typed_list_of_variables, precondition_goal_descriptor)
+
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::SimpleEffectLiteral, literal)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::SimpleEffectFluent, assign_operator, function_expression_head, function_expression)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConditionalEffectForall, typed_list_of_variables, effect)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConditionalEffectWhen, goal_descriptor, effect)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::DomainName, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Requirements, requirements)
