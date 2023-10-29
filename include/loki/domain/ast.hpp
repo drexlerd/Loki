@@ -42,6 +42,26 @@ namespace loki::domain::ast
     struct Literal;
     struct AtomicFormulaOfTerms;
 
+    struct MultiOperatorMul;
+    struct MultiOperatorPlus;
+    struct MultiOperator;
+    struct BinaryOperatorMinus;
+    struct BinaryOperatorDiv;
+    struct BinaryOperator;
+
+    struct BinaryComparatorGreater;
+    struct BinaryComparatorLess;
+    struct BinaryComparatorEqual;
+    struct BinaryComparatorGreaterEqual;
+    struct BinaryComparatorLessEqual;
+    struct BinaryComparator;
+
+    struct FunctionExpressionNumber;
+    struct FunctionExpressionBinaryOp;
+    struct FunctionExpressionMinus;
+    struct FunctionExpressionHead;
+    struct FunctionExpression;
+
     struct GoalDescriptorAtomicFormula;
     struct GoalDescriptorLiteral;                // :negative-preconditions
     struct GoalDescriptorAnd;
@@ -49,7 +69,8 @@ namespace loki::domain::ast
     struct GoalDescriptorNot;                    // :disjunctive-preconditions
     struct GoalDescriptorImply;                  // :disjunctive-preconditions
     struct GoalDescriptorExists;                 // :existential-preconditions
-    struct GoalDescriptorForall;                 // :fluents
+    struct GoalDescriptorForall;                 // :universal-preconditions
+    struct GoalDescriptorFunctionComparison;     // :fluents
     struct GoalDescriptor;
 
     struct ConstraintGoalDescriptorAnd;
@@ -66,6 +87,29 @@ namespace loki::domain::ast
     struct ConstraintGoalDescriptorHoldAfter;
     struct ConstraintGoalDescriptor;
 
+    struct PreconditionGoalDescriptorAnd;
+    struct PreconditionGoalDescriptorPreference;           // :preferences
+    struct PreferenceName;
+    struct PreconditionGoalDescriptorForall;               // :universal-preconditions
+    struct PreconditionGoalDescriptor;
+
+    struct LeafConditionalEffect;
+    struct ConditionalEffectForall;
+    struct ConditionalEffectWhen;
+    struct ConditionalEffect;
+    struct SimpleEffectLiteral;
+    struct SimpleEffectFluent;
+    struct SimpleEffect;
+    struct Effect;
+
+    struct ActionSymbol;
+    struct ActionBody;
+
+
+    struct Action;
+    struct DurativeAction;                       // :durative-actions
+    struct DerivedPredicate;                     // :derived-predicates
+
     struct DomainName;
     struct Requirements;
     struct Types;
@@ -73,6 +117,7 @@ namespace loki::domain::ast
     struct Predicates;
     struct Functions;                            // :fluents
     struct Constraints;                          // :constraints
+    struct Structure;
     struct DomainDescription;
 
     /* <name> */
@@ -236,9 +281,98 @@ namespace loki::domain::ast
     };
 
 
+    /* Operators */
+    struct MultiOperatorMul : x3::position_tagged {
+    };
+
+    struct MultiOperatorPlus : x3::position_tagged {
+    };
+
+    struct MultiOperator : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<MultiOperatorMul>,
+            x3::forward_ast<MultiOperatorPlus>> {
+        using base_type::base_type;
+        using base_type::operator=;
+    };
+
+    struct BinaryOperatorMinus : x3::position_tagged {
+    };
+
+    struct BinaryOperatorDiv : x3::position_tagged {
+    };
+
+    struct BinaryOperator : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<BinaryOperatorMinus>,
+            x3::forward_ast<BinaryOperatorDiv>,
+            x3::forward_ast<MultiOperator>> {
+        using base_type::base_type;
+        using base_type::operator=;
+    };
+
+
+    struct BinaryComparatorGreater : x3::position_tagged {
+    };
+
+    struct BinaryComparatorLess : x3::position_tagged {
+    };
+
+    struct BinaryComparatorEqual : x3::position_tagged {
+    };
+
+    struct BinaryComparatorGreaterEqual : x3::position_tagged {
+    };
+
+    struct BinaryComparatorLessEqual : x3::position_tagged {
+    };
+
+    struct BinaryComparator : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<BinaryComparatorGreater>,
+            x3::forward_ast<BinaryComparatorLess>,
+            x3::forward_ast<BinaryComparatorEqual>,
+            x3::forward_ast<BinaryComparatorGreaterEqual>,
+            x3::forward_ast<BinaryComparatorLessEqual>> {
+        using base_type::base_type;
+        using base_type::operator=;
+    };
+
+
+    struct FunctionExpressionNumber : x3::position_tagged {
+        Number number;
+    };
+
+    struct FunctionExpressionBinaryOp : x3::position_tagged {
+        BinaryOperator binary_operator;
+        x3::forward_ast<FunctionExpression> function_expression_left;
+        x3::forward_ast<FunctionExpression> function_expression_right;
+    };
+
+    struct FunctionExpressionMinus : x3::position_tagged {
+        x3::forward_ast<FunctionExpression> function_expression;
+    };
+
+    struct FunctionExpressionHead : x3::position_tagged {
+        FunctionSymbol function_symbol;
+        std::vector<Term> terms;
+    };
+
+    struct FunctionExpression : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<FunctionExpressionNumber>,
+            x3::forward_ast<FunctionExpressionBinaryOp>,
+            x3::forward_ast<FunctionExpressionMinus>,
+            x3::forward_ast<FunctionExpressionHead>> {
+        using base_type::base_type;
+        using base_type::operator=;
+    };
+
+
+
     /* Goal Descriptors */
-    struct GoalDescriptorAtomicFormula : x3::position_tagged {
-        AtomicFormulaOfTerms atomic_formula_of_terms;
+    struct GoalDescriptorAtom : x3::position_tagged {
+        Atom atom;
     };
 
     struct GoalDescriptorLiteral : x3::position_tagged {
@@ -272,16 +406,23 @@ namespace loki::domain::ast
         x3::forward_ast<GoalDescriptor> goal_descriptor;
     };
 
+    struct GoalDescriptorFunctionComparison : x3::position_tagged {
+        BinaryComparator binary_comparator;
+        FunctionExpression function_expression_left;
+        FunctionExpression function_expression_right;
+    };
+
     struct GoalDescriptor : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<GoalDescriptorAtomicFormula>,
+            x3::forward_ast<GoalDescriptorAtom>,
             x3::forward_ast<GoalDescriptorLiteral>,
             x3::forward_ast<GoalDescriptorAnd>,
             x3::forward_ast<GoalDescriptorOr>,
             x3::forward_ast<GoalDescriptorNot>,
             x3::forward_ast<GoalDescriptorImply>,
             x3::forward_ast<GoalDescriptorExists>,
-            x3::forward_ast<GoalDescriptorForall>> {
+            x3::forward_ast<GoalDescriptorForall>,
+            x3::forward_ast<GoalDescriptorFunctionComparison>> {
         using base_type::base_type;
         using base_type::operator=;
     };

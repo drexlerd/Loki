@@ -7,6 +7,15 @@
 \author{Dominik Drexler}
 \date{\today}
 
+\newcommand{\plus}{\textsuperscript{+}}
+\newcommand{\typing}{\textsuperscript{:typing}~}
+\newcommand{\fluents}{\textsuperscript{:fluents}~}
+\newcommand{\negativepreconditions}{\textsuperscript{:negative-preconditions}~}
+\newcommand{\disjunctivepreconditions}{\textsuperscript{:disjunctive-preconditions}~}
+\newcommand{\existentialpreconditions}{\textsuperscript{:existential-preconditions}~}
+\newcommand{\universalpreconditions}{\textsuperscript{:universal-preconditions}~}
+\newcommand{\conditionaleffects}{\textsuperscript{:conditional-effects}~}
+
 \begin{document}
 \maketitle
 
@@ -14,9 +23,7 @@
 
 % https://tex.stackexchange.com/questions/24886/which-package-can-be-used-to-write-bnf-grammars
 \begin{grammar}
-    \newcommand{\plus}{\textsuperscript{+}}
-    \newcommand{\typing}{\textsuperscript{:typing~}}
-    \newcommand{\fluents}{\textsuperscript{:fluents~}}
+
 
     <digit> ::= 0..9
 
@@ -27,6 +34,8 @@
     <name> ::= <letter> <any char>*
 
     <variable> ::= ?<name>
+
+    <number> ::= digit\plus . digit*   %% TODO int or float
 
 
 
@@ -39,7 +48,9 @@
     <typed list (x)> ::= x\plus - <type> <typed list (x)>
 
 
-    <atomic formula skeleton> ::= ( <name> <typed list (variable)> )
+    <predicate> ::= <name>
+
+    <atomic formula skeleton> ::= ( <predicate> <typed list (variable)> )
 
 
 
@@ -53,6 +64,14 @@
 
     <function typed list (x)> ::= x\plus - <function type> <function typed list (x)>
 
+
+    <atomic formular (t)> ::= ( <predicate> t* )
+
+    <atom> ::= <atomic formula (term)>
+
+    <negated atom> ::= ( not <atomic formula (term)> )
+
+    <literal> ::= <atom> | <negated atom>
 
 
     <require-def> ::= :strip | :typing
@@ -71,6 +90,45 @@
     [<constants-def>] \newline
     [<predicates-def>] )
 
+\end{grammar}
+
+\section{Actions}
+
+\begin{grammar}
+    <GD atom> ::= <atom>
+
+    <GD literal> ::=\negativepreconditions{} <literal>
+
+    <GD and> ::=  ( and <GD>* )
+
+    <GD or> ::=\disjunctivepreconditions{} ( or <GD>* )
+
+    <GD not> ::=\disjunctivepreconditions{} ( not <GD>* )
+
+    <GD imply> ::=\disjunctivepreconditions{} ( imply <GD> <GD> )
+
+    <GD exists> ::=\existentialpreconditions{} ( exists <typed list (variable)> <GD> )
+
+    <GD forall> ::=\universalpreconditions{} ( forall <typed list (variable)> <GD> )
+
+    <GD> ::= <GD atom> | <GD literal> | <GD and> | <GD or> | <GD not> | <GD imply> | <GD exists> | <GD forall>
+
+
+    <effect> ::= ( and <cond-effect>* ) | <cond-effect>
+
+    <cond-effect-forall> ::=\conditionaleffects ( forall ( <typed list (variable)>* ) <effect> )
+
+    <cond-effect-when> ::=\conditionaleffects ( when <GD> <leaf-cond-effect> )
+
+    <cond-effect> ::= <cond-effect-forall> | <cond-effect-when> | <simple-effect>
+
+    <simple-effect-literal> ::= <literal>
+
+    <simple-effect-fluent> ::=\fluents ( <assign-op> <f-head> <f-exp> )
+
+    <simple-effect> ::= <simple-effect-literal> | <simple-effect-fluent>
+
+    <leaf-cond-effect> ::= ( and <simple-effect>* ) | <simple-effect>
 \end{grammar}
 
 \nocite{mcdermott-et-al-1998}

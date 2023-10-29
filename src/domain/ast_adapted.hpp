@@ -30,7 +30,12 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaOfTerms, predicate, te
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Atom, atomic_formula_of_terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::NegatedAtom, atomic_formula_of_terms)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorAtomicFormula, atomic_formula_of_terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionExpressionNumber, number)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionExpressionBinaryOp, binary_operator, function_expression_left, function_expression_right)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionExpressionMinus, function_expression)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionExpressionHead, function_symbol, terms)
+
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorAtom, atom)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorLiteral, literal)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorAnd, goal_descriptors)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorOr, goal_descriptors)
@@ -38,6 +43,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorNot, goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorImply, goal_descriptor_left, goal_descriptor_right)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorExists, typed_list_of_variables, goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorForall, typed_list_of_variables, goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorFunctionComparison, binary_comparator, function_expression_left, function_expression_right)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorAnd, constraint_goal_descriptors)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorForall, typed_list_of_variables, constraint_goal_descriptor)

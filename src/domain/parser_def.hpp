@@ -61,7 +61,27 @@ namespace loki::domain::parser {
     struct LiteralClass;
     struct AtomicFormulaOfTermsClass;
 
-    struct GoalDescriptorAtomicFormulaClass;
+    struct MultiOperatorMulClass;
+    struct MultiOperatorPlusClass;
+    struct MultiOperatorClass;
+    struct BinaryOperatorMinusClass;
+    struct BinaryOperatorDivClass;
+    struct BinaryOperatorClass;
+
+    struct BinaryComparatorGreaterClass;
+    struct BinaryComparatorLessClass;
+    struct BinaryComparatorEqualClass;
+    struct BinaryComparatorGreaterEqualClass;
+    struct BinaryComparatorLessEqualClass;
+    struct BinaryComparatorClass;
+
+    struct FunctionExpressionNumberClass;
+    struct FunctionExpressionBinaryOpClass;
+    struct FunctionExpressionMinusClass;
+    struct FunctionExpressionHeadClass;
+    struct FunctionExpressionClass;
+
+    struct GoalDescriptorAtomClass;
     struct GoalDescriptorLiteralClass;
     struct GoalDescriptorAndClass;
     struct GoalDescriptorOrClass;
@@ -69,6 +89,7 @@ namespace loki::domain::parser {
     struct GoalDescriptorImplyClass;
     struct GoalDescriptorExistsClass;
     struct GoalDescriptorForallClass;
+    struct GoalDescriptorFunctionComparisonClass;
     struct GoalDescriptorClass;
 
     struct ConstraintGoalDescriptorAndClass;
@@ -155,8 +176,45 @@ namespace loki::domain::parser {
     x3::rule<LiteralClass, ast::Literal> const
         literal = "literal";
 
-    x3::rule<GoalDescriptorAtomicFormulaClass, ast::GoalDescriptorAtomicFormula> const
-        goal_descriptor_atomic_formula = "goal_descriptor_atomic_formula";
+    x3::rule<MultiOperatorMulClass, ast::MultiOperatorMul> const
+        multi_operator_mul = "multi_operator_mul";
+    x3::rule<MultiOperatorPlusClass, ast::MultiOperatorPlus> const
+        multi_operator_plus = "multi_operator_plus";
+    x3::rule<MultiOperatorClass, ast::MultiOperator> const
+        multi_operator = "multi_operator";
+    x3::rule<BinaryOperatorMinusClass, ast::BinaryOperatorMinus> const
+        binary_operator_minus = "binary_operator_minus";
+    x3::rule<BinaryOperatorDivClass, ast::BinaryOperatorDiv> const
+        binary_operator_div = "binary_operator_div";
+    x3::rule<BinaryOperatorClass, ast::BinaryOperator> const
+        binary_operator = "binary_operator";
+
+    x3::rule<BinaryComparatorGreaterClass, ast::BinaryComparatorGreater> const
+        binary_comparator_greater = "binary_comparator_greater";
+    x3::rule<BinaryComparatorLessClass, ast::BinaryComparatorLess> const
+        binary_comparator_less = "binary_comparator_less";
+    x3::rule<BinaryComparatorEqualClass, ast::BinaryComparatorEqual> const
+        binary_comparator_equal = "binary_comparator_equal";
+    x3::rule<BinaryComparatorGreaterEqualClass, ast::BinaryComparatorGreaterEqual> const
+        binary_comparator_greater_equal = "binary_comparator_greater_equal";
+    x3::rule<BinaryComparatorLessEqualClass, ast::BinaryComparatorLessEqual> const
+        binary_comparator_less_equal = "binary_comparator_less_equal";
+    x3::rule<BinaryComparatorClass, ast::BinaryComparator> const
+        binary_comparator = "binary_comparator";
+
+    x3::rule<FunctionExpressionNumberClass, ast::FunctionExpressionNumber> const
+        function_expression_number = "function_expression_number";
+    x3::rule<FunctionExpressionBinaryOpClass, ast::FunctionExpressionBinaryOp> const
+        function_expression_binary_op = "function_expression_binary_op";
+    x3::rule<FunctionExpressionMinusClass, ast::FunctionExpressionMinus> const
+        function_expression_minus = "function_expression_minus";
+    x3::rule<FunctionExpressionHeadClass, ast::FunctionExpressionHead> const
+        function_expression_head = "function_expression_head";
+    x3::rule<FunctionExpressionClass, ast::FunctionExpression> const
+        function_expression = "function_expression";
+
+    x3::rule<GoalDescriptorAtomClass, ast::GoalDescriptorAtom> const
+        goal_descriptor_atom = "goal_descriptor_atom";
     x3::rule<GoalDescriptorLiteralClass, ast::GoalDescriptorLiteral> const
         goal_descriptor_literal = "goal_descriptor_literal";
     x3::rule<GoalDescriptorAndClass, ast::GoalDescriptorAnd> const
@@ -171,6 +229,8 @@ namespace loki::domain::parser {
         goal_descriptor_exists = "goal_descriptor_exists";
     x3::rule<GoalDescriptorForallClass, ast::GoalDescriptorForall> const
         goal_descriptor_forall = "goal_descriptor_forall";
+    x3::rule<GoalDescriptorFunctionComparisonClass, ast::GoalDescriptorFunctionComparison> const
+        goal_descriptor_function_comparison = "goal_descriptor_function_comparison";
     x3::rule<GoalDescriptorClass, ast::GoalDescriptor> const
         goal_descriptor = "goal_descriptor";
 
@@ -253,16 +313,37 @@ namespace loki::domain::parser {
     const auto negated_atom_def = lit('(') >> lit("not") >> atomic_formula_of_terms > lit(')');
     const auto literal_def = atom | negated_atom;
 
-    const auto goal_descriptor_atomic_formula_def = atomic_formula_of_terms;
+    const auto multi_operator_mul_def = lit('*') >> x3::attr(ast::MultiOperatorMul{});
+    const auto multi_operator_plus_def = lit('+') >> x3::attr(ast::MultiOperatorPlus{});
+    const auto multi_operator_def = multi_operator_mul | multi_operator_plus;
+    const auto binary_operator_minus_def = lit('-') >> x3::attr(ast::BinaryOperatorMinus{});
+    const auto binary_operator_div_def = lit('/') >> x3::attr(ast::BinaryOperatorDiv{});
+    const auto binary_operator_def = binary_operator_minus | binary_operator_div | multi_operator;
+
+    const auto binary_comparator_greater_def = lit('>') >> x3::attr(ast::BinaryComparatorGreater{});
+    const auto binary_comparator_less_def = lit('<') >> x3::attr(ast::BinaryComparatorLess{});
+    const auto binary_comparator_equal_def = lit('=') >> x3::attr(ast::BinaryComparatorEqual{});
+    const auto binary_comparator_greater_equal_def = lit(">=") >> x3::attr(ast::BinaryComparatorGreaterEqual{});
+    const auto binary_comparator_less_equal_def = lit("<=") >> x3::attr(ast::BinaryComparatorLessEqual{});
+    const auto binary_comparator_def = binary_comparator_greater | binary_comparator_less | binary_comparator_equal | binary_comparator_greater_equal | binary_comparator_less_equal;
+
+    const auto function_expression_number_def = number;
+    const auto function_expression_binary_op_def = lit('(') >> binary_operator > function_expression > function_expression > lit(')');
+    const auto function_expression_minus_def = lit('(') >> lit('-') > function_expression > lit(')');
+    const auto function_expression_head_def = function_symbol >> x3::attr(std::vector<ast::Term>{}) | (lit('(') >> function_symbol >> *term > lit(')'));
+    const auto function_expression_def = function_expression_number | function_expression_binary_op | function_expression_minus | function_expression_head;
+
+    const auto goal_descriptor_atom_def = atom;
     const auto goal_descriptor_literal_def = literal;
     const auto goal_descriptor_and_def = lit('(') >> lit("and") >> *goal_descriptor > lit(')');
     const auto goal_descriptor_or_def = lit('(') >> lit("or") >> *goal_descriptor > lit(')');
     const auto goal_descriptor_not_def = lit('(') >> lit("not") > goal_descriptor > lit(')');
     const auto goal_descriptor_imply_def = lit('(') >> lit("imply") > goal_descriptor > goal_descriptor > lit(')');
-    const auto goal_descriptor_exists_def = lit('(') >> lit("exists") >> typed_list_of_variables > goal_descriptor > lit(')');
-    const auto goal_descriptor_forall_def = lit('(') >> lit("forall") >> typed_list_of_variables > goal_descriptor > lit(')');
-    const auto goal_descriptor_def = goal_descriptor_atomic_formula | goal_descriptor_literal | goal_descriptor_and | goal_descriptor_or
-        | goal_descriptor_not | goal_descriptor_imply | goal_descriptor_exists | goal_descriptor_forall;
+    const auto goal_descriptor_exists_def = lit('(') >> lit("exists") > typed_list_of_variables > goal_descriptor > lit(')');
+    const auto goal_descriptor_forall_def = lit('(') >> lit("forall") > typed_list_of_variables > goal_descriptor > lit(')');
+    const auto goal_descriptor_function_comparison_def = lit('(') >> binary_comparator >> function_expression > function_expression > lit(')');
+    const auto goal_descriptor_def = goal_descriptor_atom | goal_descriptor_literal | goal_descriptor_and | goal_descriptor_or
+        | goal_descriptor_not | goal_descriptor_imply | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison;
 
     const auto constraint_goal_descriptor_and_def = lit('(') >> lit("and") > *constraint_goal_descriptor > lit(')');
     const auto constraint_goal_descriptor_forall_def = lit('(') >> lit("forall") > typed_list_of_variables > constraint_goal_descriptor > lit(')');
@@ -307,13 +388,23 @@ namespace loki::domain::parser {
         predicate, atomic_formula_skeleton,
         function_symbol, function_type, atomic_function_skeleton, function_typed_list_of_atomic_function_skeletons_recursively, function_typed_list_of_atomic_function_skeletons,
         atomic_formula_of_terms, atom, negated_atom, literal,
-        goal_descriptor_atomic_formula, goal_descriptor_literal, goal_descriptor_and, goal_descriptor_or,
-        goal_descriptor_not, goal_descriptor_imply, goal_descriptor_exists, goal_descriptor_forall, goal_descriptor,
+        goal_descriptor_atom, goal_descriptor_literal, goal_descriptor_and, goal_descriptor_or,
+        goal_descriptor_not, goal_descriptor_imply, goal_descriptor_exists, goal_descriptor_forall,
+        goal_descriptor_function_comparison, goal_descriptor,
         constraint_goal_descriptor_and, constraint_goal_descriptor_forall, constraint_goal_descriptor_at_end,
         constraint_goal_descriptor_always, constraint_goal_descriptor_sometime, constraint_goal_descriptor_within,
         constraint_goal_descriptor_at_most_once, constraint_goal_descriptor_sometime_after,  constraint_goal_descriptor_sometime_before,
         constraint_goal_descriptor_always_within, constraint_goal_descriptor_hold_during, constraint_goal_descriptor_hold_after, constraint_goal_descriptor,
         domain_name, types, constants, predicates, functions, constraints, domain_description)
+
+    BOOST_SPIRIT_DEFINE(
+        multi_operator_mul, multi_operator_plus, multi_operator,
+        binary_operator_minus, binary_operator_div, binary_operator,
+        binary_comparator_greater, binary_comparator_less, binary_comparator_equal,
+        binary_comparator_greater_equal, binary_comparator_less_equal, binary_comparator,
+        function_expression_number, function_expression_binary_op, function_expression_minus,
+        function_expression_head, function_expression
+    )
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -351,7 +442,27 @@ namespace loki::domain::parser {
     struct LiteralClass : x3::annotate_on_success {};
     struct AtomicFormulaOfTermsClass : x3::annotate_on_success {};
 
-    struct GoalDescriptorAtomicFormulaClass : x3::annotate_on_success {};
+    struct MultiOperatorMulClass : x3::annotate_on_success {};
+    struct MultiOperatorPlusClass : x3::annotate_on_success {};
+    struct MultiOperatorClass : x3::annotate_on_success {};
+    struct BinaryOperatorMinusClass : x3::annotate_on_success {};
+    struct BinaryOperatorDivClass : x3::annotate_on_success {};
+    struct BinaryOperatorClass : x3::annotate_on_success {};
+
+    struct BinaryComparatorGreaterClass : x3::annotate_on_success {};
+    struct BinaryComparatorLessClass : x3::annotate_on_success {};
+    struct BinaryComparatorEqualClass : x3::annotate_on_success {};
+    struct BinaryComparatorGreaterEqualClass : x3::annotate_on_success {};
+    struct BinaryComparatorLessEqualClass : x3::annotate_on_success {};
+    struct BinaryComparatorClass : x3::annotate_on_success {};
+
+    struct FunctionExpressionNumberClass : x3::annotate_on_success {};
+    struct FunctionExpressionBinaryOpClass : x3::annotate_on_success {};
+    struct FunctionExpressionMinusClass : x3::annotate_on_success {};
+    struct FunctionExpressionHeadClass : x3::annotate_on_success {};
+    struct FunctionExpressionClass : x3::annotate_on_success {};
+
+    struct GoalDescriptorAtomClass : x3::annotate_on_success {};
     struct GoalDescriptorLiteralClass : x3::annotate_on_success {};
     struct GoalDescriptorAndClass : x3::annotate_on_success {};
     struct GoalDescriptorOrClass : x3::annotate_on_success {};
@@ -359,6 +470,7 @@ namespace loki::domain::parser {
     struct GoalDescriptorImplyClass : x3::annotate_on_success {};
     struct GoalDescriptorExistsClass : x3::annotate_on_success {};
     struct GoalDescriptorForallClass : x3::annotate_on_success {};
+    struct GoalDescriptorFunctionComparisonClass : x3::annotate_on_success {};
     struct GoalDescriptorClass : x3::annotate_on_success {};
 
     struct ConstraintGoalDescriptorAndClass : x3::annotate_on_success {};
