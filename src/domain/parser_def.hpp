@@ -33,6 +33,7 @@ namespace loki::domain::parser {
     struct NameClass;
     struct VariableClass;
     struct NumberClass;
+    struct TermClass;
 
     struct StripsRequirementClass;
     struct TypingRequirementClass;
@@ -46,6 +47,7 @@ namespace loki::domain::parser {
     struct TypedListOfVariablesRecursivelyClass;
     struct TypedListOfVariablesClass;
 
+    struct PredicateClass;
     struct AtomicFormulaSkeletonClass;
 
     struct FunctionSymbolClass;
@@ -53,6 +55,21 @@ namespace loki::domain::parser {
     struct AtomicFunctionSkeletonClass;
     struct FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyClass;
     struct FunctionTypedListOfAtomicFunctionSkeletonsClass;
+
+    struct AtomClass;
+    struct NegatedAtomClass;
+    struct LiteralClass;
+    struct AtomicFormulaOfTermsClass;
+
+    struct GoalDescriptorAtomicFormulaClass;
+    struct GoalDescriptorLiteralClass;
+    struct GoalDescriptorAndClass;
+    struct GoalDescriptorOrClass;
+    struct GoalDescriptorNotClass;
+    struct GoalDescriptorImplyClass;
+    struct GoalDescriptorExistsClass;
+    struct GoalDescriptorForallClass;
+    struct GoalDescriptorClass;
 
     struct DomainNameClass;
     struct RequirementsClass;
@@ -72,6 +89,8 @@ namespace loki::domain::parser {
         variable = "variable";
     x3::rule<NumberClass, ast::Number> const
         number = "number";
+    x3::rule<TermClass, ast::Term> const
+        term = "term";
 
     x3::rule<StripsRequirementClass, ast::StripsRequirement> const
         strips_requirement = "strips_requirement";
@@ -96,6 +115,8 @@ namespace loki::domain::parser {
     x3::rule<TypedListOfVariablesClass, ast::TypedListOfVariables> const
         typed_list_of_variables = "typed_list_of_variables";
 
+    x3::rule<PredicateClass, ast::Predicate> const
+        predicate = "predicate";
     x3::rule<AtomicFormulaSkeletonClass, ast::AtomicFormulaSkeleton> const
         atomic_formula_skeleton = "atomic_formula_skeleton";
 
@@ -109,6 +130,34 @@ namespace loki::domain::parser {
         function_typed_list_of_atomic_function_skeletons_recursively = "function_typed_list_of_atomic_function_skeletons_recursively";
     x3::rule<FunctionTypedListOfAtomicFunctionSkeletonsClass, ast::FunctionTypedListOfAtomicFunctionSkeletons> const
         function_typed_list_of_atomic_function_skeletons = "function_typed_list_of_atomic_function_skeletons";
+
+    x3::rule<AtomicFormulaOfTermsClass, ast::AtomicFormulaOfTerms> const
+        atomic_formula_of_terms = "atomic_formula_of_terms";
+    x3::rule<AtomClass, ast::Atom> const
+        atom = "atom";
+    x3::rule<NegatedAtomClass, ast::NegatedAtom> const
+        negated_atom = "negated_atom";
+    x3::rule<LiteralClass, ast::Literal> const
+        literal = "literal";
+
+    x3::rule<GoalDescriptorAtomicFormulaClass, ast::GoalDescriptorAtomicFormula> const
+        goal_descriptor_atomic_formula = "goal_descriptor_atomic_formula";
+    x3::rule<GoalDescriptorLiteralClass, ast::GoalDescriptorLiteral> const
+        goal_descriptor_literal = "goal_descriptor_literal";
+    x3::rule<GoalDescriptorAndClass, ast::GoalDescriptorAnd> const
+        goal_descriptor_and = "goal_descriptor_and";
+    x3::rule<GoalDescriptorOrClass, ast::GoalDescriptorOr> const
+        goal_descriptor_or = "goal_descriptor_or";
+    x3::rule<GoalDescriptorNotClass, ast::GoalDescriptorNot> const
+        goal_descriptor_not = "goal_descriptor_not";
+    x3::rule<GoalDescriptorImplyClass, ast::GoalDescriptorImply> const
+        goal_descriptor_imply = "goal_descriptor_imply";
+    x3::rule<GoalDescriptorExistsClass, ast::GoalDescriptorExists> const
+        goal_descriptor_exists = "goal_descriptor_exists";
+    x3::rule<GoalDescriptorForallClass, ast::GoalDescriptorForall> const
+        goal_descriptor_forall = "goal_descriptor_forall";
+    x3::rule<GoalDescriptorClass, ast::GoalDescriptor> const
+        goal_descriptor = "goal_descriptor";
 
     x3::rule<DomainNameClass, ast::DomainName> const
         domain_name = "domain_name";
@@ -132,20 +181,22 @@ namespace loki::domain::parser {
     const auto name_def = alpha >> lexeme[*(alnum | char_('-') | char_('_'))];
     const auto variable_def = char_('?') > name;
     const auto number_def = int_;
+    const auto term_def = name | variable;
 
     const auto strips_requirement_def = lit(":strips") >> x3::attr(ast::StripsRequirement{});
     const auto typing_requirement_def = lit(":typing") >> x3::attr(ast::TypingRequirement{});
     const auto requirement_def = strips_requirement | typing_requirement;
 
     const auto fluent_type_def = lit('(') >> lit("fluent") > type > lit(')');
-    const auto either_type_def = lit('(') >> +type > lit(')');
+    const auto either_type_def = lit('(') >> lit("either") >> +type > lit(')');
     const auto type_def = name | fluent_type | either_type;
     const auto typed_list_of_names_recursively_def = +name > lit('-') > type >> typed_list_of_names_recursively;
     const auto typed_list_of_names_def = ((*name) | typed_list_of_names_recursively);
     const auto typed_list_of_variables_recursively_def = +variable > lit('-') > type >> typed_list_of_variables_recursively;
     const auto typed_list_of_variables_def = ((*variable) | typed_list_of_variables_recursively);
 
-    const auto atomic_formula_skeleton_def = name > typed_list_of_variables;
+    const auto predicate_def = name;
+    const auto atomic_formula_skeleton_def = predicate > typed_list_of_variables;
 
     const auto function_symbol_def = name;
     const auto function_type_def = number;
@@ -153,12 +204,28 @@ namespace loki::domain::parser {
     const auto function_typed_list_of_atomic_function_skeletons_recursively_def = +atomic_function_skeleton > lit('-') > function_type > function_typed_list_of_atomic_function_skeletons_recursively;
     const auto function_typed_list_of_atomic_function_skeletons_def = ((*atomic_function_skeleton_def) | function_typed_list_of_atomic_function_skeletons_recursively);
 
-    const auto domain_name_def = lit('(') > lit("domain") > name > lit(')');
+    const auto atomic_formula_of_terms_def = lit('(') >> predicate >> *term > lit(')');
+    const auto atom_def = atomic_formula_of_terms;
+    const auto negated_atom_def = lit('(') >> lit("not") >> atomic_formula_of_terms > lit(')');
+    const auto literal_def = atom | negated_atom;
+
+    const auto goal_descriptor_atomic_formula_def = atomic_formula_of_terms;
+    const auto goal_descriptor_literal_def = literal;
+    const auto goal_descriptor_and_def = lit('(') >> lit("and") >> *goal_descriptor > lit(')');
+    const auto goal_descriptor_or_def = lit('(') >> lit("or") >> *goal_descriptor > lit(')');
+    const auto goal_descriptor_not_def = lit('(') >> lit("not") > goal_descriptor > lit(')');
+    const auto goal_descriptor_imply_def = lit('(') >> lit("imply") > goal_descriptor > goal_descriptor > lit(')');
+    const auto goal_descriptor_exists_def = lit('(') >> lit("exists") >> typed_list_of_variables > goal_descriptor > lit(')');
+    const auto goal_descriptor_forall_def = lit('(') >> lit("forall") >> typed_list_of_variables > goal_descriptor > lit(')');
+    const auto goal_descriptor_def = goal_descriptor_atomic_formula | goal_descriptor_literal | goal_descriptor_and | goal_descriptor_or
+        | goal_descriptor_not | goal_descriptor_imply | goal_descriptor_exists | goal_descriptor_forall;
+
+    const auto domain_name_def = lit('(') >> lit("domain") > name > lit(')');
     const auto requirements_def = lit('(') >> lit(":requirements") >> *requirement >> lit(')');
-    const auto types_def = lit('(') > lit(":types") >> typed_list_of_names > lit(')');
-    const auto constants_def = lit('(') > lit(":constants") >> typed_list_of_names > lit(')');
-    const auto predicates_def = lit('(') > lit(":predicates") >> *atomic_formula_skeleton > lit(')');
-    const auto functions_def = lit('(') > lit(":functions") >> *function_typed_list_of_atomic_function_skeletons > lit(')');
+    const auto types_def = lit('(') >> lit(":types") >> typed_list_of_names > lit(')');
+    const auto constants_def = lit('(') >> lit(":constants") >> typed_list_of_names > lit(')');
+    const auto predicates_def = lit('(') >> lit(":predicates") >> *atomic_formula_skeleton > lit(')');
+    const auto functions_def = lit('(') >> lit(":functions") >> *function_typed_list_of_atomic_function_skeletons > lit(')');
 
     const auto domain_description_def =
         lit('(') > lit("define")
@@ -171,11 +238,14 @@ namespace loki::domain::parser {
         > lit(')');
 
     BOOST_SPIRIT_DEFINE(
-        name, variable, number,
+        name, variable, number, term,
         strips_requirement, typing_requirement, requirement, requirements,
         fluent_type, either_type, type, typed_list_of_names_recursively, typed_list_of_names, typed_list_of_variables_recursively, typed_list_of_variables,
-        atomic_formula_skeleton,
+        predicate, atomic_formula_skeleton,
         function_symbol, function_type, atomic_function_skeleton, function_typed_list_of_atomic_function_skeletons_recursively, function_typed_list_of_atomic_function_skeletons,
+        atomic_formula_of_terms, atom, negated_atom, literal,
+        goal_descriptor_atomic_formula, goal_descriptor_literal, goal_descriptor_and, goal_descriptor_or,
+        goal_descriptor_not, goal_descriptor_imply, goal_descriptor_exists, goal_descriptor_forall, goal_descriptor,
         domain_name, types, constants, predicates, functions, domain_description)
 
 
@@ -186,6 +256,7 @@ namespace loki::domain::parser {
     struct NameClass : x3::annotate_on_success {};
     struct VariableClass : x3::annotate_on_success {};
     struct NumberClass : x3::annotate_on_success {};
+    struct TermClass : x3::annotate_on_success {};
 
     struct StripsRequirementClass : x3::annotate_on_success {};
     struct TypingRequirementClass : x3::annotate_on_success {};
@@ -199,6 +270,7 @@ namespace loki::domain::parser {
     struct TypedListOfVariablesRecursivelyClass : x3::annotate_on_success {};
     struct TypedListOfVariablesClass : x3::annotate_on_success {};
 
+    struct PredicateClass : x3::annotate_on_success {};
     struct AtomicFormulaSkeletonClass : x3::annotate_on_success {};
 
     struct FunctionSymbolClass : x3::annotate_on_success {};
@@ -206,6 +278,21 @@ namespace loki::domain::parser {
     struct AtomicFunctionSkeletonClass : x3::annotate_on_success {};
     struct FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyClass : x3::annotate_on_success {};
     struct FunctionTypedListOfAtomicFunctionSkeletonsClass : x3::annotate_on_success {};
+
+    struct AtomClass : x3::annotate_on_success {};
+    struct NegatedAtomClass : x3::annotate_on_success {};
+    struct LiteralClass : x3::annotate_on_success {};
+    struct AtomicFormulaOfTermsClass : x3::annotate_on_success {};
+
+    struct GoalDescriptorAtomicFormulaClass : x3::annotate_on_success {};
+    struct GoalDescriptorLiteralClass : x3::annotate_on_success {};
+    struct GoalDescriptorAndClass : x3::annotate_on_success {};
+    struct GoalDescriptorOrClass : x3::annotate_on_success {};
+    struct GoalDescriptorNotClass : x3::annotate_on_success {};
+    struct GoalDescriptorImplyClass : x3::annotate_on_success {};
+    struct GoalDescriptorExistsClass : x3::annotate_on_success {};
+    struct GoalDescriptorForallClass : x3::annotate_on_success {};
+    struct GoalDescriptorClass : x3::annotate_on_success {};
 
     struct DomainNameClass : x3::annotate_on_success {};
     struct RequirementsClass : x3::annotate_on_success {};

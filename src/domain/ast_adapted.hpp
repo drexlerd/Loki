@@ -18,12 +18,26 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypedListOfNamesRecursively, names,
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypedListOfVariablesRecursively, variables, type, typed_list_of_variables_recursively)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaSkeleton, name, typed_list_of_variables)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Predicate, name)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaSkeleton, predicate, typed_list_of_variables)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionSymbol, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionType, number)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFunctionSkeleton, function_symbol, arguments)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively, atomic_function_skeleton, function_type, function_typed_list_of_atomic_function_skeletons_recursively)
+
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaOfTerms, predicate, terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Atom, atomic_formula_of_terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::NegatedAtom, atomic_formula_of_terms)
+
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorAtomicFormula, atomic_formula_of_terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorLiteral, literal)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorAnd, goal_descriptors)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorOr, goal_descriptors)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorNot, goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorImply, goal_descriptor_left, goal_descriptor_right)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorExists, typed_list_of_variables, goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorForall, typed_list_of_variables, goal_descriptor)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::DomainName, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Requirements, requirements)

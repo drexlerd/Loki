@@ -1,5 +1,8 @@
 # PDDL-parser
 
+Loki is a C++ library for parsing the complete PDDL 3.1 grammar into an abstract syntax tree.
+
+
 ## Installation
 
 ```console

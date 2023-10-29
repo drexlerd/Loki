@@ -17,16 +17,18 @@ namespace loki::domain::ast
 
     struct Name;
     struct Variable;
-    struct Number;
+    struct Number;  // TODO: can also be float!
+    struct Term;
 
-    struct FluentType;
+    struct FluentType;                           // :fluents
     struct EitherType;
     struct Type;
     struct TypedListOfNamesRecursively;
     struct TypedListOfNames;
-    struct TypedListOfVariablesRecursively;  // :typing
+    struct TypedListOfVariablesRecursively;      // :typing
     struct TypedListOfVariables;
 
+    struct Predicate;
     struct AtomicFormulaSkeleton;
 
     struct AtomicFunctionSkeleton;
@@ -35,13 +37,19 @@ namespace loki::domain::ast
     struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively;  // :typing
     struct FunctionTypedListOfAtomicFunctionSkeletons;
 
+    struct Atom;
+    struct NegatedAtom;
+    struct Literal;
+    struct AtomicFormulaOfTerms;
+
     struct GoalDescriptorAtomicFormula;
-    struct GoalDescriptorLiteral;  // :negative-preconditions
-    struct GoalDescriptorOr;  // :disjunctive-preconditions
-    struct GoalDescriptorNot;  // :disjunctive-preconditions
-    struct GoalDescriptorImply;  // dijunctive-preconditions
-    struct GoalDescriptorExists;  // :existential-preconditions
-    struct GoalDescriptorForall;  // :fluents
+    struct GoalDescriptorLiteral;                // :negative-preconditions
+    struct GoalDescriptorAnd;
+    struct GoalDescriptorOr;                     // :disjunctive-preconditions
+    struct GoalDescriptorNot;                    // :disjunctive-preconditions
+    struct GoalDescriptorImply;                  // :disjunctive-preconditions
+    struct GoalDescriptorExists;                 // :existential-preconditions
+    struct GoalDescriptorForall;                 // :fluents
     struct GoalDescriptor;
 
     struct ConstraintGoalDescriptorForall;
@@ -62,8 +70,8 @@ namespace loki::domain::ast
     struct Types;
     struct Constants;
     struct Predicates;
-    struct Functions;  // :fluents
-    struct Constraints;  // :constraints
+    struct Functions;                            // :fluents
+    struct Constraints;                          // :constraints
     struct DomainDescription;
 
     /* <name> */
@@ -82,6 +90,15 @@ namespace loki::domain::ast
     /* <number> */
     struct Number : x3::position_tagged {
         int value;
+    };
+
+    /* <term> */
+    struct Term : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<Name>,
+            x3::forward_ast<Variable>> {
+        using base_type::base_type;
+        using base_type::operator=;
     };
 
 
@@ -156,8 +173,12 @@ namespace loki::domain::ast
 
 
     /* <atomic function skeleton> */
-    struct AtomicFormulaSkeleton : x3::position_tagged {
+    struct Predicate : x3::position_tagged {
         Name name;
+    };
+
+    struct AtomicFormulaSkeleton : x3::position_tagged {
+        Predicate predicate;
         TypedListOfVariables typed_list_of_variables;
     };
 
@@ -191,39 +212,70 @@ namespace loki::domain::ast
     };
 
 
+    /* Atomic formulas */
+    struct AtomicFormulaOfTerms : x3::position_tagged {
+        Predicate predicate;
+        std::vector<Term> terms;
+    };
+
+    struct Atom : x3::position_tagged {
+        AtomicFormulaOfTerms atomic_formula_of_terms;
+    };
+
+    struct NegatedAtom : x3::position_tagged {
+        AtomicFormulaOfTerms atomic_formula_of_terms;
+    };
+
+    struct Literal : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<Atom>,
+            x3::forward_ast<NegatedAtom>> {
+        using base_type::base_type;
+        using base_type::operator=;
+    };
+
+
     /* Goal Descriptors */
     struct GoalDescriptorAtomicFormula : x3::position_tagged {
-        // TODO: atomic formula
+        AtomicFormulaOfTerms atomic_formula_of_terms;
     };
 
     struct GoalDescriptorLiteral : x3::position_tagged {
+        Literal literal;
+    };
 
+    struct GoalDescriptorAnd : x3::position_tagged {
+        std::vector<x3::forward_ast<GoalDescriptor>> goal_descriptors;
     };
 
     struct GoalDescriptorOr : x3::position_tagged {
-
+        std::vector<x3::forward_ast<GoalDescriptor>> goal_descriptors;
     };
 
     struct GoalDescriptorNot : x3::position_tagged {
-
+        x3::forward_ast<GoalDescriptor> goal_descriptor;
     };
 
     struct GoalDescriptorImply : x3::position_tagged {
-
+        x3::forward_ast<GoalDescriptor> goal_descriptor_left;
+        x3::forward_ast<GoalDescriptor> goal_descriptor_right;
     };
 
     struct GoalDescriptorExists : x3::position_tagged {
-
+        TypedListOfVariables typed_list_of_variables;
+        x3::forward_ast<GoalDescriptor> goal_descriptor;
     };
 
     struct GoalDescriptorForall : x3::position_tagged {
-
+        TypedListOfVariables typed_list_of_variables;
+        x3::forward_ast<GoalDescriptor> goal_descriptor;
     };
 
     struct GoalDescriptor : x3::position_tagged,
         x3::variant<
             x3::forward_ast<GoalDescriptorAtomicFormula>,
             x3::forward_ast<GoalDescriptorLiteral>,
+            x3::forward_ast<GoalDescriptorAnd>,
             x3::forward_ast<GoalDescriptorOr>,
             x3::forward_ast<GoalDescriptorNot>,
             x3::forward_ast<GoalDescriptorImply>,
