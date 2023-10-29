@@ -71,12 +71,27 @@ namespace loki::domain::parser {
     struct GoalDescriptorForallClass;
     struct GoalDescriptorClass;
 
+    struct ConstraintGoalDescriptorAndClass;
+    struct ConstraintGoalDescriptorForallClass;
+    struct ConstraintGoalDescriptorAtEndClass;
+    struct ConstraintGoalDescriptorAlwaysClass;
+    struct ConstraintGoalDescriptorSometimeClass;
+    struct ConstraintGoalDescriptorWithinClass;
+    struct ConstraintGoalDescriptorAtMostOnceClass;
+    struct ConstraintGoalDescriptorSometimeAfterClass;
+    struct ConstraintGoalDescriptorSometimeBeforeClass;
+    struct ConstraintGoalDescriptorAlwaysWithinClass;
+    struct ConstraintGoalDescriptorHoldDuringClass;
+    struct ConstraintGoalDescriptorHoldAfterClass;
+    struct ConstraintGoalDescriptorClass;
+
     struct DomainNameClass;
     struct RequirementsClass;
     struct TypesClass;
     struct ConstantsClass;
     struct PredicatesClass;
     struct FunctionsClass;
+    struct ConstraintsClass;
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -159,6 +174,33 @@ namespace loki::domain::parser {
     x3::rule<GoalDescriptorClass, ast::GoalDescriptor> const
         goal_descriptor = "goal_descriptor";
 
+    x3::rule<ConstraintGoalDescriptorAndClass, ast::ConstraintGoalDescriptorAnd> const
+        constraint_goal_descriptor_and = "constraint_goal_descriptor_and";
+    x3::rule<ConstraintGoalDescriptorForallClass, ast::ConstraintGoalDescriptorForall> const
+        constraint_goal_descriptor_forall = "constraint_goal_descriptor_forall";
+    x3::rule<ConstraintGoalDescriptorAtEndClass, ast::ConstraintGoalDescriptorAtEnd> const
+        constraint_goal_descriptor_at_end = "constraint_goal_descriptor_at_end";
+    x3::rule<ConstraintGoalDescriptorAlwaysClass, ast::ConstraintGoalDescriptorAlways> const
+        constraint_goal_descriptor_always = "constraint_goal_descriptor_always";
+    x3::rule<ConstraintGoalDescriptorSometimeClass, ast::ConstraintGoalDescriptorSometime> const
+        constraint_goal_descriptor_sometime = "constraint_goal_descriptor_sometime";
+    x3::rule<ConstraintGoalDescriptorWithinClass, ast::ConstraintGoalDescriptorWithin> const
+        constraint_goal_descriptor_within = "constraint_goal_descriptor_within";
+    x3::rule<ConstraintGoalDescriptorAtMostOnceClass, ast::ConstraintGoalDescriptorAtMostOnce> const
+        constraint_goal_descriptor_at_most_once = "constraint_goal_descriptor_at_most_once";
+    x3::rule<ConstraintGoalDescriptorSometimeAfterClass, ast::ConstraintGoalDescriptorSometimeAfter> const
+        constraint_goal_descriptor_sometime_after = "constraint_goal_descriptor_sometime_after";
+    x3::rule<ConstraintGoalDescriptorSometimeBeforeClass, ast::ConstraintGoalDescriptorSometimeBefore> const
+        constraint_goal_descriptor_sometime_before = "constraint_goal_descriptor_sometime_before";
+    x3::rule<ConstraintGoalDescriptorAlwaysWithinClass, ast::ConstraintGoalDescriptorAlwaysWithin> const
+        constraint_goal_descriptor_always_within = "constraint_goal_descriptor_always_within";
+    x3::rule<ConstraintGoalDescriptorHoldDuringClass, ast::ConstraintGoalDescriptorHoldDuring> const
+        constraint_goal_descriptor_hold_during = "constraint_goal_descriptor_hold_during";
+    x3::rule<ConstraintGoalDescriptorHoldAfterClass, ast::ConstraintGoalDescriptorHoldAfter> const
+        constraint_goal_descriptor_hold_after = "constraint_goal_descriptor_hold_after";
+    x3::rule<ConstraintGoalDescriptorClass, ast::ConstraintGoalDescriptor> const
+        constraint_goal_descriptor = "constraint_goal_descriptor";
+
     x3::rule<DomainNameClass, ast::DomainName> const
         domain_name = "domain_name";
     x3::rule<RequirementsClass, ast::Requirements> const
@@ -171,6 +213,8 @@ namespace loki::domain::parser {
         predicates = "predicates";
     x3::rule<FunctionsClass, ast::Functions> const
         functions = "functions";
+    x3::rule<ConstraintsClass, ast::Constraints> const
+        constraints = "constraints";
     domain_description_type const domain_description = "domain_description";
 
 
@@ -220,21 +264,40 @@ namespace loki::domain::parser {
     const auto goal_descriptor_def = goal_descriptor_atomic_formula | goal_descriptor_literal | goal_descriptor_and | goal_descriptor_or
         | goal_descriptor_not | goal_descriptor_imply | goal_descriptor_exists | goal_descriptor_forall;
 
+    const auto constraint_goal_descriptor_and_def = lit('(') >> lit("and") > *constraint_goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_forall_def = lit('(') >> lit("forall") > typed_list_of_variables > constraint_goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_at_end_def = lit('(') >> lit("at") >> lit("end") > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_always_def = lit('(') >> lit("always") > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_sometime_def = lit('(') >> lit("sometime") > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_within_def = lit('(') >> lit("within") > number > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_at_most_once_def = lit('(') >> lit("at-most-once") > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_sometime_after_def = lit('(') >> lit("sometime-after") > goal_descriptor > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_sometime_before_def = lit('(') >> lit("sometime-before") > goal_descriptor > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_always_within_def = lit('(') >> lit("always-within") > number > goal_descriptor > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_hold_during_def = lit('(') >> lit("hold-during") > number > number > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_hold_after_def = lit('(') >> lit("hold-after") > number > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_def = constraint_goal_descriptor_and | constraint_goal_descriptor_forall | constraint_goal_descriptor_at_end
+        | constraint_goal_descriptor_always | constraint_goal_descriptor_sometime | constraint_goal_descriptor_within
+        | constraint_goal_descriptor_at_most_once | constraint_goal_descriptor_sometime_after | constraint_goal_descriptor_sometime_before
+        | constraint_goal_descriptor_always_within | constraint_goal_descriptor_hold_during | constraint_goal_descriptor_hold_after;
+
     const auto domain_name_def = lit('(') >> lit("domain") > name > lit(')');
     const auto requirements_def = lit('(') >> lit(":requirements") >> *requirement >> lit(')');
     const auto types_def = lit('(') >> lit(":types") >> typed_list_of_names > lit(')');
     const auto constants_def = lit('(') >> lit(":constants") >> typed_list_of_names > lit(')');
     const auto predicates_def = lit('(') >> lit(":predicates") >> *atomic_formula_skeleton > lit(')');
     const auto functions_def = lit('(') >> lit(":functions") >> *function_typed_list_of_atomic_function_skeletons > lit(')');
+    const auto constraints_def = lit('(') >> lit(":constraints") > constraint_goal_descriptor > lit(')');
 
     const auto domain_description_def =
         lit('(') > lit("define")
            > domain_name
            >> -requirements
-           > types
-           > constants
-           > predicates
-           > functions
+           >> types
+           >> constants
+           >> predicates
+           >> -functions
+           >> -constraints
         > lit(')');
 
     BOOST_SPIRIT_DEFINE(
@@ -246,7 +309,11 @@ namespace loki::domain::parser {
         atomic_formula_of_terms, atom, negated_atom, literal,
         goal_descriptor_atomic_formula, goal_descriptor_literal, goal_descriptor_and, goal_descriptor_or,
         goal_descriptor_not, goal_descriptor_imply, goal_descriptor_exists, goal_descriptor_forall, goal_descriptor,
-        domain_name, types, constants, predicates, functions, domain_description)
+        constraint_goal_descriptor_and, constraint_goal_descriptor_forall, constraint_goal_descriptor_at_end,
+        constraint_goal_descriptor_always, constraint_goal_descriptor_sometime, constraint_goal_descriptor_within,
+        constraint_goal_descriptor_at_most_once, constraint_goal_descriptor_sometime_after,  constraint_goal_descriptor_sometime_before,
+        constraint_goal_descriptor_always_within, constraint_goal_descriptor_hold_during, constraint_goal_descriptor_hold_after, constraint_goal_descriptor,
+        domain_name, types, constants, predicates, functions, constraints, domain_description)
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -294,12 +361,27 @@ namespace loki::domain::parser {
     struct GoalDescriptorForallClass : x3::annotate_on_success {};
     struct GoalDescriptorClass : x3::annotate_on_success {};
 
+    struct ConstraintGoalDescriptorAndClass : x3::annotate_on_success {};
+    struct ConstraintGoalDescriptorForallClass : x3::annotate_on_success {};
+    struct ConstraintGoalDescriptorAtEndClass : x3::annotate_on_success {};
+    struct ConstraintGoalDescriptorAlwaysClass : x3::annotate_on_success {};
+    struct ConstraintGoalDescriptorSometimeClass : x3::annotate_on_success {};
+    struct ConstraintGoalDescriptorWithinClass : x3::annotate_on_success {};
+    struct ConstraintGoalDescriptorAtMostOnceClass : x3::annotate_on_success {};
+    struct ConstraintGoalDescriptorSometimeAfterClass : x3::annotate_on_success {};
+    struct ConstraintGoalDescriptorSometimeBeforeClass : x3::annotate_on_success {};
+    struct ConstraintGoalDescriptorAlwaysWithinClass : x3::annotate_on_success {};
+    struct ConstraintGoalDescriptorHoldDuringClass : x3::annotate_on_success {};
+    struct ConstraintGoalDescriptorHoldAfterClass : x3::annotate_on_success {};
+    struct ConstraintGoalDescriptorClass : x3::annotate_on_success {};
+
     struct DomainNameClass : x3::annotate_on_success {};
     struct RequirementsClass : x3::annotate_on_success {};
     struct TypesClass : x3::annotate_on_success {};
     struct ConstantsClass : x3::annotate_on_success {};
     struct PredicatesClass : x3::annotate_on_success {};
     struct FunctionsClass : x3::annotate_on_success {};
+    struct ConstraintsClass : x3::annotate_on_success {};
     struct DomainDescriptionClass : x3::annotate_on_success, error_handler_domain {};
 }
 

@@ -52,6 +52,7 @@ namespace loki::domain::ast
     struct GoalDescriptorForall;                 // :fluents
     struct GoalDescriptor;
 
+    struct ConstraintGoalDescriptorAnd;
     struct ConstraintGoalDescriptorForall;
     struct ConstraintGoalDescriptorAtEnd;
     struct ConstraintGoalDescriptorAlways;
@@ -59,11 +60,11 @@ namespace loki::domain::ast
     struct ConstraintGoalDescriptorWithin;
     struct ConstraintGoalDescriptorAtMostOnce;
     struct ConstraintGoalDescriptorSometimeAfter;
+    struct ConstraintGoalDescriptorSometimeBefore;
     struct ConstraintGoalDescriptorAlwaysWithin;
     struct ConstraintGoalDescriptorHoldDuring;
     struct ConstraintGoalDescriptorHoldAfter;
     struct ConstraintGoalDescriptor;
-    struct ConstraintGoalDescriptorAnd;
 
     struct DomainName;
     struct Requirements;
@@ -286,6 +287,83 @@ namespace loki::domain::ast
     };
 
 
+    /* Constraint Goal Descriptors */
+    struct ConstraintGoalDescriptorAnd : x3::position_tagged {
+        std::vector<x3::forward_ast<ConstraintGoalDescriptor>> constraint_goal_descriptors;
+    };
+
+    struct ConstraintGoalDescriptorForall : x3::position_tagged {
+        TypedListOfVariables typed_list_of_variables;
+        x3::forward_ast<ConstraintGoalDescriptor> constraint_goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorAtEnd : x3::position_tagged {
+        x3::forward_ast<GoalDescriptor> goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorAlways : x3::position_tagged {
+        x3::forward_ast<GoalDescriptor> goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorSometime : x3::position_tagged {
+        x3::forward_ast<GoalDescriptor> goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorWithin : x3::position_tagged {
+        Number number;
+        x3::forward_ast<GoalDescriptor> goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorAtMostOnce : x3::position_tagged {
+        x3::forward_ast<GoalDescriptor> goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorSometimeAfter : x3::position_tagged {
+        x3::forward_ast<GoalDescriptor> goal_descriptor_left;
+        x3::forward_ast<GoalDescriptor> goal_descriptor_right;
+    };
+
+    struct ConstraintGoalDescriptorSometimeBefore : x3::position_tagged {
+        x3::forward_ast<GoalDescriptor> goal_descriptor_left;
+        x3::forward_ast<GoalDescriptor> goal_descriptor_right;
+    };
+
+    struct ConstraintGoalDescriptorAlwaysWithin : x3::position_tagged {
+        Number number;
+        x3::forward_ast<GoalDescriptor> goal_descriptor_left;
+        x3::forward_ast<GoalDescriptor> goal_descriptor_right;
+    };
+
+    struct ConstraintGoalDescriptorHoldDuring : x3::position_tagged {
+        Number number_left;
+        Number number_right;
+        x3::forward_ast<GoalDescriptor> goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorHoldAfter : x3::position_tagged {
+        Number number;
+        x3::forward_ast<GoalDescriptor> goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptor : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<ConstraintGoalDescriptorAnd>,
+            x3::forward_ast<ConstraintGoalDescriptorForall>,
+            x3::forward_ast<ConstraintGoalDescriptorAtEnd>,
+            x3::forward_ast<ConstraintGoalDescriptorAlways>,
+            x3::forward_ast<ConstraintGoalDescriptorSometime>,
+            x3::forward_ast<ConstraintGoalDescriptorWithin>,
+            x3::forward_ast<ConstraintGoalDescriptorAtMostOnce>,
+            x3::forward_ast<ConstraintGoalDescriptorSometimeAfter>,
+            x3::forward_ast<ConstraintGoalDescriptorSometimeBefore>,
+            x3::forward_ast<ConstraintGoalDescriptorAlwaysWithin>,
+            x3::forward_ast<ConstraintGoalDescriptorHoldDuring>,
+            x3::forward_ast<ConstraintGoalDescriptorHoldAfter>> {
+        using base_type::base_type;
+        using base_type::operator=;
+    };
+
+
     /* <types-def> */
     struct Types : x3::position_tagged {
         TypedListOfNames typed_list_of_names;
@@ -310,6 +388,12 @@ namespace loki::domain::ast
     };
 
 
+    /* <constraints-def> */
+    struct Constraints : x3::position_tagged {
+        ConstraintGoalDescriptor constraint_goal_descriptor;
+    };
+
+
     /* <domain> */
     struct DomainName : x3::position_tagged {
         Name name;
@@ -317,11 +401,12 @@ namespace loki::domain::ast
 
     struct DomainDescription : x3::position_tagged {
         DomainName domain_name;
-        Requirements requirements;
-        Types types;
-        Constants constants;
-        Predicates predicates;
-        Functions functions;
+        boost::optional<Requirements> requirements;
+        boost::optional<Types> types;
+        boost::optional<Constants> constants;
+        boost::optional<Predicates> predicates;
+        boost::optional<Functions> functions;
+        boost::optional<Constraints> constraints;
     };
 }
 

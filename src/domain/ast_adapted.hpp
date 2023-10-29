@@ -39,13 +39,27 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorImply, goal_descripto
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorExists, typed_list_of_variables, goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorForall, typed_list_of_variables, goal_descriptor)
 
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorAnd, constraint_goal_descriptors)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorForall, typed_list_of_variables, constraint_goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorAtEnd, goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorAlways, goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorSometime, goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorWithin, number, goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorAtMostOnce, goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorSometimeAfter, goal_descriptor_left, goal_descriptor_right)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorSometimeBefore, goal_descriptor_left, goal_descriptor_right)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorAlwaysWithin, number, goal_descriptor_left, goal_descriptor_right)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorHoldDuring, number_left, number_right, goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConstraintGoalDescriptorHoldAfter, number, goal_descriptor)
+
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::DomainName, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Requirements, requirements)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Types, typed_list_of_names)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Constants, typed_list_of_names)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Predicates, atomic_formula_skeletons)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Functions, function_types_list_of_atomic_function_skeletons)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::DomainDescription, domain_name, requirements, types, constants, predicates, functions)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Constraints, constraint_goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::DomainDescription, domain_name, requirements, types, constants, predicates, functions, constraints)
 
 
 #endif
