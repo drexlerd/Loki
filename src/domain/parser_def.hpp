@@ -106,6 +106,13 @@ namespace loki::domain::parser {
     struct ConstraintGoalDescriptorHoldAfterClass;
     struct ConstraintGoalDescriptorClass;
 
+    struct AssignOperatorAssignClass;
+    struct AssignOperatorScaleUpClass;
+    struct AssignOperatorScaleDownClass;
+    struct AssignOperatorIncreaseClass;
+    struct AssignOperatorDecreaseClass;
+    struct AssignOperatorClass;
+
     struct DomainNameClass;
     struct RequirementsClass;
     struct TypesClass;
@@ -261,6 +268,19 @@ namespace loki::domain::parser {
     x3::rule<ConstraintGoalDescriptorClass, ast::ConstraintGoalDescriptor> const
         constraint_goal_descriptor = "constraint_goal_descriptor";
 
+    x3::rule<AssignOperatorAssignClass, ast::AssignOperatorAssign> const
+        assign_operator_assign = "assign_operator_assign";
+    x3::rule<AssignOperatorScaleUpClass, ast::AssignOperatorScaleUp> const
+        assign_operator_scale_up = "assign_operator_scale_up";
+    x3::rule<AssignOperatorScaleDownClass, ast::AssignOperatorScaleDown> const
+        assign_operator_scale_down = "assign_operator_scale_down";
+    x3::rule<AssignOperatorIncreaseClass, ast::AssignOperatorIncrease> const
+        assign_operator_increase = "assign_operator_increase";
+    x3::rule<AssignOperatorDecreaseClass, ast::AssignOperatorDecrease> const
+        assign_operator_decrease = "assign_operator_decrease";
+    x3::rule<AssignOperatorClass, ast::AssignOperator> const
+        assign_operator = "assign_operator";
+
     x3::rule<DomainNameClass, ast::DomainName> const
         domain_name = "domain_name";
     x3::rule<RequirementsClass, ast::Requirements> const
@@ -362,6 +382,13 @@ namespace loki::domain::parser {
         | constraint_goal_descriptor_at_most_once | constraint_goal_descriptor_sometime_after | constraint_goal_descriptor_sometime_before
         | constraint_goal_descriptor_always_within | constraint_goal_descriptor_hold_during | constraint_goal_descriptor_hold_after;
 
+    const auto assign_operator_assign_def = lit("assign") >> x3::attr(ast::AssignOperatorAssign{});
+    const auto assign_operator_scale_up_def = lit("scale-up") >> x3::attr(ast::AssignOperatorScaleUp{});
+    const auto assign_operator_scale_down_def = lit("scale-down") >> x3::attr(ast::AssignOperatorScaleDown{});
+    const auto assign_operator_increase_def = lit("increase") >> x3::attr(ast::AssignOperatorIncrease{});
+    const auto assign_operator_decrease_def = lit("decrease") >> x3::attr(ast::AssignOperatorDecrease{});
+    const auto assign_operator_def = assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
+
     const auto domain_name_def = lit('(') >> lit("domain") > name > lit(')');
     const auto requirements_def = lit('(') >> lit(":requirements") >> *requirement >> lit(')');
     const auto types_def = lit('(') >> lit(":types") >> typed_list_of_names > lit(')');
@@ -388,22 +415,30 @@ namespace loki::domain::parser {
         predicate, atomic_formula_skeleton,
         function_symbol, function_type, atomic_function_skeleton, function_typed_list_of_atomic_function_skeletons_recursively, function_typed_list_of_atomic_function_skeletons,
         atomic_formula_of_terms, atom, negated_atom, literal,
+        multi_operator_mul, multi_operator_plus, multi_operator,
+        binary_operator_minus, binary_operator_div, binary_operator,
+        binary_comparator_greater, binary_comparator_less, binary_comparator_equal,
+        binary_comparator_greater_equal, binary_comparator_less_equal, binary_comparator,
+        function_expression_number, function_expression_binary_op, function_expression_minus,
+        function_expression_head, function_expression)
+
+    BOOST_SPIRIT_DEFINE(
         goal_descriptor_atom, goal_descriptor_literal, goal_descriptor_and, goal_descriptor_or,
         goal_descriptor_not, goal_descriptor_imply, goal_descriptor_exists, goal_descriptor_forall,
         goal_descriptor_function_comparison, goal_descriptor,
         constraint_goal_descriptor_and, constraint_goal_descriptor_forall, constraint_goal_descriptor_at_end,
         constraint_goal_descriptor_always, constraint_goal_descriptor_sometime, constraint_goal_descriptor_within,
         constraint_goal_descriptor_at_most_once, constraint_goal_descriptor_sometime_after,  constraint_goal_descriptor_sometime_before,
-        constraint_goal_descriptor_always_within, constraint_goal_descriptor_hold_during, constraint_goal_descriptor_hold_after, constraint_goal_descriptor,
-        domain_name, types, constants, predicates, functions, constraints, domain_description)
+        constraint_goal_descriptor_always_within, constraint_goal_descriptor_hold_during, constraint_goal_descriptor_hold_after, constraint_goal_descriptor
+    )
 
     BOOST_SPIRIT_DEFINE(
-        multi_operator_mul, multi_operator_plus, multi_operator,
-        binary_operator_minus, binary_operator_div, binary_operator,
-        binary_comparator_greater, binary_comparator_less, binary_comparator_equal,
-        binary_comparator_greater_equal, binary_comparator_less_equal, binary_comparator,
-        function_expression_number, function_expression_binary_op, function_expression_minus,
-        function_expression_head, function_expression
+        assign_operator_assign, assign_operator_scale_up, assign_operator_scale_down,
+        assign_operator_increase, assign_operator_decrease, assign_operator
+    )
+
+    BOOST_SPIRIT_DEFINE(
+        domain_name, types, constants, predicates, functions, constraints, domain_description
     )
 
 
@@ -486,6 +521,13 @@ namespace loki::domain::parser {
     struct ConstraintGoalDescriptorHoldDuringClass : x3::annotate_on_success {};
     struct ConstraintGoalDescriptorHoldAfterClass : x3::annotate_on_success {};
     struct ConstraintGoalDescriptorClass : x3::annotate_on_success {};
+
+    struct AssignOperatorAssignClass : x3::annotate_on_success {};
+    struct AssignOperatorScaleUpClass : x3::annotate_on_success {};
+    struct AssignOperatorScaleDownClass : x3::annotate_on_success {};
+    struct AssignOperatorIncreaseClass : x3::annotate_on_success {};
+    struct AssignOperatorDecreaseClass : x3::annotate_on_success {};
+    struct AssignOperatorClass : x3::annotate_on_success {};
 
     struct DomainNameClass : x3::annotate_on_success {};
     struct RequirementsClass : x3::annotate_on_success {};

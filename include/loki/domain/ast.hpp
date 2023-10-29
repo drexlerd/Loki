@@ -87,12 +87,21 @@ namespace loki::domain::ast
     struct ConstraintGoalDescriptorHoldAfter;
     struct ConstraintGoalDescriptor;
 
+    // TODO
     struct PreconditionGoalDescriptorAnd;
     struct PreconditionGoalDescriptorPreference;           // :preferences
     struct PreferenceName;
     struct PreconditionGoalDescriptorForall;               // :universal-preconditions
     struct PreconditionGoalDescriptor;
 
+    struct AssignOperatorAssign;
+    struct AssignOperatorScaleUp;
+    struct AssignOperatorScaleDown;
+    struct AssignOperatorIncrease;
+    struct AssignOperatorDecrease;
+    struct AssignOperator;
+
+    // TODO
     struct LeafConditionalEffect;
     struct ConditionalEffectForall;
     struct ConditionalEffectWhen;
@@ -102,10 +111,11 @@ namespace loki::domain::ast
     struct SimpleEffect;
     struct Effect;
 
+    // TODO
     struct ActionSymbol;
     struct ActionBody;
 
-
+    // TODO
     struct Action;
     struct DurativeAction;                       // :durative-actions
     struct DerivedPredicate;                     // :derived-predicates
@@ -500,6 +510,34 @@ namespace loki::domain::ast
             x3::forward_ast<ConstraintGoalDescriptorAlwaysWithin>,
             x3::forward_ast<ConstraintGoalDescriptorHoldDuring>,
             x3::forward_ast<ConstraintGoalDescriptorHoldAfter>> {
+        using base_type::base_type;
+        using base_type::operator=;
+    };
+
+
+    /* <assign-op> */
+    struct AssignOperatorAssign : x3::position_tagged {
+    };
+
+    struct AssignOperatorScaleUp : x3::position_tagged {
+    };
+
+    struct AssignOperatorScaleDown : x3::position_tagged {
+    };
+
+    struct AssignOperatorIncrease : x3::position_tagged {
+    };
+
+    struct AssignOperatorDecrease : x3::position_tagged {
+    };
+
+    struct AssignOperator : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<AssignOperatorAssign>,
+            x3::forward_ast<AssignOperatorScaleUp>,
+            x3::forward_ast<AssignOperatorScaleDown>,
+            x3::forward_ast<AssignOperatorIncrease>,
+            x3::forward_ast<AssignOperatorDecrease>> {
         using base_type::base_type;
         using base_type::operator=;
     };
