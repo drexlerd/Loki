@@ -20,9 +20,9 @@ namespace loki::domain::ast
     struct Number;  // TODO: can also be float!
     struct Term;
 
+    struct Type;
     struct FluentType;                           // :fluents
     struct EitherType;
-    struct Type;
     struct TypedListOfNamesRecursively;
     struct TypedListOfNames;
     struct TypedListOfVariablesRecursively;      // :typing
@@ -57,13 +57,14 @@ namespace loki::domain::ast
     struct BinaryComparator;
 
     struct FunctionHead;
+    struct FunctionExpression;
     struct FunctionExpressionNumber;
     struct FunctionExpressionBinaryOp;
     struct FunctionExpressionMinus;
     struct FunctionExpressionHead;
-    struct FunctionExpression;
 
-    struct GoalDescriptorAtomicFormula;
+    struct GoalDescriptor;
+    struct GoalDescriptorAtom;
     struct GoalDescriptorLiteral;                // :negative-preconditions
     struct GoalDescriptorAnd;
     struct GoalDescriptorOr;                     // :disjunctive-preconditions
@@ -72,8 +73,8 @@ namespace loki::domain::ast
     struct GoalDescriptorExists;                 // :existential-preconditions
     struct GoalDescriptorForall;                 // :universal-preconditions
     struct GoalDescriptorFunctionComparison;     // :fluents
-    struct GoalDescriptor;
 
+    struct ConstraintGoalDescriptor;
     struct ConstraintGoalDescriptorAnd;
     struct ConstraintGoalDescriptorForall;
     struct ConstraintGoalDescriptorAtEnd;
@@ -86,14 +87,13 @@ namespace loki::domain::ast
     struct ConstraintGoalDescriptorAlwaysWithin;
     struct ConstraintGoalDescriptorHoldDuring;
     struct ConstraintGoalDescriptorHoldAfter;
-    struct ConstraintGoalDescriptor;
 
     struct PreferenceName;
+    struct PreconditionGoalDescriptor;
     struct PreconditionGoalDescriptorSimple;
     struct PreconditionGoalDescriptorAnd;
     struct PreconditionGoalDescriptorPreference;           // :preferences
     struct PreconditionGoalDescriptorForall;               // :universal-preconditions
-    struct PreconditionGoalDescriptor;
 
     struct AssignOperatorAssign;
     struct AssignOperatorScaleUp;
@@ -102,13 +102,13 @@ namespace loki::domain::ast
     struct AssignOperatorDecrease;
     struct AssignOperator;
 
+    struct Effect;
     struct SimpleEffectLiteral;
     struct SimpleEffectFluent;
     struct SimpleEffect;
     struct ConditionalEffectForall;
     struct ConditionalEffectWhen;
     struct ConditionalEffect;
-    struct Effect;
 
     struct ActionSymbol;
     struct ActionBody;
@@ -149,8 +149,8 @@ namespace loki::domain::ast
     /* <term> */
     struct Term : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<Name>,
-            x3::forward_ast<Variable>> {
+            Name,
+            Variable> {
         using base_type::base_type;
         using base_type::operator=;
     };
@@ -165,8 +165,8 @@ namespace loki::domain::ast
 
     struct Requirement : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<StripsRequirement>,
-            x3::forward_ast<TypingRequirement>> {
+            StripsRequirement,
+            TypingRequirement> {
         // TODO: add more requirements
         using base_type::base_type;
         using base_type::operator=;
@@ -178,22 +178,23 @@ namespace loki::domain::ast
 
 
     /* <typed list (name)> */
-    struct FluentType : x3::position_tagged {
-        x3::forward_ast<Type> type;
-    };
-
-    struct EitherType : x3::position_tagged {
-        std::vector<x3::forward_ast<Type>> types;
-    };
-
     struct Type : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<Name>,
+            Name,
             x3::forward_ast<FluentType>,
             x3::forward_ast<EitherType>> {
         using base_type::base_type;
         using base_type::operator=;
     };
+
+    struct FluentType : x3::position_tagged {
+        Type type;
+    };
+
+    struct EitherType : x3::position_tagged {
+        std::vector<Type> types;
+    };
+
 
     struct TypedListOfNamesRecursively : x3::position_tagged {
         std::vector<Name> names;
@@ -203,8 +204,8 @@ namespace loki::domain::ast
 
     struct TypedListOfNames : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<std::vector<Name>>,
-            x3::forward_ast<TypedListOfNamesRecursively>> {
+            std::vector<Name>,
+            TypedListOfNamesRecursively> {
         using base_type::base_type;
         using base_type::operator=;
     };
@@ -219,8 +220,8 @@ namespace loki::domain::ast
 
     struct TypedListOfVariables : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<std::vector<Variable>>,
-            x3::forward_ast<TypedListOfVariablesRecursively>> {
+            std::vector<Variable>,
+            TypedListOfVariablesRecursively> {
         using base_type::base_type;
         using base_type::operator=;
     };
@@ -259,8 +260,8 @@ namespace loki::domain::ast
 
     struct FunctionTypedListOfAtomicFunctionSkeletons : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<std::vector<AtomicFunctionSkeleton>>,
-            x3::forward_ast<FunctionTypedListOfAtomicFunctionSkeletonsRecursively>> {
+            std::vector<AtomicFunctionSkeleton>,
+            FunctionTypedListOfAtomicFunctionSkeletonsRecursively> {
         using base_type::base_type;
         using base_type::operator=;
     };
@@ -282,8 +283,8 @@ namespace loki::domain::ast
 
     struct Literal : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<Atom>,
-            x3::forward_ast<NegatedAtom>> {
+            Atom,
+            NegatedAtom> {
         using base_type::base_type;
         using base_type::operator=;
     };
@@ -298,8 +299,8 @@ namespace loki::domain::ast
 
     struct MultiOperator : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<MultiOperatorMul>,
-            x3::forward_ast<MultiOperatorPlus>> {
+            MultiOperatorMul,
+            MultiOperatorPlus> {
         using base_type::base_type;
         using base_type::operator=;
     };
@@ -312,9 +313,9 @@ namespace loki::domain::ast
 
     struct BinaryOperator : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<BinaryOperatorMinus>,
-            x3::forward_ast<BinaryOperatorDiv>,
-            x3::forward_ast<MultiOperator>> {
+            BinaryOperatorMinus,
+            BinaryOperatorDiv,
+            MultiOperator> {
         using base_type::base_type;
         using base_type::operator=;
     };
@@ -337,37 +338,20 @@ namespace loki::domain::ast
 
     struct BinaryComparator : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<BinaryComparatorGreater>,
-            x3::forward_ast<BinaryComparatorLess>,
-            x3::forward_ast<BinaryComparatorEqual>,
-            x3::forward_ast<BinaryComparatorGreaterEqual>,
-            x3::forward_ast<BinaryComparatorLessEqual>> {
+            BinaryComparatorGreater,
+            BinaryComparatorLess,
+            BinaryComparatorEqual,
+            BinaryComparatorGreaterEqual,
+            BinaryComparatorLessEqual> {
         using base_type::base_type;
         using base_type::operator=;
     };
 
 
+
     struct FunctionHead : x3::position_tagged {
         FunctionSymbol function_symbol;
         std::vector<Term> terms;
-    };
-
-    struct FunctionExpressionNumber : x3::position_tagged {
-        Number number;
-    };
-
-    struct FunctionExpressionBinaryOp : x3::position_tagged {
-        BinaryOperator binary_operator;
-        x3::forward_ast<FunctionExpression> function_expression_left;
-        x3::forward_ast<FunctionExpression> function_expression_right;
-    };
-
-    struct FunctionExpressionMinus : x3::position_tagged {
-        x3::forward_ast<FunctionExpression> function_expression;
-    };
-
-    struct FunctionExpressionHead : x3::position_tagged {
-        FunctionHead function_head;
     };
 
     struct FunctionExpression : x3::position_tagged,
@@ -380,50 +364,26 @@ namespace loki::domain::ast
         using base_type::operator=;
     };
 
-
-
-    /* Goal Descriptors */
-    struct GoalDescriptorAtom : x3::position_tagged {
-        Atom atom;
+    struct FunctionExpressionNumber : x3::position_tagged {
+        Number number;
     };
 
-    struct GoalDescriptorLiteral : x3::position_tagged {
-        Literal literal;
-    };
-
-    struct GoalDescriptorAnd : x3::position_tagged {
-        std::vector<x3::forward_ast<GoalDescriptor>> goal_descriptors;
-    };
-
-    struct GoalDescriptorOr : x3::position_tagged {
-        std::vector<x3::forward_ast<GoalDescriptor>> goal_descriptors;
-    };
-
-    struct GoalDescriptorNot : x3::position_tagged {
-        x3::forward_ast<GoalDescriptor> goal_descriptor;
-    };
-
-    struct GoalDescriptorImply : x3::position_tagged {
-        x3::forward_ast<GoalDescriptor> goal_descriptor_left;
-        x3::forward_ast<GoalDescriptor> goal_descriptor_right;
-    };
-
-    struct GoalDescriptorExists : x3::position_tagged {
-        TypedListOfVariables typed_list_of_variables;
-        x3::forward_ast<GoalDescriptor> goal_descriptor;
-    };
-
-    struct GoalDescriptorForall : x3::position_tagged {
-        TypedListOfVariables typed_list_of_variables;
-        x3::forward_ast<GoalDescriptor> goal_descriptor;
-    };
-
-    struct GoalDescriptorFunctionComparison : x3::position_tagged {
-        BinaryComparator binary_comparator;
+    struct FunctionExpressionBinaryOp : x3::position_tagged {
+        BinaryOperator binary_operator;
         FunctionExpression function_expression_left;
         FunctionExpression function_expression_right;
     };
 
+    struct FunctionExpressionMinus : x3::position_tagged {
+        FunctionExpression function_expression;
+    };
+
+    struct FunctionExpressionHead : x3::position_tagged {
+        FunctionHead function_head;
+    };
+
+
+    /* Goal Descriptors */
     struct GoalDescriptor : x3::position_tagged,
         x3::variant<
             x3::forward_ast<GoalDescriptorAtom>,
@@ -439,65 +399,49 @@ namespace loki::domain::ast
         using base_type::operator=;
     };
 
-
-    /* Constraint Goal Descriptors */
-    struct ConstraintGoalDescriptorAnd : x3::position_tagged {
-        std::vector<x3::forward_ast<ConstraintGoalDescriptor>> constraint_goal_descriptors;
+    struct GoalDescriptorAtom : x3::position_tagged {
+        Atom atom;
     };
 
-    struct ConstraintGoalDescriptorForall : x3::position_tagged {
+    struct GoalDescriptorLiteral : x3::position_tagged {
+        Literal literal;
+    };
+
+    struct GoalDescriptorAnd : x3::position_tagged {
+        std::vector<GoalDescriptor> goal_descriptors;
+    };
+
+    struct GoalDescriptorOr : x3::position_tagged {
+        std::vector<GoalDescriptor> goal_descriptors;
+    };
+
+    struct GoalDescriptorNot : x3::position_tagged {
+        GoalDescriptor goal_descriptor;
+    };
+
+    struct GoalDescriptorImply : x3::position_tagged {
+        GoalDescriptor goal_descriptor_left;
+        GoalDescriptor goal_descriptor_right;
+    };
+
+    struct GoalDescriptorExists : x3::position_tagged {
         TypedListOfVariables typed_list_of_variables;
-        x3::forward_ast<ConstraintGoalDescriptor> constraint_goal_descriptor;
+        GoalDescriptor goal_descriptor;
     };
 
-    struct ConstraintGoalDescriptorAtEnd : x3::position_tagged {
-        x3::forward_ast<GoalDescriptor> goal_descriptor;
+    struct GoalDescriptorForall : x3::position_tagged {
+        TypedListOfVariables typed_list_of_variables;
+        GoalDescriptor goal_descriptor;
     };
 
-    struct ConstraintGoalDescriptorAlways : x3::position_tagged {
-        x3::forward_ast<GoalDescriptor> goal_descriptor;
+    struct GoalDescriptorFunctionComparison : x3::position_tagged {
+        BinaryComparator binary_comparator;
+        FunctionExpression function_expression_left;
+        FunctionExpression function_expression_right;
     };
 
-    struct ConstraintGoalDescriptorSometime : x3::position_tagged {
-        x3::forward_ast<GoalDescriptor> goal_descriptor;
-    };
 
-    struct ConstraintGoalDescriptorWithin : x3::position_tagged {
-        Number number;
-        x3::forward_ast<GoalDescriptor> goal_descriptor;
-    };
-
-    struct ConstraintGoalDescriptorAtMostOnce : x3::position_tagged {
-        x3::forward_ast<GoalDescriptor> goal_descriptor;
-    };
-
-    struct ConstraintGoalDescriptorSometimeAfter : x3::position_tagged {
-        x3::forward_ast<GoalDescriptor> goal_descriptor_left;
-        x3::forward_ast<GoalDescriptor> goal_descriptor_right;
-    };
-
-    struct ConstraintGoalDescriptorSometimeBefore : x3::position_tagged {
-        x3::forward_ast<GoalDescriptor> goal_descriptor_left;
-        x3::forward_ast<GoalDescriptor> goal_descriptor_right;
-    };
-
-    struct ConstraintGoalDescriptorAlwaysWithin : x3::position_tagged {
-        Number number;
-        x3::forward_ast<GoalDescriptor> goal_descriptor_left;
-        x3::forward_ast<GoalDescriptor> goal_descriptor_right;
-    };
-
-    struct ConstraintGoalDescriptorHoldDuring : x3::position_tagged {
-        Number number_left;
-        Number number_right;
-        x3::forward_ast<GoalDescriptor> goal_descriptor;
-    };
-
-    struct ConstraintGoalDescriptorHoldAfter : x3::position_tagged {
-        Number number;
-        x3::forward_ast<GoalDescriptor> goal_descriptor;
-    };
-
+    /* <con-GD> */
     struct ConstraintGoalDescriptor : x3::position_tagged,
         x3::variant<
             x3::forward_ast<ConstraintGoalDescriptorAnd>,
@@ -516,28 +460,67 @@ namespace loki::domain::ast
         using base_type::operator=;
     };
 
+    struct ConstraintGoalDescriptorAnd : x3::position_tagged {
+        std::vector<ConstraintGoalDescriptor> constraint_goal_descriptors;
+    };
 
-    /* <pref-GD> */
+    struct ConstraintGoalDescriptorForall : x3::position_tagged {
+        TypedListOfVariables typed_list_of_variables;
+        ConstraintGoalDescriptor constraint_goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorAtEnd : x3::position_tagged {
+        GoalDescriptor goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorAlways : x3::position_tagged {
+        GoalDescriptor goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorSometime : x3::position_tagged {
+        GoalDescriptor goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorWithin : x3::position_tagged {
+        Number number;
+        GoalDescriptor goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorAtMostOnce : x3::position_tagged {
+        GoalDescriptor goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorSometimeAfter : x3::position_tagged {
+        GoalDescriptor goal_descriptor_left;
+        GoalDescriptor goal_descriptor_right;
+    };
+
+    struct ConstraintGoalDescriptorSometimeBefore : x3::position_tagged {
+        GoalDescriptor goal_descriptor_left;
+        GoalDescriptor goal_descriptor_right;
+    };
+
+    struct ConstraintGoalDescriptorAlwaysWithin : x3::position_tagged {
+        Number number;
+        GoalDescriptor goal_descriptor_left;
+        GoalDescriptor goal_descriptor_right;
+    };
+
+    struct ConstraintGoalDescriptorHoldDuring : x3::position_tagged {
+        Number number_left;
+        Number number_right;
+        GoalDescriptor goal_descriptor;
+    };
+
+    struct ConstraintGoalDescriptorHoldAfter : x3::position_tagged {
+        Number number;
+        GoalDescriptor goal_descriptor;
+    };
+
+
+    /* <pre-GD> */
     struct PreferenceName : x3::position_tagged {
         Name name;
-    };
-
-    struct PreconditionGoalDescriptorSimple : x3::position_tagged {
-        GoalDescriptor goal_descriptor;
-    };
-
-    struct PreconditionGoalDescriptorAnd : x3::position_tagged {
-        std::vector<x3::forward_ast<PreconditionGoalDescriptor>> precondition_goal_descriptors;
-    };
-
-    struct PreconditionGoalDescriptorPreference : x3::position_tagged {
-        PreferenceName preference_name;
-        GoalDescriptor goal_descriptor;
-    };
-
-    struct PreconditionGoalDescriptorForall : x3::position_tagged {
-        TypedListOfVariables typed_list_of_variables;
-        x3::forward_ast<PreconditionGoalDescriptor> precondition_goal_descriptor;
     };
 
     struct PreconditionGoalDescriptor  : x3::position_tagged,
@@ -548,6 +531,24 @@ namespace loki::domain::ast
             x3::forward_ast<PreconditionGoalDescriptorForall>> {
         using base_type::base_type;
         using base_type::operator=;
+    };
+
+    struct PreconditionGoalDescriptorSimple : x3::position_tagged {
+        GoalDescriptor goal_descriptor;
+    };
+
+    struct PreconditionGoalDescriptorAnd : x3::position_tagged {
+        std::vector<PreconditionGoalDescriptor> precondition_goal_descriptors;
+    };
+
+    struct PreconditionGoalDescriptorPreference : x3::position_tagged {
+        PreferenceName preference_name;
+        GoalDescriptor goal_descriptor;
+    };
+
+    struct PreconditionGoalDescriptorForall : x3::position_tagged {
+        TypedListOfVariables typed_list_of_variables;
+        PreconditionGoalDescriptor precondition_goal_descriptor;
     };
 
 
@@ -569,11 +570,11 @@ namespace loki::domain::ast
 
     struct AssignOperator : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<AssignOperatorAssign>,
-            x3::forward_ast<AssignOperatorScaleUp>,
-            x3::forward_ast<AssignOperatorScaleDown>,
-            x3::forward_ast<AssignOperatorIncrease>,
-            x3::forward_ast<AssignOperatorDecrease>> {
+            AssignOperatorAssign,
+            AssignOperatorScaleUp,
+            AssignOperatorScaleDown,
+            AssignOperatorIncrease,
+            AssignOperatorDecrease> {
         using base_type::base_type;
         using base_type::operator=;
     };
@@ -581,6 +582,15 @@ namespace loki::domain::ast
 
     /* <effect> */
     // <p-effect>
+    struct Effect : x3::position_tagged,
+        x3::variant<
+            x3::forward_ast<SimpleEffect>,
+            x3::forward_ast<ConditionalEffect>,
+            x3::forward_ast<std::vector<Effect>>> {
+        using base_type::base_type;
+        using base_type::operator=;
+    };
+
     struct SimpleEffectLiteral : x3::position_tagged {
         Literal literal;
     };
@@ -593,35 +603,26 @@ namespace loki::domain::ast
 
     struct SimpleEffect : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<SimpleEffectLiteral>,
-            x3::forward_ast<SimpleEffectFluent>> {
+            SimpleEffectLiteral,
+            SimpleEffectFluent> {
         using base_type::base_type;
         using base_type::operator=;
     };
 
     struct ConditionalEffectForall : x3::position_tagged {
         TypedListOfVariables typed_list_of_variables;
-        x3::forward_ast<Effect> effect;
+        Effect effect;
     };
 
     struct ConditionalEffectWhen : x3::position_tagged {
         GoalDescriptor goal_descriptor;
-        x3::forward_ast<Effect> effect;
+        Effect effect;
     };
 
     struct ConditionalEffect : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<ConditionalEffectForall>,
-            x3::forward_ast<ConditionalEffectWhen>> {
-        using base_type::base_type;
-        using base_type::operator=;
-    };
-
-    struct Effect : x3::position_tagged,
-        x3::variant<
-            x3::forward_ast<SimpleEffect>,
-            x3::forward_ast<ConditionalEffect>,
-            x3::forward_ast<std::vector<Effect>>> {
+            ConditionalEffectForall,
+            ConditionalEffectWhen> {
         using base_type::base_type;
         using base_type::operator=;
     };

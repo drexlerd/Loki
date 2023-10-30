@@ -39,9 +39,9 @@ namespace loki::domain::parser {
     struct TypingRequirementClass;
     struct RequirementClass;
 
+    struct TypeClass;
     struct FluentTypeClass;
     struct EitherTypeClass;
-    struct TypeClass;
     struct TypedListOfNamesRecursivelyClass;
     struct TypedListOfNamesClass;
     struct TypedListOfVariablesRecursivelyClass;
@@ -76,12 +76,13 @@ namespace loki::domain::parser {
     struct BinaryComparatorClass;
 
     struct FunctionHeadClass;
+    struct FunctionExpressionClass;
     struct FunctionExpressionNumberClass;
     struct FunctionExpressionBinaryOpClass;
     struct FunctionExpressionMinusClass;
     struct FunctionExpressionHeadClass;
-    struct FunctionExpressionClass;
 
+    struct GoalDescriptorClass;
     struct GoalDescriptorAtomClass;
     struct GoalDescriptorLiteralClass;
     struct GoalDescriptorAndClass;
@@ -91,8 +92,8 @@ namespace loki::domain::parser {
     struct GoalDescriptorExistsClass;
     struct GoalDescriptorForallClass;
     struct GoalDescriptorFunctionComparisonClass;
-    struct GoalDescriptorClass;
 
+    struct ConstraintGoalDescriptorClass;
     struct ConstraintGoalDescriptorAndClass;
     struct ConstraintGoalDescriptorForallClass;
     struct ConstraintGoalDescriptorAtEndClass;
@@ -105,14 +106,13 @@ namespace loki::domain::parser {
     struct ConstraintGoalDescriptorAlwaysWithinClass;
     struct ConstraintGoalDescriptorHoldDuringClass;
     struct ConstraintGoalDescriptorHoldAfterClass;
-    struct ConstraintGoalDescriptorClass;
 
     struct PreferenceNameClass;
+    struct PreconditionGoalDescriptorClass;
     struct PreconditionGoalDescriptorSimpleClass;
     struct PreconditionGoalDescriptorAndClass;
     struct PreconditionGoalDescriptorPreferenceClass;
     struct PreconditionGoalDescriptorForallClass;
-    struct PreconditionGoalDescriptorClass;
 
     struct AssignOperatorAssignClass;
     struct AssignOperatorScaleUpClass;
@@ -121,13 +121,13 @@ namespace loki::domain::parser {
     struct AssignOperatorDecreaseClass;
     struct AssignOperatorClass;
 
+    struct EffectClass;
     struct SimpleEffectLiteralClass;
     struct SimpleEffectFluentClass;
     struct SimpleEffectClass;
     struct ConditionalEffectForallClass;
     struct ConditionalEffectWhenClass;
     struct ConditionalEffectClass;
-    struct EffectClass;
 
     struct ActionSymbolClass;
     struct ActionBodyClass;
@@ -167,12 +167,12 @@ namespace loki::domain::parser {
     x3::rule<RequirementClass, ast::Requirement> const
         requirement = "requirement";
 
+    x3::rule<TypeClass, ast::Type> const
+        type = "type";
     x3::rule<FluentTypeClass, ast::FluentType> const
         fluent_type = "fluent_type";
     x3::rule<EitherTypeClass, ast::EitherType> const
         either_type = "either_type";
-    x3::rule<TypeClass, ast::Type> const
-        type = "type";
     x3::rule<TypedListOfNamesRecursivelyClass, ast::TypedListOfNamesRecursively> const
         typed_list_of_names_recursively = "typed_list_of_names_recursively";
     x3::rule<TypedListOfNamesClass, ast::TypedListOfNames> const
@@ -234,6 +234,8 @@ namespace loki::domain::parser {
     x3::rule<BinaryComparatorClass, ast::BinaryComparator> const
         binary_comparator = "binary_comparator";
 
+    x3::rule<FunctionExpressionClass, ast::FunctionExpression> const
+        function_expression = "function_expression";
     x3::rule<FunctionHeadClass, ast::FunctionHead> const
         function_head = "function_head";
     x3::rule<FunctionExpressionNumberClass, ast::FunctionExpressionNumber> const
@@ -244,9 +246,9 @@ namespace loki::domain::parser {
         function_expression_minus = "function_expression_minus";
     x3::rule<FunctionExpressionHeadClass, ast::FunctionExpressionHead> const
         function_expression_head = "function_expression_head";
-    x3::rule<FunctionExpressionClass, ast::FunctionExpression> const
-        function_expression = "function_expression";
 
+    x3::rule<GoalDescriptorClass, ast::GoalDescriptor> const
+        goal_descriptor = "goal_descriptor";
     x3::rule<GoalDescriptorAtomClass, ast::GoalDescriptorAtom> const
         goal_descriptor_atom = "goal_descriptor_atom";
     x3::rule<GoalDescriptorLiteralClass, ast::GoalDescriptorLiteral> const
@@ -265,9 +267,9 @@ namespace loki::domain::parser {
         goal_descriptor_forall = "goal_descriptor_forall";
     x3::rule<GoalDescriptorFunctionComparisonClass, ast::GoalDescriptorFunctionComparison> const
         goal_descriptor_function_comparison = "goal_descriptor_function_comparison";
-    x3::rule<GoalDescriptorClass, ast::GoalDescriptor> const
-        goal_descriptor = "goal_descriptor";
 
+    x3::rule<ConstraintGoalDescriptorClass, ast::ConstraintGoalDescriptor> const
+        constraint_goal_descriptor = "constraint_goal_descriptor";
     x3::rule<ConstraintGoalDescriptorAndClass, ast::ConstraintGoalDescriptorAnd> const
         constraint_goal_descriptor_and = "constraint_goal_descriptor_and";
     x3::rule<ConstraintGoalDescriptorForallClass, ast::ConstraintGoalDescriptorForall> const
@@ -292,9 +294,9 @@ namespace loki::domain::parser {
         constraint_goal_descriptor_hold_during = "constraint_goal_descriptor_hold_during";
     x3::rule<ConstraintGoalDescriptorHoldAfterClass, ast::ConstraintGoalDescriptorHoldAfter> const
         constraint_goal_descriptor_hold_after = "constraint_goal_descriptor_hold_after";
-    x3::rule<ConstraintGoalDescriptorClass, ast::ConstraintGoalDescriptor> const
-        constraint_goal_descriptor = "constraint_goal_descriptor";
 
+    x3::rule<PreconditionGoalDescriptorClass, ast::PreconditionGoalDescriptor> const
+        precondition_goal_descriptor = "precondition_goal_descriptor";
     x3::rule<PreferenceNameClass, ast::PreferenceName> const
         preference_name = "preference_name";
     x3::rule<PreconditionGoalDescriptorSimpleClass, ast::PreconditionGoalDescriptorSimple> const
@@ -305,8 +307,6 @@ namespace loki::domain::parser {
         precondition_goal_descriptor_preference = "precondition_goal_descriptor_preference";
     x3::rule<PreconditionGoalDescriptorForallClass, ast::PreconditionGoalDescriptorForall> const
         precondition_goal_descriptor_forall = "precondition_goal_descriptor_forall";
-    x3::rule<PreconditionGoalDescriptorClass, ast::PreconditionGoalDescriptor> const
-        precondition_goal_descriptor = "precondition_goal_descriptor";
 
     x3::rule<AssignOperatorAssignClass, ast::AssignOperatorAssign> const
         assign_operator_assign = "assign_operator_assign";
@@ -321,6 +321,8 @@ namespace loki::domain::parser {
     x3::rule<AssignOperatorClass, ast::AssignOperator> const
         assign_operator = "assign_operator";
 
+    x3::rule<EffectClass, ast::Effect> const
+        effect = "effect";
     x3::rule<SimpleEffectLiteralClass, ast::SimpleEffectLiteral> const
         simple_effect_literal = "simple_effect_literal";
     x3::rule<SimpleEffectFluentClass, ast::SimpleEffectFluent> const
@@ -333,8 +335,6 @@ namespace loki::domain::parser {
         conditional_effect_when = "conditional_effect_when";
     x3::rule<ConditionalEffectClass, ast::ConditionalEffect> const
         conditional_effect = "conditional_effect";
-    x3::rule<EffectClass, ast::Effect> const
-        effect = "effect";
 
     x3::rule<ActionSymbolClass, ast::ActionSymbol> const
         action_symbol = "action_symbol";
@@ -376,9 +376,9 @@ namespace loki::domain::parser {
     const auto typing_requirement_def = lit(":typing") >> x3::attr(ast::TypingRequirement{});
     const auto requirement_def = strips_requirement | typing_requirement;
 
+    const auto type_def = name | fluent_type | either_type;
     const auto fluent_type_def = lit('(') >> lit("fluent") > type > lit(')');
     const auto either_type_def = lit('(') >> lit("either") >> +type > lit(')');
-    const auto type_def = name | fluent_type | either_type;
     const auto typed_list_of_names_recursively_def = +name > lit('-') > type >> typed_list_of_names_recursively;
     const auto typed_list_of_names_def = ((*name) | typed_list_of_names_recursively);
     const auto typed_list_of_variables_recursively_def = +variable > lit('-') > type >> typed_list_of_variables_recursively;
@@ -413,12 +413,14 @@ namespace loki::domain::parser {
     const auto binary_comparator_def = binary_comparator_greater | binary_comparator_less | binary_comparator_equal | binary_comparator_greater_equal | binary_comparator_less_equal;
 
     const auto function_head_def = lit('(') >> function_symbol >> x3::attr(std::vector<ast::Term>{}) | (lit('(') >> function_symbol >> *term > lit(')'));
+    const auto function_expression_def = function_expression_number | function_expression_binary_op | function_expression_minus | function_expression_head;
     const auto function_expression_number_def = number;
     const auto function_expression_binary_op_def = lit('(') >> binary_operator > function_expression > function_expression > lit(')');
     const auto function_expression_minus_def = lit('(') >> lit('-') > function_expression > lit(')');
     const auto function_expression_head_def = function_head;
-    const auto function_expression_def = function_expression_number | function_expression_binary_op | function_expression_minus | function_expression_head;
 
+    const auto goal_descriptor_def = goal_descriptor_atom | goal_descriptor_literal | goal_descriptor_and | goal_descriptor_or
+        | goal_descriptor_not | goal_descriptor_imply | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison;
     const auto goal_descriptor_atom_def = atom;
     const auto goal_descriptor_literal_def = literal;
     const auto goal_descriptor_and_def = lit('(') >> lit("and") >> *goal_descriptor > lit(')');
@@ -428,9 +430,11 @@ namespace loki::domain::parser {
     const auto goal_descriptor_exists_def = lit('(') >> lit("exists") > typed_list_of_variables > goal_descriptor > lit(')');
     const auto goal_descriptor_forall_def = lit('(') >> lit("forall") > typed_list_of_variables > goal_descriptor > lit(')');
     const auto goal_descriptor_function_comparison_def = lit('(') >> binary_comparator >> function_expression > function_expression > lit(')');
-    const auto goal_descriptor_def = goal_descriptor_atom | goal_descriptor_literal | goal_descriptor_and | goal_descriptor_or
-        | goal_descriptor_not | goal_descriptor_imply | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison;
 
+    const auto constraint_goal_descriptor_def = constraint_goal_descriptor_and | constraint_goal_descriptor_forall | constraint_goal_descriptor_at_end
+        | constraint_goal_descriptor_always | constraint_goal_descriptor_sometime | constraint_goal_descriptor_within
+        | constraint_goal_descriptor_at_most_once | constraint_goal_descriptor_sometime_after | constraint_goal_descriptor_sometime_before
+        | constraint_goal_descriptor_always_within | constraint_goal_descriptor_hold_during | constraint_goal_descriptor_hold_after;
     const auto constraint_goal_descriptor_and_def = lit('(') >> lit("and") > *constraint_goal_descriptor > lit(')');
     const auto constraint_goal_descriptor_forall_def = lit('(') >> lit("forall") > typed_list_of_variables > constraint_goal_descriptor > lit(')');
     const auto constraint_goal_descriptor_at_end_def = lit('(') >> lit("at") >> lit("end") > goal_descriptor > lit(')');
@@ -443,17 +447,13 @@ namespace loki::domain::parser {
     const auto constraint_goal_descriptor_always_within_def = lit('(') >> lit("always-within") > number > goal_descriptor > goal_descriptor > lit(')');
     const auto constraint_goal_descriptor_hold_during_def = lit('(') >> lit("hold-during") > number > number > goal_descriptor > lit(')');
     const auto constraint_goal_descriptor_hold_after_def = lit('(') >> lit("hold-after") > number > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_def = constraint_goal_descriptor_and | constraint_goal_descriptor_forall | constraint_goal_descriptor_at_end
-        | constraint_goal_descriptor_always | constraint_goal_descriptor_sometime | constraint_goal_descriptor_within
-        | constraint_goal_descriptor_at_most_once | constraint_goal_descriptor_sometime_after | constraint_goal_descriptor_sometime_before
-        | constraint_goal_descriptor_always_within | constraint_goal_descriptor_hold_during | constraint_goal_descriptor_hold_after;
 
+    const auto precondition_goal_descriptor_def = precondition_goal_descriptor_simple | precondition_goal_descriptor_and | precondition_goal_descriptor_preference | precondition_goal_descriptor_forall;
     const auto preference_name_def = name;
     const auto precondition_goal_descriptor_simple_def = goal_descriptor;
     const auto precondition_goal_descriptor_and_def = lit('(') >> *precondition_goal_descriptor > lit(')');
     const auto precondition_goal_descriptor_preference_def = lit('(') >> lit("preference") > preference_name > goal_descriptor > lit(')');
     const auto precondition_goal_descriptor_forall_def = lit('(') >> lit("forall") > typed_list_of_variables > precondition_goal_descriptor > lit(')');
-    const auto precondition_goal_descriptor_def = precondition_goal_descriptor_simple | precondition_goal_descriptor_and | precondition_goal_descriptor_preference | precondition_goal_descriptor_forall;
 
     const auto assign_operator_assign_def = lit("assign") >> x3::attr(ast::AssignOperatorAssign{});
     const auto assign_operator_scale_up_def = lit("scale-up") >> x3::attr(ast::AssignOperatorScaleUp{});
@@ -462,13 +462,13 @@ namespace loki::domain::parser {
     const auto assign_operator_decrease_def = lit("decrease") >> x3::attr(ast::AssignOperatorDecrease{});
     const auto assign_operator_def = assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
 
+    const auto effect_def = simple_effect | conditional_effect | *effect;
     const auto simple_effect_literal_def = literal;
     const auto simple_effect_fluent_def = lit('(') >> assign_operator >> function_head >> function_expression > lit(')');
     const auto simple_effect_def = simple_effect_literal | simple_effect_fluent;
     const auto conditional_effect_forall_def = lit('(') >> lit("forall") >> typed_list_of_variables >> effect > lit(')');
     const auto conditional_effect_when_def = lit('(') >> lit("when") >> goal_descriptor >> effect > lit(')');
     const auto conditional_effect_def = conditional_effect_forall | conditional_effect_when;
-    const auto effect_def = simple_effect | conditional_effect | *effect;
 
     const auto action_symbol_def = name;
     const auto action_body_def = -(lit(":precondition") >> (lit('(') >> lit(')')) | precondition_goal_descriptor)
@@ -491,9 +491,9 @@ namespace loki::domain::parser {
         lit('(') > lit("define")
            > domain_name
            >> -requirements
-           >> types
-           >> constants
-           >> predicates
+           >> -types
+           >> -constants
+           >> -predicates
            >> -functions
            >> -constraints
            >> *structure
@@ -502,7 +502,7 @@ namespace loki::domain::parser {
     BOOST_SPIRIT_DEFINE(
         name, variable, number, term,
         strips_requirement, typing_requirement, requirement, requirements,
-        fluent_type, either_type, type, typed_list_of_names_recursively, typed_list_of_names, typed_list_of_variables_recursively, typed_list_of_variables,
+        type, fluent_type, either_type, typed_list_of_names_recursively, typed_list_of_names, typed_list_of_variables_recursively, typed_list_of_variables,
         predicate, atomic_formula_skeleton,
         function_symbol, function_type, atomic_function_skeleton, function_typed_list_of_atomic_function_skeletons_recursively, function_typed_list_of_atomic_function_skeletons,
         atomic_formula_of_terms, atom, negated_atom, literal,
@@ -510,26 +510,26 @@ namespace loki::domain::parser {
         binary_operator_minus, binary_operator_div, binary_operator,
         binary_comparator_greater, binary_comparator_less, binary_comparator_equal,
         binary_comparator_greater_equal, binary_comparator_less_equal, binary_comparator,
-        function_head, function_expression_number, function_expression_binary_op,
-        function_expression_minus, function_expression_head, function_expression)
+        function_head, function_expression, function_expression_number,
+        function_expression_binary_op, function_expression_minus, function_expression_head)
 
     BOOST_SPIRIT_DEFINE(
-        goal_descriptor_atom, goal_descriptor_literal, goal_descriptor_and, goal_descriptor_or,
-        goal_descriptor_not, goal_descriptor_imply, goal_descriptor_exists, goal_descriptor_forall,
-        goal_descriptor_function_comparison, goal_descriptor,
-        constraint_goal_descriptor_and, constraint_goal_descriptor_forall, constraint_goal_descriptor_at_end,
+        goal_descriptor, goal_descriptor_atom, goal_descriptor_literal, goal_descriptor_and,
+        goal_descriptor_or, goal_descriptor_not, goal_descriptor_imply, goal_descriptor_exists,
+        goal_descriptor_forall, goal_descriptor_function_comparison,
+        constraint_goal_descriptor, constraint_goal_descriptor_and, constraint_goal_descriptor_forall, constraint_goal_descriptor_at_end,
         constraint_goal_descriptor_always, constraint_goal_descriptor_sometime, constraint_goal_descriptor_within,
         constraint_goal_descriptor_at_most_once, constraint_goal_descriptor_sometime_after,  constraint_goal_descriptor_sometime_before,
-        constraint_goal_descriptor_always_within, constraint_goal_descriptor_hold_during, constraint_goal_descriptor_hold_after, constraint_goal_descriptor
+        constraint_goal_descriptor_always_within, constraint_goal_descriptor_hold_during, constraint_goal_descriptor_hold_after
     )
 
     BOOST_SPIRIT_DEFINE(
-        preference_name, precondition_goal_descriptor_simple, precondition_goal_descriptor_and,
-        precondition_goal_descriptor_preference, precondition_goal_descriptor_forall, precondition_goal_descriptor,
+        preference_name, precondition_goal_descriptor, precondition_goal_descriptor_simple,
+        precondition_goal_descriptor_and, precondition_goal_descriptor_preference, precondition_goal_descriptor_forall,
         assign_operator_assign, assign_operator_scale_up, assign_operator_scale_down,
         assign_operator_increase, assign_operator_decrease, assign_operator,
-        simple_effect_literal, simple_effect_fluent, simple_effect, conditional_effect_forall,
-        conditional_effect_when, conditional_effect, effect,
+        effect, simple_effect_literal, simple_effect_fluent, simple_effect,
+        conditional_effect_forall, conditional_effect_when, conditional_effect,
         action_symbol, action_body, action
     )
 
@@ -551,9 +551,9 @@ namespace loki::domain::parser {
     struct TypingRequirementClass : x3::annotate_on_success {};
     struct RequirementClass : x3::annotate_on_success {};
 
+    struct TypeClass : x3::annotate_on_success {};
     struct FluentTypeClass : x3::annotate_on_success {};
     struct EitherTypeClass : x3::annotate_on_success {};
-    struct TypeClass : x3::annotate_on_success {};
     struct TypedListOfNamesRecursivelyClass : x3::annotate_on_success {};
     struct TypedListOfNamesClass : x3::annotate_on_success {};
     struct TypedListOfVariablesRecursivelyClass : x3::annotate_on_success {};
@@ -587,13 +587,14 @@ namespace loki::domain::parser {
     struct BinaryComparatorLessEqualClass : x3::annotate_on_success {};
     struct BinaryComparatorClass : x3::annotate_on_success {};
 
+    struct FunctionExpressionClass : x3::annotate_on_success {};
     struct FunctionHeadClass : x3::annotate_on_success {};
     struct FunctionExpressionNumberClass : x3::annotate_on_success {};
     struct FunctionExpressionBinaryOpClass : x3::annotate_on_success {};
     struct FunctionExpressionMinusClass : x3::annotate_on_success {};
     struct FunctionExpressionHeadClass : x3::annotate_on_success {};
-    struct FunctionExpressionClass : x3::annotate_on_success {};
 
+    struct GoalDescriptorClass : x3::annotate_on_success {};
     struct GoalDescriptorAtomClass : x3::annotate_on_success {};
     struct GoalDescriptorLiteralClass : x3::annotate_on_success {};
     struct GoalDescriptorAndClass : x3::annotate_on_success {};
@@ -603,8 +604,8 @@ namespace loki::domain::parser {
     struct GoalDescriptorExistsClass : x3::annotate_on_success {};
     struct GoalDescriptorForallClass : x3::annotate_on_success {};
     struct GoalDescriptorFunctionComparisonClass : x3::annotate_on_success {};
-    struct GoalDescriptorClass : x3::annotate_on_success {};
 
+    struct ConstraintGoalDescriptorClass : x3::annotate_on_success {};
     struct ConstraintGoalDescriptorAndClass : x3::annotate_on_success {};
     struct ConstraintGoalDescriptorForallClass : x3::annotate_on_success {};
     struct ConstraintGoalDescriptorAtEndClass : x3::annotate_on_success {};
@@ -617,14 +618,13 @@ namespace loki::domain::parser {
     struct ConstraintGoalDescriptorAlwaysWithinClass : x3::annotate_on_success {};
     struct ConstraintGoalDescriptorHoldDuringClass : x3::annotate_on_success {};
     struct ConstraintGoalDescriptorHoldAfterClass : x3::annotate_on_success {};
-    struct ConstraintGoalDescriptorClass : x3::annotate_on_success {};
 
     struct PreferenceNameClass : x3::annotate_on_success {};
+    struct PreconditionGoalDescriptorClass : x3::annotate_on_success {};
     struct PreconditionGoalDescriptorSimpleClass : x3::annotate_on_success {};
     struct PreconditionGoalDescriptorAndClass : x3::annotate_on_success {};
     struct PreconditionGoalDescriptorPreferenceClass : x3::annotate_on_success {};
     struct PreconditionGoalDescriptorForallClass : x3::annotate_on_success {};
-    struct PreconditionGoalDescriptorClass : x3::annotate_on_success {};
 
     struct AssignOperatorAssignClass : x3::annotate_on_success {};
     struct AssignOperatorScaleUpClass : x3::annotate_on_success {};
@@ -633,13 +633,13 @@ namespace loki::domain::parser {
     struct AssignOperatorDecreaseClass : x3::annotate_on_success {};
     struct AssignOperatorClass : x3::annotate_on_success {};
 
+    struct EffectClass : x3::annotate_on_success {};
     struct SimpleEffectLiteralClass : x3::annotate_on_success {};
     struct SimpleEffectFluentClass : x3::annotate_on_success {};
     struct SimpleEffectClass : x3::annotate_on_success {};
     struct ConditionalEffectForallClass : x3::annotate_on_success {};
     struct ConditionalEffectWhenClass : x3::annotate_on_success {};
     struct ConditionalEffectClass : x3::annotate_on_success {};
-    struct EffectClass : x3::annotate_on_success {};
 
     struct ActionSymbolClass : x3::annotate_on_success {};
     struct ActionBodyClass : x3::annotate_on_success {};
