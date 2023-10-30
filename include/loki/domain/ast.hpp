@@ -611,9 +611,8 @@ namespace loki::domain::ast
 
     struct ConditionalEffect : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<AssignOperatorAssign>,
-            x3::forward_ast<AssignOperatorScaleUp>,
-            x3::forward_ast<AssignOperatorScaleDown>> {
+            x3::forward_ast<ConditionalEffectForall>,
+            x3::forward_ast<ConditionalEffectWhen>> {
         using base_type::base_type;
         using base_type::operator=;
     };
@@ -696,7 +695,7 @@ namespace loki::domain::ast
         boost::optional<Predicates> predicates;
         boost::optional<Functions> functions;
         boost::optional<Constraints> constraints;
-        //std::vector<Structure> structures;
+        std::vector<Structure> structures;
     };
 }
 

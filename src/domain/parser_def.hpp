@@ -471,8 +471,8 @@ namespace loki::domain::parser {
     const auto effect_def = simple_effect | conditional_effect | *effect;
 
     const auto action_symbol_def = name;
-    const auto action_body_def = -(lit(":precondition") >> (lit('(') >> lit(')') >> x3::attr(boost::optional<ast::PreconditionGoalDescriptor>{}) ) | precondition_goal_descriptor)
-                                >> -(lit(":effects") >> (lit('(') >> lit(')') >> x3::attr(boost::optional<ast::Effect>{}) ) | effect);
+    const auto action_body_def = -(lit(":precondition") >> (lit('(') >> lit(')')) | precondition_goal_descriptor)
+                                >> -(lit(":effects") >> (lit('(') >> lit(')')) | effect);
     const auto action_def = lit('(') >> lit(":action") >> action_symbol
                                      >> lit(":parameters") >> lit('(') >> typed_list_of_variables >> lit(')')
                                      >> action_body
@@ -496,7 +496,7 @@ namespace loki::domain::parser {
            >> predicates
            >> -functions
            >> -constraints
-           //>> *structure
+           >> *structure
         > lit(')');
 
     BOOST_SPIRIT_DEFINE(
