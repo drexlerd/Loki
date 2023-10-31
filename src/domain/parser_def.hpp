@@ -57,9 +57,9 @@ namespace loki::domain::parser {
     struct FunctionTypedListOfAtomicFunctionSkeletonsClass;
 
     struct AtomicFormulaOfTermsClass;
-    struct AtomClass;
-    struct NegatedAtomClass;
-    struct LiteralClass;
+    struct AtomOfTermsClass;
+    struct NegatedAtomOfTermsClass;
+    struct LiteralOfTermsClass;
 
     struct MultiOperatorMulClass;
     struct MultiOperatorPlusClass;
@@ -201,12 +201,12 @@ namespace loki::domain::parser {
 
     x3::rule<AtomicFormulaOfTermsClass, ast::AtomicFormulaOfTerms> const
         atomic_formula_of_terms = "atomic_formula_of_terms";
-    x3::rule<AtomClass, ast::Atom> const
-        atom = "atom";
-    x3::rule<NegatedAtomClass, ast::NegatedAtom> const
-        negated_atom = "negated_atom";
-    x3::rule<LiteralClass, ast::Literal> const
-        literal = "literal";
+    x3::rule<AtomOfTermsClass, ast::AtomOfTerms> const
+        atom_of_terms = "atom_of_terms";
+    x3::rule<NegatedAtomOfTermsClass, ast::NegatedAtomOfTerms> const
+        negated_atom_of_terms = "negated_atom_of_terms";
+    x3::rule<LiteralOfTermsClass, ast::LiteralOfTerms> const
+        literal_of_terms = "literal_of_terms";
 
     x3::rule<MultiOperatorMulClass, ast::MultiOperatorMul> const
         multi_operator_mul = "multi_operator_mul";
@@ -394,9 +394,9 @@ namespace loki::domain::parser {
     const auto function_typed_list_of_atomic_function_skeletons_def = ((*atomic_function_skeleton_def) | function_typed_list_of_atomic_function_skeletons_recursively);
 
     const auto atomic_formula_of_terms_def = lit('(') >> predicate >> *term >> lit(')');
-    const auto atom_def = atomic_formula_of_terms;
-    const auto negated_atom_def = lit('(') >> lit("not") >> atomic_formula_of_terms >> lit(')');
-    const auto literal_def = atom | negated_atom;
+    const auto atom_of_terms_def = atomic_formula_of_terms;
+    const auto negated_atom_of_terms_def = lit('(') >> lit("not") >> atomic_formula_of_terms >> lit(')');
+    const auto literal_of_terms_def = atom_of_terms | negated_atom_of_terms;
 
     const auto multi_operator_mul_def = lit('*') >> x3::attr(ast::MultiOperatorMul{});
     const auto multi_operator_plus_def = lit('+') >> x3::attr(ast::MultiOperatorPlus{});
@@ -421,8 +421,8 @@ namespace loki::domain::parser {
 
     const auto goal_descriptor_def = goal_descriptor_atom | goal_descriptor_literal | goal_descriptor_and | goal_descriptor_or
         | goal_descriptor_not | goal_descriptor_imply | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison;
-    const auto goal_descriptor_atom_def = atom;
-    const auto goal_descriptor_literal_def = literal;
+    const auto goal_descriptor_atom_def = atom_of_terms;
+    const auto goal_descriptor_literal_def = literal_of_terms;
     const auto goal_descriptor_and_def = lit('(') >> lit("and") > *goal_descriptor > lit(')');
     const auto goal_descriptor_or_def = lit('(') >> lit("or") >> *goal_descriptor > lit(')');
     const auto goal_descriptor_not_def = lit('(') >> lit("not") > goal_descriptor > lit(')');
@@ -463,7 +463,7 @@ namespace loki::domain::parser {
     const auto assign_operator_def = assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
 
     const auto effect_def = simple_effect | conditional_effect | lit('(') >> lit("and") >> *effect >> lit(')');
-    const auto simple_effect_literal_def = literal;
+    const auto simple_effect_literal_def = literal_of_terms;
     const auto simple_effect_fluent_def = lit('(') >> assign_operator >> function_head >> function_expression > lit(')');
     const auto simple_effect_def = simple_effect_literal | simple_effect_fluent;
     const auto conditional_effect_forall_def = lit('(') >> lit("forall") >> typed_list_of_variables >> effect > lit(')');
@@ -505,7 +505,7 @@ namespace loki::domain::parser {
         type, fluent_type, either_type, typed_list_of_names_recursively, typed_list_of_names, typed_list_of_variables_recursively, typed_list_of_variables,
         predicate, atomic_formula_skeleton,
         function_symbol, function_type, atomic_function_skeleton, function_typed_list_of_atomic_function_skeletons_recursively, function_typed_list_of_atomic_function_skeletons,
-        atomic_formula_of_terms, atom, negated_atom, literal,
+        atomic_formula_of_terms, atom_of_terms, negated_atom_of_terms, literal_of_terms,
         multi_operator_mul, multi_operator_plus, multi_operator,
         binary_operator_minus, binary_operator_div, binary_operator,
         binary_comparator_greater, binary_comparator_less, binary_comparator_equal,
@@ -569,9 +569,9 @@ namespace loki::domain::parser {
     struct FunctionTypedListOfAtomicFunctionSkeletonsClass : x3::annotate_on_success {};
 
     struct AtomicFormulaOfTermsClass : x3::annotate_on_success {};
-    struct AtomClass : x3::annotate_on_success {};
-    struct NegatedAtomClass : x3::annotate_on_success {};
-    struct LiteralClass : x3::annotate_on_success {};
+    struct AtomOfTermsClass : x3::annotate_on_success {};
+    struct NegatedAtomOfTermsClass : x3::annotate_on_success {};
+    struct LiteralOfTermsClass : x3::annotate_on_success {};
 
     struct MultiOperatorMulClass : x3::annotate_on_success {};
     struct MultiOperatorPlusClass : x3::annotate_on_success {};

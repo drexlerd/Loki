@@ -38,9 +38,9 @@ namespace loki::domain::ast
     struct FunctionTypedListOfAtomicFunctionSkeletons;
 
     struct AtomicFormulaOfTerms;
-    struct Atom;
-    struct NegatedAtom;
-    struct Literal;
+    struct AtomOfTerms;
+    struct NegatedAtomOfTerms;
+    struct LiteralOfTerms;
 
     struct MultiOperatorMul;
     struct MultiOperatorPlus;
@@ -273,18 +273,18 @@ namespace loki::domain::ast
         std::vector<Term> terms;
     };
 
-    struct Atom : x3::position_tagged {
+    struct AtomOfTerms : x3::position_tagged {
         AtomicFormulaOfTerms atomic_formula_of_terms;
     };
 
-    struct NegatedAtom : x3::position_tagged {
+    struct NegatedAtomOfTerms : x3::position_tagged {
         AtomicFormulaOfTerms atomic_formula_of_terms;
     };
 
-    struct Literal : x3::position_tagged,
+    struct LiteralOfTerms : x3::position_tagged,
         x3::variant<
-            Atom,
-            NegatedAtom> {
+            AtomOfTerms,
+            NegatedAtomOfTerms> {
         using base_type::base_type;
         using base_type::operator=;
     };
@@ -400,11 +400,11 @@ namespace loki::domain::ast
     };
 
     struct GoalDescriptorAtom : x3::position_tagged {
-        Atom atom;
+        AtomOfTerms atom_of_terms;
     };
 
     struct GoalDescriptorLiteral : x3::position_tagged {
-        Literal literal;
+        LiteralOfTerms literal_of_terms;
     };
 
     struct GoalDescriptorAnd : x3::position_tagged {
@@ -592,7 +592,7 @@ namespace loki::domain::ast
     };
 
     struct SimpleEffectLiteral : x3::position_tagged {
-        Literal literal;
+        LiteralOfTerms literal_of_terms;
     };
 
     struct SimpleEffectFluent : x3::position_tagged {
