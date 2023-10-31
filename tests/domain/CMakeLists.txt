@@ -8,4 +8,4 @@ target_link_libraries(domain_tests
         loki::parsers
         GTest::GTest)
 
-add_test(core_gtests domain_tests)
+add_test(domain_gtests domain_tests)
