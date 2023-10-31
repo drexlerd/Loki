@@ -385,7 +385,7 @@ namespace loki::domain::parser {
     const auto typed_list_of_variables_def = ((*variable) | typed_list_of_variables_recursively);
 
     const auto predicate_def = name;
-    const auto atomic_formula_skeleton_def = predicate > typed_list_of_variables;
+    const auto atomic_formula_skeleton_def = lit('(') > predicate > typed_list_of_variables > lit(')');
 
     const auto function_symbol_def = name;
     const auto function_type_def = number;
@@ -451,7 +451,7 @@ namespace loki::domain::parser {
     const auto precondition_goal_descriptor_def = precondition_goal_descriptor_simple | precondition_goal_descriptor_and | precondition_goal_descriptor_preference | precondition_goal_descriptor_forall;
     const auto preference_name_def = name;
     const auto precondition_goal_descriptor_simple_def = goal_descriptor;
-    const auto precondition_goal_descriptor_and_def = lit('(') >> *precondition_goal_descriptor > lit(')');
+    const auto precondition_goal_descriptor_and_def = lit('(') >> lit("and") >> *precondition_goal_descriptor > lit(')');
     const auto precondition_goal_descriptor_preference_def = lit('(') >> lit("preference") > preference_name > goal_descriptor > lit(')');
     const auto precondition_goal_descriptor_forall_def = lit('(') >> lit("forall") > typed_list_of_variables > precondition_goal_descriptor > lit(')');
 
@@ -462,7 +462,7 @@ namespace loki::domain::parser {
     const auto assign_operator_decrease_def = lit("decrease") >> x3::attr(ast::AssignOperatorDecrease{});
     const auto assign_operator_def = assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
 
-    const auto effect_def = simple_effect | conditional_effect | *effect;
+    const auto effect_def = simple_effect | conditional_effect | lit('(') >> lit("and") >> *effect >> lit(')');
     const auto simple_effect_literal_def = literal;
     const auto simple_effect_fluent_def = lit('(') >> assign_operator >> function_head >> function_expression > lit(')');
     const auto simple_effect_def = simple_effect_literal | simple_effect_fluent;
@@ -471,10 +471,10 @@ namespace loki::domain::parser {
     const auto conditional_effect_def = conditional_effect_forall | conditional_effect_when;
 
     const auto action_symbol_def = name;
-    const auto action_body_def = -(lit(":precondition") >> (lit('(') >> lit(')')) | precondition_goal_descriptor)
-                                >> -(lit(":effects") >> (lit('(') >> lit(')')) | effect);
-    const auto action_def = lit('(') >> lit(":action") >> action_symbol
-                                     >> lit(":parameters") >> lit('(') >> typed_list_of_variables >> lit(')')
+    const auto action_body_def = (lit(":precondition") > ((lit('(') >> lit(')')) | precondition_goal_descriptor))
+                                >> (lit(":effect") > ((lit('(') >> lit(')')) | effect));
+    const auto action_def = lit('(') >> lit(":action") > action_symbol
+                                     > lit(":parameters") > lit('(') >> typed_list_of_variables > lit(')')
                                      >> action_body
                             >> lit(')');
 

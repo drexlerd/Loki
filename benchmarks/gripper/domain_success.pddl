@@ -1,0 +1,11 @@
+(define (domain gripper-strips)
+   (:constants rooma roomb)
+   (:predicates (room ?r)
+		(ball ?b)
+		(gripper ?g)
+		(at-robby ?r)
+		(at ?b ?r)
+		(free ?g)
+		(carry ?o ?g))
+)
+

@@ -36,12 +36,14 @@ ast::DomainDescription parse(
 
     // Go forth and parse!
     using boost::spirit::x3::ascii::space;
-    bool success = phrase_parse(iter, end, parser, space, ast) && iter == end;
+    std::cout << "parse" << std::endl;
+    bool success = phrase_parse(iter, end, parser, space, ast);
+    std::cout << "success: " << success << std::endl;
     if (!success) {
         throw std::runtime_error("Failed parse.");
     }
     if (iter != end) {
-        throw std::runtime_error("Failed parse. Did not consume whole input.");
+        std::cout << "Warning: Did not consume whole input." << std::endl;
     }
 
     return ast;
