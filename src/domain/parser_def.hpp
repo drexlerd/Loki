@@ -151,8 +151,7 @@ namespace loki::domain::parser {
     // Rules
     ///////////////////////////////////////////////////////////////////////////
 
-    x3::rule<NameClass, ast::Name> const
-        name = "name";
+    name_type const name = "name";
     x3::rule<VariableClass, ast::Variable> const
         variable = "variable";
     x3::rule<NumberClass, ast::Number> const
@@ -661,6 +660,10 @@ namespace loki::domain::parser {
 
 namespace loki::domain
 {
+    parser::name_type const& name() {
+        return parser::name;
+    }
+
     parser::domain_description_type const& domain_description() {
         return parser::domain_description;
     }

@@ -11,8 +11,8 @@ namespace loki::domain
 {
     namespace x3 = boost::spirit::x3;
 
-    struct error_handler_domain : common::error_handler_base {
-        error_handler_domain() : common::error_handler_base() {
+    struct error_handler_domain : error_handler_base {
+        error_handler_domain() : error_handler_base() {
             id_map["name"] = "Name";
         }
     };

@@ -7,7 +7,7 @@
 #include "include/loki/common/config.hpp"
 
 
-namespace loki::common
+namespace loki
 {
     namespace x3 = boost::spirit::x3;
 

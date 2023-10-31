@@ -16,7 +16,7 @@
 namespace loki::domain {
 
 ast::DomainDescription parse(
-    common::iterator_type& iter, common::iterator_type end,
+    iterator_type& iter, iterator_type end,
     const std::string& filename) {
 
     // Our AST
@@ -24,8 +24,7 @@ ast::DomainDescription parse(
 
     // Our parser
     using boost::spirit::x3::with;
-    using common::error_handler_tag;
-    common::error_handler_type error_handler(iter, end, std::cerr, filename);
+    error_handler_type error_handler(iter, end, std::cerr, filename);
     auto const parser =
         // we pass our error handler to the parser so we can access
         // it later on in our on_error and on_sucess handlers

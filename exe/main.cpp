@@ -20,9 +20,9 @@ int main(int argc, char** argv) {
     string domain_file = argv[1];
 
     // 1. Parse the domain
-    const auto source = loki::common::read_file(domain_file);
-    loki::common::iterator_type iter(source.begin());
-    const loki::common::iterator_type end(source.end());
+    const auto source = loki::read_file(domain_file);
+    loki::iterator_type iter(source.begin());
+    const loki::iterator_type end(source.end());
     loki::domain::parse(iter, end, domain_file);
 
     return 0;

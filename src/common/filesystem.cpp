@@ -5,7 +5,7 @@
 #include <sstream>
 
 
-namespace loki::common {
+namespace loki {
 
 std::string read_file(const fs::path& file_path) {
     std::ifstream file(file_path.c_str());

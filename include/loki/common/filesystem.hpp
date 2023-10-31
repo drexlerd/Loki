@@ -20,7 +20,7 @@
 #endif
 
 
-namespace loki::common
+namespace loki
 {
 
 extern std::string read_file(const fs::path& file_path);
