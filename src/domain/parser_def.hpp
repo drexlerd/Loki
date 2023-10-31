@@ -122,12 +122,12 @@ namespace loki::domain::parser {
     struct AssignOperatorClass;
 
     struct EffectClass;
-    struct SimpleEffectLiteralClass;
-    struct SimpleEffectFluentClass;
-    struct SimpleEffectClass;
-    struct ConditionalEffectForallClass;
-    struct ConditionalEffectWhenClass;
-    struct ConditionalEffectClass;
+    struct EffectSimpleLiteralClass;
+    struct EffectSimpleFluentClass;
+    struct EffectProductionClass;
+    struct EffectConditionalForallClass;
+    struct EffectConditionalWhenClass;
+    struct EffectConditionalClass;
 
     struct ActionSymbolClass;
     struct ActionBodyClass;
@@ -323,18 +323,18 @@ namespace loki::domain::parser {
 
     x3::rule<EffectClass, ast::Effect> const
         effect = "effect";
-    x3::rule<SimpleEffectLiteralClass, ast::SimpleEffectLiteral> const
-        simple_effect_literal = "simple_effect_literal";
-    x3::rule<SimpleEffectFluentClass, ast::SimpleEffectFluent> const
-        simple_effect_fluent = "simple_effect_fluent";
-    x3::rule<SimpleEffectClass, ast::SimpleEffect> const
-        simple_effect = "simple_effect";
-    x3::rule<ConditionalEffectForallClass, ast::ConditionalEffectForall> const
-        conditional_effect_forall = "conditional_effect_forall";
-    x3::rule<ConditionalEffectWhenClass, ast::ConditionalEffectWhen> const
-        conditional_effect_when = "conditional_effect_when";
-    x3::rule<ConditionalEffectClass, ast::ConditionalEffect> const
-        conditional_effect = "conditional_effect";
+    x3::rule<EffectSimpleLiteralClass, ast::EffectProductionLiteral> const
+        effect_production_literal = "effect_production_literal";
+    x3::rule<EffectSimpleFluentClass, ast::EffectProductionFluent> const
+        effect_production_fluent = "effect_production_fluent";
+    x3::rule<EffectProductionClass, ast::EffectProduction> const
+        effect_production = "effect_production";
+    x3::rule<EffectConditionalForallClass, ast::EffectConditionalForall> const
+        effect_conditional_forall = "effect_conditional_forall";
+    x3::rule<EffectConditionalWhenClass, ast::EffectConditionalWhen> const
+        effect_conditional_when = "effect_conditional_when";
+    x3::rule<EffectConditionalClass, ast::EffectConditional> const
+        effect_conditional = "effect_conditional";
 
     x3::rule<ActionSymbolClass, ast::ActionSymbol> const
         action_symbol = "action_symbol";
@@ -462,13 +462,13 @@ namespace loki::domain::parser {
     const auto assign_operator_decrease_def = lit("decrease") >> x3::attr(ast::AssignOperatorDecrease{});
     const auto assign_operator_def = assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
 
-    const auto effect_def = simple_effect | conditional_effect | lit('(') >> lit("and") >> *effect >> lit(')');
-    const auto simple_effect_literal_def = literal_of_terms;
-    const auto simple_effect_fluent_def = lit('(') >> assign_operator >> function_head >> function_expression > lit(')');
-    const auto simple_effect_def = simple_effect_literal | simple_effect_fluent;
-    const auto conditional_effect_forall_def = lit('(') >> lit("forall") >> typed_list_of_variables >> effect > lit(')');
-    const auto conditional_effect_when_def = lit('(') >> lit("when") >> goal_descriptor >> effect > lit(')');
-    const auto conditional_effect_def = conditional_effect_forall | conditional_effect_when;
+    const auto effect_def = effect_production | effect_conditional | lit('(') >> lit("and") >> *effect >> lit(')');
+    const auto effect_production_literal_def = literal_of_terms;
+    const auto effect_production_fluent_def = lit('(') >> assign_operator >> function_head >> function_expression > lit(')');
+    const auto effect_production_def = effect_production_literal | effect_production_fluent;
+    const auto effect_conditional_forall_def = lit('(') >> lit("forall") >> typed_list_of_variables >> effect > lit(')');
+    const auto effect_conditional_when_def = lit('(') >> lit("when") >> goal_descriptor >> effect > lit(')');
+    const auto effect_conditional_def = effect_conditional_forall | effect_conditional_when;
 
     const auto action_symbol_def = name;
     const auto action_body_def = (lit(":precondition") > ((lit('(') >> lit(')')) | precondition_goal_descriptor))
@@ -528,8 +528,8 @@ namespace loki::domain::parser {
         precondition_goal_descriptor_and, precondition_goal_descriptor_preference, precondition_goal_descriptor_forall,
         assign_operator_assign, assign_operator_scale_up, assign_operator_scale_down,
         assign_operator_increase, assign_operator_decrease, assign_operator,
-        effect, simple_effect_literal, simple_effect_fluent, simple_effect,
-        conditional_effect_forall, conditional_effect_when, conditional_effect,
+        effect, effect_production_literal, effect_production_fluent, effect_production,
+        effect_conditional_forall, effect_conditional_when, effect_conditional,
         action_symbol, action_body, action
     )
 
@@ -634,12 +634,12 @@ namespace loki::domain::parser {
     struct AssignOperatorClass : x3::annotate_on_success {};
 
     struct EffectClass : x3::annotate_on_success {};
-    struct SimpleEffectLiteralClass : x3::annotate_on_success {};
-    struct SimpleEffectFluentClass : x3::annotate_on_success {};
-    struct SimpleEffectClass : x3::annotate_on_success {};
-    struct ConditionalEffectForallClass : x3::annotate_on_success {};
-    struct ConditionalEffectWhenClass : x3::annotate_on_success {};
-    struct ConditionalEffectClass : x3::annotate_on_success {};
+    struct EffectSimpleLiteralClass : x3::annotate_on_success {};
+    struct EffectSimpleFluentClass : x3::annotate_on_success {};
+    struct EffectProductionClass : x3::annotate_on_success {};
+    struct EffectConditionalForallClass : x3::annotate_on_success {};
+    struct EffectConditionalWhenClass : x3::annotate_on_success {};
+    struct EffectConditionalClass : x3::annotate_on_success {};
 
     struct ActionSymbolClass : x3::annotate_on_success {};
     struct ActionBodyClass : x3::annotate_on_success {};

@@ -65,10 +65,10 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorAnd, prec
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorPreference, preference_name, goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorForall, typed_list_of_variables, precondition_goal_descriptor)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::SimpleEffectLiteral, literal_of_terms)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::SimpleEffectFluent, assign_operator, function_expression_head, function_expression)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConditionalEffectForall, typed_list_of_variables, effect)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ConditionalEffectWhen, goal_descriptor, effect)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionLiteral, literal_of_terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionFluent, assign_operator, function_expression_head, function_expression)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectConditionalForall, typed_list_of_variables, effect)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectConditionalWhen, goal_descriptor, effect)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ActionSymbol, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::ActionBody, precondition_goal_descriptor, effect)

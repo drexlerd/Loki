@@ -103,12 +103,12 @@ namespace loki::domain::ast
     struct AssignOperator;
 
     struct Effect;
-    struct SimpleEffectLiteral;
-    struct SimpleEffectFluent;
-    struct SimpleEffect;
-    struct ConditionalEffectForall;
-    struct ConditionalEffectWhen;
-    struct ConditionalEffect;
+    struct EffectProductionLiteral;
+    struct EffectProductionFluent;
+    struct EffectProduction;
+    struct EffectConditionalForall;
+    struct EffectConditionalWhen;
+    struct EffectConditional;
 
     struct ActionSymbol;
     struct ActionBody;
@@ -584,45 +584,45 @@ namespace loki::domain::ast
     // <p-effect>
     struct Effect : x3::position_tagged,
         x3::variant<
-            x3::forward_ast<SimpleEffect>,
-            x3::forward_ast<ConditionalEffect>,
+            x3::forward_ast<EffectProduction>,
+            x3::forward_ast<EffectConditional>,
             x3::forward_ast<std::vector<Effect>>> {
         using base_type::base_type;
         using base_type::operator=;
     };
 
-    struct SimpleEffectLiteral : x3::position_tagged {
+    struct EffectProductionLiteral : x3::position_tagged {
         LiteralOfTerms literal_of_terms;
     };
 
-    struct SimpleEffectFluent : x3::position_tagged {
+    struct EffectProductionFluent : x3::position_tagged {
         AssignOperator assign_operator;
         FunctionExpressionHead function_expression_head;
         FunctionExpression function_expression;
     };
 
-    struct SimpleEffect : x3::position_tagged,
+    struct EffectProduction : x3::position_tagged,
         x3::variant<
-            SimpleEffectLiteral,
-            SimpleEffectFluent> {
+            EffectProductionLiteral,
+            EffectProductionFluent> {
         using base_type::base_type;
         using base_type::operator=;
     };
 
-    struct ConditionalEffectForall : x3::position_tagged {
+    struct EffectConditionalForall : x3::position_tagged {
         TypedListOfVariables typed_list_of_variables;
         Effect effect;
     };
 
-    struct ConditionalEffectWhen : x3::position_tagged {
+    struct EffectConditionalWhen : x3::position_tagged {
         GoalDescriptor goal_descriptor;
         Effect effect;
     };
 
-    struct ConditionalEffect : x3::position_tagged,
+    struct EffectConditional : x3::position_tagged,
         x3::variant<
-            ConditionalEffectForall,
-            ConditionalEffectWhen> {
+            EffectConditionalForall,
+            EffectConditionalWhen> {
         using base_type::base_type;
         using base_type::operator=;
     };
