@@ -9,7 +9,6 @@
 #include "include/loki/domain/parser.hpp"
 
 #include "ast_adapted.hpp"
-#include "parser.hpp"
 
 
 namespace loki::domain::parser {
