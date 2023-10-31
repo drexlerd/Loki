@@ -393,9 +393,9 @@ namespace loki::domain::parser {
     const auto function_typed_list_of_atomic_function_skeletons_recursively_def = +atomic_function_skeleton > lit('-') > function_type > function_typed_list_of_atomic_function_skeletons_recursively;
     const auto function_typed_list_of_atomic_function_skeletons_def = ((*atomic_function_skeleton_def) | function_typed_list_of_atomic_function_skeletons_recursively);
 
-    const auto atomic_formula_of_terms_def = lit('(') >> predicate >> *term > lit(')');
+    const auto atomic_formula_of_terms_def = lit('(') >> predicate >> *term >> lit(')');
     const auto atom_def = atomic_formula_of_terms;
-    const auto negated_atom_def = lit('(') >> lit("not") >> atomic_formula_of_terms > lit(')');
+    const auto negated_atom_def = lit('(') >> lit("not") >> atomic_formula_of_terms >> lit(')');
     const auto literal_def = atom | negated_atom;
 
     const auto multi_operator_mul_def = lit('*') >> x3::attr(ast::MultiOperatorMul{});
@@ -423,7 +423,7 @@ namespace loki::domain::parser {
         | goal_descriptor_not | goal_descriptor_imply | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison;
     const auto goal_descriptor_atom_def = atom;
     const auto goal_descriptor_literal_def = literal;
-    const auto goal_descriptor_and_def = lit('(') >> lit("and") >> *goal_descriptor > lit(')');
+    const auto goal_descriptor_and_def = lit('(') >> lit("and") > *goal_descriptor > lit(')');
     const auto goal_descriptor_or_def = lit('(') >> lit("or") >> *goal_descriptor > lit(')');
     const auto goal_descriptor_not_def = lit('(') >> lit("not") > goal_descriptor > lit(')');
     const auto goal_descriptor_imply_def = lit('(') >> lit("imply") > goal_descriptor > goal_descriptor > lit(')');

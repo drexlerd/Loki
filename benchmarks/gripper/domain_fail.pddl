@@ -9,7 +9,7 @@
 		(carry ?o ?g))
 
    (:action move
-       :parameters  (?from ?to)
+       :parameters  (?from ?to )
        :precondition (and  (room ?from) (room ?to) (at-robby ?from))
        :effect (and  (at-robby ?to)
 		     (not (at-robby ?from))))

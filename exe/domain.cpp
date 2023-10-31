@@ -36,9 +36,7 @@ ast::DomainDescription parse(
 
     // Go forth and parse!
     using boost::spirit::x3::ascii::space;
-    std::cout << "parse" << std::endl;
     bool success = phrase_parse(iter, end, parser, space, ast);
-    std::cout << "success: " << success << std::endl;
     if (!success) {
         throw std::runtime_error("Failed parse.");
     }
