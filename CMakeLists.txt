@@ -72,9 +72,10 @@ add_subdirectory(src)
 
 add_subdirectory(exe)
 
-#if (ENABLE_TESTING)
-#    add_subdirectory(tests)
-#endif()
+set(ENABLE_TESTING True)
+if (ENABLE_TESTING)
+    add_subdirectory(tests)
+endif()
 
 ###########
 # Install #
