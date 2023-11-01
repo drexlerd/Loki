@@ -104,111 +104,112 @@
 \begin{grammar}
     <atomic formula (t)> ::= ( <predicate> t* )
 
-    <atom> ::= <atomic formula (term)>
+    <atom-of-terms> ::= <atomic formula (term)>
 
-    <negated atom> ::= ( not <atom> )
+    <negated-atom of-terms> ::= ( not <atom> )
 
-    <literal> ::= <atom> | <negated atom>
-
-
-    <multi-op mul> ::= *
-
-    <multi-op plus> ::= +
-
-    <multi-op> ::= <multi-op mul> | <multi-op plus>
-
-    <binary-op minus> ::= -
-
-    <binary-op div> ::= /
-
-    <binary-op> ::= <binary-op minus> | <binary-op div> | <multi-op>
+    <literal-of-terms> ::= <atom-of-terms> | <negated-atom of-terms>
 
 
-    <binary-comp greater> ::= >
+    <multi-op-mul> ::= *
 
-    <binary-comp less> ::= \textless
+    <multi-op-plus> ::= +
 
-    <binary-comp equal> ::= =
+    <multi-op> ::= <multi-op-mul> | <multi-op-plus>
 
-    <binary-comp greater equal> ::= >=
+    <binary-op-minus> ::= -
 
-    <binary-comp less equal> ::= \textgreater=
+    <binary-op-div> ::= /
 
-    <binary-comp> ::= <binary-comp greater> | <binary-comp less> \newline
-        | <binary-comp equal> | <binary-comp greater equal> \newline
-        | <binary-comp less equal>
+    <binary-op> ::= <binary-op-minus> | <binary-op-div> | <multi-op>
+
+
+    <binary-comp-greater> ::= >
+
+    <binary-comp-less> ::= \textless
+
+    <binary-comp-equal> ::= =
+
+    <binary-comp-greater-equal> ::= >=
+
+    <binary-comp-less-equal> ::= \textgreater=
+
+    <binary-comp> ::= <binary-comp-greater> | <binary-comp-less> \newline
+        | <binary-comp-equal> | <binary-comp-greater-equal> \newline
+        | <binary-comp-less-equal>
 
 
     <f-exp number> ::= <number>
 
-    <f-exp binary op> ::= ( <binary-op> <f-exp> <f-exp> )
+    <f-exp-binary-op> ::= ( <binary-op> <f-exp> <f-exp> )
 
-    <f-exp minus> ::= ( - <f-exp> )
+    <f-exp-minus> ::= ( - <f-exp> )
 
-    <f-exp head> ::= <function-symbol> | ( <function-symbol> <term>* )
+    <f-exp-head> ::= <function-symbol> | ( <function-symbol> <term>* )
 
-    <f-exp> ::= <f-exp number> | <f-exp binary op> | <f-exp minus> | <f-exp head>
+    <f-exp> ::= <f-exp-number> | <f-exp-binary-op> | <f-exp-minus> | <f-exp-head>
 
     % Preconditions
-    <GD atom> ::= <atom>
+    <GD-atom> ::= <atom-of-terms>
 
-    <GD literal> ::=\negativepreconditions{} <literal>
+    <GD-literal> ::=\negativepreconditions{} <literal-of-terms>
 
-    <GD and> ::=  ( and <GD>* )
+    <GD-and> ::=  ( and <GD>* )
 
-    <GD or> ::=\disjunctivepreconditions{} ( or <GD>* )
+    <GD-or> ::=\disjunctivepreconditions{} ( or <GD>* )
 
-    <GD not> ::=\disjunctivepreconditions{} ( not <GD>* )
+    <GD-not> ::=\disjunctivepreconditions{} ( not <GD>* )
 
-    <GD imply> ::=\disjunctivepreconditions{} ( imply <GD> <GD> )
+    <GD-imply> ::=\disjunctivepreconditions{} ( imply <GD> <GD> )
 
-    <GD exists> ::=\existentialpreconditions{} ( exists <typed list (variable)> <GD> )
+    <GD-exists> ::=\existentialpreconditions{} ( exists <typed list (variable)> <GD> )
 
-    <GD forall> ::=\universalpreconditions{} ( forall <typed list (variable)> <GD> )
+    <GD-forall> ::=\universalpreconditions{} ( forall <typed list (variable)> <GD> )
 
-    <GD f-comp> ::=\fluents{} ( <binary-comp> <f-exp> <f-exp> )
+    <GD-f-comp> ::=\fluents{} ( <binary-comp> <f-exp> <f-exp> )
 
-    <GD> ::= <GD atom> | <GD literal> | <GD and> | <GD or> | <GD not> | <GD imply> | <GD exists> | <GD forall> | <GD f-comp>
+    <GD> ::= <GD-atom> | <GD-literal> | <GD-and> | <GD-or> | <GD-not> | <GD-imply> | <GD-exists> | <GD-forall> | <GD-f-comp>
 
     <pref-name> ::= name
 
-    <pre-GD simple> ::= <GD>
+    <pre-GD-gd> ::= <GD>
 
-    <pre-GD and> ::= ( and <pre-GD>* )
+    <pre-GD-and> ::= ( and <pre-GD>* )
 
-    <pre-GD forall> ::= ( forall <typed list (variable)> <pre-GD> )
+    <pre-GD-forall> ::= ( forall <typed list (variable)> <pre-GD> )
 
-    <pre-GD preferences> ::= ( preference <pref-name> <GD> )
+    <pre-GD-preferences> ::= ( preference <pref-name> <GD> )
 
-    <pre-GD> ::= <pre-GD simple> | <pre-GD and> | <pre-GD forall> | <pre-GD preferences>
+    <pre-GD> ::= <pre-GD-gd> | <pre-GD-and> | <pre-GD-forall> | <pre-GD-preferences>
 
 
     % Effects
-    <assign-op> ::= assign
+    <assign-op-assign> ::= assign
 
-    <assign-op> ::= scale-up
+    <assign-op-scale-up> ::= scale-up
 
-    <assign-op> ::= scale-down
+    <assign-op-scale-down> ::= scale-down
 
-    <assign-op> ::= increase
+    <assign-op-increase> ::= increase
 
-    <assign-op> ::= decrease
+    <assign-op-decrease> ::= decrease
 
-    <simple-effect-literal> ::= <literal>
+    <assign-op> ::= <assign-op-assign> | <assign-op-scale-up> | <assign-op-scale-down>\newline
+        | <assign-op-increase> | <assign-op-decrease>
 
-    <simple-effect-fluent> ::=\fluents ( <assign-op> <f-head> <f-exp> )
+    <effect-production-literal> ::= <literal-of-terms>
 
-    <simple-effect> ::= <simple-effect-literal> | <simple-effect-fluent>
+    <effect-production-fluent> ::=\fluents ( <assign-op> <f-head> <f-exp> )
 
-    <cond-effect-forall> ::=\conditionaleffects{} ( forall ( <typed list (variable)>* ) <effect> )
+    <effect-production> ::= <simple-effect-literal> | <simple-effect-fluent>
 
-    <cond-effect-when> ::=\conditionaleffects{} ( when <GD> <effect> )
+    <effect-conditional-forall> ::=\conditionaleffects{} ( forall ( <typed list (variable)>* ) <effect> )
 
-    <cond-effect> ::=\conditionaleffects{} <cond-effect-forall> | <cond-effect-when>
+    <effect-conditional-when> ::=\conditionaleffects{} ( when <GD> <effect> )
 
-    <effect and> ::= ( and <effect>* )
+    <effect-conditional> ::=\conditionaleffects{} <cond-effect-forall> | <cond-effect-when>
 
-    <effect> ::= <simple-effect> | <cond-effect> | <effect and>
+    <effect> ::= <effect-production> | <effect-conditional> | ( and <effect>* )
 \end{grammar}
 
 \section{Problem}
