@@ -21,9 +21,29 @@ namespace loki::domain::ast
     struct Number;  // TODO: can also be float!
     struct Term;
 
+    struct RequirementStrips;
+    struct RequirementTyping;
+    struct RequirementNegativePreconditions;
+    struct RequirementDisjunctivePreconditions;
+    struct RequirementEquality;
+    struct RequirementExistentialPreconditions;
+    struct RequirementUniversalPreconditions;
+    struct RequirementQuantifiedPreconditions;
+    struct RequirementConditionalEffects;
+    struct RequirementFluents;                   // PDDL 3.1 = :object-fluents + :numeric-fluents
+    struct RequirementObjectFluents;             // PDDL 3.1
+    struct RequirementNumericFluents;          // PDDL 3.1
+    struct RequirementAdl;
+    struct RequirementDurativeActions;
+    struct RequirementDerivedPredicates;
+    struct RequirementTimedInitialLiterals;
+    struct RequirementPreferences;
+    struct RequirementConstraints;
+    struct Requirement;
+
     struct Type;
-    struct FluentType;                           // :fluents
-    struct EitherType;
+    struct TypeFluent;                           // :fluents
+    struct TypeEither;
     struct TypedListOfNamesRecursively;
     struct TypedListOfNames;
     struct TypedListOfVariablesRecursively;      // :typing
@@ -158,17 +178,62 @@ namespace loki::domain::ast
 
 
     /* <require-def> */
-    struct StripsRequirement : x3::position_tagged {
-    };
+    struct RequirementStrips : x3::position_tagged { };
 
-    struct TypingRequirement : x3::position_tagged {
-    };
+    struct RequirementTyping : x3::position_tagged { };
+
+    struct RequirementNegativePreconditions : x3::position_tagged { };
+
+    struct RequirementDisjunctivePreconditions : x3::position_tagged { };
+
+    struct RequirementEquality : x3::position_tagged { };
+
+    struct RequirementExistentialPreconditions : x3::position_tagged { };
+
+    struct RequirementUniversalPreconditions : x3::position_tagged { };
+
+    struct RequirementQuantifiedPreconditions : x3::position_tagged { };
+
+    struct RequirementConditionalEffects : x3::position_tagged { };
+
+    struct RequirementFluents : x3::position_tagged { };
+
+    struct RequirementObjectFluents : x3::position_tagged { };
+
+    struct RequirementNumericFluents : x3::position_tagged { };
+
+    struct RequirementAdl : x3::position_tagged { };
+
+    struct RequirementDurativeActions : x3::position_tagged { };
+
+    struct RequirementDerivedPredicates : x3::position_tagged { };
+
+    struct RequirementTimedInitialLiterals : x3::position_tagged { };
+
+    struct RequirementPreferences : x3::position_tagged { };
+
+    struct RequirementConstraints : x3::position_tagged { };
 
     struct Requirement : x3::position_tagged,
         x3::variant<
-            StripsRequirement,
-            TypingRequirement> {
-        // TODO: add more requirements
+            RequirementStrips,
+            RequirementTyping,
+            RequirementNegativePreconditions,
+            RequirementDisjunctivePreconditions,
+            RequirementEquality,
+            RequirementExistentialPreconditions,
+            RequirementUniversalPreconditions,
+            RequirementQuantifiedPreconditions,
+            RequirementConditionalEffects,
+            RequirementFluents,
+            RequirementObjectFluents,
+            RequirementNumericFluents,
+            RequirementAdl,
+            RequirementDurativeActions,
+            RequirementDerivedPredicates,
+            RequirementTimedInitialLiterals,
+            RequirementPreferences,
+            RequirementConstraints> {
         using base_type::base_type;
         using base_type::operator=;
     };
@@ -182,17 +247,17 @@ namespace loki::domain::ast
     struct Type : x3::position_tagged,
         x3::variant<
             Name,
-            x3::forward_ast<FluentType>,
-            x3::forward_ast<EitherType>> {
+            x3::forward_ast<TypeFluent>,
+            x3::forward_ast<TypeEither>> {
         using base_type::base_type;
         using base_type::operator=;
     };
 
-    struct FluentType : x3::position_tagged {
+    struct TypeFluent : x3::position_tagged {
         Type type;
     };
 
-    struct EitherType : x3::position_tagged {
+    struct TypeEither : x3::position_tagged {
         std::vector<Type> types;
     };
 

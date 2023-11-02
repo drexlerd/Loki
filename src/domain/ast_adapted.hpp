@@ -12,8 +12,8 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Name, alpha, suffix)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Variable, question_mark, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Number, value)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FluentType, type)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EitherType, types)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypeFluent, type)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypeEither, types)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypedListOfNamesRecursively, names, type, typed_list_of_names_recursively)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypedListOfVariablesRecursively, variables, type, typed_list_of_variables_recursively)

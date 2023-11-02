@@ -14,6 +14,8 @@ TEST(LokiTests, NumberTest) {
     EXPECT_EQ(parse_text(ast), "5");
     EXPECT_NO_THROW(parse_ast("4.2", number(), ast));
     EXPECT_EQ(parse_text(ast), "4.2");
+    EXPECT_NO_THROW(parse_ast("6 7", number(), ast));
+    EXPECT_EQ(parse_text(ast), "6");
     EXPECT_NO_THROW(parse_ast("1something", number(), ast));
     EXPECT_EQ(parse_text(ast), "1");
 

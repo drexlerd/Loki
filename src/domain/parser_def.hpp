@@ -30,13 +30,29 @@ namespace loki::domain::parser {
     // Rule IDs
     ///////////////////////////////////////////////////////////////////////////
 
-    struct StripsRequirementClass;
-    struct TypingRequirementClass;
+    struct RequirementStripsClass;
+    struct RequirementTypingClass;
+    struct RequirementNegativePreconditionsClass;
+    struct RequirementDisjunctivePreconditionsClass;
+    struct RequirementEqualityClass;
+    struct RequirementExistentialPreconditionsClass;
+    struct RequirementUniversalPreconditionsClass;
+    struct RequirementQuantifiedPreconditionsClass;
+    struct RequirementConditionalEffectsClass;
+    struct RequirementFluentsClass;
+    struct RequirementObjectFluentsClass;
+    struct RequirementNumericFluentsClass;
+    struct RequirementAdlClass;
+    struct RequirementDurativeActionsClass;
+    struct RequirementDerivedPredicatesClass;
+    struct RequirementTimedInitialLiteralsClass;
+    struct RequirementPreferencesClass;
+    struct RequirementConstraintsClass;
     struct RequirementClass;
 
     struct TypeClass;
-    struct FluentTypeClass;
-    struct EitherTypeClass;
+    struct TypeFluentClass;
+    struct TypeEitherClass;
     struct TypedListOfNamesRecursivelyClass;
     struct TypedListOfNamesClass;
     struct TypedListOfVariablesRecursivelyClass;
@@ -151,19 +167,51 @@ namespace loki::domain::parser {
     number_type const number = "number";
     term_type const term = "term";
 
-    x3::rule<StripsRequirementClass, ast::StripsRequirement> const
-        strips_requirement = "strips_requirement";
-    x3::rule<TypingRequirementClass, ast::TypingRequirement> const
-        typing_requirement = "typing_requirement";
+    x3::rule<RequirementStripsClass, ast::RequirementStrips> const
+        requirement_strips = "requirement_strips";
+    x3::rule<RequirementTypingClass, ast::RequirementTyping> const
+        requirement_typing = "requirement_typing";
+    x3::rule<RequirementNegativePreconditionsClass, ast::RequirementNegativePreconditions> const
+        requirement_negative_preconditions = "requirement_negative_preconditions";
+    x3::rule<RequirementDisjunctivePreconditionsClass, ast::RequirementDisjunctivePreconditions> const
+        requirement_disjunctive_preconditions = "requirement_disjunctive_preconditions";
+    x3::rule<RequirementEqualityClass, ast::RequirementEquality> const
+        requirement_equality = "requirement_equality";
+    x3::rule<RequirementExistentialPreconditionsClass, ast::RequirementExistentialPreconditions> const
+        requirement_existential_preconditions = "requirement_existential_preconditions";
+    x3::rule<RequirementUniversalPreconditionsClass, ast::RequirementUniversalPreconditions> const
+        requirement_universal_preconditions = "requirement_universal_preconditions";
+    x3::rule<RequirementQuantifiedPreconditionsClass, ast::RequirementQuantifiedPreconditions> const
+        requirement_quantified_preconditions = "requirement_quantified_preconditions";
+    x3::rule<RequirementConditionalEffectsClass, ast::RequirementConditionalEffects> const
+        requirement_conditional_effects = "requirement_conditional_effects";
+    x3::rule<RequirementFluentsClass, ast::RequirementFluents> const
+        requirement_fluents = "requirement_fluents";
+    x3::rule<RequirementObjectFluentsClass, ast::RequirementObjectFluents> const
+        requirement_object_fluents = "requirement_object_fluents";
+    x3::rule<RequirementNumericFluentsClass, ast::RequirementNumericFluents> const
+        requirement_numeric_fluents = "requirement_numeric_fluents";
+    x3::rule<RequirementAdlClass, ast::RequirementAdl> const
+        requirement_adl = "requirement_adl";
+    x3::rule<RequirementDurativeActionsClass, ast::RequirementDurativeActions> const
+        requirement_durative_actions = "requirement_durative_actions";
+    x3::rule<RequirementDerivedPredicatesClass, ast::RequirementDerivedPredicates> const
+        requirement_derived_predicates = "requirement_derived_predicates";
+    x3::rule<RequirementTimedInitialLiteralsClass, ast::RequirementTimedInitialLiterals> const
+        requirement_timed_initial_literals = "requirement_timed_initial_literals";
+    x3::rule<RequirementPreferencesClass, ast::RequirementPreferences> const
+        requirement_preferences = "requirement_preferences";
+    x3::rule<RequirementConstraintsClass, ast::RequirementConstraints> const
+        requirement_constraints = "requirement_constraints";
     x3::rule<RequirementClass, ast::Requirement> const
         requirement = "requirement";
 
     x3::rule<TypeClass, ast::Type> const
         type = "type";
-    x3::rule<FluentTypeClass, ast::FluentType> const
-        fluent_type = "fluent_type";
-    x3::rule<EitherTypeClass, ast::EitherType> const
-        either_type = "either_type";
+    x3::rule<TypeFluentClass, ast::TypeFluent> const
+        type_fluent = "type_fluent";
+    x3::rule<TypeEitherClass, ast::TypeEither> const
+        type_either = "type_either";
     x3::rule<TypedListOfNamesRecursivelyClass, ast::TypedListOfNamesRecursively> const
         typed_list_of_names_recursively = "typed_list_of_names_recursively";
     x3::rule<TypedListOfNamesClass, ast::TypedListOfNames> const
@@ -363,13 +411,34 @@ namespace loki::domain::parser {
     const auto number_def = double_;
     const auto term_def = name | variable;
 
-    const auto strips_requirement_def = lit(":strips") >> x3::attr(ast::StripsRequirement{});
-    const auto typing_requirement_def = lit(":typing") >> x3::attr(ast::TypingRequirement{});
-    const auto requirement_def = strips_requirement | typing_requirement;
+    const auto requirement_strips_def = lit(":strips") >> x3::attr(ast::RequirementStrips{});
+    const auto requirement_typing_def = lit(":typing") >> x3::attr(ast::RequirementTyping{});
+    const auto requirement_negative_preconditions_def = lit(":negative-preconditions") >> x3::attr(ast::RequirementNegativePreconditions{});
+    const auto requirement_disjunctive_preconditions_def = lit(":disjunctive-preconditions") >> x3::attr(ast::RequirementDisjunctivePreconditions{});
+    const auto requirement_equality_def = lit(":equality") >> x3::attr(ast::RequirementEquality{});
+    const auto requirement_existential_preconditions_def = lit(":existential-preconditions") >> x3::attr(ast::RequirementExistentialPreconditions{});
+    const auto requirement_universal_preconditions_def = lit(":universal-preconditions") >> x3::attr(ast::RequirementUniversalPreconditions{});
+    const auto requirement_quantified_preconditions_def = lit(":quantified-preconditions") >> x3::attr(ast::RequirementQuantifiedPreconditions{});
+    const auto requirement_conditional_effects_def = lit(":conditional-effects") >> x3::attr(ast::RequirementConditionalEffects{});
+    const auto requirement_fluents_def = lit(":fluents") >> x3::attr(ast::RequirementFluents{});
+    const auto requirement_object_fluents_def = lit(":object-fluents") >> x3::attr(ast::RequirementObjectFluents{});
+    const auto requirement_numeric_fluents_def = lit(":numeric-fluents") >> x3::attr(ast::RequirementNumericFluents{});
+    const auto requirement_adl_def = lit(":adl") >> x3::attr(ast::RequirementAdl{});
+    const auto requirement_durative_actions_def = lit(":durative-actions") >> x3::attr(ast::RequirementDurativeActions{});
+    const auto requirement_derived_predicates_def = lit(":derived-predicates") >> x3::attr(ast::RequirementDerivedPredicates{});
+    const auto requirement_timed_initial_literals_def = lit(":timed-initial-literals") >> x3::attr(ast::RequirementTimedInitialLiterals{});
+    const auto requirement_preferences_def = lit(":preferences") >> x3::attr(ast::RequirementPreferences{});
+    const auto requirement_constraints_def = lit(":constraints") >> x3::attr(ast::RequirementConstraints{});
+    const auto requirement_def = requirement_strips | requirement_typing | requirement_negative_preconditions
+        | requirement_disjunctive_preconditions | requirement_equality | requirement_existential_preconditions
+        | requirement_universal_preconditions | requirement_quantified_preconditions | requirement_conditional_effects
+        | requirement_fluents | requirement_object_fluents | requirement_numeric_fluents | requirement_adl
+        | requirement_durative_actions | requirement_derived_predicates | requirement_timed_initial_literals
+        | requirement_preferences | requirement_constraints;
 
-    const auto type_def = name | fluent_type | either_type;
-    const auto fluent_type_def = lit('(') >> lit("fluent") > type > lit(')');
-    const auto either_type_def = lit('(') >> lit("either") >> +type > lit(')');
+    const auto type_def = name | type_fluent | type_either;
+    const auto type_fluent_def = lit('(') >> lit("fluent") > type > lit(')');
+    const auto type_either_def = lit('(') >> lit("either") >> +type > lit(')');
     const auto typed_list_of_names_recursively_def = +name > lit('-') > type >> typed_list_of_names_recursively;
     const auto typed_list_of_names_def = ((*name) | typed_list_of_names_recursively);
     const auto typed_list_of_variables_recursively_def = +variable > lit('-') > type >> typed_list_of_variables_recursively;
@@ -490,10 +559,19 @@ namespace loki::domain::parser {
            >> *structure
         > lit(')');
 
+    BOOST_SPIRIT_DEFINE(name, variable, number, term)
+
     BOOST_SPIRIT_DEFINE(
-        name, variable, number, term,
-        strips_requirement, typing_requirement, requirement, requirements,
-        type, fluent_type, either_type, typed_list_of_names_recursively, typed_list_of_names, typed_list_of_variables_recursively, typed_list_of_variables,
+        requirement_strips, requirement_typing, requirement_negative_preconditions, requirement_disjunctive_preconditions,
+        requirement_equality, requirement_existential_preconditions, requirement_universal_preconditions,
+        requirement_quantified_preconditions, requirement_conditional_effects, requirement_fluents,
+        requirement_object_fluents, requirement_numeric_fluents, requirement_adl, requirement_durative_actions,
+        requirement_derived_predicates, requirement_timed_initial_literals, requirement_preferences, requirement_constraints,
+        requirement, requirements
+    )
+
+    BOOST_SPIRIT_DEFINE(
+        type, type_fluent, type_either, typed_list_of_names_recursively, typed_list_of_names, typed_list_of_variables_recursively, typed_list_of_variables,
         predicate, atomic_formula_skeleton,
         function_symbol, function_type, atomic_function_skeleton, function_typed_list_of_atomic_function_skeletons_recursively, function_typed_list_of_atomic_function_skeletons,
         atomic_formula_of_terms, atom_of_terms, negated_atom_of_terms, literal_of_terms,
@@ -538,13 +616,29 @@ namespace loki::domain::parser {
     struct NumberClass : x3::annotate_on_success {};
     struct TermClass : x3::annotate_on_success {};
 
-    struct StripsRequirementClass : x3::annotate_on_success {};
-    struct TypingRequirementClass : x3::annotate_on_success {};
+    struct RequirementStripsClass : x3::annotate_on_success {};
+    struct RequirementTypingClass : x3::annotate_on_success {};
+    struct RequirementNegativePreconditionsClass : x3::annotate_on_success {};
+    struct RequirementDisjunctivePreconditionsClass : x3::annotate_on_success {};
+    struct RequirementEqualityClass : x3::annotate_on_success {};
+    struct RequirementExistentialPreconditionsClass : x3::annotate_on_success {};
+    struct RequirementUniversalPreconditionsClass : x3::annotate_on_success {};
+    struct RequirementQuantifiedPreconditionsClass : x3::annotate_on_success {};
+    struct RequirementConditionalEffectsClass : x3::annotate_on_success {};
+    struct RequirementFluentsClass : x3::annotate_on_success {};
+    struct RequirementObjectFluentsClass : x3::annotate_on_success {};
+    struct RequirementNumericalFluentsClass : x3::annotate_on_success {};
+    struct RequirementAdlClass : x3::annotate_on_success {};
+    struct RequirementDurativeActionsClass : x3::annotate_on_success {};
+    struct RequirementDerivedPredicatesClass : x3::annotate_on_success {};
+    struct RequirementTimedInitialLiteralsClass : x3::annotate_on_success {};
+    struct RequirementPreferencesClass : x3::annotate_on_success {};
+    struct RequirementConstraintsClass : x3::annotate_on_success {};
     struct RequirementClass : x3::annotate_on_success {};
 
     struct TypeClass : x3::annotate_on_success {};
-    struct FluentTypeClass : x3::annotate_on_success {};
-    struct EitherTypeClass : x3::annotate_on_success {};
+    struct TypeFluentClass : x3::annotate_on_success {};
+    struct TypeEitherClass : x3::annotate_on_success {};
     struct TypedListOfNamesRecursivelyClass : x3::annotate_on_success {};
     struct TypedListOfNamesClass : x3::annotate_on_success {};
     struct TypedListOfVariablesRecursivelyClass : x3::annotate_on_success {};

@@ -12,6 +12,8 @@ TEST(LokiTests, VariableTest) {
 
     EXPECT_NO_THROW(parse_ast("?loki", variable(), ast));
     EXPECT_EQ(parse_text(ast), "?loki");
+    EXPECT_NO_THROW(parse_ast("?loki ?kilo", variable(), ast));
+    EXPECT_EQ(parse_text(ast), "?loki");
     EXPECT_NO_THROW(parse_ast("?loki(?loki)", variable(), ast));
     EXPECT_EQ(parse_text(ast), "?loki");
 
