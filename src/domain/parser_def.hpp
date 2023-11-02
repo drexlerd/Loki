@@ -19,6 +19,7 @@ namespace loki::domain::parser {
     using x3::lexeme;
     using x3::eps;
     using x3::int_;
+    using x3::double_;
 
     using ascii::alpha;
     using ascii::alnum;
@@ -28,11 +29,6 @@ namespace loki::domain::parser {
     ///////////////////////////////////////////////////////////////////////////
     // Rule IDs
     ///////////////////////////////////////////////////////////////////////////
-
-    struct NameClass;
-    struct VariableClass;
-    struct NumberClass;
-    struct TermClass;
 
     struct StripsRequirementClass;
     struct TypingRequirementClass;
@@ -151,12 +147,9 @@ namespace loki::domain::parser {
     ///////////////////////////////////////////////////////////////////////////
 
     name_type const name = "name";
-    x3::rule<VariableClass, ast::Variable> const
-        variable = "variable";
-    x3::rule<NumberClass, ast::Number> const
-        number = "number";
-    x3::rule<TermClass, ast::Term> const
-        term = "term";
+    variable_type const variable = "variable";
+    number_type const number = "number";
+    term_type const term = "term";
 
     x3::rule<StripsRequirementClass, ast::StripsRequirement> const
         strips_requirement = "strips_requirement";
@@ -367,7 +360,7 @@ namespace loki::domain::parser {
 
     const auto name_def = alpha >> lexeme[*(alnum | char_('-') | char_('_'))];
     const auto variable_def = char_('?') > name;
-    const auto number_def = int_;
+    const auto number_def = double_;
     const auto term_def = name | variable;
 
     const auto strips_requirement_def = lit(":strips") >> x3::attr(ast::StripsRequirement{});
@@ -661,6 +654,15 @@ namespace loki::domain
 {
     parser::name_type const& name() {
         return parser::name;
+    }
+    parser::variable_type const& variable() {
+        return parser::variable;
+    }
+    parser::number_type const& number() {
+        return parser::number;
+    }
+    parser::term_type const& term() {
+        return parser::term;
     }
 
     parser::domain_description_type const& domain_description() {

@@ -144,7 +144,7 @@ namespace loki::domain::ast
 
     /* <number> */
     struct Number : x3::position_tagged {
-        int value;
+        double value;
     };
 
     /* <term> */

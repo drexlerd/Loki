@@ -7,6 +7,7 @@
 namespace loki::domain {
 template<typename Parser, typename Node>
 void parse_ast(const std::string& source, const Parser& parser, Node& out) {
+    out = Node(); // reinitialize
     loki::iterator_type iter(source.begin());
     const loki::iterator_type end(source.end());
     using boost::spirit::x3::with;

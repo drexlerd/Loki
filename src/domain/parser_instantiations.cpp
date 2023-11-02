@@ -11,6 +11,12 @@ namespace loki::domain::parser
 
     BOOST_SPIRIT_INSTANTIATE(
         name_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        variable_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        number_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        term_type, iterator_type, context_type)
 
     BOOST_SPIRIT_INSTANTIATE(
         domain_description_type, iterator_type, context_type)

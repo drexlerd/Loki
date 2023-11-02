@@ -28,4 +28,4 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-// cmake -S . -B build && cmake --build build -j16 && ./build/src/planner/siwm  benchmarks/gripper/domain.pddl benchmarks/gripper/p-1-0.pddl benchmarks/gripper/sketch.pddl
+// cmake -S . -B build -DENABLE_TESTING:bool=TRUE && cmake --build build -j24 && ./build/exe/exe benchmarks/gripper/domain.pddl
