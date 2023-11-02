@@ -4,13 +4,14 @@
 #include <vector>
 
 #include "include/loki/common/config.hpp"
+#include "include/loki/common/parser_wrapper.hpp"
 #include "include/loki/common/filesystem.hpp"
-
-#include "domain.hpp"
+#include "include/loki/domain/ast.hpp"
+#include "include/loki/domain/parser.hpp"
 
 
 using namespace std;
-
+using namespace loki::domain;
 
 int main(int argc, char** argv) {
     if (argc < 2) {
@@ -21,9 +22,8 @@ int main(int argc, char** argv) {
 
     // 1. Parse the domain
     const auto source = loki::read_file(domain_file);
-    loki::iterator_type iter(source.begin());
-    const loki::iterator_type end(source.end());
-    loki::domain::parse(iter, end, domain_file);
+    ast::DomainDescription node;
+    parse_ast(source, domain_description(), node);
 
     return 0;
 }
