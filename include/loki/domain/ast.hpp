@@ -41,9 +41,8 @@ namespace loki::domain::ast
     struct RequirementConstraints;
     struct Requirement;
 
-    struct Type;
-    struct TypeFluent;                           // :fluents
-    struct TypeEither;
+    struct Type;                                 // We model fluent types as in fox-long-2003
+    struct TypeEither;                           // We allow nested either
     struct TypedListOfNamesRecursively;
     struct TypedListOfNames;
     struct TypedListOfVariablesRecursively;      // :typing
@@ -247,14 +246,9 @@ namespace loki::domain::ast
     struct Type : x3::position_tagged,
         x3::variant<
             Name,
-            x3::forward_ast<TypeFluent>,
             x3::forward_ast<TypeEither>> {
         using base_type::base_type;
         using base_type::operator=;
-    };
-
-    struct TypeFluent : x3::position_tagged {
-        Type type;
     };
 
     struct TypeEither : x3::position_tagged {
@@ -265,7 +259,7 @@ namespace loki::domain::ast
     struct TypedListOfNamesRecursively : x3::position_tagged {
         std::vector<Name> names;
         Type type;
-        x3::forward_ast<TypedListOfNamesRecursively> typed_list_of_names_recursively;
+        x3::forward_ast<TypedListOfNames> typed_list_of_names;
     };
 
     struct TypedListOfNames : x3::position_tagged,
@@ -281,7 +275,7 @@ namespace loki::domain::ast
     struct TypedListOfVariablesRecursively : x3::position_tagged {
         std::vector<Variable> variables;
         Type type;
-        x3::forward_ast<TypedListOfVariablesRecursively> typed_list_of_variables_recursively;
+        x3::forward_ast<TypedListOfVariables> typed_list_of_variables;
     };
 
     struct TypedListOfVariables : x3::position_tagged,

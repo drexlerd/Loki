@@ -19,5 +19,18 @@ namespace loki::domain::parser
         term_type, iterator_type, context_type)
 
     BOOST_SPIRIT_INSTANTIATE(
+        type_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        type_either_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        typed_list_of_names_recursively_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        typed_list_of_names_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        typed_list_of_variables_recursively_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        typed_list_of_variables_type, iterator_type, context_type)
+
+    BOOST_SPIRIT_INSTANTIATE(
         domain_description_type, iterator_type, context_type)
 }

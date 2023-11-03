@@ -16,6 +16,7 @@ TEST(LokiTests, NumberTest) {
     EXPECT_EQ(parse_text(ast), "4.2");
     EXPECT_NO_THROW(parse_ast("6 7", number(), ast));
     EXPECT_EQ(parse_text(ast), "6");
+    // TODO: Is this really what we want?
     EXPECT_NO_THROW(parse_ast("1loki", number(), ast));
     EXPECT_EQ(parse_text(ast), "1");
 

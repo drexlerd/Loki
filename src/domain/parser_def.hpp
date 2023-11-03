@@ -50,14 +50,6 @@ namespace loki::domain::parser {
     struct RequirementConstraintsClass;
     struct RequirementClass;
 
-    struct TypeClass;
-    struct TypeFluentClass;
-    struct TypeEitherClass;
-    struct TypedListOfNamesRecursivelyClass;
-    struct TypedListOfNamesClass;
-    struct TypedListOfVariablesRecursivelyClass;
-    struct TypedListOfVariablesClass;
-
     struct PredicateClass;
     struct AtomicFormulaSkeletonClass;
 
@@ -206,20 +198,12 @@ namespace loki::domain::parser {
     x3::rule<RequirementClass, ast::Requirement> const
         requirement = "requirement";
 
-    x3::rule<TypeClass, ast::Type> const
-        type = "type";
-    x3::rule<TypeFluentClass, ast::TypeFluent> const
-        type_fluent = "type_fluent";
-    x3::rule<TypeEitherClass, ast::TypeEither> const
-        type_either = "type_either";
-    x3::rule<TypedListOfNamesRecursivelyClass, ast::TypedListOfNamesRecursively> const
-        typed_list_of_names_recursively = "typed_list_of_names_recursively";
-    x3::rule<TypedListOfNamesClass, ast::TypedListOfNames> const
-        typed_list_of_names = "typed_list_of_names";
-
-    x3::rule<TypedListOfVariablesRecursivelyClass, ast::TypedListOfVariablesRecursively> const
-        typed_list_of_variables_recursively = "typed_list_of_variables_recursively";
-    x3::rule<TypedListOfVariablesClass, ast::TypedListOfVariables> const
+    type_type const type = "type";
+    type_either_type const type_either = "type_either";
+    typed_list_of_names_recursively_type const typed_list_of_names_recursively = "typed_list_of_names_recursively";
+    typed_list_of_names_type const typed_list_of_names = "typed_list_of_names";
+    typed_list_of_variables_recursively_type const typed_list_of_variables_recursively = "typed_list_of_variables_recursively";
+    typed_list_of_variables_type const
         typed_list_of_variables = "typed_list_of_variables";
 
     x3::rule<PredicateClass, ast::Predicate> const
@@ -436,12 +420,11 @@ namespace loki::domain::parser {
         | requirement_durative_actions | requirement_derived_predicates | requirement_timed_initial_literals
         | requirement_preferences | requirement_constraints;
 
-    const auto type_def = name | type_fluent | type_either;
-    const auto type_fluent_def = lit('(') >> lit("fluent") > type > lit(')');
+    const auto type_def = name | type_either;
     const auto type_either_def = lit('(') >> lit("either") >> +type > lit(')');
-    const auto typed_list_of_names_recursively_def = +name > lit('-') > type >> typed_list_of_names_recursively;
+    const auto typed_list_of_names_recursively_def = +name > lit('-') > type >> typed_list_of_names;
     const auto typed_list_of_names_def = ((*name) | typed_list_of_names_recursively);
-    const auto typed_list_of_variables_recursively_def = +variable > lit('-') > type >> typed_list_of_variables_recursively;
+    const auto typed_list_of_variables_recursively_def = +variable > lit('-') > type >> typed_list_of_variables;
     const auto typed_list_of_variables_def = ((*variable) | typed_list_of_variables_recursively);
 
     const auto predicate_def = name;
@@ -571,7 +554,7 @@ namespace loki::domain::parser {
     )
 
     BOOST_SPIRIT_DEFINE(
-        type, type_fluent, type_either, typed_list_of_names_recursively, typed_list_of_names, typed_list_of_variables_recursively, typed_list_of_variables,
+        type, type_either, typed_list_of_names_recursively, typed_list_of_names, typed_list_of_variables_recursively, typed_list_of_variables,
         predicate, atomic_formula_skeleton,
         function_symbol, function_type, atomic_function_skeleton, function_typed_list_of_atomic_function_skeletons_recursively, function_typed_list_of_atomic_function_skeletons,
         atomic_formula_of_terms, atom_of_terms, negated_atom_of_terms, literal_of_terms,
@@ -637,7 +620,6 @@ namespace loki::domain::parser {
     struct RequirementClass : x3::annotate_on_success {};
 
     struct TypeClass : x3::annotate_on_success {};
-    struct TypeFluentClass : x3::annotate_on_success {};
     struct TypeEitherClass : x3::annotate_on_success {};
     struct TypedListOfNamesRecursivelyClass : x3::annotate_on_success {};
     struct TypedListOfNamesClass : x3::annotate_on_success {};
@@ -757,6 +739,25 @@ namespace loki::domain
     }
     parser::term_type const& term() {
         return parser::term;
+    }
+
+    parser::type_type const& type() {
+        return parser::type;
+    }
+    parser::type_either_type const& type_either() {
+        return parser::type_either;
+    }
+    parser::typed_list_of_names_recursively_type const& typed_list_of_names_recursively() {
+        return parser::typed_list_of_names_recursively;
+    }
+    parser::typed_list_of_names_type const& typed_list_of_names() {
+        return parser::typed_list_of_names;
+    }
+    parser::typed_list_of_variables_recursively_type const& typed_list_of_variables_recursively() {
+        return parser::typed_list_of_variables_recursively;
+    }
+    parser::typed_list_of_variables_type const& typed_list_of_variables() {
+        return parser::typed_list_of_variables;
     }
 
     parser::domain_description_type const& domain_description() {

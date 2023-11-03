@@ -12,11 +12,10 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Name, alpha, suffix)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Variable, question_mark, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Number, value)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypeFluent, type)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypeEither, types)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypedListOfNamesRecursively, names, type, typed_list_of_names_recursively)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypedListOfNamesRecursively, names, type, typed_list_of_names)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypedListOfVariablesRecursively, variables, type, typed_list_of_variables_recursively)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypedListOfVariablesRecursively, variables, type, typed_list_of_variables)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Predicate, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaSkeleton, predicate, typed_list_of_variables)
