@@ -50,20 +50,6 @@ namespace loki::domain::parser {
     struct RequirementConstraintsClass;
     struct RequirementClass;
 
-    struct PredicateClass;
-    struct AtomicFormulaSkeletonClass;
-
-    struct FunctionSymbolClass;
-    struct FunctionTypeClass;
-    struct AtomicFunctionSkeletonClass;
-    struct FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyClass;
-    struct FunctionTypedListOfAtomicFunctionSkeletonsClass;
-
-    struct AtomicFormulaOfTermsClass;
-    struct AtomOfTermsClass;
-    struct NegatedAtomOfTermsClass;
-    struct LiteralOfTermsClass;
-
     struct MultiOperatorMulClass;
     struct MultiOperatorPlusClass;
     struct MultiOperatorClass;
@@ -203,33 +189,21 @@ namespace loki::domain::parser {
     typed_list_of_names_recursively_type const typed_list_of_names_recursively = "typed_list_of_names_recursively";
     typed_list_of_names_type const typed_list_of_names = "typed_list_of_names";
     typed_list_of_variables_recursively_type const typed_list_of_variables_recursively = "typed_list_of_variables_recursively";
-    typed_list_of_variables_type const
-        typed_list_of_variables = "typed_list_of_variables";
+    typed_list_of_variables_type const typed_list_of_variables = "typed_list_of_variables";
 
-    x3::rule<PredicateClass, ast::Predicate> const
-        predicate = "predicate";
-    x3::rule<AtomicFormulaSkeletonClass, ast::AtomicFormulaSkeleton> const
-        atomic_formula_skeleton = "atomic_formula_skeleton";
+    predicate_type const predicate = "predicate";
+    atomic_formula_skeleton_type const atomic_formula_skeleton = "atomic_formula_skeleton";
 
-    x3::rule<FunctionSymbolClass, ast::FunctionSymbol> const
-        function_symbol = "function_symbol";
-    x3::rule<FunctionTypeClass, ast::FunctionType> const
-        function_type = "function_type";
-    x3::rule<AtomicFunctionSkeletonClass, ast::AtomicFunctionSkeleton> const
-        atomic_function_skeleton = "atomic_function_skeleton";
-    x3::rule<FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyClass, ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively> const
-        function_typed_list_of_atomic_function_skeletons_recursively = "function_typed_list_of_atomic_function_skeletons_recursively";
-    x3::rule<FunctionTypedListOfAtomicFunctionSkeletonsClass, ast::FunctionTypedListOfAtomicFunctionSkeletons> const
-        function_typed_list_of_atomic_function_skeletons = "function_typed_list_of_atomic_function_skeletons";
+    function_symbol_type const function_symbol = "function_symbol";
+    function_type_type const function_type = "function_type";
+    atomic_function_skeleton_type const atomic_function_skeleton = "atomic_function_skeleton";
+    function_typed_list_of_atomic_function_skeletons_recursively_type const function_typed_list_of_atomic_function_skeletons_recursively = "function_typed_list_of_atomic_function_skeletons_recursively";
+    function_typed_list_of_atomic_function_skeletons_type const function_typed_list_of_atomic_function_skeletons = "function_typed_list_of_atomic_function_skeletons";
 
-    x3::rule<AtomicFormulaOfTermsClass, ast::AtomicFormulaOfTerms> const
-        atomic_formula_of_terms = "atomic_formula_of_terms";
-    x3::rule<AtomOfTermsClass, ast::AtomOfTerms> const
-        atom_of_terms = "atom_of_terms";
-    x3::rule<NegatedAtomOfTermsClass, ast::NegatedAtomOfTerms> const
-        negated_atom_of_terms = "negated_atom_of_terms";
-    x3::rule<LiteralOfTermsClass, ast::LiteralOfTerms> const
-        literal_of_terms = "literal_of_terms";
+    atomic_formula_of_terms_type const atomic_formula_of_terms = "atomic_formula_of_terms";
+    atom_of_terms_type const atom_of_terms = "atom_of_terms";
+    negated_atom_of_terms_type const negated_atom_of_terms = "negated_atom_of_terms";
+    literal_of_terms_type const literal_of_terms = "literal_of_terms";
 
     x3::rule<MultiOperatorMulClass, ast::MultiOperatorMul> const
         multi_operator_mul = "multi_operator_mul";
@@ -422,9 +396,9 @@ namespace loki::domain::parser {
 
     const auto type_def = name | type_either;
     const auto type_either_def = lit('(') >> lit("either") >> +type > lit(')');
-    const auto typed_list_of_names_recursively_def = +name >> lit('-') > type >> typed_list_of_names;
+    const auto typed_list_of_names_recursively_def = +name >> lit('-') > type > typed_list_of_names;
     const auto typed_list_of_names_def = typed_list_of_names_recursively | *name;
-    const auto typed_list_of_variables_recursively_def = +variable >> lit('-') > type >> typed_list_of_variables;
+    const auto typed_list_of_variables_recursively_def = +variable >> lit('-') > type > typed_list_of_variables;
     const auto typed_list_of_variables_def = typed_list_of_variables_recursively | *variable;
 
     const auto predicate_def = name;
@@ -433,8 +407,8 @@ namespace loki::domain::parser {
     const auto function_symbol_def = name;
     const auto function_type_def = number;
     const auto atomic_function_skeleton_def = lit('(') > function_symbol > typed_list_of_variables > lit(')');
-    const auto function_typed_list_of_atomic_function_skeletons_recursively_def = +atomic_function_skeleton > lit('-') > function_type > function_typed_list_of_atomic_function_skeletons_recursively;
-    const auto function_typed_list_of_atomic_function_skeletons_def = ((*atomic_function_skeleton_def) | function_typed_list_of_atomic_function_skeletons_recursively);
+    const auto function_typed_list_of_atomic_function_skeletons_recursively_def = +atomic_function_skeleton >> lit('-') > function_type > function_typed_list_of_atomic_function_skeletons;
+    const auto function_typed_list_of_atomic_function_skeletons_def = function_typed_list_of_atomic_function_skeletons_recursively | *atomic_function_skeleton;
 
     const auto atomic_formula_of_terms_def = lit('(') >> predicate >> *term >> lit(')');
     const auto atom_of_terms_def = atomic_formula_of_terms;
@@ -758,6 +732,42 @@ namespace loki::domain
     }
     parser::typed_list_of_variables_type const& typed_list_of_variables() {
         return parser::typed_list_of_variables;
+    }
+
+    parser::predicate_type const& predicate() {
+        return parser::predicate;
+    }
+    parser::atomic_formula_skeleton_type const& atomic_formula_skeleton() {
+        return parser::atomic_formula_skeleton;
+    }
+
+    parser::function_symbol_type const& function_symbol() {
+        return parser::function_symbol;
+    }
+    parser::function_type_type const& function_type() {
+        return parser::function_type;
+    }
+    parser::atomic_function_skeleton_type const& atomic_function_skeleton() {
+        return parser::atomic_function_skeleton;
+    }
+    parser::function_typed_list_of_atomic_function_skeletons_recursively_type const& function_typed_list_of_atomic_function_skeletons_recursively() {
+        return parser::function_typed_list_of_atomic_function_skeletons_recursively;
+    }
+    parser::function_typed_list_of_atomic_function_skeletons_type const& function_typed_list_of_atomic_function_skeletons() {
+        return parser::function_typed_list_of_atomic_function_skeletons;
+    }
+
+    parser::atomic_formula_of_terms_type const& atomic_formula_of_terms() {
+        return parser::atomic_formula_of_terms;
+    }
+    parser::atom_of_terms_type const& atom_of_terms() {
+        return parser::atom_of_terms;
+    }
+    parser::negated_atom_of_terms_type const& negated_atom_of_terms() {
+        return parser::negated_atom_of_terms;
+    }
+    parser::literal_of_terms_type const& literal_of_terms() {
+        return parser::literal_of_terms;
     }
 
     parser::domain_description_type const& domain_description() {

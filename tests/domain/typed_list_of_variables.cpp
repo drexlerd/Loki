@@ -10,16 +10,16 @@ namespace loki::domain::tests {
 TEST(LokiTests, TypedListOfVariablesTest) {
     ast::TypedListOfVariables ast;
 
-    EXPECT_NO_THROW(parse_ast("?kilo ?liko - loki ?olik ?ikol - kilo", typed_list_of_variables(), ast));
-    EXPECT_EQ(parse_text(ast), " ?kilo ?liko - loki ?olik ?ikol - kilo");  // printer adds leading whitespace
+    EXPECT_NO_THROW(parse_ast("?var1 ?var2 - type1 ?var3 ?var4 - type2", typed_list_of_variables(), ast));
+    EXPECT_EQ(parse_text(ast), " ?var1 ?var2 - type1 ?var3 ?var4 - type2");  // printer adds leading whitespace
 
-    EXPECT_NO_THROW(parse_ast("?kilo ?liko", typed_list_of_variables(), ast));
-    EXPECT_EQ(parse_text(ast), "?kilo ?liko");
+    EXPECT_NO_THROW(parse_ast("?var1 ?var2", typed_list_of_variables(), ast));
+    EXPECT_EQ(parse_text(ast), "?var1 ?var2");
 
-    EXPECT_NO_THROW(parse_ast("kilo liko", typed_list_of_variables(), ast));
+    EXPECT_NO_THROW(parse_ast("name1 name2", typed_list_of_variables(), ast));
     EXPECT_EQ(parse_text(ast), "");
 
-    EXPECT_NO_THROW(parse_ast("- kilo", typed_list_of_variables(), ast));
+    EXPECT_NO_THROW(parse_ast("- type1", typed_list_of_variables(), ast));
     EXPECT_EQ(parse_text(ast), "");
 }
 

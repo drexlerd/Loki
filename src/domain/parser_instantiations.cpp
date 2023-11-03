@@ -32,5 +32,30 @@ namespace loki::domain::parser
         typed_list_of_variables_type, iterator_type, context_type)
 
     BOOST_SPIRIT_INSTANTIATE(
+        predicate_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        atomic_formula_skeleton_type, iterator_type, context_type)
+
+    BOOST_SPIRIT_INSTANTIATE(
+        function_symbol_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        function_type_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        atomic_function_skeleton_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        function_typed_list_of_atomic_function_skeletons_recursively_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        function_typed_list_of_atomic_function_skeletons_type, iterator_type, context_type)
+
+    BOOST_SPIRIT_INSTANTIATE(
+        atomic_formula_of_terms_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        atom_of_terms_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        negated_atom_of_terms_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        literal_of_terms_type, iterator_type, context_type)
+
+    BOOST_SPIRIT_INSTANTIATE(
         domain_description_type, iterator_type, context_type)
 }

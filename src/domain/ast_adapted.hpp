@@ -23,7 +23,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaSkeleton, predicate, t
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionSymbol, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionType, number)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFunctionSkeleton, function_symbol, arguments)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively, atomic_function_skeleton, function_type, function_typed_list_of_atomic_function_skeletons_recursively)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively, atomic_function_skeleton, function_type, function_typed_list_of_atomic_function_skeletons)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaOfTerms, predicate, terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomOfTerms, atomic_formula_of_terms)

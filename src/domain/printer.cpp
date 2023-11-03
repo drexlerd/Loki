@@ -91,6 +91,34 @@ std::string parse_text(const ast::TypedListOfVariables& node) {
     return boost::apply_visitor(NodeVisitorPrinter(), node);
 }
 
+std::string parse_text(const ast::Predicate& node) {
+    return parse_text(node.name);
+}
+
+std::string parse_text(const ast::AtomicFormulaSkeleton& node) {
+    std::stringstream ss;
+    ss << "("
+       << parse_text(node.predicate) << " "
+       << parse_text(node.typed_list_of_variables) << ")";
+    return ss.str();
+}
+
+std::string parse_text(const ast::FunctionType& node) {
+    return parse_text(node.number);
+}
+
+std::string parse_text(const ast::FunctionSymbol& node) {
+    return parse_text(node.name);
+}
+
+std::string parse_text(const ast::AtomicFunctionSkeleton& node) {
+    std::stringstream ss;
+    ss << "("
+       << parse_text(node.function_symbol) << " "
+       << parse_text(node.arguments) << ")";
+    return ss.str();
+}
+
 template<typename T>
 inline std::string parse_text(const std::vector<T>& nodes) {
     std::stringstream ss;

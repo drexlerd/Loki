@@ -20,6 +20,12 @@ extern std::string parse_text(const ast::TypedListOfNames& node);
 extern std::string parse_text(const ast::TypedListOfVariablesRecursively& node);
 extern std::string parse_text(const ast::TypedListOfVariables& node);
 
+extern std::string parse_text(const ast::Predicate& node);
+extern std::string parse_text(const ast::AtomicFormulaSkeleton& node);
+
+extern std::string parse_text(const ast::FunctionType& node);
+extern std::string parse_text(const ast::FunctionSymbol& node);
+extern std::string parse_text(const ast::AtomicFunctionSkeleton& node);
 
 }
 

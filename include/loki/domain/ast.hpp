@@ -315,7 +315,7 @@ namespace loki::domain::ast
     struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively : x3::position_tagged {
         std::vector<AtomicFunctionSkeleton> atomic_function_skeleton;
         FunctionType function_type;
-        x3::forward_ast<FunctionTypedListOfAtomicFunctionSkeletonsRecursively> function_typed_list_of_atomic_function_skeletons_recursively;
+        x3::forward_ast<FunctionTypedListOfAtomicFunctionSkeletons> function_typed_list_of_atomic_function_skeletons;
     };
 
     struct FunctionTypedListOfAtomicFunctionSkeletons : x3::position_tagged,

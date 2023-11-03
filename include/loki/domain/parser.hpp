@@ -26,6 +26,20 @@ namespace loki::domain
         struct TypedListOfVariablesRecursivelyClass;
         struct TypedListOfVariablesClass;
 
+        struct PredicateClass;
+        struct AtomicFormulaSkeletonClass;
+
+        struct FunctionSymbolClass;
+        struct FunctionTypeClass;
+        struct AtomicFunctionSkeletonClass;
+        struct FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyClass;
+        struct FunctionTypedListOfAtomicFunctionSkeletonsClass;
+
+        struct AtomicFormulaOfTermsClass;
+        struct AtomOfTermsClass;
+        struct NegatedAtomOfTermsClass;
+        struct LiteralOfTermsClass;
+
         struct DomainDescriptionClass;
 
 
@@ -41,18 +55,36 @@ namespace loki::domain
         typedef x3::rule<TypedListOfVariablesRecursivelyClass, ast::TypedListOfVariablesRecursively> typed_list_of_variables_recursively_type;
         typedef x3::rule<TypedListOfVariablesClass, ast::TypedListOfVariables> typed_list_of_variables_type;
 
+        typedef x3::rule<PredicateClass, ast::Predicate> predicate_type;
+        typedef x3::rule<AtomicFormulaSkeletonClass, ast::AtomicFormulaSkeleton> atomic_formula_skeleton_type;
+
+        typedef x3::rule<FunctionSymbolClass, ast::FunctionSymbol> function_symbol_type;
+        typedef x3::rule<FunctionTypeClass, ast::FunctionType> function_type_type;
+        typedef x3::rule<AtomicFunctionSkeletonClass, ast::AtomicFunctionSkeleton> atomic_function_skeleton_type;
+        typedef x3::rule<FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyClass, ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively> function_typed_list_of_atomic_function_skeletons_recursively_type;
+        typedef x3::rule<FunctionTypedListOfAtomicFunctionSkeletonsClass, ast::FunctionTypedListOfAtomicFunctionSkeletons> function_typed_list_of_atomic_function_skeletons_type;
+
+        typedef x3::rule<AtomicFormulaOfTermsClass, ast::AtomicFormulaOfTerms> atomic_formula_of_terms_type;
+        typedef x3::rule<AtomOfTermsClass, ast::AtomOfTerms> atom_of_terms_type;
+        typedef x3::rule<NegatedAtomOfTermsClass, ast::NegatedAtomOfTerms> negated_atom_of_terms_type;
+        typedef x3::rule<LiteralOfTermsClass, ast::LiteralOfTerms> literal_of_terms_type;
+
         typedef x3::rule<DomainDescriptionClass, ast::DomainDescription> domain_description_type;
 
 
-        BOOST_SPIRIT_DECLARE(
-            name_type, variable_type, number_type, term_type)
+        BOOST_SPIRIT_DECLARE(name_type, variable_type, number_type, term_type)
 
         BOOST_SPIRIT_DECLARE(
             type_type, type_either_type, typed_list_of_names_recursively_type, typed_list_of_names_type,
             typed_list_of_variables_recursively_type, typed_list_of_variables_type)
 
-        BOOST_SPIRIT_DECLARE(
-            domain_description_type)
+        BOOST_SPIRIT_DECLARE(predicate_type, atomic_formula_skeleton_type)
+
+        BOOST_SPIRIT_DECLARE(function_symbol_type, function_type_type, atomic_function_skeleton_type, function_typed_list_of_atomic_function_skeletons_recursively_type, function_typed_list_of_atomic_function_skeletons_type)
+
+        BOOST_SPIRIT_DECLARE(atomic_formula_of_terms_type, atom_of_terms_type, negated_atom_of_terms_type, literal_of_terms_type)
+
+        BOOST_SPIRIT_DECLARE(domain_description_type)
     }
 
     parser::name_type const& name();
@@ -66,6 +98,20 @@ namespace loki::domain
     parser::typed_list_of_names_type const& typed_list_of_names();
     parser::typed_list_of_variables_recursively_type const& typed_list_of_variables_recursively();
     parser::typed_list_of_variables_type const& typed_list_of_variables();
+
+    parser::predicate_type const& predicate();
+    parser::atomic_formula_skeleton_type const& atomic_formula_skeleton();
+
+    parser::function_symbol_type const& function_symbol();
+    parser::function_type_type const& function_type();
+    parser::atomic_function_skeleton_type const& atomic_function_skeleton();
+    parser::function_typed_list_of_atomic_function_skeletons_recursively_type const& function_typed_list_of_atomic_function_skeletons_recursively();
+    parser::function_typed_list_of_atomic_function_skeletons_type const& function_typed_list_of_atomic_function_skeletons();
+
+    parser::atomic_formula_of_terms_type const& atomic_formula_of_terms();
+    parser::atom_of_terms_type const& atom_of_terms();
+    parser::negated_atom_of_terms_type const& negated_atom_of_terms();
+    parser::literal_of_terms_type const& literal_of_terms();
 
     parser::domain_description_type const& domain_description();
 }
