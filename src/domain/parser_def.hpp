@@ -422,10 +422,10 @@ namespace loki::domain::parser {
 
     const auto type_def = name | type_either;
     const auto type_either_def = lit('(') >> lit("either") >> +type > lit(')');
-    const auto typed_list_of_names_recursively_def = +name > lit('-') > type >> typed_list_of_names;
-    const auto typed_list_of_names_def = ((*name) | typed_list_of_names_recursively);
-    const auto typed_list_of_variables_recursively_def = +variable > lit('-') > type >> typed_list_of_variables;
-    const auto typed_list_of_variables_def = ((*variable) | typed_list_of_variables_recursively);
+    const auto typed_list_of_names_recursively_def = +name >> lit('-') > type >> typed_list_of_names;
+    const auto typed_list_of_names_def = typed_list_of_names_recursively | *name;
+    const auto typed_list_of_variables_recursively_def = +variable >> lit('-') > type >> typed_list_of_variables;
+    const auto typed_list_of_variables_def = typed_list_of_variables_recursively | *variable;
 
     const auto predicate_def = name;
     const auto atomic_formula_skeleton_def = lit('(') > predicate > typed_list_of_variables > lit(')');
