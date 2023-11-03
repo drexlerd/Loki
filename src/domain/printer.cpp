@@ -75,6 +75,22 @@ string parse_text(const ast::TypedListOfNames& node) {
     return boost::apply_visitor(NodeVisitorPrinter(), node);
 }
 
+std::string parse_text(const ast::TypedListOfVariablesRecursively& node) {
+    stringstream ss;
+    ss << " "; // add leading whitespace so separate from its parent
+    for (size_t i = 0; i < node.variables.size(); ++i) {
+        if (i != 0) ss << " ";
+        ss << parse_text(node.variables[i]);
+    }
+    ss << " - " << parse_text(node.type);
+    ss << parse_text(node.typed_list_of_variables);
+    return ss.str();
+}
+
+std::string parse_text(const ast::TypedListOfVariables& node) {
+    return boost::apply_visitor(NodeVisitorPrinter(), node);
+}
+
 template<typename T>
 inline std::string parse_text(const std::vector<T>& nodes) {
     std::stringstream ss;

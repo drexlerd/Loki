@@ -17,6 +17,8 @@ extern std::string parse_text(const ast::Type& node);
 extern std::string parse_text(const ast::TypeEither& node);
 extern std::string parse_text(const ast::TypedListOfNamesRecursively& node);
 extern std::string parse_text(const ast::TypedListOfNames& node);
+extern std::string parse_text(const ast::TypedListOfVariablesRecursively& node);
+extern std::string parse_text(const ast::TypedListOfVariables& node);
 
 
 }

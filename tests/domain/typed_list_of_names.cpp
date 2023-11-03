@@ -19,7 +19,7 @@ TEST(LokiTests, TypedListOfNamesTest) {
     EXPECT_NO_THROW(parse_ast("?kilo ?liko", typed_list_of_names(), ast));
     EXPECT_EQ(parse_text(ast), "");
 
-    EXPECT_NO_THROW(parse_ast("- kilo liko", typed_list_of_names(), ast));
+    EXPECT_NO_THROW(parse_ast("- kilo", typed_list_of_names(), ast));
     EXPECT_EQ(parse_text(ast), "");
 }
 
