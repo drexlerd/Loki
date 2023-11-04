@@ -21,11 +21,13 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Predicate, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaSkeleton, predicate, typed_list_of_variables)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionSymbol, name)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionType, number)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypeNumber, number)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypeType, type)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFunctionSkeleton, function_symbol, arguments)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively, atomic_function_skeleton, function_type, function_typed_list_of_atomic_function_skeletons)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaOfTerms, predicate, terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaOfTermsPredicate, predicate, terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaOfTermsEquality, term_left, term_right)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomOfTerms, atomic_formula_of_terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::NegatedAtomOfTerms, atomic_formula_of_terms)
 

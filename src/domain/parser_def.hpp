@@ -185,6 +185,7 @@ namespace loki::domain::parser {
         requirement = "requirement";
 
     type_type const type = "type";
+    type_object_type const type_object = "type_object";
     type_either_type const type_either = "type_either";
     typed_list_of_names_recursively_type const typed_list_of_names_recursively = "typed_list_of_names_recursively";
     typed_list_of_names_type const typed_list_of_names = "typed_list_of_names";
@@ -195,11 +196,15 @@ namespace loki::domain::parser {
     atomic_formula_skeleton_type const atomic_formula_skeleton = "atomic_formula_skeleton";
 
     function_symbol_type const function_symbol = "function_symbol";
+    function_type_number_type const function_type_number = "function_type_number";
+    function_type_type_type const function_type_type_ = "function_type_type";
     function_type_type const function_type = "function_type";
     atomic_function_skeleton_type const atomic_function_skeleton = "atomic_function_skeleton";
     function_typed_list_of_atomic_function_skeletons_recursively_type const function_typed_list_of_atomic_function_skeletons_recursively = "function_typed_list_of_atomic_function_skeletons_recursively";
     function_typed_list_of_atomic_function_skeletons_type const function_typed_list_of_atomic_function_skeletons = "function_typed_list_of_atomic_function_skeletons";
 
+    atomic_formula_of_terms_predicate_type const atomic_formula_of_terms_predicate = "atomic_formula_of_terms_predicate";
+    atomic_formula_of_terms_equality_type const atomic_formula_of_terms_equality = "atomic_formula_of_terms_equality";
     atomic_formula_of_terms_type const atomic_formula_of_terms = "atomic_formula_of_terms";
     atom_of_terms_type const atom_of_terms = "atom_of_terms";
     negated_atom_of_terms_type const negated_atom_of_terms = "negated_atom_of_terms";
@@ -394,7 +399,8 @@ namespace loki::domain::parser {
         | requirement_durative_actions | requirement_derived_predicates | requirement_timed_initial_literals
         | requirement_preferences | requirement_constraints;
 
-    const auto type_def = name | type_either;
+    const auto type_def = name | type_object | type_either;
+    const auto type_object_def = lit("object") >> x3::attr(ast::TypeObject{});
     const auto type_either_def = lit('(') >> lit("either") >> +type > lit(')');
     const auto typed_list_of_names_recursively_def = +name >> lit('-') > type > typed_list_of_names;
     const auto typed_list_of_names_def = typed_list_of_names_recursively | *name;
@@ -405,12 +411,16 @@ namespace loki::domain::parser {
     const auto atomic_formula_skeleton_def = lit('(') > predicate > typed_list_of_variables > lit(')');
 
     const auto function_symbol_def = name;
-    const auto function_type_def = number;
+    const auto function_type_number_def = number;
+    const auto function_type_type__def = type;
+    const auto function_type_def = function_type_number | function_type_type_;
     const auto atomic_function_skeleton_def = lit('(') > function_symbol > typed_list_of_variables > lit(')');
-    const auto function_typed_list_of_atomic_function_skeletons_recursively_def = +atomic_function_skeleton >> lit('-') > function_type > function_typed_list_of_atomic_function_skeletons;
-    const auto function_typed_list_of_atomic_function_skeletons_def = function_typed_list_of_atomic_function_skeletons_recursively | *atomic_function_skeleton;
+    const auto function_typed_list_of_atomic_function_skeletons_recursively_def = +atomic_function_skeleton >> lit('-') > function_type >> -function_typed_list_of_atomic_function_skeletons;
+    const auto function_typed_list_of_atomic_function_skeletons_def = function_typed_list_of_atomic_function_skeletons_recursively | +atomic_function_skeleton;
 
-    const auto atomic_formula_of_terms_def = lit('(') >> predicate >> *term >> lit(')');
+    const auto atomic_formula_of_terms_predicate_def = lit('(') >> predicate > *term > lit(')');
+    const auto atomic_formula_of_terms_equality_def = lit('(') >> lit('=') > term > term > lit(')');
+    const auto atomic_formula_of_terms_def = atomic_formula_of_terms_equality | atomic_formula_of_terms_predicate;
     const auto atom_of_terms_def = atomic_formula_of_terms;
     const auto negated_atom_of_terms_def = lit('(') >> lit("not") >> atomic_formula_of_terms >> lit(')');
     const auto literal_of_terms_def = atom_of_terms | negated_atom_of_terms;
@@ -528,16 +538,23 @@ namespace loki::domain::parser {
     )
 
     BOOST_SPIRIT_DEFINE(
-        type, type_either, typed_list_of_names_recursively, typed_list_of_names, typed_list_of_variables_recursively, typed_list_of_variables,
+        type, type_object, type_either, typed_list_of_names_recursively, typed_list_of_names,
+        typed_list_of_variables_recursively, typed_list_of_variables,
         predicate, atomic_formula_skeleton,
-        function_symbol, function_type, atomic_function_skeleton, function_typed_list_of_atomic_function_skeletons_recursively, function_typed_list_of_atomic_function_skeletons,
-        atomic_formula_of_terms, atom_of_terms, negated_atom_of_terms, literal_of_terms,
+        function_symbol, function_type_number, function_type_type_, function_type,
+        atomic_function_skeleton, function_typed_list_of_atomic_function_skeletons_recursively,
+        function_typed_list_of_atomic_function_skeletons,
+        atomic_formula_of_terms_predicate, atomic_formula_of_terms_equality, atomic_formula_of_terms,
+        atom_of_terms, negated_atom_of_terms, literal_of_terms)
+
+    BOOST_SPIRIT_DEFINE(
         multi_operator_mul, multi_operator_plus, multi_operator,
         binary_operator_minus, binary_operator_div, binary_operator,
         binary_comparator_greater, binary_comparator_less, binary_comparator_equal,
         binary_comparator_greater_equal, binary_comparator_less_equal, binary_comparator,
         function_head, function_expression, function_expression_number,
-        function_expression_binary_op, function_expression_minus, function_expression_head)
+        function_expression_binary_op, function_expression_minus, function_expression_head
+    )
 
     BOOST_SPIRIT_DEFINE(
         goal_descriptor, goal_descriptor_atom, goal_descriptor_literal, goal_descriptor_and,
@@ -594,6 +611,7 @@ namespace loki::domain::parser {
     struct RequirementClass : x3::annotate_on_success {};
 
     struct TypeClass : x3::annotate_on_success {};
+    struct TypeObjectClass : x3::annotate_on_success {};
     struct TypeEitherClass : x3::annotate_on_success {};
     struct TypedListOfNamesRecursivelyClass : x3::annotate_on_success {};
     struct TypedListOfNamesClass : x3::annotate_on_success {};
@@ -604,11 +622,16 @@ namespace loki::domain::parser {
     struct AtomicFormulaSkeletonClass : x3::annotate_on_success {};
 
     struct FunctionSymbolClass : x3::annotate_on_success {};
+    struct FunctionTypeNumberClass : x3::annotate_on_success {};
+    struct FunctionTypeObjectClass : x3::annotate_on_success {};
+    struct FunctionTypeTypeClass : x3::annotate_on_success {};
     struct FunctionTypeClass : x3::annotate_on_success {};
     struct AtomicFunctionSkeletonClass : x3::annotate_on_success {};
     struct FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyClass : x3::annotate_on_success {};
     struct FunctionTypedListOfAtomicFunctionSkeletonsClass : x3::annotate_on_success {};
 
+    struct AtomicFormulaOfTermsPredicateClass : x3::annotate_on_success {};
+    struct AtomicFormulaOfTermsEqualityClass : x3::annotate_on_success {};
     struct AtomicFormulaOfTermsClass : x3::annotate_on_success {};
     struct AtomOfTermsClass : x3::annotate_on_success {};
     struct NegatedAtomOfTermsClass : x3::annotate_on_success {};
@@ -718,6 +741,9 @@ namespace loki::domain
     parser::type_type const& type() {
         return parser::type;
     }
+    parser::type_object_type const& type_object() {
+        return parser::type_object;
+    }
     parser::type_either_type const& type_either() {
         return parser::type_either;
     }
@@ -744,6 +770,12 @@ namespace loki::domain
     parser::function_symbol_type const& function_symbol() {
         return parser::function_symbol;
     }
+    parser::function_type_number_type const& function_type_number() {
+        return parser::function_type_number;
+    }
+    parser::function_type_type_type const& function_type_type_() {
+        return parser::function_type_type_;
+    }
     parser::function_type_type const& function_type() {
         return parser::function_type;
     }
@@ -757,6 +789,12 @@ namespace loki::domain
         return parser::function_typed_list_of_atomic_function_skeletons;
     }
 
+    parser::atomic_formula_of_terms_predicate_type const& atomic_formula_of_terms_predicate() {
+        return parser::atomic_formula_of_terms_predicate;
+    }
+    parser::atomic_formula_of_terms_equality_type const& atomic_formula_of_terms_equality() {
+        return parser::atomic_formula_of_terms_equality;
+    }
     parser::atomic_formula_of_terms_type const& atomic_formula_of_terms() {
         return parser::atomic_formula_of_terms;
     }

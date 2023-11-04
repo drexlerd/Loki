@@ -21,6 +21,8 @@ namespace loki::domain::parser
     BOOST_SPIRIT_INSTANTIATE(
         type_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(
+        type_object_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
         type_either_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(
         typed_list_of_names_recursively_type, iterator_type, context_type)
@@ -39,6 +41,10 @@ namespace loki::domain::parser
     BOOST_SPIRIT_INSTANTIATE(
         function_symbol_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(
+        function_type_number_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        function_type_type_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
         function_type_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(
         atomic_function_skeleton_type, iterator_type, context_type)
@@ -47,6 +53,10 @@ namespace loki::domain::parser
     BOOST_SPIRIT_INSTANTIATE(
         function_typed_list_of_atomic_function_skeletons_type, iterator_type, context_type)
 
+    BOOST_SPIRIT_INSTANTIATE(
+        atomic_formula_of_terms_predicate_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(
+        atomic_formula_of_terms_equality_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(
         atomic_formula_of_terms_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(
