@@ -88,118 +88,65 @@ namespace loki::domain::parser {
     negated_atom_of_terms_type const negated_atom_of_terms = "negated_atom_of_terms";
     literal_of_terms_type const literal_of_terms = "literal_of_terms";
 
-    x3::rule<MultiOperatorMulClass, ast::MultiOperatorMul> const
-        multi_operator_mul = "multi_operator_mul";
-    x3::rule<MultiOperatorPlusClass, ast::MultiOperatorPlus> const
-        multi_operator_plus = "multi_operator_plus";
-    x3::rule<MultiOperatorClass, ast::MultiOperator> const
-        multi_operator = "multi_operator";
-    x3::rule<BinaryOperatorMinusClass, ast::BinaryOperatorMinus> const
-        binary_operator_minus = "binary_operator_minus";
-    x3::rule<BinaryOperatorDivClass, ast::BinaryOperatorDiv> const
-        binary_operator_div = "binary_operator_div";
-    x3::rule<BinaryOperatorClass, ast::BinaryOperator> const
-        binary_operator = "binary_operator";
+    multi_operator_mul_type const multi_operator_mul = "multi_operator_mul";
+    multi_operator_plus_type const multi_operator_plus = "multi_operator_plus";
+    multi_operator_type const multi_operator = "multi_operator";
+    binary_operator_minus_type const binary_operator_minus = "binary_operator_minus";
+    binary_operator_div_type const binary_operator_div = "binary_operator_div";
+    binary_operator_type const binary_operator = "binary_operator";
 
-    x3::rule<BinaryComparatorGreaterClass, ast::BinaryComparatorGreater> const
-        binary_comparator_greater = "binary_comparator_greater";
-    x3::rule<BinaryComparatorLessClass, ast::BinaryComparatorLess> const
-        binary_comparator_less = "binary_comparator_less";
-    x3::rule<BinaryComparatorEqualClass, ast::BinaryComparatorEqual> const
-        binary_comparator_equal = "binary_comparator_equal";
-    x3::rule<BinaryComparatorGreaterEqualClass, ast::BinaryComparatorGreaterEqual> const
-        binary_comparator_greater_equal = "binary_comparator_greater_equal";
-    x3::rule<BinaryComparatorLessEqualClass, ast::BinaryComparatorLessEqual> const
-        binary_comparator_less_equal = "binary_comparator_less_equal";
-    x3::rule<BinaryComparatorClass, ast::BinaryComparator> const
-        binary_comparator = "binary_comparator";
+    binary_comparator_greater_type const binary_comparator_greater = "binary_comparator_greater";
+    binary_comparator_less_type const binary_comparator_less = "binary_comparator_less";
+    binary_comparator_equal_type const binary_comparator_equal = "binary_comparator_equal";
+    binary_comparator_greater_equal_type const binary_comparator_greater_equal = "binary_comparator_greater_equal";
+    binary_comparator_less_equal_type const binary_comparator_less_equal = "binary_comparator_less_equal";
+    binary_comparator_type const binary_comparator = "binary_comparator";
 
-    x3::rule<FunctionExpressionClass, ast::FunctionExpression> const
-        function_expression = "function_expression";
-    x3::rule<FunctionHeadClass, ast::FunctionHead> const
-        function_head = "function_head";
-    x3::rule<FunctionExpressionNumberClass, ast::FunctionExpressionNumber> const
-        function_expression_number = "function_expression_number";
-    x3::rule<FunctionExpressionBinaryOpClass, ast::FunctionExpressionBinaryOp> const
-        function_expression_binary_op = "function_expression_binary_op";
-    x3::rule<FunctionExpressionMinusClass, ast::FunctionExpressionMinus> const
-        function_expression_minus = "function_expression_minus";
-    x3::rule<FunctionExpressionHeadClass, ast::FunctionExpressionHead> const
-        function_expression_head = "function_expression_head";
+    function_expression_type const function_expression = "function_expression";
+    function_head_type const function_head = "function_head";
+    function_expression_number_type const function_expression_number = "function_expression_number";
+    function_expression_binary_op_type const function_expression_binary_op = "function_expression_binary_op";
+    function_expression_minus_type const function_expression_minus = "function_expression_minus";
+    function_expression_head_type const function_expression_head = "function_expression_head";
 
-    x3::rule<GoalDescriptorClass, ast::GoalDescriptor> const
-        goal_descriptor = "goal_descriptor";
-    x3::rule<GoalDescriptorAtomClass, ast::GoalDescriptorAtom> const
-        goal_descriptor_atom = "goal_descriptor_atom";
-    x3::rule<GoalDescriptorLiteralClass, ast::GoalDescriptorLiteral> const
-        goal_descriptor_literal = "goal_descriptor_literal";
-    x3::rule<GoalDescriptorAndClass, ast::GoalDescriptorAnd> const
-        goal_descriptor_and = "goal_descriptor_and";
-    x3::rule<GoalDescriptorOrClass, ast::GoalDescriptorOr> const
-        goal_descriptor_or = "goal_descriptor_or";
-    x3::rule<GoalDescriptorNotClass, ast::GoalDescriptorNot> const
-        goal_descriptor_not = "goal_descriptor_not";
-    x3::rule<GoalDescriptorImplyClass, ast::GoalDescriptorImply> const
-        goal_descriptor_imply = "goal_descriptor_imply";
-    x3::rule<GoalDescriptorExistsClass, ast::GoalDescriptorExists> const
-        goal_descriptor_exists = "goal_descriptor_exists";
-    x3::rule<GoalDescriptorForallClass, ast::GoalDescriptorForall> const
-        goal_descriptor_forall = "goal_descriptor_forall";
-    x3::rule<GoalDescriptorFunctionComparisonClass, ast::GoalDescriptorFunctionComparison> const
-        goal_descriptor_function_comparison = "goal_descriptor_function_comparison";
+    goal_descriptor_type const goal_descriptor = "goal_descriptor";
+    goal_descriptor_atom_type const goal_descriptor_atom = "goal_descriptor_atom";
+    goal_descriptor_literal_type const goal_descriptor_literal = "goal_descriptor_literal";
+    goal_descriptor_and_type const goal_descriptor_and = "goal_descriptor_and";
+    goal_descriptor_or_type const goal_descriptor_or = "goal_descriptor_or";
+    goal_descriptor_not_type const goal_descriptor_not = "goal_descriptor_not";
+    goal_descriptor_imply_type const goal_descriptor_imply = "goal_descriptor_imply";
+    goal_descriptor_exists_type const goal_descriptor_exists = "goal_descriptor_exists";
+    goal_descriptor_forall_type const goal_descriptor_forall = "goal_descriptor_forall";
+    goal_descriptor_function_comparison_type const goal_descriptor_function_comparison = "goal_descriptor_function_comparison";
 
-    x3::rule<ConstraintGoalDescriptorClass, ast::ConstraintGoalDescriptor> const
-        constraint_goal_descriptor = "constraint_goal_descriptor";
-    x3::rule<ConstraintGoalDescriptorAndClass, ast::ConstraintGoalDescriptorAnd> const
-        constraint_goal_descriptor_and = "constraint_goal_descriptor_and";
-    x3::rule<ConstraintGoalDescriptorForallClass, ast::ConstraintGoalDescriptorForall> const
-        constraint_goal_descriptor_forall = "constraint_goal_descriptor_forall";
-    x3::rule<ConstraintGoalDescriptorAtEndClass, ast::ConstraintGoalDescriptorAtEnd> const
-        constraint_goal_descriptor_at_end = "constraint_goal_descriptor_at_end";
-    x3::rule<ConstraintGoalDescriptorAlwaysClass, ast::ConstraintGoalDescriptorAlways> const
-        constraint_goal_descriptor_always = "constraint_goal_descriptor_always";
-    x3::rule<ConstraintGoalDescriptorSometimeClass, ast::ConstraintGoalDescriptorSometime> const
-        constraint_goal_descriptor_sometime = "constraint_goal_descriptor_sometime";
-    x3::rule<ConstraintGoalDescriptorWithinClass, ast::ConstraintGoalDescriptorWithin> const
-        constraint_goal_descriptor_within = "constraint_goal_descriptor_within";
-    x3::rule<ConstraintGoalDescriptorAtMostOnceClass, ast::ConstraintGoalDescriptorAtMostOnce> const
-        constraint_goal_descriptor_at_most_once = "constraint_goal_descriptor_at_most_once";
-    x3::rule<ConstraintGoalDescriptorSometimeAfterClass, ast::ConstraintGoalDescriptorSometimeAfter> const
-        constraint_goal_descriptor_sometime_after = "constraint_goal_descriptor_sometime_after";
-    x3::rule<ConstraintGoalDescriptorSometimeBeforeClass, ast::ConstraintGoalDescriptorSometimeBefore> const
-        constraint_goal_descriptor_sometime_before = "constraint_goal_descriptor_sometime_before";
-    x3::rule<ConstraintGoalDescriptorAlwaysWithinClass, ast::ConstraintGoalDescriptorAlwaysWithin> const
-        constraint_goal_descriptor_always_within = "constraint_goal_descriptor_always_within";
-    x3::rule<ConstraintGoalDescriptorHoldDuringClass, ast::ConstraintGoalDescriptorHoldDuring> const
-        constraint_goal_descriptor_hold_during = "constraint_goal_descriptor_hold_during";
-    x3::rule<ConstraintGoalDescriptorHoldAfterClass, ast::ConstraintGoalDescriptorHoldAfter> const
-        constraint_goal_descriptor_hold_after = "constraint_goal_descriptor_hold_after";
+    constraint_goal_descriptor_type const constraint_goal_descriptor = "constraint_goal_descriptor";
+    constraint_goal_descriptor_and_type const constraint_goal_descriptor_and = "constraint_goal_descriptor_and";
+    constraint_goal_descriptor_forall_type const constraint_goal_descriptor_forall = "constraint_goal_descriptor_forall";
+    constraint_goal_descriptor_at_end_type const constraint_goal_descriptor_at_end = "constraint_goal_descriptor_at_end";
+    constraint_goal_descriptor_always_type const constraint_goal_descriptor_always = "constraint_goal_descriptor_always";
+    constraint_goal_descriptor_sometime_type const constraint_goal_descriptor_sometime = "constraint_goal_descriptor_sometime";
+    constraint_goal_descriptor_within_type const constraint_goal_descriptor_within = "constraint_goal_descriptor_within";
+    constraint_goal_descriptor_at_most_once_type const constraint_goal_descriptor_at_most_once = "constraint_goal_descriptor_at_most_once";
+    constraint_goal_descriptor_sometime_after_type const constraint_goal_descriptor_sometime_after = "constraint_goal_descriptor_sometime_after";
+    constraint_goal_descriptor_sometime_before_type const constraint_goal_descriptor_sometime_before = "constraint_goal_descriptor_sometime_before";
+    constraint_goal_descriptor_always_within_type const constraint_goal_descriptor_always_within = "constraint_goal_descriptor_always_within";
+    constraint_goal_descriptor_hold_during_type const constraint_goal_descriptor_hold_during = "constraint_goal_descriptor_hold_during";
+    constraint_goal_descriptor_hold_after_type const constraint_goal_descriptor_hold_after = "constraint_goal_descriptor_hold_after";
 
-    x3::rule<PreconditionGoalDescriptorClass, ast::PreconditionGoalDescriptor> const
-        precondition_goal_descriptor = "precondition_goal_descriptor";
-    x3::rule<PreferenceNameClass, ast::PreferenceName> const
-        preference_name = "preference_name";
-    x3::rule<PreconditionGoalDescriptorSimpleClass, ast::PreconditionGoalDescriptorSimple> const
-        precondition_goal_descriptor_simple = "precondition_goal_descriptor_simple";
-    x3::rule<PreconditionGoalDescriptorAndClass, ast::PreconditionGoalDescriptorAnd> const
-        precondition_goal_descriptor_and = "precondition_goal_descriptor_and";
-    x3::rule<PreconditionGoalDescriptorPreferenceClass, ast::PreconditionGoalDescriptorPreference> const
-        precondition_goal_descriptor_preference = "precondition_goal_descriptor_preference";
-    x3::rule<PreconditionGoalDescriptorForallClass, ast::PreconditionGoalDescriptorForall> const
-        precondition_goal_descriptor_forall = "precondition_goal_descriptor_forall";
+    precondition_goal_descriptor_type const precondition_goal_descriptor = "precondition_goal_descriptor";
+    preference_name_type const preference_name = "preference_name";
+    precondition_goal_descriptor_simple_type const precondition_goal_descriptor_simple = "precondition_goal_descriptor_simple";
+    precondition_goal_descriptor_and_type const precondition_goal_descriptor_and = "precondition_goal_descriptor_and";
+    precondition_goal_descriptor_preference_type const precondition_goal_descriptor_preference = "precondition_goal_descriptor_preference";
+    precondition_goal_descriptor_forall_type const precondition_goal_descriptor_forall = "precondition_goal_descriptor_forall";
 
-    x3::rule<AssignOperatorAssignClass, ast::AssignOperatorAssign> const
-        assign_operator_assign = "assign_operator_assign";
-    x3::rule<AssignOperatorScaleUpClass, ast::AssignOperatorScaleUp> const
-        assign_operator_scale_up = "assign_operator_scale_up";
-    x3::rule<AssignOperatorScaleDownClass, ast::AssignOperatorScaleDown> const
-        assign_operator_scale_down = "assign_operator_scale_down";
-    x3::rule<AssignOperatorIncreaseClass, ast::AssignOperatorIncrease> const
-        assign_operator_increase = "assign_operator_increase";
-    x3::rule<AssignOperatorDecreaseClass, ast::AssignOperatorDecrease> const
-        assign_operator_decrease = "assign_operator_decrease";
-    x3::rule<AssignOperatorClass, ast::AssignOperator> const
-        assign_operator = "assign_operator";
+    assign_operator_assign_type const assign_operator_assign = "assign_operator_assign";
+    assign_operator_scale_up_type const assign_operator_scale_up = "assign_operator_scale_up";
+    assign_operator_scale_down_type const assign_operator_scale_down = "assign_operator_scale_down";
+    assign_operator_increase_type const assign_operator_increase = "assign_operator_increase";
+    assign_operator_decrease_type const assign_operator_decrease = "assign_operator_decrease";
+    assign_operator_type const assign_operator = "assign_operator";
 
     effect_type const effect = "effect";
     effect_production_literal_type const effect_production_literal = "effect_production_literal";
@@ -393,47 +340,51 @@ namespace loki::domain::parser {
 
     BOOST_SPIRIT_DEFINE(name, variable, number, term, undefined)
 
-    BOOST_SPIRIT_DEFINE(
-        requirement_strips, requirement_typing, requirement_negative_preconditions, requirement_disjunctive_preconditions,
-        requirement_equality, requirement_existential_preconditions, requirement_universal_preconditions,
-        requirement_quantified_preconditions, requirement_conditional_effects, requirement_fluents,
-        requirement_object_fluents, requirement_numeric_fluents, requirement_adl, requirement_durative_actions,
-        requirement_derived_predicates, requirement_timed_initial_literals, requirement_preferences, requirement_constraints, requirement
-    )
+    BOOST_SPIRIT_DEFINE(requirement_strips, requirement_typing, requirement_negative_preconditions,
+        requirement_disjunctive_preconditions, requirement_equality, requirement_existential_preconditions,
+        requirement_universal_preconditions, requirement_quantified_preconditions,
+        requirement_conditional_effects, requirement_fluents, requirement_object_fluents,
+        requirement_numeric_fluents, requirement_adl, requirement_durative_actions,
+        requirement_derived_predicates, requirement_timed_initial_literals, requirement_preferences,
+        requirement_constraints, requirement)
 
-    BOOST_SPIRIT_DEFINE(
-        type, type_object, type_either, typed_list_of_names_recursively, typed_list_of_names,
-        typed_list_of_variables_recursively, typed_list_of_variables,
-        predicate, atomic_formula_skeleton,
-        function_symbol, function_term, function_type_number, function_type_type_, function_type,
+    BOOST_SPIRIT_DEFINE(type, type_object, type_either, typed_list_of_names_recursively,
+        typed_list_of_names, typed_list_of_variables_recursively, typed_list_of_variables)
+
+    BOOST_SPIRIT_DEFINE(predicate, atomic_formula_skeleton)
+
+    BOOST_SPIRIT_DEFINE(function_symbol, function_term, function_type_number, function_type_type_, function_type,
         atomic_function_skeleton, function_typed_list_of_atomic_function_skeletons_recursively,
-        function_typed_list_of_atomic_function_skeletons,
-        atomic_formula_of_terms_predicate, atomic_formula_of_terms_equality, atomic_formula_of_terms,
-        atom_of_terms, negated_atom_of_terms, literal_of_terms)
+        function_typed_list_of_atomic_function_skeletons)
 
-    BOOST_SPIRIT_DEFINE(
-        multi_operator_mul, multi_operator_plus, multi_operator,
-        binary_operator_minus, binary_operator_div, binary_operator,
-        binary_comparator_greater, binary_comparator_less, binary_comparator_equal,
-        binary_comparator_greater_equal, binary_comparator_less_equal, binary_comparator,
-        function_head, function_expression, function_expression_number,
-        function_expression_binary_op, function_expression_minus, function_expression_head
-    )
+    BOOST_SPIRIT_DEFINE(atomic_formula_of_terms_predicate, atomic_formula_of_terms_equality,
+        atomic_formula_of_terms, atom_of_terms, negated_atom_of_terms, literal_of_terms)
 
-    BOOST_SPIRIT_DEFINE(
-        goal_descriptor, goal_descriptor_atom, goal_descriptor_literal, goal_descriptor_and,
-        goal_descriptor_or, goal_descriptor_not, goal_descriptor_imply, goal_descriptor_exists,
-        goal_descriptor_forall, goal_descriptor_function_comparison,
-        constraint_goal_descriptor, constraint_goal_descriptor_and, constraint_goal_descriptor_forall, constraint_goal_descriptor_at_end,
-        constraint_goal_descriptor_always, constraint_goal_descriptor_sometime, constraint_goal_descriptor_within,
-        constraint_goal_descriptor_at_most_once, constraint_goal_descriptor_sometime_after,  constraint_goal_descriptor_sometime_before,
-        constraint_goal_descriptor_always_within, constraint_goal_descriptor_hold_during, constraint_goal_descriptor_hold_after
-    )
+    BOOST_SPIRIT_DEFINE(multi_operator_mul, multi_operator_plus, multi_operator,
+        binary_operator_minus, binary_operator_div, binary_operator)
 
-    BOOST_SPIRIT_DEFINE(
-        preference_name, precondition_goal_descriptor, precondition_goal_descriptor_simple,
-        precondition_goal_descriptor_and, precondition_goal_descriptor_preference, precondition_goal_descriptor_forall,
-        assign_operator_assign, assign_operator_scale_up, assign_operator_scale_down,
+    BOOST_SPIRIT_DEFINE(binary_comparator_greater, binary_comparator_less, binary_comparator_equal,
+        binary_comparator_greater_equal, binary_comparator_less_equal, binary_comparator)
+
+    BOOST_SPIRIT_DEFINE(function_head, function_expression, function_expression_number,
+        function_expression_binary_op, function_expression_minus, function_expression_head)
+
+    BOOST_SPIRIT_DEFINE(goal_descriptor, goal_descriptor_atom, goal_descriptor_literal,
+        goal_descriptor_and, goal_descriptor_or, goal_descriptor_not, goal_descriptor_imply,
+        goal_descriptor_exists, goal_descriptor_forall, goal_descriptor_function_comparison)
+
+    BOOST_SPIRIT_DEFINE(constraint_goal_descriptor, constraint_goal_descriptor_and,
+        constraint_goal_descriptor_forall, constraint_goal_descriptor_at_end,
+        constraint_goal_descriptor_always, constraint_goal_descriptor_sometime,
+        constraint_goal_descriptor_within, constraint_goal_descriptor_at_most_once,
+        constraint_goal_descriptor_sometime_after, constraint_goal_descriptor_sometime_before,
+        constraint_goal_descriptor_always_within, constraint_goal_descriptor_hold_during,
+        constraint_goal_descriptor_hold_after)
+
+    BOOST_SPIRIT_DEFINE(preference_name, precondition_goal_descriptor, precondition_goal_descriptor_simple,
+        precondition_goal_descriptor_and, precondition_goal_descriptor_preference, precondition_goal_descriptor_forall)
+
+    BOOST_SPIRIT_DEFINE(assign_operator_assign, assign_operator_scale_up, assign_operator_scale_down,
         assign_operator_increase, assign_operator_decrease, assign_operator)
 
     BOOST_SPIRIT_DEFINE(effect, effect_production_literal, effect_production_numeric_fluent,
@@ -605,7 +556,6 @@ namespace loki::domain
         return parser::undefined;
     }
 
-
     parser::requirement_strips_type const& requirement_strips() {
         return parser::requirement_strips;
     }
@@ -663,7 +613,6 @@ namespace loki::domain
     parser::requirement_type const& requirement() {
         return parser::requirement;
     }
-
 
     parser::type_type const& type() {
         return parser::type;
@@ -738,6 +687,171 @@ namespace loki::domain
         return parser::literal_of_terms;
     }
 
+    parser::multi_operator_mul_type const& multi_operator_mul() {
+        return parser::multi_operator_mul;
+    }
+    parser::multi_operator_plus_type const& multi_operator_plus() {
+        return parser::multi_operator_plus;
+    }
+    parser::multi_operator_type const& multi_operator() {
+        return parser::multi_operator;
+    }
+    parser::binary_operator_minus_type const& binary_operator_minus() {
+        return parser::binary_operator_minus;
+    }
+    parser::binary_operator_div_type const& binary_operator_div() {
+        return parser::binary_operator_div;
+    }
+    parser::binary_operator_type const& binary_operator() {
+        return parser::binary_operator;
+    }
+
+    parser::binary_comparator_greater_type const& binary_comparator_greater() {
+        return parser::binary_comparator_greater;
+    }
+    parser::binary_comparator_less_type const& binary_comparator_less() {
+        return parser::binary_comparator_less;
+    }
+    parser::binary_comparator_equal_type const& binary_comparator_equal() {
+        return parser::binary_comparator_equal;
+    }
+    parser::binary_comparator_greater_equal_type const& binary_comparator_greater_equal() {
+        return parser::binary_comparator_greater_equal;
+    }
+    parser::binary_comparator_less_equal_type const& binary_comparator_less_equal() {
+        return parser::binary_comparator_less_equal;
+    }
+    parser::binary_comparator_type const& binary_comparator() {
+        return parser::binary_comparator;
+    }
+
+    parser::function_expression_type const& function_expression() {
+        return parser::function_expression;
+    }
+    parser::function_head_type const& function_head() {
+        return parser::function_head;
+    }
+    parser::function_expression_number_type const& function_expression_number() {
+        return parser::function_expression_number;
+    }
+    parser::function_expression_binary_op_type const& function_expression_binary_op() {
+        return parser::function_expression_binary_op;
+    }
+    parser::function_expression_minus_type const& function_expression_minus() {
+        return parser::function_expression_minus;
+    }
+    parser::function_expression_head_type const& function_expression_head() {
+        return parser::function_expression_head;
+    }
+
+    parser::goal_descriptor_type const& goal_descriptor() {
+        return parser::goal_descriptor;
+    }
+    parser::goal_descriptor_atom_type const& goal_descriptor_atom() {
+        return parser::goal_descriptor_atom;
+    }
+    parser::goal_descriptor_literal_type const& goal_descriptor_literal() {
+        return parser::goal_descriptor_literal;
+    }
+    parser::goal_descriptor_and_type const& goal_descriptor_and() {
+        return parser::goal_descriptor_and;
+    }
+    parser::goal_descriptor_or_type const& goal_descriptor_or() {
+        return parser::goal_descriptor_or;
+    }
+    parser::goal_descriptor_not_type const& goal_descriptor_not() {
+        return parser::goal_descriptor_not;
+    }
+    parser::goal_descriptor_imply_type const& goal_descriptor_imply() {
+        return parser::goal_descriptor_imply;
+    }
+    parser::goal_descriptor_exists_type const& goal_descriptor_exists() {
+        return parser::goal_descriptor_exists;
+    }
+    parser::goal_descriptor_forall_type const& goal_descriptor_forall() {
+        return parser::goal_descriptor_forall;
+    }
+    parser::goal_descriptor_function_comparison_type const& goal_descriptor_function_comparison() {
+        return parser::goal_descriptor_function_comparison;
+    }
+
+    parser::constraint_goal_descriptor_type const& constraint_goal_descriptor() {
+        return parser::constraint_goal_descriptor;
+    }
+    parser::constraint_goal_descriptor_and_type const& constraint_goal_descriptor_and() {
+        return parser::constraint_goal_descriptor_and;
+    }
+    parser::constraint_goal_descriptor_forall_type const& constraint_goal_descriptor_forall() {
+        return parser::constraint_goal_descriptor_forall;
+    }
+    parser::constraint_goal_descriptor_at_end_type const& constraint_goal_descriptor_at_end() {
+        return parser::constraint_goal_descriptor_at_end;
+    }
+    parser::constraint_goal_descriptor_always_type const& constraint_goal_descriptor_always() {
+        return parser::constraint_goal_descriptor_always;
+    }
+    parser::constraint_goal_descriptor_sometime_type const& constraint_goal_descriptor_sometime() {
+        return parser::constraint_goal_descriptor_sometime;
+    }
+    parser::constraint_goal_descriptor_within_type const& constraint_goal_descriptor_within() {
+        return parser::constraint_goal_descriptor_within;
+    }
+    parser::constraint_goal_descriptor_at_most_once_type const& constraint_goal_descriptor_at_most_once() {
+        return parser::constraint_goal_descriptor_at_most_once;
+    }
+    parser::constraint_goal_descriptor_sometime_after_type const& constraint_goal_descriptor_sometime_after() {
+        return parser::constraint_goal_descriptor_sometime_after;
+    }
+    parser::constraint_goal_descriptor_sometime_before_type const& constraint_goal_descriptor_sometime_before() {
+        return parser::constraint_goal_descriptor_sometime_before;
+    }
+    parser::constraint_goal_descriptor_always_within_type const& constraint_goal_descriptor_always_within() {
+        return parser::constraint_goal_descriptor_always_within;
+    }
+    parser::constraint_goal_descriptor_hold_during_type const& constraint_goal_descriptor_hold_during() {
+        return parser::constraint_goal_descriptor_hold_during;
+    }
+    parser::constraint_goal_descriptor_hold_after_type const& constraint_goal_descriptor_hold_after() {
+        return parser::constraint_goal_descriptor_hold_after;
+    }
+
+    parser::precondition_goal_descriptor_type const& precondition_goal_descriptor() {
+        return parser::precondition_goal_descriptor;
+    }
+    parser::preference_name_type const& preference_name() {
+        return parser::preference_name;
+    }
+    parser::precondition_goal_descriptor_simple_type const& precondition_goal_descriptor_simple() {
+        return parser::precondition_goal_descriptor_simple;
+    }
+    parser::precondition_goal_descriptor_and_type const& precondition_goal_descriptor_and() {
+        return parser::precondition_goal_descriptor_and;
+    }
+    parser::precondition_goal_descriptor_preference_type const& precondition_goal_descriptor_preference() {
+        return parser::precondition_goal_descriptor_preference;
+    }
+    parser::precondition_goal_descriptor_forall_type const& precondition_goal_descriptor_forall() {
+        return parser::precondition_goal_descriptor_forall;
+    }
+
+    parser::assign_operator_assign_type const& assign_operator_assign() {
+        return parser::assign_operator_assign;
+    }
+    parser::assign_operator_scale_up_type const& assign_operator_scale_up() {
+        return parser::assign_operator_scale_up;
+    }
+    parser::assign_operator_scale_down_type const& assign_operator_scale_down() {
+        return parser::assign_operator_scale_down;
+    }
+    parser::assign_operator_increase_type const& assign_operator_increase() {
+        return parser::assign_operator_increase;
+    }
+    parser::assign_operator_decrease_type const& assign_operator_decrease() {
+        return parser::assign_operator_decrease;
+    }
+    parser::assign_operator_type const& assign_operator() {
+        return parser::assign_operator;
+    }
 
     parser::effect_type const& effect() {
         return parser::effect;

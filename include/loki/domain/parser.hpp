@@ -205,65 +205,65 @@ namespace loki::domain
         typedef x3::rule<NegatedAtomOfTermsClass, ast::NegatedAtomOfTerms> negated_atom_of_terms_type;
         typedef x3::rule<LiteralOfTermsClass, ast::LiteralOfTerms> literal_of_terms_type;
 
-        x3::rule<MultiOperatorMulClass, ast::MultiOperatorMul> multi_operator_mul_type;
-        x3::rule<MultiOperatorPlusClass, ast::MultiOperatorPlus> multi_operator_plus_type;
-        x3::rule<MultiOperatorClass, ast::MultiOperator> multi_operator_type;
-        x3::rule<BinaryOperatorMinusClass, ast::BinaryOperatorMinus> binary_operator_minus_type;
-        x3::rule<BinaryOperatorDivClass, ast::BinaryOperatorDiv> binary_operator_div_type;
-        x3::rule<BinaryOperatorClass, ast::BinaryOperator> binary_operator_type;
+        typedef x3::rule<MultiOperatorMulClass, ast::MultiOperatorMul> multi_operator_mul_type;
+        typedef x3::rule<MultiOperatorPlusClass, ast::MultiOperatorPlus> multi_operator_plus_type;
+        typedef x3::rule<MultiOperatorClass, ast::MultiOperator> multi_operator_type;
+        typedef x3::rule<BinaryOperatorMinusClass, ast::BinaryOperatorMinus> binary_operator_minus_type;
+        typedef x3::rule<BinaryOperatorDivClass, ast::BinaryOperatorDiv> binary_operator_div_type;
+        typedef x3::rule<BinaryOperatorClass, ast::BinaryOperator> binary_operator_type;
 
-        x3::rule<BinaryComparatorGreaterClass, ast::BinaryComparatorGreater> binary_comparator_greater_type;
-        x3::rule<BinaryComparatorLessClass, ast::BinaryComparatorLess> binary_comparator_less_type;
-        x3::rule<BinaryComparatorEqualClass, ast::BinaryComparatorEqual> binary_comparator_equal_type;
-        x3::rule<BinaryComparatorGreaterEqualClass, ast::BinaryComparatorGreaterEqual> binary_comparator_greater_equal_type;
-        x3::rule<BinaryComparatorLessEqualClass, ast::BinaryComparatorLessEqual> binary_comparator_less_equal_type;
-        x3::rule<BinaryComparatorClass, ast::BinaryComparator> binary_comparator_type;
+        typedef x3::rule<BinaryComparatorGreaterClass, ast::BinaryComparatorGreater> binary_comparator_greater_type;
+        typedef x3::rule<BinaryComparatorLessClass, ast::BinaryComparatorLess> binary_comparator_less_type;
+        typedef x3::rule<BinaryComparatorEqualClass, ast::BinaryComparatorEqual> binary_comparator_equal_type;
+        typedef x3::rule<BinaryComparatorGreaterEqualClass, ast::BinaryComparatorGreaterEqual> binary_comparator_greater_equal_type;
+        typedef x3::rule<BinaryComparatorLessEqualClass, ast::BinaryComparatorLessEqual> binary_comparator_less_equal_type;
+        typedef x3::rule<BinaryComparatorClass, ast::BinaryComparator> binary_comparator_type;
 
-        x3::rule<FunctionExpressionClass, ast::FunctionExpression> function_expression_type;
-        x3::rule<FunctionHeadClass, ast::FunctionHead> function_head_type;
-        x3::rule<FunctionExpressionNumberClass, ast::FunctionExpressionNumber> function_expression_number_type;
-        x3::rule<FunctionExpressionBinaryOpClass, ast::FunctionExpressionBinaryOp> function_expression_binary_op_type;
-        x3::rule<FunctionExpressionMinusClass, ast::FunctionExpressionMinus> function_expression_minus_type;
-        x3::rule<FunctionExpressionHeadClass, ast::FunctionExpressionHead> function_expression_head_type;
+        typedef x3::rule<FunctionExpressionClass, ast::FunctionExpression> function_expression_type;
+        typedef x3::rule<FunctionHeadClass, ast::FunctionHead> function_head_type;
+        typedef x3::rule<FunctionExpressionNumberClass, ast::FunctionExpressionNumber> function_expression_number_type;
+        typedef x3::rule<FunctionExpressionBinaryOpClass, ast::FunctionExpressionBinaryOp> function_expression_binary_op_type;
+        typedef x3::rule<FunctionExpressionMinusClass, ast::FunctionExpressionMinus> function_expression_minus_type;
+        typedef x3::rule<FunctionExpressionHeadClass, ast::FunctionExpressionHead> function_expression_head_type;
 
-        x3::rule<GoalDescriptorClass, ast::GoalDescriptor> goal_descriptor_type;
-        x3::rule<GoalDescriptorAtomClass, ast::GoalDescriptorAtom> goal_descriptor_atom_type;
-        x3::rule<GoalDescriptorLiteralClass, ast::GoalDescriptorLiteral> goal_descriptor_literal_type;
-        x3::rule<GoalDescriptorAndClass, ast::GoalDescriptorAnd> goal_descriptor_and_type;
-        x3::rule<GoalDescriptorOrClass, ast::GoalDescriptorOr> goal_descriptor_or_type;
-        x3::rule<GoalDescriptorNotClass, ast::GoalDescriptorNot> goal_descriptor_not_type;
-        x3::rule<GoalDescriptorImplyClass, ast::GoalDescriptorImply> goal_descriptor_imply_type;
-        x3::rule<GoalDescriptorExistsClass, ast::GoalDescriptorExists> goal_descriptor_exists_type;
-        x3::rule<GoalDescriptorForallClass, ast::GoalDescriptorForall> goal_descriptor_forall_type;
-        x3::rule<GoalDescriptorFunctionComparisonClass, ast::GoalDescriptorFunctionComparison> goal_descriptor_function_comparison_type;
+        typedef x3::rule<GoalDescriptorClass, ast::GoalDescriptor> goal_descriptor_type;
+        typedef x3::rule<GoalDescriptorAtomClass, ast::GoalDescriptorAtom> goal_descriptor_atom_type;
+        typedef x3::rule<GoalDescriptorLiteralClass, ast::GoalDescriptorLiteral> goal_descriptor_literal_type;
+        typedef x3::rule<GoalDescriptorAndClass, ast::GoalDescriptorAnd> goal_descriptor_and_type;
+        typedef x3::rule<GoalDescriptorOrClass, ast::GoalDescriptorOr> goal_descriptor_or_type;
+        typedef x3::rule<GoalDescriptorNotClass, ast::GoalDescriptorNot> goal_descriptor_not_type;
+        typedef x3::rule<GoalDescriptorImplyClass, ast::GoalDescriptorImply> goal_descriptor_imply_type;
+        typedef x3::rule<GoalDescriptorExistsClass, ast::GoalDescriptorExists> goal_descriptor_exists_type;
+        typedef x3::rule<GoalDescriptorForallClass, ast::GoalDescriptorForall> goal_descriptor_forall_type;
+        typedef x3::rule<GoalDescriptorFunctionComparisonClass, ast::GoalDescriptorFunctionComparison> goal_descriptor_function_comparison_type;
 
-        x3::rule<ConstraintGoalDescriptorClass, ast::ConstraintGoalDescriptor> constraint_goal_descriptor_type;
-        x3::rule<ConstraintGoalDescriptorAndClass, ast::ConstraintGoalDescriptorAnd> constraint_goal_descriptor_and_type;
-        x3::rule<ConstraintGoalDescriptorForallClass, ast::ConstraintGoalDescriptorForall> constraint_goal_descriptor_forall_type;
-        x3::rule<ConstraintGoalDescriptorAtEndClass, ast::ConstraintGoalDescriptorAtEnd> constraint_goal_descriptor_at_end_type;
-        x3::rule<ConstraintGoalDescriptorAlwaysClass, ast::ConstraintGoalDescriptorAlways> constraint_goal_descriptor_always_type;
-        x3::rule<ConstraintGoalDescriptorSometimeClass, ast::ConstraintGoalDescriptorSometime> constraint_goal_descriptor_sometime_type;
-        x3::rule<ConstraintGoalDescriptorWithinClass, ast::ConstraintGoalDescriptorWithin> constraint_goal_descriptor_within_type;
-        x3::rule<ConstraintGoalDescriptorAtMostOnceClass, ast::ConstraintGoalDescriptorAtMostOnce> constraint_goal_descriptor_at_most_once_type;
-        x3::rule<ConstraintGoalDescriptorSometimeAfterClass, ast::ConstraintGoalDescriptorSometimeAfter> constraint_goal_descriptor_sometime_after_type;
-        x3::rule<ConstraintGoalDescriptorSometimeBeforeClass, ast::ConstraintGoalDescriptorSometimeBefore> constraint_goal_descriptor_sometime_before_type;
-        x3::rule<ConstraintGoalDescriptorAlwaysWithinClass, ast::ConstraintGoalDescriptorAlwaysWithin> constraint_goal_descriptor_always_within_type;
-        x3::rule<ConstraintGoalDescriptorHoldDuringClass, ast::ConstraintGoalDescriptorHoldDuring> constraint_goal_descriptor_hold_during_type;
-        x3::rule<ConstraintGoalDescriptorHoldAfterClass, ast::ConstraintGoalDescriptorHoldAfter> constraint_goal_descriptor_hold_after_type;
+        typedef x3::rule<ConstraintGoalDescriptorClass, ast::ConstraintGoalDescriptor> constraint_goal_descriptor_type;
+        typedef x3::rule<ConstraintGoalDescriptorAndClass, ast::ConstraintGoalDescriptorAnd> constraint_goal_descriptor_and_type;
+        typedef x3::rule<ConstraintGoalDescriptorForallClass, ast::ConstraintGoalDescriptorForall> constraint_goal_descriptor_forall_type;
+        typedef x3::rule<ConstraintGoalDescriptorAtEndClass, ast::ConstraintGoalDescriptorAtEnd> constraint_goal_descriptor_at_end_type;
+        typedef x3::rule<ConstraintGoalDescriptorAlwaysClass, ast::ConstraintGoalDescriptorAlways> constraint_goal_descriptor_always_type;
+        typedef x3::rule<ConstraintGoalDescriptorSometimeClass, ast::ConstraintGoalDescriptorSometime> constraint_goal_descriptor_sometime_type;
+        typedef x3::rule<ConstraintGoalDescriptorWithinClass, ast::ConstraintGoalDescriptorWithin> constraint_goal_descriptor_within_type;
+        typedef x3::rule<ConstraintGoalDescriptorAtMostOnceClass, ast::ConstraintGoalDescriptorAtMostOnce> constraint_goal_descriptor_at_most_once_type;
+        typedef x3::rule<ConstraintGoalDescriptorSometimeAfterClass, ast::ConstraintGoalDescriptorSometimeAfter> constraint_goal_descriptor_sometime_after_type;
+        typedef x3::rule<ConstraintGoalDescriptorSometimeBeforeClass, ast::ConstraintGoalDescriptorSometimeBefore> constraint_goal_descriptor_sometime_before_type;
+        typedef x3::rule<ConstraintGoalDescriptorAlwaysWithinClass, ast::ConstraintGoalDescriptorAlwaysWithin> constraint_goal_descriptor_always_within_type;
+        typedef x3::rule<ConstraintGoalDescriptorHoldDuringClass, ast::ConstraintGoalDescriptorHoldDuring> constraint_goal_descriptor_hold_during_type;
+        typedef x3::rule<ConstraintGoalDescriptorHoldAfterClass, ast::ConstraintGoalDescriptorHoldAfter> constraint_goal_descriptor_hold_after_type;
 
-        x3::rule<PreconditionGoalDescriptorClass, ast::PreconditionGoalDescriptor> precondition_goal_descriptor_type;
-        x3::rule<PreferenceNameClass, ast::PreferenceName> preference_name_type;
-        x3::rule<PreconditionGoalDescriptorSimpleClass, ast::PreconditionGoalDescriptorSimple> precondition_goal_descriptor_simple_type;
-        x3::rule<PreconditionGoalDescriptorAndClass, ast::PreconditionGoalDescriptorAnd> precondition_goal_descriptor_and_type;
-        x3::rule<PreconditionGoalDescriptorPreferenceClass, ast::PreconditionGoalDescriptorPreference> precondition_goal_descriptor_preference_type;
-        x3::rule<PreconditionGoalDescriptorForallClass, ast::PreconditionGoalDescriptorForall> precondition_goal_descriptor_forall_type;
+        typedef x3::rule<PreconditionGoalDescriptorClass, ast::PreconditionGoalDescriptor> precondition_goal_descriptor_type;
+        typedef x3::rule<PreferenceNameClass, ast::PreferenceName> preference_name_type;
+        typedef x3::rule<PreconditionGoalDescriptorSimpleClass, ast::PreconditionGoalDescriptorSimple> precondition_goal_descriptor_simple_type;
+        typedef x3::rule<PreconditionGoalDescriptorAndClass, ast::PreconditionGoalDescriptorAnd> precondition_goal_descriptor_and_type;
+        typedef x3::rule<PreconditionGoalDescriptorPreferenceClass, ast::PreconditionGoalDescriptorPreference> precondition_goal_descriptor_preference_type;
+        typedef x3::rule<PreconditionGoalDescriptorForallClass, ast::PreconditionGoalDescriptorForall> precondition_goal_descriptor_forall_type;
 
-        x3::rule<AssignOperatorAssignClass, ast::AssignOperatorAssign> assign_operator_assign_type;
-        x3::rule<AssignOperatorScaleUpClass, ast::AssignOperatorScaleUp> assign_operator_scale_up_type;
-        x3::rule<AssignOperatorScaleDownClass, ast::AssignOperatorScaleDown> assign_operator_scale_down_type;
-        x3::rule<AssignOperatorIncreaseClass, ast::AssignOperatorIncrease> assign_operator_increase_type;
-        x3::rule<AssignOperatorDecreaseClass, ast::AssignOperatorDecrease> assign_operator_decrease_type;
-        x3::rule<AssignOperatorClass, ast::AssignOperator> assign_operator_type;
+        typedef x3::rule<AssignOperatorAssignClass, ast::AssignOperatorAssign> assign_operator_assign_type;
+        typedef x3::rule<AssignOperatorScaleUpClass, ast::AssignOperatorScaleUp> assign_operator_scale_up_type;
+        typedef x3::rule<AssignOperatorScaleDownClass, ast::AssignOperatorScaleDown> assign_operator_scale_down_type;
+        typedef x3::rule<AssignOperatorIncreaseClass, ast::AssignOperatorIncrease> assign_operator_increase_type;
+        typedef x3::rule<AssignOperatorDecreaseClass, ast::AssignOperatorDecrease> assign_operator_decrease_type;
+        typedef x3::rule<AssignOperatorClass, ast::AssignOperator> assign_operator_type;
 
         typedef x3::rule<EffectClass, ast::Effect> effect_type;
         typedef x3::rule<EffectProductionLiteralClass, ast::EffectProductionLiteral> effect_production_literal_type;
@@ -309,6 +309,36 @@ namespace loki::domain
 
         BOOST_SPIRIT_DECLARE(atomic_formula_of_terms_type, atom_of_terms_type, negated_atom_of_terms_type, literal_of_terms_type)
 
+        BOOST_SPIRIT_DECLARE(multi_operator_mul_type, multi_operator_plus_type, multi_operator_type,
+            binary_operator_minus_type, binary_operator_div_type, binary_operator_type)
+
+        BOOST_SPIRIT_DECLARE(binary_comparator_greater_type, binary_comparator_less_type,
+            binary_comparator_equal_type, binary_comparator_greater_equal_type,
+            binary_comparator_less_equal_type, binary_comparator_type)
+
+        BOOST_SPIRIT_DECLARE(function_expression_type, function_head_type, function_expression_number_type,
+            function_expression_number_type, function_expression_binary_op_type,
+            function_expression_minus_type, function_expression_head_type)
+
+        BOOST_SPIRIT_DECLARE(goal_descriptor_type, goal_descriptor_atom_type, goal_descriptor_literal_type,
+            goal_descriptor_and_type, goal_descriptor_or_type, goal_descriptor_not_type,
+            goal_descriptor_imply_type, goal_descriptor_exists_type, goal_descriptor_forall_type,
+            goal_descriptor_function_comparison_type)
+
+        BOOST_SPIRIT_DECLARE(constraint_goal_descriptor_type, constraint_goal_descriptor_and_type,
+            constraint_goal_descriptor_forall_type, constraint_goal_descriptor_at_end_type,
+            constraint_goal_descriptor_always_type, constraint_goal_descriptor_sometime_type,
+            constraint_goal_descriptor_within_type, constraint_goal_descriptor_at_most_once_type,
+            constraint_goal_descriptor_sometime_after_type, constraint_goal_descriptor_sometime_before_type,
+            constraint_goal_descriptor_always_within_type, constraint_goal_descriptor_hold_during_type,
+            constraint_goal_descriptor_hold_after_type)
+
+        BOOST_SPIRIT_DECLARE(precondition_goal_descriptor_type, preference_name_type,
+           precondition_goal_descriptor_simple_type, precondition_goal_descriptor_and_type,
+           precondition_goal_descriptor_preference_type, precondition_goal_descriptor_forall_type)
+
+        BOOST_SPIRIT_DECLARE(assign_operator_assign_type, assign_operator_scale_up_type, assign_operator_scale_down_type,
+            assign_operator_increase_type, assign_operator_decrease_type, assign_operator_type)
 
         BOOST_SPIRIT_DECLARE(effect_type, effect_production_literal_type, effect_production_numeric_fluent_type,
             effect_production_object_fluent_type, effect_production_type, effect_conditional_forall_type,
@@ -356,6 +386,20 @@ namespace loki::domain
     parser::predicate_type const& predicate();
     parser::atomic_formula_skeleton_type const& atomic_formula_skeleton();
 
+    parser::multi_operator_mul_type const& multi_operator_mul();
+    parser::multi_operator_plus_type const& multi_operator_plus();
+    parser::multi_operator_type const& multi_operator();
+    parser::binary_operator_minus_type const& binary_operator_minus();
+    parser::binary_operator_div_type const& binary_operator_div();
+    parser::binary_operator_type const& binary_operator();
+
+    parser::binary_comparator_greater_type const& binary_comparator_greater();
+    parser::binary_comparator_less_type const& binary_comparator_less();
+    parser::binary_comparator_equal_type const& binary_comparator_equal();
+    parser::binary_comparator_greater_equal_type const& binary_comparator_greater_equal();
+    parser::binary_comparator_less_equal_type const& binary_comparator_less_equal();
+    parser::binary_comparator_type const& binary_comparator();
+
     parser::function_symbol_type const& function_symbol();
     parser::function_term_type const& function_term();
     parser::function_type_number_type const& function_type_number();
@@ -371,6 +415,53 @@ namespace loki::domain
     parser::atom_of_terms_type const& atom_of_terms();
     parser::negated_atom_of_terms_type const& negated_atom_of_terms();
     parser::literal_of_terms_type const& literal_of_terms();
+
+
+    parser::function_expression_type const& function_expression();
+    parser::function_head_type const& function_head();
+    parser::function_expression_number_type const& function_expression_number();
+    parser::function_expression_binary_op_type const& function_expression_binary_op();
+    parser::function_expression_minus_type const& function_expression_minus();
+    parser::function_expression_head_type const& function_expression_head();
+
+    parser::goal_descriptor_type const& goal_descriptor();
+    parser::goal_descriptor_atom_type const& goal_descriptor_atom();
+    parser::goal_descriptor_literal_type const& goal_descriptor_literal();
+    parser::goal_descriptor_and_type const& goal_descriptor_and();
+    parser::goal_descriptor_or_type const& goal_descriptor_or();
+    parser::goal_descriptor_not_type const& goal_descriptor_not();
+    parser::goal_descriptor_imply_type const& goal_descriptor_imply();
+    parser::goal_descriptor_exists_type const& goal_descriptor_exists();
+    parser::goal_descriptor_forall_type const& goal_descriptor_forall();
+    parser::goal_descriptor_function_comparison_type const& goal_descriptor_function_comparison();
+
+    parser::constraint_goal_descriptor_type const& constraint_goal_descriptor();
+    parser::constraint_goal_descriptor_and_type const& constraint_goal_descriptor_and();
+    parser::constraint_goal_descriptor_forall_type const& constraint_goal_descriptor_forall();
+    parser::constraint_goal_descriptor_at_end_type const& constraint_goal_descriptor_at_end();
+    parser::constraint_goal_descriptor_always_type const& constraint_goal_descriptor_always();
+    parser::constraint_goal_descriptor_sometime_type const& constraint_goal_descriptor_sometime();
+    parser::constraint_goal_descriptor_within_type const& constraint_goal_descriptor_within();
+    parser::constraint_goal_descriptor_at_most_once_type const& constraint_goal_descriptor_at_most_once();
+    parser::constraint_goal_descriptor_sometime_after_type const& constraint_goal_descriptor_sometime_after();
+    parser::constraint_goal_descriptor_sometime_before_type const& constraint_goal_descriptor_sometime_before();
+    parser::constraint_goal_descriptor_always_within_type const& constraint_goal_descriptor_always_within();
+    parser::constraint_goal_descriptor_hold_during_type const& constraint_goal_descriptor_hold_during();
+    parser::constraint_goal_descriptor_hold_after_type const& constraint_goal_descriptor_hold_after();
+
+    parser::precondition_goal_descriptor_type const& precondition_goal_descriptor();
+    parser::preference_name_type const& preference_name();
+    parser::precondition_goal_descriptor_simple_type const& precondition_goal_descriptor_simple();
+    parser::precondition_goal_descriptor_and_type const& precondition_goal_descriptor_and();
+    parser::precondition_goal_descriptor_preference_type const& precondition_goal_descriptor_preference();
+    parser::precondition_goal_descriptor_forall_type const& precondition_goal_descriptor_forall();
+
+    parser::assign_operator_assign_type const& assign_operator_assign();
+    parser::assign_operator_scale_up_type const& assign_operator_scale_up();
+    parser::assign_operator_scale_down_type const& assign_operator_scale_down();
+    parser::assign_operator_increase_type const& assign_operator_increase();
+    parser::assign_operator_decrease_type const& assign_operator_decrease();
+    parser::assign_operator_type const& assign_operator();
 
     parser::effect_type const& effect();
     parser::effect_production_literal_type const& effect_production_literal();
