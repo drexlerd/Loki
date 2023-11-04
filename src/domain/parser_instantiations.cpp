@@ -9,70 +9,60 @@ namespace loki::domain::parser
     using phrase_context_type = loki::phrase_context_type;
     using context_type = loki::context_type;
 
-    BOOST_SPIRIT_INSTANTIATE(
-        name_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        variable_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        number_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        term_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        undefined_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(name_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(variable_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(number_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(term_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(undefined_type, iterator_type, context_type)
 
-    BOOST_SPIRIT_INSTANTIATE(
-        type_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        type_object_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        type_either_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        typed_list_of_names_recursively_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        typed_list_of_names_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        typed_list_of_variables_recursively_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        typed_list_of_variables_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_strips_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_typing_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_negative_preconditions_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_disjunctive_preconditions_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_equality_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_existential_preconditions_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_universal_preconditions_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_quantified_preconditions_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_conditional_effects_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_fluents_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_object_fluents_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_numeric_fluents_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_adl_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_durative_actions_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_derived_predicates_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_timed_initial_literals_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_preferences_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_constraints_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_type, iterator_type, context_type)
 
-    BOOST_SPIRIT_INSTANTIATE(
-        predicate_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        atomic_formula_skeleton_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(type_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(type_object_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(type_either_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(typed_list_of_names_recursively_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(typed_list_of_names_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(typed_list_of_variables_recursively_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(typed_list_of_variables_type, iterator_type, context_type)
 
-    BOOST_SPIRIT_INSTANTIATE(
-        function_symbol_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        function_term_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        function_type_number_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        function_type_type_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        function_type_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        atomic_function_skeleton_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        function_typed_list_of_atomic_function_skeletons_recursively_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        function_typed_list_of_atomic_function_skeletons_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(predicate_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(atomic_formula_skeleton_type, iterator_type, context_type)
 
-    BOOST_SPIRIT_INSTANTIATE(
-        atomic_formula_of_terms_predicate_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        atomic_formula_of_terms_equality_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        atomic_formula_of_terms_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        atom_of_terms_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        negated_atom_of_terms_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(
-        literal_of_terms_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(function_symbol_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(function_term_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(function_type_number_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(function_type_type_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(function_type_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(atomic_function_skeleton_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(function_typed_list_of_atomic_function_skeletons_recursively_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(function_typed_list_of_atomic_function_skeletons_type, iterator_type, context_type)
 
-    BOOST_SPIRIT_INSTANTIATE(
-        derived_predicate_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(atomic_formula_of_terms_predicate_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(atomic_formula_of_terms_equality_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(atomic_formula_of_terms_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(atom_of_terms_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(negated_atom_of_terms_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(literal_of_terms_type, iterator_type, context_type)
 
-    BOOST_SPIRIT_INSTANTIATE(
-        domain_description_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(derived_predicate_type, iterator_type, context_type)
+
+    BOOST_SPIRIT_INSTANTIATE(domain_description_type, iterator_type, context_type)
 }

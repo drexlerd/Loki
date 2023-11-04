@@ -20,6 +20,26 @@ namespace loki::domain
         struct TermClass;
         struct UndefinedClass;
 
+        struct RequirementStripsClass;
+        struct RequirementTypingClass;
+        struct RequirementNegativePreconditionsClass;
+        struct RequirementDisjunctivePreconditionsClass;
+        struct RequirementEqualityClass;
+        struct RequirementExistentialPreconditionsClass;
+        struct RequirementUniversalPreconditionsClass;
+        struct RequirementQuantifiedPreconditionsClass;
+        struct RequirementConditionalEffectsClass;
+        struct RequirementFluentsClass;
+        struct RequirementObjectFluentsClass;
+        struct RequirementNumericFluentsClass;
+        struct RequirementAdlClass;
+        struct RequirementDurativeActionsClass;
+        struct RequirementDerivedPredicatesClass;
+        struct RequirementTimedInitialLiteralsClass;
+        struct RequirementPreferencesClass;
+        struct RequirementConstraintsClass;
+        struct RequirementClass;
+
         struct TypeClass;
         struct TypeObjectClass;
         struct TypeEitherClass;
@@ -58,6 +78,26 @@ namespace loki::domain
         typedef x3::rule<TermClass, ast::Term> term_type;
         typedef x3::rule<UndefinedClass, ast::Undefined> undefined_type;
 
+        typedef x3::rule<RequirementStripsClass, ast::RequirementStrips> requirement_strips_type;
+        typedef x3::rule<RequirementTypingClass, ast::RequirementTyping> requirement_typing_type;
+        typedef x3::rule<RequirementNegativePreconditionsClass, ast::RequirementNegativePreconditions> requirement_negative_preconditions_type;
+        typedef x3::rule<RequirementDisjunctivePreconditionsClass, ast::RequirementDisjunctivePreconditions> requirement_disjunctive_preconditions_type;
+        typedef x3::rule<RequirementEqualityClass, ast::RequirementEquality> requirement_equality_type;
+        typedef x3::rule<RequirementExistentialPreconditionsClass, ast::RequirementExistentialPreconditions> requirement_existential_preconditions_type;
+        typedef x3::rule<RequirementUniversalPreconditionsClass, ast::RequirementUniversalPreconditions> requirement_universal_preconditions_type;
+        typedef x3::rule<RequirementQuantifiedPreconditionsClass, ast::RequirementQuantifiedPreconditions> requirement_quantified_preconditions_type;
+        typedef x3::rule<RequirementConditionalEffectsClass, ast::RequirementConditionalEffects> requirement_conditional_effects_type;
+        typedef x3::rule<RequirementFluentsClass, ast::RequirementFluents> requirement_fluents_type;
+        typedef x3::rule<RequirementObjectFluentsClass, ast::RequirementObjectFluents> requirement_object_fluents_type;
+        typedef x3::rule<RequirementNumericFluentsClass, ast::RequirementNumericFluents> requirement_numeric_fluents_type;
+        typedef x3::rule<RequirementAdlClass, ast::RequirementAdl> requirement_adl_type;
+        typedef x3::rule<RequirementDurativeActionsClass, ast::RequirementDurativeActions> requirement_durative_actions_type;
+        typedef x3::rule<RequirementDerivedPredicatesClass, ast::RequirementDerivedPredicates> requirement_derived_predicates_type;
+        typedef x3::rule<RequirementTimedInitialLiteralsClass, ast::RequirementTimedInitialLiterals> requirement_timed_initial_literals_type;
+        typedef x3::rule<RequirementPreferencesClass, ast::RequirementPreferences> requirement_preferences_type;
+        typedef x3::rule<RequirementConstraintsClass, ast::RequirementConstraints> requirement_constraints_type;
+        typedef x3::rule<RequirementClass, ast::Requirement> requirement_type;
+
         typedef x3::rule<TypeClass, ast::Type> type_type;
         typedef x3::rule<TypeObjectClass, ast::TypeObject> type_object_type;
         typedef x3::rule<TypeEitherClass, ast::TypeEither> type_either_type;
@@ -93,6 +133,13 @@ namespace loki::domain
         BOOST_SPIRIT_DECLARE(name_type, variable_type, number_type, term_type, undefined_type)
 
         BOOST_SPIRIT_DECLARE(
+            requirement_strips_type, requirement_typing_type, requirement_negative_preconditions_type, requirement_disjunctive_preconditions_type,
+            requirement_equality_type, requirement_existential_preconditions_type, requirement_universal_preconditions_type,
+            requirement_quantified_preconditions_type, requirement_conditional_effects_type, requirement_fluents_type,
+            requirement_object_fluents_type, requirement_numeric_fluents_type, requirement_adl_type, requirement_durative_actions_type,
+            requirement_derived_predicates_type, requirement_timed_initial_literals_type, requirement_preferences_type, requirement_constraints_type, requirement_type)
+
+        BOOST_SPIRIT_DECLARE(
             type_type, type_object_type, type_either_type, typed_list_of_names_recursively_type, typed_list_of_names_type,
             typed_list_of_variables_recursively_type, typed_list_of_variables_type)
 
@@ -112,6 +159,26 @@ namespace loki::domain
     parser::number_type const& number();
     parser::term_type const& term();
     parser::undefined_type const& undefined();
+
+    parser::requirement_strips_type const& requirement_strips();
+    parser::requirement_typing_type const& requirement_typing();
+    parser::requirement_negative_preconditions_type const& requirement_negative_preconditions();
+    parser::requirement_disjunctive_preconditions_type const& requirement_disjunctive_preconditions();
+    parser::requirement_equality_type const& requirement_equality();
+    parser::requirement_existential_preconditions_type const& requirement_existential_preconditions();
+    parser::requirement_universal_preconditions_type const& requirement_universal_preconditions();
+    parser::requirement_quantified_preconditions_type const& requirement_quantified_preconditions();
+    parser::requirement_conditional_effects_type const& requirement_conditional_effects();
+    parser::requirement_fluents_type const& requirement_fluents();
+    parser::requirement_object_fluents_type const& requirement_object_fluents();
+    parser::requirement_numeric_fluents_type const& requirement_numeric_fluents();
+    parser::requirement_adl_type const& requirement_adl();
+    parser::requirement_durative_actions_type const& requirement_durative_actions();
+    parser::requirement_derived_predicates_type const& requirement_derived_predicates();
+    parser::requirement_timed_initial_literals_type const& requirement_timed_initial_literals();
+    parser::requirement_preferences_type const& requirement_preferences();
+    parser::requirement_constraints_type const& requirement_constraints();
+    parser::requirement_type const& requirement();
 
     parser::type_type const& type();
     parser::type_object_type const& type_object();

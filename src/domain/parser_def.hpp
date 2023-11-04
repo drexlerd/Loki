@@ -30,26 +30,6 @@ namespace loki::domain::parser {
     // Rule IDs
     ///////////////////////////////////////////////////////////////////////////
 
-    struct RequirementStripsClass;
-    struct RequirementTypingClass;
-    struct RequirementNegativePreconditionsClass;
-    struct RequirementDisjunctivePreconditionsClass;
-    struct RequirementEqualityClass;
-    struct RequirementExistentialPreconditionsClass;
-    struct RequirementUniversalPreconditionsClass;
-    struct RequirementQuantifiedPreconditionsClass;
-    struct RequirementConditionalEffectsClass;
-    struct RequirementFluentsClass;
-    struct RequirementObjectFluentsClass;
-    struct RequirementNumericFluentsClass;
-    struct RequirementAdlClass;
-    struct RequirementDurativeActionsClass;
-    struct RequirementDerivedPredicatesClass;
-    struct RequirementTimedInitialLiteralsClass;
-    struct RequirementPreferencesClass;
-    struct RequirementConstraintsClass;
-    struct RequirementClass;
-
     struct MultiOperatorMulClass;
     struct MultiOperatorPlusClass;
     struct MultiOperatorClass;
@@ -145,44 +125,25 @@ namespace loki::domain::parser {
     term_type const term = "term";
     undefined_type const undefined = "undefined";
 
-    x3::rule<RequirementStripsClass, ast::RequirementStrips> const
-        requirement_strips = "requirement_strips";
-    x3::rule<RequirementTypingClass, ast::RequirementTyping> const
-        requirement_typing = "requirement_typing";
-    x3::rule<RequirementNegativePreconditionsClass, ast::RequirementNegativePreconditions> const
-        requirement_negative_preconditions = "requirement_negative_preconditions";
-    x3::rule<RequirementDisjunctivePreconditionsClass, ast::RequirementDisjunctivePreconditions> const
-        requirement_disjunctive_preconditions = "requirement_disjunctive_preconditions";
-    x3::rule<RequirementEqualityClass, ast::RequirementEquality> const
-        requirement_equality = "requirement_equality";
-    x3::rule<RequirementExistentialPreconditionsClass, ast::RequirementExistentialPreconditions> const
-        requirement_existential_preconditions = "requirement_existential_preconditions";
-    x3::rule<RequirementUniversalPreconditionsClass, ast::RequirementUniversalPreconditions> const
-        requirement_universal_preconditions = "requirement_universal_preconditions";
-    x3::rule<RequirementQuantifiedPreconditionsClass, ast::RequirementQuantifiedPreconditions> const
-        requirement_quantified_preconditions = "requirement_quantified_preconditions";
-    x3::rule<RequirementConditionalEffectsClass, ast::RequirementConditionalEffects> const
-        requirement_conditional_effects = "requirement_conditional_effects";
-    x3::rule<RequirementFluentsClass, ast::RequirementFluents> const
-        requirement_fluents = "requirement_fluents";
-    x3::rule<RequirementObjectFluentsClass, ast::RequirementObjectFluents> const
-        requirement_object_fluents = "requirement_object_fluents";
-    x3::rule<RequirementNumericFluentsClass, ast::RequirementNumericFluents> const
-        requirement_numeric_fluents = "requirement_numeric_fluents";
-    x3::rule<RequirementAdlClass, ast::RequirementAdl> const
-        requirement_adl = "requirement_adl";
-    x3::rule<RequirementDurativeActionsClass, ast::RequirementDurativeActions> const
-        requirement_durative_actions = "requirement_durative_actions";
-    x3::rule<RequirementDerivedPredicatesClass, ast::RequirementDerivedPredicates> const
-        requirement_derived_predicates = "requirement_derived_predicates";
-    x3::rule<RequirementTimedInitialLiteralsClass, ast::RequirementTimedInitialLiterals> const
-        requirement_timed_initial_literals = "requirement_timed_initial_literals";
-    x3::rule<RequirementPreferencesClass, ast::RequirementPreferences> const
-        requirement_preferences = "requirement_preferences";
-    x3::rule<RequirementConstraintsClass, ast::RequirementConstraints> const
-        requirement_constraints = "requirement_constraints";
-    x3::rule<RequirementClass, ast::Requirement> const
-        requirement = "requirement";
+    requirement_strips_type const requirement_strips = "requirement_strips";
+    requirement_typing_type const requirement_typing = "requirement_typing";
+    requirement_negative_preconditions_type const requirement_negative_preconditions = "requirement_negative_preconditions";
+    requirement_disjunctive_preconditions_type const requirement_disjunctive_preconditions = "requirement_disjunctive_preconditions";
+    requirement_equality_type const requirement_equality = "requirement_equality";
+    requirement_existential_preconditions_type const requirement_existential_preconditions = "requirement_existential_preconditions";
+    requirement_universal_preconditions_type const requirement_universal_preconditions = "requirement_universal_preconditions";
+    requirement_quantified_preconditions_type const requirement_quantified_preconditions = "requirement_quantified_preconditions";
+    requirement_conditional_effects_type const requirement_conditional_effects = "requirement_conditional_effects";
+    requirement_fluents_type const requirement_fluents = "requirement_fluents";
+    requirement_object_fluents_type const requirement_object_fluents = "requirement_object_fluents";
+    requirement_numeric_fluents_type const requirement_numeric_fluents = "requirement_numeric_fluents";
+    requirement_adl_type const requirement_adl = "requirement_adl";
+    requirement_durative_actions_type const requirement_durative_actions = "requirement_durative_actions";
+    requirement_derived_predicates_type const requirement_derived_predicates = "requirement_derived_predicates";
+    requirement_timed_initial_literals_type const requirement_timed_initial_literals = "requirement_timed_initial_literals";
+    requirement_preferences_type const requirement_preferences = "requirement_preferences";
+    requirement_constraints_type const requirement_constraints = "requirement_constraints";
+    requirement_type const requirement = "requirement";
 
     type_type const type = "type";
     type_object_type const type_object = "type_object";
@@ -543,8 +504,7 @@ namespace loki::domain::parser {
         requirement_equality, requirement_existential_preconditions, requirement_universal_preconditions,
         requirement_quantified_preconditions, requirement_conditional_effects, requirement_fluents,
         requirement_object_fluents, requirement_numeric_fluents, requirement_adl, requirement_durative_actions,
-        requirement_derived_predicates, requirement_timed_initial_literals, requirement_preferences, requirement_constraints,
-        requirement, requirements
+        requirement_derived_predicates, requirement_timed_initial_literals, requirement_preferences, requirement_constraints, requirement
     )
 
     BOOST_SPIRIT_DEFINE(
@@ -587,7 +547,7 @@ namespace loki::domain::parser {
     )
 
     BOOST_SPIRIT_DEFINE(
-        domain_name, types, constants, predicates, functions, constraints, structure, domain_description
+        domain_name, requirements, types, constants, predicates, functions, constraints, structure, domain_description
     )
 
 
@@ -752,6 +712,66 @@ namespace loki::domain
     parser::undefined_type const& undefined() {
         return parser::undefined;
     }
+
+
+    parser::requirement_strips_type const& requirement_strips() {
+        return parser::requirement_strips;
+    }
+    parser::requirement_typing_type const& requirement_typing() {
+        return parser::requirement_typing;
+    }
+    parser::requirement_negative_preconditions_type const& requirement_negative_preconditions() {
+        return parser::requirement_negative_preconditions;
+    }
+    parser::requirement_disjunctive_preconditions_type const& requirement_disjunctive_preconditions() {
+        return parser::requirement_disjunctive_preconditions;
+    }
+    parser::requirement_equality_type const& requirement_equality() {
+        return parser::requirement_equality;
+    }
+    parser::requirement_existential_preconditions_type const& requirement_existential_preconditions() {
+        return parser::requirement_existential_preconditions;
+    }
+    parser::requirement_universal_preconditions_type const& requirement_universal_preconditions() {
+        return parser::requirement_universal_preconditions;
+    }
+    parser::requirement_quantified_preconditions_type const& requirement_quantified_preconditions() {
+        return parser::requirement_quantified_preconditions;
+    }
+    parser::requirement_conditional_effects_type const& requirement_conditional_effects() {
+        return parser::requirement_conditional_effects;
+    }
+    parser::requirement_fluents_type const& requirement_fluents() {
+        return parser::requirement_fluents;
+    }
+    parser::requirement_object_fluents_type const& requirement_object_fluents() {
+        return parser::requirement_object_fluents;
+    }
+    parser::requirement_numeric_fluents_type const& requirement_numeric_fluents() {
+        return parser::requirement_numeric_fluents;
+    }
+    parser::requirement_adl_type const& requirement_adl() {
+        return parser::requirement_adl;
+    }
+    parser::requirement_durative_actions_type const& requirement_durative_actions() {
+        return parser::requirement_durative_actions;
+    }
+    parser::requirement_derived_predicates_type const& requirement_derived_predicates() {
+        return parser::requirement_derived_predicates;
+    }
+    parser::requirement_timed_initial_literals_type const& requirement_timed_initial_literals() {
+        return parser::requirement_timed_initial_literals;
+    }
+    parser::requirement_preferences_type const& requirement_preferences() {
+        return parser::requirement_preferences;
+    }
+    parser::requirement_constraints_type const& requirement_constraints() {
+        return parser::requirement_constraints;
+    }
+    parser::requirement_type const& requirement() {
+        return parser::requirement;
+    }
+
 
     parser::type_type const& type() {
         return parser::type;
