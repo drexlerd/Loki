@@ -18,6 +18,7 @@ namespace loki::domain
         struct VariableClass;
         struct NumberClass;
         struct TermClass;
+        struct UndefinedClass;
 
         struct TypeClass;
         struct TypeObjectClass;
@@ -53,6 +54,7 @@ namespace loki::domain
         typedef x3::rule<VariableClass, ast::Variable> variable_type;
         typedef x3::rule<NumberClass, ast::Number> number_type;
         typedef x3::rule<TermClass, ast::Term> term_type;
+        typedef x3::rule<UndefinedClass, ast::Undefined> undefined_type;
 
         typedef x3::rule<TypeClass, ast::Type> type_type;
         typedef x3::rule<TypeObjectClass, ast::TypeObject> type_object_type;
@@ -84,7 +86,7 @@ namespace loki::domain
         typedef x3::rule<DomainDescriptionClass, ast::DomainDescription> domain_description_type;
 
 
-        BOOST_SPIRIT_DECLARE(name_type, variable_type, number_type, term_type)
+        BOOST_SPIRIT_DECLARE(name_type, variable_type, number_type, term_type, undefined_type)
 
         BOOST_SPIRIT_DECLARE(
             type_type, type_object_type, type_either_type, typed_list_of_names_recursively_type, typed_list_of_names_type,
@@ -103,6 +105,7 @@ namespace loki::domain
     parser::variable_type const& variable();
     parser::number_type const& number();
     parser::term_type const& term();
+    parser::undefined_type const& undefined();
 
     parser::type_type const& type();
     parser::type_object_type const& type_object();

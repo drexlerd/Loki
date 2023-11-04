@@ -113,6 +113,7 @@ namespace loki::domain::parser {
     struct EffectClass;
     struct EffectProductionLiteralClass;
     struct EffectProductionNumericFluentClass;
+    struct EffectProductionObjectFluentClass;
     struct EffectProductionClass;
     struct EffectConditionalForallClass;
     struct EffectConditionalWhenClass;
@@ -144,6 +145,7 @@ namespace loki::domain::parser {
     variable_type const variable = "variable";
     number_type const number = "number";
     term_type const term = "term";
+    undefined_type const undefined = "undefined";
 
     x3::rule<RequirementStripsClass, ast::RequirementStrips> const
         requirement_strips = "requirement_strips";
@@ -330,6 +332,8 @@ namespace loki::domain::parser {
         effect_production_literal = "effect_production_literal";
     x3::rule<EffectProductionNumericFluentClass, ast::EffectProductionNumericFluent> const
         effect_production_numeric_fluent = "effect_production_numeric_fluent";
+    x3::rule<EffectProductionObjectFluentClass, ast::EffectProductionObjectFluent> const
+        effect_production_object_fluent = "effect_production_object_fluent";
     x3::rule<EffectProductionClass, ast::EffectProduction> const
         effect_production = "effect_production";
     x3::rule<EffectConditionalForallClass, ast::EffectConditionalForall> const
@@ -374,6 +378,7 @@ namespace loki::domain::parser {
     const auto variable_def = char_('?') > name;
     const auto number_def = double_;
     const auto term_def = name | variable | function_term;
+    const auto undefined_def = lit("undefined") >> x3::attr(ast::Undefined{});
 
     const auto requirement_strips_def = lit(":strips") >> x3::attr(ast::RequirementStrips{});
     const auto requirement_typing_def = lit(":typing") >> x3::attr(ast::RequirementTyping{});
@@ -494,7 +499,8 @@ namespace loki::domain::parser {
     const auto effect_def = effect_production | effect_conditional | lit('(') >> lit("and") >> *effect >> lit(')');
     const auto effect_production_literal_def = literal_of_terms;
     const auto effect_production_numeric_fluent_def = lit('(') >> assign_operator >> function_head >> function_expression > lit(')');
-    const auto effect_production_def = effect_production_literal | effect_production_numeric_fluent;
+    const auto effect_production_object_fluent_def = lit('(') >> function_term >> (term | undefined);
+    const auto effect_production_def = effect_production_literal | effect_production_numeric_fluent | effect_production_object_fluent;
     const auto effect_conditional_forall_def = lit('(') >> lit("forall") >> typed_list_of_variables >> effect > lit(')');
     const auto effect_conditional_when_def = lit('(') >> lit("when") >> goal_descriptor >> effect > lit(')');
     const auto effect_conditional_def = effect_conditional_forall | effect_conditional_when;
@@ -528,7 +534,7 @@ namespace loki::domain::parser {
            >> *structure
         > lit(')');
 
-    BOOST_SPIRIT_DEFINE(name, variable, number, term)
+    BOOST_SPIRIT_DEFINE(name, variable, number, term, undefined)
 
     BOOST_SPIRIT_DEFINE(
         requirement_strips, requirement_typing, requirement_negative_preconditions, requirement_disjunctive_preconditions,
@@ -573,7 +579,7 @@ namespace loki::domain::parser {
         precondition_goal_descriptor_and, precondition_goal_descriptor_preference, precondition_goal_descriptor_forall,
         assign_operator_assign, assign_operator_scale_up, assign_operator_scale_down,
         assign_operator_increase, assign_operator_decrease, assign_operator,
-        effect, effect_production_literal, effect_production_numeric_fluent, effect_production,
+        effect, effect_production_literal, effect_production_numeric_fluent, effect_production_object_fluent, effect_production,
         effect_conditional_forall, effect_conditional_when, effect_conditional,
         action_symbol, action_body, action
     )
@@ -591,6 +597,7 @@ namespace loki::domain::parser {
     struct VariableClass : x3::annotate_on_success {};
     struct NumberClass : x3::annotate_on_success {};
     struct TermClass : x3::annotate_on_success {};
+    struct UndefinedClass : x3::annotate_on_success {};
 
     struct RequirementStripsClass : x3::annotate_on_success {};
     struct RequirementTypingClass : x3::annotate_on_success {};
@@ -702,6 +709,7 @@ namespace loki::domain::parser {
     struct EffectClass : x3::annotate_on_success {};
     struct EffectProductionLiteralClass : x3::annotate_on_success {};
     struct EffectProductionNumericFluentClass : x3::annotate_on_success {};
+    struct EffectProductionObjectFluentClass : x3::annotate_on_success {};
     struct EffectProductionClass : x3::annotate_on_success {};
     struct EffectConditionalForallClass : x3::annotate_on_success {};
     struct EffectConditionalWhenClass : x3::annotate_on_success {};
@@ -738,6 +746,9 @@ namespace loki::domain
     }
     parser::term_type const& term() {
         return parser::term;
+    }
+    parser::undefined_type const& undefined() {
+        return parser::undefined;
     }
 
     parser::type_type const& type() {

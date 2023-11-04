@@ -130,6 +130,7 @@ namespace loki::domain::ast
     struct Effect;
     struct EffectProductionLiteral;
     struct EffectProductionNumericFluent;
+    struct EffectProductionObjectFluent;
     struct EffectProduction;
     struct EffectConditionalForall;
     struct EffectConditionalWhen;
@@ -183,6 +184,8 @@ namespace loki::domain::ast
         using base_type::base_type;
         using base_type::operator=;
     };
+
+    struct Undefined : x3::position_tagged { };
 
     /* <require-def> */
     struct RequirementStrips : x3::position_tagged
@@ -803,10 +806,16 @@ namespace loki::domain::ast
         FunctionExpression function_expression;
     };
 
+    struct EffectProductionObjectFluent : x3::position_tagged {
+        FunctionTerm function_term;
+        boost::variant<Term, Undefined> term;
+    };
+
     struct EffectProduction : x3::position_tagged,
                               x3::variant<
                                   EffectProductionLiteral,
-                                  EffectProductionNumericFluent>
+                                  EffectProductionNumericFluent,
+                                  EffectProductionObjectFluent>
     {
         using base_type::base_type;
         using base_type::operator=;
