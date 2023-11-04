@@ -47,6 +47,8 @@ namespace loki::domain
         struct NegatedAtomOfTermsClass;
         struct LiteralOfTermsClass;
 
+        struct DerivedPredicateClass;
+
         struct DomainDescriptionClass;
 
 
@@ -83,6 +85,8 @@ namespace loki::domain
         typedef x3::rule<NegatedAtomOfTermsClass, ast::NegatedAtomOfTerms> negated_atom_of_terms_type;
         typedef x3::rule<LiteralOfTermsClass, ast::LiteralOfTerms> literal_of_terms_type;
 
+        typedef x3::rule<DerivedPredicateClass, ast::DerivedPredicate> derived_predicate_type;
+
         typedef x3::rule<DomainDescriptionClass, ast::DomainDescription> domain_description_type;
 
 
@@ -97,6 +101,8 @@ namespace loki::domain
         BOOST_SPIRIT_DECLARE(function_symbol_type, function_term_type, function_type_number_type, function_type_type_type, function_type_type, atomic_function_skeleton_type, function_typed_list_of_atomic_function_skeletons_recursively_type, function_typed_list_of_atomic_function_skeletons_type)
 
         BOOST_SPIRIT_DECLARE(atomic_formula_of_terms_type, atom_of_terms_type, negated_atom_of_terms_type, literal_of_terms_type)
+
+        BOOST_SPIRIT_DECLARE(derived_predicate_type)
 
         BOOST_SPIRIT_DECLARE(domain_description_type)
     }
@@ -133,6 +139,8 @@ namespace loki::domain
     parser::atom_of_terms_type const& atom_of_terms();
     parser::negated_atom_of_terms_type const& negated_atom_of_terms();
     parser::literal_of_terms_type const& literal_of_terms();
+
+    parser::derived_predicate_type const& derived_predicate();
 
     parser::domain_description_type const& domain_description();
 }

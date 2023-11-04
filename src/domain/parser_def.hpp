@@ -123,9 +123,7 @@ namespace loki::domain::parser {
     struct ActionBodyClass;
 
     struct ActionClass;
-    // TODO
-    struct DurativeActionClass;
-    struct DerivedPredicateClass;
+    struct DurativeActionClass;  // TODO
 
     struct DomainNameClass;
     struct RequirementsClass;
@@ -351,6 +349,8 @@ namespace loki::domain::parser {
     x3::rule<ActionClass, ast::Action> const
         action = "action";
 
+    derived_predicate_type const derived_predicate = "derived_predicate";
+
     x3::rule<DomainNameClass, ast::DomainName> const
         domain_name = "domain_name";
     x3::rule<RequirementsClass, ast::Requirements> const
@@ -513,6 +513,8 @@ namespace loki::domain::parser {
                                      >> action_body
                             >> lit(')');
 
+    const auto derived_predicate_def = lit('(') >> typed_list_of_variables >> goal_descriptor > lit(')');
+
     const auto domain_name_def = lit('(') >> lit("domain") > name > lit(')');
     const auto requirements_def = lit('(') >> lit(":requirements") >> *requirement >> lit(')');
     const auto types_def = lit('(') >> lit(":types") >> typed_list_of_names > lit(')');
@@ -520,7 +522,7 @@ namespace loki::domain::parser {
     const auto predicates_def = lit('(') >> lit(":predicates") >> *atomic_formula_skeleton > lit(')');
     const auto functions_def = lit('(') >> lit(":functions") >> *function_typed_list_of_atomic_function_skeletons > lit(')');
     const auto constraints_def = lit('(') >> lit(":constraints") > constraint_goal_descriptor > lit(')');
-    const auto structure_def = action;
+    const auto structure_def = action | derived_predicate;
 
     const auto domain_description_def =
         lit('(') > lit("define")
@@ -581,7 +583,7 @@ namespace loki::domain::parser {
         assign_operator_increase, assign_operator_decrease, assign_operator,
         effect, effect_production_literal, effect_production_numeric_fluent, effect_production_object_fluent, effect_production,
         effect_conditional_forall, effect_conditional_when, effect_conditional,
-        action_symbol, action_body, action
+        action_symbol, action_body, action, derived_predicate
     )
 
     BOOST_SPIRIT_DEFINE(

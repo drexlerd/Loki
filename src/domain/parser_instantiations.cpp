@@ -71,5 +71,8 @@ namespace loki::domain::parser
         literal_of_terms_type, iterator_type, context_type)
 
     BOOST_SPIRIT_INSTANTIATE(
+        derived_predicate_type, iterator_type, context_type)
+
+    BOOST_SPIRIT_INSTANTIATE(
         domain_description_type, iterator_type, context_type)
 }

@@ -17,7 +17,7 @@ namespace loki::domain::ast
 
     struct Name;
     struct Variable;
-    struct Number; // TODO: can also be float!
+    struct Number;
     struct Term;
 
     struct RequirementStrips;
@@ -29,9 +29,9 @@ namespace loki::domain::ast
     struct RequirementUniversalPreconditions;
     struct RequirementQuantifiedPreconditions;
     struct RequirementConditionalEffects;
-    struct RequirementFluents;        // PDDL 3.1 = :object-fluents + :numeric-fluents
-    struct RequirementObjectFluents;  // PDDL 3.1
-    struct RequirementNumericFluents; // PDDL 3.1
+    struct RequirementFluents;                   // PDDL 3.1 = :object-fluents + :numeric-fluents
+    struct RequirementObjectFluents;             // PDDL 3.1
+    struct RequirementNumericFluents;            // PDDL 3.1
     struct RequirementAdl;
     struct RequirementDurativeActions;
     struct RequirementDerivedPredicates;
@@ -40,9 +40,9 @@ namespace loki::domain::ast
     struct RequirementConstraints;
     struct Requirement;
 
-    struct Type; // We model fluent types as in fox-long-2003
+    struct Type;
     struct TypeObject;
-    struct TypeEither; // We allow nested either
+    struct TypeEither;
     struct TypedListOfNamesRecursively;
     struct TypedListOfNames;
     struct TypedListOfVariablesRecursively; // :typing
@@ -53,15 +53,15 @@ namespace loki::domain::ast
 
     struct FunctionSymbol;
     struct FunctionTerm;
-    struct FunctionTypeNumber;                                     // :numeric-fluents
-    struct FunctionTypeType;                                       // :object-fluents :typing
+    struct FunctionTypeNumber;                                       // :numeric-fluents
+    struct FunctionTypeType;                                         // :object-fluents :typing
     struct FunctionType;
     struct AtomicFunctionSkeleton;
     struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively;
     struct FunctionTypedListOfAtomicFunctionSkeletons;
 
     struct AtomicFormulaOfTermsPredicate;
-    struct AtomicFormulaOfTermsEquality;
+    struct AtomicFormulaOfTermsEquality;         // :equality
     struct AtomicFormulaOfTerms;
     struct AtomOfTerms;
     struct NegatedAtomOfTerms;
@@ -82,7 +82,7 @@ namespace loki::domain::ast
     struct BinaryComparator;
 
     struct FunctionHead;
-    struct FunctionExpression;
+    struct FunctionExpression;                   // :numeric-fluents
     struct FunctionExpressionNumber;
     struct FunctionExpressionBinaryOp;
     struct FunctionExpressionMinus;
@@ -90,14 +90,14 @@ namespace loki::domain::ast
 
     struct GoalDescriptor;
     struct GoalDescriptorAtom;
-    struct GoalDescriptorLiteral; // :negative-preconditions
+    struct GoalDescriptorLiteral;                // :negative-preconditions
     struct GoalDescriptorAnd;
-    struct GoalDescriptorOr;                 // :disjunctive-preconditions
-    struct GoalDescriptorNot;                // :disjunctive-preconditions
-    struct GoalDescriptorImply;              // :disjunctive-preconditions
-    struct GoalDescriptorExists;             // :existential-preconditions
-    struct GoalDescriptorForall;             // :universal-preconditions
-    struct GoalDescriptorFunctionComparison; // :fluents
+    struct GoalDescriptorOr;                     // :disjunctive-preconditions
+    struct GoalDescriptorNot;                    // :disjunctive-preconditions
+    struct GoalDescriptorImply;                  // :disjunctive-preconditions
+    struct GoalDescriptorExists;                 // :existential-preconditions
+    struct GoalDescriptorForall;                 // :universal-preconditions
+    struct GoalDescriptorFunctionComparison;     // :numeric-fluents
 
     struct ConstraintGoalDescriptor;
     struct ConstraintGoalDescriptorAnd;
@@ -141,16 +141,16 @@ namespace loki::domain::ast
 
     struct Action;
     // TODO
-    struct DurativeAction;   // :durative-actions
-    struct DerivedPredicate; // :derived-predicates
+    struct DurativeAction;                       // :durative-actions
+    struct DerivedPredicate;                     // :derived-predicates
 
     struct DomainName;
     struct Requirements;
-    struct Types;
+    struct Types;                                // : typing
     struct Constants;
     struct Predicates;
-    struct Functions;   // :fluents
-    struct Constraints; // :constraints
+    struct Functions;
+    struct Constraints;                          // :constraints
     struct Structure;
     struct DomainDescription;
 
@@ -861,6 +861,13 @@ namespace loki::domain::ast
         ActionBody action_body;
     };
 
+
+    /* <derived-def> */
+    struct DerivedPredicate : x3::position_tagged {
+        TypedListOfVariables typed_list_of_variables;
+        GoalDescriptor goal_descriptor;
+    };
+
     /* <types-def> */
     struct Types : x3::position_tagged
     {
@@ -892,10 +899,13 @@ namespace loki::domain::ast
     };
 
     /* <structure-def> */
-    struct Structure : x3::position_tagged
+    struct Structure : x3::position_tagged,
+        x3::variant<
+            Action,
+            DerivedPredicate>
     {
-        Action action;
-        // TODO add other structure in a variant.
+        using base_type::base_type;
+        using base_type::operator=;
     };
 
     /* <domain> */
