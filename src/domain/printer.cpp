@@ -127,6 +127,20 @@ namespace loki::domain
         return ss.str();
     }
 
+    std::string parse_text(const ast::FunctionSymbol &node)
+    {
+        return parse_text(node.name);
+    }
+
+    std::string parse_text(const ast::FunctionTerm &node)
+    {
+        std::stringstream ss;
+        ss << "("
+           << parse_text(node.function_symbol) << " "
+           << parse_text(node.terms) << ")";
+        return ss.str();
+    }
+
     std::string parse_text(const ast::FunctionTypeNumber &node)
     {
         return parse_text(node.number);
@@ -139,11 +153,6 @@ namespace loki::domain
 
     std::string parse_text(const ast::FunctionType& node) {
         return boost::apply_visitor(NodeVisitorPrinter(), node);
-    }
-
-    std::string parse_text(const ast::FunctionSymbol &node)
-    {
-        return parse_text(node.name);
     }
 
     std::string parse_text(const ast::AtomicFunctionSkeleton &node)

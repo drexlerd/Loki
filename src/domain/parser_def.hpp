@@ -111,8 +111,8 @@ namespace loki::domain::parser {
     struct AssignOperatorClass;
 
     struct EffectClass;
-    struct EffectSimpleLiteralClass;
-    struct EffectSimpleFluentClass;
+    struct EffectProductionLiteralClass;
+    struct EffectProductionNumericFluentClass;
     struct EffectProductionClass;
     struct EffectConditionalForallClass;
     struct EffectConditionalWhenClass;
@@ -196,6 +196,7 @@ namespace loki::domain::parser {
     atomic_formula_skeleton_type const atomic_formula_skeleton = "atomic_formula_skeleton";
 
     function_symbol_type const function_symbol = "function_symbol";
+    function_term_type const function_term = "function_term";
     function_type_number_type const function_type_number = "function_type_number";
     function_type_type_type const function_type_type_ = "function_type_type";
     function_type_type const function_type = "function_type";
@@ -325,10 +326,10 @@ namespace loki::domain::parser {
 
     x3::rule<EffectClass, ast::Effect> const
         effect = "effect";
-    x3::rule<EffectSimpleLiteralClass, ast::EffectProductionLiteral> const
+    x3::rule<EffectProductionLiteralClass, ast::EffectProductionLiteral> const
         effect_production_literal = "effect_production_literal";
-    x3::rule<EffectSimpleFluentClass, ast::EffectProductionFluent> const
-        effect_production_fluent = "effect_production_fluent";
+    x3::rule<EffectProductionNumericFluentClass, ast::EffectProductionNumericFluent> const
+        effect_production_numeric_fluent = "effect_production_numeric_fluent";
     x3::rule<EffectProductionClass, ast::EffectProduction> const
         effect_production = "effect_production";
     x3::rule<EffectConditionalForallClass, ast::EffectConditionalForall> const
@@ -372,7 +373,7 @@ namespace loki::domain::parser {
     const auto name_def = alpha >> lexeme[*(alnum | char_('-') | char_('_'))];
     const auto variable_def = char_('?') > name;
     const auto number_def = double_;
-    const auto term_def = name | variable;
+    const auto term_def = name | variable | function_term;
 
     const auto requirement_strips_def = lit(":strips") >> x3::attr(ast::RequirementStrips{});
     const auto requirement_typing_def = lit(":typing") >> x3::attr(ast::RequirementTyping{});
@@ -411,6 +412,7 @@ namespace loki::domain::parser {
     const auto atomic_formula_skeleton_def = lit('(') > predicate > typed_list_of_variables > lit(')');
 
     const auto function_symbol_def = name;
+    const auto function_term_def = lit('(') >> function_symbol > *term > lit(')');
     const auto function_type_number_def = number;
     const auto function_type_type__def = type;
     const auto function_type_def = function_type_number | function_type_type_;
@@ -491,8 +493,8 @@ namespace loki::domain::parser {
 
     const auto effect_def = effect_production | effect_conditional | lit('(') >> lit("and") >> *effect >> lit(')');
     const auto effect_production_literal_def = literal_of_terms;
-    const auto effect_production_fluent_def = lit('(') >> assign_operator >> function_head >> function_expression > lit(')');
-    const auto effect_production_def = effect_production_literal | effect_production_fluent;
+    const auto effect_production_numeric_fluent_def = lit('(') >> assign_operator >> function_head >> function_expression > lit(')');
+    const auto effect_production_def = effect_production_literal | effect_production_numeric_fluent;
     const auto effect_conditional_forall_def = lit('(') >> lit("forall") >> typed_list_of_variables >> effect > lit(')');
     const auto effect_conditional_when_def = lit('(') >> lit("when") >> goal_descriptor >> effect > lit(')');
     const auto effect_conditional_def = effect_conditional_forall | effect_conditional_when;
@@ -541,7 +543,7 @@ namespace loki::domain::parser {
         type, type_object, type_either, typed_list_of_names_recursively, typed_list_of_names,
         typed_list_of_variables_recursively, typed_list_of_variables,
         predicate, atomic_formula_skeleton,
-        function_symbol, function_type_number, function_type_type_, function_type,
+        function_symbol, function_term, function_type_number, function_type_type_, function_type,
         atomic_function_skeleton, function_typed_list_of_atomic_function_skeletons_recursively,
         function_typed_list_of_atomic_function_skeletons,
         atomic_formula_of_terms_predicate, atomic_formula_of_terms_equality, atomic_formula_of_terms,
@@ -571,7 +573,7 @@ namespace loki::domain::parser {
         precondition_goal_descriptor_and, precondition_goal_descriptor_preference, precondition_goal_descriptor_forall,
         assign_operator_assign, assign_operator_scale_up, assign_operator_scale_down,
         assign_operator_increase, assign_operator_decrease, assign_operator,
-        effect, effect_production_literal, effect_production_fluent, effect_production,
+        effect, effect_production_literal, effect_production_numeric_fluent, effect_production,
         effect_conditional_forall, effect_conditional_when, effect_conditional,
         action_symbol, action_body, action
     )
@@ -698,8 +700,8 @@ namespace loki::domain::parser {
     struct AssignOperatorClass : x3::annotate_on_success {};
 
     struct EffectClass : x3::annotate_on_success {};
-    struct EffectSimpleLiteralClass : x3::annotate_on_success {};
-    struct EffectSimpleFluentClass : x3::annotate_on_success {};
+    struct EffectProductionLiteralClass : x3::annotate_on_success {};
+    struct EffectProductionNumericFluentClass : x3::annotate_on_success {};
     struct EffectProductionClass : x3::annotate_on_success {};
     struct EffectConditionalForallClass : x3::annotate_on_success {};
     struct EffectConditionalWhenClass : x3::annotate_on_success {};
@@ -769,6 +771,9 @@ namespace loki::domain
 
     parser::function_symbol_type const& function_symbol() {
         return parser::function_symbol;
+    }
+    parser::function_term_type const& function_term() {
+        return parser::function_term;
     }
     parser::function_type_number_type const& function_type_number() {
         return parser::function_type_number;

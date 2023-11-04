@@ -52,11 +52,12 @@ namespace loki::domain::ast
     struct AtomicFormulaSkeleton;
 
     struct FunctionSymbol;
-    struct FunctionTypeNumber;
-    struct FunctionTypeType;
+    struct FunctionTerm;
+    struct FunctionTypeNumber;                                     // :numeric-fluents
+    struct FunctionTypeType;                                       // :object-fluents :typing
     struct FunctionType;
     struct AtomicFunctionSkeleton;
-    struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively; // :typing
+    struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively;
     struct FunctionTypedListOfAtomicFunctionSkeletons;
 
     struct AtomicFormulaOfTermsPredicate;
@@ -128,7 +129,7 @@ namespace loki::domain::ast
 
     struct Effect;
     struct EffectProductionLiteral;
-    struct EffectProductionFluent;
+    struct EffectProductionNumericFluent;
     struct EffectProduction;
     struct EffectConditionalForall;
     struct EffectConditionalWhen;
@@ -176,7 +177,8 @@ namespace loki::domain::ast
     struct Term : x3::position_tagged,
                   x3::variant<
                       Name,
-                      Variable>
+                      Variable,
+                      x3::forward_ast<FunctionTerm>>
     {
         using base_type::base_type;
         using base_type::operator=;
@@ -356,6 +358,11 @@ namespace loki::domain::ast
         Name name;
     };
 
+    struct FunctionTerm : x3::position_tagged {
+        FunctionSymbol function_symbol;
+        std::vector<Term> terms;
+    };
+
     struct FunctionTypeNumber : x3::position_tagged
     {
         Number number;
@@ -389,7 +396,7 @@ namespace loki::domain::ast
 
     struct FunctionTypedListOfAtomicFunctionSkeletons : x3::position_tagged,
         x3::variant<
-            std::vector<AtomicFunctionSkeleton>,
+            std::vector<AtomicFunctionSkeleton>,  // :numeric-fluents and deprecated (https://ipc08.icaps-conference.org/deterministic/PddlExtension.html)
             FunctionTypedListOfAtomicFunctionSkeletonsRecursively>
     {
         using base_type::base_type;
@@ -789,7 +796,7 @@ namespace loki::domain::ast
         LiteralOfTerms literal_of_terms;
     };
 
-    struct EffectProductionFluent : x3::position_tagged
+    struct EffectProductionNumericFluent : x3::position_tagged
     {
         AssignOperator assign_operator;
         FunctionExpressionHead function_expression_head;
@@ -799,7 +806,7 @@ namespace loki::domain::ast
     struct EffectProduction : x3::position_tagged,
                               x3::variant<
                                   EffectProductionLiteral,
-                                  EffectProductionFluent>
+                                  EffectProductionNumericFluent>
     {
         using base_type::base_type;
         using base_type::operator=;

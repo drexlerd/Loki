@@ -31,6 +31,7 @@ namespace loki::domain
         struct AtomicFormulaSkeletonClass;
 
         struct FunctionSymbolClass;
+        struct FunctionTermClass;
         struct FunctionTypeNumberClass;
         struct FunctionTypeTypeClass;
         struct FunctionTypeClass;
@@ -65,6 +66,7 @@ namespace loki::domain
         typedef x3::rule<AtomicFormulaSkeletonClass, ast::AtomicFormulaSkeleton> atomic_formula_skeleton_type;
 
         typedef x3::rule<FunctionSymbolClass, ast::FunctionSymbol> function_symbol_type;
+        typedef x3::rule<FunctionTermClass, ast::FunctionTerm> function_term_type;
         typedef x3::rule<FunctionTypeNumberClass, ast::FunctionTypeNumber> function_type_number_type;
         typedef x3::rule<FunctionTypeTypeClass, ast::FunctionTypeType> function_type_type_type;
         typedef x3::rule<FunctionTypeClass, ast::FunctionType> function_type_type;
@@ -90,7 +92,7 @@ namespace loki::domain
 
         BOOST_SPIRIT_DECLARE(predicate_type, atomic_formula_skeleton_type)
 
-        BOOST_SPIRIT_DECLARE(function_symbol_type, function_type_number_type, function_type_type_type, function_type_type, atomic_function_skeleton_type, function_typed_list_of_atomic_function_skeletons_recursively_type, function_typed_list_of_atomic_function_skeletons_type)
+        BOOST_SPIRIT_DECLARE(function_symbol_type, function_term_type, function_type_number_type, function_type_type_type, function_type_type, atomic_function_skeleton_type, function_typed_list_of_atomic_function_skeletons_recursively_type, function_typed_list_of_atomic_function_skeletons_type)
 
         BOOST_SPIRIT_DECLARE(atomic_formula_of_terms_type, atom_of_terms_type, negated_atom_of_terms_type, literal_of_terms_type)
 
@@ -113,11 +115,12 @@ namespace loki::domain
     parser::predicate_type const& predicate();
     parser::atomic_formula_skeleton_type const& atomic_formula_skeleton();
 
-    parser::atomic_function_skeleton_type const& atomic_function_skeleton();
     parser::function_symbol_type const& function_symbol();
+    parser::function_term_type const& function_term();
     parser::function_type_number_type const& function_type_number();
     parser::function_type_type_type const& function_type_type_();
     parser::function_type_type const& function_type();
+    parser::atomic_function_skeleton_type const& atomic_function_skeleton();
     parser::function_typed_list_of_atomic_function_skeletons_recursively_type const& function_typed_list_of_atomic_function_skeletons_recursively();
     parser::function_typed_list_of_atomic_function_skeletons_type const& function_typed_list_of_atomic_function_skeletons();
 

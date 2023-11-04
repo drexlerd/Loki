@@ -21,6 +21,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Predicate, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaSkeleton, predicate, typed_list_of_variables)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionSymbol, name)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTerm, function_symbol, terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypeNumber, number)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypeType, type)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFunctionSkeleton, function_symbol, arguments)
@@ -67,7 +68,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorPreferenc
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorForall, typed_list_of_variables, precondition_goal_descriptor)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionLiteral, literal_of_terms)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionFluent, assign_operator, function_expression_head, function_expression)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionNumericFluent, assign_operator, function_expression_head, function_expression)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectConditionalForall, typed_list_of_variables, effect)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectConditionalWhen, goal_descriptor, effect)
 
