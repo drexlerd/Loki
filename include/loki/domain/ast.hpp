@@ -63,9 +63,9 @@ namespace loki::domain::ast
     struct AtomicFormulaOfTermsPredicate;
     struct AtomicFormulaOfTermsEquality;         // :equality
     struct AtomicFormulaOfTerms;
-    struct AtomOfTerms;
-    struct NegatedAtomOfTerms;
-    struct LiteralOfTerms;
+    struct Atom;
+    struct NegatedAtom;
+    struct Literal;
 
     struct MultiOperatorMul;
     struct MultiOperatorPlus;
@@ -426,20 +426,20 @@ namespace loki::domain::ast
         using base_type::operator=;
     };
 
-    struct AtomOfTerms : x3::position_tagged
+    struct Atom : x3::position_tagged
     {
         AtomicFormulaOfTerms atomic_formula_of_terms;
     };
 
-    struct NegatedAtomOfTerms : x3::position_tagged
+    struct NegatedAtom : x3::position_tagged
     {
         AtomicFormulaOfTerms atomic_formula_of_terms;
     };
 
-    struct LiteralOfTerms : x3::position_tagged,
+    struct Literal : x3::position_tagged,
                             x3::variant<
-                                AtomOfTerms,
-                                NegatedAtomOfTerms>
+                                Atom,
+                                NegatedAtom>
     {
         using base_type::base_type;
         using base_type::operator=;
@@ -571,12 +571,12 @@ namespace loki::domain::ast
 
     struct GoalDescriptorAtom : x3::position_tagged
     {
-        AtomOfTerms atom_of_terms;
+        Atom atom;
     };
 
     struct GoalDescriptorLiteral : x3::position_tagged
     {
-        LiteralOfTerms literal_of_terms;
+        Literal literal;
     };
 
     struct GoalDescriptorAnd : x3::position_tagged
@@ -794,7 +794,7 @@ namespace loki::domain::ast
 
     struct EffectProductionLiteral : x3::position_tagged
     {
-        LiteralOfTerms literal_of_terms;
+        Literal literal;
     };
 
     struct EffectProductionNumericFluent : x3::position_tagged

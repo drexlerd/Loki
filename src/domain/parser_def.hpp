@@ -84,9 +84,9 @@ namespace loki::domain::parser {
     atomic_formula_of_terms_predicate_type const atomic_formula_of_terms_predicate = "atomic_formula_of_terms_predicate";
     atomic_formula_of_terms_equality_type const atomic_formula_of_terms_equality = "atomic_formula_of_terms_equality";
     atomic_formula_of_terms_type const atomic_formula_of_terms = "atomic_formula_of_terms";
-    atom_of_terms_type const atom_of_terms = "atom_of_terms";
-    negated_atom_of_terms_type const negated_atom_of_terms = "negated_atom_of_terms";
-    literal_of_terms_type const literal_of_terms = "literal_of_terms";
+    atom_type const atom = "atom";
+    negated_atom_type const negated_atom = "negated_atom";
+    literal_type const literal = "literal";
 
     multi_operator_mul_type const multi_operator_mul = "multi_operator_mul";
     multi_operator_plus_type const multi_operator_plus = "multi_operator_plus";
@@ -230,9 +230,9 @@ namespace loki::domain::parser {
     const auto atomic_formula_of_terms_predicate_def = lit('(') >> predicate > *term > lit(')');
     const auto atomic_formula_of_terms_equality_def = lit('(') >> lit('=') > term > term > lit(')');
     const auto atomic_formula_of_terms_def = atomic_formula_of_terms_equality | atomic_formula_of_terms_predicate;
-    const auto atom_of_terms_def = atomic_formula_of_terms;
-    const auto negated_atom_of_terms_def = lit('(') >> lit("not") >> atomic_formula_of_terms >> lit(')');
-    const auto literal_of_terms_def = atom_of_terms | negated_atom_of_terms;
+    const auto atom_def = atomic_formula_of_terms;
+    const auto negated_atom_def = lit('(') >> lit("not") >> atomic_formula_of_terms >> lit(')');
+    const auto literal_def = atom | negated_atom;
 
     const auto multi_operator_mul_def = lit('*') >> x3::attr(ast::MultiOperatorMul{});
     const auto multi_operator_plus_def = lit('+') >> x3::attr(ast::MultiOperatorPlus{});
@@ -257,8 +257,8 @@ namespace loki::domain::parser {
 
     const auto goal_descriptor_def = goal_descriptor_atom | goal_descriptor_literal | goal_descriptor_and | goal_descriptor_or
         | goal_descriptor_not | goal_descriptor_imply | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison;
-    const auto goal_descriptor_atom_def = atom_of_terms;
-    const auto goal_descriptor_literal_def = literal_of_terms;
+    const auto goal_descriptor_atom_def = atom;
+    const auto goal_descriptor_literal_def = literal;
     const auto goal_descriptor_and_def = lit('(') >> lit("and") > *goal_descriptor > lit(')');
     const auto goal_descriptor_or_def = lit('(') >> lit("or") >> *goal_descriptor > lit(')');
     const auto goal_descriptor_not_def = lit('(') >> lit("not") > goal_descriptor > lit(')');
@@ -299,7 +299,7 @@ namespace loki::domain::parser {
     const auto assign_operator_def = assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
 
     const auto effect_def = effect_production | effect_conditional | lit('(') >> lit("and") >> *effect >> lit(')');
-    const auto effect_production_literal_def = literal_of_terms;
+    const auto effect_production_literal_def = literal;
     const auto effect_production_numeric_fluent_def = lit('(') >> assign_operator >> function_head >> function_expression > lit(')');
     const auto effect_production_object_fluent_def = lit('(') >> function_term >> (term | undefined);
     const auto effect_production_def = effect_production_literal | effect_production_numeric_fluent | effect_production_object_fluent;
@@ -358,7 +358,7 @@ namespace loki::domain::parser {
         function_typed_list_of_atomic_function_skeletons)
 
     BOOST_SPIRIT_DEFINE(atomic_formula_of_terms_predicate, atomic_formula_of_terms_equality,
-        atomic_formula_of_terms, atom_of_terms, negated_atom_of_terms, literal_of_terms)
+        atomic_formula_of_terms, atom, negated_atom, literal)
 
     BOOST_SPIRIT_DEFINE(multi_operator_mul, multi_operator_plus, multi_operator,
         binary_operator_minus, binary_operator_div, binary_operator)
@@ -449,9 +449,9 @@ namespace loki::domain::parser {
     struct AtomicFormulaOfTermsPredicateClass : x3::annotate_on_success {};
     struct AtomicFormulaOfTermsEqualityClass : x3::annotate_on_success {};
     struct AtomicFormulaOfTermsClass : x3::annotate_on_success {};
-    struct AtomOfTermsClass : x3::annotate_on_success {};
-    struct NegatedAtomOfTermsClass : x3::annotate_on_success {};
-    struct LiteralOfTermsClass : x3::annotate_on_success {};
+    struct AtomClass : x3::annotate_on_success {};
+    struct NegatedAtomClass : x3::annotate_on_success {};
+    struct LiteralClass : x3::annotate_on_success {};
 
     struct MultiOperatorMulClass : x3::annotate_on_success {};
     struct MultiOperatorPlusClass : x3::annotate_on_success {};
@@ -677,14 +677,14 @@ namespace loki::domain
     parser::atomic_formula_of_terms_type const& atomic_formula_of_terms() {
         return parser::atomic_formula_of_terms;
     }
-    parser::atom_of_terms_type const& atom_of_terms() {
-        return parser::atom_of_terms;
+    parser::atom_type const& atom() {
+        return parser::atom;
     }
-    parser::negated_atom_of_terms_type const& negated_atom_of_terms() {
-        return parser::negated_atom_of_terms;
+    parser::negated_atom_type const& negated_atom() {
+        return parser::negated_atom;
     }
-    parser::literal_of_terms_type const& literal_of_terms() {
-        return parser::literal_of_terms;
+    parser::literal_type const& literal() {
+        return parser::literal;
     }
 
     parser::multi_operator_mul_type const& multi_operator_mul() {

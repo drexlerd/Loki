@@ -29,8 +29,8 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypedListOfAtomicFunctionSk
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaOfTermsPredicate, predicate, terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaOfTermsEquality, term_left, term_right)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomOfTerms, atomic_formula_of_terms)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::NegatedAtomOfTerms, atomic_formula_of_terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Atom, atomic_formula_of_terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::NegatedAtom, atomic_formula_of_terms)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionHead, function_symbol, terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionExpressionNumber, number)
@@ -38,8 +38,8 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionExpressionBinaryOp, binary_
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionExpressionMinus, function_expression)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionExpressionHead, function_head)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorAtom, atom_of_terms)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorLiteral, literal_of_terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorAtom, atom)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorLiteral, literal)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorAnd, goal_descriptors)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorOr, goal_descriptors)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::GoalDescriptorNot, goal_descriptor)
@@ -67,7 +67,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorAnd, prec
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorPreference, preference_name, goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorForall, typed_list_of_variables, precondition_goal_descriptor)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionLiteral, literal_of_terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionLiteral, literal)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionNumericFluent, assign_operator, function_expression_head, function_expression)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionObjectFluent, function_term, term)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectConditionalForall, typed_list_of_variables, effect)

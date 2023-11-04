@@ -58,9 +58,9 @@ namespace loki::domain::parser
     BOOST_SPIRIT_INSTANTIATE(atomic_formula_of_terms_predicate_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(atomic_formula_of_terms_equality_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(atomic_formula_of_terms_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(atom_of_terms_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(negated_atom_of_terms_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(literal_of_terms_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(atom_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(negated_atom_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(literal_type, iterator_type, context_type)
 
     BOOST_SPIRIT_INSTANTIATE(multi_operator_mul_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(multi_operator_plus_type, iterator_type, context_type)

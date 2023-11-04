@@ -63,9 +63,9 @@ namespace loki::domain
         struct AtomicFormulaOfTermsPredicateClass;
         struct AtomicFormulaOfTermsEqualityClass;
         struct AtomicFormulaOfTermsClass;
-        struct AtomOfTermsClass;
-        struct NegatedAtomOfTermsClass;
-        struct LiteralOfTermsClass;
+        struct AtomClass;
+        struct NegatedAtomClass;
+        struct LiteralClass;
 
         struct MultiOperatorMulClass;
         struct MultiOperatorPlusClass;
@@ -201,9 +201,9 @@ namespace loki::domain
         typedef x3::rule<AtomicFormulaOfTermsPredicateClass, ast::AtomicFormulaOfTermsPredicate> atomic_formula_of_terms_predicate_type;
         typedef x3::rule<AtomicFormulaOfTermsEqualityClass, ast::AtomicFormulaOfTermsEquality> atomic_formula_of_terms_equality_type;
         typedef x3::rule<AtomicFormulaOfTermsClass, ast::AtomicFormulaOfTerms> atomic_formula_of_terms_type;
-        typedef x3::rule<AtomOfTermsClass, ast::AtomOfTerms> atom_of_terms_type;
-        typedef x3::rule<NegatedAtomOfTermsClass, ast::NegatedAtomOfTerms> negated_atom_of_terms_type;
-        typedef x3::rule<LiteralOfTermsClass, ast::LiteralOfTerms> literal_of_terms_type;
+        typedef x3::rule<AtomClass, ast::Atom> atom_type;
+        typedef x3::rule<NegatedAtomClass, ast::NegatedAtom> negated_atom_type;
+        typedef x3::rule<LiteralClass, ast::Literal> literal_type;
 
         typedef x3::rule<MultiOperatorMulClass, ast::MultiOperatorMul> multi_operator_mul_type;
         typedef x3::rule<MultiOperatorPlusClass, ast::MultiOperatorPlus> multi_operator_plus_type;
@@ -307,7 +307,7 @@ namespace loki::domain
 
         BOOST_SPIRIT_DECLARE(function_symbol_type, function_term_type, function_type_number_type, function_type_type_type, function_type_type, atomic_function_skeleton_type, function_typed_list_of_atomic_function_skeletons_recursively_type, function_typed_list_of_atomic_function_skeletons_type)
 
-        BOOST_SPIRIT_DECLARE(atomic_formula_of_terms_type, atom_of_terms_type, negated_atom_of_terms_type, literal_of_terms_type)
+        BOOST_SPIRIT_DECLARE(atomic_formula_of_terms_type, atom_type, negated_atom_type, literal_type)
 
         BOOST_SPIRIT_DECLARE(multi_operator_mul_type, multi_operator_plus_type, multi_operator_type,
             binary_operator_minus_type, binary_operator_div_type, binary_operator_type)
@@ -412,9 +412,9 @@ namespace loki::domain
     parser::atomic_formula_of_terms_predicate_type const& atomic_formula_of_terms_predicate();
     parser::atomic_formula_of_terms_equality_type const& atomic_formula_of_terms_equality();
     parser::atomic_formula_of_terms_type const& atomic_formula_of_terms();
-    parser::atom_of_terms_type const& atom_of_terms();
-    parser::negated_atom_of_terms_type const& negated_atom_of_terms();
-    parser::literal_of_terms_type const& literal_of_terms();
+    parser::atom_type const& atom();
+    parser::negated_atom_type const& negated_atom();
+    parser::literal_type const& literal();
 
 
     parser::function_expression_type const& function_expression();
