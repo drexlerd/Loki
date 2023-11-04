@@ -54,6 +54,7 @@ namespace loki::problem::ast
     struct PreferenceConstraintGoalDescriptorSimple;
 
     struct ProblemName;
+    struct DomainName;
     struct Objects;
     struct Initial;
     struct Goal;
@@ -62,14 +63,15 @@ namespace loki::problem::ast
 
     struct Problem;
 
+
     /* <basic-function-term> */
     struct BasicFunctionTermArityGreaterZero : x3::position_tagged {
         domain::ast::FunctionSymbol function_symbol;
+        std::vector<domain::ast::Name> names;
     };
 
     struct BasicFunctionTermArityZero : x3::position_tagged {
         domain::ast::FunctionSymbol function_symbol;
-        std::vector<domain::ast::Name> names;
     };
 
     struct BasicFunctionTerm : x3::position_tagged,
@@ -247,6 +249,10 @@ namespace loki::problem::ast
         domain::ast::Name name;
     };
 
+    struct DomainName : x3::position_tagged {
+        domain::ast::Name name;
+    };
+
     struct Objects : x3::position_tagged {
         domain::ast::TypedListOfNames typed_list_of_names;
     };
@@ -263,18 +269,20 @@ namespace loki::problem::ast
         PreferenceConstraintGoalDescriptor preference_constraint_goal_descriptor;
     };
 
-    struct Metric : x3::position_tagged {
+    struct MetricSpecification : x3::position_tagged {
         Optimization optimization;
         MetricFunctionExpression metric_function_expression;
     };
 
     struct Problem : x3::position_tagged {
         ProblemName problem_name;
-        Objects objects;
+        DomainName domain_name;
+        boost::optional<domain::ast::Requirements> requirements;
+        boost::optional<Objects> objects;
         Initial initial;
         Goal goal;
-        Constraints constraints;
-        domain::ast::Requirements requirements;
+        boost::optional<Constraints> constraints;
+        boost::optional<MetricSpecification> metric_specification;
     };
 
 }
