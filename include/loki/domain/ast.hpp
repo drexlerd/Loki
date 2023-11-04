@@ -140,8 +140,6 @@ namespace loki::domain::ast
     struct ActionBody;
 
     struct Action;
-    // TODO
-    struct DurativeAction;                       // :durative-actions
     struct DerivedPredicate;                     // :derived-predicates
 
     struct DomainName;
@@ -152,7 +150,7 @@ namespace loki::domain::ast
     struct Functions;
     struct Constraints;                          // :constraints
     struct Structure;
-    struct DomainDescription;
+    struct Domain;
 
     /* <name> */
     struct Name : x3::position_tagged
@@ -914,7 +912,7 @@ namespace loki::domain::ast
         Name name;
     };
 
-    struct DomainDescription : x3::position_tagged
+    struct Domain : x3::position_tagged
     {
         DomainName domain_name;
         boost::optional<Requirements> requirements;

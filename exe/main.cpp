@@ -22,8 +22,8 @@ int main(int argc, char** argv) {
 
     // 1. Parse the domain
     const auto source = loki::read_file(domain_file);
-    ast::DomainDescription node;
-    parse_ast(source, domain_description(), node);
+    ast::Domain node;
+    parse_ast(source, domain(), node);
 
     return 0;
 }

@@ -169,7 +169,7 @@ namespace loki::domain::parser {
     functions_type const functions = "functions";
     constraints_type const constraints = "constraints";
     structure_type const structure = "structure";
-    domain_description_type const domain_description = "domain_description";
+    domain_type const domain = "domain";
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -326,7 +326,7 @@ namespace loki::domain::parser {
     const auto constraints_def = lit('(') >> lit(":constraints") > constraint_goal_descriptor > lit(')');
     const auto structure_def = action | derived_predicate;
 
-    const auto domain_description_def =
+    const auto domain_def =
         lit('(') > lit("define")
            > domain_name
            >> -requirements
@@ -393,7 +393,7 @@ namespace loki::domain::parser {
         action_body, action, derived_predicate)
 
     BOOST_SPIRIT_DEFINE(domain_name, requirements, types, constants, predicates, functions,
-        constraints, structure, domain_description)
+        constraints, structure, domain)
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -535,7 +535,7 @@ namespace loki::domain::parser {
     struct FunctionsClass : x3::annotate_on_success {};
     struct ConstraintsClass : x3::annotate_on_success {};
     struct StructureClass : x3::annotate_on_success {};
-    struct DomainDescriptionClass : x3::annotate_on_success, error_handler_domain {};
+    struct DomainClass : x3::annotate_on_success, error_handler_domain {};
 }
 
 namespace loki::domain
@@ -914,8 +914,8 @@ namespace loki::domain
     parser::structure_type const& structure() {
         return parser::structure;
     }
-    parser::domain_description_type const& domain_description() {
-        return parser::domain_description;
+    parser::domain_type const& domain() {
+        return parser::domain;
     }
 }
 

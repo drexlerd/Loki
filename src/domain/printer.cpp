@@ -10,56 +10,56 @@ namespace loki::domain
 
     // Printer for std::vector
     template <typename T>
-    inline std::string parse_text(const std::vector<T> &nodes);
+    inline std::string parse_text(const std::vector<T>& nodes);
 
     // Printer for boost::variant
     class NodeVisitorPrinter : public boost::static_visitor<std::string>
     {
     public:
         template <typename Node>
-        std::string operator()(const Node &node) const
+        std::string operator()(const Node& node) const
         {
             return parse_text(node);
         }
     };
 
-    string parse_text(const ast::Name &node)
+    string parse_text(const ast::Name& node)
     {
         stringstream ss;
         ss << node.alpha << node.suffix;
         return ss.str();
     }
 
-    string parse_text(const ast::Variable &node)
+    string parse_text(const ast::Variable& node)
     {
         stringstream ss;
         ss << node.question_mark << parse_text(node.name);
         return ss.str();
     }
 
-    string parse_text(const ast::Number &node)
+    string parse_text(const ast::Number& node)
     {
         stringstream ss;
         ss << node.value;
         return ss.str();
     }
 
-    string parse_text(const ast::Term &node)
+    string parse_text(const ast::Term& node)
     {
         return boost::apply_visitor(NodeVisitorPrinter(), node);
     }
 
-    string parse_text(const ast::Type &node)
+    string parse_text(const ast::Type& node)
     {
         return boost::apply_visitor(NodeVisitorPrinter(), node);
     }
 
-    std::string parse_text(const ast::TypeObject &node)
+    std::string parse_text(const ast::TypeObject& node)
     {
         return "object";
     }
 
-    string parse_text(const ast::TypeEither &node)
+    string parse_text(const ast::TypeEither& node)
     {
         stringstream ss;
         ss << "(either ";
@@ -73,7 +73,7 @@ namespace loki::domain
         return ss.str();
     }
 
-    string parse_text(const ast::TypedListOfNamesRecursively &node)
+    string parse_text(const ast::TypedListOfNamesRecursively& node)
     {
         stringstream ss;
         ss << " "; // add leading whitespace so separate from its parent
@@ -88,12 +88,12 @@ namespace loki::domain
         return ss.str();
     }
 
-    string parse_text(const ast::TypedListOfNames &node)
+    string parse_text(const ast::TypedListOfNames& node)
     {
         return boost::apply_visitor(NodeVisitorPrinter(), node);
     }
 
-    std::string parse_text(const ast::TypedListOfVariablesRecursively &node)
+    std::string parse_text(const ast::TypedListOfVariablesRecursively& node)
     {
         stringstream ss;
         ss << " "; // add leading whitespace so separate from its parent
@@ -108,17 +108,17 @@ namespace loki::domain
         return ss.str();
     }
 
-    std::string parse_text(const ast::TypedListOfVariables &node)
+    std::string parse_text(const ast::TypedListOfVariables& node)
     {
         return boost::apply_visitor(NodeVisitorPrinter(), node);
     }
 
-    std::string parse_text(const ast::Predicate &node)
+    std::string parse_text(const ast::Predicate& node)
     {
         return parse_text(node.name);
     }
 
-    std::string parse_text(const ast::AtomicFormulaSkeleton &node)
+    std::string parse_text(const ast::AtomicFormulaSkeleton& node)
     {
         std::stringstream ss;
         ss << "("
@@ -127,12 +127,12 @@ namespace loki::domain
         return ss.str();
     }
 
-    std::string parse_text(const ast::FunctionSymbol &node)
+    std::string parse_text(const ast::FunctionSymbol& node)
     {
         return parse_text(node.name);
     }
 
-    std::string parse_text(const ast::FunctionTerm &node)
+    std::string parse_text(const ast::FunctionTerm& node)
     {
         std::stringstream ss;
         ss << "("
@@ -141,12 +141,12 @@ namespace loki::domain
         return ss.str();
     }
 
-    std::string parse_text(const ast::FunctionTypeNumber &node)
+    std::string parse_text(const ast::FunctionTypeNumber& node)
     {
         return parse_text(node.number);
     }
 
-    std::string parse_text(const ast::FunctionTypeType &node)
+    std::string parse_text(const ast::FunctionTypeType& node)
     {
         return parse_text(node.type);
     }
@@ -155,7 +155,7 @@ namespace loki::domain
         return boost::apply_visitor(NodeVisitorPrinter(), node);
     }
 
-    std::string parse_text(const ast::AtomicFunctionSkeleton &node)
+    std::string parse_text(const ast::AtomicFunctionSkeleton& node)
     {
         std::stringstream ss;
         ss << "("
@@ -165,7 +165,7 @@ namespace loki::domain
     }
 
     template <typename T>
-    inline std::string parse_text(const std::vector<T> &nodes)
+    inline std::string parse_text(const std::vector<T>& nodes)
     {
         std::stringstream ss;
         for (size_t i = 0; i < nodes.size(); ++i)

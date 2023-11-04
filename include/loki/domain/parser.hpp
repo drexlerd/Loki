@@ -149,7 +149,7 @@ namespace loki::domain
         struct FunctionsClass;
         struct ConstraintsClass;
         struct StructureClass;
-        struct DomainDescriptionClass;
+        struct DomainClass;
 
 
         typedef x3::rule<NameClass, ast::Name> name_type;
@@ -287,7 +287,7 @@ namespace loki::domain
         typedef x3::rule<FunctionsClass, ast::Functions> functions_type;
         typedef x3::rule<ConstraintsClass, ast::Constraints> constraints_type;
         typedef x3::rule<StructureClass, ast::Structure> structure_type;
-        typedef x3::rule<DomainDescriptionClass, ast::DomainDescription> domain_description_type;
+        typedef x3::rule<DomainClass, ast::Domain> domain_type;
 
 
         BOOST_SPIRIT_DECLARE(name_type, variable_type, number_type, term_type, undefined_type)
@@ -346,7 +346,7 @@ namespace loki::domain
             derived_predicate_type)
 
         BOOST_SPIRIT_DECLARE(domain_name_type, requirements_type, types_type, constants_type,
-            predicates_type, functions_type, constraints_type, structure_type, domain_description_type)
+            predicates_type, functions_type, constraints_type, structure_type, domain_type)
     }
 
     parser::name_type const& name();
@@ -484,7 +484,7 @@ namespace loki::domain
     parser::functions_type const& functions();
     parser::constraints_type const& constraints();
     parser::structure_type const& structure();
-    parser::domain_description_type const& domain_description();
+    parser::domain_type const& domain();
 }
 
 #endif
