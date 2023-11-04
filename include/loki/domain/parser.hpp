@@ -67,8 +67,88 @@ namespace loki::domain
         struct NegatedAtomOfTermsClass;
         struct LiteralOfTermsClass;
 
+        struct MultiOperatorMulClass;
+        struct MultiOperatorPlusClass;
+        struct MultiOperatorClass;
+        struct BinaryOperatorMinusClass;
+        struct BinaryOperatorDivClass;
+        struct BinaryOperatorClass;
+
+        struct BinaryComparatorGreaterClass;
+        struct BinaryComparatorLessClass;
+        struct BinaryComparatorEqualClass;
+        struct BinaryComparatorGreaterEqualClass;
+        struct BinaryComparatorLessEqualClass;
+        struct BinaryComparatorClass;
+
+        struct FunctionHeadClass;
+        struct FunctionExpressionClass;
+        struct FunctionExpressionNumberClass;
+        struct FunctionExpressionBinaryOpClass;
+        struct FunctionExpressionMinusClass;
+        struct FunctionExpressionHeadClass;
+
+        struct GoalDescriptorClass;
+        struct GoalDescriptorAtomClass;
+        struct GoalDescriptorLiteralClass;
+        struct GoalDescriptorAndClass;
+        struct GoalDescriptorOrClass;
+        struct GoalDescriptorNotClass;
+        struct GoalDescriptorImplyClass;
+        struct GoalDescriptorExistsClass;
+        struct GoalDescriptorForallClass;
+        struct GoalDescriptorFunctionComparisonClass;
+
+        struct ConstraintGoalDescriptorClass;
+        struct ConstraintGoalDescriptorAndClass;
+        struct ConstraintGoalDescriptorForallClass;
+        struct ConstraintGoalDescriptorAtEndClass;
+        struct ConstraintGoalDescriptorAlwaysClass;
+        struct ConstraintGoalDescriptorSometimeClass;
+        struct ConstraintGoalDescriptorWithinClass;
+        struct ConstraintGoalDescriptorAtMostOnceClass;
+        struct ConstraintGoalDescriptorSometimeAfterClass;
+        struct ConstraintGoalDescriptorSometimeBeforeClass;
+        struct ConstraintGoalDescriptorAlwaysWithinClass;
+        struct ConstraintGoalDescriptorHoldDuringClass;
+        struct ConstraintGoalDescriptorHoldAfterClass;
+
+        struct PreferenceNameClass;
+        struct PreconditionGoalDescriptorClass;
+        struct PreconditionGoalDescriptorSimpleClass;
+        struct PreconditionGoalDescriptorAndClass;
+        struct PreconditionGoalDescriptorPreferenceClass;
+        struct PreconditionGoalDescriptorForallClass;
+
+        struct AssignOperatorAssignClass;
+        struct AssignOperatorScaleUpClass;
+        struct AssignOperatorScaleDownClass;
+        struct AssignOperatorIncreaseClass;
+        struct AssignOperatorDecreaseClass;
+        struct AssignOperatorClass;
+
+        struct EffectClass;
+        struct EffectProductionLiteralClass;
+        struct EffectProductionNumericFluentClass;
+        struct EffectProductionObjectFluentClass;
+        struct EffectProductionClass;
+        struct EffectConditionalForallClass;
+        struct EffectConditionalWhenClass;
+        struct EffectConditionalClass;
+        struct ActionSymbolClass;
+        struct ActionBodyClass;
+        struct ActionClass;
+        struct DurativeActionClass;  // TODO
         struct DerivedPredicateClass;
 
+        struct DomainNameClass;
+        struct RequirementsClass;
+        struct TypesClass;
+        struct ConstantsClass;
+        struct PredicatesClass;
+        struct FunctionsClass;
+        struct ConstraintsClass;
+        struct StructureClass;
         struct DomainDescriptionClass;
 
 
@@ -125,8 +205,88 @@ namespace loki::domain
         typedef x3::rule<NegatedAtomOfTermsClass, ast::NegatedAtomOfTerms> negated_atom_of_terms_type;
         typedef x3::rule<LiteralOfTermsClass, ast::LiteralOfTerms> literal_of_terms_type;
 
+        x3::rule<MultiOperatorMulClass, ast::MultiOperatorMul> multi_operator_mul_type;
+        x3::rule<MultiOperatorPlusClass, ast::MultiOperatorPlus> multi_operator_plus_type;
+        x3::rule<MultiOperatorClass, ast::MultiOperator> multi_operator_type;
+        x3::rule<BinaryOperatorMinusClass, ast::BinaryOperatorMinus> binary_operator_minus_type;
+        x3::rule<BinaryOperatorDivClass, ast::BinaryOperatorDiv> binary_operator_div_type;
+        x3::rule<BinaryOperatorClass, ast::BinaryOperator> binary_operator_type;
+
+        x3::rule<BinaryComparatorGreaterClass, ast::BinaryComparatorGreater> binary_comparator_greater_type;
+        x3::rule<BinaryComparatorLessClass, ast::BinaryComparatorLess> binary_comparator_less_type;
+        x3::rule<BinaryComparatorEqualClass, ast::BinaryComparatorEqual> binary_comparator_equal_type;
+        x3::rule<BinaryComparatorGreaterEqualClass, ast::BinaryComparatorGreaterEqual> binary_comparator_greater_equal_type;
+        x3::rule<BinaryComparatorLessEqualClass, ast::BinaryComparatorLessEqual> binary_comparator_less_equal_type;
+        x3::rule<BinaryComparatorClass, ast::BinaryComparator> binary_comparator_type;
+
+        x3::rule<FunctionExpressionClass, ast::FunctionExpression> function_expression_type;
+        x3::rule<FunctionHeadClass, ast::FunctionHead> function_head_type;
+        x3::rule<FunctionExpressionNumberClass, ast::FunctionExpressionNumber> function_expression_number_type;
+        x3::rule<FunctionExpressionBinaryOpClass, ast::FunctionExpressionBinaryOp> function_expression_binary_op_type;
+        x3::rule<FunctionExpressionMinusClass, ast::FunctionExpressionMinus> function_expression_minus_type;
+        x3::rule<FunctionExpressionHeadClass, ast::FunctionExpressionHead> function_expression_head_type;
+
+        x3::rule<GoalDescriptorClass, ast::GoalDescriptor> goal_descriptor_type;
+        x3::rule<GoalDescriptorAtomClass, ast::GoalDescriptorAtom> goal_descriptor_atom_type;
+        x3::rule<GoalDescriptorLiteralClass, ast::GoalDescriptorLiteral> goal_descriptor_literal_type;
+        x3::rule<GoalDescriptorAndClass, ast::GoalDescriptorAnd> goal_descriptor_and_type;
+        x3::rule<GoalDescriptorOrClass, ast::GoalDescriptorOr> goal_descriptor_or_type;
+        x3::rule<GoalDescriptorNotClass, ast::GoalDescriptorNot> goal_descriptor_not_type;
+        x3::rule<GoalDescriptorImplyClass, ast::GoalDescriptorImply> goal_descriptor_imply_type;
+        x3::rule<GoalDescriptorExistsClass, ast::GoalDescriptorExists> goal_descriptor_exists_type;
+        x3::rule<GoalDescriptorForallClass, ast::GoalDescriptorForall> goal_descriptor_forall_type;
+        x3::rule<GoalDescriptorFunctionComparisonClass, ast::GoalDescriptorFunctionComparison> goal_descriptor_function_comparison_type;
+
+        x3::rule<ConstraintGoalDescriptorClass, ast::ConstraintGoalDescriptor> constraint_goal_descriptor_type;
+        x3::rule<ConstraintGoalDescriptorAndClass, ast::ConstraintGoalDescriptorAnd> constraint_goal_descriptor_and_type;
+        x3::rule<ConstraintGoalDescriptorForallClass, ast::ConstraintGoalDescriptorForall> constraint_goal_descriptor_forall_type;
+        x3::rule<ConstraintGoalDescriptorAtEndClass, ast::ConstraintGoalDescriptorAtEnd> constraint_goal_descriptor_at_end_type;
+        x3::rule<ConstraintGoalDescriptorAlwaysClass, ast::ConstraintGoalDescriptorAlways> constraint_goal_descriptor_always_type;
+        x3::rule<ConstraintGoalDescriptorSometimeClass, ast::ConstraintGoalDescriptorSometime> constraint_goal_descriptor_sometime_type;
+        x3::rule<ConstraintGoalDescriptorWithinClass, ast::ConstraintGoalDescriptorWithin> constraint_goal_descriptor_within_type;
+        x3::rule<ConstraintGoalDescriptorAtMostOnceClass, ast::ConstraintGoalDescriptorAtMostOnce> constraint_goal_descriptor_at_most_once_type;
+        x3::rule<ConstraintGoalDescriptorSometimeAfterClass, ast::ConstraintGoalDescriptorSometimeAfter> constraint_goal_descriptor_sometime_after_type;
+        x3::rule<ConstraintGoalDescriptorSometimeBeforeClass, ast::ConstraintGoalDescriptorSometimeBefore> constraint_goal_descriptor_sometime_before_type;
+        x3::rule<ConstraintGoalDescriptorAlwaysWithinClass, ast::ConstraintGoalDescriptorAlwaysWithin> constraint_goal_descriptor_always_within_type;
+        x3::rule<ConstraintGoalDescriptorHoldDuringClass, ast::ConstraintGoalDescriptorHoldDuring> constraint_goal_descriptor_hold_during_type;
+        x3::rule<ConstraintGoalDescriptorHoldAfterClass, ast::ConstraintGoalDescriptorHoldAfter> constraint_goal_descriptor_hold_after_type;
+
+        x3::rule<PreconditionGoalDescriptorClass, ast::PreconditionGoalDescriptor> precondition_goal_descriptor_type;
+        x3::rule<PreferenceNameClass, ast::PreferenceName> preference_name_type;
+        x3::rule<PreconditionGoalDescriptorSimpleClass, ast::PreconditionGoalDescriptorSimple> precondition_goal_descriptor_simple_type;
+        x3::rule<PreconditionGoalDescriptorAndClass, ast::PreconditionGoalDescriptorAnd> precondition_goal_descriptor_and_type;
+        x3::rule<PreconditionGoalDescriptorPreferenceClass, ast::PreconditionGoalDescriptorPreference> precondition_goal_descriptor_preference_type;
+        x3::rule<PreconditionGoalDescriptorForallClass, ast::PreconditionGoalDescriptorForall> precondition_goal_descriptor_forall_type;
+
+        x3::rule<AssignOperatorAssignClass, ast::AssignOperatorAssign> assign_operator_assign_type;
+        x3::rule<AssignOperatorScaleUpClass, ast::AssignOperatorScaleUp> assign_operator_scale_up_type;
+        x3::rule<AssignOperatorScaleDownClass, ast::AssignOperatorScaleDown> assign_operator_scale_down_type;
+        x3::rule<AssignOperatorIncreaseClass, ast::AssignOperatorIncrease> assign_operator_increase_type;
+        x3::rule<AssignOperatorDecreaseClass, ast::AssignOperatorDecrease> assign_operator_decrease_type;
+        x3::rule<AssignOperatorClass, ast::AssignOperator> assign_operator_type;
+
+        typedef x3::rule<EffectClass, ast::Effect> effect_type;
+        typedef x3::rule<EffectProductionLiteralClass, ast::EffectProductionLiteral> effect_production_literal_type;
+        typedef x3::rule<EffectProductionNumericFluentClass, ast::EffectProductionNumericFluent> effect_production_numeric_fluent_type;
+        typedef x3::rule<EffectProductionObjectFluentClass, ast::EffectProductionObjectFluent> effect_production_object_fluent_type;
+        typedef x3::rule<EffectProductionClass, ast::EffectProduction> effect_production_type;
+        typedef x3::rule<EffectConditionalForallClass, ast::EffectConditionalForall> effect_conditional_forall_type;
+        typedef x3::rule<EffectConditionalWhenClass, ast::EffectConditionalWhen> effect_conditional_when_type;
+        typedef x3::rule<EffectConditionalClass, ast::EffectConditional> effect_conditional_type;
+        typedef x3::rule<ActionSymbolClass, ast::ActionSymbol> action_symbol_type;
+        typedef x3::rule<ActionBodyClass, ast::ActionBody> action_body_type;
+        typedef x3::rule<ActionClass, ast::Action> action_type;
+
         typedef x3::rule<DerivedPredicateClass, ast::DerivedPredicate> derived_predicate_type;
 
+        typedef x3::rule<DomainNameClass, ast::DomainName> domain_name_type;
+        typedef x3::rule<RequirementsClass, ast::Requirements> requirements_type;
+        typedef x3::rule<TypesClass, ast::Types> types_type;
+        typedef x3::rule<ConstantsClass, ast::Constants> constants_type;
+        typedef x3::rule<PredicatesClass, ast::Predicates> predicates_type;
+        typedef x3::rule<FunctionsClass, ast::Functions> functions_type;
+        typedef x3::rule<ConstraintsClass, ast::Constraints> constraints_type;
+        typedef x3::rule<StructureClass, ast::Structure> structure_type;
         typedef x3::rule<DomainDescriptionClass, ast::DomainDescription> domain_description_type;
 
 
@@ -149,9 +309,14 @@ namespace loki::domain
 
         BOOST_SPIRIT_DECLARE(atomic_formula_of_terms_type, atom_of_terms_type, negated_atom_of_terms_type, literal_of_terms_type)
 
-        BOOST_SPIRIT_DECLARE(derived_predicate_type)
 
-        BOOST_SPIRIT_DECLARE(domain_description_type)
+        BOOST_SPIRIT_DECLARE(effect_type, effect_production_literal_type, effect_production_numeric_fluent_type,
+            effect_production_object_fluent_type, effect_production_type, effect_conditional_forall_type,
+            effect_conditional_when_type, effect_conditional_type, action_symbol_type, action_body_type, action_type,
+            derived_predicate_type)
+
+        BOOST_SPIRIT_DECLARE(domain_name_type, requirements_type, types_type, constants_type,
+            predicates_type, functions_type, constraints_type, structure_type, domain_description_type)
     }
 
     parser::name_type const& name();
@@ -207,8 +372,27 @@ namespace loki::domain
     parser::negated_atom_of_terms_type const& negated_atom_of_terms();
     parser::literal_of_terms_type const& literal_of_terms();
 
+    parser::effect_type const& effect();
+    parser::effect_production_literal_type const& effect_production_literal();
+    parser::effect_production_numeric_fluent_type const& effect_production_numeric_fluent();
+    parser::effect_production_object_fluent_type const& effect_production_object_fluent();
+    parser::effect_production_type const& effect_production();
+    parser::effect_conditional_forall_type const& effect_conditional_forall();
+    parser::effect_conditional_when_type const& effect_conditional_when();
+    parser::effect_conditional_type const& effect_conditional();
+    parser::action_symbol_type const& action_symbol();
+    parser::action_body_type const& action_body();
+    parser::action_type const& action();
     parser::derived_predicate_type const& derived_predicate();
 
+    parser::domain_name_type const& domain_name();
+    parser::requirements_type const& requirements();
+    parser::types_type const& types();
+    parser::constants_type const& constants();
+    parser::predicates_type const& predicates();
+    parser::functions_type const& functions();
+    parser::constraints_type const& constraints();
+    parser::structure_type const& structure();
     parser::domain_description_type const& domain_description();
 }
 

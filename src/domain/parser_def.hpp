@@ -30,90 +30,6 @@ namespace loki::domain::parser {
     // Rule IDs
     ///////////////////////////////////////////////////////////////////////////
 
-    struct MultiOperatorMulClass;
-    struct MultiOperatorPlusClass;
-    struct MultiOperatorClass;
-    struct BinaryOperatorMinusClass;
-    struct BinaryOperatorDivClass;
-    struct BinaryOperatorClass;
-
-    struct BinaryComparatorGreaterClass;
-    struct BinaryComparatorLessClass;
-    struct BinaryComparatorEqualClass;
-    struct BinaryComparatorGreaterEqualClass;
-    struct BinaryComparatorLessEqualClass;
-    struct BinaryComparatorClass;
-
-    struct FunctionHeadClass;
-    struct FunctionExpressionClass;
-    struct FunctionExpressionNumberClass;
-    struct FunctionExpressionBinaryOpClass;
-    struct FunctionExpressionMinusClass;
-    struct FunctionExpressionHeadClass;
-
-    struct GoalDescriptorClass;
-    struct GoalDescriptorAtomClass;
-    struct GoalDescriptorLiteralClass;
-    struct GoalDescriptorAndClass;
-    struct GoalDescriptorOrClass;
-    struct GoalDescriptorNotClass;
-    struct GoalDescriptorImplyClass;
-    struct GoalDescriptorExistsClass;
-    struct GoalDescriptorForallClass;
-    struct GoalDescriptorFunctionComparisonClass;
-
-    struct ConstraintGoalDescriptorClass;
-    struct ConstraintGoalDescriptorAndClass;
-    struct ConstraintGoalDescriptorForallClass;
-    struct ConstraintGoalDescriptorAtEndClass;
-    struct ConstraintGoalDescriptorAlwaysClass;
-    struct ConstraintGoalDescriptorSometimeClass;
-    struct ConstraintGoalDescriptorWithinClass;
-    struct ConstraintGoalDescriptorAtMostOnceClass;
-    struct ConstraintGoalDescriptorSometimeAfterClass;
-    struct ConstraintGoalDescriptorSometimeBeforeClass;
-    struct ConstraintGoalDescriptorAlwaysWithinClass;
-    struct ConstraintGoalDescriptorHoldDuringClass;
-    struct ConstraintGoalDescriptorHoldAfterClass;
-
-    struct PreferenceNameClass;
-    struct PreconditionGoalDescriptorClass;
-    struct PreconditionGoalDescriptorSimpleClass;
-    struct PreconditionGoalDescriptorAndClass;
-    struct PreconditionGoalDescriptorPreferenceClass;
-    struct PreconditionGoalDescriptorForallClass;
-
-    struct AssignOperatorAssignClass;
-    struct AssignOperatorScaleUpClass;
-    struct AssignOperatorScaleDownClass;
-    struct AssignOperatorIncreaseClass;
-    struct AssignOperatorDecreaseClass;
-    struct AssignOperatorClass;
-
-    struct EffectClass;
-    struct EffectProductionLiteralClass;
-    struct EffectProductionNumericFluentClass;
-    struct EffectProductionObjectFluentClass;
-    struct EffectProductionClass;
-    struct EffectConditionalForallClass;
-    struct EffectConditionalWhenClass;
-    struct EffectConditionalClass;
-
-    struct ActionSymbolClass;
-    struct ActionBodyClass;
-
-    struct ActionClass;
-    struct DurativeActionClass;  // TODO
-
-    struct DomainNameClass;
-    struct RequirementsClass;
-    struct TypesClass;
-    struct ConstantsClass;
-    struct PredicatesClass;
-    struct FunctionsClass;
-    struct ConstraintsClass;
-    struct StructureClass;
-
 
     ///////////////////////////////////////////////////////////////////////////
     // Rules
@@ -285,49 +201,27 @@ namespace loki::domain::parser {
     x3::rule<AssignOperatorClass, ast::AssignOperator> const
         assign_operator = "assign_operator";
 
-    x3::rule<EffectClass, ast::Effect> const
-        effect = "effect";
-    x3::rule<EffectProductionLiteralClass, ast::EffectProductionLiteral> const
-        effect_production_literal = "effect_production_literal";
-    x3::rule<EffectProductionNumericFluentClass, ast::EffectProductionNumericFluent> const
-        effect_production_numeric_fluent = "effect_production_numeric_fluent";
-    x3::rule<EffectProductionObjectFluentClass, ast::EffectProductionObjectFluent> const
-        effect_production_object_fluent = "effect_production_object_fluent";
-    x3::rule<EffectProductionClass, ast::EffectProduction> const
-        effect_production = "effect_production";
-    x3::rule<EffectConditionalForallClass, ast::EffectConditionalForall> const
-        effect_conditional_forall = "effect_conditional_forall";
-    x3::rule<EffectConditionalWhenClass, ast::EffectConditionalWhen> const
-        effect_conditional_when = "effect_conditional_when";
-    x3::rule<EffectConditionalClass, ast::EffectConditional> const
-        effect_conditional = "effect_conditional";
-
-    x3::rule<ActionSymbolClass, ast::ActionSymbol> const
-        action_symbol = "action_symbol";
-    x3::rule<ActionBodyClass, ast::ActionBody> const
-        action_body = "action_body";
-
-    x3::rule<ActionClass, ast::Action> const
-        action = "action";
-
+    effect_type const effect = "effect";
+    effect_production_literal_type const effect_production_literal = "effect_production_literal";
+    effect_production_numeric_fluent_type const effect_production_numeric_fluent = "effect_production_numeric_fluent";
+    effect_production_object_fluent_type const effect_production_object_fluent = "effect_production_object_fluent";
+    effect_production_type const effect_production = "effect_production";
+    effect_conditional_forall_type const effect_conditional_forall = "effect_conditional_forall";
+    effect_conditional_when_type const effect_conditional_when = "effect_conditional_when";
+    effect_conditional_type const effect_conditional = "effect_conditional";
+    action_symbol_type const action_symbol = "action_symbol";
+    action_body_type const action_body = "action_body";
+    action_type const action = "action";
     derived_predicate_type const derived_predicate = "derived_predicate";
 
-    x3::rule<DomainNameClass, ast::DomainName> const
-        domain_name = "domain_name";
-    x3::rule<RequirementsClass, ast::Requirements> const
-        requirements = "requirements";
-    x3::rule<TypesClass, ast::Types> const
-        types = "types";
-    x3::rule<ConstantsClass, ast::Constants> const
-        constants = "constants";
-    x3::rule<PredicatesClass, ast::Predicates> const
-        predicates = "predicates";
-    x3::rule<FunctionsClass, ast::Functions> const
-        functions = "functions";
-    x3::rule<ConstraintsClass, ast::Constraints> const
-        constraints = "constraints";
-    x3::rule<StructureClass, ast::Structure> const
-        structure = "structure";
+    domain_name_type const domain_name = "domain_name";
+    requirements_type const requirements = "requirements";
+    types_type const types = "types";
+    constants_type const constants = "constants";
+    predicates_type const predicates = "predicates";
+    functions_type const functions = "functions";
+    constraints_type const constraints = "constraints";
+    structure_type const structure = "structure";
     domain_description_type const domain_description = "domain_description";
 
 
@@ -540,15 +434,15 @@ namespace loki::domain::parser {
         preference_name, precondition_goal_descriptor, precondition_goal_descriptor_simple,
         precondition_goal_descriptor_and, precondition_goal_descriptor_preference, precondition_goal_descriptor_forall,
         assign_operator_assign, assign_operator_scale_up, assign_operator_scale_down,
-        assign_operator_increase, assign_operator_decrease, assign_operator,
-        effect, effect_production_literal, effect_production_numeric_fluent, effect_production_object_fluent, effect_production,
-        effect_conditional_forall, effect_conditional_when, effect_conditional,
-        action_symbol, action_body, action, derived_predicate
-    )
+        assign_operator_increase, assign_operator_decrease, assign_operator)
 
-    BOOST_SPIRIT_DEFINE(
-        domain_name, requirements, types, constants, predicates, functions, constraints, structure, domain_description
-    )
+    BOOST_SPIRIT_DEFINE(effect, effect_production_literal, effect_production_numeric_fluent,
+        effect_production_object_fluent, effect_production, effect_conditional_forall,
+        effect_conditional_when, effect_conditional, action_symbol,
+        action_body, action, derived_predicate)
+
+    BOOST_SPIRIT_DEFINE(domain_name, requirements, types, constants, predicates, functions,
+        constraints, structure, domain_description)
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -676,10 +570,8 @@ namespace loki::domain::parser {
     struct EffectConditionalForallClass : x3::annotate_on_success {};
     struct EffectConditionalWhenClass : x3::annotate_on_success {};
     struct EffectConditionalClass : x3::annotate_on_success {};
-
     struct ActionSymbolClass : x3::annotate_on_success {};
     struct ActionBodyClass : x3::annotate_on_success {};
-
     struct ActionClass : x3::annotate_on_success {};
     struct DurativeActionClass : x3::annotate_on_success {};
     struct DerivedPredicateClass : x3::annotate_on_success {};
@@ -846,6 +738,68 @@ namespace loki::domain
         return parser::literal_of_terms;
     }
 
+
+    parser::effect_type const& effect() {
+        return parser::effect;
+    }
+    parser::effect_production_literal_type const& effect_production_literal() {
+        return parser::effect_production_literal;
+    }
+    parser::effect_production_numeric_fluent_type const& effect_production_numeric_fluent() {
+        return parser::effect_production_numeric_fluent;
+    }
+    parser::effect_production_object_fluent_type const& effect_production_object_fluent() {
+        return parser::effect_production_object_fluent;
+    }
+    parser::effect_production_type const& effect_production() {
+        return parser::effect_production;
+    }
+    parser::effect_conditional_forall_type const& effect_conditional_forall() {
+        return parser::effect_conditional_forall;
+    }
+    parser::effect_conditional_when_type const& effect_conditional_when() {
+        return parser::effect_conditional_when;
+    }
+    parser::effect_conditional_type const& effect_conditional() {
+        return parser::effect_conditional;
+    }
+    parser::action_symbol_type const& action_symbol() {
+        return parser::action_symbol;
+    }
+    parser::action_body_type const& action_body() {
+        return parser::action_body;
+    }
+    parser::action_type const& action() {
+        return parser::action;
+    }
+    parser::derived_predicate_type const& derived_predicate() {
+        return parser::derived_predicate;
+    }
+
+    parser::domain_name_type const& domain_name() {
+        return parser::domain_name;
+    }
+    parser::requirements_type const& requirements() {
+        return parser::requirements;
+    }
+    parser::types_type const& types() {
+        return parser::types;
+    }
+    parser::constants_type const& constants() {
+        return parser::constants;
+    }
+    parser::predicates_type const& predicates() {
+        return parser::predicates;
+    }
+    parser::functions_type const& functions() {
+        return parser::functions;
+    }
+    parser::constraints_type const& constraints() {
+        return parser::constraints;
+    }
+    parser::structure_type const& structure() {
+        return parser::structure;
+    }
     parser::domain_description_type const& domain_description() {
         return parser::domain_description;
     }

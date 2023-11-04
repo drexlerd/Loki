@@ -62,7 +62,29 @@ namespace loki::domain::parser
     BOOST_SPIRIT_INSTANTIATE(negated_atom_of_terms_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(literal_of_terms_type, iterator_type, context_type)
 
+
+
+    BOOST_SPIRIT_INSTANTIATE(effect_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(effect_production_literal_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(effect_production_numeric_fluent_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(effect_production_object_fluent_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(effect_production_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(effect_conditional_forall_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(effect_conditional_when_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(effect_conditional_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(action_symbol_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(action_body_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(action_type, iterator_type, context_type)
+
     BOOST_SPIRIT_INSTANTIATE(derived_predicate_type, iterator_type, context_type)
 
+    BOOST_SPIRIT_INSTANTIATE(domain_name_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirements_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(types_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(constants_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(predicates_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(functions_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(constraints_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(structure_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(domain_description_type, iterator_type, context_type)
 }
