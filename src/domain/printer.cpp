@@ -53,24 +53,26 @@ namespace loki::domain
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
 
-    std::string parse_text(const ast::RequirementStrips& node, const FormattingOptions&) { return ":strips"; }
-    std::string parse_text(const ast::RequirementTyping& node, const FormattingOptions&) { return ":typing"; }
-    std::string parse_text(const ast::RequirementNegativePreconditions& node, const FormattingOptions&) { return ":negative-preconditions"; }
-    std::string parse_text(const ast::RequirementDisjunctivePreconditions& node, const FormattingOptions&) { return ":disjunctive-preconditions"; }
-    std::string parse_text(const ast::RequirementEquality& node, const FormattingOptions&) { return ":equality"; }
-    std::string parse_text(const ast::RequirementExistentialPreconditions& node, const FormattingOptions&) { return ":existential-preconditions"; }
-    std::string parse_text(const ast::RequirementUniversalPreconditions& node, const FormattingOptions&) { return ":universal-preconditions"; }
-    std::string parse_text(const ast::RequirementQuantifiedPreconditions& node, const FormattingOptions&) { return ":quantified-preconditions"; }
-    std::string parse_text(const ast::RequirementConditionalEffects& node, const FormattingOptions&) { return ":conditional-effects"; }
-    std::string parse_text(const ast::RequirementFluents& node, const FormattingOptions&) { return ":fluents"; }
-    std::string parse_text(const ast::RequirementObjectFluents& node, const FormattingOptions&) { return ":object-fluents"; }
-    std::string parse_text(const ast::RequirementNumericFluents& node, const FormattingOptions&) { return ":numeric-fluents"; }
-    std::string parse_text(const ast::RequirementAdl& node, const FormattingOptions&) { return ":adl"; }
-    std::string parse_text(const ast::RequirementDurativeActions& node, const FormattingOptions&) { return ":durative-actions"; }
-    std::string parse_text(const ast::RequirementDerivedPredicates& node, const FormattingOptions&) { return ":derived-predicates"; }
-    std::string parse_text(const ast::RequirementTimedInitialLiterals& node, const FormattingOptions&) { return ":timed-initial-literals"; }
-    std::string parse_text(const ast::RequirementPreferences& node, const FormattingOptions&) { return ":preferences"; }
-    std::string parse_text(const ast::RequirementConstraints& node, const FormattingOptions&) { return ":constraints"; }
+    std::string parse_text(const ast::Undefined& node, const FormattingOptions& options) { return "undefined"; }
+
+    std::string parse_text(const ast::RequirementStrips&, const FormattingOptions&) { return ":strips"; }
+    std::string parse_text(const ast::RequirementTyping&, const FormattingOptions&) { return ":typing"; }
+    std::string parse_text(const ast::RequirementNegativePreconditions&, const FormattingOptions&) { return ":negative-preconditions"; }
+    std::string parse_text(const ast::RequirementDisjunctivePreconditions&, const FormattingOptions&) { return ":disjunctive-preconditions"; }
+    std::string parse_text(const ast::RequirementEquality&, const FormattingOptions&) { return ":equality"; }
+    std::string parse_text(const ast::RequirementExistentialPreconditions&, const FormattingOptions&) { return ":existential-preconditions"; }
+    std::string parse_text(const ast::RequirementUniversalPreconditions&, const FormattingOptions&) { return ":universal-preconditions"; }
+    std::string parse_text(const ast::RequirementQuantifiedPreconditions&, const FormattingOptions&) { return ":quantified-preconditions"; }
+    std::string parse_text(const ast::RequirementConditionalEffects&, const FormattingOptions&) { return ":conditional-effects"; }
+    std::string parse_text(const ast::RequirementFluents&, const FormattingOptions&) { return ":fluents"; }
+    std::string parse_text(const ast::RequirementObjectFluents&, const FormattingOptions&) { return ":object-fluents"; }
+    std::string parse_text(const ast::RequirementNumericFluents&, const FormattingOptions&) { return ":numeric-fluents"; }
+    std::string parse_text(const ast::RequirementAdl&, const FormattingOptions&) { return ":adl"; }
+    std::string parse_text(const ast::RequirementDurativeActions&, const FormattingOptions&) { return ":durative-actions"; }
+    std::string parse_text(const ast::RequirementDerivedPredicates&, const FormattingOptions&) { return ":derived-predicates"; }
+    std::string parse_text(const ast::RequirementTimedInitialLiterals&, const FormattingOptions&) { return ":timed-initial-literals"; }
+    std::string parse_text(const ast::RequirementPreferences&, const FormattingOptions&) { return ":preferences"; }
+    std::string parse_text(const ast::RequirementConstraints&, const FormattingOptions&) { return ":constraints"; }
 
     std::string parse_text(const ast::Requirement& node, const FormattingOptions& options) {
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
@@ -82,7 +84,7 @@ namespace loki::domain
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
 
-    std::string parse_text(const ast::TypeObject& node, const FormattingOptions&)
+    std::string parse_text(const ast::TypeObject&, const FormattingOptions&)
     {
         return "object";
     }
@@ -203,6 +205,393 @@ namespace loki::domain
         return ss.str();
     }
 
+    std::string parse_text(const ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& node, const FormattingOptions& options) {
+        stringstream ss;
+        for (size_t i = 0; i < node.atomic_function_skeletons.size(); ++i)
+        {
+            if (i != 0)
+                ss << " ";
+            ss << parse_text(node.atomic_function_skeletons[i]);
+        }
+        ss << " - " << parse_text(node.function_type);
+        auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent, options.newline};
+        if (node.function_typed_list_of_atomic_function_skeletons.has_value()) {
+            auto nested_text = parse_text(node.function_typed_list_of_atomic_function_skeletons.value(), options);
+            if (nested_text.size() > 0) {
+                if (options.newline) ss << "\n";
+                ss << string(nested_options.indent, ' ')
+                << nested_text;
+            }
+        }
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::FunctionTypedListOfAtomicFunctionSkeletons& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+
+    std::string parse_text(const ast::AtomicFormulaOfTermsPredicate& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(" << parse_text(node.predicate, options) << " " << parse_text(node.terms, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::AtomicFormulaOfTermsEquality& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(" << "= " << parse_text(node.term_left, options) << " " << parse_text(node.term_right, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::AtomicFormulaOfTerms& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+    std::string parse_text(const ast::Atom& node, const FormattingOptions& options) {
+        return parse_text(node.atomic_formula_of_terms, options);
+    }
+
+    std::string parse_text(const ast::NegatedAtom& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(not " << parse_text(node.atomic_formula_of_terms, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::Literal& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+    std::string parse_text(const ast::MultiOperatorMul&, const FormattingOptions&) { return "*"; }
+    std::string parse_text(const ast::MultiOperatorPlus&, const FormattingOptions&) { return "+"; }
+    std::string parse_text(const ast::MultiOperator& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+    std::string parse_text(const ast::BinaryOperatorMinus&, const FormattingOptions&) { return "-"; }
+    std::string parse_text(const ast::BinaryOperatorDiv&, const FormattingOptions&) { return "/"; }
+    std::string parse_text(const ast::BinaryOperator& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+
+    std::string parse_text(const ast::BinaryComparatorGreater&, const FormattingOptions&) { return ">"; }
+    std::string parse_text(const ast::BinaryComparatorLess&, const FormattingOptions&) { return "<"; }
+    std::string parse_text(const ast::BinaryComparatorEqual&, const FormattingOptions&) { return "="; }
+    std::string parse_text(const ast::BinaryComparatorGreaterEqual&, const FormattingOptions&) { return ">="; }
+    std::string parse_text(const ast::BinaryComparatorLessEqual&, const FormattingOptions&) { return "<="; }
+    std::string parse_text(const ast::BinaryComparator& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+
+    std::string parse_text(const ast::FunctionHead& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        if (node.terms.size() > 0) {
+            ss << "(" << parse_text(node.function_symbol, options) << " " << parse_text(node.terms, options) << ")";
+        } else {
+            ss << parse_text(node.function_symbol, options);
+        }
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::FunctionExpression& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+    std::string parse_text(const ast::FunctionExpressionNumber& node, const FormattingOptions& options) {
+        return parse_text(node.number, options);
+    }
+
+    std::string parse_text(const ast::FunctionExpressionBinaryOp& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(" << parse_text(node.binary_operator, options) << " "
+                  << parse_text(node.function_expression_left, options) << " "
+                  << parse_text(node.function_expression_right, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::FunctionExpressionMinus& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(- " << parse_text(node.function_expression, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::FunctionExpressionHead& node, const FormattingOptions& options) {
+        return parse_text(node.function_head, options);
+    }
+
+
+    std::string parse_text(const ast::GoalDescriptor& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+    std::string parse_text(const ast::GoalDescriptorAtom& node, const FormattingOptions& options) {
+        return parse_text(node.atom, options);
+    }
+
+    std::string parse_text(const ast::GoalDescriptorLiteral& node, const FormattingOptions& options) {
+        return parse_text(node.literal, options);
+    }
+
+    std::string parse_text(const ast::GoalDescriptorAnd& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(and " << parse_text(node.goal_descriptors, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::GoalDescriptorOr& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(or " << parse_text(node.goal_descriptors, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::GoalDescriptorNot& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(not " << parse_text(node.goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::GoalDescriptorImply& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(imply " << parse_text(node.goal_descriptor_left, options) << " "
+                        << parse_text(node.goal_descriptor_right, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::GoalDescriptorExists& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(exists " << parse_text(node.typed_list_of_variables, options) << " "
+                        << parse_text(node.goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::GoalDescriptorForall& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(forall " << parse_text(node.typed_list_of_variables, options) << " "
+                        << parse_text(node.goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::GoalDescriptorFunctionComparison& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(" << parse_text(node.binary_comparator, options) << " "
+                  << parse_text(node.function_expression_left, options) << " "
+                  << parse_text(node.function_expression_right, options) << ")";
+        return ss.str();
+    }
+
+
+    std::string parse_text(const ast::ConstraintGoalDescriptor& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+    std::string parse_text(const ast::ConstraintGoalDescriptorAnd& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(and " << parse_text(node.constraint_goal_descriptors, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::ConstraintGoalDescriptorForall& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(forall " << parse_text(node.typed_list_of_variables, options) << " "
+                        << parse_text(node.constraint_goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::ConstraintGoalDescriptorAtEnd& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(at end " << parse_text(node.goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::ConstraintGoalDescriptorAlways& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(always " << parse_text(node.goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::ConstraintGoalDescriptorSometime& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(sometime " << parse_text(node.goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::ConstraintGoalDescriptorWithin& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(within " << parse_text(node.number, options) << " "
+                         << parse_text(node.goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::ConstraintGoalDescriptorAtMostOnce& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(at-most-once " << parse_text(node.goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::ConstraintGoalDescriptorSometimeAfter& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(sometime-after " << parse_text(node.goal_descriptor_left, options) << " "
+                                 << parse_text(node.goal_descriptor_right, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::ConstraintGoalDescriptorSometimeBefore& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(sometime-before " << parse_text(node.goal_descriptor_left, options) << " "
+                                  << parse_text(node.goal_descriptor_right, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::ConstraintGoalDescriptorAlwaysWithin& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(always-within " << parse_text(node.number, options) << " "
+                                << parse_text(node.goal_descriptor_left, options) << " "
+                                << parse_text(node.goal_descriptor_right, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::ConstraintGoalDescriptorHoldDuring& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(hold-during " << parse_text(node.number_left, options) << " "
+                              << parse_text(node.number_right, options) << " "
+                              << parse_text(node.goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::ConstraintGoalDescriptorHoldAfter& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(hold-after " << parse_text(node.number, options) << " "
+                            << parse_text(node.goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+
+    std::string parse_text(const ast::PreferenceName& node, const FormattingOptions& options) {
+        return parse_text(node.name, options);
+    }
+
+    std::string parse_text(const ast::PreconditionGoalDescriptor& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+    std::string parse_text(const ast::PreconditionGoalDescriptorSimple& node, const FormattingOptions& options) {
+        return parse_text(node.goal_descriptor, options);
+    }
+
+    std::string parse_text(const ast::PreconditionGoalDescriptorAnd& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(and " << parse_text(node.precondition_goal_descriptors, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::PreconditionGoalDescriptorPreference& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(preference " << parse_text(node.preference_name, options) << " "
+                             << parse_text(node.goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::PreconditionGoalDescriptorForall& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(forall " << parse_text(node.typed_list_of_variables, options) << " "
+                         << parse_text(node.precondition_goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::AssignOperatorAssign&, const FormattingOptions&) { return "assign"; }
+    std::string parse_text(const ast::AssignOperatorScaleUp&, const FormattingOptions&) { return "scale-up"; }
+    std::string parse_text(const ast::AssignOperatorScaleDown&, const FormattingOptions&) { return "scale-down"; }
+    std::string parse_text(const ast::AssignOperatorIncrease&, const FormattingOptions&) { return "increase"; }
+    std::string parse_text(const ast::AssignOperatorDecrease&, const FormattingOptions&) { return "decrease"; }
+    std::string parse_text(const ast::AssignOperator& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+
+    std::string parse_text(const ast::Effect& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+    std::string parse_text(const ast::EffectProductionLiteral& node, const FormattingOptions& options) {
+        return parse_text(node.literal, options);
+    }
+
+    std::string parse_text(const ast::EffectProductionNumericFluent& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(" << parse_text(node.assign_operator, options) << " "
+                  << parse_text(node.function_head, options) << " "
+                  << parse_text(node.function_expression, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::EffectProductionObjectFluent& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(assign " << parse_text(node.function_term, options) << " "
+                         << boost::apply_visitor(NodeVisitorPrinter(options), node.term) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::EffectProduction& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+    std::string parse_text(const ast::EffectConditionalForall& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(forall " << parse_text(node.typed_list_of_variables, options) << " "
+                         << parse_text(node.effect, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::EffectConditionalWhen& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(when " << parse_text(node.goal_descriptor, options) << " "
+                       << parse_text(node.effect, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::EffectConditional& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+
+    std::string parse_text(const ast::ActionSymbol& node, const FormattingOptions& options) {
+        return parse_text(node.name, options);
+    }
+
+    std::string parse_text(const ast::ActionBody& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        if (node.precondition_goal_descriptor.has_value()) {
+            ss << std::string(options.indent, ' ') << ":precondition " << parse_text(node.precondition_goal_descriptor.value(), options);
+            ss << ((options.newline) ? "\n" : " ");
+        }
+        if (node.effect.has_value()) {
+            ss << std::string(options.indent, ' ') << ":effect " << parse_text(node.effect.value(), options);
+        }
+        return ss.str();
+    }
+
+
+    std::string parse_text(const ast::Action& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << std::string(options.indent, ' ') << "(action " << parse_text(node.action_symbol, options);
+        FormattingOptions nested_options{options.indent + options.add_indent, options.add_indent, options.newline};
+        ss << ((nested_options.newline) ? "\n" : " ");
+        ss << std::string(nested_options.indent, ' ') << ":parameters (" << parse_text(node.typed_list_of_variables, nested_options) << ")";
+        ss << ((nested_options.newline) ? "\n" : " ");
+        ss << parse_text(node.action_body, nested_options);
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::DerivedPredicate& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << std::string(options.indent, ' ') << "(:derived "
+            << parse_text(node.typed_list_of_variables, options) << " "
+            << parse_text(node.goal_descriptor, options) << ")";
+        return ss.str();
+    }
+
+
 
     std::string parse_text(const ast::DomainName& node, const FormattingOptions& options) {
         stringstream ss;
@@ -251,7 +640,7 @@ namespace loki::domain
     }
 
     std::string parse_text(const ast::Structure& node, const FormattingOptions& options) {
-
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
 
 
@@ -273,7 +662,12 @@ namespace loki::domain
         }
         // TODO: functions
         // TODO: constraints
-        // TODO: structure
+        for (size_t i = 0; i < node.structures.size(); ++i) {
+            if (i != 0) {
+                ss << ((options.newline) ? "\n" : " ");
+            }
+            ss << parse_text(node.structures[i], nested_options);
+        }
         ss << ")";
         return ss.str();
     }

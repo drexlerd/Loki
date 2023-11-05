@@ -390,7 +390,7 @@ namespace loki::domain::ast
 
     struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively : x3::position_tagged
     {
-        std::vector<AtomicFunctionSkeleton> atomic_function_skeleton;
+        std::vector<AtomicFunctionSkeleton> atomic_function_skeletons;
         FunctionType function_type;
         boost::optional<x3::forward_ast<FunctionTypedListOfAtomicFunctionSkeletons>> function_typed_list_of_atomic_function_skeletons;
     };
@@ -783,10 +783,10 @@ namespace loki::domain::ast
     /* <effect> */
     // <p-effect>
     struct Effect : x3::position_tagged,
-                    x3::variant<
-                        x3::forward_ast<EffectProduction>,
-                        x3::forward_ast<EffectConditional>,
-                        x3::forward_ast<std::vector<Effect>>>
+        x3::variant<
+            x3::forward_ast<EffectProduction>,
+            x3::forward_ast<EffectConditional>,
+            std::vector<Effect>>
     {
         using base_type::base_type;
         using base_type::operator=;
@@ -800,7 +800,7 @@ namespace loki::domain::ast
     struct EffectProductionNumericFluent : x3::position_tagged
     {
         AssignOperator assign_operator;
-        FunctionExpressionHead function_expression_head;
+        FunctionHead function_head;
         FunctionExpression function_expression;
     };
 
