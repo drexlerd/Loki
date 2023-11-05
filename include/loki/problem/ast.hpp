@@ -28,11 +28,11 @@ namespace loki::problem::ast
     struct NegatedAtom;
     struct Literal;
 
-    struct InitialElaborationLiteral;
-    struct InitialElaborationTimedLiterals;      // :timed-initial-literals
-    struct InitialElaborationNumericFluents;     // :numeric-fluents
-    struct InitialElaborationObjectFluents;      // :object-fluents
-    struct InitialElaboration;
+    struct InitialElementLiteral;
+    struct InitialElementTimedLiterals;      // :timed-initial-literals
+    struct InitialElementNumericFluents;     // :numeric-fluents
+    struct InitialElementObjectFluents;      // :object-fluents
+    struct InitialElement;
 
     struct MetricFunctionExpression;
     struct MetricFunctionExpressionBinaryOperator;
@@ -125,31 +125,31 @@ namespace loki::problem::ast
     };
 
     /* <init-el> */
-    struct InitialElaborationLiteral : x3::position_tagged {
+    struct InitialElementLiteral : x3::position_tagged {
         Literal literal;
     };
 
-    struct InitialElaborationTimedLiterals : x3::position_tagged {
+    struct InitialElementTimedLiterals : x3::position_tagged {
         domain::ast::Number number;
         Literal literal;
     };
 
-    struct InitialElaborationNumericFluents : x3::position_tagged {
+    struct InitialElementNumericFluents : x3::position_tagged {
         domain::ast::FunctionHead function_head;
         domain::ast::Number number;
     };
 
-    struct InitialElaborationObjectFluents : x3::position_tagged {
+    struct InitialElementObjectFluents : x3::position_tagged {
         BasicFunctionTerm basic_function_term;
         domain::ast::Name name;
     };
 
-    struct InitialElaboration : x3::position_tagged,
+    struct InitialElement : x3::position_tagged,
         x3::variant<
-            InitialElaborationLiteral,
-            InitialElaborationTimedLiterals,
-            InitialElaborationNumericFluents,
-            InitialElaborationObjectFluents> {
+            InitialElementLiteral,
+            InitialElementTimedLiterals,
+            InitialElementNumericFluents,
+            InitialElementObjectFluents> {
         using base_type::base_type;
         using base_type::operator=;
     };
@@ -258,7 +258,7 @@ namespace loki::problem::ast
     };
 
     struct Initial : x3::position_tagged {
-        std::vector<InitialElaboration> initial_elaboration;
+        std::vector<InitialElement> initial_element;
     };
 
     struct Goal : x3::position_tagged {

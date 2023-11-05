@@ -49,11 +49,11 @@ namespace loki::problem::parser {
     negated_atom_type const negated_atom = "negated_atom";
     literal_type const literal = "literal";
 
-    initial_elaboration_literals_type const initial_elaboration_literals = "initial_elaboration_literals";
-    initial_elaboration_timed_literals_type const initial_elaboration_timed_literals = "initial_elaboration_timed_literals";
-    initial_elaboration_numeric_fluents_type const initial_elaboration_numeric_fluents = "initial_elaboration_numeric_fluents";
-    initial_elaboration_object_fluents_type const initial_elaboration_object_fluents = "initial_elaboration_object_fluents";
-    initial_elaboration_type const initial_elaboration = "initial_elaboration";
+    initial_element_literals_type const initial_element_literals = "initial_element_literals";
+    initial_element_timed_literals_type const initial_element_timed_literals = "initial_element_timed_literals";
+    initial_element_numeric_fluents_type const initial_element_numeric_fluents = "initial_element_numeric_fluents";
+    initial_element_object_fluents_type const initial_element_object_fluents = "initial_element_object_fluents";
+    initial_element_type const initial_element = "initial_element";
 
     metric_function_expression_type const metric_function_expression = "metric_function_expression";
     metric_function_expression_binary_operator_type const metric_function_expression_binary_operator = "metric_function_expression_binary_operator";
@@ -100,12 +100,12 @@ namespace loki::problem::parser {
     const auto negated_atom_def = lit('(') >> lit("not") >> atomic_formula_of_names >> lit(')');
     const auto literal_def = atom | negated_atom;
 
-    const auto initial_elaboration_literals_def = literal;
-    const auto initial_elaboration_timed_literals_def = lit('(') >> lit("at") > domain::number() > literal > lit(')');
-    const auto initial_elaboration_numeric_fluents_def = lit('(') >> lit('=') >> domain::function_head() > domain::number() > lit(')');
-    const auto initial_elaboration_object_fluents_def = lit('(') >> lit('=') >> basic_function_term > domain::name() > lit(')');
-    const auto initial_elaboration_def = initial_elaboration_literals | initial_elaboration_timed_literals
-        | initial_elaboration_numeric_fluents | initial_elaboration_object_fluents;
+    const auto initial_element_literals_def = literal;
+    const auto initial_element_timed_literals_def = lit('(') >> lit("at") > domain::number() > literal > lit(')');
+    const auto initial_element_numeric_fluents_def = lit('(') >> lit('=') >> domain::function_head() > domain::number() > lit(')');
+    const auto initial_element_object_fluents_def = lit('(') >> lit('=') >> basic_function_term > domain::name() > lit(')');
+    const auto initial_element_def = initial_element_literals | initial_element_timed_literals
+        | initial_element_numeric_fluents | initial_element_object_fluents;
 
 
     const auto metric_function_expression_binary_operator_def = lit('(') >> domain::binary_operator() >> metric_function_expression >> metric_function_expression > lit(')');
@@ -134,7 +134,7 @@ namespace loki::problem::parser {
     const auto problem_name_def = lit('(') >> lit("problem") > domain::name() > lit(')');
     const auto domain_name_def = lit('(') >> lit(":domain") > domain::name() > lit(')');
     const auto objects_def = lit('(') >> lit(":objects") > domain::typed_list_of_names() > lit(')');
-    const auto initial_def = lit('(') >> lit(":init") > *initial_elaboration > lit(')');
+    const auto initial_def = lit('(') >> lit(":init") > *initial_element > lit(')');
     const auto goal_def = lit('(') >> lit(":goal") > domain::precondition_goal_descriptor() > lit(')');
     const auto constraints_def = lit('(') >> lit(":constraints") > preference_constraint_goal_descriptor > lit(')');
     const auto metric_specification_def = lit('(') >> lit(":metric") > optimization > metric_function_expression > lit(')');
@@ -157,9 +157,9 @@ namespace loki::problem::parser {
     BOOST_SPIRIT_DEFINE(atomic_formula_of_names_predicate, atomic_formula_of_names_equality,
         atomic_formula_of_names, atom, negated_atom, literal)
 
-    BOOST_SPIRIT_DEFINE(initial_elaboration_literals, initial_elaboration_timed_literals,
-       initial_elaboration_numeric_fluents, initial_elaboration_object_fluents,
-       initial_elaboration)
+    BOOST_SPIRIT_DEFINE(initial_element_literals, initial_element_timed_literals,
+       initial_element_numeric_fluents, initial_element_object_fluents,
+       initial_element)
 
     BOOST_SPIRIT_DEFINE(metric_function_expression,
         metric_function_expression_binary_operator,
@@ -196,11 +196,11 @@ namespace loki::problem::parser {
     struct NegatedAtomClass : x3::annotate_on_success {};
     struct LiteralClass : x3::annotate_on_success {};
 
-    struct InitialElaborationLiteralClass : x3::annotate_on_success {};
-    struct InitialElaborationTimedLiteralsClass : x3::annotate_on_success {};
-    struct InitialElaborationNumericFluentsClass : x3::annotate_on_success {};
-    struct InitialElaborationObjectFluentsClass : x3::annotate_on_success {};
-    struct InitialElaborationClass : x3::annotate_on_success {};
+    struct InitialElementLiteralClass : x3::annotate_on_success {};
+    struct InitialElementTimedLiteralsClass : x3::annotate_on_success {};
+    struct InitialElementNumericFluentsClass : x3::annotate_on_success {};
+    struct InitialElementObjectFluentsClass : x3::annotate_on_success {};
+    struct InitialElementClass : x3::annotate_on_success {};
 
     struct MetricFunctionExpressionClass : x3::annotate_on_success {};
     struct MetricFunctionExpressionBinaryOperatorClass : x3::annotate_on_success {};
@@ -234,7 +234,127 @@ namespace loki::problem::parser {
 
 namespace loki::problem
 {
+    parser::basic_function_term_arity_greater_zero_type const& basic_function_term_arity_greater_zero() {
+        return parser::basic_function_term_arity_greater_zero;
+    }
+    parser::basic_function_term_arity_zero_type const& basic_function_term_arity_zero() {
+        return parser::basic_function_term_arity_zero;
+    }
+    parser::basic_function_term_type const& basic_function_term() {
+        return parser::basic_function_term;
+    }
 
+    parser::atomic_formula_of_names_predicate_type const& atomic_formula_of_names_predicate() {
+        return parser::atomic_formula_of_names_predicate;
+    }
+    parser::atomic_formula_of_names_equality_type const& atomic_formula_of_names_equality() {
+        return parser::atomic_formula_of_names_equality;
+    }
+    parser::atomic_formula_of_names_type const& atomic_formula_of_names() {
+        return parser::atomic_formula_of_names;
+    }
+    parser::atom_type const& atom() {
+        return parser::atom;
+    }
+    parser::negated_atom_type const& negated_atom() {
+        return parser::negated_atom;
+    }
+    parser::literal_type const& literal() {
+        return parser::literal;
+    }
+
+    parser::initial_element_literals_type const& initial_element_literals() {
+        return parser::initial_element_literals;
+    }
+    parser::initial_element_timed_literals_type const& initial_element_timed_literals() {
+        return parser::initial_element_timed_literals;
+    }
+    parser::initial_element_numeric_fluents_type const& initial_element_numeric_fluents() {
+        return parser::initial_element_numeric_fluents;
+    }
+    parser::initial_element_object_fluents_type const& initial_element_object_fluents() {
+        return parser::initial_element_object_fluents;
+    }
+    parser::initial_element_type const& initial_element() {
+        return parser::initial_element;
+    }
+
+    parser::metric_function_expression_type const& metric_function_expression() {
+        return parser::metric_function_expression;
+    }
+    parser::metric_function_expression_binary_operator_type const& metric_function_expression_binary_operator() {
+        return parser::metric_function_expression_binary_operator;
+    }
+    parser::metric_function_expression_multi_operator_type const& metric_function_expression_multi_operator() {
+        return parser::metric_function_expression_multi_operator;
+    }
+    parser::metric_function_expression_minus_type const& metric_function_expression_minus() {
+        return parser::metric_function_expression_minus;
+    }
+    parser::metric_function_expression_number_type const& metric_function_expression_number() {
+        return parser::metric_function_expression_number;
+    }
+    parser::metric_function_expression_basic_function_term_type const& metric_function_expression_basic_function_term() {
+        return parser::metric_function_expression_basic_function_term;
+    }
+    parser::metric_function_expression_total_time_type const& metric_function_expression_total_time() {
+        return parser::metric_function_expression_total_time;
+    }
+    parser::metric_function_expression_preferences_type const& metric_function_expression_preferences() {
+        return parser::metric_function_expression_preferences;
+    }
+
+    parser::optimization_minimize_type const& optimization_minimize() {
+        return parser::optimization_minimize;
+    }
+    parser::optimization_maximize_type const& optimization_maximize() {
+        return parser::optimization_maximize;
+    }
+    parser::optimization_type const& optimization() {
+        return parser::optimization;
+    }
+
+    parser::preference_constraint_goal_descriptor_type const& preference_constraint_goal_descriptor() {
+        return parser::preference_constraint_goal_descriptor;
+    }
+    parser::preference_constraint_goal_descriptor_and_type const& preference_constraint_goal_descriptor_and() {
+        return parser::preference_constraint_goal_descriptor_and;
+    }
+    parser::preference_constraint_goal_descriptor_forall_type const& preference_constraint_goal_descriptor_forall() {
+        return parser::preference_constraint_goal_descriptor_forall;
+    }
+    parser::preference_constraint_goal_descriptor_preference_type const& preference_constraint_goal_descriptor_preference() {
+        return parser::preference_constraint_goal_descriptor_preference;
+    }
+    parser::preference_constraint_goal_descriptor_simple_type const& preference_constraint_goal_descriptor_simple() {
+        return parser::preference_constraint_goal_descriptor_simple;
+    }
+
+    parser::problem_name_type const& problem_name() {
+        return parser::problem_name;
+    }
+    parser::domain_name_type const& domain_name() {
+        return parser::domain_name;
+    }
+    parser::objects_type const& objects() {
+        return parser::objects;
+    }
+    parser::initial_type const& initial() {
+        return parser::initial;
+    }
+    parser::goal_type const& goal() {
+        return parser::goal;
+    }
+    parser::constraints_type const& constraints() {
+        return parser::constraints;
+    }
+    parser::metric_specification_type const& metric_specification() {
+        return parser::metric_specification;
+    }
+
+    parser::problem_type const& problem() {
+        return parser::problem;
+    }
 }
 
 #endif

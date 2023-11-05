@@ -16,10 +16,10 @@ BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::AtomicFormulaOfNamesEquality, name
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Atom, atomic_formula_of_names)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::NegatedAtom, atomic_formula_of_names)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElaborationLiteral, literal)
-BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElaborationTimedLiterals, number, literal)
-BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElaborationNumericFluents, function_head, number)
-BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElaborationObjectFluents, basic_function_term, name)
+BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementLiteral, literal)
+BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementTimedLiterals, number, literal)
+BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementNumericFluents, function_head, number)
+BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementObjectFluents, basic_function_term, name)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionBinaryOperator, binary_operator, metric_function_expression_left, metric_function_expression_right)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionMultiOperator, binary_operator, metric_function_expression_first, metric_function_expression_remaining)
@@ -36,7 +36,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::PreferenceConstraintGoalDescriptor
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::ProblemName, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::DomainName, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Objects, typed_list_of_names)
-BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Initial, initial_elaboration)
+BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Initial, initial_element)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Goal, precondition_goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Constraints, preference_constraint_goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricSpecification, optimization, metric_function_expression)

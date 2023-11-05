@@ -25,11 +25,11 @@ namespace loki::problem
         struct NegatedAtomClass;
         struct LiteralClass;
 
-        struct InitialElaborationLiteralClass;
-        struct InitialElaborationTimedLiteralsClass;
-        struct InitialElaborationNumericFluentsClass;
-        struct InitialElaborationObjectFluentsClass;
-        struct InitialElaborationClass;
+        struct InitialElementLiteralClass;
+        struct InitialElementTimedLiteralsClass;
+        struct InitialElementNumericFluentsClass;
+        struct InitialElementObjectFluentsClass;
+        struct InitialElementClass;
 
         struct MetricFunctionExpressionClass;
         struct MetricFunctionExpressionBinaryOperatorClass;
@@ -72,11 +72,11 @@ namespace loki::problem
         typedef x3::rule<NegatedAtomClass, ast::NegatedAtom> negated_atom_type;
         typedef x3::rule<LiteralClass, ast::Literal> literal_type;
 
-        typedef x3::rule<InitialElaborationLiteralClass, ast::InitialElaborationLiteral> initial_elaboration_literals_type;
-        typedef x3::rule<InitialElaborationTimedLiteralsClass, ast::InitialElaborationTimedLiterals> initial_elaboration_timed_literals_type;
-        typedef x3::rule<InitialElaborationNumericFluentsClass, ast::InitialElaborationNumericFluents> initial_elaboration_numeric_fluents_type;
-        typedef x3::rule<InitialElaborationObjectFluentsClass, ast::InitialElaborationObjectFluents> initial_elaboration_object_fluents_type;
-        typedef x3::rule<InitialElaborationClass, ast::InitialElaboration> initial_elaboration_type;
+        typedef x3::rule<InitialElementLiteralClass, ast::InitialElementLiteral> initial_element_literals_type;
+        typedef x3::rule<InitialElementTimedLiteralsClass, ast::InitialElementTimedLiterals> initial_element_timed_literals_type;
+        typedef x3::rule<InitialElementNumericFluentsClass, ast::InitialElementNumericFluents> initial_element_numeric_fluents_type;
+        typedef x3::rule<InitialElementObjectFluentsClass, ast::InitialElementObjectFluents> initial_element_object_fluents_type;
+        typedef x3::rule<InitialElementClass, ast::InitialElement> initial_element_type;
 
         typedef x3::rule<MetricFunctionExpressionClass, ast::MetricFunctionExpression> metric_function_expression_type;
         typedef x3::rule<MetricFunctionExpressionBinaryOperatorClass, ast::MetricFunctionExpressionBinaryOperator> metric_function_expression_binary_operator_type;
@@ -114,9 +114,9 @@ namespace loki::problem
         BOOST_SPIRIT_DECLARE(atomic_formula_of_names_predicate_type, atomic_formula_of_names_equality_type,
             atomic_formula_of_names_type, atom_type, negated_atom_type, literal_type)
 
-        BOOST_SPIRIT_DECLARE(initial_elaboration_literals_type, initial_elaboration_timed_literals_type,
-            initial_elaboration_numeric_fluents_type, initial_elaboration_object_fluents_type,
-            initial_elaboration_type)
+        BOOST_SPIRIT_DECLARE(initial_element_literals_type, initial_element_timed_literals_type,
+            initial_element_numeric_fluents_type, initial_element_object_fluents_type,
+            initial_element_type)
 
         BOOST_SPIRIT_DECLARE(metric_function_expression_type,
             metric_function_expression_binary_operator_type,
@@ -140,8 +140,51 @@ namespace loki::problem
     }
 
 
+    parser::basic_function_term_arity_greater_zero_type const& basic_function_term_arity_greater_zero();
+    parser::basic_function_term_arity_zero_type const& basic_function_term_arity_zero();
+    parser::basic_function_term_type const& basic_function_term();
 
-    parser::problem_type const& problem_type();
+    parser::atomic_formula_of_names_predicate_type const& atomic_formula_of_names_predicate();
+    parser::atomic_formula_of_names_equality_type const& atomic_formula_of_names_equality();
+    parser::atomic_formula_of_names_type const& atomic_formula_of_names();
+    parser::atom_type const& atom();
+    parser::negated_atom_type const& negated_atom();
+    parser::literal_type const& literal();
+
+    parser::initial_element_literals_type const& initial_element_literals();
+    parser::initial_element_timed_literals_type const& initial_element_timed_literals();
+    parser::initial_element_numeric_fluents_type const& initial_element_numeric_fluents();
+    parser::initial_element_object_fluents_type const& initial_element_object_fluents();
+    parser::initial_element_type const& initial_element();
+
+    parser::metric_function_expression_type const& metric_function_expression();
+    parser::metric_function_expression_binary_operator_type const& metric_function_expression_binary_operator();
+    parser::metric_function_expression_multi_operator_type const& metric_function_expression_multi_operator();
+    parser::metric_function_expression_minus_type const& metric_function_expression_minus();
+    parser::metric_function_expression_number_type const& metric_function_expression_number();
+    parser::metric_function_expression_basic_function_term_type const& metric_function_expression_basic_function_term();
+    parser::metric_function_expression_total_time_type const& metric_function_expression_total_time();
+    parser::metric_function_expression_preferences_type const& metric_function_expression_preferences();
+
+    parser::optimization_minimize_type const& optimization_minimize();
+    parser::optimization_maximize_type const& optimization_maximize();
+    parser::optimization_type const& optimization();
+
+    parser::preference_constraint_goal_descriptor_type const& preference_constraint_goal_descriptor();
+    parser::preference_constraint_goal_descriptor_and_type const& preference_constraint_goal_descriptor_and();
+    parser::preference_constraint_goal_descriptor_forall_type const& preference_constraint_goal_descriptor_forall();
+    parser::preference_constraint_goal_descriptor_preference_type const& preference_constraint_goal_descriptor_preference();
+    parser::preference_constraint_goal_descriptor_simple_type const& preference_constraint_goal_descriptor_simple();
+
+    parser::problem_name_type const& problem_name();
+    parser::domain_name_type const& domain_name();
+    parser::objects_type const& objects();
+    parser::initial_type const& initial();
+    parser::goal_type const& goal();
+    parser::constraints_type const& constraints();
+    parser::metric_specification_type const& metric_specification();
+
+    parser::problem_type const& problem();
 }
 
 #endif
