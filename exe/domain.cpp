@@ -1,13 +1,13 @@
-
-#include <iostream>
-#include <memory>
-#include <vector>
-
 #include "include/loki/common/config.hpp"
 #include "include/loki/common/parser_wrapper.hpp"
 #include "include/loki/common/filesystem.hpp"
 #include "include/loki/domain/ast.hpp"
 #include "include/loki/domain/parser.hpp"
+#include "include/loki/domain/printer.hpp"
+
+#include <iostream>
+#include <memory>
+#include <vector>
 
 using namespace loki;
 using namespace std;
@@ -23,6 +23,8 @@ int main(int argc, char** argv) {
     const auto source = loki::read_file(domain_file);
     domain::ast::Domain node;
     parse_ast(source, domain::domain(), node);
+
+    std::cout << domain::parse_text(node, FormattingOptions{2,2,true}) << std::endl;
 
     return 0;
 }

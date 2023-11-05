@@ -53,6 +53,30 @@ namespace loki::domain
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
 
+    std::string parse_text(const ast::RequirementStrips& node, const FormattingOptions&) { return ":strips"; }
+    std::string parse_text(const ast::RequirementTyping& node, const FormattingOptions&) { return ":typing"; }
+    std::string parse_text(const ast::RequirementNegativePreconditions& node, const FormattingOptions&) { return ":negative-preconditions"; }
+    std::string parse_text(const ast::RequirementDisjunctivePreconditions& node, const FormattingOptions&) { return ":disjunctive-preconditions"; }
+    std::string parse_text(const ast::RequirementEquality& node, const FormattingOptions&) { return ":equality"; }
+    std::string parse_text(const ast::RequirementExistentialPreconditions& node, const FormattingOptions&) { return ":existential-preconditions"; }
+    std::string parse_text(const ast::RequirementUniversalPreconditions& node, const FormattingOptions&) { return ":universal-preconditions"; }
+    std::string parse_text(const ast::RequirementQuantifiedPreconditions& node, const FormattingOptions&) { return ":quantified-preconditions"; }
+    std::string parse_text(const ast::RequirementConditionalEffects& node, const FormattingOptions&) { return ":conditional-effects"; }
+    std::string parse_text(const ast::RequirementFluents& node, const FormattingOptions&) { return ":fluents"; }
+    std::string parse_text(const ast::RequirementObjectFluents& node, const FormattingOptions&) { return ":object-fluents"; }
+    std::string parse_text(const ast::RequirementNumericFluents& node, const FormattingOptions&) { return ":numeric-fluents"; }
+    std::string parse_text(const ast::RequirementAdl& node, const FormattingOptions&) { return ":adl"; }
+    std::string parse_text(const ast::RequirementDurativeActions& node, const FormattingOptions&) { return ":durative-actions"; }
+    std::string parse_text(const ast::RequirementDerivedPredicates& node, const FormattingOptions&) { return ":derived-predicates"; }
+    std::string parse_text(const ast::RequirementTimedInitialLiterals& node, const FormattingOptions&) { return ":timed-initial-literals"; }
+    std::string parse_text(const ast::RequirementPreferences& node, const FormattingOptions&) { return ":preferences"; }
+    std::string parse_text(const ast::RequirementConstraints& node, const FormattingOptions&) { return ":constraints"; }
+
+    std::string parse_text(const ast::Requirement& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+
     string parse_text(const ast::Type& node, const FormattingOptions& options)
     {
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
@@ -88,12 +112,12 @@ namespace loki::domain
         }
         ss << " - " << parse_text(node.type);
         // lookahead
-        auto next_options = FormattingOptions{options.indent + options.add_indent, options.add_indent, options.newline};
-        auto next_text = parse_text(node.typed_list_of_names, next_options);
-        if (next_text.size() > 0) {
+        auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent, options.newline};
+        auto nested_text = parse_text(node.typed_list_of_names, nested_options);
+        if (nested_text.size() > 0) {
             if (options.newline) ss << "\n";
-            ss << string(next_options.indent, ' ')
-               << next_text;
+            ss << string(nested_options.indent, ' ')
+               << nested_text;
         }
         return ss.str();
     }
@@ -113,12 +137,12 @@ namespace loki::domain
             ss << parse_text(node.variables[i]);
         }
         ss << " - " << parse_text(node.type);
-        auto next_options = FormattingOptions{options.indent + options.add_indent, options.add_indent, options.newline};
-        auto next_text = parse_text(node.typed_list_of_variables, options);
-        if (next_text.size() > 0) {
+        auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent, options.newline};
+        auto nested_text = parse_text(node.typed_list_of_variables, options);
+        if (nested_text.size() > 0) {
             if (options.newline) ss << "\n";
-            ss << string(next_options.indent, ' ')
-               << next_text;
+            ss << string(nested_options.indent, ' ')
+               << nested_text;
         }
         return ss.str();
     }
@@ -178,6 +202,61 @@ namespace loki::domain
            << parse_text(node.arguments, options) << ")";
         return ss.str();
     }
+
+
+    std::string parse_text(const ast::DomainName& node, const FormattingOptions& options) {
+        stringstream ss;
+        ss << "(domain " << parse_text(node.name, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::Requirements& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << string(options.indent, ' ') << "(:requirements ";
+        for (size_t i = 0; i < node.requirements.size(); ++i) {
+            if (i != 0) ss << " ";
+            ss << parse_text(node.requirements[i], options);
+        }
+        ss << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const ast::Types& node, const FormattingOptions& options) {
+
+    }
+
+    std::string parse_text(const ast::Constants& node, const FormattingOptions& options) {
+
+    }
+
+    std::string parse_text(const ast::Predicates& node, const FormattingOptions& options) {
+
+    }
+
+    std::string parse_text(const ast::Functions& node, const FormattingOptions& options) {
+
+    }
+
+    std::string parse_text(const ast::Constraints& node, const FormattingOptions& options) {
+
+    }
+
+    std::string parse_text(const ast::Structure& node, const FormattingOptions& options) {
+
+    }
+
+
+    std::string parse_text(const ast::Domain& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(define " << parse_text(node.domain_name, options) << "\n";
+        auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent, options.newline};
+        if (node.requirements.has_value()) {
+            ss << parse_text(node.requirements.value(), nested_options) << "\n";
+        }
+        ss << ")";
+        return ss.str();
+    }
+
 
     template <typename T>
     inline std::string parse_text(const std::vector<T>& nodes, const FormattingOptions& options)

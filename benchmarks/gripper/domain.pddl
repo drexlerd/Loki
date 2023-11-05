@@ -1,4 +1,5 @@
 (define (domain gripper-strips)
+    (:requirements :strips)
    (:constants rooma roomb)
    (:predicates (room ?r)
 		(ball ?b)

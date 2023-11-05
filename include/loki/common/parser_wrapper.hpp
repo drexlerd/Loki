@@ -3,6 +3,8 @@
 
 #include "include/loki/common/config.hpp"
 
+#include <iostream>
+
 
 namespace loki {
 template<typename Parser, typename Node>
