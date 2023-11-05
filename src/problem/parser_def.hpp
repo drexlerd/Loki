@@ -115,8 +115,8 @@ namespace loki::problem::parser {
     const auto metric_function_expression_basic_function_term_def = basic_function_term;
     const auto metric_function_expression_total_time_def = lit("total-time") >> x3::attr(ast::MetricFunctionExpressionTotalTime{});
     const auto metric_function_expression_preferences_def = lit('(') >> lit("is-violated") > domain::preference_name() > lit(')');
-    const auto metric_function_expression_def = metric_function_expression_binary_operator | metric_function_expression_multi_operator
-        | metric_function_expression_minus | metric_function_expression_number
+    const auto metric_function_expression_def = metric_function_expression_number | metric_function_expression_binary_operator
+        | metric_function_expression_multi_operator | metric_function_expression_minus
         | metric_function_expression_basic_function_term | metric_function_expression_total_time
         | metric_function_expression_preferences;
 
@@ -162,9 +162,10 @@ namespace loki::problem::parser {
        initial_element)
 
     BOOST_SPIRIT_DEFINE(metric_function_expression,
+        metric_function_expression_number,
         metric_function_expression_binary_operator,
         metric_function_expression_multi_operator,
-        metric_function_expression_minus, metric_function_expression_number,
+        metric_function_expression_minus,
         metric_function_expression_basic_function_term,
         metric_function_expression_total_time, metric_function_expression_preferences)
 
@@ -203,10 +204,10 @@ namespace loki::problem::parser {
     struct InitialElementClass : x3::annotate_on_success {};
 
     struct MetricFunctionExpressionClass : x3::annotate_on_success {};
+    struct MetricFunctionExpressionNumberClass : x3::annotate_on_success {};
     struct MetricFunctionExpressionBinaryOperatorClass : x3::annotate_on_success {};
     struct MetricFunctionExpressionMultiOperatorClass : x3::annotate_on_success {};
     struct MetricFunctionExpressionMinusClass : x3::annotate_on_success {};
-    struct MetricFunctionExpressionNumberClass : x3::annotate_on_success {};
     struct MetricFunctionExpressionBasicFunctionTermClass : x3::annotate_on_success {};
     struct MetricFunctionExpressionTotalTimeClass : x3::annotate_on_success {};
     struct MetricFunctionExpressionPreferencesClass : x3::annotate_on_success {};
@@ -282,6 +283,9 @@ namespace loki::problem
     parser::metric_function_expression_type const& metric_function_expression() {
         return parser::metric_function_expression;
     }
+    parser::metric_function_expression_number_type const& metric_function_expression_number() {
+        return parser::metric_function_expression_number;
+    }
     parser::metric_function_expression_binary_operator_type const& metric_function_expression_binary_operator() {
         return parser::metric_function_expression_binary_operator;
     }
@@ -290,9 +294,6 @@ namespace loki::problem
     }
     parser::metric_function_expression_minus_type const& metric_function_expression_minus() {
         return parser::metric_function_expression_minus;
-    }
-    parser::metric_function_expression_number_type const& metric_function_expression_number() {
-        return parser::metric_function_expression_number;
     }
     parser::metric_function_expression_basic_function_term_type const& metric_function_expression_basic_function_term() {
         return parser::metric_function_expression_basic_function_term;

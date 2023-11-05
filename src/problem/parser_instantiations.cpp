@@ -27,10 +27,10 @@ namespace loki::problem::parser
     BOOST_SPIRIT_INSTANTIATE(initial_element_type, iterator_type, context_type)
 
     BOOST_SPIRIT_INSTANTIATE(metric_function_expression_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(metric_function_expression_number_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(metric_function_expression_binary_operator_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(metric_function_expression_multi_operator_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(metric_function_expression_minus_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(metric_function_expression_number_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(metric_function_expression_basic_function_term_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(metric_function_expression_total_time_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(metric_function_expression_preferences_type, iterator_type, context_type)

@@ -35,10 +35,10 @@ namespace loki::problem::ast
     struct InitialElement;
 
     struct MetricFunctionExpression;
+    struct MetricFunctionExpressionNumber;
     struct MetricFunctionExpressionBinaryOperator;
     struct MetricFunctionExpressionMultiOperator;
     struct MetricFunctionExpressionMinus;
-    struct MetricFunctionExpressionNumber;
     struct MetricFunctionExpressionBasicFunctionTerm;
     struct MetricFunctionExpressionTotalTime;
     struct MetricFunctionExpressionPreferences;  // :preferences
@@ -158,15 +158,19 @@ namespace loki::problem::ast
     /* <metric-f-exp> */
     struct MetricFunctionExpression : x3::position_tagged,
         x3::variant<
+            x3::forward_ast<MetricFunctionExpressionNumber>,
             x3::forward_ast<MetricFunctionExpressionBinaryOperator>,
             x3::forward_ast<MetricFunctionExpressionMultiOperator>,
             x3::forward_ast<MetricFunctionExpressionMinus>,
-            x3::forward_ast<MetricFunctionExpressionNumber>,
             x3::forward_ast<MetricFunctionExpressionBasicFunctionTerm>,
             x3::forward_ast<MetricFunctionExpressionTotalTime>,
             x3::forward_ast<MetricFunctionExpressionPreferences>> {
         using base_type::base_type;
         using base_type::operator=;
+    };
+
+    struct MetricFunctionExpressionNumber : x3::position_tagged {
+        domain::ast::Number number;
     };
 
     struct MetricFunctionExpressionBinaryOperator : x3::position_tagged {
@@ -183,10 +187,6 @@ namespace loki::problem::ast
 
     struct MetricFunctionExpressionMinus : x3::position_tagged {
         MetricFunctionExpression metric_function_expression;
-    };
-
-    struct MetricFunctionExpressionNumber : x3::position_tagged {
-        domain::ast::Number number;
     };
 
     struct MetricFunctionExpressionBasicFunctionTerm : x3::position_tagged {

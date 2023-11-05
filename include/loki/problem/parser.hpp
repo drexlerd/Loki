@@ -32,10 +32,10 @@ namespace loki::problem
         struct InitialElementClass;
 
         struct MetricFunctionExpressionClass;
+        struct MetricFunctionExpressionNumberClass;
         struct MetricFunctionExpressionBinaryOperatorClass;
         struct MetricFunctionExpressionMultiOperatorClass;
         struct MetricFunctionExpressionMinusClass;
-        struct MetricFunctionExpressionNumberClass;
         struct MetricFunctionExpressionBasicFunctionTermClass;
         struct MetricFunctionExpressionTotalTimeClass;
         struct MetricFunctionExpressionPreferencesClass;
@@ -79,10 +79,10 @@ namespace loki::problem
         typedef x3::rule<InitialElementClass, ast::InitialElement> initial_element_type;
 
         typedef x3::rule<MetricFunctionExpressionClass, ast::MetricFunctionExpression> metric_function_expression_type;
+        typedef x3::rule<MetricFunctionExpressionNumberClass, ast::MetricFunctionExpressionNumber> metric_function_expression_number_type;
         typedef x3::rule<MetricFunctionExpressionBinaryOperatorClass, ast::MetricFunctionExpressionBinaryOperator> metric_function_expression_binary_operator_type;
         typedef x3::rule<MetricFunctionExpressionMultiOperatorClass, ast::MetricFunctionExpressionMultiOperator> metric_function_expression_multi_operator_type;
         typedef x3::rule<MetricFunctionExpressionMinusClass, ast::MetricFunctionExpressionMinus> metric_function_expression_minus_type;
-        typedef x3::rule<MetricFunctionExpressionNumberClass, ast::MetricFunctionExpressionNumber> metric_function_expression_number_type;
         typedef x3::rule<MetricFunctionExpressionBasicFunctionTermClass, ast::MetricFunctionExpressionBasicFunctionTerm> metric_function_expression_basic_function_term_type;
         typedef x3::rule<MetricFunctionExpressionTotalTimeClass, ast::MetricFunctionExpressionTotalTime> metric_function_expression_total_time_type;
         typedef x3::rule<MetricFunctionExpressionPreferencesClass, ast::MetricFunctionExpressionPreferences> metric_function_expression_preferences_type;
@@ -158,10 +158,10 @@ namespace loki::problem
     parser::initial_element_type const& initial_element();
 
     parser::metric_function_expression_type const& metric_function_expression();
+    parser::metric_function_expression_number_type const& metric_function_expression_number();
     parser::metric_function_expression_binary_operator_type const& metric_function_expression_binary_operator();
     parser::metric_function_expression_multi_operator_type const& metric_function_expression_multi_operator();
     parser::metric_function_expression_minus_type const& metric_function_expression_minus();
-    parser::metric_function_expression_number_type const& metric_function_expression_number();
     parser::metric_function_expression_basic_function_term_type const& metric_function_expression_basic_function_term();
     parser::metric_function_expression_total_time_type const& metric_function_expression_total_time();
     parser::metric_function_expression_preferences_type const& metric_function_expression_preferences();

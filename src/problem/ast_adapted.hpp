@@ -21,10 +21,10 @@ BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementTimedLiterals, numbe
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementNumericFluents, function_head, number)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementObjectFluents, basic_function_term, name)
 
+BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionNumber, number)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionBinaryOperator, binary_operator, metric_function_expression_left, metric_function_expression_right)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionMultiOperator, binary_operator, metric_function_expression_first, metric_function_expression_remaining)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionMinus, metric_function_expression)
-BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionNumber, number)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionBasicFunctionTerm, basic_function_term)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionPreferences, preference_name)
 
