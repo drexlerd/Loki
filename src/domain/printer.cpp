@@ -222,15 +222,24 @@ namespace loki::domain
     }
 
     std::string parse_text(const ast::Types& node, const FormattingOptions& options) {
-
+        std::stringstream ss;
+        ss << string(options.indent, ' ') << "(:types " << parse_text(node.typed_list_of_names, options);
+        ss << ")";
+        return ss.str();
     }
 
     std::string parse_text(const ast::Constants& node, const FormattingOptions& options) {
-
+        std::stringstream ss;
+        ss << string(options.indent, ' ') << "(:constants " << parse_text(node.typed_list_of_names, options);
+        ss << ")";
+        return ss.str();
     }
 
     std::string parse_text(const ast::Predicates& node, const FormattingOptions& options) {
-
+        std::stringstream ss;
+        ss << string(options.indent, ' ') << "(:predicates " << parse_text(node.atomic_formula_skeletons, options);
+        ss << ")";
+        return ss.str();
     }
 
     std::string parse_text(const ast::Functions& node, const FormattingOptions& options) {
@@ -253,6 +262,18 @@ namespace loki::domain
         if (node.requirements.has_value()) {
             ss << parse_text(node.requirements.value(), nested_options) << "\n";
         }
+        if (node.types.has_value()) {
+            ss << parse_text(node.types.value(), nested_options) << "\n";
+        }
+        if (node.constants.has_value()) {
+            ss << parse_text(node.constants.value(), nested_options) << "\n";
+        }
+        if (node.predicates.has_value()) {
+            ss << parse_text(node.predicates.value(), nested_options) << "\n";
+        }
+        // TODO: functions
+        // TODO: constraints
+        // TODO: structure
         ss << ")";
         return ss.str();
     }

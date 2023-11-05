@@ -176,8 +176,8 @@ namespace loki::domain::parser {
     // Grammar
     ///////////////////////////////////////////////////////////////////////////
 
-    const auto name_def = alpha >> lexeme[*(alnum | char_('-') | char_('_'))];
-    const auto variable_def = char_('?') > name;
+    const auto name_def = lexeme[alpha >> *(alnum | char_('-') | char_('_'))];
+    const auto variable_def = lexeme[char_('?') > name];
     const auto number_def = double_;
     const auto term_def = name | variable | function_term;
     const auto undefined_def = lit("undefined") >> x3::attr(ast::Undefined{});
