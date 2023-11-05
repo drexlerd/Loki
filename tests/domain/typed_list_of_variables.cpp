@@ -11,7 +11,7 @@ TEST(LokiTests, TypedListOfVariablesTest) {
     ast::TypedListOfVariables ast;
 
     EXPECT_NO_THROW(parse_ast("?var1 ?var2 - type1 ?var3 ?var4 - type2", typed_list_of_variables(), ast));
-    EXPECT_EQ(parse_text(ast), " ?var1 ?var2 - type1 ?var3 ?var4 - type2");  // printer adds leading whitespace
+    EXPECT_EQ(parse_text(ast), "?var1 ?var2 - type1\n?var3 ?var4 - type2");
 
     EXPECT_NO_THROW(parse_ast("?var1 ?var2", typed_list_of_variables(), ast));
     EXPECT_EQ(parse_text(ast), "?var1 ?var2");

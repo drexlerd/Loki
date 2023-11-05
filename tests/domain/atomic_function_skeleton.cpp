@@ -14,10 +14,10 @@ TEST(LokiTests, AtomicFunctionSkeletonTest) {
     EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2)");
 
     EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 - type1 ?var2 - type2)", atomic_function_skeleton(), ast));
-    EXPECT_EQ(parse_text(ast), "(function-symbol1  ?var1 - type1 ?var2 - type2)");
+    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 - type1\n?var2 - type2)");
 
     EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2 - type1)", atomic_function_skeleton(), ast));
-    EXPECT_EQ(parse_text(ast), "(function-symbol1  ?var1 ?var2 - type1)");
+    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2 - type1)");
 
     EXPECT_ANY_THROW(parse_ast("(?var1 ?var2 - type1)", atomic_function_skeleton(), ast));
 }
