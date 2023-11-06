@@ -117,7 +117,7 @@ namespace loki::domain
         auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent, options.newline};
         auto nested_text = parse_text(node.typed_list_of_names, nested_options);
         if (nested_text.size() > 0) {
-            if (options.newline) ss << "\n";
+            ss << (options.newline) ? "\n" : " ";
             ss << string(nested_options.indent, ' ')
                << nested_text;
         }
@@ -142,7 +142,7 @@ namespace loki::domain
         auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent, options.newline};
         auto nested_text = parse_text(node.typed_list_of_variables, options);
         if (nested_text.size() > 0) {
-            if (options.newline) ss << "\n";
+            ss << (options.newline) ? "\n" : " ";
             ss << string(nested_options.indent, ' ')
                << nested_text;
         }
@@ -218,7 +218,7 @@ namespace loki::domain
         if (node.function_typed_list_of_atomic_function_skeletons.has_value()) {
             auto nested_text = parse_text(node.function_typed_list_of_atomic_function_skeletons.value(), options);
             if (nested_text.size() > 0) {
-                if (options.newline) ss << "\n";
+                ss << (options.newline) ? "\n" : " ";
                 ss << string(nested_options.indent, ' ')
                 << nested_text;
             }
