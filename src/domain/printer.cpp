@@ -113,7 +113,7 @@ namespace loki::domain
             ss << parse_text(node.names[i], options);
         }
         ss << " - " << parse_text(node.type, options);
-    
+
         // lookahead
         auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent};
         auto nested_text = parse_text(node.typed_list_of_names, nested_options);
@@ -575,10 +575,16 @@ namespace loki::domain
 
     std::string parse_text(const ast::Action& node, const FormattingOptions& options) {
         std::stringstream ss;
-        ss << std::string(options.indent, ' ') << "(action " << parse_text(node.action_symbol, options) << "\n";
+        ss << std::string(options.indent, ' ')
+           << "(action "
+           << parse_text(node.action_symbol, options) << "\n";
         FormattingOptions nested_options{options.indent + options.add_indent, options.add_indent};
-        ss << std::string(nested_options.indent, ' ') << ":parameters (" << parse_text(node.typed_list_of_variables, nested_options) << ")\n";
-        ss << parse_text(node.action_body, nested_options);
+        ss << std::string(nested_options.indent, ' ')
+           << ":parameters ("
+           << parse_text(node.typed_list_of_variables, nested_options) << ")\n"
+           << parse_text(node.action_body, nested_options) << "\n";
+        ss << std::string(options.indent, ' ') << ")";
+
         return ss.str();
     }
 
@@ -594,7 +600,7 @@ namespace loki::domain
 
     std::string parse_text(const ast::DomainName& node, const FormattingOptions& options) {
         stringstream ss;
-        ss << std::string(options.indent, ' ') << "(domain " << parse_text(node.name, options) << ")";
+        ss << std::string(options.indent, ' ') << "(domain "  << parse_text(node.name, options) << ")";
         return ss.str();
     }
 
@@ -611,30 +617,32 @@ namespace loki::domain
 
     std::string parse_text(const ast::Types& node, const FormattingOptions& options) {
         std::stringstream ss;
-        ss << string(options.indent, ' ') << "(:types " << parse_text(node.typed_list_of_names, options);
-        ss << ")";
+        ss << string(options.indent, ' ') << "(:types " << parse_text(node.typed_list_of_names, options) << ")";
         return ss.str();
     }
 
     std::string parse_text(const ast::Constants& node, const FormattingOptions& options) {
         std::stringstream ss;
-        ss << string(options.indent, ' ') << "(:constants " << parse_text(node.typed_list_of_names, options);
-        ss << ")";
+        ss << string(options.indent, ' ') << "(:constants " << parse_text(node.typed_list_of_names, options) << ")";
         return ss.str();
     }
 
     std::string parse_text(const ast::Predicates& node, const FormattingOptions& options) {
         std::stringstream ss;
-        ss << string(options.indent, ' ') << "(:predicates " << parse_text(node.atomic_formula_skeletons, options);
-        ss << ")";
+        ss << string(options.indent, ' ') << "(:predicates " << parse_text(node.atomic_formula_skeletons, options) << ")";
         return ss.str();
     }
 
     std::string parse_text(const ast::Functions& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << string(options.indent, ' ') << "(:functions " << parse_text(node.function_types_list_of_atomic_function_skeletons, options) << ")";
+        return ss.str();
     }
 
     std::string parse_text(const ast::Constraints& node, const FormattingOptions& options) {
-
+        std::stringstream ss;
+        ss << string(options.indent, ' ') << "(:constraints " << parse_text(node.constraint_goal_descriptor, options) << ")";
+        return ss.str();
     }
 
     std::string parse_text(const ast::Structure& node, const FormattingOptions& options) {
@@ -658,15 +666,16 @@ namespace loki::domain
         if (node.predicates.has_value()) {
             ss << parse_text(node.predicates.value(), nested_options) << "\n";
         }
-        // TODO: functions
-        // TODO: constraints
-        for (size_t i = 0; i < node.structures.size(); ++i) {
-            if (i != 0) {
-                ss << "\n";
-            }
-            ss << parse_text(node.structures[i], nested_options);
+        if (node.functions.has_value()) {
+            ss << parse_text(node.functions.value(), nested_options) << "\n";
         }
-        ss << ")";
+        if (node.constraints.has_value()) {
+            ss << parse_text(node.constraints.value(), nested_options) << "\n";
+        }
+        for (size_t i = 0; i < node.structures.size(); ++i) {
+            ss << parse_text(node.structures[i], nested_options) << "\n";
+        }
+        ss << std::string(options.indent, ' ') << ")";
         return ss.str();
     }
 
