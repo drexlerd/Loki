@@ -53,7 +53,7 @@ namespace loki::domain
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
 
-    std::string parse_text(const ast::Undefined& node, const FormattingOptions& options) { return "undefined"; }
+    std::string parse_text(const ast::Undefined&, const FormattingOptions&) { return "undefined"; }
 
     std::string parse_text(const ast::RequirementStrips&, const FormattingOptions&) { return ":strips"; }
     std::string parse_text(const ast::RequirementTyping&, const FormattingOptions&) { return ":typing"; }
@@ -594,7 +594,7 @@ namespace loki::domain
 
     std::string parse_text(const ast::DomainName& node, const FormattingOptions& options) {
         stringstream ss;
-        ss << "(domain " << parse_text(node.name, options) << ")";
+        ss << std::string(options.indent, ' ') << "(domain " << parse_text(node.name, options) << ")";
         return ss.str();
     }
 
@@ -631,7 +631,6 @@ namespace loki::domain
     }
 
     std::string parse_text(const ast::Functions& node, const FormattingOptions& options) {
-
     }
 
     std::string parse_text(const ast::Constraints& node, const FormattingOptions& options) {
