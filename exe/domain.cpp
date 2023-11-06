@@ -24,9 +24,9 @@ int main(int argc, char** argv) {
     domain::ast::Domain node;
     parse_ast(source, domain::domain(), node);
 
-    std::cout << domain::parse_text(node, FormattingOptions{0,4,true}) << std::endl;
+    std::cout << domain::parse_text(node, FormattingOptions{0,4}) << std::endl;
 
     return 0;
 }
 
-// cmake -S . -B build -DENABLE_TESTING:bool=TRUE && cmake --build build -j16 && ./build/exe/domain benchmarks/gripper/domain.pddl ./build/tests/domain/domain_tests
+// cmake -S . -B build -DENABLE_TESTING:bool=TRUE && cmake --build build -j16 && ./build/exe/domain benchmarks/gripper/domain.pddl && ./build/tests/domain/domain_tests

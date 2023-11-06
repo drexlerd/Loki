@@ -9,8 +9,6 @@ struct FormattingOptions {
     int indent = 0;
     // The amount of indentation added per nesting
     int add_indent = 0;
-    // If true, adds a newline in nested structures
-    bool newline = true;
 };
 
 }

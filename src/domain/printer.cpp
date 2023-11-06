@@ -34,10 +34,10 @@ namespace loki::domain
         return ss.str();
     }
 
-    string parse_text(const ast::Variable& node, const FormattingOptions&)
+    string parse_text(const ast::Variable& node, const FormattingOptions& options)
     {
         stringstream ss;
-        ss << node.question_mark << parse_text(node.name);
+        ss << node.question_mark << parse_text(node.name, options);
         return ss.str();
     }
 
@@ -89,7 +89,7 @@ namespace loki::domain
         return "object";
     }
 
-    string parse_text(const ast::TypeEither& node, const FormattingOptions&)
+    string parse_text(const ast::TypeEither& node, const FormattingOptions& options)
     {
         stringstream ss;
         ss << "(either ";
@@ -97,7 +97,7 @@ namespace loki::domain
         {
             if (i != 0)
                 ss << " ";
-            ss << parse_text(node.types[i]);
+            ss << parse_text(node.types[i], options);
         }
         ss << ")";
         return ss.str();
@@ -110,16 +110,16 @@ namespace loki::domain
         {
             if (i != 0)
                 ss << " ";
-            ss << parse_text(node.names[i]);
+            ss << parse_text(node.names[i], options);
         }
-        ss << " - " << parse_text(node.type);
+        ss << " - " << parse_text(node.type, options);
+    
         // lookahead
-        auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent, options.newline};
+        auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent};
         auto nested_text = parse_text(node.typed_list_of_names, nested_options);
         if (nested_text.size() > 0) {
-            ss << (options.newline) ? "\n" : " ";
-            ss << string(nested_options.indent, ' ')
-               << nested_text;
+            ss << "\n";
+            ss << string(nested_options.indent, ' ') << nested_text;
         }
         return ss.str();
     }
@@ -138,13 +138,14 @@ namespace loki::domain
                 ss << " ";
             ss << parse_text(node.variables[i]);
         }
-        ss << " - " << parse_text(node.type);
-        auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent, options.newline};
+        ss << " - " << parse_text(node.type, options);
+
+        // lookahead
+        auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent};
         auto nested_text = parse_text(node.typed_list_of_variables, options);
         if (nested_text.size() > 0) {
-            ss << (options.newline) ? "\n" : " ";
-            ss << string(nested_options.indent, ' ')
-               << nested_text;
+            ss << "\n";
+            ss << string(nested_options.indent, ' ') << nested_text;
         }
         return ss.str();
     }
@@ -211,16 +212,17 @@ namespace loki::domain
         {
             if (i != 0)
                 ss << " ";
-            ss << parse_text(node.atomic_function_skeletons[i]);
+            ss << parse_text(node.atomic_function_skeletons[i], options);
         }
-        ss << " - " << parse_text(node.function_type);
-        auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent, options.newline};
+        ss << " - " << parse_text(node.function_type, options);
+
+        // lookahead
+        auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent};
         if (node.function_typed_list_of_atomic_function_skeletons.has_value()) {
             auto nested_text = parse_text(node.function_typed_list_of_atomic_function_skeletons.value(), options);
             if (nested_text.size() > 0) {
-                ss << (options.newline) ? "\n" : " ";
-                ss << string(nested_options.indent, ' ')
-                << nested_text;
+                ss << "\n";
+                ss << string(nested_options.indent, ' ') << nested_text;
             }
         }
         return ss.str();
@@ -562,8 +564,7 @@ namespace loki::domain
     std::string parse_text(const ast::ActionBody& node, const FormattingOptions& options) {
         std::stringstream ss;
         if (node.precondition_goal_descriptor.has_value()) {
-            ss << std::string(options.indent, ' ') << ":precondition " << parse_text(node.precondition_goal_descriptor.value(), options);
-            ss << ((options.newline) ? "\n" : " ");
+            ss << std::string(options.indent, ' ') << ":precondition " << parse_text(node.precondition_goal_descriptor.value(), options) << "\n";
         }
         if (node.effect.has_value()) {
             ss << std::string(options.indent, ' ') << ":effect " << parse_text(node.effect.value(), options);
@@ -574,11 +575,9 @@ namespace loki::domain
 
     std::string parse_text(const ast::Action& node, const FormattingOptions& options) {
         std::stringstream ss;
-        ss << std::string(options.indent, ' ') << "(action " << parse_text(node.action_symbol, options);
-        FormattingOptions nested_options{options.indent + options.add_indent, options.add_indent, options.newline};
-        ss << ((nested_options.newline) ? "\n" : " ");
-        ss << std::string(nested_options.indent, ' ') << ":parameters (" << parse_text(node.typed_list_of_variables, nested_options) << ")";
-        ss << ((nested_options.newline) ? "\n" : " ");
+        ss << std::string(options.indent, ' ') << "(action " << parse_text(node.action_symbol, options) << "\n";
+        FormattingOptions nested_options{options.indent + options.add_indent, options.add_indent};
+        ss << std::string(nested_options.indent, ' ') << ":parameters (" << parse_text(node.typed_list_of_variables, nested_options) << ")\n";
         ss << parse_text(node.action_body, nested_options);
         return ss.str();
     }
@@ -647,7 +646,7 @@ namespace loki::domain
     std::string parse_text(const ast::Domain& node, const FormattingOptions& options) {
         std::stringstream ss;
         ss << "(define " << parse_text(node.domain_name, options) << "\n";
-        auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent, options.newline};
+        auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent};
         if (node.requirements.has_value()) {
             ss << parse_text(node.requirements.value(), nested_options) << "\n";
         }
@@ -664,7 +663,7 @@ namespace loki::domain
         // TODO: constraints
         for (size_t i = 0; i < node.structures.size(); ++i) {
             if (i != 0) {
-                ss << ((options.newline) ? "\n" : " ");
+                ss << "\n";
             }
             ss << parse_text(node.structures[i], nested_options);
         }
