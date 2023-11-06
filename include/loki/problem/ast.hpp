@@ -65,21 +65,9 @@ namespace loki::problem::ast
 
 
     /* <basic-function-term> */
-    struct BasicFunctionTermArityGreaterZero : x3::position_tagged {
+    struct BasicFunctionTerm : x3::position_tagged {
         domain::ast::FunctionSymbol function_symbol;
         std::vector<domain::ast::Name> names;
-    };
-
-    struct BasicFunctionTermArityZero : x3::position_tagged {
-        domain::ast::FunctionSymbol function_symbol;
-    };
-
-    struct BasicFunctionTerm : x3::position_tagged,
-        x3::variant<
-        BasicFunctionTermArityGreaterZero,
-        BasicFunctionTermArityZero> {
-        using base_type::base_type;
-        using base_type::operator=;
     };
 
 

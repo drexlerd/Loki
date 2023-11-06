@@ -38,8 +38,6 @@ namespace loki::problem::parser {
 
     //domain_type const domain = "domain";
 
-    basic_function_term_arity_greater_zero_type const basic_function_term_arity_greater_zero = "basic_function_term_arity_greater_zero";
-    basic_function_term_arity_zero_type const basic_function_term_arity_zero = "basic_function_term_arity_zero";
     basic_function_term_type const basic_function_term = "basic_function_term";
 
     atomic_formula_of_names_predicate_type const atomic_formula_of_names_predicate = "atomic_formula_of_names_predicate";
@@ -89,9 +87,7 @@ namespace loki::problem::parser {
     // Grammar
     ///////////////////////////////////////////////////////////////////////////
 
-    const auto basic_function_term_arity_greater_zero_def = lit('(') >> domain::function_symbol() >> *domain::name() > lit(')');
-    const auto basic_function_term_arity_zero_def = domain::function_symbol();
-    const auto basic_function_term_def = basic_function_term_arity_greater_zero | basic_function_term_arity_zero;
+    const auto basic_function_term_def = (lit('(') >> domain::function_symbol() >> *domain::name() > lit(')')) | (domain::function_symbol() >> x3::attr(std::vector<domain::ast::Name>{}));
 
     const auto atomic_formula_of_names_predicate_def = lit('(') >> domain::predicate() > *domain::name() > lit(')');
     const auto atomic_formula_of_names_equality_def = lit('(') >> lit('=') > domain::name() > domain::name() > lit(')');
@@ -151,8 +147,7 @@ namespace loki::problem::parser {
         > lit(')');
 
 
-    BOOST_SPIRIT_DEFINE(basic_function_term_arity_greater_zero,
-        basic_function_term_arity_zero, basic_function_term)
+    BOOST_SPIRIT_DEFINE(basic_function_term)
 
     BOOST_SPIRIT_DEFINE(atomic_formula_of_names_predicate, atomic_formula_of_names_equality,
         atomic_formula_of_names, atom, negated_atom, literal)
@@ -235,12 +230,6 @@ namespace loki::problem::parser {
 
 namespace loki::problem
 {
-    parser::basic_function_term_arity_greater_zero_type const& basic_function_term_arity_greater_zero() {
-        return parser::basic_function_term_arity_greater_zero;
-    }
-    parser::basic_function_term_arity_zero_type const& basic_function_term_arity_zero() {
-        return parser::basic_function_term_arity_zero;
-    }
     parser::basic_function_term_type const& basic_function_term() {
         return parser::basic_function_term;
     }

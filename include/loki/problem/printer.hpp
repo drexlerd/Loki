@@ -8,8 +8,6 @@
 namespace loki::problem {
 
 // create string representations from ast nodes.
-extern std::string parse_text(const ast::BasicFunctionTermArityGreaterZero& node, const FormattingOptions& options={});
-extern std::string parse_text(const ast::BasicFunctionTermArityZero& node, const FormattingOptions& options={});
 extern std::string parse_text(const ast::BasicFunctionTerm& node, const FormattingOptions& options={});
 
 extern std::string parse_text(const ast::AtomicFormulaOfNamesPredicate& node, const FormattingOptions& options={});

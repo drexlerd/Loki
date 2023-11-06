@@ -9,8 +9,6 @@ namespace loki::problem::parser
     using phrase_context_type = loki::phrase_context_type;
     using context_type = loki::context_type;
 
-    BOOST_SPIRIT_INSTANTIATE(basic_function_term_arity_greater_zero_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(basic_function_term_arity_zero_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(basic_function_term_type, iterator_type, context_type)
 
     BOOST_SPIRIT_INSTANTIATE(atomic_formula_of_names_predicate_type, iterator_type, context_type)

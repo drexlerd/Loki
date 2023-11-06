@@ -14,8 +14,6 @@ namespace loki::problem
     // parser public interface
     ///////////////////////////////////////////////////////////////////////////
     namespace parser {
-        struct BasicFunctionTermArityGreaterZeroClass;
-        struct BasicFunctionTermArityZeroClass;
         struct BasicFunctionTermClass;
 
         struct AtomicFormulaOfNamesPredicateClass;
@@ -61,8 +59,6 @@ namespace loki::problem
         struct ProblemClass;
 
 
-        typedef x3::rule<BasicFunctionTermArityGreaterZeroClass, ast::BasicFunctionTermArityGreaterZero> basic_function_term_arity_greater_zero_type;
-        typedef x3::rule<BasicFunctionTermArityZeroClass, ast::BasicFunctionTermArityZero> basic_function_term_arity_zero_type;
         typedef x3::rule<BasicFunctionTermClass, ast::BasicFunctionTerm> basic_function_term_type;
 
         typedef x3::rule<AtomicFormulaOfNamesPredicateClass, ast::AtomicFormulaOfNamesPredicate> atomic_formula_of_names_predicate_type;
@@ -108,8 +104,7 @@ namespace loki::problem
         typedef x3::rule<ProblemClass, ast::Problem> problem_type;
 
 
-        BOOST_SPIRIT_DECLARE(basic_function_term_arity_greater_zero_type,
-            basic_function_term_arity_zero_type, basic_function_term_type)
+        BOOST_SPIRIT_DECLARE(basic_function_term_type)
 
         BOOST_SPIRIT_DECLARE(atomic_formula_of_names_predicate_type, atomic_formula_of_names_equality_type,
             atomic_formula_of_names_type, atom_type, negated_atom_type, literal_type)
@@ -140,8 +135,6 @@ namespace loki::problem
     }
 
 
-    parser::basic_function_term_arity_greater_zero_type const& basic_function_term_arity_greater_zero();
-    parser::basic_function_term_arity_zero_type const& basic_function_term_arity_zero();
     parser::basic_function_term_type const& basic_function_term();
 
     parser::atomic_formula_of_names_predicate_type const& atomic_formula_of_names_predicate();

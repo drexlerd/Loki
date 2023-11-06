@@ -8,8 +8,7 @@
 
 // We need to tell fusion about our rexpr and rexpr_key_value
 // to make them a first-class fusion citizens
-BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::BasicFunctionTermArityGreaterZero, function_symbol, names)
-BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::BasicFunctionTermArityZero, function_symbol)
+BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::BasicFunctionTerm, function_symbol, names)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::AtomicFormulaOfNamesPredicate, predicate, names)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::AtomicFormulaOfNamesEquality, name_left, name_right)

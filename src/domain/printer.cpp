@@ -7,7 +7,6 @@ using namespace std;
 
 namespace loki::domain
 {
-
     // Printer for std::vector
     template <typename T>
     inline std::string parse_text(const std::vector<T>& nodes, const FormattingOptions& options);
@@ -692,5 +691,4 @@ namespace loki::domain
         }
         return ss.str();
     }
-
 }
