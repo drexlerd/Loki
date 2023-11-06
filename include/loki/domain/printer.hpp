@@ -4,7 +4,6 @@
 #include "ast.hpp"
 #include "include/loki/common/printer.hpp"
 
-#include <sstream>
 
 namespace loki::domain {
 
