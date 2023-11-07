@@ -21,6 +21,7 @@ namespace loki::problem::parser {
     using x3::eps;
     using x3::int_;
     using x3::double_;
+    using x3::expect;
 
     using ascii::alpha;
     using ascii::alnum;
@@ -97,10 +98,10 @@ namespace loki::problem::parser {
     const auto literal_def = atom | negated_atom;
 
     const auto initial_element_literals_def = literal;
-    const auto initial_element_timed_literals_def = lit('(') >> lit("at") > domain::number() > literal > lit(')');
+    const auto initial_element_timed_literals_def = lit('(') >> lit("at") >> domain::number() > literal > lit(')');
     const auto initial_element_numeric_fluents_def = lit('(') >> lit('=') >> domain::function_head() > domain::number() > lit(')');
     const auto initial_element_object_fluents_def = lit('(') >> lit('=') >> basic_function_term > domain::name() > lit(')');
-    const auto initial_element_def = initial_element_timed_literals | initial_element_numeric_fluents 
+    const auto initial_element_def = initial_element_timed_literals | initial_element_numeric_fluents
         | initial_element_object_fluents | initial_element_literals;
 
 
@@ -113,7 +114,7 @@ namespace loki::problem::parser {
     const auto metric_function_expression_preferences_def = lit('(') >> lit("is-violated") > domain::preference_name() > lit(')');
     const auto metric_function_expression_def = metric_function_expression_binary_operator
         | metric_function_expression_multi_operator | metric_function_expression_minus
-        | metric_function_expression_total_time | metric_function_expression_preferences 
+        | metric_function_expression_total_time | metric_function_expression_preferences
         | metric_function_expression_basic_function_term | metric_function_expression_number;
 
     const auto optimization_minimize_def = lit("minimize") >> x3::attr(ast::OptimizationMinimize{});
@@ -130,6 +131,8 @@ namespace loki::problem::parser {
     const auto problem_name_def = lit('(') >> lit("problem") > domain::name() > lit(')');
     const auto domain_name_def = lit('(') >> lit(":domain") > domain::name() > lit(')');
     const auto objects_def = lit('(') >> lit(":objects") > domain::typed_list_of_names() > lit(')');
+    // Idea on how to obtain more meaningful error messages.
+    // const auto objects_def = lit('(') >> lit(":objects") > domain::typed_list_of_names() > !domain::variable() > !domain::function_term() > lit(')');
     const auto initial_def = lit('(') >> lit(":init") > *initial_element > lit(')');
     const auto goal_def = lit('(') >> lit(":goal") > domain::precondition_goal_descriptor() > lit(')');
     const auto constraints_def = lit('(') >> lit(":constraints") > preference_constraint_goal_descriptor > lit(')');

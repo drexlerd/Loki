@@ -255,7 +255,7 @@ namespace loki::domain::parser {
     const auto function_expression_minus_def = lit('(') >> lit('-') > function_expression > lit(')');
     const auto function_expression_head_def = function_head;
 
-    const auto goal_descriptor_def = goal_descriptor_not | goal_descriptor_and | goal_descriptor_or | goal_descriptor_imply 
+    const auto goal_descriptor_def = goal_descriptor_not | goal_descriptor_and | goal_descriptor_or | goal_descriptor_imply
         | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison | goal_descriptor_literal | goal_descriptor_atom;
     const auto goal_descriptor_atom_def = atom;
     const auto goal_descriptor_literal_def = literal;
