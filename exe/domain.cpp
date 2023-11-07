@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     domain::ast::Domain node;
     parse_ast(source, domain::domain(), node);
 
-    std::cout << domain::parse_text(node, FormattingOptions{0,4}) << std::endl;
+    std::cout << parse_text(node, FormattingOptions{0,4}) << std::endl;
 
     return 0;
 }

@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     problem::ast::Problem node;
     parse_ast(source, problem::problem(), node);
 
-    std::cout << problem::parse_text(node, FormattingOptions{0,4}) << std::endl;
+    std::cout << parse_text(node, FormattingOptions{0,4}) << std::endl;
 
     return 0;
 }
