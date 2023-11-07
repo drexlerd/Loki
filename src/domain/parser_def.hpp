@@ -231,8 +231,8 @@ namespace loki::domain::parser {
     const auto atomic_formula_of_terms_equality_def = lit('(') >> lit('=') > term > term > lit(')');
     const auto atomic_formula_of_terms_def = atomic_formula_of_terms_equality | atomic_formula_of_terms_predicate;
     const auto atom_def = atomic_formula_of_terms;
-    const auto negated_atom_def = lit('(') >> lit("not") >> atomic_formula_of_terms >> lit(')');
-    const auto literal_def = atom | negated_atom;
+    const auto negated_atom_def = lit('(') >> lit("not") > atomic_formula_of_terms > lit(')');
+    const auto literal_def = negated_atom | atom;
 
     const auto multi_operator_mul_def = lit('*') >> x3::attr(ast::MultiOperatorMul{});
     const auto multi_operator_plus_def = lit('+') >> x3::attr(ast::MultiOperatorPlus{});
@@ -255,8 +255,8 @@ namespace loki::domain::parser {
     const auto function_expression_minus_def = lit('(') >> lit('-') > function_expression > lit(')');
     const auto function_expression_head_def = function_head;
 
-    const auto goal_descriptor_def = goal_descriptor_atom | goal_descriptor_literal | goal_descriptor_and | goal_descriptor_or
-        | goal_descriptor_not | goal_descriptor_imply | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison;
+    const auto goal_descriptor_def = goal_descriptor_not | goal_descriptor_and | goal_descriptor_or | goal_descriptor_imply 
+        | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison | goal_descriptor_literal | goal_descriptor_atom;
     const auto goal_descriptor_atom_def = atom;
     const auto goal_descriptor_literal_def = literal;
     const auto goal_descriptor_and_def = lit('(') >> lit("and") > *goal_descriptor > lit(')');
@@ -298,13 +298,13 @@ namespace loki::domain::parser {
     const auto assign_operator_decrease_def = lit("decrease") >> x3::attr(ast::AssignOperatorDecrease{});
     const auto assign_operator_def = assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
 
-    const auto effect_def = effect_production | effect_conditional | lit('(') >> lit("and") >> *effect >> lit(')');
+    const auto effect_def = lit('(') >> lit("and") >> *effect >> lit(')') | effect_conditional | effect_production;
     const auto effect_production_literal_def = literal;
     const auto effect_production_numeric_fluent_def = lit('(') >> assign_operator >> function_head >> function_expression > lit(')');
     const auto effect_production_object_fluent_def = lit('(') >> function_term >> (term | undefined);
     const auto effect_production_def = effect_production_literal | effect_production_numeric_fluent | effect_production_object_fluent;
-    const auto effect_conditional_forall_def = lit('(') >> lit("forall") >> typed_list_of_variables >> effect > lit(')');
-    const auto effect_conditional_when_def = lit('(') >> lit("when") >> goal_descriptor >> effect > lit(')');
+    const auto effect_conditional_forall_def = lit('(') >> lit("forall") > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
+    const auto effect_conditional_when_def = lit('(') >> lit("when") > goal_descriptor > effect > lit(')');
     const auto effect_conditional_def = effect_conditional_forall | effect_conditional_when;
 
     const auto action_symbol_def = name;
