@@ -122,7 +122,7 @@ namespace loki::problem::parser {
 
     const auto preference_constraint_goal_descriptor_and_def = lit('(') >> lit("and") > *preference_constraint_goal_descriptor > lit(')');
     const auto preference_constraint_goal_descriptor_forall_def = lit('(') >> lit("forall") > domain::typed_list_of_variables() > preference_constraint_goal_descriptor > lit(')');
-    const auto preference_constraint_goal_descriptor_preference_def = lit('(') >> lit("preference") > domain::preference_name() > domain::constraint_goal_descriptor() > lit(')');
+    const auto preference_constraint_goal_descriptor_preference_def = lit('(') >> lit("preference") >> (-domain::preference_name()) > domain::constraint_goal_descriptor() > lit(')');
     const auto preference_constraint_goal_descriptor_simple_def = domain::constraint_goal_descriptor();
     const auto preference_constraint_goal_descriptor_def = preference_constraint_goal_descriptor_and | preference_constraint_goal_descriptor_forall
         | preference_constraint_goal_descriptor_preference | preference_constraint_goal_descriptor_simple;

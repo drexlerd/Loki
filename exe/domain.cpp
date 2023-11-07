@@ -12,6 +12,7 @@
 using namespace loki;
 using namespace std;
 
+
 int main(int argc, char** argv) {
     if (argc < 2) {
         std::cout << "Usage: interpreter <domain:str>" << std::endl;

@@ -1,17 +1,18 @@
 
-#include <iostream>
-#include <memory>
-#include <vector>
-
 #include "include/loki/common/config.hpp"
 #include "include/loki/common/parser_wrapper.hpp"
 #include "include/loki/common/filesystem.hpp"
 #include "include/loki/problem/ast.hpp"
 #include "include/loki/problem/parser.hpp"
+#include "include/loki/problem/printer.hpp"
 
+#include <iostream>
+#include <memory>
+#include <vector>
 
 using namespace std;
 using namespace loki;
+
 
 int main(int argc, char** argv) {
     if (argc < 2) {
@@ -24,6 +25,8 @@ int main(int argc, char** argv) {
     const auto source = loki::read_file(domain_file);
     problem::ast::Problem node;
     parse_ast(source, problem::problem(), node);
+
+    std::cout << problem::parse_text(node, FormattingOptions{0,4}) << std::endl;
 
     return 0;
 }

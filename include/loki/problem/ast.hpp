@@ -223,7 +223,7 @@ namespace loki::problem::ast
     };
 
     struct PreferenceConstraintGoalDescriptorPreference : x3::position_tagged {
-        domain::ast::PreferenceName preference_name;
+        boost::optional<domain::ast::PreferenceName> preference_name;
         domain::ast::ConstraintGoalDescriptor constraint_goal_descriptor;
     };
 
