@@ -249,9 +249,9 @@ namespace loki::domain::parser {
     const auto binary_comparator_def = binary_comparator_greater | binary_comparator_less | binary_comparator_equal | binary_comparator_greater_equal | binary_comparator_less_equal;
 
     const auto function_head_def = (lit('(') >> function_symbol >> *term > lit(')')) | (function_symbol >> x3::attr(std::vector<ast::Term>{}));
-    const auto function_expression_def = function_expression_number | function_expression_binary_op | function_expression_minus | function_expression_head;
+    const auto function_expression_def = function_expression_binary_op | function_expression_minus | function_expression_head | function_expression_number;
     const auto function_expression_number_def = number;
-    const auto function_expression_binary_op_def = lit('(') >> binary_operator > function_expression > function_expression > lit(')');
+    const auto function_expression_binary_op_def = lit('(') >> binary_operator >> function_expression >> function_expression > lit(')');
     const auto function_expression_minus_def = lit('(') >> lit('-') > function_expression > lit(')');
     const auto function_expression_head_def = function_head;
 
@@ -284,7 +284,7 @@ namespace loki::domain::parser {
     const auto constraint_goal_descriptor_hold_during_def = lit('(') >> lit("hold-during") > number > number > goal_descriptor > lit(')');
     const auto constraint_goal_descriptor_hold_after_def = lit('(') >> lit("hold-after") > number > goal_descriptor > lit(')');
 
-    const auto precondition_goal_descriptor_def = precondition_goal_descriptor_simple | precondition_goal_descriptor_and | precondition_goal_descriptor_preference | precondition_goal_descriptor_forall;
+    const auto precondition_goal_descriptor_def = precondition_goal_descriptor_and | precondition_goal_descriptor_preference | precondition_goal_descriptor_forall | precondition_goal_descriptor_simple;
     const auto preference_name_def = name;
     const auto precondition_goal_descriptor_simple_def = goal_descriptor;
     const auto precondition_goal_descriptor_and_def = lit('(') >> lit("and") >> *precondition_goal_descriptor > lit(')');

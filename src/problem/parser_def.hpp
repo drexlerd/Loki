@@ -100,21 +100,21 @@ namespace loki::problem::parser {
     const auto initial_element_timed_literals_def = lit('(') >> lit("at") > domain::number() > literal > lit(')');
     const auto initial_element_numeric_fluents_def = lit('(') >> lit('=') >> domain::function_head() > domain::number() > lit(')');
     const auto initial_element_object_fluents_def = lit('(') >> lit('=') >> basic_function_term > domain::name() > lit(')');
-    const auto initial_element_def = initial_element_literals | initial_element_timed_literals
-        | initial_element_numeric_fluents | initial_element_object_fluents;
+    const auto initial_element_def = initial_element_timed_literals | initial_element_numeric_fluents 
+        | initial_element_object_fluents | initial_element_literals;
 
 
     const auto metric_function_expression_binary_operator_def = lit('(') >> domain::binary_operator() >> metric_function_expression >> metric_function_expression > lit(')');
     const auto metric_function_expression_multi_operator_def = lit('(') >> domain::multi_operator() >> metric_function_expression >> +metric_function_expression > lit(')');
-    const auto metric_function_expression_minus_def = lit('(') >> lit('-') >> metric_function_expression > lit(')');
+    const auto metric_function_expression_minus_def = lit('(') >> lit('-') > metric_function_expression > lit(')');
     const auto metric_function_expression_number_def = domain::number();
     const auto metric_function_expression_basic_function_term_def = basic_function_term;
     const auto metric_function_expression_total_time_def = lit("total-time") >> x3::attr(ast::MetricFunctionExpressionTotalTime{});
     const auto metric_function_expression_preferences_def = lit('(') >> lit("is-violated") > domain::preference_name() > lit(')');
-    const auto metric_function_expression_def = metric_function_expression_number | metric_function_expression_binary_operator
+    const auto metric_function_expression_def = metric_function_expression_binary_operator
         | metric_function_expression_multi_operator | metric_function_expression_minus
-        | metric_function_expression_basic_function_term | metric_function_expression_total_time
-        | metric_function_expression_preferences;
+        | metric_function_expression_total_time | metric_function_expression_preferences 
+        | metric_function_expression_basic_function_term | metric_function_expression_number;
 
     const auto optimization_minimize_def = lit("minimize") >> x3::attr(ast::OptimizationMinimize{});
     const auto optimization_maximize_def = lit("maximize") >> x3::attr(ast::OptimizationMaximize{});
