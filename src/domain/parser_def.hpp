@@ -8,6 +8,7 @@
 #include "include/loki/domain/syntactic/error_handler.hpp"
 #include "include/loki/domain/syntactic/parser.hpp"
 
+#include "annotate_on_success.hpp"
 #include "ast_adapted.hpp"
 
 
@@ -531,7 +532,7 @@ namespace loki::domain::parser {
     struct RequirementsClass : x3::annotate_on_success {};
     struct TypesClass : x3::annotate_on_success {};
     struct ConstantsClass : x3::annotate_on_success {};
-    struct PredicatesClass : x3::annotate_on_success {};
+    struct PredicatesClass : annotation_domain {};
     struct FunctionsClass : x3::annotate_on_success {};
     struct ConstraintsClass : x3::annotate_on_success {};
     struct StructureClass : x3::annotate_on_success {};

@@ -25,15 +25,35 @@ namespace loki
     typedef error_handler<iterator_type> error_handler_type;
 
 
+    /* Pddl context */
+    struct domain_context_type {
+        std::vector<std::string> predicate_names;
+    };
+
+    struct problem_context_type {
+
+    };
+
+    struct pddl_context_type {
+        domain_context_type domain_context;
+        problem_context_type problem_context;
+    };
+
+    struct pddl_context_tag {};
+
+
     /* The phrase parse context */
     typedef
         x3::phrase_parse_context<x3::ascii::space_type>::type phrase_context_type;
 
-    /* Combined error handler and phrase parse Context */
+    /* Combined error handler, pddl, and phrase parse Context */
     typedef x3::context<
             error_handler_tag,
             std::reference_wrapper<error_handler_type>,
-            phrase_context_type>
+            x3::context<
+                pddl_context_tag,
+                std::reference_wrapper<pddl_context_type>,
+                phrase_context_type>>
     context_type;
 }
 

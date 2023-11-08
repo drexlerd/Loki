@@ -13,11 +13,14 @@ void parse_ast(const std::string& source, const Parser& parser, Node& out) {
     loki::iterator_type iter(source.begin());
     const loki::iterator_type end(source.end());
     using boost::spirit::x3::with;
+    pddl_context_type pddl_context;
     error_handler_type error_handler(iter, end, std::cerr);
     auto const wrapped_parser =
-        with<error_handler_tag>(std::ref(error_handler))
-        [
-            parser
+        with<pddl_context_tag>(std::ref(pddl_context)) [
+            with<error_handler_tag>(std::ref(error_handler))
+            [
+                parser
+            ]
         ];
     using boost::spirit::x3::ascii::space;
     bool success = phrase_parse(iter, end, wrapped_parser, space, out);
