@@ -1,15 +1,22 @@
 # PDDL-parser
 
-Loki is a C++ library for parsing the PDDL files into an abstract syntax tree.
-It supports PDDL version 3.1.
+Loki is a C++ library for parsing the PDDL files.
+Loki aims to achieve three goals: 
+1. Support all concepts of PDDL,
+2. Provide meaningful error messages to the user,
+3. Provide easy integration into existing planning systems, and
+4. Provide methods to compile away requirements.
 
-## Grammar details
+The parsing is split into two phases: syntactic and semantic parsing.
+The syntactic parser constructs an abstract syntax tree while performing error handling locally on the basis of recursively applied grammar rules.
+The semantic parsing performs error handling globally on the basis of the whole abstract syntax tree.
 
-The grammar implementation is mostly similar to the BNF description of PDDL 3.0 by Gerevini and Long (2005)
-with object fluents and actions costs of PDDL 3.1 and the following additional details
+## Dependencies
 
-- We allow for nested either in types
-- We allow nested conditional effects
+Loki depends on a fraction of Boost's (boost.org) header only libraries.
+
+- Fusion
+- Spirit x3
 
 
 ## Installation
@@ -21,14 +28,14 @@ cmake --build build -j16
 
 ## Running
 
-A successful parse:
+Parsing a domain file into an abstract syntax tree and printing it.
 
 ```console
-./build/exe/exe benchmarks/gripper/success.pddl
+./build/exe/domain benchmarks/schedule/domain.pddl
 ```
 
-A failed parse:
+Parsing a problem file into an abstract syntax tree and printing it.
 
 ```console
-./build/exe/exe benchmarks/gripper/fail.pddl
+./build/exe/problem benchmarks/schedule/probschedule-51-2.pddl
 ```
