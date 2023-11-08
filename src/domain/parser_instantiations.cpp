@@ -1,6 +1,6 @@
 #include "parser_def.hpp"
 
-#include "include/loki/common/config.hpp"
+#include "include/loki/common/syntactic/config.hpp"
 
 
 namespace loki::domain::parser

@@ -4,9 +4,9 @@
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 
-#include "include/loki/domain/ast.hpp"
-#include "include/loki/domain/error_handler.hpp"
-#include "include/loki/domain/parser.hpp"
+#include "include/loki/domain/syntactic/ast.hpp"
+#include "include/loki/domain/syntactic/error_handler.hpp"
+#include "include/loki/domain/syntactic/parser.hpp"
 
 #include "ast_adapted.hpp"
 

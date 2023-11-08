@@ -1,8 +1,8 @@
-#ifndef LOKI_INCLUDE_LOKI_DOMAIN_PRINTER_HPP_
-#define LOKI_INCLUDE_LOKI_DOMAIN_PRINTER_HPP_
+#ifndef LOKI_INCLUDE_LOKI_DOMAIN_SYNTACTIC_PRINTER_HPP_
+#define LOKI_INCLUDE_LOKI_DOMAIN_SYNTACTIC_PRINTER_HPP_
 
 #include "ast.hpp"
-#include "include/loki/common/printer.hpp"
+#include "include/loki/common/syntactic/printer.hpp"
 
 
 namespace loki {

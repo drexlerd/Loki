@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "include/loki/common/parser_wrapper.hpp"
-#include "include/loki/domain/parser.hpp"
-#include "include/loki/domain/printer.hpp"
+#include "include/loki/common/syntactic/parser_wrapper.hpp"
+#include "include/loki/domain/syntactic/parser.hpp"
+#include "include/loki/domain/syntactic/printer.hpp"
 
 
 namespace loki::domain::tests {

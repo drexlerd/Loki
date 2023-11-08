@@ -1,7 +1,7 @@
-#ifndef LOKI_INCLUDE_COMMON_PARSER_WRAPPER_HPP_
-#define LOKI_INCLUDE_COMMON_PARSER_WRAPPER_HPP_
+#ifndef LOKI_INCLUDE_COMMON_SYNTACTIC_PARSER_WRAPPER_HPP_
+#define LOKI_INCLUDE_COMMON_SYNTACTIC_PARSER_WRAPPER_HPP_
 
-#include "include/loki/common/config.hpp"
+#include "include/loki/common/syntactic/config.hpp"
 
 #include <iostream>
 

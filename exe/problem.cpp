@@ -1,10 +1,10 @@
 
-#include "include/loki/common/config.hpp"
-#include "include/loki/common/parser_wrapper.hpp"
+#include "include/loki/common/syntactic/config.hpp"
+#include "include/loki/common/syntactic/parser_wrapper.hpp"
 #include "include/loki/common/filesystem.hpp"
-#include "include/loki/problem/ast.hpp"
-#include "include/loki/problem/parser.hpp"
-#include "include/loki/problem/printer.hpp"
+#include "include/loki/problem/syntactic/ast.hpp"
+#include "include/loki/problem/syntactic/parser.hpp"
+#include "include/loki/problem/syntactic/printer.hpp"
 
 #include <iostream>
 #include <memory>

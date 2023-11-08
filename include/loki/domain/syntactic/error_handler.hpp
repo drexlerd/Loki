@@ -1,10 +1,10 @@
-#ifndef LOKI_INCLUDE_LOKI_DOMAIN_ERROR_HANDLER_HPP_
-#define LOKI_INCLUDE_LOKI_DOMAIN_ERROR_HANDLER_HPP_
+#ifndef LOKI_INCLUDE_LOKI_DOMAIN_SYNTACTIC_ERROR_HANDLER_HPP_
+#define LOKI_INCLUDE_LOKI_DOMAIN_SYNTACTIC_ERROR_HANDLER_HPP_
 
 #include <unordered_map>
 #include <iostream>
 
-#include "include/loki/common/error_handler.hpp"
+#include "include/loki/common/syntactic/error_handler.hpp"
 
 
 namespace loki::domain

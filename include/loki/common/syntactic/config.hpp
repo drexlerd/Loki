@@ -1,5 +1,5 @@
-#ifndef LOKI_INCLUDE_LOKI_COMMON_CONFIG_HPP_
-#define LOKI_INCLUDE_LOKI_COMMON_CONFIG_HPP_
+#ifndef LOKI_INCLUDE_LOKI_COMMON_SYNTACTIC_CONFIG_HPP_
+#define LOKI_INCLUDE_LOKI_COMMON_SYNTACTIC_CONFIG_HPP_
 
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>

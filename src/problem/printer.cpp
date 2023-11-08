@@ -1,6 +1,6 @@
-#include "include/loki/problem/printer.hpp"
+#include "include/loki/problem/syntactic/printer.hpp"
 
-#include "include/loki/domain/printer.hpp"
+#include "include/loki/domain/syntactic/printer.hpp"
 
 #include <sstream>
 
