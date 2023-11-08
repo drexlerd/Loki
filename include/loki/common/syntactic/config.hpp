@@ -26,12 +26,36 @@ namespace loki
 
 
     /* Pddl context */
+    struct SpecifiedRequirements {
+        bool strips = false;
+        bool typing = false;
+        bool negative_preconditions = false;
+        bool disjunctive_preconditions = false;
+        bool equality = false;
+        bool existential_preconditions = false;
+        bool universal_preconditions = false;
+        bool quantified_preconditions = false;
+        bool conditional_effects = false;
+        bool fluents = false;
+        bool object_fluents = false;
+        bool numeric_fluents = false;
+        bool adl = false;
+        bool durative_actions = false;
+        bool derived_predicates = false;
+        bool timed_initial_literals = false;
+        bool preferences = false;
+        bool constraints = false;
+    };
+
+
     struct domain_context_type {
+        SpecifiedRequirements requirements;
+
         std::vector<std::string> predicate_names;
     };
 
     struct problem_context_type {
-
+        SpecifiedRequirements requirements;
     };
 
     struct pddl_context_type {

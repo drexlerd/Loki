@@ -14,6 +14,15 @@ struct annotation_domain : boost::spirit::x3::annotate_on_success
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
+        loki::domain::ast::RequirementStrips& ast, Context const& context) {
+        auto& pddl_context = x3::get<pddl_context_tag>(context).get();
+        pddl_context.domain_context.requirements.strips = true;
+        boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
+    }
+
+    template <typename Iterator, typename Context>
+    inline void on_success(
+        Iterator const& first, Iterator const& last,
         loki::domain::ast::Predicates& ast, Context const& context) {
 
         auto& pddl_context = x3::get<pddl_context_tag>(context).get();

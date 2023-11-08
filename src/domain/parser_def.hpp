@@ -407,7 +407,7 @@ namespace loki::domain::parser {
     struct TermClass : x3::annotate_on_success {};
     struct UndefinedClass : x3::annotate_on_success {};
 
-    struct RequirementStripsClass : x3::annotate_on_success {};
+    struct RequirementStripsClass : annotation_domain {};
     struct RequirementTypingClass : x3::annotate_on_success {};
     struct RequirementNegativePreconditionsClass : x3::annotate_on_success {};
     struct RequirementDisjunctivePreconditionsClass : x3::annotate_on_success {};
