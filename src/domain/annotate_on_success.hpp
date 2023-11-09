@@ -17,6 +17,20 @@ struct annotation_domain : boost::spirit::x3::annotate_on_success
         loki::domain::ast::RequirementStrips& ast, Context const& context) {
         auto& pddl_context = x3::get<pddl_context_tag>(context).get();
         pddl_context.domain_context.requirements.strips = true;
+
+        // Return fail
+        /*
+        _pass(context) = false;
+        */
+
+        // Throw an exception
+        /*
+        boost::throw_exception(
+                boost::spirit::x3::expectation_failure<Iterator>(
+                    first, "asd"));
+        */
+
+        // Call standard on_success that tags the ast
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
@@ -26,11 +40,8 @@ struct annotation_domain : boost::spirit::x3::annotate_on_success
         loki::domain::ast::Predicates& ast, Context const& context) {
 
         auto& pddl_context = x3::get<pddl_context_tag>(context).get();
-        /*
-        boost::throw_exception(
-            boost::spirit::x3::expectation_failure<Iterator>(
-                first, "asd"));
-        */
+
+        // TODO: add predicates to the context
 
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
