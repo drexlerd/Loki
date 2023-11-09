@@ -1,19 +1,18 @@
-#ifndef LOKI_INCLUDE_COMMON_SYNTACTIC_PARSER_WRAPPER_HPP_
-#define LOKI_INCLUDE_COMMON_SYNTACTIC_PARSER_WRAPPER_HPP_
+#ifndef LOKI_INCLUDE_COMMON_AST_PARSER_WRAPPER_HPP_
+#define LOKI_INCLUDE_COMMON_AST_PARSER_WRAPPER_HPP_
 
-#include "include/loki/common/syntactic/config.hpp"
+#include "config.hpp"
 
 #include <iostream>
 
 
 namespace loki {
 template<typename Parser, typename Node>
-void parse_ast(const std::string& source, const Parser& parser, Node& out) {
+void parse_ast(const std::string& source, const Parser& parser, Node& out, pddl_context_type& pddl_context) {
     out = Node(); // reinitialize
     loki::iterator_type iter(source.begin());
     const loki::iterator_type end(source.end());
     using boost::spirit::x3::with;
-    pddl_context_type pddl_context;
     error_handler_type error_handler(iter, end, std::cerr);
     auto const wrapped_parser =
         with<pddl_context_tag>(std::ref(pddl_context)) [
@@ -27,6 +26,13 @@ void parse_ast(const std::string& source, const Parser& parser, Node& out) {
     if (!success) {
         throw std::runtime_error("Failed parse.");
     }
+}
+
+
+template<typename Parser, typename Node>
+void parse_ast(const std::string& source, const Parser& parser, Node& out) {
+    pddl_context_type pddl_context;
+    parse_ast(source, parser, out, pddl_context);
 }
 
 }

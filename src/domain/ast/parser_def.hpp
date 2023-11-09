@@ -1,15 +1,15 @@
-#ifndef LOKI_SRC_DOMAIN_PARSER_DEF_HPP_
-#define LOKI_SRC_DOMAIN_PARSER_DEF_HPP_
-
-#include <boost/spirit/home/x3.hpp>
-#include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
-
-#include "include/loki/domain/syntactic/ast.hpp"
-#include "include/loki/domain/syntactic/error_handler.hpp"
-#include "include/loki/domain/syntactic/parser.hpp"
+#ifndef LOKI_SRC_DOMAIN_AST_PARSER_DEF_HPP_
+#define LOKI_SRC_DOMAIN_AST_PARSER_DEF_HPP_
 
 #include "annotate_on_success.hpp"
 #include "ast_adapted.hpp"
+
+#include "../../../include/loki/domain/ast/ast.hpp"
+#include "../../../include/loki/domain/ast/error_handler.hpp"
+#include "../../../include/loki/domain/ast/parser.hpp"
+
+#include <boost/spirit/home/x3.hpp>
+#include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 
 
 namespace loki::domain::parser {

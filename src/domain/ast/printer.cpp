@@ -1,11 +1,11 @@
-#include "include/loki/domain/syntactic/printer.hpp"
-
-#include "include/loki/problem/syntactic/printer.hpp"
+#include "../../../include/loki/domain/ast/printer.hpp"
+#include "../../../include/loki/problem/ast/printer.hpp"
 
 #include <sstream>
 #include <vector>
 
 using namespace std;
+
 
 namespace loki
 {

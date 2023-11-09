@@ -1,9 +1,9 @@
-#ifndef LOKI_INCLUDE_LOKI_PROBLEM_SYNTACTIC_PARSER_HPP_
-#define LOKI_INCLUDE_LOKI_PROBLEM_SYNTACTIC_PARSER_HPP_
-
-#include <boost/spirit/home/x3.hpp>
+#ifndef LOKI_INCLUDE_LOKI_PROBLEM_AST_PARSER_HPP_
+#define LOKI_INCLUDE_LOKI_PROBLEM_AST_PARSER_HPP_
 
 #include "ast.hpp"
+
+#include <boost/spirit/home/x3.hpp>
 
 
 namespace loki::problem

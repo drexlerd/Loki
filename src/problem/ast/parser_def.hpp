@@ -1,15 +1,15 @@
-#ifndef LOKI_SRC_DOMAIN_PARSER_DEF_HPP_
-#define LOKI_SRC_DOMAIN_PARSER_DEF_HPP_
+#ifndef LOKI_SRC_PROBLEM_AST_PARSER_DEF_HPP_
+#define LOKI_SRC_PROBLEM_AST_PARSER_DEF_HPP_
+
+#include "ast_adapted.hpp"
+
+#include "../../../include/loki/problem/ast/ast.hpp"
+#include "../../../include/loki/problem/ast/error_handler.hpp"
+#include "../../../include/loki/problem/ast/parser.hpp"
+#include "../../../include/loki/domain/ast/parser.hpp"
 
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
-
-#include "include/loki/problem/syntactic/ast.hpp"
-#include "include/loki/problem/syntactic/error_handler.hpp"
-#include "include/loki/problem/syntactic/parser.hpp"
-#include "include/loki/domain/syntactic/parser.hpp"
-
-#include "ast_adapted.hpp"
 
 
 namespace loki::problem::parser {
@@ -114,7 +114,7 @@ namespace loki::problem::parser {
     const auto metric_function_expression_number_def = domain::number();
     const auto metric_function_expression_def = metric_function_expression_binary_operator
         | metric_function_expression_multi_operator | metric_function_expression_minus
-        | metric_function_expression_preferences | metric_function_expression_basic_function_term 
+        | metric_function_expression_preferences | metric_function_expression_basic_function_term
         | metric_function_expression_total_time | metric_function_expression_number;
 
     const auto optimization_minimize_def = lit("minimize") >> x3::attr(ast::OptimizationMinimize{});

@@ -1,9 +1,9 @@
-#include "include/loki/common/syntactic/config.hpp"
-#include "include/loki/common/syntactic/parser_wrapper.hpp"
-#include "include/loki/common/filesystem.hpp"
-#include "include/loki/domain/syntactic/ast.hpp"
-#include "include/loki/domain/syntactic/parser.hpp"
-#include "include/loki/domain/syntactic/printer.hpp"
+#include "../include/loki/common/ast/config.hpp"
+#include "../include/loki/common/ast/parser_wrapper.hpp"
+#include "../include/loki/common/filesystem.hpp"
+#include "../include/loki/domain/ast/ast.hpp"
+#include "../include/loki/domain/ast/parser.hpp"
+#include "../include/loki/domain/ast/printer.hpp"
 
 #include <iostream>
 #include <memory>

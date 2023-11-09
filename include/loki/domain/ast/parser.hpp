@@ -1,9 +1,9 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_SYNTACTIC_PARSER_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_SYNTACTIC_PARSER_HPP_
 
-#include <boost/spirit/home/x3.hpp>
-
 #include "ast.hpp"
+
+#include <boost/spirit/home/x3.hpp>
 
 
 namespace loki::domain

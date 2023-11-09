@@ -1,6 +1,5 @@
-#include "include/loki/problem/syntactic/printer.hpp"
-
-#include "include/loki/domain/syntactic/printer.hpp"
+#include "../../../include/loki/problem/ast/printer.hpp"
+#include "../../../include/loki/domain/ast/printer.hpp"
 
 #include <sstream>
 
@@ -8,7 +7,7 @@ using namespace std;
 
 
 namespace loki {
-    
+
     // Printer for std::vector
     template <typename T>
     inline std::string parse_text(const std::vector<T>& nodes, const FormattingOptions& options);
@@ -108,7 +107,7 @@ namespace loki {
 
     string parse_text(const problem::ast::MetricFunctionExpressionBinaryOperator& node, const FormattingOptions& options) {
         stringstream ss;
-        ss << "(" << parse_text(node.binary_operator, options) << " " 
+        ss << "(" << parse_text(node.binary_operator, options) << " "
                   << parse_text(node.metric_function_expression_left, options) << " "
                   << parse_text(node.metric_function_expression_right, options)  << ")";
         return ss.str();
@@ -116,7 +115,7 @@ namespace loki {
 
     string parse_text(const problem::ast::MetricFunctionExpressionMultiOperator& node, const FormattingOptions& options) {
         stringstream ss;
-        ss << "(" << parse_text(node.binary_operator, options) << " " 
+        ss << "(" << parse_text(node.binary_operator, options) << " "
                   << parse_text(node.metric_function_expression_first, options) << " "
                   << parse_text(node.metric_function_expression_remaining, options)  << ")";
         return ss.str();
@@ -231,7 +230,7 @@ namespace loki {
         ss << string(nested_options.indent, ' ') << parse_text(node.domain_name, nested_options) << "\n";
         if (node.requirements.has_value()) {
             ss << string(nested_options.indent, ' ') << parse_text(node.requirements.value(), nested_options) << "\n";
-        } 
+        }
         if (node.objects.has_value()) {
             ss << string(nested_options.indent, ' ') << parse_text(node.objects.value(), nested_options) << "\n";
         }

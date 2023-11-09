@@ -1,7 +1,7 @@
-#ifndef LOKI_INCLUDE_LOKI_PROBLEM_SYNTACTIC_AST_HPP_
-#define LOKI_INCLUDE_LOKI_PROBLEM_SYNTACTIC_AST_HPP_
+#ifndef LOKI_INCLUDE_LOKI_PROBLEM_AST_AST_HPP_
+#define LOKI_INCLUDE_LOKI_PROBLEM_AST_AST_HPP_
 
-#include "include/loki/domain/syntactic/ast.hpp"
+#include "../../domain/ast/ast.hpp"
 
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
@@ -9,6 +9,7 @@
 
 #include <map>
 #include <vector>
+
 
 namespace loki::problem::ast
 {

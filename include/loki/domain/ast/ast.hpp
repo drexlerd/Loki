@@ -1,12 +1,13 @@
-#ifndef LOKI_INCLUDE_LOKI_DOMAIN_SYNTACTIC_AST_HPP_
-#define LOKI_INCLUDE_LOKI_DOMAIN_SYNTACTIC_AST_HPP_
-
-#include <map>
-#include <vector>
+#ifndef LOKI_INCLUDE_LOKI_DOMAIN_AST_AST_HPP_
+#define LOKI_INCLUDE_LOKI_DOMAIN_AST_AST_HPP_
 
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/optional.hpp>
+
+#include <map>
+#include <vector>
+
 
 namespace loki::domain::ast
 {

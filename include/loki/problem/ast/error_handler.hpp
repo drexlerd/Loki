@@ -1,10 +1,10 @@
-#ifndef LOKI_INCLUDE_LOKI_PROBLEM_SYNTACTIC_ERROR_HANDLER_HPP_
-#define LOKI_INCLUDE_LOKI_PROBLEM_SYNTACTIC_ERROR_HANDLER_HPP_
+#ifndef LOKI_INCLUDE_LOKI_PROBLEM_AST_ERROR_HANDLER_HPP_
+#define LOKI_INCLUDE_LOKI_PROBLEM_AST_ERROR_HANDLER_HPP_
+
+#include "../../domain/ast/error_handler.hpp"
 
 #include <unordered_map>
 #include <iostream>
-
-#include "include/loki/domain/syntactic/error_handler.hpp"
 
 
 namespace loki::problem

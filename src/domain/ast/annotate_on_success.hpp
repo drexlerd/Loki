@@ -1,10 +1,12 @@
-#ifndef LOKI_SRC_DOMAIN_ANNOTATE_ON_SUCCESS_HPP_
-#define LOKI_SRC_DOMAIN_ANNOTATE_ON_SUCCESS_HPP_
+#ifndef LOKI_SRC_DOMAIN_AST_ANNOTATE_ON_SUCCESS_HPP_
+#define LOKI_SRC_DOMAIN_AST_ANNOTATE_ON_SUCCESS_HPP_
 
-#include "include/loki/domain/syntactic/ast.hpp"
+#include "../../../include/loki/common/ast/config.hpp"
+#include "../../../include/loki/domain/ast/ast.hpp"
 
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 #include <boost/spirit/home/x3/directive/expect.hpp>
+
 
 namespace loki::domain {
 
