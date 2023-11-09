@@ -6,6 +6,7 @@
 #include <boost/optional.hpp>
 
 #include <map>
+#include <sstream>
 #include <vector>
 
 
@@ -39,6 +40,7 @@ namespace loki::domain::ast
     struct RequirementTimedInitialLiterals;
     struct RequirementPreferences;
     struct RequirementConstraints;
+    struct RequirementActionCosts;
     struct Requirement;
 
     struct Type;
@@ -158,6 +160,12 @@ namespace loki::domain::ast
     {
         char alpha;
         std::string suffix;
+
+        std::string get_name() const {
+            std::stringstream ss;
+            ss << alpha << suffix;
+            return ss.str();
+        }
     };
 
     /* <variable> */
@@ -259,6 +267,10 @@ namespace loki::domain::ast
     {
     };
 
+    struct RequirementActionCosts : x3::position_tagged
+    {
+    };
+
     struct Requirement : x3::position_tagged,
                          x3::variant<
                              RequirementStrips,
@@ -278,7 +290,8 @@ namespace loki::domain::ast
                              RequirementDerivedPredicates,
                              RequirementTimedInitialLiterals,
                              RequirementPreferences,
-                             RequirementConstraints>
+                             RequirementConstraints,
+                             RequirementActionCosts>
     {
         using base_type::base_type;
         using base_type::operator=;

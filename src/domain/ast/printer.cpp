@@ -74,6 +74,7 @@ namespace loki
     std::string parse_text(const domain::ast::RequirementTimedInitialLiterals&, const FormattingOptions&) { return ":timed-initial-literals"; }
     std::string parse_text(const domain::ast::RequirementPreferences&, const FormattingOptions&) { return ":preferences"; }
     std::string parse_text(const domain::ast::RequirementConstraints&, const FormattingOptions&) { return ":constraints"; }
+    std::string parse_text(const domain::ast::RequirementActionCosts& node, const FormattingOptions& options) { return ":action-costs";}
 
     std::string parse_text(const domain::ast::Requirement& node, const FormattingOptions& options) {
         return boost::apply_visitor(NodeVisitorPrinter(options), node);

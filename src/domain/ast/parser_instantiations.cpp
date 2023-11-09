@@ -33,6 +33,7 @@ namespace loki::domain::parser
     BOOST_SPIRIT_INSTANTIATE(requirement_timed_initial_literals_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(requirement_preferences_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(requirement_constraints_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(requirement_action_costs_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(requirement_type, iterator_type, context_type)
 
     BOOST_SPIRIT_INSTANTIATE(type_type, iterator_type, context_type)

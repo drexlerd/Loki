@@ -38,6 +38,7 @@ namespace loki::domain
         struct RequirementTimedInitialLiteralsClass;
         struct RequirementPreferencesClass;
         struct RequirementConstraintsClass;
+        struct RequirementActionCostsClass;
         struct RequirementClass;
 
         struct TypeClass;
@@ -176,6 +177,7 @@ namespace loki::domain
         typedef x3::rule<RequirementTimedInitialLiteralsClass, ast::RequirementTimedInitialLiterals> requirement_timed_initial_literals_type;
         typedef x3::rule<RequirementPreferencesClass, ast::RequirementPreferences> requirement_preferences_type;
         typedef x3::rule<RequirementConstraintsClass, ast::RequirementConstraints> requirement_constraints_type;
+        typedef x3::rule<RequirementActionCostsClass, ast::RequirementActionCosts> requirement_action_costs_type;
         typedef x3::rule<RequirementClass, ast::Requirement> requirement_type;
 
         typedef x3::rule<TypeClass, ast::Type> type_type;
@@ -297,7 +299,8 @@ namespace loki::domain
             requirement_equality_type, requirement_existential_preconditions_type, requirement_universal_preconditions_type,
             requirement_quantified_preconditions_type, requirement_conditional_effects_type, requirement_fluents_type,
             requirement_object_fluents_type, requirement_numeric_fluents_type, requirement_adl_type, requirement_durative_actions_type,
-            requirement_derived_predicates_type, requirement_timed_initial_literals_type, requirement_preferences_type, requirement_constraints_type, requirement_type)
+            requirement_derived_predicates_type, requirement_timed_initial_literals_type, requirement_preferences_type,
+            requirement_constraints_type, requirement_action_costs_type, requirement_type)
 
         BOOST_SPIRIT_DECLARE(
             type_type, type_object_type, type_either_type, typed_list_of_names_recursively_type, typed_list_of_names_type,
@@ -373,6 +376,7 @@ namespace loki::domain
     parser::requirement_timed_initial_literals_type const& requirement_timed_initial_literals();
     parser::requirement_preferences_type const& requirement_preferences();
     parser::requirement_constraints_type const& requirement_constraints();
+    parser::requirement_action_costs_type const& requirement_action_costs();
     parser::requirement_type const& requirement();
 
     parser::type_type const& type();

@@ -32,6 +32,7 @@ extern std::string parse_text(const domain::ast::RequirementDerivedPredicates& n
 extern std::string parse_text(const domain::ast::RequirementTimedInitialLiterals& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::RequirementPreferences& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::RequirementConstraints& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::RequirementActionCosts& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::Requirement& node, const FormattingOptions& options={});
 
 extern std::string parse_text(const domain::ast::Type& node, const FormattingOptions& options={});

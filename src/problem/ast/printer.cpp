@@ -140,8 +140,8 @@ namespace loki {
     }
 
 
-    string parse_text(const problem::ast::OptimizationMinimize& node, const FormattingOptions& options) { return "minimize"; }
-    string parse_text(const problem::ast::OptimizationMaximize& node, const FormattingOptions& options) { return "maximize"; }
+    string parse_text(const problem::ast::OptimizationMinimize&, const FormattingOptions&) { return "minimize"; }
+    string parse_text(const problem::ast::OptimizationMaximize&, const FormattingOptions&) { return "maximize"; }
     string parse_text(const problem::ast::Optimization& node, const FormattingOptions& options) {
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }

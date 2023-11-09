@@ -60,6 +60,7 @@ namespace loki::domain::parser {
     requirement_timed_initial_literals_type const requirement_timed_initial_literals = "requirement_timed_initial_literals";
     requirement_preferences_type const requirement_preferences = "requirement_preferences";
     requirement_constraints_type const requirement_constraints = "requirement_constraints";
+    requirement_action_costs_type const requirement_action_costs = "requirement_action_costs";
     requirement_type const requirement = "requirement";
 
     type_type const type = "type";
@@ -201,12 +202,13 @@ namespace loki::domain::parser {
     const auto requirement_timed_initial_literals_def = lit(":timed-initial-literals") >> x3::attr(ast::RequirementTimedInitialLiterals{});
     const auto requirement_preferences_def = lit(":preferences") >> x3::attr(ast::RequirementPreferences{});
     const auto requirement_constraints_def = lit(":constraints") >> x3::attr(ast::RequirementConstraints{});
+    const auto requirement_action_costs_def = lit(":action-costs") >> x3::attr(ast::RequirementActionCosts{});
     const auto requirement_def = requirement_strips | requirement_typing | requirement_negative_preconditions
         | requirement_disjunctive_preconditions | requirement_equality | requirement_existential_preconditions
         | requirement_universal_preconditions | requirement_quantified_preconditions | requirement_conditional_effects
         | requirement_fluents | requirement_object_fluents | requirement_numeric_fluents | requirement_adl
         | requirement_durative_actions | requirement_derived_predicates | requirement_timed_initial_literals
-        | requirement_preferences | requirement_constraints;
+        | requirement_preferences | requirement_constraints | requirement_action_costs;
 
     const auto type_def = name | type_object | type_either;
     const auto type_object_def = lit("object") >> x3::attr(ast::TypeObject{});
@@ -347,7 +349,7 @@ namespace loki::domain::parser {
         requirement_conditional_effects, requirement_fluents, requirement_object_fluents,
         requirement_numeric_fluents, requirement_adl, requirement_durative_actions,
         requirement_derived_predicates, requirement_timed_initial_literals, requirement_preferences,
-        requirement_constraints, requirement)
+        requirement_constraints, requirement_action_costs, requirement)
 
     BOOST_SPIRIT_DEFINE(type, type_object, type_either, typed_list_of_names_recursively,
         typed_list_of_names, typed_list_of_variables_recursively, typed_list_of_variables)
@@ -401,142 +403,143 @@ namespace loki::domain::parser {
     // Annotation and Error handling
     ///////////////////////////////////////////////////////////////////////////
 
-    struct NameClass : x3::annotate_on_success {};
-    struct VariableClass : x3::annotate_on_success {};
-    struct NumberClass : x3::annotate_on_success {};
-    struct TermClass : x3::annotate_on_success {};
-    struct UndefinedClass : x3::annotate_on_success {};
+    struct NameClass : domain_annotate_on_success {};
+    struct VariableClass : domain_annotate_on_success {};
+    struct NumberClass : domain_annotate_on_success {};
+    struct TermClass : domain_annotate_on_success {};
+    struct UndefinedClass : domain_annotate_on_success {};
 
-    struct RequirementStripsClass : annotation_domain {};
-    struct RequirementTypingClass : x3::annotate_on_success {};
-    struct RequirementNegativePreconditionsClass : x3::annotate_on_success {};
-    struct RequirementDisjunctivePreconditionsClass : x3::annotate_on_success {};
-    struct RequirementEqualityClass : x3::annotate_on_success {};
-    struct RequirementExistentialPreconditionsClass : x3::annotate_on_success {};
-    struct RequirementUniversalPreconditionsClass : x3::annotate_on_success {};
-    struct RequirementQuantifiedPreconditionsClass : x3::annotate_on_success {};
-    struct RequirementConditionalEffectsClass : x3::annotate_on_success {};
-    struct RequirementFluentsClass : x3::annotate_on_success {};
-    struct RequirementObjectFluentsClass : x3::annotate_on_success {};
-    struct RequirementNumericalFluentsClass : x3::annotate_on_success {};
-    struct RequirementAdlClass : x3::annotate_on_success {};
-    struct RequirementDurativeActionsClass : x3::annotate_on_success {};
-    struct RequirementDerivedPredicatesClass : x3::annotate_on_success {};
-    struct RequirementTimedInitialLiteralsClass : x3::annotate_on_success {};
-    struct RequirementPreferencesClass : x3::annotate_on_success {};
-    struct RequirementConstraintsClass : x3::annotate_on_success {};
-    struct RequirementClass : x3::annotate_on_success {};
+    struct RequirementStripsClass : domain_annotate_on_success {};
+    struct RequirementTypingClass : domain_annotate_on_success {};
+    struct RequirementNegativePreconditionsClass : domain_annotate_on_success {};
+    struct RequirementDisjunctivePreconditionsClass : domain_annotate_on_success {};
+    struct RequirementEqualityClass : domain_annotate_on_success {};
+    struct RequirementExistentialPreconditionsClass : domain_annotate_on_success {};
+    struct RequirementUniversalPreconditionsClass : domain_annotate_on_success {};
+    struct RequirementQuantifiedPreconditionsClass : domain_annotate_on_success {};
+    struct RequirementConditionalEffectsClass : domain_annotate_on_success {};
+    struct RequirementFluentsClass : domain_annotate_on_success {};
+    struct RequirementObjectFluentsClass : domain_annotate_on_success {};
+    struct RequirementNumericalFluentsClass : domain_annotate_on_success {};
+    struct RequirementAdlClass : domain_annotate_on_success {};
+    struct RequirementDurativeActionsClass : domain_annotate_on_success {};
+    struct RequirementDerivedPredicatesClass : domain_annotate_on_success {};
+    struct RequirementTimedInitialLiteralsClass : domain_annotate_on_success {};
+    struct RequirementPreferencesClass : domain_annotate_on_success {};
+    struct RequirementConstraintsClass : domain_annotate_on_success {};
+    struct RequirementActionCostsClass : domain_annotate_on_success {};
+    struct RequirementClass : domain_annotate_on_success {};
 
-    struct TypeClass : x3::annotate_on_success {};
-    struct TypeObjectClass : x3::annotate_on_success {};
-    struct TypeEitherClass : x3::annotate_on_success {};
-    struct TypedListOfNamesRecursivelyClass : x3::annotate_on_success {};
-    struct TypedListOfNamesClass : x3::annotate_on_success {};
-    struct TypedListOfVariablesRecursivelyClass : x3::annotate_on_success {};
-    struct TypedListOfVariablesClass : x3::annotate_on_success {};
+    struct TypeClass : domain_annotate_on_success {};
+    struct TypeObjectClass : domain_annotate_on_success {};
+    struct TypeEitherClass : domain_annotate_on_success {};
+    struct TypedListOfNamesRecursivelyClass : domain_annotate_on_success {};
+    struct TypedListOfNamesClass : domain_annotate_on_success {};
+    struct TypedListOfVariablesRecursivelyClass : domain_annotate_on_success {};
+    struct TypedListOfVariablesClass : domain_annotate_on_success {};
 
-    struct PredicateClass : x3::annotate_on_success {};
-    struct AtomicFormulaSkeletonClass : x3::annotate_on_success {};
+    struct PredicateClass : domain_annotate_on_success {};
+    struct AtomicFormulaSkeletonClass : domain_annotate_on_success {};
 
-    struct FunctionSymbolClass : x3::annotate_on_success {};
-    struct FunctionTypeNumberClass : x3::annotate_on_success {};
-    struct FunctionTypeObjectClass : x3::annotate_on_success {};
-    struct FunctionTypeTypeClass : x3::annotate_on_success {};
-    struct FunctionTypeClass : x3::annotate_on_success {};
-    struct AtomicFunctionSkeletonClass : x3::annotate_on_success {};
-    struct FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyClass : x3::annotate_on_success {};
-    struct FunctionTypedListOfAtomicFunctionSkeletonsClass : x3::annotate_on_success {};
+    struct FunctionSymbolClass : domain_annotate_on_success {};
+    struct FunctionTypeNumberClass : domain_annotate_on_success {};
+    struct FunctionTypeObjectClass : domain_annotate_on_success {};
+    struct FunctionTypeTypeClass : domain_annotate_on_success {};
+    struct FunctionTypeClass : domain_annotate_on_success {};
+    struct AtomicFunctionSkeletonClass : domain_annotate_on_success {};
+    struct FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyClass : domain_annotate_on_success {};
+    struct FunctionTypedListOfAtomicFunctionSkeletonsClass : domain_annotate_on_success {};
 
-    struct AtomicFormulaOfTermsPredicateClass : x3::annotate_on_success {};
-    struct AtomicFormulaOfTermsEqualityClass : x3::annotate_on_success {};
-    struct AtomicFormulaOfTermsClass : x3::annotate_on_success {};
-    struct AtomClass : x3::annotate_on_success {};
-    struct NegatedAtomClass : x3::annotate_on_success {};
-    struct LiteralClass : x3::annotate_on_success {};
+    struct AtomicFormulaOfTermsPredicateClass : domain_annotate_on_success {};
+    struct AtomicFormulaOfTermsEqualityClass : domain_annotate_on_success {};
+    struct AtomicFormulaOfTermsClass : domain_annotate_on_success {};
+    struct AtomClass : domain_annotate_on_success {};
+    struct NegatedAtomClass : domain_annotate_on_success {};
+    struct LiteralClass : domain_annotate_on_success {};
 
-    struct MultiOperatorMulClass : x3::annotate_on_success {};
-    struct MultiOperatorPlusClass : x3::annotate_on_success {};
-    struct MultiOperatorClass : x3::annotate_on_success {};
-    struct BinaryOperatorMinusClass : x3::annotate_on_success {};
-    struct BinaryOperatorDivClass : x3::annotate_on_success {};
-    struct BinaryOperatorClass : x3::annotate_on_success {};
+    struct MultiOperatorMulClass : domain_annotate_on_success {};
+    struct MultiOperatorPlusClass : domain_annotate_on_success {};
+    struct MultiOperatorClass : domain_annotate_on_success {};
+    struct BinaryOperatorMinusClass : domain_annotate_on_success {};
+    struct BinaryOperatorDivClass : domain_annotate_on_success {};
+    struct BinaryOperatorClass : domain_annotate_on_success {};
 
-    struct BinaryComparatorGreaterClass : x3::annotate_on_success {};
-    struct BinaryComparatorLessClass : x3::annotate_on_success {};
-    struct BinaryComparatorEqualClass : x3::annotate_on_success {};
-    struct BinaryComparatorGreaterEqualClass : x3::annotate_on_success {};
-    struct BinaryComparatorLessEqualClass : x3::annotate_on_success {};
-    struct BinaryComparatorClass : x3::annotate_on_success {};
+    struct BinaryComparatorGreaterClass : domain_annotate_on_success {};
+    struct BinaryComparatorLessClass : domain_annotate_on_success {};
+    struct BinaryComparatorEqualClass : domain_annotate_on_success {};
+    struct BinaryComparatorGreaterEqualClass : domain_annotate_on_success {};
+    struct BinaryComparatorLessEqualClass : domain_annotate_on_success {};
+    struct BinaryComparatorClass : domain_annotate_on_success {};
 
-    struct FunctionExpressionClass : x3::annotate_on_success {};
-    struct FunctionHeadClass : x3::annotate_on_success {};
-    struct FunctionExpressionNumberClass : x3::annotate_on_success {};
-    struct FunctionExpressionBinaryOpClass : x3::annotate_on_success {};
-    struct FunctionExpressionMinusClass : x3::annotate_on_success {};
-    struct FunctionExpressionHeadClass : x3::annotate_on_success {};
+    struct FunctionExpressionClass : domain_annotate_on_success {};
+    struct FunctionHeadClass : domain_annotate_on_success {};
+    struct FunctionExpressionNumberClass : domain_annotate_on_success {};
+    struct FunctionExpressionBinaryOpClass : domain_annotate_on_success {};
+    struct FunctionExpressionMinusClass : domain_annotate_on_success {};
+    struct FunctionExpressionHeadClass : domain_annotate_on_success {};
 
-    struct GoalDescriptorClass : x3::annotate_on_success {};
-    struct GoalDescriptorAtomClass : x3::annotate_on_success {};
-    struct GoalDescriptorLiteralClass : x3::annotate_on_success {};
-    struct GoalDescriptorAndClass : x3::annotate_on_success {};
-    struct GoalDescriptorOrClass : x3::annotate_on_success {};
-    struct GoalDescriptorNotClass : x3::annotate_on_success {};
-    struct GoalDescriptorImplyClass : x3::annotate_on_success {};
-    struct GoalDescriptorExistsClass : x3::annotate_on_success {};
-    struct GoalDescriptorForallClass : x3::annotate_on_success {};
-    struct GoalDescriptorFunctionComparisonClass : x3::annotate_on_success {};
+    struct GoalDescriptorClass : domain_annotate_on_success {};
+    struct GoalDescriptorAtomClass : domain_annotate_on_success {};
+    struct GoalDescriptorLiteralClass : domain_annotate_on_success {};
+    struct GoalDescriptorAndClass : domain_annotate_on_success {};
+    struct GoalDescriptorOrClass : domain_annotate_on_success {};
+    struct GoalDescriptorNotClass : domain_annotate_on_success {};
+    struct GoalDescriptorImplyClass : domain_annotate_on_success {};
+    struct GoalDescriptorExistsClass : domain_annotate_on_success {};
+    struct GoalDescriptorForallClass : domain_annotate_on_success {};
+    struct GoalDescriptorFunctionComparisonClass : domain_annotate_on_success {};
 
-    struct ConstraintGoalDescriptorClass : x3::annotate_on_success {};
-    struct ConstraintGoalDescriptorAndClass : x3::annotate_on_success {};
-    struct ConstraintGoalDescriptorForallClass : x3::annotate_on_success {};
-    struct ConstraintGoalDescriptorAtEndClass : x3::annotate_on_success {};
-    struct ConstraintGoalDescriptorAlwaysClass : x3::annotate_on_success {};
-    struct ConstraintGoalDescriptorSometimeClass : x3::annotate_on_success {};
-    struct ConstraintGoalDescriptorWithinClass : x3::annotate_on_success {};
-    struct ConstraintGoalDescriptorAtMostOnceClass : x3::annotate_on_success {};
-    struct ConstraintGoalDescriptorSometimeAfterClass : x3::annotate_on_success {};
-    struct ConstraintGoalDescriptorSometimeBeforeClass : x3::annotate_on_success {};
-    struct ConstraintGoalDescriptorAlwaysWithinClass : x3::annotate_on_success {};
-    struct ConstraintGoalDescriptorHoldDuringClass : x3::annotate_on_success {};
-    struct ConstraintGoalDescriptorHoldAfterClass : x3::annotate_on_success {};
+    struct ConstraintGoalDescriptorClass : domain_annotate_on_success {};
+    struct ConstraintGoalDescriptorAndClass : domain_annotate_on_success {};
+    struct ConstraintGoalDescriptorForallClass : domain_annotate_on_success {};
+    struct ConstraintGoalDescriptorAtEndClass : domain_annotate_on_success {};
+    struct ConstraintGoalDescriptorAlwaysClass : domain_annotate_on_success {};
+    struct ConstraintGoalDescriptorSometimeClass : domain_annotate_on_success {};
+    struct ConstraintGoalDescriptorWithinClass : domain_annotate_on_success {};
+    struct ConstraintGoalDescriptorAtMostOnceClass : domain_annotate_on_success {};
+    struct ConstraintGoalDescriptorSometimeAfterClass : domain_annotate_on_success {};
+    struct ConstraintGoalDescriptorSometimeBeforeClass : domain_annotate_on_success {};
+    struct ConstraintGoalDescriptorAlwaysWithinClass : domain_annotate_on_success {};
+    struct ConstraintGoalDescriptorHoldDuringClass : domain_annotate_on_success {};
+    struct ConstraintGoalDescriptorHoldAfterClass : domain_annotate_on_success {};
 
-    struct PreferenceNameClass : x3::annotate_on_success {};
-    struct PreconditionGoalDescriptorClass : x3::annotate_on_success {};
-    struct PreconditionGoalDescriptorSimpleClass : x3::annotate_on_success {};
-    struct PreconditionGoalDescriptorAndClass : x3::annotate_on_success {};
-    struct PreconditionGoalDescriptorPreferenceClass : x3::annotate_on_success {};
-    struct PreconditionGoalDescriptorForallClass : x3::annotate_on_success {};
+    struct PreferenceNameClass : domain_annotate_on_success {};
+    struct PreconditionGoalDescriptorClass : domain_annotate_on_success {};
+    struct PreconditionGoalDescriptorSimpleClass : domain_annotate_on_success {};
+    struct PreconditionGoalDescriptorAndClass : domain_annotate_on_success {};
+    struct PreconditionGoalDescriptorPreferenceClass : domain_annotate_on_success {};
+    struct PreconditionGoalDescriptorForallClass : domain_annotate_on_success {};
 
-    struct AssignOperatorAssignClass : x3::annotate_on_success {};
-    struct AssignOperatorScaleUpClass : x3::annotate_on_success {};
-    struct AssignOperatorScaleDownClass : x3::annotate_on_success {};
-    struct AssignOperatorIncreaseClass : x3::annotate_on_success {};
-    struct AssignOperatorDecreaseClass : x3::annotate_on_success {};
-    struct AssignOperatorClass : x3::annotate_on_success {};
+    struct AssignOperatorAssignClass : domain_annotate_on_success {};
+    struct AssignOperatorScaleUpClass : domain_annotate_on_success {};
+    struct AssignOperatorScaleDownClass : domain_annotate_on_success {};
+    struct AssignOperatorIncreaseClass : domain_annotate_on_success {};
+    struct AssignOperatorDecreaseClass : domain_annotate_on_success {};
+    struct AssignOperatorClass : domain_annotate_on_success {};
 
-    struct EffectClass : x3::annotate_on_success {};
-    struct EffectProductionLiteralClass : x3::annotate_on_success {};
-    struct EffectProductionNumericFluentClass : x3::annotate_on_success {};
-    struct EffectProductionObjectFluentClass : x3::annotate_on_success {};
-    struct EffectProductionClass : x3::annotate_on_success {};
-    struct EffectConditionalForallClass : x3::annotate_on_success {};
-    struct EffectConditionalWhenClass : x3::annotate_on_success {};
-    struct EffectConditionalClass : x3::annotate_on_success {};
-    struct ActionSymbolClass : x3::annotate_on_success {};
-    struct ActionBodyClass : x3::annotate_on_success {};
-    struct ActionClass : x3::annotate_on_success {};
-    struct DurativeActionClass : x3::annotate_on_success {};
-    struct DerivedPredicateClass : x3::annotate_on_success {};
+    struct EffectClass : domain_annotate_on_success {};
+    struct EffectProductionLiteralClass : domain_annotate_on_success {};
+    struct EffectProductionNumericFluentClass : domain_annotate_on_success {};
+    struct EffectProductionObjectFluentClass : domain_annotate_on_success {};
+    struct EffectProductionClass : domain_annotate_on_success {};
+    struct EffectConditionalForallClass : domain_annotate_on_success {};
+    struct EffectConditionalWhenClass : domain_annotate_on_success {};
+    struct EffectConditionalClass : domain_annotate_on_success {};
+    struct ActionSymbolClass : domain_annotate_on_success {};
+    struct ActionBodyClass : domain_annotate_on_success {};
+    struct ActionClass : domain_annotate_on_success {};
+    struct DurativeActionClass : domain_annotate_on_success {};
+    struct DerivedPredicateClass : domain_annotate_on_success {};
 
-    struct DomainNameClass : x3::annotate_on_success {};
-    struct RequirementsClass : x3::annotate_on_success {};
-    struct TypesClass : x3::annotate_on_success {};
-    struct ConstantsClass : x3::annotate_on_success {};
-    struct PredicatesClass : annotation_domain {};
-    struct FunctionsClass : x3::annotate_on_success {};
-    struct ConstraintsClass : x3::annotate_on_success {};
-    struct StructureClass : x3::annotate_on_success {};
-    struct DomainClass : x3::annotate_on_success, error_handler_domain {};
+    struct DomainNameClass : domain_annotate_on_success {};
+    struct RequirementsClass : domain_annotate_on_success {};
+    struct TypesClass : domain_annotate_on_success {};
+    struct ConstantsClass : domain_annotate_on_success {};
+    struct PredicatesClass : domain_annotate_on_success {};
+    struct FunctionsClass : domain_annotate_on_success {};
+    struct ConstraintsClass : domain_annotate_on_success {};
+    struct StructureClass : domain_annotate_on_success {};
+    struct DomainClass : domain_annotate_on_success, error_handler_domain {};
 }
 
 namespace loki::domain
@@ -610,6 +613,9 @@ namespace loki::domain
     }
     parser::requirement_constraints_type const& requirement_constraints() {
         return parser::requirement_constraints;
+    }
+    parser::requirement_action_costs_type const& requirement_action_costs() {
+        return parser::requirement_action_costs;
     }
     parser::requirement_type const& requirement() {
         return parser::requirement;

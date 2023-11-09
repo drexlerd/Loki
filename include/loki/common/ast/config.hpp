@@ -5,6 +5,8 @@
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
 
+#include <unordered_set>
+
 
 /// @brief Defines types of our parsers.
 ///        The configuration is relevant when reusing the parsers instantiated by the library.
@@ -45,13 +47,14 @@ namespace loki
         bool timed_initial_literals = false;
         bool preferences = false;
         bool constraints = false;
+        bool action_costs = false;
     };
 
 
     struct domain_context_type {
         SpecifiedRequirements requirements;
 
-        std::vector<std::string> predicate_names;
+        std::unordered_set<std::string> predicate_names;
     };
 
     struct problem_context_type {
