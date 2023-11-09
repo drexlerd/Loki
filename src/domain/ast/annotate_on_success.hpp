@@ -219,6 +219,58 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
     }
 
 
+    /* Typed list of names recursively */
+    template <typename Iterator, typename Context>
+    inline void on_success(
+        Iterator const& first, Iterator const& last,
+        loki::domain::ast::TypedListOfNamesRecursively& ast, Context const& context) {
+
+        auto& pddl_context = x3::get<pddl_context_tag>(context).get();
+        if (!pddl_context.domain_context.requirements.typing) {
+            boost::throw_exception(
+                x3::expectation_failure<Iterator>(
+                    first, ":typing in the requirements."));
+        }
+
+        boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
+    }
+
+
+    /* Typed list of variables recursively */
+    template <typename Iterator, typename Context>
+    inline void on_success(
+        Iterator const& first, Iterator const& last,
+        loki::domain::ast::TypedListOfVariablesRecursively& ast, Context const& context) {
+
+        auto& pddl_context = x3::get<pddl_context_tag>(context).get();
+        if (!pddl_context.domain_context.requirements.typing) {
+            boost::throw_exception(
+                x3::expectation_failure<Iterator>(
+                    first, ":typing in the requirements."));
+        }
+
+        boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
+    }
+
+
+    /* Derived predicates*/
+    template <typename Iterator, typename Context>
+    inline void on_success(
+        Iterator const& first, Iterator const& last,
+        loki::domain::ast::DerivedPredicate& ast, Context const& context) {
+
+        auto& pddl_context = x3::get<pddl_context_tag>(context).get();
+        if (!pddl_context.domain_context.requirements.derived_predicates) {
+            boost::throw_exception(
+                x3::expectation_failure<Iterator>(
+                    first, ":derived-predicates in the requirements."));
+        }
+
+        boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
+    }
+
+
+
     /* Predicates */
     template <typename Iterator, typename Context>
     inline void on_success(
@@ -249,6 +301,202 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
 
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
+
+
+    /* Types */
+    template <typename Iterator, typename Context>
+    inline void on_success(
+        Iterator const& first, Iterator const& last,
+        loki::domain::ast::Types& ast, Context const& context) {
+
+        auto& pddl_context = x3::get<pddl_context_tag>(context).get();
+        if (!pddl_context.domain_context.requirements.typing) {
+            boost::throw_exception(
+                x3::expectation_failure<Iterator>(
+                    first, ":typing in the requirements."));
+        }
+
+        boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
+    }
+
+
+    /* Functions */
+    template <typename Iterator, typename Context>
+    inline void on_success(
+        Iterator const& first, Iterator const& last,
+        loki::domain::ast::Functions& ast, Context const& context) {
+
+        auto& pddl_context = x3::get<pddl_context_tag>(context).get();
+        if (!(pddl_context.domain_context.requirements.numeric_fluents
+            || pddl_context.domain_context.requirements.numeric_fluents)) {
+            boost::throw_exception(
+                x3::expectation_failure<Iterator>(
+                    first, ":object-fluents or :numeric-fluents in the requirements."));
+        }
+
+        boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
+    }
+
+
+    /* Constraints */
+    template <typename Iterator, typename Context>
+    inline void on_success(
+        Iterator const& first, Iterator const& last,
+        loki::domain::ast::Constraints& ast, Context const& context) {
+
+        auto& pddl_context = x3::get<pddl_context_tag>(context).get();
+        if (!pddl_context.domain_context.requirements.constraints) {
+            boost::throw_exception(
+                x3::expectation_failure<Iterator>(
+                    first, ":constraints in the requirements."));
+        }
+
+        boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
+    }
+
+
+
+
+
+/*
+    struct Name;
+    struct Variable;
+    struct Number;
+    struct Term;
+
+    struct RequirementStrips;
+    struct RequirementTyping;
+    struct RequirementNegativePreconditions;
+    struct RequirementDisjunctivePreconditions;
+    struct RequirementEquality;
+    struct RequirementExistentialPreconditions;
+    struct RequirementUniversalPreconditions;
+    struct RequirementQuantifiedPreconditions;
+    struct RequirementConditionalEffects;
+    struct RequirementFluents;                   // PDDL 3.1 = :object-fluents + :numeric-fluents
+    struct RequirementObjectFluents;             // PDDL 3.1
+    struct RequirementNumericFluents;            // PDDL 3.1
+    struct RequirementAdl;
+    struct RequirementDurativeActions;
+    struct RequirementDerivedPredicates;
+    struct RequirementTimedInitialLiterals;
+    struct RequirementPreferences;
+    struct RequirementConstraints;
+    struct RequirementActionCosts;
+    struct Requirement;
+
+    struct Type;
+    struct TypeObject;
+    struct TypeEither;
+    struct TypedListOfNamesRecursively;
+    struct TypedListOfNames;
+    struct TypedListOfVariablesRecursively; // :typing
+    struct TypedListOfVariables;
+
+    struct Predicate;
+    struct AtomicFormulaSkeleton;
+
+    struct FunctionSymbol;
+    struct FunctionTerm;
+    struct FunctionTypeNumber;                                       // :numeric-fluents
+    struct FunctionTypeType;                                         // :object-fluents :typing
+    struct FunctionType;
+    struct AtomicFunctionSkeleton;
+    struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively;
+    struct FunctionTypedListOfAtomicFunctionSkeletons;
+
+    struct AtomicFormulaOfTermsPredicate;
+    struct AtomicFormulaOfTermsEquality;         // :equality
+    struct AtomicFormulaOfTerms;
+    struct Atom;
+    struct NegatedAtom;
+    struct Literal;
+
+    struct MultiOperatorMul;
+    struct MultiOperatorPlus;
+    struct MultiOperator;
+    struct BinaryOperatorMinus;
+    struct BinaryOperatorDiv;
+    struct BinaryOperator;
+
+    struct BinaryComparatorGreater;
+    struct BinaryComparatorLess;
+    struct BinaryComparatorEqual;
+    struct BinaryComparatorGreaterEqual;
+    struct BinaryComparatorLessEqual;
+    struct BinaryComparator;
+
+    struct FunctionHead;
+    struct FunctionExpression;                   // :numeric-fluents
+    struct FunctionExpressionNumber;
+    struct FunctionExpressionBinaryOp;
+    struct FunctionExpressionMinus;
+    struct FunctionExpressionHead;
+
+    struct GoalDescriptor;
+    struct GoalDescriptorAtom;
+    struct GoalDescriptorLiteral;                // :negative-preconditions
+    struct GoalDescriptorAnd;
+    struct GoalDescriptorOr;                     // :disjunctive-preconditions
+    struct GoalDescriptorNot;                    // :disjunctive-preconditions
+    struct GoalDescriptorImply;                  // :disjunctive-preconditions
+    struct GoalDescriptorExists;                 // :existential-preconditions
+    struct GoalDescriptorForall;                 // :universal-preconditions
+    struct GoalDescriptorFunctionComparison;     // :numeric-fluents
+
+    struct ConstraintGoalDescriptor;
+    struct ConstraintGoalDescriptorAnd;
+    struct ConstraintGoalDescriptorForall;
+    struct ConstraintGoalDescriptorAtEnd;
+    struct ConstraintGoalDescriptorAlways;
+    struct ConstraintGoalDescriptorSometime;
+    struct ConstraintGoalDescriptorWithin;
+    struct ConstraintGoalDescriptorAtMostOnce;
+    struct ConstraintGoalDescriptorSometimeAfter;
+    struct ConstraintGoalDescriptorSometimeBefore;
+    struct ConstraintGoalDescriptorAlwaysWithin;
+    struct ConstraintGoalDescriptorHoldDuring;
+    struct ConstraintGoalDescriptorHoldAfter;
+
+    struct PreferenceName;
+    struct PreconditionGoalDescriptor;
+    struct PreconditionGoalDescriptorSimple;
+    struct PreconditionGoalDescriptorAnd;
+    struct PreconditionGoalDescriptorPreference; // :preferences
+    struct PreconditionGoalDescriptorForall;     // :universal-preconditions
+
+    struct AssignOperatorAssign;
+    struct AssignOperatorScaleUp;
+    struct AssignOperatorScaleDown;
+    struct AssignOperatorIncrease;
+    struct AssignOperatorDecrease;
+    struct AssignOperator;
+
+    struct Effect;
+    struct EffectProductionLiteral;
+    struct EffectProductionNumericFluent;
+    struct EffectProductionObjectFluent;
+    struct EffectProduction;
+    struct EffectConditionalForall;
+    struct EffectConditionalWhen;
+    struct EffectConditional;
+
+    struct ActionSymbol;
+    struct ActionBody;
+
+    struct Action;
+    struct DerivedPredicate;                     // :derived-predicates
+
+    struct DomainName;
+    struct Requirements;
+    struct Types;                                // : typing
+    struct Constants;
+    struct Predicates;
+    struct Functions;
+    struct Constraints;                          // :constraints
+    struct Structure;
+    struct Domain;
+*/
 };
 
 }
