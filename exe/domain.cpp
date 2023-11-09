@@ -21,9 +21,10 @@ int main(int argc, char** argv) {
     string domain_file = argv[1];
 
     // 1. Parse the domain
+    pddl_context_type pddl_context;
     const auto source = loki::read_file(domain_file);
     domain::ast::Domain node;
-    parse_ast(source, domain::domain(), node);
+    parse_ast(source, domain::domain(), node, pddl_context);
 
     std::cout << parse_text(node, FormattingOptions{0,4}) << std::endl;
 
