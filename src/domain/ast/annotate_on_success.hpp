@@ -16,32 +16,6 @@ namespace loki::domain {
 /// @brief Provide template spezializations for specific nodes.
 struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
 {
-    /*
-    template <typename Iterator, typename Context>
-    inline void on_success(
-        Iterator const& first, Iterator const& last,
-        loki::domain::ast::RequirementStrips& ast, Context const& context) {
-        auto& pddl_context = x3::get<pddl_context_tag>(context).get();
-        pddl_context.domain_context.requirements.strips = true;
-    */
-        // Return fail
-        /*
-        _pass(context) = false;
-        */
-
-        // Throw an exception
-        /*
-        boost::throw_exception(
-                boost::spirit::x3::expectation_failure<Iterator>(
-                    first, "asd"));
-        */
-    /*
-        // Call standard on_success that tags the ast
-        boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
-    }
-    */
-
-
     /* Requirements */
     template <typename Iterator, typename Context>
     inline void on_success(
