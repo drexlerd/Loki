@@ -1,4 +1,4 @@
-# PDDL-parser
+# Loki
 
 Loki is a C++ library for parsing the PDDL files.
 Loki aims to achieve four goals:

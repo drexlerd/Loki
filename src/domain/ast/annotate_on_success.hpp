@@ -259,6 +259,22 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
 
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
+
+    /* ConditionalEffect */
+    template <typename Iterator, typename Context>
+    inline void on_success(
+        Iterator const& first, Iterator const& last,
+        loki::domain::ast::EffectConditional& ast, Context const& context) {
+
+        auto& pddl_context = x3::get<pddl_context_tag>(context).get();
+        if (!pddl_context.domain_context.requirements.conditional_effects) {
+            boost::throw_exception(
+                x3::expectation_failure<Iterator>(
+                    first, ":conditional-effects in the requirements."));
+        }
+
+        boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
+    }
 };
 
 }
