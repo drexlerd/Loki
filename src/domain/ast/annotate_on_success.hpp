@@ -3,6 +3,7 @@
 
 #include "../../../include/loki/common/ast/config.hpp"
 #include "../../../include/loki/domain/ast/ast.hpp"
+#include "../../../include/loki/domain/pddl/predicate.hpp"
 
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 #include <boost/spirit/home/x3/directive/expect.hpp>
@@ -16,7 +17,34 @@ namespace loki::domain {
 /// @brief Provide template spezializations for specific nodes.
 struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
 {
-    /* Requirements */
+    // Name;
+    // Variable;
+    // Number;
+    // Term;
+
+
+    // RequirementStrips;
+    // RequirementTyping;
+    // RequirementNegativePreconditions;
+    // RequirementDisjunctivePreconditions;
+    // RequirementEquality;
+    // RequirementExistentialPreconditions;
+    // RequirementUniversalPreconditions;
+    // RequirementQuantifiedPreconditions;
+    // RequirementConditionalEffects;
+    // RequirementFluents;                   // PDDL 3.1 = :object-fluents + :numeric-fluents
+    // RequirementObjectFluents;             // PDDL 3.1
+    // RequirementNumericFluents;            // PDDL 3.1
+    // RequirementAdl;
+    // RequirementDurativeActions;
+    // RequirementDerivedPredicates;
+    // RequirementTimedInitialLiterals;
+    // RequirementPreferences;
+    // RequirementConstraints;
+    // RequirementActionCosts;
+    // Requirement;
+
+    /* RequirementStrips */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -27,6 +55,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementTyping */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -37,6 +66,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementNegativePreconditions */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -47,6 +77,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementDisjunctivePreconditions */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -57,6 +88,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementEquality */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -67,6 +99,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementExistentialPreconditions */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -77,6 +110,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementUniversalPreconditions */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -87,6 +121,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementQuantifiedPreconditions */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -99,6 +134,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementConditionalEffects */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -109,6 +145,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementFluents */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -121,6 +158,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementObjectFluents */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -131,6 +169,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementNumericFluents */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -141,6 +180,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementAdl */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -157,6 +197,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementDurativeActions */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -167,6 +208,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementDerivedPredicates */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -177,6 +219,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementTimedInitialLiterals */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -188,6 +231,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementPreferences */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -198,6 +242,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementConstraints */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -208,6 +253,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* RequirementActionCosts */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -219,7 +265,15 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
     }
 
 
-    /* Typed list of names recursively */
+    // Type;
+    // TypeObject;
+    // TypeEither;
+    // TypedListOfNamesRecursively;  // :typing
+    // TypedListOfNames;
+    // TypedListOfVariablesRecursively;  // :typing
+    // TypedListOfVariables;
+
+    /* TypedListOfNamesRecursively */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -235,8 +289,7 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
-
-    /* Typed list of variables recursively */
+    /* TypedListOfVariablesRecursively */
     template <typename Iterator, typename Context>
     inline void on_success(
         Iterator const& first, Iterator const& last,
@@ -253,38 +306,93 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
     }
 
 
-    /* Derived predicates*/
-    template <typename Iterator, typename Context>
-    inline void on_success(
-        Iterator const& first, Iterator const& last,
-        loki::domain::ast::DerivedPredicate& ast, Context const& context) {
+    // Predicate;
+    // AtomicFormulaSkeleton;
 
-        auto& pddl_context = x3::get<pddl_context_tag>(context).get();
-        if (!pddl_context.domain_context.requirements.derived_predicates) {
-            boost::throw_exception(
-                x3::expectation_failure<Iterator>(
-                    first, ":derived-predicates in the requirements."));
-        }
+    // FunctionSymbol;
+    // FunctionTerm;
+    // FunctionTypeNumber;                                       // :numeric-fluents
+    // FunctionTypeType;                                         // :object-fluents :typing
+    // FunctionType;
+    // AtomicFunctionSkeleton;
+    // FunctionTypedListOfAtomicFunctionSkeletonsRecursively;
+    // FunctionTypedListOfAtomicFunctionSkeletons;
 
-        boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
-    }
+    // AtomicFormulaOfTermsPredicate;
+    // AtomicFormulaOfTermsEquality;         // :equality
+    // AtomicFormulaOfTerms;
+    // Atom;
+    // NegatedAtom;
+    // Literal;
 
+    // MultiOperatorMul;
+    // MultiOperatorPlus;
+    // MultiOperator;
+    // BinaryOperatorMinus;
+    // BinaryOperatorDiv;
+    // BinaryOperator;
 
+    // BinaryComparatorGreater;
+    // BinaryComparatorLess;
+    // BinaryComparatorEqual;
+    // BinaryComparatorGreaterEqual;
+    // BinaryComparatorLessEqual;
+    // BinaryComparator;
 
-    /* Predicates */
-    template <typename Iterator, typename Context>
-    inline void on_success(
-        Iterator const& first, Iterator const& last,
-        loki::domain::ast::Predicates& ast, Context const& context) {
+    // FunctionHead;
+    // FunctionExpression;                   // :numeric-fluents
+    // FunctionExpressionNumber;
+    // FunctionExpressionBinaryOp;
+    // FunctionExpressionMinus;
+    // FunctionExpressionHead;
 
-        auto& pddl_context = x3::get<pddl_context_tag>(context).get();
-        for (const auto& atomic_formula_skeleton : ast.atomic_formula_skeletons) {
-            const auto predicate_name = atomic_formula_skeleton.predicate.name.get_name();
-            pddl_context.domain_context.predicate_names.insert(predicate_name);
-        }
+    // GoalDescriptor;
+    // GoalDescriptorAtom;
+    // GoalDescriptorLiteral;                // :negative-preconditions
+    // GoalDescriptorAnd;
+    // GoalDescriptorOr;                     // :disjunctive-preconditions
+    // GoalDescriptorNot;                    // :disjunctive-preconditions
+    // GoalDescriptorImply;                  // :disjunctive-preconditions
+    // GoalDescriptorExists;                 // :existential-preconditions
+    // GoalDescriptorForall;                 // :universal-preconditions
+    // GoalDescriptorFunctionComparison;     // :numeric-fluents
 
-        boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
-    }
+    // ConstraintGoalDescriptor;
+    // ConstraintGoalDescriptorAnd;
+    // ConstraintGoalDescriptorForall;
+    // ConstraintGoalDescriptorAtEnd;
+    // ConstraintGoalDescriptorAlways;
+    // ConstraintGoalDescriptorSometime;
+    // ConstraintGoalDescriptorWithin;
+    // ConstraintGoalDescriptorAtMostOnce;
+    // ConstraintGoalDescriptorSometimeAfter;
+    // ConstraintGoalDescriptorSometimeBefore;
+    // ConstraintGoalDescriptorAlwaysWithin;
+    // ConstraintGoalDescriptorHoldDuring;
+    // ConstraintGoalDescriptorHoldAfter;
+
+    // PreferenceName;
+    // PreconditionGoalDescriptor;
+    // PreconditionGoalDescriptorSimple;
+    // PreconditionGoalDescriptorAnd;
+    // PreconditionGoalDescriptorPreference; // :preferences
+    // PreconditionGoalDescriptorForall;     // :universal-preconditions
+
+    // AssignOperatorAssign;
+    // AssignOperatorScaleUp;
+    // AssignOperatorScaleDown;
+    // AssignOperatorIncrease;
+    // AssignOperatorDecrease;
+    // AssignOperator;
+
+    // Effect;
+    // EffectProductionLiteral;
+    // EffectProductionNumericFluent;
+    // EffectProductionObjectFluent;
+    // EffectProduction;
+    // EffectConditionalForall;
+    // EffectConditionalWhen;
+    // EffectConditional;
 
     /* ConditionalEffect */
     template <typename Iterator, typename Context>
@@ -303,6 +411,40 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
     }
 
 
+    // ActionSymbol;
+    // ActionBody;
+
+
+    // Action;
+    // DerivedPredicate;                     // :derived-predicates
+
+    /* DerivedPredicate */
+    template <typename Iterator, typename Context>
+    inline void on_success(
+        Iterator const& first, Iterator const& last,
+        loki::domain::ast::DerivedPredicate& ast, Context const& context) {
+
+        auto& pddl_context = x3::get<pddl_context_tag>(context).get();
+        if (!pddl_context.domain_context.requirements.derived_predicates) {
+            boost::throw_exception(
+                x3::expectation_failure<Iterator>(
+                    first, ":derived-predicates in the requirements."));
+        }
+
+        boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
+    }
+
+
+    // DomainName;
+    // Requirements;
+    // Types;                                // : typing
+    // Constants;
+    // Predicates;
+    // Functions;
+    // Constraints;                          // :constraints
+    // Structure;
+    // Domain;
+
     /* Types */
     template <typename Iterator, typename Context>
     inline void on_success(
@@ -319,6 +461,22 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
+    /* Predicates */
+    template <typename Iterator, typename Context>
+    inline void on_success(
+        Iterator const& first, Iterator const& last,
+        loki::domain::ast::Predicates& ast, Context const& context) {
+
+        auto& pddl_context = x3::get<pddl_context_tag>(context).get();
+        for (const auto& atomic_formula_skeleton : ast.atomic_formula_skeletons) {
+            auto name = atomic_formula_skeleton.predicate.name.get_name();
+            // TODO: set arity and check types
+            int arity = 0;
+            pddl_context.domain_context.predicates.emplace(name, pddl::Predicate{name, arity});
+        }
+
+        boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
+    }
 
     /* Functions */
     template <typename Iterator, typename Context>
@@ -337,7 +495,6 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
 
-
     /* Constraints */
     template <typename Iterator, typename Context>
     inline void on_success(
@@ -353,150 +510,6 @@ struct domain_annotate_on_success : boost::spirit::x3::annotate_on_success
 
         boost::spirit::x3::annotate_on_success::on_success(first, last, ast, context);
     }
-
-
-
-
-
-/*
-    struct Name;
-    struct Variable;
-    struct Number;
-    struct Term;
-
-    struct RequirementStrips;
-    struct RequirementTyping;
-    struct RequirementNegativePreconditions;
-    struct RequirementDisjunctivePreconditions;
-    struct RequirementEquality;
-    struct RequirementExistentialPreconditions;
-    struct RequirementUniversalPreconditions;
-    struct RequirementQuantifiedPreconditions;
-    struct RequirementConditionalEffects;
-    struct RequirementFluents;                   // PDDL 3.1 = :object-fluents + :numeric-fluents
-    struct RequirementObjectFluents;             // PDDL 3.1
-    struct RequirementNumericFluents;            // PDDL 3.1
-    struct RequirementAdl;
-    struct RequirementDurativeActions;
-    struct RequirementDerivedPredicates;
-    struct RequirementTimedInitialLiterals;
-    struct RequirementPreferences;
-    struct RequirementConstraints;
-    struct RequirementActionCosts;
-    struct Requirement;
-
-    struct Type;
-    struct TypeObject;
-    struct TypeEither;
-    struct TypedListOfNamesRecursively;
-    struct TypedListOfNames;
-    struct TypedListOfVariablesRecursively; // :typing
-    struct TypedListOfVariables;
-
-    struct Predicate;
-    struct AtomicFormulaSkeleton;
-
-    struct FunctionSymbol;
-    struct FunctionTerm;
-    struct FunctionTypeNumber;                                       // :numeric-fluents
-    struct FunctionTypeType;                                         // :object-fluents :typing
-    struct FunctionType;
-    struct AtomicFunctionSkeleton;
-    struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively;
-    struct FunctionTypedListOfAtomicFunctionSkeletons;
-
-    struct AtomicFormulaOfTermsPredicate;
-    struct AtomicFormulaOfTermsEquality;         // :equality
-    struct AtomicFormulaOfTerms;
-    struct Atom;
-    struct NegatedAtom;
-    struct Literal;
-
-    struct MultiOperatorMul;
-    struct MultiOperatorPlus;
-    struct MultiOperator;
-    struct BinaryOperatorMinus;
-    struct BinaryOperatorDiv;
-    struct BinaryOperator;
-
-    struct BinaryComparatorGreater;
-    struct BinaryComparatorLess;
-    struct BinaryComparatorEqual;
-    struct BinaryComparatorGreaterEqual;
-    struct BinaryComparatorLessEqual;
-    struct BinaryComparator;
-
-    struct FunctionHead;
-    struct FunctionExpression;                   // :numeric-fluents
-    struct FunctionExpressionNumber;
-    struct FunctionExpressionBinaryOp;
-    struct FunctionExpressionMinus;
-    struct FunctionExpressionHead;
-
-    struct GoalDescriptor;
-    struct GoalDescriptorAtom;
-    struct GoalDescriptorLiteral;                // :negative-preconditions
-    struct GoalDescriptorAnd;
-    struct GoalDescriptorOr;                     // :disjunctive-preconditions
-    struct GoalDescriptorNot;                    // :disjunctive-preconditions
-    struct GoalDescriptorImply;                  // :disjunctive-preconditions
-    struct GoalDescriptorExists;                 // :existential-preconditions
-    struct GoalDescriptorForall;                 // :universal-preconditions
-    struct GoalDescriptorFunctionComparison;     // :numeric-fluents
-
-    struct ConstraintGoalDescriptor;
-    struct ConstraintGoalDescriptorAnd;
-    struct ConstraintGoalDescriptorForall;
-    struct ConstraintGoalDescriptorAtEnd;
-    struct ConstraintGoalDescriptorAlways;
-    struct ConstraintGoalDescriptorSometime;
-    struct ConstraintGoalDescriptorWithin;
-    struct ConstraintGoalDescriptorAtMostOnce;
-    struct ConstraintGoalDescriptorSometimeAfter;
-    struct ConstraintGoalDescriptorSometimeBefore;
-    struct ConstraintGoalDescriptorAlwaysWithin;
-    struct ConstraintGoalDescriptorHoldDuring;
-    struct ConstraintGoalDescriptorHoldAfter;
-
-    struct PreferenceName;
-    struct PreconditionGoalDescriptor;
-    struct PreconditionGoalDescriptorSimple;
-    struct PreconditionGoalDescriptorAnd;
-    struct PreconditionGoalDescriptorPreference; // :preferences
-    struct PreconditionGoalDescriptorForall;     // :universal-preconditions
-
-    struct AssignOperatorAssign;
-    struct AssignOperatorScaleUp;
-    struct AssignOperatorScaleDown;
-    struct AssignOperatorIncrease;
-    struct AssignOperatorDecrease;
-    struct AssignOperator;
-
-    struct Effect;
-    struct EffectProductionLiteral;
-    struct EffectProductionNumericFluent;
-    struct EffectProductionObjectFluent;
-    struct EffectProduction;
-    struct EffectConditionalForall;
-    struct EffectConditionalWhen;
-    struct EffectConditional;
-
-    struct ActionSymbol;
-    struct ActionBody;
-
-    struct Action;
-    struct DerivedPredicate;                     // :derived-predicates
-
-    struct DomainName;
-    struct Requirements;
-    struct Types;                                // : typing
-    struct Constants;
-    struct Predicates;
-    struct Functions;
-    struct Constraints;                          // :constraints
-    struct Structure;
-    struct Domain;
-*/
 };
 
 }

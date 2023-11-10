@@ -46,9 +46,9 @@ namespace loki::domain::ast
     struct Type;
     struct TypeObject;
     struct TypeEither;
-    struct TypedListOfNamesRecursively;
+    struct TypedListOfNamesRecursively;  // :typing
     struct TypedListOfNames;
-    struct TypedListOfVariablesRecursively; // :typing
+    struct TypedListOfVariablesRecursively;  // :typing
     struct TypedListOfVariables;
 
     struct Predicate;

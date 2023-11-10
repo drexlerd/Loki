@@ -1,6 +1,9 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_AST_CONFIG_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_AST_CONFIG_HPP_
 
+#include "../../domain/pddl/predicate.hpp"
+#include "../../domain/pddl/requirements.hpp"
+
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
@@ -28,37 +31,16 @@ namespace loki
 
 
     /* Pddl context */
-    struct SpecifiedRequirements {
-        bool strips = false;
-        bool typing = false;
-        bool negative_preconditions = false;
-        bool disjunctive_preconditions = false;
-        bool equality = false;
-        bool existential_preconditions = false;
-        bool universal_preconditions = false;
-        bool quantified_preconditions = false;
-        bool conditional_effects = false;
-        bool fluents = false;
-        bool object_fluents = false;
-        bool numeric_fluents = false;
-        bool adl = false;
-        bool durative_actions = false;
-        bool derived_predicates = false;
-        bool timed_initial_literals = false;
-        bool preferences = false;
-        bool constraints = false;
-        bool action_costs = false;
-    };
-
-
+    // We create some PDDL constructs during parsing for error checking.
+    // The final PDDL constructs must be created separately.
     struct domain_context_type {
-        SpecifiedRequirements requirements;
+        pddl::Requirements requirements;
 
-        std::unordered_set<std::string> predicate_names;
+        std::unordered_map<std::string, pddl::Predicate> predicates;
     };
 
     struct problem_context_type {
-        SpecifiedRequirements requirements;
+        pddl::Requirements requirements;
     };
 
     struct pddl_context_type {
