@@ -149,6 +149,7 @@ public:
     }
 
     pddl::TypeList operator()(const std::vector<ast::Name>& name_nodes) {
+        // A visited vector of name has single base type "object"
         pddl::TypeList type_list;
         auto base_type = result.emplace("object", pddl::create_type("object")).first->second;
         for (const auto& name_node : name_nodes) {
@@ -161,6 +162,7 @@ public:
     pddl::TypeList operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
         pddl::TypeList type_list;
         auto base_types = this->operator()(typed_list_of_names_recursively_node.type);
+        // A non-visited vector of names has user defined base types.
         for (const auto& name_node : typed_list_of_names_recursively_node.names) {
             auto type = result.emplace(name_node.get_name(), pddl::create_type(name_node.get_name(), base_types)).first->second;
             type_list.push_back(type);
