@@ -1,7 +1,7 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_AST_CONFIG_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_AST_CONFIG_HPP_
 
-#include "../../domain/pddl/predicate.hpp"
+#include "../../domain/pddl/declarations.hpp"
 #include "../../domain/pddl/requirements.hpp"
 
 #include <boost/spirit/home/x3.hpp>
@@ -31,11 +31,12 @@ namespace loki
 
 
     /* Pddl context */
-    // We create some PDDL constructs during parsing for error checking.
-    // The final PDDL constructs must be created separately.
     struct domain_context_type {
+        // test requirement declarations
         pddl::Requirements requirements;
-
+        // test type declarations
+        std::unordered_map<std::string, pddl::Type> types;
+        // test predicate declarations
         std::unordered_map<std::string, pddl::Predicate> predicates;
     };
 

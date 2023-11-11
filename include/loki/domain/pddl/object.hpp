@@ -7,10 +7,10 @@
 
 namespace loki::pddl {
 
-class PredicateImpl {
+class ObjectImpl {
     public:
         std::string name;
-        ParameterList parameters;
+        Type type;
 };
 
 }

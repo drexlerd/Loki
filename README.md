@@ -1,11 +1,31 @@
 # Loki
 
-Loki is a C++ library for parsing the PDDL files.
-Loki aims to achieve four goals:
-1. Support all concepts of PDDL,
-2. Provide meaningful error messages to the user,
-3. Provide easy integration into existing planning systems, and
-4. Provide methods to compile away requirements.
+Loki is a C++ library for syntactic and semantic parsing of PDDL files.
+Loki aims to provide meaningful error messages.
+
+## Supported PDDL Requirements
+
+TODO
+
+- [] :strips
+- [] :typing
+- [] :negative-preconditions
+- [] :disjunctive-preconditions
+- [] :equality
+- [] :existential-preconditions
+- [] :universal-preconditions
+- [] :quantified-preconditions
+- [] :conditional-effects
+- [] :fluents
+- [] :numeric-fluents
+- [] :object-fluents
+- [] :adl
+- [] :durative-actions
+- [] :derived-predicates
+- [] :timed-initial-literals
+- [] :preferences
+- [] :constraints
+- [] :action-costs
 
 
 ## Dependencies
