@@ -7,25 +7,25 @@ Loki aims to provide meaningful error messages.
 
 TODO
 
-- [] :strips
-- [] :typing
-- [] :negative-preconditions
-- [] :disjunctive-preconditions
-- [] :equality
-- [] :existential-preconditions
-- [] :universal-preconditions
-- [] :quantified-preconditions
-- [] :conditional-effects
-- [] :fluents
-- [] :numeric-fluents
-- [] :object-fluents
-- [] :adl
-- [] :durative-actions
-- [] :derived-predicates
-- [] :timed-initial-literals
-- [] :preferences
-- [] :constraints
-- [] :action-costs
+- [ ] :strips
+- [ ] :typing
+- [ ] :negative-preconditions
+- [ ] :disjunctive-preconditions
+- [ ] :equality
+- [ ] :existential-preconditions
+- [ ] :universal-preconditions
+- [ ] :quantified-preconditions
+- [ ] :conditional-effects
+- [ ] :fluents
+- [ ] :numeric-fluents
+- [ ] :object-fluents
+- [ ] :adl
+- [ ] :durative-actions
+- [ ] :derived-predicates
+- [ ] :timed-initial-literals
+- [ ] :preferences
+- [ ] :constraints
+- [ ] :action-costs
 
 
 ## Dependencies
