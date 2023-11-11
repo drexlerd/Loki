@@ -119,12 +119,14 @@ pddl::Requirements parse(const ast::Requirements& node) {
 /* Types */
 pddl::TypeList parse(const domain::ast::Types& node) {
     pddl::TypeList result;
+    // TODO
     return result;
 }
 
 /* Predicates */
 pddl::PredicateList parse(const domain::ast::Predicates& node) {
     pddl::PredicateList result;
+    // TODO
     return result;
 }
 

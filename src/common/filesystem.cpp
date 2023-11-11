@@ -12,6 +12,7 @@ std::string read_file(const fs::path& file_path) {
     if (file.is_open()) {
         std::stringstream buffer;
         buffer << file.rdbuf();
+        // TODO remove comments, change tabs to 4 spaces
         return buffer.str();
     }
     throw std::runtime_error("file does not exist at " + std::string(file_path.c_str()));
