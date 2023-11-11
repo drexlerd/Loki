@@ -25,5 +25,11 @@
 
 namespace loki::pddl
 {
+    TypeImpl::TypeImpl(const std::string& name, const std::vector<Type>& bases)
+        : name(name), bases(bases) { }
+
+    Type create_type(const std::string& name, const std::vector<Type>& bases) {
+        return std::make_shared<TypeImpl>(name, bases);
+    }
 }
 

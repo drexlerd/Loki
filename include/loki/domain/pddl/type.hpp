@@ -11,8 +11,12 @@ namespace loki::pddl {
     {
         public:
             std::string name;
-            Type base;
+            std::vector<Type> bases;
+
+            TypeImpl(const std::string& name, const std::vector<Type>& bases = {});
     };
+
+    extern Type create_type(const std::string& name, const std::vector<Type>& bases = {});
 }
 
 #endif

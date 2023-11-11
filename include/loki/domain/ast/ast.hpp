@@ -331,7 +331,7 @@ namespace loki::domain::ast
 
     struct TypedListOfNames : x3::position_tagged,
                               x3::variant<
-                                  std::vector<Name>,
+                                  std::vector<Name>,  // base type is object
                                   TypedListOfNamesRecursively>
     {
         using base_type::base_type;

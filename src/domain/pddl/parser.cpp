@@ -1,5 +1,7 @@
 #include "../../../include/loki/domain/pddl/parser.hpp"
 
+#include "../../../include/loki/domain/pddl/type.hpp"
+
 using namespace loki::domain;
 
 
@@ -117,14 +119,67 @@ pddl::Requirements parse(const ast::Requirements& node) {
 }
 
 /* Types */
-pddl::TypeList parse(const domain::ast::Types& node) {
-    pddl::TypeList result;
-    // TODO
-    return result;
+class TypeListVisitor : boost::static_visitor<pddl::TypeList> {
+private:
+    std::unordered_map<std::string, pddl::Type>& result;
+
+public:
+    TypeListVisitor(std::unordered_map<std::string, pddl::Type>& result_) : result(result_) { }
+
+    pddl::TypeList operator()(const ast::Type& type_node) {
+        return boost::apply_visitor(*this, type_node);
+    }
+
+    pddl::TypeList operator()(const ast::Name& name_node) {
+        return { result.emplace(name_node.get_name(), pddl::create_type(name_node.get_name())).first->second };
+    }
+
+    pddl::TypeList operator()(const ast::TypeObject&) {
+        return { result.emplace("object", pddl::create_type("object")).first->second };
+    }
+
+    pddl::TypeList operator()(const ast::TypeEither& either_type_node) {
+        // we flatten nested either types
+        pddl::TypeList type_list;
+        for (auto& type_node : either_type_node.types) {
+            auto types = this->operator()(type_node);
+            type_list.insert(type_list.end(), types.begin(), types.end());
+        }
+        return type_list;
+    }
+
+    pddl::TypeList operator()(const std::vector<ast::Name>& name_nodes) {
+        pddl::TypeList type_list;
+        auto base_type = result.emplace("object", pddl::create_type("object")).first->second;
+        for (const auto& name_node : name_nodes) {
+            auto type = result.emplace(name_node.get_name(), pddl::create_type(name_node.get_name(), {base_type})).first->second;
+            type_list.push_back(type);
+        }
+        return type_list;
+    }
+
+    pddl::TypeList operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
+        pddl::TypeList type_list;
+        auto base_types = this->operator()(typed_list_of_names_recursively_node.type);
+        for (const auto& name_node : typed_list_of_names_recursively_node.names) {
+            auto type = result.emplace(name_node.get_name(), pddl::create_type(name_node.get_name(), base_types)).first->second;
+            type_list.push_back(type);
+        }
+        return type_list;
+    }
+
+    pddl::TypeList operator()(const ast::TypedListOfNames& node) {
+        return boost::apply_visitor(*this, node);
+    }
+};
+
+pddl::TypeList parse(const ast::Types& types_node) {
+    std::unordered_map<std::string, pddl::Type> result;
+    return boost::apply_visitor(TypeListVisitor(result), types_node.typed_list_of_names);
 }
 
 /* Predicates */
-pddl::PredicateList parse(const domain::ast::Predicates& node) {
+pddl::PredicateList parse(const ast::Predicates& node) {
     pddl::PredicateList result;
     // TODO
     return result;
