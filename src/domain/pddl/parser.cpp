@@ -1,6 +1,7 @@
 #include "../../../include/loki/domain/pddl/parser.hpp"
 
 #include "../../../include/loki/domain/pddl/type.hpp"
+#include "../../../include/loki/domain/pddl/object.hpp"
 
 using namespace loki::domain;
 
@@ -110,37 +111,38 @@ static void parse(const ast::Requirement& node, pddl::Requirements& result) {
     boost::apply_visitor(RequirementVisitor(result), node);
 }
 
-pddl::Requirements parse(const ast::Requirements& node) {
+pddl::Requirements parse(const ast::Requirements& requirements_node) {
     pddl::Requirements result;
-    for (const auto& requirement : node.requirements) {
+    for (const auto& requirement : requirements_node.requirements) {
         parse(requirement, result);
     }
     return result;
 }
 
 /* Types */
-class TypeListVisitor : boost::static_visitor<pddl::TypeList> {
+template<typename T>
+class TypeListVisitor : boost::static_visitor<std::vector<std::shared_ptr<T>>> {
 private:
-    std::unordered_map<std::string, pddl::Type>& result;
+    std::unordered_map<std::string, std::shared_ptr<T>>& result;
 
 public:
-    TypeListVisitor(std::unordered_map<std::string, pddl::Type>& result_) : result(result_) { }
+    TypeListVisitor(std::unordered_map<std::string, std::shared_ptr<T>>& result_) : result(result_) { }
 
-    pddl::TypeList operator()(const ast::Type& type_node) {
+    std::vector<std::shared_ptr<T>> operator()(const ast::Type& type_node) {
         return boost::apply_visitor(*this, type_node);
     }
 
-    pddl::TypeList operator()(const ast::Name& name_node) {
-        return { result.emplace(name_node.get_name(), pddl::create_type(name_node.get_name())).first->second };
+    std::vector<std::shared_ptr<T>> operator()(const ast::Name& name_node) {
+        return { result.emplace(name_node.get_name(), std::make_shared<T>(name_node.get_name())).first->second };
     }
 
-    pddl::TypeList operator()(const ast::TypeObject&) {
+    std::vector<std::shared_ptr<T>> operator()(const ast::TypeObject&) {
         return { result.emplace("object", pddl::create_type("object")).first->second };
     }
 
-    pddl::TypeList operator()(const ast::TypeEither& either_type_node) {
+    std::vector<std::shared_ptr<T>> operator()(const ast::TypeEither& either_type_node) {
         // we flatten nested either types
-        pddl::TypeList type_list;
+        std::vector<std::shared_ptr<T>> type_list;
         for (auto& type_node : either_type_node.types) {
             auto types = this->operator()(type_node);
             type_list.insert(type_list.end(), types.begin(), types.end());
@@ -148,23 +150,23 @@ public:
         return type_list;
     }
 
-    pddl::TypeList operator()(const std::vector<ast::Name>& name_nodes) {
+    std::vector<std::shared_ptr<T>> operator()(const std::vector<ast::Name>& name_nodes) {
         // A visited vector of name has single base type "object"
-        pddl::TypeList type_list;
+        std::vector<std::shared_ptr<T>> type_list;
         auto base_type = result.emplace("object", pddl::create_type("object")).first->second;
         for (const auto& name_node : name_nodes) {
-            auto type = result.emplace(name_node.get_name(), pddl::create_type(name_node.get_name(), {base_type})).first->second;
+            auto type = result.emplace(name_node.get_name(), std::make_shared<T>(name_node.get_name(), pddl::TypeList{base_type})).first->second;
             type_list.push_back(type);
         }
         return type_list;
     }
 
-    pddl::TypeList operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
-        pddl::TypeList type_list;
+    std::vector<std::shared_ptr<T>> operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
+        std::vector<std::shared_ptr<T>> type_list;
         auto base_types = this->operator()(typed_list_of_names_recursively_node.type);
         // A non-visited vector of names has user defined base types.
         for (const auto& name_node : typed_list_of_names_recursively_node.names) {
-            auto type = result.emplace(name_node.get_name(), pddl::create_type(name_node.get_name(), base_types)).first->second;
+            auto type = result.emplace(name_node.get_name(), std::make_shared<T>(name_node.get_name(), base_types)).first->second;
             type_list.push_back(type);
         }
         return type_list;
@@ -177,13 +179,24 @@ public:
 
 pddl::TypeList parse(const ast::Types& types_node) {
     std::unordered_map<std::string, pddl::Type> result;
-    return boost::apply_visitor(TypeListVisitor(result), types_node.typed_list_of_names);
+    return boost::apply_visitor(TypeListVisitor<pddl::TypeImpl>(result), types_node.typed_list_of_names);
+}
+
+/* Constants */
+pddl::ObjectList parse(const ast::Constants& constants_node) {
+    std::unordered_map<std::string, pddl::Object> result;
+    return boost::apply_visitor(TypeListVisitor<pddl::ObjectImpl>(result), constants_node.typed_list_of_names);
 }
 
 /* Predicates */
-pddl::PredicateList parse(const ast::Predicates& node) {
+pddl::PredicateList parse(const ast::Predicates& predicates_node) {
     pddl::PredicateList result;
-    // TODO
+    for (const auto& atomic_formula_skeleton : predicates_node.atomic_formula_skeletons) {
+        auto predicate_name = atomic_formula_skeleton.predicate.name.get_name();
+        std::unordered_map<std::string, pddl::Parameter> result;
+        //auto parameters = boost::apply_visitor(
+        //    TypeListVisitor<pddl::ParameterImpl>(result), atomic_formula_skeleton.typed_list_of_variables);
+    }
     return result;
 }
 
