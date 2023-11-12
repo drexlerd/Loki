@@ -8,18 +8,19 @@
 
 namespace loki {
 template<typename Parser, typename Node>
-void parse_ast(const std::string& source, const Parser& parser, Node& out, pddl_context_type& pddl_context) {
+void parse_ast(const std::string& source, const Parser& parser, Node& out, error_handler_type& error_handler) {
     out = Node(); // reinitialize
     loki::iterator_type iter(source.begin());
     const loki::iterator_type end(source.end());
+
+    assert(error_handler.get_position_cache().first() == iter &&
+           error_handler.get_position_cache().last() == end);
+
     using boost::spirit::x3::with;
-    error_handler_type error_handler(iter, end, std::cerr);
     auto const wrapped_parser =
-        with<pddl_context_tag>(std::ref(pddl_context)) [
-            with<error_handler_tag>(std::ref(error_handler))
-            [
-                parser
-            ]
+        with<error_handler_tag>(std::ref(error_handler))
+        [
+            parser
         ];
     using boost::spirit::x3::ascii::space;
     bool success = phrase_parse(iter, end, wrapped_parser, space, out);
@@ -28,12 +29,15 @@ void parse_ast(const std::string& source, const Parser& parser, Node& out, pddl_
     }
 }
 
-
 template<typename Parser, typename Node>
 void parse_ast(const std::string& source, const Parser& parser, Node& out) {
-    pddl_context_type pddl_context;
-    parse_ast(source, parser, out, pddl_context);
+    loki::iterator_type iter(source.begin());
+    const loki::iterator_type end(source.end());
+    error_handler_type error_handler(iter, end, std::cerr);
+    parse_ast(source, parser, out, error_handler);
 }
+
+
 
 }
 

@@ -9,20 +9,17 @@ namespace loki::domain::tests {
 
 TEST(LokiTests, AtomicFunctionSkeletonTest) {
     ast::AtomicFunctionSkeleton ast;
-    pddl_context_type pddl_context;
-    pddl_context.domain_context.requirements.typing = true;
 
-    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2)", atomic_function_skeleton(), ast, pddl_context));
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2)", atomic_function_skeleton(), ast));
     EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2)");
 
-    EXPECT_ANY_THROW(parse_ast("(function-symbol1 ?var1 - type1 ?var2 - type2)", atomic_function_skeleton(), ast));
-    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 - type1 ?var2 - type2)", atomic_function_skeleton(), ast, pddl_context));
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 - type1 ?var2 - type2)", atomic_function_skeleton(), ast));
     EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 - type1\n?var2 - type2)");
 
-    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2 - type1)", atomic_function_skeleton(), ast, pddl_context));
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2 - type1)", atomic_function_skeleton(), ast));
     EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2 - type1)");
 
-    EXPECT_ANY_THROW(parse_ast("(?var1 ?var2 - type1)", atomic_function_skeleton(), ast, pddl_context));
+    EXPECT_ANY_THROW(parse_ast("(?var1 ?var2 - type1)", atomic_function_skeleton(), ast));
 }
 
 }

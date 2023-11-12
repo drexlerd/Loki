@@ -30,6 +30,10 @@ namespace loki::pddl {
     class TypeImpl;
     using Type = std::shared_ptr<TypeImpl>;
     using TypeList = std::vector<Type>;
+
+    class DomainImpl;
+    using Domain = std::shared_ptr<DomainImpl>;
+    using DomainList = std::vector<Domain>;
 }
 
 #endif

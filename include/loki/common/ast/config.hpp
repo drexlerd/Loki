@@ -1,14 +1,9 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_AST_CONFIG_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_AST_CONFIG_HPP_
 
-#include "../../domain/pddl/declarations.hpp"
-#include "../../domain/pddl/requirements.hpp"
-
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
-
-#include <unordered_set>
 
 
 /// @brief Defines types of our parsers.
@@ -30,28 +25,6 @@ namespace loki
     typedef error_handler<iterator_type> error_handler_type;
 
 
-    /* Pddl context */
-    struct domain_context_type {
-        // test requirement declarations
-        pddl::Requirements requirements;
-        // test type declarations
-        std::unordered_map<std::string, pddl::Type> types;
-        // test predicate declarations
-        std::unordered_map<std::string, pddl::Predicate> predicates;
-    };
-
-    struct problem_context_type {
-        pddl::Requirements requirements;
-    };
-
-    struct pddl_context_type {
-        domain_context_type domain_context;
-        problem_context_type problem_context;
-    };
-
-    struct pddl_context_tag {};
-
-
     /* The phrase parse context */
     typedef
         x3::phrase_parse_context<x3::ascii::space_type>::type phrase_context_type;
@@ -60,10 +33,7 @@ namespace loki
     typedef x3::context<
             error_handler_tag,
             std::reference_wrapper<error_handler_type>,
-            x3::context<
-                pddl_context_tag,
-                std::reference_wrapper<pddl_context_type>,
-                phrase_context_type>>
+            phrase_context_type>
     context_type;
 }
 

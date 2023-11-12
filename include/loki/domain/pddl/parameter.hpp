@@ -9,7 +9,7 @@ namespace loki::pddl {
 class ParameterImpl {
     public:
         std::string name;
-        Type type;
+        TypeList types;
 };
 
 }

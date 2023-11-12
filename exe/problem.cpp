@@ -25,16 +25,15 @@ int main(int argc, char** argv) {
     string problem_file = argv[2];
 
     // 1. Parse the domain
-    pddl_context_type pddl_context;
     const auto domain_source = loki::read_file(domain_file);
     domain::ast::Domain domain_node;
-    parse_ast(domain_source, domain::domain(), domain_node, pddl_context);
+    parse_ast(domain_source, domain::domain(), domain_node);
     std::cout << parse_text(domain_node, FormattingOptions{0,4}) << std::endl;
 
     // 2. Parse the problem
     const auto problem_source = loki::read_file(problem_file);
     problem::ast::Problem problem_node;
-    parse_ast(problem_source, problem::problem(), problem_node, pddl_context);
+    parse_ast(problem_source, problem::problem(), problem_node);
     std::cout << parse_text(problem_node, FormattingOptions{0,4}) << std::endl;
 
     return 0;

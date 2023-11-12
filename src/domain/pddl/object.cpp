@@ -18,18 +18,18 @@
 
 #include "help_functions.hpp"
 
-#include "../../../include/loki/domain/pddl/type.hpp"
-
+#include "../../../include/loki/domain/pddl/object.hpp"
 
 #include <memory>
 
+
 namespace loki::pddl
 {
-    TypeImpl::TypeImpl(const std::string& name, const TypeList& bases)
-        : name(name), bases(bases) { }
+    ObjectImpl::ObjectImpl(const std::string& name, const TypeList& types)
+        : name(name), types(types) { }
 
-    Type create_type(const std::string& name, const TypeList& bases) {
-        return std::make_shared<TypeImpl>(name, bases);
+    Object create_object(const std::string& name, const TypeList& types) {
+        return std::make_shared<ObjectImpl>(name, types);
     }
 }
 

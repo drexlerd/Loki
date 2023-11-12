@@ -4,6 +4,7 @@
 #include "../include/loki/domain/ast/ast.hpp"
 #include "../include/loki/domain/ast/parser.hpp"
 #include "../include/loki/domain/ast/printer.hpp"
+#include "../include/loki/domain/pddl/parser.hpp"
 
 #include <iostream>
 #include <memory>
@@ -21,12 +22,14 @@ int main(int argc, char** argv) {
     string domain_file = argv[1];
 
     // 1. Parse the domain
-    pddl_context_type pddl_context;
     const auto source = loki::read_file(domain_file);
-    domain::ast::Domain node;
-    parse_ast(source, domain::domain(), node, pddl_context);
+    domain::ast::Domain domain_node;
+    error_handler_type error_handler(source.begin(), source.end(), std::cerr);
+    parse_ast(source, domain::domain(), domain_node, error_handler);
+    std::cout << parse_text(domain_node, FormattingOptions{0,4}) << std::endl;
 
-    std::cout << parse_text(node, FormattingOptions{0,4}) << std::endl;
+    domain::Context context;
+    pddl::Domain domain = parse(domain_node, error_handler, context);
 
     return 0;
 }

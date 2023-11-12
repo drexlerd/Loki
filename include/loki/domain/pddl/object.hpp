@@ -8,10 +8,14 @@
 namespace loki::pddl {
 
 class ObjectImpl {
-    public:
-        std::string name;
-        Type type;
+public:
+    std::string name;
+    TypeList types;
+
+    ObjectImpl(const std::string& name, const TypeList& types={});
 };
+
+extern Object create_object(const std::string& name, const TypeList& types = {});
 
 }
 

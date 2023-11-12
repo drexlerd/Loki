@@ -7,16 +7,15 @@
 
 
 namespace loki::pddl {
-    class TypeImpl
-    {
-        public:
-            std::string name;
-            std::vector<Type> bases;
+class TypeImpl {
+public:
+    std::string name;
+    TypeList bases;
 
-            TypeImpl(const std::string& name, const std::vector<Type>& bases = {});
-    };
+    TypeImpl(const std::string& name, const TypeList& bases = {});
+};
 
-    extern Type create_type(const std::string& name, const std::vector<Type>& bases = {});
+extern Type create_type(const std::string& name, const TypeList& bases = {});
 }
 
 #endif

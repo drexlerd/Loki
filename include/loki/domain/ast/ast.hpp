@@ -160,12 +160,6 @@ namespace loki::domain::ast
     {
         char alpha;
         std::string suffix;
-
-        std::string get_name() const {
-            std::stringstream ss;
-            ss << alpha << suffix;
-            return ss.str();
-        }
     };
 
     /* <variable> */
