@@ -211,29 +211,29 @@ namespace loki::domain::parser {
 
     const auto type_def = name | type_object | type_either;
     const auto type_object_def = lit("object") >> x3::attr(ast::TypeObject{});
-    const auto type_either_def = lit('(') >> lit("either") >> +type > lit(')');
-    const auto typed_list_of_names_recursively_def = +name >> lit('-') > type > typed_list_of_names;
+    const auto type_either_def = (lit('(') >> lit("either") >> +type) > lit(')');
+    const auto typed_list_of_names_recursively_def = (+name >> lit('-')) > type > typed_list_of_names;
     const auto typed_list_of_names_def = typed_list_of_names_recursively | *name;
-    const auto typed_list_of_variables_recursively_def = +variable >> lit('-') > type > typed_list_of_variables;
+    const auto typed_list_of_variables_recursively_def = (+variable >> lit('-')) > type > typed_list_of_variables;
     const auto typed_list_of_variables_def = typed_list_of_variables_recursively | *variable;
 
     const auto predicate_def = name;
     const auto atomic_formula_skeleton_def = lit('(') > predicate > typed_list_of_variables > lit(')');
 
     const auto function_symbol_def = name;
-    const auto function_term_def = lit('(') >> function_symbol > *term > lit(')');
+    const auto function_term_def = (lit('(') >> function_symbol) > *term > lit(')');
     const auto function_type_number_def = number;
     const auto function_type_type__def = type;
     const auto function_type_def = function_type_number | function_type_type_;
     const auto atomic_function_skeleton_def = lit('(') > function_symbol > typed_list_of_variables > lit(')');
-    const auto function_typed_list_of_atomic_function_skeletons_recursively_def = +atomic_function_skeleton >> lit('-') > function_type >> -function_typed_list_of_atomic_function_skeletons;
+    const auto function_typed_list_of_atomic_function_skeletons_recursively_def = (+atomic_function_skeleton >> lit('-')) > function_type >> -function_typed_list_of_atomic_function_skeletons;
     const auto function_typed_list_of_atomic_function_skeletons_def = function_typed_list_of_atomic_function_skeletons_recursively | +atomic_function_skeleton;
 
-    const auto atomic_formula_of_terms_predicate_def = lit('(') >> predicate > *term > lit(')');
-    const auto atomic_formula_of_terms_equality_def = lit('(') >> lit('=') > term > term > lit(')');
+    const auto atomic_formula_of_terms_predicate_def = (lit('(') >> predicate) > *term > lit(')');
+    const auto atomic_formula_of_terms_equality_def = (lit('(') >> lit('=')) > term > term > lit(')');
     const auto atomic_formula_of_terms_def = atomic_formula_of_terms_equality | atomic_formula_of_terms_predicate;
     const auto atom_def = atomic_formula_of_terms;
-    const auto negated_atom_def = lit('(') >> lit("not") > atomic_formula_of_terms > lit(')');
+    const auto negated_atom_def = (lit('(') >> lit("not")) > atomic_formula_of_terms > lit(')');
     const auto literal_def = negated_atom | atom;
 
     const auto multi_operator_mul_def = lit('*') >> x3::attr(ast::MultiOperatorMul{});
@@ -250,48 +250,48 @@ namespace loki::domain::parser {
     const auto binary_comparator_less_equal_def = lit("<=") >> x3::attr(ast::BinaryComparatorLessEqual{});
     const auto binary_comparator_def = binary_comparator_greater | binary_comparator_less | binary_comparator_equal | binary_comparator_greater_equal | binary_comparator_less_equal;
 
-    const auto function_head_def = (lit('(') >> function_symbol >> *term > lit(')')) | (function_symbol >> x3::attr(std::vector<ast::Term>{}));
+    const auto function_head_def = ((lit('(') >> function_symbol >> *term) > lit(')')) | (function_symbol >> x3::attr(std::vector<ast::Term>{}));
     const auto function_expression_def = function_expression_binary_op | function_expression_minus | function_expression_head | function_expression_number;
     const auto function_expression_number_def = number;
-    const auto function_expression_binary_op_def = lit('(') >> binary_operator >> function_expression >> function_expression > lit(')');
-    const auto function_expression_minus_def = lit('(') >> lit('-') > function_expression > lit(')');
+    const auto function_expression_binary_op_def = (lit('(') >> binary_operator >> function_expression >> function_expression) > lit(')');
+    const auto function_expression_minus_def = (lit('(') >> lit('-')) > function_expression > lit(')');
     const auto function_expression_head_def = function_head;
 
     const auto goal_descriptor_def = goal_descriptor_not | goal_descriptor_and | goal_descriptor_or | goal_descriptor_imply
         | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison | goal_descriptor_literal | goal_descriptor_atom;
     const auto goal_descriptor_atom_def = atom;
     const auto goal_descriptor_literal_def = literal;
-    const auto goal_descriptor_and_def = lit('(') >> lit("and") > *goal_descriptor > lit(')');
-    const auto goal_descriptor_or_def = lit('(') >> lit("or") >> *goal_descriptor > lit(')');
-    const auto goal_descriptor_not_def = lit('(') >> lit("not") > goal_descriptor > lit(')');
-    const auto goal_descriptor_imply_def = lit('(') >> lit("imply") > goal_descriptor > goal_descriptor > lit(')');
-    const auto goal_descriptor_exists_def = lit('(') >> lit("exists") > typed_list_of_variables > goal_descriptor > lit(')');
-    const auto goal_descriptor_forall_def = lit('(') >> lit("forall") > typed_list_of_variables > goal_descriptor > lit(')');
-    const auto goal_descriptor_function_comparison_def = lit('(') >> binary_comparator >> function_expression > function_expression > lit(')');
+    const auto goal_descriptor_and_def = (lit('(') >> lit("and")) > *goal_descriptor > lit(')');
+    const auto goal_descriptor_or_def = (lit('(') >> lit("or") >> *goal_descriptor) > lit(')');
+    const auto goal_descriptor_not_def = (lit('(') >> lit("not")) > goal_descriptor > lit(')');
+    const auto goal_descriptor_imply_def = (lit('(') >> lit("imply")) > goal_descriptor > goal_descriptor > lit(')');
+    const auto goal_descriptor_exists_def = (lit('(') >> lit("exists")) > typed_list_of_variables > goal_descriptor > lit(')');
+    const auto goal_descriptor_forall_def = (lit('(') >> lit("forall")) > typed_list_of_variables > goal_descriptor > lit(')');
+    const auto goal_descriptor_function_comparison_def = (lit('(') >> binary_comparator >> function_expression) > function_expression > lit(')');
 
     const auto constraint_goal_descriptor_def = constraint_goal_descriptor_and | constraint_goal_descriptor_forall | constraint_goal_descriptor_at_end
         | constraint_goal_descriptor_always | constraint_goal_descriptor_sometime | constraint_goal_descriptor_within
         | constraint_goal_descriptor_at_most_once | constraint_goal_descriptor_sometime_after | constraint_goal_descriptor_sometime_before
         | constraint_goal_descriptor_always_within | constraint_goal_descriptor_hold_during | constraint_goal_descriptor_hold_after;
-    const auto constraint_goal_descriptor_and_def = lit('(') >> lit("and") > *constraint_goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_forall_def = lit('(') >> lit("forall") > typed_list_of_variables > constraint_goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_at_end_def = lit('(') >> lit("at") >> lit("end") > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_always_def = lit('(') >> lit("always") > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_sometime_def = lit('(') >> lit("sometime") > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_within_def = lit('(') >> lit("within") > number > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_at_most_once_def = lit('(') >> lit("at-most-once") > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_sometime_after_def = lit('(') >> lit("sometime-after") > goal_descriptor > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_sometime_before_def = lit('(') >> lit("sometime-before") > goal_descriptor > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_always_within_def = lit('(') >> lit("always-within") > number > goal_descriptor > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_hold_during_def = lit('(') >> lit("hold-during") > number > number > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_hold_after_def = lit('(') >> lit("hold-after") > number > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_and_def = (lit('(') >> lit("and")) > *constraint_goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_forall_def = (lit('(') >> lit("forall")) > typed_list_of_variables > constraint_goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_at_end_def = (lit('(') >> lit("at") >> lit("end")) > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_always_def = (lit('(') >> lit("always")) > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_sometime_def = (lit('(') >> lit("sometime")) > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_within_def = (lit('(') >> lit("within")) > number > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_at_most_once_def = (lit('(') >> lit("at-most-once")) > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_sometime_after_def = (lit('(') >> lit("sometime-after")) > goal_descriptor > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_sometime_before_def = (lit('(') >> lit("sometime-before")) > goal_descriptor > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_always_within_def = (lit('(') >> lit("always-within")) > number > goal_descriptor > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_hold_during_def = (lit('(') >> lit("hold-during")) > number > number > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_hold_after_def = (lit('(') >> lit("hold-after")) > number > goal_descriptor > lit(')');
 
     const auto precondition_goal_descriptor_def = precondition_goal_descriptor_and | precondition_goal_descriptor_preference | precondition_goal_descriptor_forall | precondition_goal_descriptor_simple;
     const auto preference_name_def = name;
     const auto precondition_goal_descriptor_simple_def = goal_descriptor;
-    const auto precondition_goal_descriptor_and_def = lit('(') >> lit("and") >> *precondition_goal_descriptor > lit(')');
-    const auto precondition_goal_descriptor_preference_def = lit('(') >> lit("preference") > preference_name > goal_descriptor > lit(')');
-    const auto precondition_goal_descriptor_forall_def = lit('(') >> lit("forall") > typed_list_of_variables > precondition_goal_descriptor > lit(')');
+    const auto precondition_goal_descriptor_and_def = (lit('(') >> lit("and") >> *precondition_goal_descriptor) > lit(')');
+    const auto precondition_goal_descriptor_preference_def = (lit('(') >> lit("preference")) > preference_name > goal_descriptor > lit(')');
+    const auto precondition_goal_descriptor_forall_def = (lit('(') >> lit("forall")) > typed_list_of_variables > precondition_goal_descriptor > lit(')');
 
     const auto assign_operator_assign_def = lit("assign") >> x3::attr(ast::AssignOperatorAssign{});
     const auto assign_operator_scale_up_def = lit("scale-up") >> x3::attr(ast::AssignOperatorScaleUp{});
@@ -302,30 +302,30 @@ namespace loki::domain::parser {
 
     const auto effect_def = lit('(') >> lit("and") >> *effect >> lit(')') | effect_conditional | effect_production;
     const auto effect_production_literal_def = literal;
-    const auto effect_production_numeric_fluent_def = lit('(') >> assign_operator >> function_head >> function_expression > lit(')');
+    const auto effect_production_numeric_fluent_def = (lit('(') >> assign_operator >> function_head >> function_expression) > lit(')');
     const auto effect_production_object_fluent_def = lit('(') >> function_term >> (term | undefined);
     const auto effect_production_def = effect_production_literal | effect_production_numeric_fluent | effect_production_object_fluent;
-    const auto effect_conditional_forall_def = lit('(') >> lit("forall") > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
-    const auto effect_conditional_when_def = lit('(') >> lit("when") > goal_descriptor > effect > lit(')');
+    const auto effect_conditional_forall_def = (lit('(') >> lit("forall")) > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
+    const auto effect_conditional_when_def = (lit('(') >> lit("when")) > goal_descriptor > effect > lit(')');
     const auto effect_conditional_def = effect_conditional_forall | effect_conditional_when;
 
     const auto action_symbol_def = name;
     const auto action_body_def = (lit(":precondition") > ((lit('(') >> lit(')')) | precondition_goal_descriptor))
                                 >> (lit(":effect") > ((lit('(') >> lit(')')) | effect));
-    const auto action_def = lit('(') >> lit(":action") > action_symbol
-                                     > lit(":parameters") > lit('(') >> typed_list_of_variables > lit(')')
-                                     >> action_body
+    const auto action_def = (lit('(') >> lit(":action")) > action_symbol
+                                      > lit(":parameters") > lit('(') >> typed_list_of_variables > lit(')')
+                                      >> action_body
                             >> lit(')');
 
-    const auto derived_predicate_def = lit('(') >> typed_list_of_variables >> goal_descriptor > lit(')');
+    const auto derived_predicate_def = (lit('(') >> typed_list_of_variables >> goal_descriptor) > lit(')');
 
-    const auto domain_name_def = lit('(') >> lit("domain") > name > lit(')');
+    const auto domain_name_def = (lit('(') >> lit("domain")) > name > lit(')');
     const auto requirements_def = lit('(') >> lit(":requirements") >> *requirement >> lit(')');
-    const auto types_def = lit('(') >> lit(":types") >> typed_list_of_names > lit(')');
-    const auto constants_def = lit('(') >> lit(":constants") >> typed_list_of_names > lit(')');
-    const auto predicates_def = lit('(') >> lit(":predicates") >> *atomic_formula_skeleton > lit(')');
-    const auto functions_def = lit('(') >> lit(":functions") >> *function_typed_list_of_atomic_function_skeletons > lit(')');
-    const auto constraints_def = lit('(') >> lit(":constraints") > constraint_goal_descriptor > lit(')');
+    const auto types_def = (lit('(') >> lit(":types") >> typed_list_of_names) > lit(')');
+    const auto constants_def = (lit('(') >> lit(":constants") >> typed_list_of_names) > lit(')');
+    const auto predicates_def = (lit('(') >> lit(":predicates") >> *atomic_formula_skeleton) > lit(')');
+    const auto functions_def = (lit('(') >> lit(":functions") >> *function_typed_list_of_atomic_function_skeletons) > lit(')');
+    const auto constraints_def = (lit('(') >> lit(":constraints")) > constraint_goal_descriptor > lit(')');
     const auto structure_def = action | derived_predicate;
 
     const auto domain_def =
