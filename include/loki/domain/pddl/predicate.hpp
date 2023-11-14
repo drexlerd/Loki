@@ -8,11 +8,14 @@
 namespace loki::pddl {
 
 class PredicateImpl {
-    public:
-        std::string name;
-        ParameterList parameters;
+public:
+    std::string name;
+    ParameterList parameters;
+
+    PredicateImpl(const std::string& name, const ParameterList& parameters);
 };
 
+extern Predicate create_predicate(const std::string& name, const ParameterList& parameters);
 }
 
 #endif

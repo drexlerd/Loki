@@ -3,14 +3,19 @@
 
 #include "declarations.hpp"
 
+#include <string>
 
 namespace loki::pddl {
 
 class ParameterImpl {
-    public:
-        std::string name;
-        TypeList types;
+public:
+    std::string name;
+    TypeList types;
+
+    ParameterImpl(const std::string& name, const TypeList& types);
 };
+
+extern Parameter create_parameter(const std::string& name, const TypeList& types = {});
 
 }
 

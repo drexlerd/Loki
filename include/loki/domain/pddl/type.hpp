@@ -5,8 +5,8 @@
 
 #include <string>
 
-
 namespace loki::pddl {
+
 class TypeImpl {
 public:
     std::string name;
