@@ -6,6 +6,7 @@
 #include "../../../include/loki/domain/pddl/type.hpp"
 
 #include <sstream>
+#include <iostream>
 
 using namespace loki::domain;
 using namespace std;
@@ -297,6 +298,8 @@ public:
             const auto parameter = pddl::create_parameter(name, types);
             parameter_list.emplace_back(parameter);
         }
+        auto additional_parameters = this->operator()(typed_variables_node.typed_list_of_variables);
+        parameter_list.insert(parameter_list.end(), additional_parameters.begin(), additional_parameters.end());
         return parameter_list;
     }
 
