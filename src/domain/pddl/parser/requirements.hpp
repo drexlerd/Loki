@@ -1,5 +1,5 @@
-#ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_REQUIREMENT_HPP_
-#define LOKI_SRC_DOMAIN_PDDL_PARSER_REQUIREMENT_HPP_
+#ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_REQUIREMENTS_HPP_
+#define LOKI_SRC_DOMAIN_PDDL_PARSER_REQUIREMENTS_HPP_
 
 #include "../../../../include/loki/common/ast/config.hpp"
 #include "../../../../include/loki/domain/ast/ast.hpp"
@@ -9,7 +9,6 @@ using namespace loki::domain;
 
 namespace loki {
 
-/* Requirements */
 void parse(const ast::RequirementStrips&, const error_handler_type&, Context& context);
 
 void parse(const ast::RequirementTyping&, const error_handler_type&, Context& context);
@@ -54,8 +53,7 @@ struct RequirementVisitor {
     const error_handler_type& error_handler;
     Context& context;
 
-    RequirementVisitor(const error_handler_type& error_handler_, Context& context_)
-        : error_handler(error_handler_), context(context_) { }
+    RequirementVisitor(const error_handler_type& error_handler_, Context& context_);
 
     template<typename Node>
     void operator()(const Node& node) const {
@@ -63,6 +61,8 @@ struct RequirementVisitor {
     }
 };
 
+pddl::Requirements parse(const ast::Requirements& requirements_node, const error_handler_type& error_handler, Context& context);
+
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_REQUIREMENT_HPP_
+#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_REQUIREMENTS_HPP_

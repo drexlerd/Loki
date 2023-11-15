@@ -5,293 +5,31 @@
 #include "../../../include/loki/domain/pddl/predicate.hpp"
 #include "../../../include/loki/domain/pddl/type.hpp"
 
-#include "parser/requirement.hpp"
-
-#include <sstream>
-#include <iostream>
+#include "parser/common.hpp"
+#include "parser/constants.hpp"
+#include "parser/objects.hpp"
+#include "parser/parameters.hpp"
+#include "parser/predicates.hpp"
+#include "parser/requirements.hpp"
+#include "parser/types.hpp"
 
 using namespace loki::domain;
 using namespace std;
 
-
 namespace loki {
 
-/* Name */
-string parse(const domain::ast::Name& name_node, const error_handler_type&, domain::Context&) {
-    stringstream ss;
-    ss << name_node.alpha << name_node.suffix;
-    return ss.str();
-}
-
-/* Variable */
-string parse(const domain::ast::Variable& variable_node, const error_handler_type& error_handler, domain::Context& context) {
-    stringstream ss;
-    ss << variable_node.question_mark << parse(variable_node.name, error_handler, context);
-    return ss.str();
-}
-
-/* Number */
-double parse(const domain::ast::Number& number_node, const error_handler_type&, domain::Context&) {
-    return number_node.value;
-}
-
-/* DomainName */
 std::string parse(const domain::ast::DomainName& domain_name_node, const error_handler_type& error_handler, domain::Context& context) {
     return parse(domain_name_node.name, error_handler, context);
 }
 
-/* Requirements */
-pddl::Requirements parse(const ast::Requirements& requirements_node, const error_handler_type& error_handler, Context& context) {
-    for (const auto& requirement : requirements_node.requirements) {
-        parse(requirement, error_handler, context);
-    }
-    return context.requirements;
-}
-
-/* Types */
-class TypeDeclarationVisitor : boost::static_visitor<pddl::TypeList> {
-private:
-    const error_handler_type& error_handler;
-    Context& context;
-
-public:
-    TypeDeclarationVisitor(const error_handler_type& error_handler_, Context& context_)
-        : error_handler(error_handler_),
-          context(context_) { }
-
-    pddl::TypeList operator()(const ast::Type& type_node) {
-        return boost::apply_visitor(*this, type_node);
-    }
-
-    pddl::TypeList operator()(const ast::Name& name_node) {
-        auto name = parse(name_node, error_handler, context);
-        return { context.types.emplace(name, pddl::create_type(name)).first->second };
-    }
-
-    pddl::TypeList operator()(const ast::TypeObject&) {
-        return { context.types.emplace("object", context.types.at("object")).first->second };
-    }
-
-    pddl::TypeList operator()(const ast::TypeEither& either_type_node) {
-        // we flatten nested either types
-        pddl::TypeList type_list;
-        for (auto& type_node : either_type_node.types) {
-            auto types = this->operator()(type_node);
-            type_list.insert(type_list.end(), types.begin(), types.end());
-        }
-        return type_list;
-    }
-};
-
-class TypeReferenceVisitor : boost::static_visitor<pddl::TypeList> {
-private:
-    const error_handler_type& error_handler;
-    Context& context;
-
-public:
-    TypeReferenceVisitor(const error_handler_type& error_handler_, Context& context_)
-        : error_handler(error_handler_),
-          context(context_) { }
-
-    pddl::TypeList operator()(const ast::Type& type_node) {
-        return boost::apply_visitor(*this, type_node);
-    }
-
-    pddl::TypeList operator()(const ast::Name& name_node) {
-        auto name = parse(name_node, error_handler, context);
-        auto it = context.types.find(name);
-        if (it == context.types.end()) {
-            error_handler(name_node, "Used undefined type.");
-            throw std::runtime_error("Failed parse.");
-        }
-        return { it->second };
-    }
-
-    pddl::TypeList operator()(const ast::TypeObject&) {
-        assert(context.types.count("object"));
-        return { context.types.at("object") };
-    }
-
-    pddl::TypeList operator()(const ast::TypeEither& either_type_node) {
-        // we flatten nested either types
-        pddl::TypeList type_list;
-        for (auto& type_node : either_type_node.types) {
-            auto types = this->operator()(type_node);
-            type_list.insert(type_list.end(), types.begin(), types.end());
-        }
-        return type_list;
-    }
-};
-
-class TypeListVisitor : boost::static_visitor<pddl::TypeList> {
-private:
-    const error_handler_type& error_handler;
-    Context& context;
-
-public:
-    TypeListVisitor(const error_handler_type& error_handler_, Context& context_)
-        : error_handler(error_handler_),
-          context(context_) { }
-
-    pddl::TypeList operator()(const std::vector<ast::Name>& name_nodes) {
-        // A visited vector of name has single base type "object"
-        pddl::TypeList type_list;
-        const auto base_type = context.types.at("object");
-        for (const auto& name_node : name_nodes) {
-            const auto name = parse(name_node, error_handler, context);
-            const auto type = context.types.emplace(name, pddl::create_type(name, {base_type})).first->second;
-            type_list.emplace_back(type);
-        }
-        return type_list;
-    }
-
-    pddl::TypeList operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
-        pddl::TypeList type_list;
-        const auto types = boost::apply_visitor(TypeDeclarationVisitor(error_handler, context),
-                                                typed_list_of_names_recursively_node.type);
-        // A non-visited vector of names has user defined base types.
-        for (const auto& name_node : typed_list_of_names_recursively_node.names) {
-            const auto name = parse(name_node, error_handler, context);
-            if (name == "object") {
-                error_handler(name_node, "Unexpected type name \"object\". It is a reserved type name.");
-                throw std::runtime_error("Failed parse.");
-            }
-            // Dominik: "number" is not reserved as a type but is reserved as a function type.
-            // We either reserve "number" within type as well, or parse a completely separate set of function types
-            // from the types where "number" is reserved if :numeric-fluents.
-            const auto type = context.types.emplace(name, pddl::create_type(name, types)).first->second;
-            type_list.emplace_back(type);
-        }
-        // Recursively add types.
-        auto additional_types = this->operator()(typed_list_of_names_recursively_node.typed_list_of_names);
-        type_list.insert(type_list.end(), additional_types.begin(), additional_types.end());
-        return type_list;
-    }
-
-    pddl::TypeList operator()(const ast::TypedListOfNames& node) {
-        return boost::apply_visitor(*this, node);
-    }
-};
-
-class ParameterListVisitor : boost::static_visitor<pddl::ParameterList> {
-private:
-    const error_handler_type& error_handler;
-    Context& context;
-
-public:
-    ParameterListVisitor(const error_handler_type& error_handler_, Context& context_)
-        : error_handler(error_handler_),
-          context(context_) { }
-
-    pddl::ParameterList operator()(const std::vector<ast::Variable>& variable_nodes) {
-        // A visited vector of variable has single base type "object"
-        pddl::ParameterList parameter_list;
-        assert(context.types.count("object"));
-        const auto type = context.types.at("object");
-        for (const auto& variable_node : variable_nodes) {
-            const auto name = parse(variable_node, error_handler, context);
-            const auto parameter = pddl::create_parameter(name, {type});
-            parameter_list.emplace_back(parameter);
-        }
-        return parameter_list;
-    }
-
-    pddl::ParameterList operator()(const ast::TypedListOfVariablesRecursively& typed_variables_node) {
-        pddl::ParameterList parameter_list;
-        const auto types = boost::apply_visitor(TypeReferenceVisitor(error_handler, context),
-                                                typed_variables_node.type);
-        // A non-visited vector of variables has user defined types
-        for (const auto& variable_node : typed_variables_node.variables) {
-            const auto name = parse(variable_node, error_handler, context);
-            const auto parameter = pddl::create_parameter(name, types);
-            parameter_list.emplace_back(parameter);
-        }
-        // Recursively add parameters.
-        auto additional_parameters = this->operator()(typed_variables_node.typed_list_of_variables);
-        parameter_list.insert(parameter_list.end(), additional_parameters.begin(), additional_parameters.end());
-        return parameter_list;
-    }
-
-    pddl::ParameterList operator()(const ast::TypedListOfVariables& node) {
-        return boost::apply_visitor(*this, node);
-    }
-};
-
-pddl::TypeList parse(const ast::Types& types_node, const error_handler_type& error_handler, Context& context) {
-    return boost::apply_visitor(TypeListVisitor(error_handler, context), types_node.typed_list_of_names);
-}
-
-/* Constants */
-class ConstantListVisitor : boost::static_visitor<pddl::ObjectList> {
-private:
-    const error_handler_type& error_handler;
-    Context& context;
-
-public:
-    ConstantListVisitor(const error_handler_type& error_handler_, Context& context_)
-        : error_handler(error_handler_),
-          context(context_) { }
-
-
-    pddl::ObjectList operator()(const std::vector<ast::Name>& name_nodes) {
-        // A visited vector of name has single base type "object"
-        pddl::ObjectList object_list;
-        assert(context.types.count("object"));
-        const auto type = context.types.at("object");
-        for (const auto& name_node : name_nodes) {
-            const auto name = parse(name_node, error_handler, context);
-            const auto object = context.constants.emplace(name, pddl::create_object(name, {type})).first->second;
-            object_list.emplace_back(object);
-        }
-        return object_list;
-    }
-
-    pddl::ObjectList operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
-        pddl::ObjectList object_list;
-        const auto types = boost::apply_visitor(TypeReferenceVisitor(error_handler, context),
-                                                typed_list_of_names_recursively_node.type);
-        // A non-visited vector of names has user defined base types
-        for (const auto& name_node : typed_list_of_names_recursively_node.names) {
-            const auto name = parse(name_node, error_handler, context);
-            const auto object = context.constants.emplace(name, pddl::create_object(name, types)).first->second;
-            object_list.emplace_back(object);
-        }
-        // Recursively add objects.
-        auto additional_objects = this->operator()(typed_list_of_names_recursively_node.typed_list_of_names);
-        object_list.insert(object_list.end(), additional_objects.begin(), additional_objects.end());
-        return object_list;
-    }
-
-    pddl::ObjectList operator()(const ast::TypedListOfNames& node) {
-        return boost::apply_visitor(*this, node);
-    }
-};
-
-pddl::ObjectList parse(const ast::Constants& constants_node, const error_handler_type& error_handler, Context& context) {
-    return boost::apply_visitor(ConstantListVisitor(error_handler, context), constants_node.typed_list_of_names);
-}
-
-/* Predicates */
-pddl::PredicateList parse(const ast::Predicates& predicates_node, const error_handler_type& error_handler, Context& context) {
-
-    pddl::PredicateList predicate_list;
-    for (const auto& atomic_formula_skeleton : predicates_node.atomic_formula_skeletons) {
-        const auto name = parse(atomic_formula_skeleton.predicate.name, error_handler, context);
-        const auto parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context),
-                                                     atomic_formula_skeleton.typed_list_of_variables);
-        const auto predicate = pddl::create_predicate(name, parameters);
-        predicate_list.emplace_back(predicate);
-    }
-    return predicate_list;
-}
-
-/* Domain */
 pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& error_handler, Context& context) {
-    auto domain_name = parse(domain_node.domain_name, error_handler, context);
+    const auto domain_name = parse(domain_node.domain_name, error_handler, context);
+    /* Requirements section */
     pddl::Requirements requirements;
     if (domain_node.requirements.has_value()) {
         requirements = parse(domain_node.requirements.value(), error_handler, context);
     }
+    /* Types section */
     pddl::TypeList types;
     if (domain_node.types.has_value()) {
         if (!context.requirements.typing) {
@@ -300,14 +38,17 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
         }
         types = parse(domain_node.types.value(), error_handler, context);
     }
+    /* Constants section */
     pddl::ObjectList constants;
     if (domain_node.constants.has_value()) {
         constants = parse(domain_node.constants.value(), error_handler, context);
     }
+    /* Predicates section */
     pddl::PredicateList predicates;
     if (domain_node.predicates.has_value()) {
         predicates = parse(domain_node.predicates.value(), error_handler, context);
     }
+    /* Action Schema section */
     return nullptr;
 }
 

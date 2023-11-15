@@ -1,4 +1,4 @@
-#include "requirement.hpp"
+#include "requirements.hpp"
 
 using namespace loki::domain;
 
@@ -93,6 +93,16 @@ void parse(const ast::RequirementActionCosts&, const error_handler_type&, Contex
 
 void parse(const ast::Requirement& node, const error_handler_type& error_handler, Context& context) {
     boost::apply_visitor(RequirementVisitor(error_handler, context), node);
+}
+
+RequirementVisitor::RequirementVisitor(const error_handler_type& error_handler_, Context& context_)
+    : error_handler(error_handler_), context(context_) { }
+
+pddl::Requirements parse(const ast::Requirements& requirements_node, const error_handler_type& error_handler, Context& context) {
+    for (const auto& requirement : requirements_node.requirements) {
+        parse(requirement, error_handler, context);
+    }
+    return context.requirements;
 }
 
 }
