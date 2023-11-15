@@ -257,6 +257,9 @@ public:
             const auto type = context.types.emplace(name, pddl::create_type(name, types)).first->second;
             type_list.emplace_back(type);
         }
+        // Recursively add types.
+        auto additional_types = this->operator()(typed_list_of_names_recursively_node.typed_list_of_names);
+        type_list.insert(type_list.end(), additional_types.begin(), additional_types.end());
         return type_list;
     }
 
@@ -298,6 +301,7 @@ public:
             const auto parameter = pddl::create_parameter(name, types);
             parameter_list.emplace_back(parameter);
         }
+        // Recursively add parameters.
         auto additional_parameters = this->operator()(typed_variables_node.typed_list_of_variables);
         parameter_list.insert(parameter_list.end(), additional_parameters.begin(), additional_parameters.end());
         return parameter_list;
@@ -309,8 +313,6 @@ public:
 };
 
 pddl::TypeList parse(const ast::Types& types_node, const error_handler_type& error_handler, Context& context) {
-    // create base type.
-    context.types.emplace("object", pddl::create_type("object"));
     return boost::apply_visitor(TypeListVisitor(error_handler, context), types_node.typed_list_of_names);
 }
 
@@ -349,6 +351,9 @@ public:
             const auto object = context.constants.emplace(name, pddl::create_object(name, types)).first->second;
             object_list.emplace_back(object);
         }
+        // Recursively add objects.
+        auto additional_objects = this->operator()(typed_list_of_names_recursively_node.typed_list_of_names);
+        object_list.insert(object_list.end(), additional_objects.begin(), additional_objects.end());
         return object_list;
     }
 

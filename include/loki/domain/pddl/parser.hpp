@@ -3,6 +3,7 @@
 
 #include "declarations.hpp"
 #include "requirements.hpp"
+#include "type.hpp"
 
 #include "../../common/ast/config.hpp"
 #include "../ast/ast.hpp"
@@ -13,6 +14,11 @@ namespace domain {
         pddl::Requirements requirements;
         std::unordered_map<std::string, pddl::Type> types;
         std::unordered_map<std::string, pddl::Object> constants;
+
+        Context() {
+            // create base type.
+            types.emplace("object", pddl::create_type("object"));
+        }
     };
 }
 
