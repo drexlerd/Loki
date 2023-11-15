@@ -27,6 +27,10 @@ namespace loki::pddl {
     using Predicate = std::shared_ptr<PredicateImpl>;
     using PredicateList = std::vector<Predicate>;
 
+    class FunctionImpl;
+    using Function = std::shared_ptr<FunctionImpl>;
+    using FunctionList = std::vector<Function>;
+
     class TypeImpl;
     using Type = std::shared_ptr<TypeImpl>;
     using TypeList = std::vector<Type>;

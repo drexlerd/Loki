@@ -254,6 +254,13 @@ public:
         // A non-visited vector of names has user defined base types.
         for (const auto& name_node : typed_list_of_names_recursively_node.names) {
             const auto name = parse(name_node, error_handler, context);
+            if (name == "object") {
+                error_handler(name_node, "Unexpected type name \"object\". It is a reserved type name.");
+                throw std::runtime_error("Failed parse.");
+            }
+            // Dominik: "number" is not reserved as a type but is reserved as a function type.
+            // We either reserve "number" within type as well, or parse a completely separate set of function types
+            // from the types where "number" is reserved if :numeric-fluents.
             const auto type = context.types.emplace(name, pddl::create_type(name, types)).first->second;
             type_list.emplace_back(type);
         }
