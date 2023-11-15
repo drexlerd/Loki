@@ -5,6 +5,8 @@
 #include "../../../include/loki/domain/pddl/predicate.hpp"
 #include "../../../include/loki/domain/pddl/type.hpp"
 
+#include "parser/requirement.hpp"
+
 #include <sstream>
 #include <iostream>
 
@@ -39,110 +41,6 @@ std::string parse(const domain::ast::DomainName& domain_name_node, const error_h
 }
 
 /* Requirements */
-static void parse(const ast::RequirementStrips&, const error_handler_type&, Context& context) {
-    context.requirements.strips = true;
-}
-
-static void parse(const ast::RequirementTyping&, const error_handler_type&, Context& context) {
-    context.requirements.typing = true;
-}
-
-static void parse(const ast::RequirementNegativePreconditions&, const error_handler_type&, Context& context) {
-    context.requirements.negative_preconditions = true;
-}
-
-static void parse(const ast::RequirementDisjunctivePreconditions&, const error_handler_type&, Context& context) {
-    context.requirements.disjunctive_preconditions = true;
-}
-
-static void parse(const ast::RequirementEquality&, const error_handler_type&, Context& context) {
-    context.requirements.equality = true;
-}
-
-static void parse(const ast::RequirementExistentialPreconditions&, const error_handler_type&, Context& context) {
-    context.requirements.existential_preconditions = true;
-}
-
-static void parse(const ast::RequirementUniversalPreconditions&, const error_handler_type&, Context& context) {
-    context.requirements.universal_preconditions = true;
-}
-
-static void parse(const ast::RequirementQuantifiedPreconditions&, const error_handler_type&, Context& context) {
-    context.requirements.quantified_preconditions = true;
-    context.requirements.existential_preconditions = true;
-    context.requirements.universal_preconditions = true;
-}
-
-static void parse(const ast::RequirementConditionalEffects&, const error_handler_type&, Context& context) {
-    context.requirements.conditional_effects = true;
-}
-
-static void parse(const ast::RequirementFluents&, const error_handler_type&, Context& context) {
-    context.requirements.fluents = true;
-    context.requirements.object_fluents = true;
-    context.requirements.numeric_fluents = true;
-}
-
-static void parse(const ast::RequirementObjectFluents&, const error_handler_type&, Context& context) {
-    context.requirements.object_fluents = true;
-}
-
-static void parse(const ast::RequirementNumericFluents&, const error_handler_type&, Context& context) {
-    context.requirements.numeric_fluents = true;
-}
-
-static void parse(const ast::RequirementAdl&, const error_handler_type&, Context& context) {
-    context.requirements.adl = true;
-    context.requirements.strips = true;
-    context.requirements.typing = true;
-    context.requirements.disjunctive_preconditions = true;
-    context.requirements.equality = true;
-    context.requirements.quantified_preconditions = true;
-    context.requirements.conditional_effects = true;
-}
-
-static void parse(const ast::RequirementDurativeActions&, const error_handler_type&, Context& context) {
-    context.requirements.durative_actions = true;
-}
-
-static void parse(const ast::RequirementDerivedPredicates&, const error_handler_type&, Context& context) {
-    context.requirements.derived_predicates = true;
-}
-
-static void parse(const ast::RequirementTimedInitialLiterals&, const error_handler_type&, Context& context) {
-    context.requirements.timed_initial_literals = true;
-    context.requirements.durative_actions = true;
-}
-
-static void parse(const ast::RequirementPreferences&, const error_handler_type&, Context& context) {
-    context.requirements.preferences = true;
-}
-
-static void parse(const ast::RequirementConstraints&, const error_handler_type&, Context& context) {
-    context.requirements.constraints = true;
-}
-
-static void parse(const ast::RequirementActionCosts&, const error_handler_type&, Context& context) {
-    context.requirements.action_costs = true;
-}
-
-struct RequirementVisitor {
-    const error_handler_type& error_handler;
-    Context& context;
-
-    RequirementVisitor(const error_handler_type& error_handler_, Context& context_)
-        : error_handler(error_handler_), context(context_) { }
-
-    template<typename Node>
-    void operator()(const Node& node) const {
-        parse(node, error_handler, context);
-    }
-};
-
-static void parse(const ast::Requirement& node, const error_handler_type& error_handler, Context& context) {
-    boost::apply_visitor(RequirementVisitor(error_handler, context), node);
-}
-
 pddl::Requirements parse(const ast::Requirements& requirements_node, const error_handler_type& error_handler, Context& context) {
     for (const auto& requirement : requirements_node.requirements) {
         parse(requirement, error_handler, context);
