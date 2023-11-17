@@ -26,10 +26,15 @@ private:
 public:
     ReferenceCountedObjectCache() { }
 
+    struct InsertResult {
+        std::shared_ptr<const T> element;
+        bool newly_inserted;
+    };
+
     /**
      * Inserts a new value and derives the key from it.
      */
-    std::shared_ptr<const T> insert(std::unique_ptr<T>&& element) {
+    InsertResult insert(std::unique_ptr<T>&& element) {
         /* we must declare sp before locking the mutex
            s.t. the deleter is called after the mutex was released in case of stack unwinding. */
         std::shared_ptr<T> sp;
@@ -54,7 +59,7 @@ public:
             );
             element.release();
         }
-        return sp;
+        return InsertResult{sp, new_insertion};
     }
 };
 

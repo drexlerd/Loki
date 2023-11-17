@@ -6,18 +6,25 @@
 #include "type.hpp"
 
 #include "../../common/ast/config.hpp"
+#include "../../common/cache.hpp"
 #include "../ast/ast.hpp"
+
+#include <unordered_set>
 
 namespace loki {
 namespace domain {
     struct Context {
         pddl::Requirements requirements;
-        std::unordered_map<std::string, pddl::Type> types;
+        std::shared_ptr<ReferenceCountedObjectCache<pddl::TypeImpl>> types;  // to enable shared_from_this
+        pddl::Type base_type_object;
+        pddl::Type base_type_number;
         std::unordered_map<std::string, pddl::Object> constants;
 
-        Context() {
-            // create base type.
-            types.emplace("object", pddl::create_type("object"));
+        Context() 
+            : types(std::make_shared<ReferenceCountedObjectCache<pddl::TypeImpl>>()) {
+            // create base types.
+            base_type_object = types->insert(pddl::create_type("object")).element;
+            base_type_number = types->insert(pddl::create_type("number")).element;
         }
     };
 }

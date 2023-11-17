@@ -32,7 +32,7 @@ namespace loki::pddl {
     using FunctionList = std::vector<Function>;
 
     class TypeImpl;
-    using Type = std::shared_ptr<TypeImpl>;
+    using Type = std::shared_ptr<const TypeImpl>;
     using TypeList = std::vector<Type>;
 
     class DomainImpl;

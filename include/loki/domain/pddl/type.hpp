@@ -7,15 +7,33 @@
 
 namespace loki::pddl {
 
+// Should never be modified after construction for caching to work.
 class TypeImpl {
-public:
-    std::string name;
-    TypeList bases;
+private:
+    std::string m_name;
+    TypeList m_bases;
 
+public:
     TypeImpl(const std::string& name, const TypeList& bases = {});
+
+    bool operator==(const TypeImpl& other) const;
+    bool operator!=(const TypeImpl& other) const;
+
+    const std::string& get_name() const;  
+    const TypeList& get_bases() const;
 };
 
-extern Type create_type(const std::string& name, const TypeList& bases = {});
+extern std::unique_ptr<TypeImpl> create_type(const std::string& name, const TypeList& bases = {});
+}
+
+
+namespace std {
+    template<>
+    struct hash<loki::pddl::TypeImpl>
+    {
+        std::size_t operator()(const loki::pddl::TypeImpl& type) const;
+    };
+
 }
 
 #endif
