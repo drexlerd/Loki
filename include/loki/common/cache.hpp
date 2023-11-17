@@ -16,7 +16,7 @@ namespace loki {
 template<typename T>
 class ReferenceCountedObjectCache : public std::enable_shared_from_this<ReferenceCountedObjectCache<T>> {
 private:
-    std::unordered_map<std::string, std::weak_ptr<T>> m_cache;
+    std::unordered_map<T, std::weak_ptr<T>> m_cache;
 
     /**
      * For multi-threading purposes
@@ -29,13 +29,12 @@ public:
     /**
      * Inserts a new value and derives the key from it.
      */
-    std::pair<std::shared_ptr<T>, bool> insert(std::unique_ptr<T>&& element) {
-        const std::string key = compute_key(*element);
+    std::shared_ptr<const T> insert(std::unique_ptr<T>&& element) {
         /* we must declare sp before locking the mutex
            s.t. the deleter is called after the mutex was released in case of stack unwinding. */
         std::shared_ptr<T> sp;
         std::lock_guard<std::mutex> hold(m_mutex);
-        auto& cached = m_cache[key];
+        auto& cached = m_cache[*element];
         sp = cached.lock();
         bool new_insertion = false;
         if (!sp) {
@@ -46,7 +45,7 @@ public:
                 {
                     {
                         std::lock_guard<std::mutex> hold(parent->m_mutex);
-                        parent->m_cache.erase(compute_key(*x));
+                        parent->m_cache.erase(*x);
                     }
                     /* After cache removal, we can call the objects destructor
                        and recursively call the deleter of children if their ref count goes to 0 */
@@ -55,7 +54,7 @@ public:
             );
             element.release();
         }
-        return std::make_pair(sp, new_insertion);
+        return sp;
     }
 };
 
