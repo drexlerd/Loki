@@ -8,19 +8,17 @@
 
 
 namespace loki {
-/**
- * A thread-safe reference-counted object cache.
- * Idea taken from Herb Sutter: https://channel9.msdn.com/Events/GoingNative/2013/My-Favorite-Cpp-10-Liner
- * Other sources: (1) https://stackoverflow.com/questions/49782011/herb-sutters-10-liner-with-cleanup
- */
+
+/// @brief A thread-safe reference-counted object cache.
+/// Original idea by Herb Sutter.
+/// Custom deleter idea: https://stackoverflow.com/questions/49782011/herb-sutters-10-liner-with-cleanup
+/// @tparam T The underlying object type.
 template<typename T>
 class ReferenceCountedObjectFactory : public std::enable_shared_from_this<ReferenceCountedObjectFactory<T>> {
 private:
     std::unordered_map<T, std::weak_ptr<T>> m_cache;
 
-    /**
-     * For multi-threading purposes
-     */
+    /// @brief For multi-threading purposes
     mutable std::mutex m_mutex;
 
 public:
@@ -31,9 +29,11 @@ public:
         bool newly_inserted;
     };
 
-    /**
-     * Inserts a new value and derives the key from it.
-     */
+    /// @brief Gets a shared reference to the object of type T with the given arguments.
+    ///        If such an object does not exists the it creates one.
+    /// @tparam ...Args The arguments that are passed to the constructor of T.
+    /// @param ...args
+    /// @return
     template<typename... Args>
     InsertResult get_or_create(Args&&... args) {
         /* Must explicitly call the constructor of T to give exclusive access to the factory. */
