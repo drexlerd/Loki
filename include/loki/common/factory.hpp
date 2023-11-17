@@ -24,9 +24,9 @@ private:
 public:
     ReferenceCountedObjectFactory() { }
 
-    struct InsertResult {
+    struct GetOrCreateResult {
         std::shared_ptr<const T> object;
-        bool newly_inserted;
+        bool created;
     };
 
     /// @brief Gets a shared reference to the object of type T with the given arguments.
@@ -35,7 +35,7 @@ public:
     /// @param ...args
     /// @return
     template<typename... Args>
-    InsertResult get_or_create(Args&&... args) {
+    GetOrCreateResult get_or_create(Args&&... args) {
         /* Must explicitly call the constructor of T to give exclusive access to the factory. */
         auto element = std::make_unique<T>(T(m_cache.size(), args...));
         /* we must declare sp before locking the mutex
@@ -62,7 +62,7 @@ public:
             );
             element.release();
         }
-        return InsertResult{sp, new_insertion};
+        return GetOrCreateResult{sp, new_insertion};
     }
 };
 

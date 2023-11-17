@@ -48,7 +48,7 @@ pddl::TypeSet TypeReferenceVisitor::operator()(const ast::Type& type_node) {
 pddl::TypeSet TypeReferenceVisitor::operator()(const ast::Name& name_node) {
     auto name = parse(name_node, error_handler, context);
     auto insert_result = context.types->get_or_create(name);
-    if (insert_result.newly_inserted) {
+    if (insert_result.created) {
         error_handler(name_node, "Used undefined type.");
         throw std::runtime_error("Failed parse.");
     }
@@ -56,7 +56,7 @@ pddl::TypeSet TypeReferenceVisitor::operator()(const ast::Name& name_node) {
 }
 
 pddl::TypeSet TypeReferenceVisitor::operator()(const ast::TypeObject&) {
-    assert(!context.types->get_or_create("object").newly_inserted);
+    assert(!context.types->get_or_create("object").created);
     return { context.types->get_or_create("object").object };
 }
 
@@ -79,7 +79,7 @@ TypeListVisitor::TypeListVisitor(const error_handler_type& error_handler_, Conte
 pddl::TypeSet TypeListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::TypeSet type_list;
-    assert(!context.types->get_or_create("object").newly_inserted);
+    assert(!context.types->get_or_create("object").created);
     const auto base_type = context.types->get_or_create("object").object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node, error_handler, context);
