@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <set>
 
 
 namespace loki::pddl {
@@ -33,7 +34,7 @@ namespace loki::pddl {
 
     class TypeImpl;
     using Type = std::shared_ptr<const TypeImpl>;
-    using TypeList = std::vector<Type>;
+    using TypeSet = std::set<Type>;
 
     class DomainImpl;
     using Domain = std::shared_ptr<DomainImpl>;

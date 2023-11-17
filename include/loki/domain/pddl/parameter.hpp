@@ -10,12 +10,12 @@ namespace loki::pddl {
 class ParameterImpl {
 public:
     std::string name;
-    TypeList types;
+    TypeSet types;
 
-    ParameterImpl(const std::string& name, const TypeList& types);
+    ParameterImpl(const std::string& name, const TypeSet& types);
 };
 
-extern Parameter create_parameter(const std::string& name, const TypeList& types = {});
+extern Parameter create_parameter(const std::string& name, const TypeSet& types = {});
 
 }
 

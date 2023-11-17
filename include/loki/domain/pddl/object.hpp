@@ -10,12 +10,12 @@ namespace loki::pddl {
 class ObjectImpl {
 public:
     std::string name;
-    TypeList types;
+    TypeSet types;
 
-    ObjectImpl(const std::string& name, const TypeList& types={});
+    ObjectImpl(const std::string& name, const TypeSet& types={});
 };
 
-extern Object create_object(const std::string& name, const TypeList& types = {});
+extern Object create_object(const std::string& name, const TypeSet& types = {});
 
 }
 

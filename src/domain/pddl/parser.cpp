@@ -30,7 +30,7 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
         requirements = parse(domain_node.requirements.value(), error_handler, context);
     }
     /* Types section */
-    pddl::TypeList types;
+    pddl::TypeSet types;
     if (domain_node.types.has_value()) {
         if (!context.requirements.typing) {
             error_handler(domain_node.types.value(), "Unexpected :types section. (Is :typing missing?)");

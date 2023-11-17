@@ -12,7 +12,7 @@ class DomainImpl {
     public:
         std::string name;
         Requirements requirements;
-        TypeList types;
+        TypeSet types;
 };
 
 }

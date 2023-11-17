@@ -12,10 +12,13 @@ class TypeImpl;
 // Should never be modified after construction for caching to work.
 class TypeImpl {
 private:
-    std::string m_name;
-    TypeList m_bases;
+    /* Index is used in sorting to obtain deterministic results. */
+    int m_index;
 
-    TypeImpl(const std::string& name, const TypeList& bases = {});
+    std::string m_name;
+    TypeSet m_bases;
+
+    TypeImpl(int index, const std::string& name, const TypeSet& bases = {});
 
     template<typename T>
     friend class loki::ReferenceCountedObjectFactory;
@@ -24,8 +27,13 @@ public:
     bool operator==(const TypeImpl& other) const;
     bool operator!=(const TypeImpl& other) const;
 
+    bool operator<(const TypeImpl& other) const;
+    bool operator>(const TypeImpl& other) const;
+
+    size_t hash() const;
+
     const std::string& get_name() const;
-    const TypeList& get_bases() const;
+    const TypeSet& get_bases() const;
 };
 }
 

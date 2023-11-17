@@ -1,12 +1,14 @@
 #include "help_functions.hpp"
 
 #include "../../../include/loki/domain/pddl/type.hpp"
+#include "../../../include/loki/common/hash.hpp"
 
 #include <memory>
 
 namespace loki::pddl {
-TypeImpl::TypeImpl(const std::string& name, const TypeList& bases)
-    : m_name(name)
+TypeImpl::TypeImpl(int index, const std::string& name, const TypeSet& bases)
+    : m_index(index)
+    , m_name(name)
     , m_bases(bases)
 {
 }
@@ -19,11 +21,23 @@ bool TypeImpl::operator!=(const TypeImpl& other) const {
     return !(*this == other);
 }
 
+bool TypeImpl::operator<(const TypeImpl& other) const {
+    return m_index < other.m_index;
+}
+
+bool TypeImpl::operator>(const TypeImpl& other) const {
+    return m_index > other.m_index;
+}
+
+size_t TypeImpl::hash() const {
+    return hash_combine(m_name, hash_set(m_bases));
+}
+
 const std::string& TypeImpl::get_name() const {
     return m_name;
 }
 
-const TypeList& TypeImpl::get_bases() const {
+const TypeSet& TypeImpl::get_bases() const {
     return m_bases;
 }
 
@@ -31,7 +45,6 @@ const TypeList& TypeImpl::get_bases() const {
 
 namespace std {
     std::size_t hash<loki::pddl::TypeImpl>::operator()(const loki::pddl::TypeImpl& type) const {
-        // TODO: implement correct hashing
-        return std::hash<std::string>()(type.get_name());
+        return type.hash();
     }
 }

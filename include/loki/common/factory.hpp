@@ -37,7 +37,7 @@ public:
     template<typename... Args>
     InsertResult get_or_create(Args&&... args) {
         /* Must explicitly call the constructor of T to give exclusive access to the factory. */
-        auto element = std::make_unique<T>(T(args...));
+        auto element = std::make_unique<T>(T(m_cache.size(), args...));
         /* we must declare sp before locking the mutex
            s.t. the deleter is called after the mutex was released in case of stack unwinding. */
         std::shared_ptr<T> sp;

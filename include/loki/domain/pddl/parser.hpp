@@ -36,7 +36,7 @@ extern double parse(const domain::ast::Number& number_node, const error_handler_
 
 extern std::string parse(const domain::ast::DomainName& domain_name_node, const error_handler_type& error_handler, domain::Context& context);
 extern pddl::Requirements parse(const domain::ast::Requirements& requirements_node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::TypeList parse(const domain::ast::Types& types_node, const error_handler_type& error_handler, domain::Context& context);
+extern pddl::TypeSet parse(const domain::ast::Types& types_node, const error_handler_type& error_handler, domain::Context& context);
 extern pddl::PredicateList parse(const domain::ast::Predicates& predicates_node, const error_handler_type& error_handler, domain::Context& context);
 
 extern pddl::Domain parse(const domain::ast::Domain& domain_node, const error_handler_type& error_handler, domain::Context& context);

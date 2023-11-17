@@ -7,10 +7,10 @@
 
 namespace loki::pddl
 {
-    ObjectImpl::ObjectImpl(const std::string& name, const TypeList& types)
+    ObjectImpl::ObjectImpl(const std::string& name, const TypeSet& types)
         : name(name), types(types) { }
 
-    Object create_object(const std::string& name, const TypeList& types) {
+    Object create_object(const std::string& name, const TypeSet& types) {
         return std::make_shared<ObjectImpl>(name, types);
     }
 }

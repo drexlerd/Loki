@@ -11,7 +11,7 @@ using namespace std;
 
 namespace loki {
 
-class TypeDeclarationVisitor : boost::static_visitor<pddl::TypeList> {
+class TypeDeclarationVisitor : boost::static_visitor<pddl::TypeSet> {
 private:
     const error_handler_type& error_handler;
     Context& context;
@@ -19,16 +19,16 @@ private:
 public:
     TypeDeclarationVisitor(const error_handler_type& error_handler_, Context& context_);
 
-    pddl::TypeList operator()(const ast::Type& type_node);
+    pddl::TypeSet operator()(const ast::Type& type_node);
 
-    pddl::TypeList operator()(const ast::Name& name_node);
+    pddl::TypeSet operator()(const ast::Name& name_node);
 
-    pddl::TypeList operator()(const ast::TypeObject&);
+    pddl::TypeSet operator()(const ast::TypeObject&);
 
-    pddl::TypeList operator()(const ast::TypeEither& either_type_node);
+    pddl::TypeSet operator()(const ast::TypeEither& either_type_node);
 };
 
-class TypeReferenceVisitor : boost::static_visitor<pddl::TypeList> {
+class TypeReferenceVisitor : boost::static_visitor<pddl::TypeSet> {
 private:
     const error_handler_type& error_handler;
     Context& context;
@@ -36,16 +36,16 @@ private:
 public:
     TypeReferenceVisitor(const error_handler_type& error_handler_, Context& context_);
 
-    pddl::TypeList operator()(const ast::Type& type_node);
+    pddl::TypeSet operator()(const ast::Type& type_node);
 
-    pddl::TypeList operator()(const ast::Name& name_node);
+    pddl::TypeSet operator()(const ast::Name& name_node);
 
-    pddl::TypeList operator()(const ast::TypeObject&);
+    pddl::TypeSet operator()(const ast::TypeObject&);
 
-    pddl::TypeList operator()(const ast::TypeEither& either_type_node);
+    pddl::TypeSet operator()(const ast::TypeEither& either_type_node);
 };
 
-class TypeListVisitor : boost::static_visitor<pddl::TypeList> {
+class TypeListVisitor : boost::static_visitor<pddl::TypeSet> {
 private:
     const error_handler_type& error_handler;
     Context& context;
@@ -53,15 +53,15 @@ private:
 public:
     TypeListVisitor(const error_handler_type& error_handler_, Context& context_);
 
-    pddl::TypeList operator()(const std::vector<ast::Name>& name_nodes);
+    pddl::TypeSet operator()(const std::vector<ast::Name>& name_nodes);
 
-    pddl::TypeList operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
+    pddl::TypeSet operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
 
-    pddl::TypeList operator()(const ast::TypedListOfNames& node);
+    pddl::TypeSet operator()(const ast::TypedListOfNames& node);
 };
 
 
-pddl::TypeList parse(const ast::Types& types_node, const error_handler_type& error_handler, Context& context);
+pddl::TypeSet parse(const ast::Types& types_node, const error_handler_type& error_handler, Context& context);
 
 }
 
