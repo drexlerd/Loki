@@ -2,14 +2,16 @@
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_TYPE_HPP_
 
 #include "declarations.hpp"
-#include "../../common/factory.hpp"
 
 #include <string>
 
-namespace loki::pddl {
-class TypeImpl;
+namespace loki {
+template<typename T>
+class ReferenceCountedObjectFactory;
+}
 
-// Should never be modified after construction for caching to work.
+
+namespace loki::pddl {
 class TypeImpl {
 private:
     /* Index is used in sorting to obtain deterministic results. */
@@ -44,7 +46,6 @@ namespace std {
     {
         std::size_t operator()(const loki::pddl::TypeImpl& type) const;
     };
-
 }
 
 #endif

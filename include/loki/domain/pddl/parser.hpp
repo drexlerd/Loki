@@ -2,6 +2,8 @@
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_PARSER_HPP_
 
 #include "declarations.hpp"
+#include "object.hpp"
+#include "parameter.hpp"
 #include "requirements.hpp"
 #include "type.hpp"
 
@@ -18,10 +20,13 @@ namespace domain {
         std::shared_ptr<ReferenceCountedObjectFactory<pddl::TypeImpl>> types;  // to enable shared_from_this
         pddl::Type base_type_object;
         pddl::Type base_type_number;
-        std::unordered_map<std::string, pddl::Object> constants;
+        std::shared_ptr<ReferenceCountedObjectFactory<pddl::ObjectImpl>> constants;
+        std::shared_ptr<ReferenceCountedObjectFactory<pddl::ParameterImpl>> parameters;
 
         Context()
-            : types(std::make_shared<ReferenceCountedObjectFactory<pddl::TypeImpl>>()) {
+            : types(std::make_shared<ReferenceCountedObjectFactory<pddl::TypeImpl>>())
+            , constants(std::make_shared<ReferenceCountedObjectFactory<pddl::ObjectImpl>>())
+            , parameters(std::make_shared<ReferenceCountedObjectFactory<pddl::ParameterImpl>>()) {
             // create base types.
             base_type_object = types->get_or_create("object").object;
             base_type_number = types->get_or_create("number").object;

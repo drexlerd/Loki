@@ -18,7 +18,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Vari
     const auto type = context.types->get_or_create("object").object;
     for (const auto& variable_node : variable_nodes) {
         const auto name = parse(variable_node, error_handler, context);
-        const auto parameter = pddl::create_parameter(name, {type});
+        const auto parameter = context.parameters->get_or_create(name, pddl::TypeSet{type}).object;
         parameter_list.emplace_back(parameter);
     }
     return parameter_list;
@@ -31,7 +31,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
     // A non-visited vector of variables has user defined types
     for (const auto& variable_node : typed_variables_node.variables) {
         const auto name = parse(variable_node, error_handler, context);
-        const auto parameter = pddl::create_parameter(name, types);
+        const auto parameter = context.parameters->get_or_create(name, types).object;
         parameter_list.emplace_back(parameter);
     }
     // Recursively add parameters.

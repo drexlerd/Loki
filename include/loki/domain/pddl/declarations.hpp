@@ -11,25 +11,25 @@
 
 namespace loki::pddl {
     class AtomImpl;
-    using Atom = std::shared_ptr<AtomImpl>;
+    using Atom = std::shared_ptr<const AtomImpl>;
     using AtomList = std::vector<Atom>;
     using AtomSet = std::unordered_set<Atom>;
 
     class ObjectImpl;
-    using Object = std::shared_ptr<ObjectImpl>;
+    using Object = std::shared_ptr<const ObjectImpl>;
     using ObjectList = std::vector<Object>;
 
     class ParameterImpl;
-    using Parameter = std::shared_ptr<ParameterImpl>;
+    using Parameter = std::shared_ptr<const ParameterImpl>;
     using ParameterList = std::vector<Parameter>;
     using ParameterAssignment = std::unordered_map<Parameter, Object>;
 
     class PredicateImpl;
-    using Predicate = std::shared_ptr<PredicateImpl>;
+    using Predicate = std::shared_ptr<const PredicateImpl>;
     using PredicateList = std::vector<Predicate>;
 
     class FunctionImpl;
-    using Function = std::shared_ptr<FunctionImpl>;
+    using Function = std::shared_ptr<const FunctionImpl>;
     using FunctionList = std::vector<Function>;
 
     class TypeImpl;
@@ -37,7 +37,7 @@ namespace loki::pddl {
     using TypeSet = std::set<Type>;
 
     class DomainImpl;
-    using Domain = std::shared_ptr<DomainImpl>;
+    using Domain = std::shared_ptr<const DomainImpl>;
     using DomainList = std::vector<Domain>;
 }
 

@@ -1,9 +1,6 @@
-#include "help_functions.hpp"
-
 #include "../../../include/loki/domain/pddl/type.hpp"
 #include "../../../include/loki/common/hash.hpp"
 
-#include <memory>
 
 namespace loki::pddl {
 TypeImpl::TypeImpl(int index, const std::string& name, const TypeSet& bases)

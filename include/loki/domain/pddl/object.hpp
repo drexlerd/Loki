@@ -4,19 +4,51 @@
 #include "declarations.hpp"
 
 #include <string>
+#include <functional>
+
+
+namespace loki {
+template<typename T>
+class ReferenceCountedObjectFactory;
+}
+
 
 namespace loki::pddl {
-
 class ObjectImpl {
-public:
-    std::string name;
-    TypeSet types;
+private:
+    int m_index;
 
-    ObjectImpl(const std::string& name, const TypeSet& types={});
+    std::string m_name;
+    TypeSet m_types;
+
+    ObjectImpl(int index, const std::string& name, const TypeSet& types={});
+
+    template<typename T>
+    friend class loki::ReferenceCountedObjectFactory;
+
+public:
+    bool operator==(const ObjectImpl& other) const;
+    bool operator!=(const ObjectImpl& other) const;
+
+    bool operator<(const ObjectImpl& other) const;
+    bool operator>(const ObjectImpl& other) const;
+
+    size_t hash() const;
+
+    const std::string& get_name() const;
+    const TypeSet& get_bases() const;
 };
 
-extern Object create_object(const std::string& name, const TypeSet& types = {});
-
 }
+
+
+namespace std {
+    template<>
+    struct hash<loki::pddl::ObjectImpl>
+    {
+        std::size_t operator()(const loki::pddl::ObjectImpl& type) const;
+    };
+}
+
 
 #endif

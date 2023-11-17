@@ -19,7 +19,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& n
     const auto type = context.types->get_or_create("object").object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node, error_handler, context);
-        const auto object = context.constants.emplace(name, pddl::create_object(name, {type})).first->second;
+        const auto object = context.constants->get_or_create(name, pddl::TypeSet{type}).object;
         object_list.emplace_back(object);
     }
     return object_list;
@@ -32,7 +32,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
         const auto name = parse(name_node, error_handler, context);
-        const auto object = context.constants.emplace(name, pddl::create_object(name, types)).first->second;
+        const auto object = context.constants->get_or_create(name, types).object;
         object_list.emplace_back(object);
     }
     // Recursively add objects.

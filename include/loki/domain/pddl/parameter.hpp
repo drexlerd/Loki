@@ -5,18 +5,49 @@
 
 #include <string>
 
+
+namespace loki {
+template<typename T>
+class ReferenceCountedObjectFactory;
+}
+
+
 namespace loki::pddl {
 
 class ParameterImpl {
-public:
-    std::string name;
-    TypeSet types;
+private:
+    int m_index;
 
-    ParameterImpl(const std::string& name, const TypeSet& types);
+    std::string m_name;
+    TypeSet m_types;
+
+    ParameterImpl(int index, const std::string& name, const TypeSet& types);
+
+    template<typename T>
+    friend class loki::ReferenceCountedObjectFactory;
+
+public:
+    bool operator==(const ParameterImpl& other) const;
+    bool operator!=(const ParameterImpl& other) const;
+
+    bool operator<(const ParameterImpl& other) const;
+    bool operator>(const ParameterImpl& other) const;
+
+    size_t hash() const;
+
+    const std::string& get_name() const;
+    const TypeSet& get_bases() const;
 };
 
-extern Parameter create_parameter(const std::string& name, const TypeSet& types = {});
+}
 
+
+namespace std {
+    template<>
+    struct hash<loki::pddl::ParameterImpl>
+    {
+        std::size_t operator()(const loki::pddl::ParameterImpl& parameter) const;
+    };
 }
 
 #endif
