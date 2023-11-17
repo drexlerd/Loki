@@ -14,8 +14,8 @@ ParameterListVisitor::ParameterListVisitor(const error_handler_type& error_handl
 pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>& variable_nodes) {
     // A visited vector of variable has single base type "object"
     pddl::ParameterList parameter_list;
-    assert(!context.types->insert(pddl::create_type("object")).newly_inserted);
-    const auto type = context.types->insert(pddl::create_type("object")).element;
+    assert(!context.types->get_or_create("object").newly_inserted);
+    const auto type = context.types->get_or_create("object").object;
     for (const auto& variable_node : variable_nodes) {
         const auto name = parse(variable_node, error_handler, context);
         const auto parameter = pddl::create_parameter(name, {type});

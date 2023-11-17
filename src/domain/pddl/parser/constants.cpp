@@ -15,8 +15,8 @@ ConstantListVisitor::ConstantListVisitor(const error_handler_type& error_handler
 pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::ObjectList object_list;
-    assert(!context.types->insert(pddl::create_type("object")).newly_inserted);
-    const auto type = context.types->insert(pddl::create_type("object")).element;
+    assert(!context.types->get_or_create("object").newly_inserted);
+    const auto type = context.types->get_or_create("object").object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node, error_handler, context);
         const auto object = context.constants.emplace(name, pddl::create_object(name, {type})).first->second;

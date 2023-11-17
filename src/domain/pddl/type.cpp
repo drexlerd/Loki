@@ -11,11 +11,6 @@ TypeImpl::TypeImpl(const std::string& name, const TypeList& bases)
 {
 }
 
-std::unique_ptr<TypeImpl> create_type(const std::string& name, const TypeList& bases)
-{
-    return std::make_unique<TypeImpl>(name, bases);
-}
-
 bool TypeImpl::operator==(const TypeImpl& other) const {
     return (m_name == other.m_name) && (m_bases == other.m_bases);
 }

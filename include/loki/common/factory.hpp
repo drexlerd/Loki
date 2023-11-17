@@ -14,7 +14,7 @@ namespace loki {
  * Other sources: (1) https://stackoverflow.com/questions/49782011/herb-sutters-10-liner-with-cleanup
  */
 template<typename T>
-class ReferenceCountedObjectCache : public std::enable_shared_from_this<ReferenceCountedObjectCache<T>> {
+class ReferenceCountedObjectFactory : public std::enable_shared_from_this<ReferenceCountedObjectFactory<T>> {
 private:
     std::unordered_map<T, std::weak_ptr<T>> m_cache;
 
@@ -24,19 +24,21 @@ private:
     mutable std::mutex m_mutex;
 
 public:
-    ReferenceCountedObjectCache() { }
+    ReferenceCountedObjectFactory() { }
 
     struct InsertResult {
-        std::shared_ptr<const T> element;
+        std::shared_ptr<const T> object;
         bool newly_inserted;
     };
 
     /**
      * Inserts a new value and derives the key from it.
      */
-    InsertResult insert(std::unique_ptr<T>&& element) {
+    template<typename... Args>
+    InsertResult get_or_create(Args&&... args) {
         /* we must declare sp before locking the mutex
            s.t. the deleter is called after the mutex was released in case of stack unwinding. */
+        auto element = std::make_unique<T>(T(args...));
         std::shared_ptr<T> sp;
         std::lock_guard<std::mutex> hold(m_mutex);
         auto& cached = m_cache[*element];
