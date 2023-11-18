@@ -1,4 +1,4 @@
-#include "../../../include/loki/domain/pddl/atom.hpp"
+#include "../../../include/loki/problem/pddl/atom.hpp"
 #include "../../../include/loki/common/hash.hpp"
 
 
