@@ -5,17 +5,36 @@
 
 #include <string>
 
-namespace loki::pddl {
 
+namespace loki {
+template<typename T>
+class ReferenceCountedObjectFactory;
+}
+
+
+namespace loki::pddl {
 class FunctionImpl {
-public:
+private:
     std::string name;
     ParameterList parameters;
 
     FunctionImpl(const std::string& name, const ParameterList& parameters);
+
+    template<typename T>
+    friend class loki::ReferenceCountedObjectFactory;
+
+public:
+    bool operator==(const ObjectImpl& other) const;
+    bool operator!=(const ObjectImpl& other) const;
+    bool operator<(const ObjectImpl& other) const;
+    bool operator>(const ObjectImpl& other) const;
+
+    size_t hash() const;
+
+    const std::string& get_name() const;
+    const ParameterList& get_parameters() const;
 };
 
-extern Function create_function(const std::string& name, const ParameterList& parameters);
 }
 
 #endif

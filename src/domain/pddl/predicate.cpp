@@ -5,14 +5,45 @@
 #include <memory>
 
 namespace loki::pddl {
-PredicateImpl::PredicateImpl(const std::string& name, const ParameterList& parameters)
-    : name(name)
-    , parameters(parameters)
+PredicateImpl::PredicateImpl(int index, const std::string& name, const ParameterList& parameters)
+    : m_index(index)
+    , m_name(name)
+    , m_parameters(parameters)
 {
 }
 
-Predicate create_predicate(const std::string& name, const ParameterList& parameters)
-{
-    return std::make_shared<PredicateImpl>(name, parameters);
+bool PredicateImpl::operator==(const PredicateImpl& other) const {
+    return (m_name == other.m_name) && (m_parameters == other.m_parameters);
 }
+
+bool PredicateImpl::operator!=(const PredicateImpl& other) const {
+    return !(*this == other);
+}
+
+bool PredicateImpl::operator<(const PredicateImpl& other) const {
+    return m_index < other.m_index;
+}
+
+bool PredicateImpl::operator>(const PredicateImpl& other) const {
+    return m_index > other.m_index;
+}
+
+size_t PredicateImpl::hash() const {
+    return hash_combine(m_name, hash_vector(m_parameters));
+}
+
+const std::string& PredicateImpl::get_name() const {
+    return m_name;
+}
+
+const ParameterList& PredicateImpl::get_parameters() const {
+    return m_parameters;
+}
+
+}
+
+namespace std {
+    std::size_t hash<loki::pddl::PredicateImpl>::operator()(const loki::pddl::PredicateImpl& predicate) const {
+        return predicate.hash();
+    }
 }

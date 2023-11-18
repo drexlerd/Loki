@@ -29,7 +29,6 @@ private:
 public:
     bool operator==(const ParameterImpl& other) const;
     bool operator!=(const ParameterImpl& other) const;
-
     bool operator<(const ParameterImpl& other) const;
     bool operator>(const ParameterImpl& other) const;
 

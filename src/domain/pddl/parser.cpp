@@ -32,7 +32,7 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
     /* Types section */
     pddl::TypeSet types;
     if (domain_node.types.has_value()) {
-        if (!context.requirements.typing) {
+        if (!requirements->test(pddl::RequirementEnum::TYPING)) {
             error_handler(domain_node.types.value(), "Unexpected :types section. (Is :typing missing?)");
             throw std::runtime_error("Failed parse.");
         }

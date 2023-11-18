@@ -4,105 +4,110 @@ using namespace loki::domain;
 
 namespace loki {
 
-void parse(const ast::RequirementStrips&, const error_handler_type&, Context& context) {
-    context.requirements.strips = true;
+pddl::RequirementEnumSet parse(const ast::RequirementStrips&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::STRIPS };
 }
 
-void parse(const ast::RequirementTyping&, const error_handler_type&, Context& context) {
-    context.requirements.typing = true;
+pddl::RequirementEnumSet parse(const ast::RequirementTyping&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::TYPING };
 }
 
-void parse(const ast::RequirementNegativePreconditions&, const error_handler_type&, Context& context) {
-    context.requirements.negative_preconditions = true;
+pddl::RequirementEnumSet parse(const ast::RequirementNegativePreconditions&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::NEGATIVE_PRECONDITIONS };
 }
 
-void parse(const ast::RequirementDisjunctivePreconditions&, const error_handler_type&, Context& context) {
-    context.requirements.disjunctive_preconditions = true;
+pddl::RequirementEnumSet parse(const ast::RequirementDisjunctivePreconditions&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS };
 }
 
-void parse(const ast::RequirementEquality&, const error_handler_type&, Context& context) {
-    context.requirements.equality = true;
+pddl::RequirementEnumSet parse(const ast::RequirementEquality&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::EQUALITY };
 }
 
-void parse(const ast::RequirementExistentialPreconditions&, const error_handler_type&, Context& context) {
-    context.requirements.existential_preconditions = true;
+pddl::RequirementEnumSet parse(const ast::RequirementExistentialPreconditions&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS };
 }
 
-void parse(const ast::RequirementUniversalPreconditions&, const error_handler_type&, Context& context) {
-    context.requirements.universal_preconditions = true;
+pddl::RequirementEnumSet parse(const ast::RequirementUniversalPreconditions&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS };
 }
 
-void parse(const ast::RequirementQuantifiedPreconditions&, const error_handler_type&, Context& context) {
-    context.requirements.quantified_preconditions = true;
-    context.requirements.existential_preconditions = true;
-    context.requirements.universal_preconditions = true;
+pddl::RequirementEnumSet parse(const ast::RequirementQuantifiedPreconditions&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::QUANTIFIED_PRECONDITIONS,
+             pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS,
+             pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS };
 }
 
-void parse(const ast::RequirementConditionalEffects&, const error_handler_type&, Context& context) {
-    context.requirements.conditional_effects = true;
+pddl::RequirementEnumSet parse(const ast::RequirementConditionalEffects&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::CONDITIONAL_EFFECTS };
 }
 
-void parse(const ast::RequirementFluents&, const error_handler_type&, Context& context) {
-    context.requirements.fluents = true;
-    context.requirements.object_fluents = true;
-    context.requirements.numeric_fluents = true;
+pddl::RequirementEnumSet parse(const ast::RequirementFluents&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::FLUENTS,
+             pddl::RequirementEnum::OBJECT_FLUENTS,
+             pddl::RequirementEnum::NUMERIC_FLUENTS };
 }
 
-void parse(const ast::RequirementObjectFluents&, const error_handler_type&, Context& context) {
-    context.requirements.object_fluents = true;
+pddl::RequirementEnumSet parse(const ast::RequirementObjectFluents&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::OBJECT_FLUENTS };
 }
 
-void parse(const ast::RequirementNumericFluents&, const error_handler_type&, Context& context) {
-    context.requirements.numeric_fluents = true;
+pddl::RequirementEnumSet parse(const ast::RequirementNumericFluents&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::NUMERIC_FLUENTS };
 }
 
-void parse(const ast::RequirementAdl&, const error_handler_type&, Context& context) {
-    context.requirements.adl = true;
-    context.requirements.strips = true;
-    context.requirements.typing = true;
-    context.requirements.disjunctive_preconditions = true;
-    context.requirements.equality = true;
-    context.requirements.quantified_preconditions = true;
-    context.requirements.conditional_effects = true;
+pddl::RequirementEnumSet parse(const ast::RequirementAdl&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::ADL,
+             pddl::RequirementEnum::STRIPS,
+             pddl::RequirementEnum::TYPING,
+             pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS,
+             pddl::RequirementEnum::EQUALITY,
+             pddl::RequirementEnum::QUANTIFIED_PRECONDITIONS,
+             pddl::RequirementEnum::CONDITIONAL_EFFECTS };
 }
 
-void parse(const ast::RequirementDurativeActions&, const error_handler_type&, Context& context) {
-    context.requirements.durative_actions = true;
+pddl::RequirementEnumSet parse(const ast::RequirementDurativeActions&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::DURATIVE_ACTIONS };
 }
 
-void parse(const ast::RequirementDerivedPredicates&, const error_handler_type&, Context& context) {
-    context.requirements.derived_predicates = true;
+pddl::RequirementEnumSet parse(const ast::RequirementDerivedPredicates&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::DERIVED_PREDICATES };
 }
 
-void parse(const ast::RequirementTimedInitialLiterals&, const error_handler_type&, Context& context) {
-    context.requirements.timed_initial_literals = true;
-    context.requirements.durative_actions = true;
+pddl::RequirementEnumSet parse(const ast::RequirementTimedInitialLiterals&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::TIMED_INITIAL_LITERALS,
+             pddl::RequirementEnum::DURATIVE_ACTIONS };
 }
 
-void parse(const ast::RequirementPreferences&, const error_handler_type&, Context& context) {
-    context.requirements.preferences = true;
+pddl::RequirementEnumSet parse(const ast::RequirementPreferences&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::PREFERENCES };
 }
 
-void parse(const ast::RequirementConstraints&, const error_handler_type&, Context& context) {
-    context.requirements.constraints = true;
+pddl::RequirementEnumSet parse(const ast::RequirementConstraints&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::CONSTRAINTS };
+
 }
 
-void parse(const ast::RequirementActionCosts&, const error_handler_type&, Context& context) {
-    context.requirements.action_costs = true;
+pddl::RequirementEnumSet parse(const ast::RequirementActionCosts&, const error_handler_type&, Context&) {
+    return { pddl::RequirementEnum::ACTION_COSTS };
 }
 
-void parse(const ast::Requirement& node, const error_handler_type& error_handler, Context& context) {
-    boost::apply_visitor(RequirementVisitor(error_handler, context), node);
+pddl::RequirementEnumSet parse(const ast::Requirement& node, const error_handler_type& error_handler, Context& context) {
+    return boost::apply_visitor(RequirementVisitor(error_handler, context), node);
 }
 
 RequirementVisitor::RequirementVisitor(const error_handler_type& error_handler_, Context& context_)
     : error_handler(error_handler_), context(context_) { }
 
 pddl::Requirements parse(const ast::Requirements& requirements_node, const error_handler_type& error_handler, Context& context) {
+    pddl::RequirementEnumSet requirements;
     for (const auto& requirement : requirements_node.requirements) {
-        parse(requirement, error_handler, context);
+        auto additional_requirements = parse(requirement, error_handler, context);
+        requirements.insert(additional_requirements.begin(), additional_requirements.end());
     }
-    return context.requirements;
+    auto specified_requirements = context.requirements->get_or_create(requirements).object;
+    context.specified_requirements = specified_requirements;
+    return specified_requirements;
 }
 
 }

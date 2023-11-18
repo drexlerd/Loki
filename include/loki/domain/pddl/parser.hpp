@@ -4,6 +4,7 @@
 #include "declarations.hpp"
 #include "object.hpp"
 #include "parameter.hpp"
+#include "predicate.hpp"
 #include "requirements.hpp"
 #include "type.hpp"
 
@@ -16,17 +17,21 @@
 namespace loki {
 namespace domain {
     struct Context {
-        pddl::Requirements requirements;
+        std::shared_ptr<ReferenceCountedObjectFactory<pddl::RequirementsImpl>> requirements;  // we use factory for controlled creation even if there exists only a single Requirements per domain.
+        pddl::Requirements specified_requirements;
         std::shared_ptr<ReferenceCountedObjectFactory<pddl::TypeImpl>> types;  // to enable shared_from_this
         pddl::Type base_type_object;
         pddl::Type base_type_number;
         std::shared_ptr<ReferenceCountedObjectFactory<pddl::ObjectImpl>> constants;
         std::shared_ptr<ReferenceCountedObjectFactory<pddl::ParameterImpl>> parameters;
+        std::shared_ptr<ReferenceCountedObjectFactory<pddl::PredicateImpl>> predicates;
 
         Context()
-            : types(std::make_shared<ReferenceCountedObjectFactory<pddl::TypeImpl>>())
+            : requirements(std::make_shared<ReferenceCountedObjectFactory<pddl::RequirementsImpl>>())
+            , types(std::make_shared<ReferenceCountedObjectFactory<pddl::TypeImpl>>())
             , constants(std::make_shared<ReferenceCountedObjectFactory<pddl::ObjectImpl>>())
-            , parameters(std::make_shared<ReferenceCountedObjectFactory<pddl::ParameterImpl>>()) {
+            , parameters(std::make_shared<ReferenceCountedObjectFactory<pddl::ParameterImpl>>())
+            , predicates(std::make_shared<ReferenceCountedObjectFactory<pddl::PredicateImpl>>()) {
             // create base types.
             base_type_object = types->get_or_create("object").object;
             base_type_number = types->get_or_create("number").object;

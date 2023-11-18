@@ -5,17 +5,47 @@
 
 #include <string>
 
+
+namespace loki {
+template<typename T>
+class ReferenceCountedObjectFactory;
+}
+
+
 namespace loki::pddl {
 
 class PredicateImpl {
-public:
-    std::string name;
-    ParameterList parameters;
+private:
+    int m_index;
+    std::string m_name;
+    ParameterList m_parameters;
 
-    PredicateImpl(const std::string& name, const ParameterList& parameters);
+    PredicateImpl(int index, const std::string& name, const ParameterList& parameters);
+
+    template<typename T>
+    friend class loki::ReferenceCountedObjectFactory;
+
+public:
+    bool operator==(const PredicateImpl& other) const;
+    bool operator!=(const PredicateImpl& other) const;
+    bool operator<(const PredicateImpl& other) const;
+    bool operator>(const PredicateImpl& other) const;
+
+    size_t hash() const;
+
+    const std::string& get_name() const;
+    const ParameterList& get_parameters() const;
 };
 
-extern Predicate create_predicate(const std::string& name, const ParameterList& parameters);
+}
+
+
+namespace std {
+    template<>
+    struct hash<loki::pddl::PredicateImpl>
+    {
+        std::size_t operator()(const loki::pddl::PredicateImpl& predicate) const;
+    };
 }
 
 #endif

@@ -2,31 +2,72 @@
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_REQUIREMENTS_HPP_
 
 #include <string>
+#include <set>
+
+
+namespace loki {
+template<typename T>
+class ReferenceCountedObjectFactory;
+}
+
 
 namespace loki::pddl {
 
-struct Requirements {
-    bool strips = false;
-    bool typing = false;
-    bool negative_preconditions = false;
-    bool disjunctive_preconditions = false;
-    bool equality = false;
-    bool existential_preconditions = false;
-    bool universal_preconditions = false;
-    bool quantified_preconditions = false;
-    bool conditional_effects = false;
-    bool fluents = false;
-    bool object_fluents = false;
-    bool numeric_fluents = false;
-    bool adl = false;
-    bool durative_actions = false;
-    bool derived_predicates = false;
-    bool timed_initial_literals = false;
-    bool preferences = false;
-    bool constraints = false;
-    bool action_costs = false;
+enum class RequirementEnum {
+    STRIPS,
+    TYPING,
+    NEGATIVE_PRECONDITIONS,
+    DISJUNCTIVE_PRECONDITIONS,
+    EQUALITY,
+    EXISTENTIAL_PRECONDITIONS,
+    UNIVERSAL_PRECONDITIONS,
+    QUANTIFIED_PRECONDITIONS,
+    CONDITIONAL_EFFECTS,
+    FLUENTS,
+    OBJECT_FLUENTS,
+    NUMERIC_FLUENTS,
+    ADL,
+    DURATIVE_ACTIONS,
+    DERIVED_PREDICATES,
+    TIMED_INITIAL_LITERALS,
+    PREFERENCES,
+    CONSTRAINTS,
+    ACTION_COSTS,
 };
 
+using RequirementEnumSet = std::set<RequirementEnum>;
+
+
+class RequirementsImpl {
+private:
+    int m_index;
+    RequirementEnumSet m_requirements;
+
+    RequirementsImpl(int index, const RequirementEnumSet& requirements);
+
+    template<typename T>
+    friend class loki::ReferenceCountedObjectFactory;
+
+public:
+    bool operator==(const RequirementsImpl& other) const;
+    bool operator!=(const RequirementsImpl& other) const;
+    bool operator<(const RequirementsImpl& other) const;
+    bool operator>(const RequirementsImpl& other) const;
+
+    size_t hash() const;
+
+    bool test(RequirementEnum requirement) const;
+};
+
+}
+
+
+namespace std {
+    template<>
+    struct hash<loki::pddl::RequirementsImpl>
+    {
+        std::size_t operator()(const loki::pddl::RequirementsImpl& requirements) const;
+    };
 }
 
 #endif

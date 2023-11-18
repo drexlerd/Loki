@@ -29,7 +29,6 @@ private:
 public:
     bool operator==(const ObjectImpl& other) const;
     bool operator!=(const ObjectImpl& other) const;
-
     bool operator<(const ObjectImpl& other) const;
     bool operator>(const ObjectImpl& other) const;
 

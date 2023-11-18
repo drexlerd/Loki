@@ -10,6 +10,9 @@
 
 
 namespace loki::pddl {
+    class RequirementsImpl;
+    using Requirements = std::shared_ptr<const RequirementsImpl>;
+
     class TypeImpl;
     using Type = std::shared_ptr<const TypeImpl>;
     using TypeList = std::vector<Type>;
@@ -69,7 +72,7 @@ namespace loki::pddl {
     using ActionSet = std::set<Action>;
 
     class DerivedPredicateImpl;
-    using DerivedPredicate = std::shared_ptr<const DerivedPredicate>;
+    using DerivedPredicate = std::shared_ptr<const DerivedPredicateImpl>;
     using DerivedPredicateList = std::vector<DerivedPredicate>;
     using DerivedPredicateSet = std::set<DerivedPredicate>;
 

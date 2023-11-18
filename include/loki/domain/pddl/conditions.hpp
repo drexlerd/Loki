@@ -3,8 +3,14 @@
 
 #include "declarations.hpp"
 
-
 #include <string>
+
+
+namespace loki {
+template<typename T>
+class ReferenceCountedObjectFactory;
+}
+
 
 namespace loki::pddl {
 /// @brief Provides an interface for visiting nodes in a DAG of conditions.
@@ -15,25 +21,39 @@ public:
 
 
 class ConditionImpl {
-private:
+protected:
     int m_index;
 
-public:
     ConditionImpl(int index);
+
+public:
     virtual ~ConditionImpl();
+
+    virtual size_t hash() const = 0;
 
     /// @brief Accepts the visitor by calling the visit overload.
     virtual void accept(ConditionVisitor& visitor) const = 0;
 };
 
 
-class ConditionLiteralImpl : public ConditionImpl {
+class ConditionLiteralImpl : public ConditionImpl, std::enable_shared_from_this<ConditionLiteralImpl> {
 private:
     Literal m_literal;
 
+    ConditionLiteralImpl(int index, const Literal& literal);
+
+    template<typename T>
+    friend class loki::ReferenceCountedObjectFactory;
+
 public:
-    ConditionLiteralImpl(int index);
     ~ConditionLiteralImpl() override;
+
+    bool operator==(const ConditionLiteralImpl& other) const;
+    bool operator!=(const ConditionLiteralImpl& other) const;
+    bool operator<(const ConditionLiteralImpl& other) const;
+    bool operator>(const ConditionLiteralImpl& other) const;
+
+    size_t hash() const override;
 
     void accept(ConditionVisitor& visitor) const override;
 
@@ -41,5 +61,15 @@ public:
 };
 
 }
+
+
+namespace std {
+    template<>
+    struct hash<loki::pddl::ConditionLiteralImpl>
+    {
+        std::size_t operator()(const loki::pddl::ConditionLiteralImpl& condition) const;
+    };
+}
+
 
 #endif

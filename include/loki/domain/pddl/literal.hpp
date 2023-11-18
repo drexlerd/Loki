@@ -4,13 +4,34 @@
 #include "declarations.hpp"
 
 
+namespace loki {
+template<typename T>
+class ReferenceCountedObjectFactory;
+}
+
+
 namespace loki::pddl {
 class LiteralImpl {
 private:
     bool m_is_negated;
     Atom m_atom;
 
+    LiteralImpl(int index, bool is_negated, const Atom& atom);
+
+    template<typename T>
+    friend class loki::ReferenceCountedObjectFactory;
+
 public:
+    bool operator==(const LiteralImpl& other) const;
+    bool operator!=(const LiteralImpl& other) const;
+    bool operator<(const LiteralImpl& other) const;
+    bool operator>(const LiteralImpl& other) const;
+
+    size_t hash() const;
+
+    bool is_negated() const;
+    const Atom& get_atom() const;
+
 };
 
 }
