@@ -12,25 +12,25 @@ namespace loki {
 TypeDeclarationVisitor::TypeDeclarationVisitor(const error_handler_type& error_handler_, Context& context_)
     : error_handler(error_handler_), context(context_) { }
 
-pddl::TypeSet TypeDeclarationVisitor::operator()(const ast::Type& type_node) {
+pddl::TypeList TypeDeclarationVisitor::operator()(const ast::Type& type_node) {
     return boost::apply_visitor(*this, type_node);
 }
 
-pddl::TypeSet TypeDeclarationVisitor::operator()(const ast::Name& name_node) {
+pddl::TypeList TypeDeclarationVisitor::operator()(const ast::Name& name_node) {
     auto name = parse(name_node, error_handler, context);
     return { context.types->get_or_create(name).object };
 }
 
-pddl::TypeSet TypeDeclarationVisitor::operator()(const ast::TypeObject&) {
+pddl::TypeList TypeDeclarationVisitor::operator()(const ast::TypeObject&) {
     return { context.types->get_or_create("object").object };
 }
 
-pddl::TypeSet TypeDeclarationVisitor::operator()(const ast::TypeEither& either_type_node) {
+pddl::TypeList TypeDeclarationVisitor::operator()(const ast::TypeEither& either_type_node) {
     // we flatten nested either types
-    pddl::TypeSet type_list;
+    pddl::TypeList type_list;
     for (auto& type_node : either_type_node.types) {
         auto types = this->operator()(type_node);
-        type_list.insert(types.begin(), types.end());
+        type_list.insert(type_list.end(), types.begin(), types.end());
     }
     return type_list;
 }
@@ -41,11 +41,11 @@ TypeReferenceVisitor::TypeReferenceVisitor(const error_handler_type& error_handl
     : error_handler(error_handler_),
         context(context_) { }
 
-pddl::TypeSet TypeReferenceVisitor::operator()(const ast::Type& type_node) {
+pddl::TypeList TypeReferenceVisitor::operator()(const ast::Type& type_node) {
     return boost::apply_visitor(*this, type_node);
 }
 
-pddl::TypeSet TypeReferenceVisitor::operator()(const ast::Name& name_node) {
+pddl::TypeList TypeReferenceVisitor::operator()(const ast::Name& name_node) {
     auto name = parse(name_node, error_handler, context);
     auto insert_result = context.types->get_or_create(name);
     if (insert_result.created) {
@@ -55,17 +55,17 @@ pddl::TypeSet TypeReferenceVisitor::operator()(const ast::Name& name_node) {
     return { insert_result.object };
 }
 
-pddl::TypeSet TypeReferenceVisitor::operator()(const ast::TypeObject&) {
+pddl::TypeList TypeReferenceVisitor::operator()(const ast::TypeObject&) {
     assert(!context.types->get_or_create("object").created);
     return { context.types->get_or_create("object").object };
 }
 
-pddl::TypeSet TypeReferenceVisitor::operator()(const ast::TypeEither& either_type_node) {
+pddl::TypeList TypeReferenceVisitor::operator()(const ast::TypeEither& either_type_node) {
     // we flatten nested either types
-    pddl::TypeSet type_list;
+    pddl::TypeList type_list;
     for (auto& type_node : either_type_node.types) {
         auto types = this->operator()(type_node);
-        type_list.insert(types.begin(), types.end());
+        type_list.insert(type_list.end(), types.begin(), types.end());
     }
     return type_list;
 }
@@ -76,21 +76,21 @@ TypeListVisitor::TypeListVisitor(const error_handler_type& error_handler_, Conte
     : error_handler(error_handler_),
         context(context_) { }
 
-pddl::TypeSet TypeListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
+pddl::TypeList TypeListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
-    pddl::TypeSet type_list;
+    pddl::TypeList type_list;
     assert(!context.types->get_or_create("object").created);
     const auto base_type = context.types->get_or_create("object").object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node, error_handler, context);
-        const auto type = context.types->get_or_create(name, pddl::TypeSet{base_type}).object;
-        type_list.insert(type);
+        const auto type = context.types->get_or_create(name, pddl::TypeList{base_type}).object;
+        type_list.push_back(type);
     }
     return type_list;
 }
 
-pddl::TypeSet TypeListVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
-    pddl::TypeSet type_list;
+pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
+    pddl::TypeList type_list;
     const auto types = boost::apply_visitor(TypeDeclarationVisitor(error_handler, context),
                                             typed_list_of_names_recursively_node.type);
     // A non-visited vector of names has user defined base types.
@@ -107,21 +107,21 @@ pddl::TypeSet TypeListVisitor::operator()(const ast::TypedListOfNamesRecursively
             throw std::runtime_error("Failed parse.");
         }
         const auto type = context.types->get_or_create(name, types).object;
-        type_list.insert(type);
+        type_list.push_back(type);
     }
     // Recursively add types.
     auto additional_types = this->operator()(typed_list_of_names_recursively_node.typed_list_of_names);
-    type_list.insert(additional_types.begin(), additional_types.end());
+    type_list.insert(type_list.end(), additional_types.begin(), additional_types.end());
     return type_list;
 }
 
-pddl::TypeSet TypeListVisitor::operator()(const ast::TypedListOfNames& node) {
+pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNames& node) {
     return boost::apply_visitor(*this, node);
 }
 
 /* Other functions */
 
-pddl::TypeSet parse(const ast::Types& types_node, const error_handler_type& error_handler, Context& context) {
+pddl::TypeList parse(const ast::Types& types_node, const error_handler_type& error_handler, Context& context) {
     return boost::apply_visitor(TypeListVisitor(error_handler, context), types_node.typed_list_of_names);
 }
 

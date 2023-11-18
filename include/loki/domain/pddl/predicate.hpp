@@ -16,11 +16,11 @@ namespace loki::pddl {
 
 class PredicateImpl {
 private:
-    int m_index;
+    int m_identifier;
     std::string m_name;
     ParameterList m_parameters;
 
-    PredicateImpl(int index, const std::string& name, const ParameterList& parameters);
+    PredicateImpl(int identifier, const std::string& name, const ParameterList& parameters);
 
     template<typename T>
     friend class loki::ReferenceCountedObjectFactory;

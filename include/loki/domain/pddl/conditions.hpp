@@ -22,9 +22,9 @@ public:
 
 class ConditionImpl {
 protected:
-    int m_index;
+    int m_identifier;
 
-    ConditionImpl(int index);
+    ConditionImpl(int identifier);
 
 public:
     virtual ~ConditionImpl();
@@ -40,7 +40,7 @@ class ConditionLiteralImpl : public ConditionImpl, std::enable_shared_from_this<
 private:
     Literal m_literal;
 
-    ConditionLiteralImpl(int index, const Literal& literal);
+    ConditionLiteralImpl(int identifier, const Literal& literal);
 
     template<typename T>
     friend class loki::ReferenceCountedObjectFactory;

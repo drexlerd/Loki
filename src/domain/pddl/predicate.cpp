@@ -5,8 +5,8 @@
 #include <memory>
 
 namespace loki::pddl {
-PredicateImpl::PredicateImpl(int index, const std::string& name, const ParameterList& parameters)
-    : m_index(index)
+PredicateImpl::PredicateImpl(int identifier, const std::string& name, const ParameterList& parameters)
+    : m_identifier(identifier)
     , m_name(name)
     , m_parameters(parameters)
 {
@@ -21,11 +21,11 @@ bool PredicateImpl::operator!=(const PredicateImpl& other) const {
 }
 
 bool PredicateImpl::operator<(const PredicateImpl& other) const {
-    return m_index < other.m_index;
+    return m_identifier < other.m_identifier;
 }
 
 bool PredicateImpl::operator>(const PredicateImpl& other) const {
-    return m_index > other.m_index;
+    return m_identifier > other.m_identifier;
 }
 
 size_t PredicateImpl::hash() const {

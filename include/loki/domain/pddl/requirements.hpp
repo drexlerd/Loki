@@ -40,10 +40,10 @@ using RequirementEnumSet = std::set<RequirementEnum>;
 
 class RequirementsImpl {
 private:
-    int m_index;
+    int m_identifier;
     RequirementEnumSet m_requirements;
 
-    RequirementsImpl(int index, const RequirementEnumSet& requirements);
+    RequirementsImpl(int identifier, const RequirementEnumSet& requirements);
 
     template<typename T>
     friend class loki::ReferenceCountedObjectFactory;

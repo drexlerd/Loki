@@ -14,12 +14,12 @@ class ReferenceCountedObjectFactory;
 namespace loki::pddl {
 class AtomImpl {
 private:
-    int m_index;
+    int m_identifier;
 
     Predicate m_predicate;
     ObjectList m_arguments;
 
-    AtomImpl(int index, const Predicate& predicate, const ObjectList& arguments);
+    AtomImpl(int identifier, const Predicate& predicate, const ObjectList& arguments);
 
     template<typename T>
     friend class loki::ReferenceCountedObjectFactory;

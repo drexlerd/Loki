@@ -13,10 +13,11 @@ class ReferenceCountedObjectFactory;
 namespace loki::pddl {
 class LiteralImpl {
 private:
+    int m_identifier;
     bool m_is_negated;
     Atom m_atom;
 
-    LiteralImpl(int index, bool is_negated, const Atom& atom);
+    LiteralImpl(int identifier, bool is_negated, const Atom& atom);
 
     template<typename T>
     friend class loki::ReferenceCountedObjectFactory;

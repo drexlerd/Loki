@@ -3,8 +3,8 @@
 
 
 namespace loki::pddl {
-RequirementsImpl::RequirementsImpl(int index, const RequirementEnumSet& requirements)
-    : m_index(index)
+RequirementsImpl::RequirementsImpl(int identifier, const RequirementEnumSet& requirements)
+    : m_identifier(identifier)
     , m_requirements(requirements)
 {
 }
@@ -18,11 +18,11 @@ bool RequirementsImpl::operator!=(const RequirementsImpl& other) const {
 }
 
 bool RequirementsImpl::operator<(const RequirementsImpl& other) const {
-    return m_index < other.m_index;
+    return m_identifier < other.m_identifier;
 }
 
 bool RequirementsImpl::operator>(const RequirementsImpl& other) const {
-    return m_index > other.m_index;
+    return m_identifier > other.m_identifier;
 }
 
 size_t RequirementsImpl::hash() const {

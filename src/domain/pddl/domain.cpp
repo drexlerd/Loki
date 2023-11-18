@@ -1,15 +1,16 @@
 #include "../../../include/loki/domain/pddl/domain.hpp"
 #include "../../../include/loki/common/hash.hpp"
+#include "../../../include/loki/common/collections.hpp"
 
 
 namespace loki::pddl {
-DomainImpl::DomainImpl(int index,
+DomainImpl::DomainImpl(int identifier,
     const std::string& name,
     const Requirements& requirements,
-    const TypeSet& types,
-    const ObjectSet& constants,
-    const PredicateSet& predicates)
-    : m_index(index)
+    const TypeList& types,
+    const ObjectList& constants,
+    const PredicateList& predicates)
+    : m_identifier(identifier)
     , m_name(name)
     , m_requirements(requirements)
     , m_types(types)
@@ -21,9 +22,9 @@ DomainImpl::DomainImpl(int index,
 bool DomainImpl::operator==(const DomainImpl& other) const {
     return (m_name == other.m_name)
         && (m_requirements == other.m_requirements)
-        && (m_types == other.m_types)
-        && (m_constants == other.m_constants)
-        && (m_predicates == other.m_predicates);
+        && (sorted(m_types) == sorted(other.m_types))
+        && (sorted(m_constants) == sorted(other.m_constants))
+        && (sorted(m_predicates) == sorted(other.m_predicates));
 }
 
 
@@ -32,15 +33,20 @@ bool DomainImpl::operator!=(const DomainImpl& other) const {
 }
 
 bool DomainImpl::operator<(const DomainImpl& other) const {
-    return m_index < other.m_index;
+    return m_identifier < other.m_identifier;
 }
 
 bool DomainImpl::operator>(const DomainImpl& other) const {
-    return m_index > other.m_index;
+    return m_identifier > other.m_identifier;
 }
 
 size_t DomainImpl::hash() const {
-    return hash_combine(m_name, m_requirements, hash_set(m_types), hash_set(m_constants), hash_set(m_predicates));
+    return hash_combine(
+        m_name,
+        m_requirements,
+        hash_vector(sorted(m_types)),
+        hash_vector(sorted(m_constants)),
+        hash_vector(sorted(m_predicates)));
 }
 
 const std::string& DomainImpl::get_name() const {
@@ -51,15 +57,15 @@ const Requirements& DomainImpl::get_requirements() const {
     return m_requirements;
 }
 
-const TypeSet& DomainImpl::get_types() const {
+const TypeList& DomainImpl::get_types() const {
     return m_types;
 }
 
-const ObjectSet& DomainImpl::get_constants() const {
+const ObjectList& DomainImpl::get_constants() const {
     return m_constants;
 }
 
-const PredicateSet& DomainImpl::get_predicates() const {
+const PredicateList& DomainImpl::get_predicates() const {
     return m_predicates;
 }
 

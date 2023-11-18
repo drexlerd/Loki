@@ -1,17 +1,18 @@
 #include "../../../include/loki/domain/pddl/type.hpp"
 #include "../../../include/loki/common/hash.hpp"
+#include "../../../include/loki/common/collections.hpp"
 
 
 namespace loki::pddl {
-TypeImpl::TypeImpl(int index, const std::string& name, const TypeSet& bases)
-    : m_index(index)
+TypeImpl::TypeImpl(int identifier, const std::string& name, const TypeList& bases)
+    : m_identifier(identifier)
     , m_name(name)
     , m_bases(bases)
 {
 }
 
 bool TypeImpl::operator==(const TypeImpl& other) const {
-    return (m_name == other.m_name) && (m_bases == other.m_bases);
+    return (m_name == other.m_name) && (sorted(m_bases) == sorted(other.m_bases));
 }
 
 bool TypeImpl::operator!=(const TypeImpl& other) const {
@@ -19,22 +20,22 @@ bool TypeImpl::operator!=(const TypeImpl& other) const {
 }
 
 bool TypeImpl::operator<(const TypeImpl& other) const {
-    return m_index < other.m_index;
+    return m_identifier < other.m_identifier;
 }
 
 bool TypeImpl::operator>(const TypeImpl& other) const {
-    return m_index > other.m_index;
+    return m_identifier > other.m_identifier;
 }
 
 size_t TypeImpl::hash() const {
-    return hash_combine(m_name, hash_set(m_bases));
+    return hash_combine(m_name, hash_vector(sorted(m_bases)));
 }
 
 const std::string& TypeImpl::get_name() const {
     return m_name;
 }
 
-const TypeSet& TypeImpl::get_bases() const {
+const TypeList& TypeImpl::get_bases() const {
     return m_bases;
 }
 

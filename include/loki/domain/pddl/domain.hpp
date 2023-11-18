@@ -16,19 +16,19 @@ namespace loki::pddl {
 
 class DomainImpl {
 private:
-    int m_index;
+    int m_identifier;
     std::string m_name;
     Requirements m_requirements;
-    TypeSet m_types;
-    ObjectSet m_constants;
-    PredicateSet m_predicates;
+    TypeList m_types;
+    ObjectList m_constants;
+    PredicateList m_predicates;
 
-    DomainImpl(int index,
+    DomainImpl(int identifier,
         const std::string& name,
         const Requirements& requirements,
-        const TypeSet& types,
-        const ObjectSet& constants,
-        const PredicateSet& predicates);
+        const TypeList& types,
+        const ObjectList& constants,
+        const PredicateList& predicates);
 
     template<typename T>
     friend class loki::ReferenceCountedObjectFactory;
@@ -43,9 +43,9 @@ public:
 
     const std::string& get_name() const;
     const Requirements& get_requirements() const;
-    const TypeSet& get_types() const;
-    const ObjectSet& get_constants() const;
-    const PredicateSet& get_predicates() const;
+    const TypeList& get_types() const;
+    const ObjectList& get_constants() const;
+    const PredicateList& get_predicates() const;
 };
 
 }

@@ -18,7 +18,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Vari
     const auto type = context.types->get_or_create("object").object;
     for (const auto& variable_node : variable_nodes) {
         const auto name = parse(variable_node, error_handler, context);
-        const auto parameter = context.parameters->get_or_create(name, pddl::TypeSet{type}).object;
+        const auto parameter = context.parameters->get_or_create(name, pddl::TypeList{type}).object;
         parameter_list.emplace_back(parameter);
     }
     return parameter_list;

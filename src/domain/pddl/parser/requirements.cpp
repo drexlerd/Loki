@@ -105,9 +105,7 @@ pddl::Requirements parse(const ast::Requirements& requirements_node, const error
         auto additional_requirements = parse(requirement, error_handler, context);
         requirements.insert(additional_requirements.begin(), additional_requirements.end());
     }
-    auto specified_requirements = context.requirements->get_or_create(requirements).object;
-    context.specified_requirements = specified_requirements;
-    return specified_requirements;
+    return context.requirements->get_or_create(requirements).object;
 }
 
 }

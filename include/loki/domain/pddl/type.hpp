@@ -14,13 +14,12 @@ class ReferenceCountedObjectFactory;
 namespace loki::pddl {
 class TypeImpl {
 private:
-    /* Index is used in sorting to obtain deterministic results. */
-    int m_index;
+    int m_identifier;
 
     std::string m_name;
-    TypeSet m_bases;
+    TypeList m_bases;
 
-    TypeImpl(int index, const std::string& name, const TypeSet& bases = {});
+    TypeImpl(int identifier, const std::string& name, const TypeList& bases = {});
 
     template<typename T>
     friend class loki::ReferenceCountedObjectFactory;
@@ -35,7 +34,7 @@ public:
     size_t hash() const;
 
     const std::string& get_name() const;
-    const TypeSet& get_bases() const;
+    const TypeList& get_bases() const;
 };
 }
 

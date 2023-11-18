@@ -16,12 +16,12 @@ class ReferenceCountedObjectFactory;
 namespace loki::pddl {
 class ObjectImpl {
 private:
-    int m_index;
+    int m_identifier;
 
     std::string m_name;
-    TypeSet m_types;
+    TypeList m_types;
 
-    ObjectImpl(int index, const std::string& name, const TypeSet& types={});
+    ObjectImpl(int identifier, const std::string& name, const TypeList& types={});
 
     template<typename T>
     friend class loki::ReferenceCountedObjectFactory;
@@ -35,7 +35,7 @@ public:
     size_t hash() const;
 
     const std::string& get_name() const;
-    const TypeSet& get_bases() const;
+    const TypeList& get_bases() const;
 };
 
 }

@@ -19,7 +19,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& n
     const auto type = context.types->get_or_create("object").object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node, error_handler, context);
-        const auto object = context.constants->get_or_create(name, pddl::TypeSet{type}).object;
+        const auto object = context.constants->get_or_create(name, pddl::TypeList{type}).object;
         object_list.emplace_back(object);
     }
     return object_list;

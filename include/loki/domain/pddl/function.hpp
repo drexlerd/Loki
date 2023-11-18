@@ -15,10 +15,11 @@ class ReferenceCountedObjectFactory;
 namespace loki::pddl {
 class FunctionImpl {
 private:
+    int m_identifier;
     std::string name;
     ParameterList parameters;
 
-    FunctionImpl(const std::string& name, const ParameterList& parameters);
+    FunctionImpl(int identifier, const std::string& name, const ParameterList& parameters);
 
     template<typename T>
     friend class loki::ReferenceCountedObjectFactory;

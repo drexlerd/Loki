@@ -3,14 +3,14 @@
 
 
 namespace loki::pddl {
-ConditionImpl::ConditionImpl(int index)
-    : m_index(index) { }
+ConditionImpl::ConditionImpl(int identifier)
+    : m_identifier(identifier) { }
 
 ConditionImpl::~ConditionImpl() = default;
 
 
-ConditionLiteralImpl::ConditionLiteralImpl(int index, const Literal& literal)
-    : ConditionImpl(index)
+ConditionLiteralImpl::ConditionLiteralImpl(int identifier, const Literal& literal)
+    : ConditionImpl(identifier)
     , m_literal(literal) { }
 
 ConditionLiteralImpl::~ConditionLiteralImpl() = default;
@@ -24,11 +24,11 @@ bool ConditionLiteralImpl::operator!=(const ConditionLiteralImpl& other) const {
 }
 
 bool ConditionLiteralImpl::operator<(const ConditionLiteralImpl& other) const {
-    return m_index < other.m_index;
+    return m_identifier < other.m_identifier;
 }
 
 bool ConditionLiteralImpl::operator>(const ConditionLiteralImpl& other) const {
-    return m_index > other.m_index;
+    return m_identifier > other.m_identifier;
 }
 
 size_t ConditionLiteralImpl::hash() const {

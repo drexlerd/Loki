@@ -30,7 +30,7 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
         requirements = parse(domain_node.requirements.value(), error_handler, context);
     }
     /* Types section */
-    pddl::TypeSet types;
+    pddl::TypeList types;
     if (domain_node.types.has_value()) {
         if (!requirements->test(pddl::RequirementEnum::TYPING)) {
             error_handler(domain_node.types.value(), "Unexpected :types section. (Is :typing missing?)");
@@ -49,7 +49,7 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
         predicates = parse(domain_node.predicates.value(), error_handler, context);
     }
     /* Action Schema section */
-    return nullptr;
+    return context.domains->get_or_create(domain_name, requirements, types, constants, predicates).object;
 }
 
 }

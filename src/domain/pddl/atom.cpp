@@ -3,8 +3,8 @@
 
 
 namespace loki::pddl {
-AtomImpl::AtomImpl(int index, const Predicate& predicate, const ObjectList& arguments)
-    : m_index(index)
+AtomImpl::AtomImpl(int identifier, const Predicate& predicate, const ObjectList& arguments)
+    : m_identifier(identifier)
     , m_predicate(predicate)
     , m_arguments(arguments)
 {
@@ -19,11 +19,11 @@ bool AtomImpl::operator!=(const AtomImpl& other) const {
 }
 
 bool AtomImpl::operator<(const AtomImpl& other) const {
-    return m_index < other.m_index;
+    return m_identifier < other.m_identifier;
 }
 
 bool AtomImpl::operator>(const AtomImpl& other) const {
-    return m_index > other.m_index;
+    return m_identifier > other.m_identifier;
 }
 
 size_t AtomImpl::hash() const {
