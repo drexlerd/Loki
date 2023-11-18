@@ -2,7 +2,9 @@
 #define LOKI_SRC_PROBLEM_AST_PARSER_DEF_HPP_
 
 #include "ast_adapted.hpp"
+#include "parser.hpp"
 
+#include "../../domain/ast/parser.hpp"
 #include "../../../include/loki/problem/ast/ast.hpp"
 #include "../../../include/loki/problem/ast/error_handler.hpp"
 #include "../../../include/loki/problem/ast/parser.hpp"

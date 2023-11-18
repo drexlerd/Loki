@@ -26,7 +26,7 @@ public:
     bool operator==(const GroundLiteralImpl& other) const;
     bool operator!=(const GroundLiteralImpl& other) const;
 
-    size_t hash() const override;
+    size_t hash() const;
 
     bool is_negated() const;
     const GroundAtom& get_atom() const;

@@ -10,7 +10,7 @@ using namespace std;
 
 namespace loki {
 
-pddl::ObjectList parse(const ast::Constants& constants_node, const error_handler_type& error_handler, Context& context);
+extern pddl::ObjectList parse(const ast::Constants& constants_node, const error_handler_type& error_handler, Context& context);
 
 }
 

@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include "../../src/domain/ast/parser.hpp"
 #include "../../include/loki/common/ast/parser_wrapper.hpp"
-#include "../../include/loki/domain/ast/parser.hpp"
 #include "../../include/loki/domain/ast/printer.hpp"
 
 

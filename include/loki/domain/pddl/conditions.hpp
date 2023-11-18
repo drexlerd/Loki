@@ -55,7 +55,7 @@ public:
     bool operator==(const ConditionLiteralImpl& other) const;
     bool operator!=(const ConditionLiteralImpl& other) const;
 
-    size_t hash() const override;
+    size_t hash() const;
 
     void accept(ConditionVisitor& visitor) const override;
 
@@ -79,7 +79,7 @@ public:
     bool operator==(const ConditionAndImpl& other) const;
     bool operator!=(const ConditionAndImpl& other) const;
 
-    size_t hash() const override;
+    size_t hash() const;
 
     void accept(ConditionVisitor& visitor) const override;
 

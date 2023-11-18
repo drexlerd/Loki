@@ -26,7 +26,7 @@ public:
     bool operator==(const LiteralImpl& other) const;
     bool operator!=(const LiteralImpl& other) const;
 
-    size_t hash() const override;
+    size_t hash() const;
 
     bool is_negated() const;
     const Predicate& get_predicate() const;

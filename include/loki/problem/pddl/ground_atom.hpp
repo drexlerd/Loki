@@ -28,7 +28,7 @@ public:
     bool operator==(const GroundAtomImpl& other) const;
     bool operator!=(const GroundAtomImpl& other) const;
 
-    size_t hash() const override;
+    size_t hash() const;
 
     const Predicate& get_predicate() const;
     const ObjectList& get_arguments() const;

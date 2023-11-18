@@ -29,7 +29,7 @@ public:
     bool operator==(const ParameterImpl& other) const;
     bool operator!=(const ParameterImpl& other) const;
 
-    size_t hash() const override;
+    size_t hash() const;
 
     const std::string& get_name() const;
     const TypeList& get_bases() const;

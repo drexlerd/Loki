@@ -37,7 +37,7 @@ public:
     bool operator==(const DomainImpl& other) const;
     bool operator!=(const DomainImpl& other) const;
 
-    size_t hash() const override;
+    size_t hash() const;
 
     const std::string& get_name() const;
     const Requirements& get_requirements() const;

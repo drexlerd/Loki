@@ -21,8 +21,7 @@ namespace domain {
     ///
     ///        We use factories for all types since only them have access to the pddl constructors.
     ///        Factories are wrapped into shared_ptr to enable shared_from_this
-    ///        since each pddl object gets a reference to the factory to remove
-    ///        the entry from the factory as soon as the reference count reaches zero.
+    ///        to allow the PDDL object to notify the factory upon deletion.
     struct Context {
         // Use object counter to obtain deterministic and canonical sortings.
         std::shared_ptr<IdentifierCounter> counter;
@@ -51,15 +50,6 @@ namespace domain {
     };
 }
 
-extern std::string parse(const domain::ast::Name& name_node, const error_handler_type& error_handler, domain::Context& context);
-extern std::string parse(const domain::ast::Variable& variable_node, const error_handler_type& error_handler, domain::Context& context);
-extern double parse(const domain::ast::Number& number_node, const error_handler_type& error_handler, domain::Context& context);
-
-
-extern std::string parse(const domain::ast::DomainName& domain_name_node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::Requirements parse(const domain::ast::Requirements& requirements_node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::TypeList parse(const domain::ast::Types& types_node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::PredicateList parse(const domain::ast::Predicates& predicates_node, const error_handler_type& error_handler, domain::Context& context);
 
 extern pddl::Domain parse(const domain::ast::Domain& domain_node, const error_handler_type& error_handler, domain::Context& context);
 

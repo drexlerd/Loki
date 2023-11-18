@@ -11,7 +11,7 @@ using namespace std;
 
 namespace loki {
 
-pddl::PredicateList parse(const ast::Predicates& predicates_node, const error_handler_type& error_handler, Context& context);
+extern pddl::PredicateList parse(const ast::Predicates& predicates_node, const error_handler_type& error_handler, Context& context);
 
 }
 

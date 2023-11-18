@@ -29,7 +29,7 @@ public:
     bool operator==(const PredicateImpl& other) const;
     bool operator!=(const PredicateImpl& other) const;
 
-    size_t hash() const override;
+    size_t hash() const;
 
     const std::string& get_name() const;
     const ParameterList& get_parameters() const;

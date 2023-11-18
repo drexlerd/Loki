@@ -28,7 +28,7 @@ public:
     bool operator==(const ObjectImpl& other) const;
     bool operator!=(const ObjectImpl& other) const;
 
-    size_t hash() const override;
+    size_t hash() const;
 
     const std::string& get_name() const;
     const ParameterList& get_parameters() const;

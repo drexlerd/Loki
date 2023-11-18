@@ -61,7 +61,7 @@ struct RequirementVisitor : boost::static_visitor<pddl::RequirementEnumSet> {
     }
 };
 
-pddl::Requirements parse(const ast::Requirements& requirements_node, const error_handler_type& error_handler, Context& context);
+extern pddl::Requirements parse(const ast::Requirements& requirements_node, const error_handler_type& error_handler, Context& context);
 
 }
 

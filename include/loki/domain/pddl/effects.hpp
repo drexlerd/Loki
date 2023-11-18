@@ -54,7 +54,7 @@ public:
     bool operator==(const EffectLiteralImpl& other) const;
     bool operator!=(const EffectLiteralImpl& other) const;
 
-    size_t hash() const override;
+    size_t hash() const;
 
     void accept(EffectVisitor& visitor) const override;
 

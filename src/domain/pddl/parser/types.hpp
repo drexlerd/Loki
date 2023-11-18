@@ -61,7 +61,7 @@ public:
 };
 
 
-pddl::TypeList parse(const ast::Types& types_node, const error_handler_type& error_handler, Context& context);
+extern pddl::TypeList parse(const ast::Types& types_node, const error_handler_type& error_handler, Context& context);
 
 }
 

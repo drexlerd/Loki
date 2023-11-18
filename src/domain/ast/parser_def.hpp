@@ -2,6 +2,7 @@
 #define LOKI_SRC_DOMAIN_AST_PARSER_DEF_HPP_
 
 #include "ast_adapted.hpp"
+#include "parser.hpp"
 
 #include "../../../include/loki/domain/ast/ast.hpp"
 #include "../../../include/loki/domain/ast/error_handler.hpp"
