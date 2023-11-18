@@ -56,34 +56,6 @@ const Literal& ConditionLiteralImpl::get_literal() const {
 }
 
 
-/* GroundLiteral */
-ConditionGroundLiteralImpl::ConditionGroundLiteralImpl(int identifier, const GroundLiteral& literal)
-    : ConditionImpl(identifier)
-    , m_literal(literal) { }
-
-ConditionGroundLiteralImpl::~ConditionGroundLiteralImpl() = default;
-
-bool ConditionGroundLiteralImpl::operator==(const ConditionGroundLiteralImpl& other) const {
-    return m_literal == other.m_literal;
-}
-
-bool ConditionGroundLiteralImpl::operator!=(const ConditionGroundLiteralImpl& other) const {
-    return !(*this == other);
-}
-
-size_t ConditionGroundLiteralImpl::hash() const {
-    return std::hash<GroundLiteral>()(m_literal);
-}
-
-void ConditionGroundLiteralImpl::accept(ConditionVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
-}
-
-const GroundLiteral& ConditionGroundLiteralImpl::get_literal() const {
-    return m_literal;
-}
-
-
 /* And */
 ConditionAndImpl::ConditionAndImpl(int identifier, const ConditionList& conditions)
     : ConditionImpl(identifier)
@@ -121,10 +93,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::ConditionLiteralImpl>::operator()(const loki::pddl::ConditionLiteralImpl& condition) const {
-        return condition.hash();
-    }
-
-    std::size_t hash<loki::pddl::ConditionGroundLiteralImpl>::operator()(const loki::pddl::ConditionGroundLiteralImpl& condition) const {
         return condition.hash();
     }
 

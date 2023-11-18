@@ -1,6 +1,8 @@
 #ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_DECLARATIONS_HPP_
 #define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_DECLARATIONS_HPP_
 
+#include "../../domain/pddl/declarations.hpp"
+
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -19,9 +21,6 @@ namespace loki::pddl {
     using GroundLiteral = std::shared_ptr<const GroundLiteralImpl>;
     using GroundLiteralList = std::vector<GroundLiteral>;
     using GroundLiteralSet = std::set<GroundLiteral>;
-
-    class ConditionGroundLiteralImpl;
-    using ConditionGroundLiteral = std::shared_ptr<const ConditionGroundLiteralImpl>;
 }
 
 #endif

@@ -19,7 +19,6 @@ namespace loki::pddl {
 class ConditionVisitor {
 public:
     virtual void visit(const ConditionLiteral& condition) = 0;
-    virtual void visit(const ConditionGroundLiteral& condition) = 0;
     virtual void visit(const ConditionAnd& condition) = 0;
 };
 
@@ -66,31 +65,6 @@ public:
 };
 
 
-/* GroundLiteral */
-class ConditionGroundLiteralImpl : public ConditionImpl, std::enable_shared_from_this<ConditionGroundLiteralImpl> {
-private:
-    GroundLiteral m_literal;
-
-    ConditionGroundLiteralImpl(int identifier, const GroundLiteral& literal);
-
-    template<typename T>
-    friend class loki::ReferenceCountedObjectFactory;
-
-public:
-    ~ConditionGroundLiteralImpl() override;
-
-    /// @brief Test for structural equivalence
-    bool operator==(const ConditionGroundLiteralImpl& other) const;
-    bool operator!=(const ConditionGroundLiteralImpl& other) const;
-
-    size_t hash() const;
-
-    void accept(ConditionVisitor& visitor) const override;
-
-    const GroundLiteral& get_literal() const;
-};
-
-
 /* And */
 class ConditionAndImpl : public ConditionImpl, std::enable_shared_from_this<ConditionAndImpl> {
 private:
@@ -129,12 +103,6 @@ namespace std {
     struct hash<loki::pddl::ConditionLiteralImpl>
     {
         std::size_t operator()(const loki::pddl::ConditionLiteralImpl& condition) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::ConditionGroundLiteralImpl>
-    {
-        std::size_t operator()(const loki::pddl::ConditionGroundLiteralImpl& condition) const;
     };
 
     template<>
