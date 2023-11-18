@@ -17,9 +17,16 @@
 
 namespace loki {
 namespace domain {
+    /// @brief Provides functionality for unique creation of objects from pddl types.
+    ///
+    ///        We use factories for all types since only them have access to the pddl constructors.
+    ///        Factories are wrapped into shared_ptr to enable shared_from_this
+    ///        since each pddl object gets a reference to the factory to remove
+    ///        the entry from the factory as soon as the reference count reaches zero.
     struct Context {
-        std::shared_ptr<ReferenceCountedObjectFactory<pddl::RequirementsImpl>> requirements;  // we use factory for controlled creation even if there exists only a single Requirements per domain.
-        std::shared_ptr<ReferenceCountedObjectFactory<pddl::TypeImpl>> types;  // to enable shared_from_this
+        std::shared_ptr<ReferenceCountedObjectFactory<pddl::RequirementsImpl>> requirements;
+        std::shared_ptr<ReferenceCountedObjectFactory<pddl::TypeImpl>> types;
+        // Ensure that base types are not deallocated by adding one to the reference count.
         pddl::Type base_type_object;
         pddl::Type base_type_number;
         std::shared_ptr<ReferenceCountedObjectFactory<pddl::ObjectImpl>> constants;

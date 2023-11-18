@@ -16,6 +16,7 @@ namespace loki::pddl {
     class TypeImpl;
     using Type = std::shared_ptr<const TypeImpl>;
     using TypeList = std::vector<Type>;
+    using TypeSet = std::set<Type>;
 
     class ObjectImpl;
     using Object = std::shared_ptr<const ObjectImpl>;
