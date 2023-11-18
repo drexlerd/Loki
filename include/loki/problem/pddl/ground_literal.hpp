@@ -1,6 +1,7 @@
 #ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_LITERAL_HPP_
 #define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_LITERAL_HPP_
 
+#include "../../common/pddl/base.hpp"
 #include "declarations.hpp"
 
 
@@ -11,9 +12,8 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-class GroundLiteralImpl {
+class GroundLiteralImpl : public Base {
 private:
-    int m_identifier;
     bool m_is_negated;
     GroundAtom m_atom;
 
@@ -25,10 +25,8 @@ private:
 public:
     bool operator==(const GroundLiteralImpl& other) const;
     bool operator!=(const GroundLiteralImpl& other) const;
-    bool operator<(const GroundLiteralImpl& other) const;
-    bool operator>(const GroundLiteralImpl& other) const;
 
-    size_t hash() const;
+    size_t hash() const override;
 
     bool is_negated() const;
     const GroundAtom& get_atom() const;

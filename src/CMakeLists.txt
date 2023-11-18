@@ -4,7 +4,8 @@ file(GLOB SRC_FILES
     "domain/ast/*.cpp"
     "domain/pddl/*.cpp"
     "domain/pddl/parser/*.cpp"
-    "problem/ast/*.cpp")
+    "problem/ast/*.cpp"
+    "problem/pddl/parser/*.cpp")
 add_library(parsers STATIC ${SRC_FILES})
 
 # Create an alias for simpler reference

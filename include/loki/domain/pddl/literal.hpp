@@ -25,8 +25,6 @@ private:
 public:
     bool operator==(const LiteralImpl& other) const;
     bool operator!=(const LiteralImpl& other) const;
-    bool operator<(const LiteralImpl& other) const;
-    bool operator>(const LiteralImpl& other) const;
 
     size_t hash() const override;
 

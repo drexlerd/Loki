@@ -15,50 +15,48 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/problem/pddl/atom.hpp"
+#include "../../../include/loki/problem/pddl/ground_atom.hpp"
 #include "../../../include/loki/common/hash.hpp"
 
 
 namespace loki::pddl {
-AtomImpl::AtomImpl(int identifier, const Predicate& predicate, const ObjectList& arguments)
-    : m_identifier(identifier)
+GroundAtomImpl::GroundAtomImpl(int identifier, const Predicate& predicate, const ObjectList& arguments)
+    : Base(identifier)
     , m_predicate(predicate)
     , m_arguments(arguments)
 {
 }
 
-bool AtomImpl::operator==(const AtomImpl& other) const {
+bool GroundAtomImpl::operator==(const GroundAtomImpl& other) const {
     return (m_predicate == other.m_predicate) && (m_arguments == other.m_arguments);
 }
 
-bool AtomImpl::operator!=(const AtomImpl& other) const {
+bool GroundAtomImpl::operator!=(const GroundAtomImpl& other) const {
     return !(*this == other);
 }
 
-bool AtomImpl::operator<(const AtomImpl& other) const {
-    return m_identifier < other.m_identifier;
-}
-
-bool AtomImpl::operator>(const AtomImpl& other) const {
-    return m_identifier > other.m_identifier;
-}
-
-size_t AtomImpl::hash() const {
+size_t GroundAtomImpl::hash() const {
     return hash_combine(m_predicate, hash_vector(m_arguments));
 }
 
-const Predicate& AtomImpl::get_predicate() const {
+const Predicate& GroundAtomImpl::get_predicate() const {
     return m_predicate;
 }
 
-const ObjectList& AtomImpl::get_arguments() const {
+const ObjectList& GroundAtomImpl::get_arguments() const {
     return m_arguments;
 }
 
 }
 
 namespace std {
-    std::size_t hash<loki::pddl::AtomImpl>::operator()(const loki::pddl::AtomImpl& atom) const {
+    bool less<loki::pddl::GroundAtom>::operator()(
+        const loki::pddl::GroundAtom& left_atom,
+        const loki::pddl::GroundAtom& right_atom) const {
+        return *left_atom < *right_atom;
+    }
+
+    std::size_t hash<loki::pddl::GroundAtomImpl>::operator()(const loki::pddl::GroundAtomImpl& atom) const {
         return atom.hash();
     }
 }
