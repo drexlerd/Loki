@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/domain/pddl/base.hpp"
+#include "../../../include/loki/common/pddl/base.hpp"
 
 
 namespace loki::pddl {

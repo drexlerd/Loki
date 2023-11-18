@@ -1,7 +1,7 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_DOMAIN_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_DOMAIN_HPP_
 
-#include "base.hpp"
+#include "../../common/pddl/base.hpp"
 #include "declarations.hpp"
 #include "requirements.hpp"
 
