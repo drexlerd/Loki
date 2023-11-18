@@ -5,14 +5,14 @@
 
 namespace loki::pddl {
 
-/// @brief Implements a common base for PDDL object.
+/// @brief Implements a common base class for PDDL objects.
 ///
 ///        Each PDDL object has an identifier.
-///        Identifiers are used to detect semantically equivalent PDDL object.
+///        Identifiers are used to describe and detect semantically equivalent PDDL object.
 ///        Detecting semantic equivalence is important for
 ///            - reducing the required memory
 ///            - detecting duplicates during compilations
-///            - reducing comparison and hashing to the pointer level instead of traversing the whole structure
+///            - reducing comparison and hashing to pointer level instead of traversing the whole structure
 ///        For the following type of PDDL objects, loki detects semantic equivalence:
 ///            * Type
 ///            * Object

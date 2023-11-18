@@ -57,7 +57,7 @@ namespace std {
         return *left_parameter < *right_parameter;
     }
 
-    std::size_t hash<loki::pddl::ParameterImpl>::operator()(const loki::pddl::ParameterImpl& object) const {
-        return object.hash();
+    std::size_t hash<loki::pddl::ParameterImpl>::operator()(const loki::pddl::ParameterImpl& parameter) const {
+        return parameter.hash();
     }
 }

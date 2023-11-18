@@ -51,6 +51,7 @@ private:
 public:
     ~EffectLiteralImpl() override;
 
+    /// @brief Test for structural equivalence
     bool operator==(const EffectLiteralImpl& other) const;
     bool operator!=(const EffectLiteralImpl& other) const;
 

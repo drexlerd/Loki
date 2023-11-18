@@ -26,6 +26,7 @@ private:
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
+    /// @brief Test for semantic equivalence
     bool operator==(const ObjectImpl& other) const;
     bool operator!=(const ObjectImpl& other) const;
 
@@ -49,7 +50,7 @@ namespace std {
     template<>
     struct hash<loki::pddl::ObjectImpl>
     {
-        std::size_t operator()(const loki::pddl::ObjectImpl& type) const;
+        std::size_t operator()(const loki::pddl::ObjectImpl& object) const;
     };
 }
 

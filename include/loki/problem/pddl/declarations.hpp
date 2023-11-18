@@ -19,6 +19,9 @@ namespace loki::pddl {
     using GroundLiteral = std::shared_ptr<const GroundLiteralImpl>;
     using GroundLiteralList = std::vector<GroundLiteral>;
     using GroundLiteralSet = std::set<GroundLiteral>;
+
+    class ConditionGroundLiteralImpl;
+    using ConditionGroundLiteral = std::shared_ptr<const ConditionGroundLiteralImpl>;
 }
 
 #endif

@@ -24,6 +24,7 @@ private:
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
+    /// @brief Test for semantic equivalence
     bool operator==(const TypeImpl& other) const;
     bool operator!=(const TypeImpl& other) const;
 

@@ -3,6 +3,7 @@
 
 #include "../../common/pddl/base.hpp"
 #include "declarations.hpp"
+#include "../../problem/pddl/declarations.hpp"
 
 #include <string>
 
@@ -18,6 +19,7 @@ namespace loki::pddl {
 class ConditionVisitor {
 public:
     virtual void visit(const ConditionLiteral& condition) = 0;
+    virtual void visit(const ConditionGroundLiteral& condition) = 0;
     virtual void visit(const ConditionAnd& condition) = 0;
 };
 
@@ -52,6 +54,7 @@ private:
 public:
     ~ConditionLiteralImpl() override;
 
+    /// @brief Test for structural equivalence
     bool operator==(const ConditionLiteralImpl& other) const;
     bool operator!=(const ConditionLiteralImpl& other) const;
 
@@ -60,6 +63,31 @@ public:
     void accept(ConditionVisitor& visitor) const override;
 
     const Literal& get_literal() const;
+};
+
+
+/* GroundLiteral */
+class ConditionGroundLiteralImpl : public ConditionImpl, std::enable_shared_from_this<ConditionGroundLiteralImpl> {
+private:
+    GroundLiteral m_literal;
+
+    ConditionGroundLiteralImpl(int identifier, const GroundLiteral& literal);
+
+    template<typename T>
+    friend class loki::ReferenceCountedObjectFactory;
+
+public:
+    ~ConditionGroundLiteralImpl() override;
+
+    /// @brief Test for structural equivalence
+    bool operator==(const ConditionGroundLiteralImpl& other) const;
+    bool operator!=(const ConditionGroundLiteralImpl& other) const;
+
+    size_t hash() const;
+
+    void accept(ConditionVisitor& visitor) const override;
+
+    const GroundLiteral& get_literal() const;
 };
 
 
@@ -101,6 +129,12 @@ namespace std {
     struct hash<loki::pddl::ConditionLiteralImpl>
     {
         std::size_t operator()(const loki::pddl::ConditionLiteralImpl& condition) const;
+    };
+
+    template<>
+    struct hash<loki::pddl::ConditionGroundLiteralImpl>
+    {
+        std::size_t operator()(const loki::pddl::ConditionGroundLiteralImpl& condition) const;
     };
 
     template<>

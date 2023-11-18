@@ -10,7 +10,7 @@ namespace loki::problem {
     namespace x3 = boost::spirit::x3;
 
     ///////////////////////////////////////////////////////////////////////////
-    // parser public interface
+    // parser public interface for testing
     ///////////////////////////////////////////////////////////////////////////
     namespace parser {
         struct BasicFunctionTermClass;

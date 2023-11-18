@@ -34,6 +34,7 @@ private:
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
+    /// @brief Test for structural equivalence
     bool operator==(const DomainImpl& other) const;
     bool operator!=(const DomainImpl& other) const;
 

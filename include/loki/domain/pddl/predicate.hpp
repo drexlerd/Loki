@@ -26,6 +26,7 @@ private:
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
+    /// @brief Test for semantic equivalence
     bool operator==(const PredicateImpl& other) const;
     bool operator!=(const PredicateImpl& other) const;
 
