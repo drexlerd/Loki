@@ -1,6 +1,7 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_EFFECTS_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_EFFECTS_HPP_
 
+#include "base.hpp"
 #include "declarations.hpp"
 
 #include <string>
@@ -21,10 +22,8 @@ public:
 
 
 /* BaseEffect */
-class EffectImpl {
+class EffectImpl : public Base {
 protected:
-    int m_identifier;
-
     EffectImpl(int identifier);
 
 public:
@@ -33,11 +32,6 @@ public:
     // We never need to compare base types
     bool operator==(const EffectImpl& other) const = delete;
     bool operator!=(const EffectImpl& other) const = delete;
-
-    virtual bool operator<(const EffectImpl& other) const;
-    virtual bool operator>(const EffectImpl& other) const;
-
-    virtual size_t hash() const = 0;
 
     /// @brief Accepts the visitor by calling the visit overload.
     virtual void accept(EffectVisitor& visitor) const = 0;

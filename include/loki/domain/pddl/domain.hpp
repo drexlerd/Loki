@@ -1,6 +1,7 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_DOMAIN_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_DOMAIN_HPP_
 
+#include "base.hpp"
 #include "declarations.hpp"
 #include "requirements.hpp"
 
@@ -14,9 +15,8 @@ class ReferenceCountedObjectFactory;
 
 namespace loki::pddl {
 
-class DomainImpl {
+class DomainImpl : public Base {
 private:
-    int m_identifier;
     std::string m_name;
     Requirements m_requirements;
     TypeList m_types;
@@ -36,10 +36,8 @@ private:
 public:
     bool operator==(const DomainImpl& other) const;
     bool operator!=(const DomainImpl& other) const;
-    bool operator<(const DomainImpl& other) const;
-    bool operator>(const DomainImpl& other) const;
 
-    size_t hash() const;
+    size_t hash() const override;
 
     const std::string& get_name() const;
     const Requirements& get_requirements() const;

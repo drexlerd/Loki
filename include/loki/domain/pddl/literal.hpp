@@ -1,6 +1,7 @@
 #ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_LITERAL_HPP_
 #define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_LITERAL_HPP_
 
+#include "base.hpp"
 #include "declarations.hpp"
 
 
@@ -11,9 +12,8 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-class LiteralImpl {
+class LiteralImpl : public Base {
 private:
-    int m_identifier;
     bool m_is_negated;
     Predicate m_predicate;
 
@@ -28,7 +28,7 @@ public:
     bool operator<(const LiteralImpl& other) const;
     bool operator>(const LiteralImpl& other) const;
 
-    size_t hash() const;
+    size_t hash() const override;
 
     bool is_negated() const;
     const Predicate& get_predicate() const;

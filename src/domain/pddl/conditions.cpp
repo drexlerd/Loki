@@ -23,17 +23,9 @@
 namespace loki::pddl {
 /* BaseCondition */
 ConditionImpl::ConditionImpl(int identifier)
-    : m_identifier(identifier) { }
+    : Base(identifier) { }
 
 ConditionImpl::~ConditionImpl() = default;
-
-bool ConditionImpl::operator<(const ConditionImpl& other) const {
-    return m_identifier < other.m_identifier;
-}
-
-bool ConditionImpl::operator>(const ConditionImpl& other) const {
-    return m_identifier > other.m_identifier;
-}
 
 
 /* Literal */

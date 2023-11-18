@@ -1,6 +1,7 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_TYPE_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_TYPE_HPP_
 
+#include "base.hpp"
 #include "declarations.hpp"
 
 #include <string>
@@ -12,10 +13,8 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-class TypeImpl {
+class TypeImpl : public Base {
 private:
-    int m_identifier;
-
     std::string m_name;
     TypeList m_bases;
 
@@ -27,9 +26,6 @@ private:
 public:
     bool operator==(const TypeImpl& other) const;
     bool operator!=(const TypeImpl& other) const;
-
-    bool operator<(const TypeImpl& other) const;
-    bool operator>(const TypeImpl& other) const;
 
     size_t hash() const;
 

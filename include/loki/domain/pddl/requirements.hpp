@@ -1,6 +1,7 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_REQUIREMENTS_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_REQUIREMENTS_HPP_
 
+#include "base.hpp"
 #include "declarations.hpp"
 
 #include <string>
@@ -40,9 +41,8 @@ enum class RequirementEnum {
 using RequirementEnumSet = std::set<RequirementEnum>;
 
 
-class RequirementsImpl {
+class RequirementsImpl : public Base {
 private:
-    int m_identifier;
     RequirementEnumSet m_requirements;
 
     RequirementsImpl(int identifier, const RequirementEnumSet& requirements);
@@ -53,8 +53,6 @@ private:
 public:
     bool operator==(const RequirementsImpl& other) const;
     bool operator!=(const RequirementsImpl& other) const;
-    bool operator<(const RequirementsImpl& other) const;
-    bool operator>(const RequirementsImpl& other) const;
 
     size_t hash() const;
 

@@ -15,33 +15,24 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/domain/pddl/effects.hpp"
-#include "../../../include/loki/common/hash.hpp"
-#include "../../../include/loki/common/collections.hpp"
+#include "../../../include/loki/domain/pddl/base.hpp"
 
 
 namespace loki::pddl {
-/* BaseCondition */
-EffectImpl::EffectImpl(int identifier)
-    : Base(identifier) { }
-
-EffectImpl::~EffectImpl() = default;
-
-
-/* Literal */
-
-
+Base::Base(int identifier)
+    : m_identifier(identifier)
+{
 }
 
-namespace std {
-    bool less<loki::pddl::Effect>::operator()(
-        const loki::pddl::Effect& left_effect,
-        const loki::pddl::Effect& right_effect) const {
-        return *left_effect < *right_effect;
-    }
+Base::~Base() = default;
 
-    std::size_t hash<loki::pddl::EffectLiteralImpl>::operator()(const loki::pddl::EffectLiteralImpl& effect) const {
-        return effect.hash();
-    }
+bool Base::operator<(const Base& other) const {
+    return m_identifier < other.m_identifier;
+}
+
+bool Base::operator>(const Base& other) const {
+    return m_identifier > other.m_identifier;
+}
+
 
 }

@@ -27,7 +27,7 @@ DomainImpl::DomainImpl(int identifier,
     const TypeList& types,
     const ObjectList& constants,
     const PredicateList& predicates)
-    : m_identifier(identifier)
+    : Base(identifier)
     , m_name(name)
     , m_requirements(requirements)
     , m_types(types)
@@ -47,14 +47,6 @@ bool DomainImpl::operator==(const DomainImpl& other) const {
 
 bool DomainImpl::operator!=(const DomainImpl& other) const {
     return !(*this == other);
-}
-
-bool DomainImpl::operator<(const DomainImpl& other) const {
-    return m_identifier < other.m_identifier;
-}
-
-bool DomainImpl::operator>(const DomainImpl& other) const {
-    return m_identifier > other.m_identifier;
 }
 
 size_t DomainImpl::hash() const {

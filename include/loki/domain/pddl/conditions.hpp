@@ -1,6 +1,7 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_CONDITIONS_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_CONDITIONS_HPP_
 
+#include "base.hpp"
 #include "declarations.hpp"
 
 #include <string>
@@ -22,10 +23,8 @@ public:
 
 
 /* BaseCondition */
-class ConditionImpl {
+class ConditionImpl : public Base {
 protected:
-    int m_identifier;
-
     ConditionImpl(int identifier);
 
 public:
@@ -34,11 +33,6 @@ public:
     // We never need to compare base types
     bool operator==(const ConditionImpl& other) const = delete;
     bool operator!=(const ConditionImpl& other) const = delete;
-
-    bool operator<(const ConditionImpl& other) const;
-    bool operator>(const ConditionImpl& other) const;
-
-    virtual size_t hash() const = 0;
 
     /// @brief Accepts the visitor by calling the visit overload.
     virtual void accept(ConditionVisitor& visitor) const = 0;
