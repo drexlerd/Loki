@@ -1,6 +1,8 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_REQUIREMENTS_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_REQUIREMENTS_HPP_
 
+#include "declarations.hpp"
+
 #include <string>
 #include <set>
 
@@ -63,6 +65,13 @@ public:
 
 
 namespace std {
+    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+    template<>
+    struct less<loki::pddl::Requirements>
+    {
+        bool operator()(const loki::pddl::Requirements& left_requirements, const loki::pddl::Requirements& right_requirements) const;
+    };
+
     template<>
     struct hash<loki::pddl::RequirementsImpl>
     {

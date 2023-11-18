@@ -60,6 +60,12 @@ const ParameterList& PredicateImpl::get_parameters() const {
 }
 
 namespace std {
+    bool less<loki::pddl::Predicate>::operator()(
+        const loki::pddl::Predicate& left_predicate,
+        const loki::pddl::Predicate& right_predicate) const {
+        return *left_predicate < *right_predicate;
+    }
+
     std::size_t hash<loki::pddl::PredicateImpl>::operator()(const loki::pddl::PredicateImpl& predicate) const {
         return predicate.hash();
     }

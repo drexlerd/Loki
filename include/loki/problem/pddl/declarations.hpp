@@ -5,14 +5,20 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <set>
 #include <vector>
 
 
 namespace loki::pddl {
-    class AtomImpl;
-    using Atom = std::shared_ptr<AtomImpl>;
-    using AtomList = std::vector<Atom>;
-    using AtomSet = std::unordered_set<Atom>;
+    class GroundAtomImpl;
+    using GroundAtom = std::shared_ptr<const GroundAtomImpl>;
+    using GroundAtomList = std::vector<GroundAtom>;
+    using GroundAtomSet = std::unordered_set<GroundAtom>;
+
+    class GroundLiteralImpl;
+    using GroundLiteral = std::shared_ptr<const GroundLiteralImpl>;
+    using GroundLiteralList = std::vector<GroundLiteral>;
+    using GroundLiteralSet = std::set<GroundLiteral>;
 }
 
 #endif

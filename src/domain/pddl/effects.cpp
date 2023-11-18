@@ -42,6 +42,12 @@ bool EffectImpl::operator>(const EffectImpl& other) const {
 }
 
 namespace std {
+    bool less<loki::pddl::Effect>::operator()(
+        const loki::pddl::Effect& left_effect,
+        const loki::pddl::Effect& right_effect) const {
+        return *left_effect < *right_effect;
+    }
+
     std::size_t hash<loki::pddl::EffectLiteralImpl>::operator()(const loki::pddl::EffectLiteralImpl& effect) const {
         return effect.hash();
     }

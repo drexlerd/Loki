@@ -23,16 +23,6 @@ namespace loki::pddl {
     using ObjectList = std::vector<Object>;
     using ObjectSet = std::set<Object>;
 
-    class AtomImpl;
-    using Atom = std::shared_ptr<const AtomImpl>;
-    using AtomList = std::vector<Atom>;
-    using AtomSet = std::set<Atom>;
-
-    class LiteralImpl;
-    using Literal = std::shared_ptr<const LiteralImpl>;
-    using LiteralList = std::vector<Literal>;
-    using LiteralSet = std::set<Literal>;
-
     class ParameterImpl;
     using Parameter = std::shared_ptr<const ParameterImpl>;
     using ParameterList = std::vector<Parameter>;
@@ -42,6 +32,11 @@ namespace loki::pddl {
     using Predicate = std::shared_ptr<const PredicateImpl>;
     using PredicateList = std::vector<Predicate>;
     using PredicateSet = std::set<Predicate>;
+
+    class LiteralImpl;
+    using Literal = std::shared_ptr<const LiteralImpl>;
+    using LiteralList = std::vector<Literal>;
+    using LiteralSet = std::set<Literal>;
 
     class ConditionImpl;
     using Condition = std::shared_ptr<const ConditionImpl>;

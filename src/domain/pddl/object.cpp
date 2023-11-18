@@ -59,6 +59,12 @@ const TypeList& ObjectImpl::get_bases() const {
 }
 
 namespace std {
+    bool less<loki::pddl::Object>::operator()(
+        const loki::pddl::Object& left_object,
+        const loki::pddl::Object& right_object) const {
+        return *left_object < *right_object;
+    }
+
     std::size_t hash<loki::pddl::ObjectImpl>::operator()(const loki::pddl::ObjectImpl& object) const {
         return object.hash();
     }

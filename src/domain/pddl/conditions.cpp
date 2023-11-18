@@ -94,6 +94,12 @@ const ConditionList& ConditionAndImpl::get_conditions() const {
 }
 
 namespace std {
+    bool less<loki::pddl::Condition>::operator()(
+        const loki::pddl::Condition& left_condition,
+        const loki::pddl::Condition& right_condition) const {
+        return *left_condition < *right_condition;
+    }
+
     std::size_t hash<loki::pddl::ConditionLiteralImpl>::operator()(const loki::pddl::ConditionLiteralImpl& condition) const {
         return condition.hash();
     }

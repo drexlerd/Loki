@@ -52,6 +52,13 @@ public:
 
 
 namespace std {
+    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+    template<>
+    struct less<loki::pddl::Domain>
+    {
+        bool operator()(const loki::pddl::Domain& left_domain, const loki::pddl::Domain& right_domain) const;
+    };
+
     template<>
     struct hash<loki::pddl::DomainImpl>
     {

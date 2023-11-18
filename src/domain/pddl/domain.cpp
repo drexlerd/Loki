@@ -89,6 +89,12 @@ const PredicateList& DomainImpl::get_predicates() const {
 }
 
 namespace std {
+    bool less<loki::pddl::Domain>::operator()(
+        const loki::pddl::Domain& left_domain,
+        const loki::pddl::Domain& right_domain) const {
+        return *left_domain < *right_domain;
+    }
+
     std::size_t hash<loki::pddl::DomainImpl>::operator()(const loki::pddl::DomainImpl& domain) const {
         return domain.hash();
     }
