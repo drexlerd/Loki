@@ -13,6 +13,7 @@ namespace loki::pddl {
 ///            - reducing the required memory
 ///            - detecting duplicates during compilations
 ///            - reducing comparison and hashing to pointer level instead of traversing the whole structure
+///            - caching results of evaluating conditions
 ///        For the following type of PDDL objects, loki detects semantic equivalence:
 ///            * Type
 ///            * Object
