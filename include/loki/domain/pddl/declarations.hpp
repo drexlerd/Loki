@@ -47,14 +47,17 @@ namespace loki::pddl {
     using Condition = std::shared_ptr<const ConditionImpl>;
     using ConditionList = std::vector<Condition>;
     using ConditionSet = std::set<Condition>;
-
     class ConditionLiteralImpl;
     using ConditionLiteral = std::shared_ptr<const ConditionLiteralImpl>;
+    class ConditionAndImpl;
+    using ConditionAnd = std::shared_ptr<const ConditionAndImpl>;
 
     class EffectImpl;
     using Effect = std::shared_ptr<const EffectImpl>;
     using EffectList = std::vector<Effect>;
     using EffectSet = std::set<Effect>;
+    class EffectLiteralImpl;
+    using EffectLiteral = std::shared_ptr<const EffectLiteralImpl>;
 
     class FunctionImpl;
     using Function = std::shared_ptr<const FunctionImpl>;

@@ -24,6 +24,8 @@ namespace domain {
     ///        since each pddl object gets a reference to the factory to remove
     ///        the entry from the factory as soon as the reference count reaches zero.
     struct Context {
+        // Use object counter to obtain deterministic and canonical sortings.
+        std::shared_ptr<IdentifierCounter> counter;
         std::shared_ptr<ReferenceCountedObjectFactory<pddl::RequirementsImpl>> requirements;
         std::shared_ptr<ReferenceCountedObjectFactory<pddl::TypeImpl>> types;
         // Ensure that base types are not deallocated by adding one to the reference count.
@@ -34,13 +36,14 @@ namespace domain {
         std::shared_ptr<ReferenceCountedObjectFactory<pddl::PredicateImpl>> predicates;
         std::shared_ptr<ReferenceCountedObjectFactory<pddl::DomainImpl>> domains;
 
-        Context()
-            : requirements(std::make_shared<ReferenceCountedObjectFactory<pddl::RequirementsImpl>>())
-            , types(std::make_shared<ReferenceCountedObjectFactory<pddl::TypeImpl>>())
-            , constants(std::make_shared<ReferenceCountedObjectFactory<pddl::ObjectImpl>>())
-            , parameters(std::make_shared<ReferenceCountedObjectFactory<pddl::ParameterImpl>>())
-            , predicates(std::make_shared<ReferenceCountedObjectFactory<pddl::PredicateImpl>>())
-            , domains(std::make_shared<ReferenceCountedObjectFactory<pddl::DomainImpl>>()) {
+        Context() {
+            counter = std::make_shared<IdentifierCounter>();
+            requirements = std::make_shared<ReferenceCountedObjectFactory<pddl::RequirementsImpl>>(counter);
+            types = std::make_shared<ReferenceCountedObjectFactory<pddl::TypeImpl>>(counter);
+            constants = std::make_shared<ReferenceCountedObjectFactory<pddl::ObjectImpl>>(counter);
+            parameters = std::make_shared<ReferenceCountedObjectFactory<pddl::ParameterImpl>>(counter);
+            predicates = std::make_shared<ReferenceCountedObjectFactory<pddl::PredicateImpl>>(counter);
+            domains = std::make_shared<ReferenceCountedObjectFactory<pddl::DomainImpl>>(counter);
             // create base types.
             base_type_object = types->get_or_create("object").object;
             base_type_number = types->get_or_create("number").object;

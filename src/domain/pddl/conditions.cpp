@@ -17,15 +17,26 @@
 
 #include "../../../include/loki/domain/pddl/conditions.hpp"
 #include "../../../include/loki/common/hash.hpp"
+#include "../../../include/loki/common/collections.hpp"
 
 
 namespace loki::pddl {
+/* BaseCondition */
 ConditionImpl::ConditionImpl(int identifier)
     : m_identifier(identifier) { }
 
 ConditionImpl::~ConditionImpl() = default;
 
+bool ConditionImpl::operator<(const ConditionImpl& other) const {
+    return m_identifier < other.m_identifier;
+}
 
+bool ConditionImpl::operator>(const ConditionImpl& other) const {
+    return m_identifier > other.m_identifier;
+}
+
+
+/* Literal */
 ConditionLiteralImpl::ConditionLiteralImpl(int identifier, const Literal& literal)
     : ConditionImpl(identifier)
     , m_literal(literal) { }
@@ -40,14 +51,6 @@ bool ConditionLiteralImpl::operator!=(const ConditionLiteralImpl& other) const {
     return !(*this == other);
 }
 
-bool ConditionLiteralImpl::operator<(const ConditionLiteralImpl& other) const {
-    return m_identifier < other.m_identifier;
-}
-
-bool ConditionLiteralImpl::operator>(const ConditionLiteralImpl& other) const {
-    return m_identifier > other.m_identifier;
-}
-
 size_t ConditionLiteralImpl::hash() const {
     return std::hash<Literal>()(m_literal);
 }
@@ -60,10 +63,42 @@ const Literal& ConditionLiteralImpl::get_literal() const {
     return m_literal;
 }
 
+
+/* And */
+ConditionAndImpl::ConditionAndImpl(int identifier, const ConditionList& conditions)
+    : ConditionImpl(identifier)
+    , m_conditions(conditions) { }
+
+ConditionAndImpl::~ConditionAndImpl() = default;
+
+bool ConditionAndImpl::operator==(const ConditionAndImpl& other) const {
+    return sorted(m_conditions) == sorted(other.m_conditions);
+}
+
+bool ConditionAndImpl::operator!=(const ConditionAndImpl& other) const {
+    return !(*this == other);
+}
+
+size_t ConditionAndImpl::hash() const {
+    return hash_vector(sorted(m_conditions));
+}
+
+void ConditionAndImpl::accept(ConditionVisitor& visitor) const {
+    visitor.visit(this->shared_from_this());
+}
+
+const ConditionList& ConditionAndImpl::get_conditions() const {
+    return m_conditions;
+}
+
 }
 
 namespace std {
     std::size_t hash<loki::pddl::ConditionLiteralImpl>::operator()(const loki::pddl::ConditionLiteralImpl& condition) const {
+        return condition.hash();
+    }
+
+    std::size_t hash<loki::pddl::ConditionAndImpl>::operator()(const loki::pddl::ConditionAndImpl& condition) const {
         return condition.hash();
     }
 }

@@ -8,6 +8,15 @@
 
 
 namespace loki {
+/// @brief
+struct IdentifierCounter {
+    int counter = 0;
+
+    int get_identifier_and_increment() {
+        int identifier = counter++;
+        return identifier;
+    }
+};
 
 /// @brief A thread-safe reference-counted object cache.
 /// Original idea by Herb Sutter.
@@ -16,13 +25,16 @@ namespace loki {
 template<typename T>
 class ReferenceCountedObjectFactory : public std::enable_shared_from_this<ReferenceCountedObjectFactory<T>> {
 private:
+    std::shared_ptr<IdentifierCounter> m_counter;
+
     std::unordered_map<T, std::weak_ptr<T>> m_cache;
 
     /// @brief For multi-threading purposes
-    mutable std::mutex m_mutex;
+    //mutable std::mutex m_mutex;
 
 public:
-    ReferenceCountedObjectFactory() { }
+    ReferenceCountedObjectFactory(std::shared_ptr<IdentifierCounter> counter)
+        : m_counter(counter) { }
 
     struct GetOrCreateResult {
         std::shared_ptr<const T> object;
@@ -37,11 +49,11 @@ public:
     template<typename... Args>
     GetOrCreateResult get_or_create(Args&&... args) {
         /* Must explicitly call the constructor of T to give exclusive access to the factory. */
-        auto element = std::make_unique<T>(T(m_cache.size(), args...));
+        auto element = std::make_unique<T>(T(m_counter->get_identifier_and_increment(), args...));
         /* we must declare sp before locking the mutex
            s.t. the deleter is called after the mutex was released in case of stack unwinding. */
         std::shared_ptr<T> sp;
-        std::lock_guard<std::mutex> hold(m_mutex);
+        //std::lock_guard<std::mutex> hold(m_mutex);
         auto& cached = m_cache[*element];
         sp = cached.lock();
         bool new_insertion = false;
@@ -52,7 +64,7 @@ public:
                 [parent=this->shared_from_this(), original_deleter=element.get_deleter()](T* x)
                 {
                     {
-                        std::lock_guard<std::mutex> hold(parent->m_mutex);
+                        //std::lock_guard<std::mutex> hold(parent->m_mutex);
                         parent->m_cache.erase(*x);
                     }
                     /* After cache removal, we can call the objects destructor
