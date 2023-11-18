@@ -10,14 +10,20 @@
 
 
 namespace loki::pddl {
-    class AtomImpl;
-    using Atom = std::shared_ptr<const AtomImpl>;
-    using AtomList = std::vector<Atom>;
-    using AtomSet = std::unordered_set<Atom>;
+    class TypeImpl;
+    using Type = std::shared_ptr<const TypeImpl>;
+    using TypeList = std::vector<Type>;
+    using TypeSet = std::set<Type>;
 
     class ObjectImpl;
     using Object = std::shared_ptr<const ObjectImpl>;
     using ObjectList = std::vector<Object>;
+    using ObjectSet = std::set<Object>;
+
+    class AtomImpl;
+    using Atom = std::shared_ptr<const AtomImpl>;
+    using AtomList = std::vector<Atom>;
+    using AtomSet = std::set<Atom>;
 
     class ParameterImpl;
     using Parameter = std::shared_ptr<const ParameterImpl>;
@@ -27,18 +33,42 @@ namespace loki::pddl {
     class PredicateImpl;
     using Predicate = std::shared_ptr<const PredicateImpl>;
     using PredicateList = std::vector<Predicate>;
+    using PredicateSet = std::set<Predicate>;
+
+    class ConditionImpl;
+    using Condition = std::shared_ptr<const ConditionImpl>;
+    using ConditionList = std::vector<Condition>;
+    using ConditionSet = std::set<Condition>;
+
+    class EffectImpl;
+    using Effect = std::shared_ptr<const EffectImpl>;
+    using EffectList = std::vector<Effect>;
+    using EffectSet = std::set<Effect>;
 
     class FunctionImpl;
     using Function = std::shared_ptr<const FunctionImpl>;
     using FunctionList = std::vector<Function>;
+    using FunctionSet = std::set<Function>;
 
-    class TypeImpl;
-    using Type = std::shared_ptr<const TypeImpl>;
-    using TypeSet = std::set<Type>;
+    class ConstraintImpl;
+    using Constraint = std::shared_ptr<const ConstraintImpl>;
+    using ConstraintList = std::vector<Constraint>;
+    using ConstraintSet = std::set<Constraint>;
+
+    class ActionImpl;
+    using Action = std::shared_ptr<const ActionImpl>;
+    using ActionList = std::vector<Action>;
+    using ActionSet = std::set<Action>;
+
+    class DerivedPredicateImpl;
+    using DerivedPredicate = std::shared_ptr<const DerivedPredicate>;
+    using DerivedPredicateList = std::vector<DerivedPredicate>;
+    using DerivedPredicateSet = std::set<DerivedPredicate>;
 
     class DomainImpl;
     using Domain = std::shared_ptr<const DomainImpl>;
     using DomainList = std::vector<Domain>;
+    using DomainSet = std::set<Domain>;
 }
 
 #endif

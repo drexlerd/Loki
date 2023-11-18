@@ -13,6 +13,8 @@ class DomainImpl {
         std::string name;
         Requirements requirements;
         TypeSet types;
+        ObjectSet constants;
+        PredicateSet predicates;
 };
 
 }
