@@ -25,17 +25,12 @@ struct IdentifierCounter {
 template<typename T>
 class ReferenceCountedObjectFactory : public std::enable_shared_from_this<ReferenceCountedObjectFactory<T>> {
 private:
-    std::shared_ptr<IdentifierCounter> m_counter;
-
     std::unordered_map<T, std::weak_ptr<T>> m_cache;
 
     /// @brief For multi-threading purposes
     //mutable std::mutex m_mutex;
 
 public:
-    ReferenceCountedObjectFactory(std::shared_ptr<IdentifierCounter> counter)
-        : m_counter(counter) { }
-
     struct GetOrCreateResult {
         std::shared_ptr<const T> object;
         bool created;
@@ -48,8 +43,13 @@ public:
     /// @return
     template<typename... Args>
     GetOrCreateResult get_or_create(Args&&... args) {
+        return get_or_create_derived<T>(args...);
+    }
+
+    template<typename Derived, typename... Args>
+    GetOrCreateResult get_or_create_derived(Args&&... args) {
         /* Must explicitly call the constructor of T to give exclusive access to the factory. */
-        auto element = std::make_unique<T>(T(m_counter->get_identifier_and_increment(), args...));
+        auto element = std::make_unique<T>(Derived(m_cache.size(), args...));
         /* we must declare sp before locking the mutex
            s.t. the deleter is called after the mutex was released in case of stack unwinding. */
         std::shared_ptr<T> sp;

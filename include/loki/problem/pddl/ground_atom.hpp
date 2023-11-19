@@ -1,7 +1,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_ATOM_HPP_
 #define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_ATOM_HPP_
 
-#include "../../common/pddl/base.hpp"
 #include "declarations.hpp"
 
 #include "../../domain/pddl/declarations.hpp"
@@ -14,8 +13,9 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-class GroundAtomImpl : public Base {
+class GroundAtomImpl {
 private:
+    int m_identifier;
     Predicate m_predicate;
     ObjectList m_arguments;
 
@@ -25,8 +25,12 @@ private:
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
+    /// @brief Test for semantic equivalence
     bool operator==(const GroundAtomImpl& other) const;
     bool operator!=(const GroundAtomImpl& other) const;
+
+    bool operator<(const GroundAtomImpl& other) const;
+    bool operator>(const GroundAtomImpl& other) const;
 
     size_t hash() const;
 

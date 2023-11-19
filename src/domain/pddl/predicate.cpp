@@ -23,7 +23,7 @@
 
 namespace loki::pddl {
 PredicateImpl::PredicateImpl(int identifier, const std::string& name, const ParameterList& parameters)
-    : Base(identifier)
+    : m_identifier(identifier)
     , m_name(name)
     , m_parameters(parameters)
 {
@@ -35,6 +35,14 @@ bool PredicateImpl::operator==(const PredicateImpl& other) const {
 
 bool PredicateImpl::operator!=(const PredicateImpl& other) const {
     return !(*this == other);
+}
+
+bool PredicateImpl::operator<(const PredicateImpl& other) const {
+    return m_identifier < other.m_identifier;
+}
+
+bool PredicateImpl::operator>(const PredicateImpl& other) const {
+    return m_identifier > other.m_identifier;
 }
 
 size_t PredicateImpl::hash() const {

@@ -1,7 +1,6 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_DERIVED_PREDICATE_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_DERIVED_PREDICATE_HPP_
 
-#include "../../common/pddl/base.hpp"
 #include "declarations.hpp"
 #include "conditions.hpp"
 #include "effects.hpp"
@@ -17,8 +16,9 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-class DerivedPredicateImpl : public Base {
+class DerivedPredicateImpl {
 private:
+    int m_identifier;
     ParameterList m_parameters;
     Condition m_condition;
 
@@ -31,6 +31,9 @@ public:
     /// @brief Test for structural equivalence
     bool operator==(const DerivedPredicateImpl& other) const;
     bool operator!=(const DerivedPredicateImpl& other) const;
+
+    bool operator<(const DerivedPredicateImpl& other) const;
+    bool operator>(const DerivedPredicateImpl& other) const;
 
     size_t hash() const;
 

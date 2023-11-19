@@ -22,7 +22,7 @@
 
 namespace loki::pddl {
 TypeImpl::TypeImpl(int identifier, const std::string& name, const TypeList& bases)
-    : Base(identifier)
+    : m_identifier(identifier)
     , m_name(name)
     , m_bases(bases)
 {
@@ -34,6 +34,14 @@ bool TypeImpl::operator==(const TypeImpl& other) const {
 
 bool TypeImpl::operator!=(const TypeImpl& other) const {
     return !(*this == other);
+}
+
+bool TypeImpl::operator<(const TypeImpl& other) const {
+    return m_identifier < other.m_identifier;
+}
+
+bool TypeImpl::operator>(const TypeImpl& other) const {
+    return m_identifier > other.m_identifier;
 }
 
 size_t TypeImpl::hash() const {

@@ -22,7 +22,7 @@
 
 namespace loki::pddl {
 DerivedPredicateImpl::DerivedPredicateImpl(int identifier, const ParameterList& parameters, const Condition& condition)
-    : Base(identifier)
+    : m_identifier(identifier)
     , m_parameters(parameters)
     , m_condition(condition)
 {
@@ -35,6 +35,14 @@ bool DerivedPredicateImpl::operator==(const DerivedPredicateImpl& other) const {
 
 bool DerivedPredicateImpl::operator!=(const DerivedPredicateImpl& other) const {
     return !(*this == other);
+}
+
+bool DerivedPredicateImpl::operator<(const DerivedPredicateImpl& other) const {
+    return m_identifier < other.m_identifier;
+}
+
+bool DerivedPredicateImpl::operator>(const DerivedPredicateImpl& other) const {
+    return m_identifier > other.m_identifier;
 }
 
 size_t DerivedPredicateImpl::hash() const {

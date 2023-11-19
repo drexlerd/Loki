@@ -1,7 +1,6 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_ACTION_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_ACTION_HPP_
 
-#include "../../common/pddl/base.hpp"
 #include "declarations.hpp"
 #include "conditions.hpp"
 #include "effects.hpp"
@@ -17,8 +16,9 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-class ActionImpl : public Base {
+class ActionImpl {
 private:
+    int m_identifier;
     std::string m_name;
     Condition m_condition;
     EffectList m_effects;
@@ -32,6 +32,9 @@ public:
     /// @brief Test for structural equivalence
     bool operator==(const ActionImpl& other) const;
     bool operator!=(const ActionImpl& other) const;
+
+    bool operator<(const ActionImpl& other) const;
+    bool operator>(const ActionImpl& other) const;
 
     size_t hash() const;
 

@@ -21,7 +21,7 @@
 
 namespace loki::pddl {
 GroundAtomImpl::GroundAtomImpl(int identifier, const Predicate& predicate, const ObjectList& arguments)
-    : Base(identifier)
+    : m_identifier(identifier)
     , m_predicate(predicate)
     , m_arguments(arguments)
 {
@@ -33,6 +33,14 @@ bool GroundAtomImpl::operator==(const GroundAtomImpl& other) const {
 
 bool GroundAtomImpl::operator!=(const GroundAtomImpl& other) const {
     return !(*this == other);
+}
+
+bool GroundAtomImpl::operator<(const GroundAtomImpl& other) const {
+    return m_identifier < other.m_identifier;
+}
+
+bool GroundAtomImpl::operator>(const GroundAtomImpl& other) const {
+    return m_identifier > other.m_identifier;
 }
 
 size_t GroundAtomImpl::hash() const {

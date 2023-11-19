@@ -22,7 +22,7 @@
 
 namespace loki::pddl {
 LiteralImpl::LiteralImpl(int identifier, bool is_negated, const Predicate& predicate)
-    : Base(identifier)
+    : m_identifier(identifier)
     , m_is_negated(is_negated)
     , m_predicate(predicate)
 {
@@ -34,6 +34,14 @@ bool LiteralImpl::operator==(const LiteralImpl& other) const {
 
 bool LiteralImpl::operator!=(const LiteralImpl& other) const {
     return !(*this == other);
+}
+
+bool LiteralImpl::operator<(const LiteralImpl& other) const {
+    return m_identifier < other.m_identifier;
+}
+
+bool LiteralImpl::operator>(const LiteralImpl& other) const {
+    return m_identifier > other.m_identifier;
 }
 
 size_t LiteralImpl::hash() const {

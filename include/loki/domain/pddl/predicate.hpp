@@ -1,7 +1,6 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_PREDICATE_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_PREDICATE_HPP_
 
-#include "../../common/pddl/base.hpp"
 #include "declarations.hpp"
 
 #include <string>
@@ -15,8 +14,9 @@ class ReferenceCountedObjectFactory;
 
 namespace loki::pddl {
 
-class PredicateImpl : public Base {
+class PredicateImpl {
 private:
+    int m_identifier;
     std::string m_name;
     ParameterList m_parameters;
 
@@ -29,6 +29,9 @@ public:
     /// @brief Test for semantic equivalence
     bool operator==(const PredicateImpl& other) const;
     bool operator!=(const PredicateImpl& other) const;
+
+    bool operator<(const PredicateImpl& other) const;
+    bool operator>(const PredicateImpl& other) const;
 
     size_t hash() const;
 

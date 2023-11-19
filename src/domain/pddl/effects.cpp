@@ -23,9 +23,17 @@
 namespace loki::pddl {
 /* BaseCondition */
 EffectImpl::EffectImpl(int identifier)
-    : Base(identifier) { }
+    : m_identifier(identifier) { }
 
 EffectImpl::~EffectImpl() = default;
+
+bool EffectImpl::operator<(const EffectImpl& other) const {
+    return m_identifier < other.m_identifier;
+}
+
+bool EffectImpl::operator>(const EffectImpl& other) const {
+    return m_identifier > other.m_identifier;
+}
 
 
 /* Literal */

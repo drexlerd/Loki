@@ -22,7 +22,7 @@
 
 namespace loki::pddl {
 ActionImpl::ActionImpl(int identifier, const std::string& name, const Condition& condition, const EffectList& effects)
-    : Base(identifier)
+    : m_identifier(identifier)
     , m_name(name)
     , m_condition(condition)
     , m_effects(effects)
@@ -37,6 +37,14 @@ bool ActionImpl::operator==(const ActionImpl& other) const {
 
 bool ActionImpl::operator!=(const ActionImpl& other) const {
     return !(*this == other);
+}
+
+bool ActionImpl::operator<(const ActionImpl& other) const {
+    return m_identifier < other.m_identifier;
+}
+
+bool ActionImpl::operator>(const ActionImpl& other) const {
+    return m_identifier > other.m_identifier;
 }
 
 size_t ActionImpl::hash() const {
