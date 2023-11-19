@@ -22,6 +22,8 @@ private:
     //mutable std::mutex m_mutex;
 
 public:
+    ReferenceCountedObjectFactory() = default;
+
     struct GetOrCreateResult {
         std::shared_ptr<const T> object;
         bool created;

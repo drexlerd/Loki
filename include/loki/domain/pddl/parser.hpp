@@ -1,8 +1,11 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_PARSER_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_PARSER_HPP_
 
+#include "action.hpp"
+#include "conditions.hpp"
 #include "declarations.hpp"
 #include "domain.hpp"
+#include "effects.hpp"
 #include "object.hpp"
 #include "parameter.hpp"
 #include "predicate.hpp"
@@ -31,6 +34,9 @@ namespace domain {
         std::shared_ptr<ReferenceCountedObjectFactory<pddl::ObjectImpl>> constants;
         std::shared_ptr<ReferenceCountedObjectFactory<pddl::ParameterImpl>> parameters;
         std::shared_ptr<ReferenceCountedObjectFactory<pddl::PredicateImpl>> predicates;
+        std::shared_ptr<ReferenceCountedObjectFactory<pddl::ConditionImpl>> conditions;
+        std::shared_ptr<ReferenceCountedObjectFactory<pddl::EffectImpl>> effects;
+        std::shared_ptr<ReferenceCountedObjectFactory<pddl::ActionImpl>> actions;
         std::shared_ptr<ReferenceCountedObjectFactory<pddl::DomainImpl>> domains;
 
         Context()
@@ -39,6 +45,10 @@ namespace domain {
             , constants(std::make_shared<ReferenceCountedObjectFactory<pddl::ObjectImpl>>())
             , parameters(std::make_shared<ReferenceCountedObjectFactory<pddl::ParameterImpl>>())
             , predicates(std::make_shared<ReferenceCountedObjectFactory<pddl::PredicateImpl>>())
+            // TODO: the idea of how this is used for polymorphic types does not work yet
+            // , conditions(std::make_shared<ReferenceCountedObjectFactory<pddl::ConditionImpl>>())
+            //, effects(std::make_shared<ReferenceCountedObjectFactory<pddl::EffectImpl>>())
+            //, actions(std::make_shared<ReferenceCountedObjectFactory<pddl::ActionImpl>>())
             , domains(std::make_shared<ReferenceCountedObjectFactory<pddl::DomainImpl>>()) {
             // create base types.
             base_type_object = types->get_or_create("object").object;

@@ -20,10 +20,11 @@ class ActionImpl {
 private:
     int m_identifier;
     std::string m_name;
+    ParameterList m_parameters;
     Condition m_condition;
-    EffectList m_effects;
+    Effect m_effect;
 
-    ActionImpl(int identifier, const std::string& name, const Condition& condition, const EffectList& effects);
+    ActionImpl(int identifier, const std::string& name, const ParameterList& parameters, const Condition& condition, const Effect& effect);
 
     template<typename T>
     friend class loki::ReferenceCountedObjectFactory;
@@ -39,8 +40,9 @@ public:
     size_t hash() const;
 
     const std::string& get_name() const;
+    const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
-    const EffectList& get_effects() const;
+    const Effect& get_effect() const;
 };
 
 }

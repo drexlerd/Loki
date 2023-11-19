@@ -17,6 +17,7 @@ namespace loki::pddl {
 class EffectVisitor {
 public:
     virtual void visit(const EffectLiteral& condition) = 0;
+    virtual void visit(const EffectAnd& condition) = 0;
 };
 
 
@@ -68,6 +69,30 @@ public:
     const Literal& get_literal() const;
 };
 
+
+/* And */
+class EffectAndImpl : public EffectImpl, std::enable_shared_from_this<EffectAndImpl> {
+private:
+    EffectList m_effects;
+
+    EffectAndImpl(int identifier, const EffectList& effects);
+
+    template<typename T>
+    friend class loki::ReferenceCountedObjectFactory;
+
+public:
+    ~EffectAndImpl() override;
+
+    bool operator==(const EffectImpl& other) const override;
+    bool operator!=(const EffectImpl& other) const override;
+
+    size_t hash() const;
+
+    void accept(EffectVisitor& visitor) const override;
+
+    const EffectList& get_effects() const;
+};
+
 }
 
 
@@ -83,6 +108,12 @@ namespace std {
     struct hash<loki::pddl::EffectLiteralImpl>
     {
         std::size_t operator()(const loki::pddl::EffectLiteralImpl& effect) const;
+    };
+
+    template<>
+    struct hash<loki::pddl::EffectAndImpl>
+    {
+        std::size_t operator()(const loki::pddl::EffectAndImpl& effect) const;
     };
 }
 

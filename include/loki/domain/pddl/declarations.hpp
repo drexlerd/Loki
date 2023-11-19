@@ -53,6 +53,8 @@ namespace loki::pddl {
     using EffectSet = std::set<Effect>;
     class EffectLiteralImpl;
     using EffectLiteral = std::shared_ptr<const EffectLiteralImpl>;
+    class EffectAndImpl;
+    using EffectAnd = std::shared_ptr<const EffectAndImpl>;
 
     class FunctionImpl;
     using Function = std::shared_ptr<const FunctionImpl>;

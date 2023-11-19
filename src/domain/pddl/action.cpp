@@ -21,18 +21,20 @@
 
 
 namespace loki::pddl {
-ActionImpl::ActionImpl(int identifier, const std::string& name, const Condition& condition, const EffectList& effects)
+ActionImpl::ActionImpl(int identifier, const std::string& name, const ParameterList& parameters, const Condition& condition, const Effect& effect)
     : m_identifier(identifier)
     , m_name(name)
+    , m_parameters(parameters)
     , m_condition(condition)
-    , m_effects(effects)
+    , m_effect(effect)
 {
 }
 
 bool ActionImpl::operator==(const ActionImpl& other) const {
     return (m_name == other.m_name)
+        && (sorted(m_parameters) == sorted(other.m_parameters))
         && (m_condition == other.m_condition)
-        && (sorted(m_effects) == sorted(other.m_effects));
+        && (m_effect == other.m_effect);
 }
 
 bool ActionImpl::operator!=(const ActionImpl& other) const {
@@ -50,20 +52,25 @@ bool ActionImpl::operator>(const ActionImpl& other) const {
 size_t ActionImpl::hash() const {
     return hash_combine(
         m_name,
+        hash_vector(m_parameters),
         m_condition,
-        hash_vector(sorted(m_effects)));
+        m_effect);
 }
 
 const std::string& ActionImpl::get_name() const {
     return m_name;
 }
 
+const ParameterList& ActionImpl::get_parameters() const {
+    return m_parameters;
+}
+
 const Condition& ActionImpl::get_condition() const {
     return m_condition;
 }
 
-const EffectList& ActionImpl::get_effects() const {
-    return m_effects;
+const Effect& ActionImpl::get_effect() const {
+    return m_effect;
 }
 
 }

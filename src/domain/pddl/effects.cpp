@@ -69,6 +69,35 @@ const Literal& EffectLiteralImpl::get_literal() const {
     return m_literal;
 }
 
+
+EffectAndImpl::EffectAndImpl(int identifier, const EffectList& effects)
+    : EffectImpl(identifier), m_effects(effects) { }
+
+EffectAndImpl::~EffectAndImpl() = default;
+
+bool EffectAndImpl::operator==(const EffectImpl& other) const {
+    if (typeid(*this) == typeid(other)) {
+        const auto& other_derived = static_cast<const EffectAndImpl&>(other);
+        return sorted(m_effects) == sorted(other_derived.m_effects);
+    }
+    return false;
+}
+bool EffectAndImpl::operator!=(const EffectImpl& other) const {
+    return !(*this == other);
+}
+
+size_t EffectAndImpl::hash() const {
+    return hash_vector(sorted(m_effects));
+}
+
+void EffectAndImpl::accept(EffectVisitor& visitor) const {
+    visitor.visit(this->shared_from_this());
+}
+
+const EffectList& EffectAndImpl::get_effects() const {
+    return m_effects;
+}
+
 }
 
 namespace std {
@@ -82,4 +111,7 @@ namespace std {
         return effect.hash();
     }
 
+    std::size_t hash<loki::pddl::EffectAndImpl>::operator()(const loki::pddl::EffectAndImpl& effect) const {
+        return effect.hash();
+    }
 }
