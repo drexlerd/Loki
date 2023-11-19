@@ -14,7 +14,7 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-/// @brief Provides an interface for visiting nodes in a DAG of conditions.
+/// @brief Defines an interface for visiting nodes in a DAG of conditions.
 class ConditionVisitor {
 public:
     virtual void visit(const ConditionLiteral& condition) = 0;
@@ -23,6 +23,9 @@ public:
 
 
 /* BaseCondition */
+/// @brief Defines the common base class for conditions.
+///        We use polymorphism instead of variant,
+///        since we wrap conditions into shared_ptr.
 class ConditionImpl {
 protected:
     int m_identifier;
@@ -32,9 +35,9 @@ protected:
 public:
     virtual ~ConditionImpl();
 
-    // We never need to compare base types
-    bool operator==(const ConditionImpl& other) const = delete;
-    bool operator!=(const ConditionImpl& other) const = delete;
+    /// @brief Test for structural equivalence
+    virtual bool operator==(const ConditionImpl& other) const = 0;
+    virtual bool operator!=(const ConditionImpl& other) const = 0;
 
     bool operator<(const ConditionImpl& other) const;
     bool operator>(const ConditionImpl& other) const;
@@ -57,9 +60,8 @@ private:
 public:
     ~ConditionLiteralImpl() override;
 
-    /// @brief Test for structural equivalence
-    bool operator==(const ConditionLiteralImpl& other) const;
-    bool operator!=(const ConditionLiteralImpl& other) const;
+    bool operator==(const ConditionImpl& other) const override;
+    bool operator!=(const ConditionImpl& other) const override;
 
     size_t hash() const;
 
@@ -82,8 +84,8 @@ private:
 public:
     ~ConditionAndImpl() override;
 
-    bool operator==(const ConditionAndImpl& other) const;
-    bool operator!=(const ConditionAndImpl& other) const;
+    bool operator==(const ConditionImpl& other) const override;
+    bool operator!=(const ConditionImpl& other) const override;
 
     size_t hash() const;
 

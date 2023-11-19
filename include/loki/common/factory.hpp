@@ -8,15 +8,6 @@
 
 
 namespace loki {
-/// @brief
-struct IdentifierCounter {
-    int counter = 0;
-
-    int get_identifier_and_increment() {
-        int identifier = counter++;
-        return identifier;
-    }
-};
 
 /// @brief A thread-safe reference-counted object cache.
 /// Original idea by Herb Sutter.

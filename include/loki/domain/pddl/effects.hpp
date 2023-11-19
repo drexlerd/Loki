@@ -13,7 +13,7 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-/// @brief Provides an interface for visiting nodes in a DAG of conditions.
+/// @brief Defines an interface for visiting nodes in a DAG of conditions.
 class EffectVisitor {
 public:
     virtual void visit(const EffectLiteral& condition) = 0;
@@ -21,6 +21,9 @@ public:
 
 
 /* BaseEffect */
+/// @brief Defines the common base class for effects.
+///        We use polymorphism instead of variant,
+///        since we wrap effects into shared_ptr.
 class EffectImpl {
 protected:
     int m_identifier;
@@ -30,9 +33,9 @@ protected:
 public:
     virtual ~EffectImpl();
 
-    // We never need to compare base types
-    bool operator==(const EffectImpl& other) const = delete;
-    bool operator!=(const EffectImpl& other) const = delete;
+    /// @brief Test for structural equivalence
+    virtual bool operator==(const EffectImpl& other) const = 0;
+    virtual bool operator!=(const EffectImpl& other) const = 0;
 
     bool operator<(const EffectImpl& other) const;
     bool operator>(const EffectImpl& other) const;
@@ -55,9 +58,8 @@ private:
 public:
     ~EffectLiteralImpl() override;
 
-    /// @brief Test for structural equivalence
-    bool operator==(const EffectLiteralImpl& other) const;
-    bool operator!=(const EffectLiteralImpl& other) const;
+    bool operator==(const EffectImpl& other) const override;
+    bool operator!=(const EffectImpl& other) const override;
 
     size_t hash() const;
 

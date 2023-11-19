@@ -37,7 +37,37 @@ bool EffectImpl::operator>(const EffectImpl& other) const {
 
 
 /* Literal */
+EffectLiteralImpl::EffectLiteralImpl(int identifier, const Literal& literal)
+    : EffectImpl(identifier)
+    , m_literal(literal) { }
 
+
+EffectLiteralImpl::~EffectLiteralImpl() = default;
+
+bool EffectLiteralImpl::operator==(const EffectImpl& other) const {
+    // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
+    if (typeid(*this) == typeid(other)) {
+        const auto& other_derived = static_cast<const EffectLiteralImpl&>(other);
+        return m_literal == other_derived.m_literal;
+    }
+    return false;
+}
+
+bool EffectLiteralImpl::operator!=(const EffectImpl& other) const {
+    return !(*this == other);
+}
+
+size_t EffectLiteralImpl::hash() const {
+    return std::hash<Literal>()(m_literal);
+}
+
+void EffectLiteralImpl::accept(EffectVisitor& visitor) const {
+    visitor.visit(this->shared_from_this());
+}
+
+const Literal& EffectLiteralImpl::get_literal() const {
+    return m_literal;
+}
 
 }
 
