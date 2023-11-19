@@ -6,24 +6,22 @@
 #include "../../../../include/loki/domain/pddl/parameter.hpp"
 #include "../../../../include/loki/domain/pddl/parser.hpp"
 
-using namespace loki::domain;
-using namespace std;
 
 namespace loki {
 
 class ParameterListVisitor : boost::static_visitor<pddl::ParameterList> {
 private:
     const error_handler_type& error_handler;
-    Context& context;
+    domain::Context& context;
 
 public:
-    ParameterListVisitor(const error_handler_type& error_handler_, Context& context_);
+    ParameterListVisitor(const error_handler_type& error_handler_, domain::Context& context_);
 
-    pddl::ParameterList operator()(const std::vector<ast::Variable>& variable_nodes);
+    pddl::ParameterList operator()(const std::vector<domain::ast::Variable>& variable_nodes);
 
-    pddl::ParameterList operator()(const ast::TypedListOfVariablesRecursively& typed_variables_node);
+    pddl::ParameterList operator()(const domain::ast::TypedListOfVariablesRecursively& typed_variables_node);
 
-    pddl::ParameterList operator()(const ast::TypedListOfVariables& node);
+    pddl::ParameterList operator()(const domain::ast::TypedListOfVariables& node);
 };
 
 

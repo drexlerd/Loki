@@ -3,27 +3,25 @@
 
 #include "../../../../include/loki/common/ast/config.hpp"
 #include "../../../../include/loki/domain/ast/ast.hpp"
-#include "../../../../include/loki/domain/pddl/object.hpp"
+#include "../../../../include/loki/domain/pddl/declarations.hpp"
 #include "../../../../include/loki/domain/pddl/parser.hpp"
 
-using namespace loki::domain;
-using namespace std;
 
 namespace loki {
 
 class ConstantListVisitor : boost::static_visitor<pddl::ObjectList> {
 private:
     const error_handler_type& error_handler;
-    Context& context;
+    domain::Context& context;
 
 public:
-    ConstantListVisitor(const error_handler_type& error_handler_, Context& context_);
+    ConstantListVisitor(const error_handler_type& error_handler_, domain::Context& context_);
 
-    pddl::ObjectList operator()(const std::vector<ast::Name>& name_nodes);
+    pddl::ObjectList operator()(const std::vector<domain::ast::Name>& name_nodes);
 
-    pddl::ObjectList operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
+    pddl::ObjectList operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
 
-    pddl::ObjectList operator()(const ast::TypedListOfNames& node);
+    pddl::ObjectList operator()(const domain::ast::TypedListOfNames& node);
 };
 
 }

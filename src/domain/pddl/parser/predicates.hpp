@@ -6,12 +6,10 @@
 #include "../../../../include/loki/domain/pddl/parser.hpp"
 #include "../../../../include/loki/domain/pddl/predicate.hpp"
 
-using namespace loki::domain;
-using namespace std;
 
 namespace loki {
 
-extern pddl::PredicateList parse(const ast::Predicates& predicates_node, const error_handler_type& error_handler, Context& context);
+extern pddl::PredicateList parse(const domain::ast::Predicates& predicates_node, const error_handler_type& error_handler, domain::Context& context);
 
 }
 
