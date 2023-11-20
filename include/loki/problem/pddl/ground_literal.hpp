@@ -5,7 +5,7 @@
 
 
 namespace loki {
-template<typename T>
+template<typename... Ts>
 class ReferenceCountedObjectFactory;
 }
 
@@ -19,7 +19,7 @@ private:
 
     GroundLiteralImpl(int identifier, bool is_negated, const GroundAtom& atom);
 
-    template<typename T>
+    template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
 
 public:

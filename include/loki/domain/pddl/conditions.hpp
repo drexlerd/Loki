@@ -8,7 +8,7 @@
 
 
 namespace loki {
-template<typename T>
+template<typename... Ts>
 class ReferenceCountedObjectFactory;
 }
 
@@ -54,7 +54,7 @@ private:
 
     ConditionLiteralImpl(int identifier, const Literal& literal);
 
-    template<typename T>
+    template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
@@ -78,7 +78,7 @@ private:
 
     ConditionAndImpl(int identifier, const ConditionList& conditions);
 
-    template<typename T>
+    template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
 
 public:

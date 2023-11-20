@@ -5,7 +5,7 @@
 
 
 namespace loki {
-template<typename T>
+template<typename... Ts>
 class ReferenceCountedObjectFactory;
 }
 
@@ -19,7 +19,7 @@ private:
 
     LiteralImpl(int identifier, bool is_negated, const Predicate& predicate);
 
-    template<typename T>
+    template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
 
 public:

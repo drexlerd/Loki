@@ -7,7 +7,7 @@
 
 
 namespace loki {
-template<typename T>
+template<typename... Ts>
 class ReferenceCountedObjectFactory;
 }
 
@@ -53,7 +53,7 @@ private:
 
     EffectLiteralImpl(int identifier, const Literal& literal);
 
-    template<typename T>
+    template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
@@ -77,7 +77,7 @@ private:
 
     EffectAndImpl(int identifier, const EffectList& effects);
 
-    template<typename T>
+    template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
 
 public:

@@ -7,7 +7,7 @@
 
 
 namespace loki {
-template<typename T>
+template<typename... Ts>
 class ReferenceCountedObjectFactory;
 }
 
@@ -21,7 +21,7 @@ private:
 
     FunctionImpl(int identifier, const std::string& name, const ParameterList& parameters);
 
-    template<typename T>
+    template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
 
 public:

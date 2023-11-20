@@ -10,7 +10,7 @@
 
 
 namespace loki {
-template<typename T>
+template<typename... Ts>
 class ReferenceCountedObjectFactory;
 }
 
@@ -24,7 +24,7 @@ private:
 
     DerivedPredicateImpl(int identifier, const ParameterList& parameters, const Condition& condition);
 
-    template<typename T>
+    template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
 
 public:

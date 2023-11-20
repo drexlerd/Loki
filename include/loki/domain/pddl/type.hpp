@@ -6,7 +6,7 @@
 #include <string>
 
 namespace loki {
-template<typename T>
+template<typename... Ts>
 class ReferenceCountedObjectFactory;
 }
 
@@ -20,7 +20,7 @@ private:
 
     TypeImpl(int identifier, const std::string& name, const TypeList& bases = {});
 
-    template<typename T>
+    template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
 
 public:

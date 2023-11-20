@@ -8,7 +8,7 @@
 
 
 namespace loki {
-template<typename T>
+template<typename... Ts>
 class ReferenceCountedObjectFactory;
 }
 
@@ -47,7 +47,7 @@ private:
 
     RequirementsImpl(int identifier, const RequirementEnumSet& requirements);
 
-    template<typename T>
+    template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
 
 public:

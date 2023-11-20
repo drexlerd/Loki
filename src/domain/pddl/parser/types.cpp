@@ -35,11 +35,11 @@ pddl::TypeList TypeDeclarationVisitor::operator()(const ast::Type& type_node) {
 
 pddl::TypeList TypeDeclarationVisitor::operator()(const ast::Name& name_node) {
     auto name = parse(name_node, error_handler, context);
-    return { context.types->get_or_create(name).object };
+    return { context.cache.get_or_create<pddl::TypeImpl>(name).object };
 }
 
 pddl::TypeList TypeDeclarationVisitor::operator()(const ast::TypeObject&) {
-    return { context.types->get_or_create("object").object };
+    return { context.cache.get_or_create<pddl::TypeImpl>("object").object };
 }
 
 pddl::TypeList TypeDeclarationVisitor::operator()(const ast::TypeEither& either_type_node) {
@@ -64,7 +64,7 @@ pddl::TypeList TypeReferenceVisitor::operator()(const ast::Type& type_node) {
 
 pddl::TypeList TypeReferenceVisitor::operator()(const ast::Name& name_node) {
     auto name = parse(name_node, error_handler, context);
-    auto insert_result = context.types->get_or_create(name);
+    auto insert_result = context.cache.get_or_create<pddl::TypeImpl>(name);
     if (insert_result.created) {
         error_handler(name_node, "Used undefined type.");
         throw std::runtime_error("Failed parse.");
@@ -73,8 +73,8 @@ pddl::TypeList TypeReferenceVisitor::operator()(const ast::Name& name_node) {
 }
 
 pddl::TypeList TypeReferenceVisitor::operator()(const ast::TypeObject&) {
-    assert(!context.types->get_or_create("object").created);
-    return { context.types->get_or_create("object").object };
+    assert(!context.cache.get_or_create<pddl::TypeImpl>("object").created);
+    return { context.cache.get_or_create<pddl::TypeImpl>("object").object };
 }
 
 pddl::TypeList TypeReferenceVisitor::operator()(const ast::TypeEither& either_type_node) {
@@ -96,11 +96,11 @@ TypeListVisitor::TypeListVisitor(const error_handler_type& error_handler_, Conte
 pddl::TypeList TypeListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::TypeList type_list;
-    assert(!context.types->get_or_create("object").created);
-    const auto base_type = context.types->get_or_create("object").object;
+    assert(!context.cache.get_or_create<pddl::TypeImpl>("object").created);
+    const auto base_type = context.cache.get_or_create<pddl::TypeImpl>("object").object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node, error_handler, context);
-        const auto type = context.types->get_or_create(name, pddl::TypeList{base_type}).object;
+        const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, pddl::TypeList{base_type}).object;
         type_list.push_back(type);
     }
     return type_list;
@@ -123,7 +123,7 @@ pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNamesRecursivel
             error_handler(name_node, "Unexpected type name \"number\". It is a reserved type name.");
             throw std::runtime_error("Failed parse.");
         }
-        const auto type = context.types->get_or_create(name, types).object;
+        const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, types).object;
         type_list.push_back(type);
     }
     // Recursively add types.

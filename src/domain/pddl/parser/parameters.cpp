@@ -31,11 +31,11 @@ ParameterListVisitor::ParameterListVisitor(const error_handler_type& error_handl
 pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>& variable_nodes) {
     // A visited vector of variable has single base type "object"
     pddl::ParameterList parameter_list;
-    assert(!context.types->get_or_create("object").created);
-    const auto type = context.types->get_or_create("object").object;
+    assert(!context.cache.get_or_create<pddl::TypeImpl>("object").created);
+    const auto type = context.cache.get_or_create<pddl::TypeImpl>("object").object;
     for (const auto& variable_node : variable_nodes) {
         const auto name = parse(variable_node, error_handler, context);
-        const auto parameter = context.parameters->get_or_create(name, pddl::TypeList{type}).object;
+        const auto parameter = context.cache.get_or_create<pddl::ParameterImpl>(name, pddl::TypeList{type}).object;
         parameter_list.emplace_back(parameter);
     }
     return parameter_list;
@@ -48,7 +48,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
     // A non-visited vector of variables has user defined types
     for (const auto& variable_node : typed_variables_node.variables) {
         const auto name = parse(variable_node, error_handler, context);
-        const auto parameter = context.parameters->get_or_create(name, types).object;
+        const auto parameter = context.cache.get_or_create<pddl::ParameterImpl>(name, types).object;
         parameter_list.emplace_back(parameter);
     }
     // Recursively add parameters.

@@ -21,6 +21,7 @@
 #include "../../../include/loki/domain/pddl/parameter.hpp"
 #include "../../../include/loki/domain/pddl/predicate.hpp"
 #include "../../../include/loki/domain/pddl/type.hpp"
+#include "../../../include/loki/domain/pddl/domain.hpp"
 
 #include "parser/common.hpp"
 #include "parser/constants.hpp"
@@ -67,7 +68,7 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
         predicates = parse(domain_node.predicates.value(), error_handler, context);
     }
     /* Action Schema section */
-    return context.domains->get_or_create(domain_name, requirements, types, constants, predicates).object;
+    return context.cache.get_or_create<pddl::DomainImpl>(domain_name, requirements, types, constants, predicates).object;
 }
 
 }
