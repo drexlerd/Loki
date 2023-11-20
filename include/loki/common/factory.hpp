@@ -20,12 +20,13 @@ private:
     struct PerTypeCache {
         std::unordered_map<T, std::weak_ptr<T>> data;
         std::mutex mutex;
+        int count = -1;
     };
 
     std::tuple<std::shared_ptr<PerTypeCache<Ts>>...> m_cache;
 
 public:
-    ReferenceCountedObjectFactory() 
+    ReferenceCountedObjectFactory()
         : m_cache((std::make_shared<PerTypeCache<Ts>>())...) { }
 
     template<typename T>
@@ -43,7 +44,7 @@ public:
     GetOrCreateResult<T> get_or_create(Args&&... args) {
         auto& t_cache = std::get<std::shared_ptr<PerTypeCache<T>>>(m_cache);
         // There is a separate index for each T.
-        int index = t_cache->data.size();
+        int index = ++t_cache->count;
         /* Must explicitly call the constructor of T to give exclusive access to the factory. */
         auto element = std::make_unique<T>(T(index, args...));
         /* we must declare sp before locking the mutex
@@ -53,7 +54,7 @@ public:
         sp = cached.lock();
         std::lock_guard<std::mutex> hold(t_cache->mutex);
         bool new_insertion = false;
-        
+
         if (!sp) {
             new_insertion = true;
             cached = sp = std::shared_ptr<T>(
@@ -71,8 +72,8 @@ public:
             );
             element.release();
         }
-        
-        return GetOrCreateResult<T>{sp, new_insertion};      
+
+        return GetOrCreateResult<T>{sp, new_insertion};
     }
 };
 
