@@ -31,6 +31,10 @@ namespace domain {
             , pddl::ObjectImpl
             , pddl::ParameterImpl
             , pddl::PredicateImpl
+            , pddl::ConditionLiteralImpl
+            , pddl::ConditionAndImpl
+            , pddl::EffectLiteralImpl
+            , pddl::EffectAndImpl
             , pddl::DomainImpl> cache;
         // Ensure that base types are not deallocated by adding one to the reference count.
         pddl::Type base_type_object;
@@ -43,7 +47,6 @@ namespace domain {
         }
     };
 }
-
 
 extern pddl::Domain parse(const domain::ast::Domain& domain_node, const error_handler_type& error_handler, domain::Context& context);
 

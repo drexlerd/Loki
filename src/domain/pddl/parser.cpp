@@ -15,6 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "parser.hpp"
 #include "../../../include/loki/domain/pddl/parser.hpp"
 
 #include "../../../include/loki/domain/pddl/object.hpp"
@@ -68,6 +69,11 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
         predicates = parse(domain_node.predicates.value(), error_handler, context);
     }
     /* Action Schema section */
+    pddl::DerivedPredicateList derived_predicate_list;
+    pddl::ActionList action_list;
+    for (const auto& structure_node : domain_node.structures) {
+        
+    }
     return context.cache.get_or_create<pddl::DomainImpl>(domain_name, requirements, types, constants, predicates).object;
 }
 

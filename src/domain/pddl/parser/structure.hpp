@@ -26,13 +26,13 @@ struct StructureVisitor : boost::static_visitor<std::variant<pddl::DerivedPredic
     StructureVisitor(const error_handler_type& error_handler_, domain::Context& context_);
 
     template<typename Node>
-    std::variant<pddl::DerivedPredicate, pddl::Action> operator()(const Node& node) const {
+    boost::variant<pddl::DerivedPredicate, pddl::Action> operator()(const Node& node) const {
         return parse(node, error_handler, context);
     }
 };
 
 // TODO return durative action in the future as well.
-extern std::variant<pddl::DerivedPredicate, pddl::Action> parse(
+extern boost::variant<pddl::DerivedPredicate, pddl::Action> parse(
     const domain::ast::Structure& node, const error_handler_type& error_handler, domain::Context& context);
 
 

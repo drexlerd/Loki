@@ -42,7 +42,7 @@ StructureVisitor::StructureVisitor(const error_handler_type& error_handler_, dom
     : error_handler(error_handler_), context(context_) { }
 
 
-std::variant<pddl::DerivedPredicate, pddl::Action> parse(
+boost::variant<pddl::DerivedPredicate, pddl::Action> parse(
     const domain::ast::Structure& node, const error_handler_type& error_handler, domain::Context& context) {
 
 }
