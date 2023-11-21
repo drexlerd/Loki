@@ -15,9 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "help_functions.hpp"
-
 #include "../../../include/loki/domain/pddl/predicate.hpp"
+#include "../../../include/loki/common/hash.hpp"
 
 #include <memory>
 

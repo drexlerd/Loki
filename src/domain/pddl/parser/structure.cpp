@@ -5,6 +5,9 @@
 #include "common.hpp"
 #include "parameters.hpp"
 
+#include "../../../../include/loki/domain/pddl/action.hpp"
+#include "../../../../include/loki/domain/pddl/derived_predicate.hpp"
+
 namespace loki {
 
 std::string parse(const domain::ast::ActionSymbol& node, const error_handler_type& error_handler, domain::Context& context) {
@@ -14,17 +17,17 @@ std::string parse(const domain::ast::ActionSymbol& node, const error_handler_typ
 std::tuple<pddl::Condition, pddl::Effect> parse(const domain::ast::ActionBody& node, const error_handler_type& error_handler, domain::Context& context) {
     pddl::Condition condition;
     if (node.precondition_goal_descriptor.has_value()) {
-        //condition = parse(node.precondition_goal_descriptor.value(), error_handler, context);
+        condition = parse(node.precondition_goal_descriptor.value(), error_handler, context);
     } else {
         // Empty And condition represents true
-        //condition = context.conditions->get_or_create_derived<pddl::ConditionAndImpl>(pddl::ConditionList{}).object;
+        condition = context.cache.get_or_create<pddl::ConditionAndImpl>(pddl::ConditionList{}).object;
     }
     pddl::Effect effect;
     if (node.effect.has_value()) {
-        //effect = parse(node.effect.value(), error_handler, context);
+        effect = parse(node.effect.value(), error_handler, context);
     } else {
         // Empty And effect represents no effects
-        //effect = context.effects->get_or_create_derived<pddl::EffectAndImpl>(pddl::EffectList{}).object;
+        effect = context.cache.get_or_create<pddl::EffectAndImpl>(pddl::EffectList{}).object;
     }
     return {condition, effect};
 }
@@ -33,8 +36,18 @@ pddl::Action parse(const domain::ast::Action& node, const error_handler_type& er
     auto name = parse(node.action_symbol, error_handler, context);
     auto parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context), node.typed_list_of_variables);
     auto [condition, effect] = parse(node.action_body, error_handler, context);
-    //return context.actions->get_or_create(name, parameters, condition, effect).object;
-    return nullptr;
+    return context.cache.get_or_create<pddl::ActionImpl>(name, parameters, condition, effect).object;
+}
+
+pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, const error_handler_type& error_handler, domain::Context& context) {
+    if (!context.requirements->test(pddl::RequirementEnum::DERIVED_PREDICATES)) {
+        error_handler(node, "Unexpected :derived-predicates section. (Is :derived-predicates missing?)");
+        throw std::runtime_error("Failed parse.");
+    }
+    auto parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context),
+        node.typed_list_of_variables);
+    auto condition = parse(node.goal_descriptor, error_handler, context);
+    return context.cache.get_or_create<pddl::DerivedPredicateImpl>(parameters, condition).object;
 }
 
 
@@ -44,7 +57,7 @@ StructureVisitor::StructureVisitor(const error_handler_type& error_handler_, dom
 
 boost::variant<pddl::DerivedPredicate, pddl::Action> parse(
     const domain::ast::Structure& node, const error_handler_type& error_handler, domain::Context& context) {
-
+    return boost::apply_visitor(StructureVisitor(error_handler, context), node);
 }
 
 

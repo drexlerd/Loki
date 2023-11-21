@@ -4,6 +4,7 @@
 #include "action.hpp"
 #include "conditions.hpp"
 #include "declarations.hpp"
+#include "derived_predicate.hpp"
 #include "domain.hpp"
 #include "effects.hpp"
 #include "object.hpp"
@@ -35,7 +36,11 @@ namespace domain {
             , pddl::ConditionAndImpl
             , pddl::EffectLiteralImpl
             , pddl::EffectAndImpl
+            , pddl::ActionImpl
+            , pddl::DerivedPredicateImpl
             , pddl::DomainImpl> cache;
+        // Requirements for testing
+        pddl::Requirements requirements;
         // Ensure that base types are not deallocated by adding one to the reference count.
         pddl::Type base_type_object;
         pddl::Type base_type_number;

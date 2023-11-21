@@ -19,7 +19,9 @@ extern std::tuple<pddl::Condition, pddl::Effect> parse(const domain::ast::Action
 
 extern pddl::Action parse(const domain::ast::Action& node, const error_handler_type& error_handler, domain::Context& context);
 
-struct StructureVisitor : boost::static_visitor<std::variant<pddl::DerivedPredicate, pddl::Action>> {
+extern pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, const error_handler_type& error_handler, domain::Context& context);
+
+struct StructureVisitor : boost::static_visitor<boost::variant<pddl::DerivedPredicate, pddl::Action>> {
     const error_handler_type& error_handler;
     domain::Context& context;
 

@@ -16,6 +16,8 @@
  */
 
 #include "parser.hpp"
+#include "insert_visitor.hpp"
+
 #include "../../../include/loki/domain/pddl/parser.hpp"
 
 #include "../../../include/loki/domain/pddl/object.hpp"
@@ -31,6 +33,7 @@
 #include "parser/predicates.hpp"
 #include "parser/requirements.hpp"
 #include "parser/types.hpp"
+#include "parser/structure.hpp"
 
 using namespace loki::domain;
 using namespace std;
@@ -45,14 +48,18 @@ std::string parse(const domain::ast::DomainName& domain_name_node, const error_h
 pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& error_handler, Context& context) {
     const auto domain_name = parse(domain_node.domain_name, error_handler, context);
     /* Requirements section */
-    pddl::Requirements requirements;
     if (domain_node.requirements.has_value()) {
-        requirements = parse(domain_node.requirements.value(), error_handler, context);
+        context.requirements = parse(domain_node.requirements.value(), error_handler, context);
+    } else {
+        // Default requirements
+        context.requirements = context.cache.get_or_create<pddl::RequirementsImpl>(
+            pddl::RequirementEnumSet{pddl::RequirementEnum::STRIPS}
+        ).object;
     }
     /* Types section */
     pddl::TypeList types;
     if (domain_node.types.has_value()) {
-        if (!requirements->test(pddl::RequirementEnum::TYPING)) {
+        if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
             error_handler(domain_node.types.value(), "Unexpected :types section. (Is :typing missing?)");
             throw std::runtime_error("Failed parse.");
         }
@@ -72,9 +79,11 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
     pddl::DerivedPredicateList derived_predicate_list;
     pddl::ActionList action_list;
     for (const auto& structure_node : domain_node.structures) {
-        
+        auto variant = boost::apply_visitor(StructureVisitor(error_handler, context), structure_node);
+        boost::apply_visitor(InsertVisitor(error_handler, context, derived_predicate_list), variant);
+        boost::apply_visitor(InsertVisitor(error_handler, context, action_list), variant);
     }
-    return context.cache.get_or_create<pddl::DomainImpl>(domain_name, requirements, types, constants, predicates).object;
+    return context.cache.get_or_create<pddl::DomainImpl>(domain_name, context.requirements, types, constants, predicates).object;
 }
 
 }
