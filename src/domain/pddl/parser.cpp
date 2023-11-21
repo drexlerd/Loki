@@ -16,7 +16,7 @@
  */
 
 #include "parser.hpp"
-#include "insert_visitor.hpp"
+#include "unpacking_visitor.hpp"
 
 #include "../../../include/loki/domain/pddl/parser.hpp"
 
@@ -80,8 +80,7 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
     pddl::ActionList action_list;
     for (const auto& structure_node : domain_node.structures) {
         auto variant = boost::apply_visitor(StructureVisitor(error_handler, context), structure_node);
-        boost::apply_visitor(InsertVisitor(error_handler, context, derived_predicate_list), variant);
-        boost::apply_visitor(InsertVisitor(error_handler, context, action_list), variant);
+        boost::apply_visitor(UnpackingVisitor(error_handler, context, action_list, derived_predicate_list), variant);
     }
     return context.cache.get_or_create<pddl::DomainImpl>(domain_name, context.requirements, types, constants, predicates).object;
 }
