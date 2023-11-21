@@ -10,7 +10,7 @@
 
 namespace loki {
 
-/// @brief A thread-safe reference-counted object cache.
+/// @brief A reference-counted object cache.
 /// Original idea by Herb Sutter.
 /// Custom deleter idea: https://stackoverflow.com/questions/49782011/herb-sutters-10-liner-with-cleanup
 template<typename... Ts>
@@ -19,7 +19,6 @@ private:
     template<typename T>
     struct PerTypeCache {
         std::unordered_map<T, std::weak_ptr<T>> data;
-        std::mutex mutex;
     };
 
     std::tuple<std::shared_ptr<PerTypeCache<Ts>>...> m_cache;
@@ -45,7 +44,6 @@ public:
     template<typename T, typename... Args>
     GetOrCreateResult<T> get_or_create(Args&&... args) {
         auto& t_cache = std::get<std::shared_ptr<PerTypeCache<T>>>(m_cache);
-        // There is a separate index for each T.
         int index = ++m_count;
         /* Must explicitly call the constructor of T to give exclusive access to the factory. */
         auto element = std::make_unique<T>(T(index, args...));
@@ -54,7 +52,7 @@ public:
         std::shared_ptr<T> sp;
         auto& cached = t_cache->data[*element];
         sp = cached.lock();
-        std::lock_guard<std::mutex> hold(t_cache->mutex);
+        // std::lock_guard<std::mutex> hold(t_cache->mutex);
         bool new_insertion = false;
 
         if (!sp) {
@@ -64,7 +62,7 @@ public:
                 [parent=t_cache, original_deleter=element.get_deleter()](T* x)
                 {
                     {
-                        std::lock_guard<std::mutex> hold(parent->mutex);
+                        // std::lock_guard<std::mutex> hold(parent->mutex);
                         parent->data.erase(*x);
                     }
                     /* After cache removal, we can call the objects destructor
