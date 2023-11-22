@@ -23,18 +23,9 @@
 namespace loki::pddl {
 /* BaseCondition */
 EffectImpl::EffectImpl(int identifier)
-    : m_identifier(identifier) { }
+    : Base(identifier) { }
 
 EffectImpl::~EffectImpl() = default;
-
-bool EffectImpl::operator<(const EffectImpl& other) const {
-    return m_identifier < other.m_identifier;
-}
-
-bool EffectImpl::operator>(const EffectImpl& other) const {
-    return m_identifier > other.m_identifier;
-}
-
 
 /* Literal */
 EffectLiteralImpl::EffectLiteralImpl(int identifier, const Literal& literal)
@@ -44,7 +35,7 @@ EffectLiteralImpl::EffectLiteralImpl(int identifier, const Literal& literal)
 
 EffectLiteralImpl::~EffectLiteralImpl() = default;
 
-bool EffectLiteralImpl::operator==(const EffectImpl& other) const {
+bool EffectLiteralImpl::are_equal_impl(const EffectImpl& other) const {
     // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
     if (typeid(*this) == typeid(other)) {
         const auto& other_derived = static_cast<const EffectLiteralImpl&>(other);
@@ -53,11 +44,7 @@ bool EffectLiteralImpl::operator==(const EffectImpl& other) const {
     return false;
 }
 
-bool EffectLiteralImpl::operator!=(const EffectImpl& other) const {
-    return !(*this == other);
-}
-
-size_t EffectLiteralImpl::hash() const {
+size_t EffectLiteralImpl::hash_impl() const {
     return std::hash<Literal>()(m_literal);
 }
 
@@ -75,18 +62,15 @@ EffectAndImpl::EffectAndImpl(int identifier, const EffectList& effects)
 
 EffectAndImpl::~EffectAndImpl() = default;
 
-bool EffectAndImpl::operator==(const EffectImpl& other) const {
+bool EffectAndImpl::are_equal_impl(const EffectImpl& other) const {
     if (typeid(*this) == typeid(other)) {
         const auto& other_derived = static_cast<const EffectAndImpl&>(other);
         return sorted(m_effects) == sorted(other_derived.m_effects);
     }
     return false;
 }
-bool EffectAndImpl::operator!=(const EffectImpl& other) const {
-    return !(*this == other);
-}
 
-size_t EffectAndImpl::hash() const {
+size_t EffectAndImpl::hash_impl() const {
     return hash_vector(sorted(m_effects));
 }
 
@@ -108,10 +92,10 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::EffectLiteralImpl>::operator()(const loki::pddl::EffectLiteralImpl& effect) const {
-        return effect.hash();
+        return effect.hash_impl();
     }
 
     std::size_t hash<loki::pddl::EffectAndImpl>::operator()(const loki::pddl::EffectAndImpl& effect) const {
-        return effect.hash();
+        return effect.hash_impl();
     }
 }

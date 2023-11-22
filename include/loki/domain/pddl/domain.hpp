@@ -4,6 +4,8 @@
 #include "declarations.hpp"
 #include "requirements.hpp"
 
+#include "../../common/pddl/base.hpp"
+
 #include <string>
 
 
@@ -14,9 +16,8 @@ class ReferenceCountedObjectFactory;
 
 namespace loki::pddl {
 
-class DomainImpl {
+class DomainImpl : public Base<DomainImpl> {
 private:
-    int m_identifier;
     std::string m_name;
     Requirements m_requirements;
     TypeList m_types;
@@ -35,13 +36,9 @@ private:
 
 public:
     /// @brief Test for structural equivalence
-    bool operator==(const DomainImpl& other) const;
-    bool operator!=(const DomainImpl& other) const;
+    bool are_equal_impl(const DomainImpl& other) const;
 
-    bool operator<(const DomainImpl& other) const;
-    bool operator>(const DomainImpl& other) const;
-
-    size_t hash() const;
+    size_t hash_impl() const;
 
     const std::string& get_name() const;
     const Requirements& get_requirements() const;

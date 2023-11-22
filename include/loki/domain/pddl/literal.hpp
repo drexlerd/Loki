@@ -3,6 +3,8 @@
 
 #include "declarations.hpp"
 
+#include "../../common/pddl/base.hpp"
+
 
 namespace loki {
 template<typename... Ts>
@@ -11,9 +13,8 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-class LiteralImpl {
+class LiteralImpl : public Base<LiteralImpl> {
 private:
-    int m_identifier;
     bool m_is_negated;
     Predicate m_predicate;
 
@@ -24,13 +25,9 @@ private:
 
 public:
     /// @brief Test for semantic equivalence
-    bool operator==(const LiteralImpl& other) const;
-    bool operator!=(const LiteralImpl& other) const;
+    bool are_equal_impl(const LiteralImpl& other) const;
 
-    bool operator<(const LiteralImpl& other) const;
-    bool operator>(const LiteralImpl& other) const;
-
-    size_t hash() const;
+    size_t hash_impl() const;
 
     bool is_negated() const;
     const Predicate& get_predicate() const;

@@ -22,30 +22,18 @@
 
 namespace loki::pddl {
 DerivedPredicateImpl::DerivedPredicateImpl(int identifier, const ParameterList& parameters, const Condition& condition)
-    : m_identifier(identifier)
+    : Base(identifier)
     , m_parameters(parameters)
     , m_condition(condition)
 {
 }
 
-bool DerivedPredicateImpl::operator==(const DerivedPredicateImpl& other) const {
+bool DerivedPredicateImpl::are_equal_impl(const DerivedPredicateImpl& other) const {
     return (sorted(m_parameters) == sorted(other.m_parameters))
         && (m_condition == other.m_condition);
 }
 
-bool DerivedPredicateImpl::operator!=(const DerivedPredicateImpl& other) const {
-    return !(*this == other);
-}
-
-bool DerivedPredicateImpl::operator<(const DerivedPredicateImpl& other) const {
-    return m_identifier < other.m_identifier;
-}
-
-bool DerivedPredicateImpl::operator>(const DerivedPredicateImpl& other) const {
-    return m_identifier > other.m_identifier;
-}
-
-size_t DerivedPredicateImpl::hash() const {
+size_t DerivedPredicateImpl::hash_impl() const {
     return hash_combine(hash_vector(sorted(m_parameters)), m_condition);
 }
 
@@ -68,6 +56,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::DerivedPredicateImpl>::operator()(const loki::pddl::DerivedPredicateImpl& action) const {
-        return action.hash();
+        return action.hash_impl();
     }
 }

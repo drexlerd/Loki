@@ -2,6 +2,8 @@
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_CONDITIONS_HPP_
 
 #include "declarations.hpp"
+
+#include "../../common/pddl/base.hpp"
 #include "../../problem/pddl/declarations.hpp"
 
 #include <string>
@@ -26,21 +28,14 @@ public:
 /// @brief Defines the common base class for conditions.
 ///        We use polymorphism instead of variant,
 ///        since we wrap conditions into shared_ptr.
-class ConditionImpl {
+class ConditionImpl : public Base<ConditionImpl> {
 protected:
-    int m_identifier;
-
     ConditionImpl(int identifier);
 
 public:
     virtual ~ConditionImpl();
 
-    /// @brief Test for structural equivalence
-    virtual bool operator==(const ConditionImpl& other) const = 0;
-    virtual bool operator!=(const ConditionImpl& other) const = 0;
-
-    bool operator<(const ConditionImpl& other) const;
-    bool operator>(const ConditionImpl& other) const;
+    virtual bool are_equal_impl(const ConditionImpl& other) const = 0;
 
     /// @brief Accepts the visitor by calling the visit overload.
     virtual void accept(ConditionVisitor& visitor) const = 0;
@@ -60,10 +55,9 @@ private:
 public:
     ~ConditionLiteralImpl() override;
 
-    bool operator==(const ConditionImpl& other) const override;
-    bool operator!=(const ConditionImpl& other) const override;
+    bool are_equal_impl(const ConditionImpl& other) const override;
 
-    size_t hash() const;
+    size_t hash_impl() const;
 
     void accept(ConditionVisitor& visitor) const override;
 
@@ -84,10 +78,9 @@ private:
 public:
     ~ConditionAndImpl() override;
 
-    bool operator==(const ConditionImpl& other) const override;
-    bool operator!=(const ConditionImpl& other) const override;
+    bool are_equal_impl(const ConditionImpl& other) const override;
 
-    size_t hash() const;
+    size_t hash_impl() const;
 
     void accept(ConditionVisitor& visitor) const override;
 

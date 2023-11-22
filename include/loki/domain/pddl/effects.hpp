@@ -3,6 +3,8 @@
 
 #include "declarations.hpp"
 
+#include "../../common/pddl/base.hpp"
+
 #include <string>
 
 
@@ -25,21 +27,15 @@ public:
 /// @brief Defines the common base class for effects.
 ///        We use polymorphism instead of variant,
 ///        since we wrap effects into shared_ptr.
-class EffectImpl {
+class EffectImpl : public Base<EffectImpl> {
 protected:
-    int m_identifier;
-
     EffectImpl(int identifier);
 
 public:
     virtual ~EffectImpl();
 
     /// @brief Test for structural equivalence
-    virtual bool operator==(const EffectImpl& other) const = 0;
-    virtual bool operator!=(const EffectImpl& other) const = 0;
-
-    bool operator<(const EffectImpl& other) const;
-    bool operator>(const EffectImpl& other) const;
+    virtual bool are_equal_impl(const EffectImpl& other) const = 0;
 
     /// @brief Accepts the visitor by calling the visit overload.
     virtual void accept(EffectVisitor& visitor) const = 0;
@@ -59,10 +55,9 @@ private:
 public:
     ~EffectLiteralImpl() override;
 
-    bool operator==(const EffectImpl& other) const override;
-    bool operator!=(const EffectImpl& other) const override;
+    bool are_equal_impl(const EffectImpl& other) const override;
 
-    size_t hash() const;
+    size_t hash_impl() const;
 
     void accept(EffectVisitor& visitor) const override;
 
@@ -83,10 +78,9 @@ private:
 public:
     ~EffectAndImpl() override;
 
-    bool operator==(const EffectImpl& other) const override;
-    bool operator!=(const EffectImpl& other) const override;
+    bool are_equal_impl(const EffectImpl& other) const override;
 
-    size_t hash() const;
+    size_t hash_impl() const;
 
     void accept(EffectVisitor& visitor) const override;
 

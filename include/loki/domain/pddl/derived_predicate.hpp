@@ -5,6 +5,8 @@
 #include "conditions.hpp"
 #include "effects.hpp"
 
+#include "../../common/pddl/base.hpp"
+
 #include <string>
 #include <functional>
 
@@ -16,9 +18,8 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-class DerivedPredicateImpl {
+class DerivedPredicateImpl : public Base<DerivedPredicateImpl> {
 private:
-    int m_identifier;
     ParameterList m_parameters;
     Condition m_condition;
 
@@ -29,13 +30,9 @@ private:
 
 public:
     /// @brief Test for structural equivalence
-    bool operator==(const DerivedPredicateImpl& other) const;
-    bool operator!=(const DerivedPredicateImpl& other) const;
+    bool are_equal_impl(const DerivedPredicateImpl& other) const;
 
-    bool operator<(const DerivedPredicateImpl& other) const;
-    bool operator>(const DerivedPredicateImpl& other) const;
-
-    size_t hash() const;
+    size_t hash_impl() const;
 
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;

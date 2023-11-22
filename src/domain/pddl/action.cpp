@@ -22,7 +22,7 @@
 
 namespace loki::pddl {
 ActionImpl::ActionImpl(int identifier, const std::string& name, const ParameterList& parameters, const Condition& condition, const Effect& effect)
-    : m_identifier(identifier)
+    : Base(identifier)
     , m_name(name)
     , m_parameters(parameters)
     , m_condition(condition)
@@ -30,26 +30,14 @@ ActionImpl::ActionImpl(int identifier, const std::string& name, const ParameterL
 {
 }
 
-bool ActionImpl::operator==(const ActionImpl& other) const {
+bool ActionImpl::are_equal_impl(const ActionImpl& other) const {
     return (m_name == other.m_name)
         && (sorted(m_parameters) == sorted(other.m_parameters))
         && (m_condition == other.m_condition)
         && (m_effect == other.m_effect);
 }
 
-bool ActionImpl::operator!=(const ActionImpl& other) const {
-    return !(*this == other);
-}
-
-bool ActionImpl::operator<(const ActionImpl& other) const {
-    return m_identifier < other.m_identifier;
-}
-
-bool ActionImpl::operator>(const ActionImpl& other) const {
-    return m_identifier > other.m_identifier;
-}
-
-size_t ActionImpl::hash() const {
+size_t ActionImpl::hash_impl() const {
     return hash_combine(
         m_name,
         hash_vector(m_parameters),
@@ -83,6 +71,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::ActionImpl>::operator()(const loki::pddl::ActionImpl& action) const {
-        return action.hash();
+        return action.hash_impl();
     }
 }

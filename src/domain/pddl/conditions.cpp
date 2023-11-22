@@ -23,17 +23,9 @@
 namespace loki::pddl {
 /* BaseCondition */
 ConditionImpl::ConditionImpl(int identifier)
-    : m_identifier(identifier) { }
+    : Base(identifier) { }
 
 ConditionImpl::~ConditionImpl() = default;
-
-bool ConditionImpl::operator<(const ConditionImpl& other) const {
-    return m_identifier < other.m_identifier;
-}
-
-bool ConditionImpl::operator>(const ConditionImpl& other) const {
-    return m_identifier > other.m_identifier;
-}
 
 
 /* Literal */
@@ -43,7 +35,8 @@ ConditionLiteralImpl::ConditionLiteralImpl(int identifier, const Literal& litera
 
 ConditionLiteralImpl::~ConditionLiteralImpl() = default;
 
-bool ConditionLiteralImpl::operator==(const ConditionImpl& other) const {
+
+bool ConditionLiteralImpl::are_equal_impl(const ConditionImpl& other) const {
     // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
     if (typeid(*this) == typeid(other)) {
         const auto& other_derived = static_cast<const ConditionLiteralImpl&>(other);
@@ -52,11 +45,7 @@ bool ConditionLiteralImpl::operator==(const ConditionImpl& other) const {
     return false;
 }
 
-bool ConditionLiteralImpl::operator!=(const ConditionImpl& other) const {
-    return !(*this == other);
-}
-
-size_t ConditionLiteralImpl::hash() const {
+size_t ConditionLiteralImpl::hash_impl() const {
     return std::hash<Literal>()(m_literal);
 }
 
@@ -76,7 +65,8 @@ ConditionAndImpl::ConditionAndImpl(int identifier, const ConditionList& conditio
 
 ConditionAndImpl::~ConditionAndImpl() = default;
 
-bool ConditionAndImpl::operator==(const ConditionImpl& other) const {
+
+bool ConditionAndImpl::are_equal_impl(const ConditionImpl& other) const {
     if (typeid(*this) == typeid(other)) {
         const auto& other_derived = static_cast<const ConditionAndImpl&>(other);
         return sorted(m_conditions) == sorted(other_derived.m_conditions);
@@ -84,11 +74,8 @@ bool ConditionAndImpl::operator==(const ConditionImpl& other) const {
     return false;
 }
 
-bool ConditionAndImpl::operator!=(const ConditionImpl& other) const {
-    return !(*this == other);
-}
 
-size_t ConditionAndImpl::hash() const {
+size_t ConditionAndImpl::hash_impl() const {
     return hash_vector(sorted(m_conditions));
 }
 
@@ -110,10 +97,10 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::ConditionLiteralImpl>::operator()(const loki::pddl::ConditionLiteralImpl& condition) const {
-        return condition.hash();
+        return condition.hash_impl();
     }
 
     std::size_t hash<loki::pddl::ConditionAndImpl>::operator()(const loki::pddl::ConditionAndImpl& condition) const {
-        return condition.hash();
+        return condition.hash_impl();
     }
 }

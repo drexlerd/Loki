@@ -22,29 +22,17 @@
 
 namespace loki::pddl {
 ParameterImpl::ParameterImpl(int identifier, const std::string& name, const TypeList& types)
-    : m_identifier(identifier)
+    : Base(identifier)
     , m_name(name)
     , m_types(types)
 {
 }
 
-bool ParameterImpl::operator==(const ParameterImpl& other) const {
+bool ParameterImpl::are_equal_impl(const ParameterImpl& other) const {
     return (m_name == other.m_name) && (sorted(m_types) == sorted(other.m_types));
 }
 
-bool ParameterImpl::operator!=(const ParameterImpl& other) const {
-    return !(*this == other);
-}
-
-bool ParameterImpl::operator<(const ParameterImpl& other) const {
-    return m_identifier < other.m_identifier;
-}
-
-bool ParameterImpl::operator>(const ParameterImpl& other) const {
-    return m_identifier > other.m_identifier;
-}
-
-size_t ParameterImpl::hash() const {
+size_t ParameterImpl::hash_impl() const {
     return hash_combine(m_name, hash_vector(sorted(m_types)));
 }
 
@@ -66,6 +54,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::ParameterImpl>::operator()(const loki::pddl::ParameterImpl& parameter) const {
-        return parameter.hash();
+        return parameter.hash_impl();
     }
 }

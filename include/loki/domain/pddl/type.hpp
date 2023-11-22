@@ -3,7 +3,10 @@
 
 #include "declarations.hpp"
 
+#include "../../common/pddl/base.hpp"
+
 #include <string>
+
 
 namespace loki {
 template<typename... Ts>
@@ -12,9 +15,8 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-class TypeImpl {
+class TypeImpl : public Base<TypeImpl> {
 private:
-    int m_identifier;
     std::string m_name;
     TypeList m_bases;
 
@@ -25,13 +27,9 @@ private:
 
 public:
     /// @brief Test for semantic equivalence
-    bool operator==(const TypeImpl& other) const;
-    bool operator!=(const TypeImpl& other) const;
+    bool are_equal_impl(const TypeImpl& other) const;
 
-    bool operator<(const TypeImpl& other) const;
-    bool operator>(const TypeImpl& other) const;
-
-    size_t hash() const;
+    size_t hash_impl() const;
 
     const std::string& get_name() const;
     const TypeList& get_bases() const;

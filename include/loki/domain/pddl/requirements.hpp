@@ -3,6 +3,8 @@
 
 #include "declarations.hpp"
 
+#include "../../common/pddl/base.hpp"
+
 #include <string>
 #include <set>
 
@@ -40,9 +42,8 @@ enum class RequirementEnum {
 using RequirementEnumSet = std::set<RequirementEnum>;
 
 
-class RequirementsImpl {
+class RequirementsImpl : public Base<RequirementsImpl> {
 private:
-    int m_identifier;
     RequirementEnumSet m_requirements;
 
     RequirementsImpl(int identifier, const RequirementEnumSet& requirements);
@@ -52,13 +53,9 @@ private:
 
 public:
     /// @brief Test for semantic equivalence
-    bool operator==(const RequirementsImpl& other) const;
-    bool operator!=(const RequirementsImpl& other) const;
+    bool are_equal_impl(const RequirementsImpl& other) const;
 
-    bool operator<(const RequirementsImpl& other) const;
-    bool operator>(const RequirementsImpl& other) const;
-
-    size_t hash() const;
+    size_t hash_impl() const;
 
     bool test(RequirementEnum requirement) const;
 };

@@ -3,6 +3,8 @@
 
 #include "declarations.hpp"
 
+#include "../../common/pddl/base.hpp"
+
 #include <string>
 
 
@@ -14,9 +16,8 @@ class ReferenceCountedObjectFactory;
 
 namespace loki::pddl {
 
-class PredicateImpl {
+class PredicateImpl : public Base<PredicateImpl> {
 private:
-    int m_identifier;
     std::string m_name;
     ParameterList m_parameters;
 
@@ -27,13 +28,9 @@ private:
 
 public:
     /// @brief Test for semantic equivalence
-    bool operator==(const PredicateImpl& other) const;
-    bool operator!=(const PredicateImpl& other) const;
+    bool are_equal_impl(const PredicateImpl& other) const;
 
-    bool operator<(const PredicateImpl& other) const;
-    bool operator>(const PredicateImpl& other) const;
-
-    size_t hash() const;
+    size_t hash_impl() const;
 
     const std::string& get_name() const;
     const ParameterList& get_parameters() const;

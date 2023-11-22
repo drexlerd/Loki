@@ -15,7 +15,8 @@ pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, const erro
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorAnd& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw std::runtime_error("Not implemented");
+    // TODO double check
+    return context.cache.get_or_create<pddl::ConditionAndImpl>(pddl::ConditionList{}).object;
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, const error_handler_type& error_handler, domain::Context& context) {

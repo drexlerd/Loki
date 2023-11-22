@@ -27,7 +27,7 @@ DomainImpl::DomainImpl(int identifier,
     const TypeList& types,
     const ObjectList& constants,
     const PredicateList& predicates)
-    : m_identifier(identifier)
+    : Base(identifier)
     , m_name(name)
     , m_requirements(requirements)
     , m_types(types)
@@ -36,7 +36,7 @@ DomainImpl::DomainImpl(int identifier,
 {
 }
 
-bool DomainImpl::operator==(const DomainImpl& other) const {
+bool DomainImpl::are_equal_impl(const DomainImpl& other) const {
     return (m_name == other.m_name)
         && (m_requirements == other.m_requirements)
         && (sorted(m_types) == sorted(other.m_types))
@@ -44,20 +44,7 @@ bool DomainImpl::operator==(const DomainImpl& other) const {
         && (sorted(m_predicates) == sorted(other.m_predicates));
 }
 
-
-bool DomainImpl::operator!=(const DomainImpl& other) const {
-    return !(*this == other);
-}
-
-bool DomainImpl::operator<(const DomainImpl& other) const {
-    return m_identifier < other.m_identifier;
-}
-
-bool DomainImpl::operator>(const DomainImpl& other) const {
-    return m_identifier > other.m_identifier;
-}
-
-size_t DomainImpl::hash() const {
+size_t DomainImpl::hash_impl() const {
     return hash_combine(
         m_name,
         m_requirements,
@@ -96,6 +83,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::DomainImpl>::operator()(const loki::pddl::DomainImpl& domain) const {
-        return domain.hash();
+        return domain.hash_impl();
     }
 }
