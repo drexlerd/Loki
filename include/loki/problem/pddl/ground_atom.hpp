@@ -3,6 +3,7 @@
 
 #include "declarations.hpp"
 
+#include "../../common/pddl/base.hpp"
 #include "../../domain/pddl/declarations.hpp"
 
 
@@ -13,9 +14,8 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-class GroundAtomImpl {
+class GroundAtomImpl : Base<GroundAtomImpl> {
 private:
-    int m_identifier;
     Predicate m_predicate;
     ObjectList m_arguments;
 
@@ -26,13 +26,9 @@ private:
 
 public:
     /// @brief Test for semantic equivalence
-    bool operator==(const GroundAtomImpl& other) const;
-    bool operator!=(const GroundAtomImpl& other) const;
+    bool are_equal_impl(const GroundAtomImpl& other) const;
 
-    bool operator<(const GroundAtomImpl& other) const;
-    bool operator>(const GroundAtomImpl& other) const;
-
-    size_t hash() const;
+    size_t hash_impl() const;
 
     const Predicate& get_predicate() const;
     const ObjectList& get_arguments() const;
