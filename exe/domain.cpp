@@ -41,11 +41,11 @@ int main(int argc, char** argv) {
     // 1. Parse the domain
     const auto source = loki::read_file(domain_file);
     domain::ast::Domain domain_node;
-    error_handler_type error_handler(source.begin(), source.end(), std::cerr);
+    std::unique_ptr<std::ostringstream> error_stream = std::make_unique<std::ostringstream>();
+    error_handler_type error_handler(source.begin(), source.end(), *error_stream, domain_file);
     parse_ast(source, domain::domain(), domain_node, error_handler);
     std::cout << parse_text(domain_node, FormattingOptions{0,4}) << std::endl;
-
-    domain::Context context;
+    domain::Context context(std::move(error_stream));
     pddl::Domain domain = parse(domain_node, error_handler, context);
 
     return 0;

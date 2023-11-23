@@ -2,6 +2,7 @@
 #define LOKI_INCLUDE_COMMON_AST_PARSER_WRAPPER_HPP_
 
 #include "config.hpp"
+#include "../exceptions.hpp"
 
 #include <iostream>
 
@@ -25,7 +26,7 @@ void parse_ast(const std::string& source, const Parser& parser, Node& out, error
     using boost::spirit::x3::ascii::space;
     bool success = phrase_parse(iter, end, wrapped_parser, space, out);
     if (!success) {
-        throw std::runtime_error("Failed parse.");
+        throw SyntaxParserError("Failed parse.");
     }
 }
 

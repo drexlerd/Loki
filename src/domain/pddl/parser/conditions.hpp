@@ -57,4 +57,4 @@ struct ConditionVisitor : boost::static_visitor<pddl::Condition> {
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_STRUCTURE_HPP_
+#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_CONDITIONS_HPP_

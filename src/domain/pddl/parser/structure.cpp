@@ -5,8 +5,10 @@
 #include "common.hpp"
 #include "parameters.hpp"
 
+#include "../../../../include/loki/common/exceptions.hpp"
 #include "../../../../include/loki/domain/pddl/action.hpp"
 #include "../../../../include/loki/domain/pddl/derived_predicate.hpp"
+
 
 namespace loki {
 
@@ -42,7 +44,7 @@ pddl::Action parse(const domain::ast::Action& node, const error_handler_type& er
 pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, const error_handler_type& error_handler, domain::Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::DERIVED_PREDICATES)) {
         error_handler(node, "Unexpected :derived-predicates section. (Is :derived-predicates missing?)");
-        throw std::runtime_error("Failed parse.");
+        throw SemanticParserError(context.error_stream->str());
     }
     auto parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context),
         node.typed_list_of_variables);

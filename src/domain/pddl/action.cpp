@@ -32,7 +32,7 @@ ActionImpl::ActionImpl(int identifier, const std::string& name, const ParameterL
 
 bool ActionImpl::are_equal_impl(const ActionImpl& other) const {
     return (m_name == other.m_name)
-        && (sorted(m_parameters) == sorted(other.m_parameters))
+        && (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters))
         && (m_condition == other.m_condition)
         && (m_effect == other.m_effect);
 }

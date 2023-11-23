@@ -65,13 +65,13 @@ EffectAndImpl::~EffectAndImpl() = default;
 bool EffectAndImpl::are_equal_impl(const EffectImpl& other) const {
     if (typeid(*this) == typeid(other)) {
         const auto& other_derived = static_cast<const EffectAndImpl&>(other);
-        return sorted(m_effects) == sorted(other_derived.m_effects);
+        return get_sorted_vector(m_effects) == get_sorted_vector(other_derived.m_effects);
     }
     return false;
 }
 
 size_t EffectAndImpl::hash_impl() const {
-    return hash_vector(sorted(m_effects));
+    return hash_vector(get_sorted_vector(m_effects));
 }
 
 void EffectAndImpl::accept(EffectVisitor& visitor) const {

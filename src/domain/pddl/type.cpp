@@ -29,11 +29,11 @@ TypeImpl::TypeImpl(int identifier, const std::string& name, const TypeList& base
 }
 
 bool TypeImpl::are_equal_impl(const TypeImpl& other) const {
-    return (m_name == other.m_name) && (sorted(m_bases) == sorted(other.m_bases));
+    return (m_name == other.m_name) && (get_sorted_vector(m_bases) == get_sorted_vector(other.m_bases));
 }
 
 size_t TypeImpl::hash_impl() const {
-    return hash_combine(m_name, hash_vector(sorted(m_bases)));
+    return hash_combine(m_name, hash_vector(get_sorted_vector(m_bases)));
 }
 
 const std::string& TypeImpl::get_name() const {

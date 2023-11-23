@@ -16,8 +16,9 @@
  */
 
 #include "types.hpp"
-
 #include "common.hpp"
+
+#include "../../../../include/loki/common/exceptions.hpp"
 
 using namespace loki::domain;
 using namespace std;
@@ -67,7 +68,7 @@ pddl::TypeList TypeReferenceVisitor::operator()(const ast::Name& name_node) {
     auto insert_result = context.cache.get_or_create<pddl::TypeImpl>(name);
     if (insert_result.created) {
         error_handler(name_node, "Used undefined type.");
-        throw std::runtime_error("Failed parse.");
+        throw SemanticParserError(context.error_stream->str());
     }
     return { insert_result.object };
 }
@@ -115,13 +116,13 @@ pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNamesRecursivel
         const auto name = parse(name_node, error_handler, context);
         if (name == "object") {
             error_handler(name_node, "Unexpected type name \"object\". It is a reserved type name.");
-            throw std::runtime_error("Failed parse.");
+            throw SemanticParserError(context.error_stream->str());
         }
         // We also reserve type name number although PDDL specification allows it.
         // However, this allows using regular types as function types for simplicity.
         if (name == "number") {
             error_handler(name_node, "Unexpected type name \"number\". It is a reserved type name.");
-            throw std::runtime_error("Failed parse.");
+            throw SemanticParserError(context.error_stream->str());
         }
         const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, types).object;
         type_list.push_back(type);

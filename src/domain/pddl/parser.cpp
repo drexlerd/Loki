@@ -18,8 +18,8 @@
 #include "parser.hpp"
 #include "unpacking_visitor.hpp"
 
+#include "../../../include/loki/common/exceptions.hpp"
 #include "../../../include/loki/domain/pddl/parser.hpp"
-
 #include "../../../include/loki/domain/pddl/object.hpp"
 #include "../../../include/loki/domain/pddl/parameter.hpp"
 #include "../../../include/loki/domain/pddl/predicate.hpp"
@@ -61,7 +61,7 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
     if (domain_node.types.has_value()) {
         if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
             error_handler(domain_node.types.value(), "Unexpected :types section. (Is :typing missing?)");
-            throw std::runtime_error("Failed parse.");
+            throw SemanticParserError(context.error_stream->str());
         }
         types = parse(domain_node.types.value(), error_handler, context);
     }

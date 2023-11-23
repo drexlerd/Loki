@@ -42,8 +42,8 @@ public:
         return static_cast<const Derived*>(this)->are_equal_impl(static_cast<const Derived&>(other));
     }
 
-    size_t hash() const {
-        return static_cast<Derived*>(this)->hash_impl();
+    bool operator!=(const Base& other) const {
+        return !(*this == other);
     }
 
     bool operator<(const Base& other) const {
@@ -52,6 +52,10 @@ public:
 
     bool operator>(const Base& other) const {
         return m_idenfitier > other.m_idenfitier;
+    }
+
+    size_t hash() const {
+        return static_cast<Derived*>(this)->hash_impl();
     }
 };
 

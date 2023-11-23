@@ -27,6 +27,8 @@ namespace domain {
     ///        Factories are wrapped into shared_ptr to enable shared_from_this
     ///        to allow the PDDL object to notify the factory upon deletion.
     struct Context {
+        std::unique_ptr<std::ostringstream> error_stream;
+
         ReferenceCountedObjectFactory<pddl::RequirementsImpl
             , pddl::TypeImpl
             , pddl::ObjectImpl
@@ -45,7 +47,8 @@ namespace domain {
         pddl::Type base_type_object;
         pddl::Type base_type_number;
 
-        Context() {
+        Context(std::unique_ptr<std::ostringstream>&& error_stream_)
+            : error_stream(std::move(error_stream_)) {
             // create base types.
             base_type_object = cache.get_or_create<pddl::TypeImpl>("object").object;
             base_type_number = cache.get_or_create<pddl::TypeImpl>("number").object;

@@ -39,18 +39,18 @@ DomainImpl::DomainImpl(int identifier,
 bool DomainImpl::are_equal_impl(const DomainImpl& other) const {
     return (m_name == other.m_name)
         && (m_requirements == other.m_requirements)
-        && (sorted(m_types) == sorted(other.m_types))
-        && (sorted(m_constants) == sorted(other.m_constants))
-        && (sorted(m_predicates) == sorted(other.m_predicates));
+        && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types))
+        && (get_sorted_vector(m_constants) == get_sorted_vector(other.m_constants))
+        && (get_sorted_vector(m_predicates) == get_sorted_vector(other.m_predicates));
 }
 
 size_t DomainImpl::hash_impl() const {
     return hash_combine(
         m_name,
         m_requirements,
-        hash_vector(sorted(m_types)),
-        hash_vector(sorted(m_constants)),
-        hash_vector(sorted(m_predicates)));
+        hash_vector(get_sorted_vector(m_types)),
+        hash_vector(get_sorted_vector(m_constants)),
+        hash_vector(get_sorted_vector(m_predicates)));
 }
 
 const std::string& DomainImpl::get_name() const {

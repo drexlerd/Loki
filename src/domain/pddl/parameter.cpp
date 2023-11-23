@@ -29,11 +29,11 @@ ParameterImpl::ParameterImpl(int identifier, const std::string& name, const Type
 }
 
 bool ParameterImpl::are_equal_impl(const ParameterImpl& other) const {
-    return (m_name == other.m_name) && (sorted(m_types) == sorted(other.m_types));
+    return (m_name == other.m_name) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types));
 }
 
 size_t ParameterImpl::hash_impl() const {
-    return hash_combine(m_name, hash_vector(sorted(m_types)));
+    return hash_combine(m_name, hash_vector(get_sorted_vector(m_types)));
 }
 
 const std::string& ParameterImpl::get_name() const {

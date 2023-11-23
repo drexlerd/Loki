@@ -29,11 +29,11 @@ ObjectImpl::ObjectImpl(int identifier, const std::string& name, const TypeList& 
 }
 
 bool ObjectImpl::are_equal_impl(const ObjectImpl& other) const {
-    return (m_name == other.m_name) && (sorted(m_types) == sorted(other.m_types));
+    return (m_name == other.m_name) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types));
 }
 
 size_t ObjectImpl::hash_impl() const {
-    return hash_combine(m_name, hash_vector(sorted(m_types)));
+    return hash_combine(m_name, hash_vector(get_sorted_vector(m_types)));
 }
 
 const std::string& ObjectImpl::get_name() const {

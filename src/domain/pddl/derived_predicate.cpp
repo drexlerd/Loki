@@ -29,12 +29,12 @@ DerivedPredicateImpl::DerivedPredicateImpl(int identifier, const ParameterList& 
 }
 
 bool DerivedPredicateImpl::are_equal_impl(const DerivedPredicateImpl& other) const {
-    return (sorted(m_parameters) == sorted(other.m_parameters))
+    return (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters))
         && (m_condition == other.m_condition);
 }
 
 size_t DerivedPredicateImpl::hash_impl() const {
-    return hash_combine(hash_vector(sorted(m_parameters)), m_condition);
+    return hash_combine(hash_vector(get_sorted_vector(m_parameters)), m_condition);
 }
 
 const ParameterList& DerivedPredicateImpl::get_parameters() const {

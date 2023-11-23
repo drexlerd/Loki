@@ -69,14 +69,14 @@ ConditionAndImpl::~ConditionAndImpl() = default;
 bool ConditionAndImpl::are_equal_impl(const ConditionImpl& other) const {
     if (typeid(*this) == typeid(other)) {
         const auto& other_derived = static_cast<const ConditionAndImpl&>(other);
-        return sorted(m_conditions) == sorted(other_derived.m_conditions);
+        return get_sorted_vector(m_conditions) == get_sorted_vector(other_derived.m_conditions);
     }
     return false;
 }
 
 
 size_t ConditionAndImpl::hash_impl() const {
-    return hash_vector(sorted(m_conditions));
+    return hash_vector(get_sorted_vector(m_conditions));
 }
 
 void ConditionAndImpl::accept(ConditionVisitor& visitor) const {

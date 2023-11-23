@@ -43,4 +43,4 @@ struct EffectVisitor : boost::static_visitor<pddl::Effect> {
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_STRUCTURE_HPP_
+#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_EFFECTS_HPP_

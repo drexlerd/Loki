@@ -11,9 +11,9 @@ namespace loki {
 /// @tparam T
 /// @param vec
 /// @return
-template<typename T>
-std::vector<T> sorted(const std::vector<T>& vec) {
-    std::vector<T> result(vec.begin(), vec.end());
+template<typename Collection>
+std::vector<typename Collection::value_type> get_sorted_vector(const Collection& collection) {
+    std::vector<typename Collection::value_type> result(collection.begin(), collection.end());
     std::sort(result.begin(), result.end());
     return result;
 }
