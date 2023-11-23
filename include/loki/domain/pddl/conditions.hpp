@@ -56,7 +56,6 @@ public:
     ~ConditionLiteralImpl() override;
 
     bool are_equal_impl(const ConditionImpl& other) const override;
-
     size_t hash_impl() const;
 
     void accept(ConditionVisitor& visitor) const override;

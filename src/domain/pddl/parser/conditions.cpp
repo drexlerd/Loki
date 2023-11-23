@@ -6,7 +6,7 @@
 namespace loki {
 
 pddl::Condition parse(const domain::ast::GoalDescriptor& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::GoalDescriptor");
+    return boost::apply_visitor(ConditionVisitor(error_handler, context), node);
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorAtom& node, const error_handler_type& error_handler, domain::Context& context) {
@@ -17,8 +17,11 @@ pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, const erro
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorAnd& node, const error_handler_type& error_handler, domain::Context& context) {
-    // TODO double check
-    return context.cache.get_or_create<pddl::ConditionAndImpl>(pddl::ConditionList{}).object;
+    pddl::ConditionList condition_list;
+    for (const auto& child_node : node.goal_descriptors) {
+        condition_list.push_back(parse(child_node, error_handler, context));
+    }
+    return context.cache.get_or_create<pddl::ConditionAndImpl>(condition_list).object;
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, const error_handler_type& error_handler, domain::Context& context) {
@@ -47,11 +50,15 @@ pddl::Condition parse(const domain::ast::GoalDescriptorFunctionComparison& node,
 
 
 pddl::Condition parse(const domain::ast::ConstraintGoalDescriptor& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::ConstraintGoalDescriptor");
+    return boost::apply_visitor(ConditionVisitor(error_handler, context), node);
 }
 
 pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAnd& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::ConstraintGoalDescriptorAnd");
+    pddl::ConditionList condition_list;
+    for (const auto& child_node : node.constraint_goal_descriptors) {
+        condition_list.push_back(parse(child_node, error_handler, context));
+    }
+    return context.cache.get_or_create<pddl::ConditionAndImpl>(condition_list).object;
 }
 
 pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorForall& node, const error_handler_type& error_handler, domain::Context& context) {
@@ -100,15 +107,19 @@ pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorHoldAfter& node
 
 
 pddl::Condition parse(const domain::ast::PreconditionGoalDescriptor& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::PreconditionGoalDescriptor");
+    return boost::apply_visitor(ConditionVisitor(error_handler, context), node);
 }
 
 pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorSimple& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::PreconditionGoalDescriptorSimple");
+    return parse(node.goal_descriptor, error_handler, context);
 }
 
 pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorAnd& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::PreconditionGoalDescriptorAnd");
+    pddl::ConditionList condition_list;
+    for (const auto& child_node : node.precondition_goal_descriptors) {
+        condition_list.push_back(parse(child_node, error_handler, context));
+    }
+    return context.cache.get_or_create<pddl::ConditionAndImpl>(condition_list).object;
 }
 
 pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorPreference& node, const error_handler_type& error_handler, domain::Context& context) {
