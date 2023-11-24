@@ -8,6 +8,7 @@
 #include "derived_predicate.hpp"
 #include "domain.hpp"
 #include "effects.hpp"
+#include "literal.hpp"
 #include "object.hpp"
 #include "parameter.hpp"
 #include "predicate.hpp"
@@ -39,6 +40,7 @@ namespace domain {
             , pddl::TermVariableImpl
             , pddl::ObjectImpl
             , pddl::AtomImpl
+            , pddl::LiteralImpl
             , pddl::ParameterImpl
             , pddl::PredicateImpl
             , pddl::ConditionLiteralImpl
@@ -50,6 +52,10 @@ namespace domain {
             , pddl::DomainImpl> cache;
         // Requirements for testing
         pddl::Requirements requirements;
+        
+        std::unordered_map<std::string, pddl::Object> constants_by_name;
+        std::unordered_map<std::string, pddl::Predicate> predicates_by_name;
+
         // Ensure that base types are not deallocated by adding one to the reference count.
         pddl::Type base_type_object;
         pddl::Type base_type_number;

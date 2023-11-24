@@ -33,6 +33,7 @@ pddl::PredicateList parse(const ast::Predicates& predicates_node, const error_ha
         const auto parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context),
                                                      atomic_formula_skeleton.typed_list_of_variables);
         const auto predicate = context.cache.get_or_create<pddl::PredicateImpl>(name, parameters).object;
+        context.predicates_by_name.emplace(name, predicate);
         predicate_list.emplace_back(predicate);
     }
     return predicate_list;

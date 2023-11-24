@@ -21,6 +21,13 @@ public:
     UndefinedError(const std::string& object_name, const std::string& type_name);
 };
 
+class MismatchedArgumentError : public SemanticParserError {
+public:
+    MismatchedArgumentError(
+        const std::string& parameter_name, const std::string& variable_name,
+        int parameter_list_arity, int variable_list_arity);
+};
+
 
 
 class NotImplementedError : public std::runtime_error {
