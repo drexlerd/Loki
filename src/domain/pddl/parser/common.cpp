@@ -47,7 +47,7 @@ pddl::Term TermVisitor::operator()(const domain::ast::Name& name_node) const {
     auto result = context.cache.get_or_create<pddl::ObjectImpl>(constant_name);
     if (result.created) {
         error_handler(name_node, constant_name + " is undefined");
-        throw UndefinedError(constant_name, "constant");
+        throw UndefinedConstantError(constant_name);
     }
     return context.cache.get_or_create<pddl::TermConstantImpl>(result.object).object;
 }

@@ -11,7 +11,7 @@ pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formul
     auto it = context.predicates_by_name.find(predicate_name);
     if (it == context.predicates_by_name.end()) {
         error_handler(atomic_formula_of_terms_node.predicate, "Undefined predicate.");
-        throw UndefinedError(predicate_name, "predicate");
+        throw UndefinedPredicateError(predicate_name);
     }
     auto predicate = it->second;
     auto term_list = parse(atomic_formula_of_terms_node.terms, error_handler, context);

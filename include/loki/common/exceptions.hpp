@@ -18,9 +18,14 @@ public:
     explicit SemanticParserError(const std::string& message);
 };
 
-class UndefinedError : public SemanticParserError {
+class UndefinedPredicateError : public SemanticParserError {
 public:
-    UndefinedError(const std::string& object_name, const std::string& type_name);
+    UndefinedPredicateError(const std::string& name);
+};
+
+class UndefinedConstantError : public SemanticParserError {
+public:
+    UndefinedConstantError(const std::string& name);
 };
 
 class UndefinedRequirementError : public SemanticParserError {

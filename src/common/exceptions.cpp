@@ -9,10 +9,13 @@ SyntaxParserError::SyntaxParserError(const std::string& message)
 SemanticParserError::SemanticParserError(const std::string& message)
     : std::runtime_error(message) { }
 
-UndefinedError::UndefinedError(const std::string& object_name, const std::string& type_name)
+UndefinedPredicateError::UndefinedPredicateError(const std::string& name)
     : SemanticParserError(
-        ("Undefined object with name \"" + object_name + "\" and type" + type_name)) { }
+        ("Undefined predicate with name \"" + name + "\".")) { }
 
+UndefinedConstantError::UndefinedConstantError(const std::string& name)
+    : SemanticParserError(
+        ("Undefined constant with name \"" + name + "\".")) { }
 
 UndefinedRequirementError::UndefinedRequirementError(pddl::RequirementEnum requirement)
     : SemanticParserError("") { }
