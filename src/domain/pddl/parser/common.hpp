@@ -22,7 +22,7 @@ struct TermVisitor : boost::static_visitor<pddl::Term> {
     TermVisitor(const error_handler_type& error_handler_, domain::Context& context_);
 
     pddl::Term operator()(const domain::ast::Name& name_node) const;
-    pddl::Term operator()(const domain::ast::Variable& variable_node) const; 
+    pddl::Term operator()(const domain::ast::Variable& variable_node) const;
     pddl::Term operator()(const domain::ast::FunctionTerm& function_term_node) const;
 };
 

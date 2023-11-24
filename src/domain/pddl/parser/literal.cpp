@@ -10,20 +10,21 @@ pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formul
     auto predicate_name = parse(atomic_formula_of_terms_node.predicate.name, error_handler, context);
     auto it = context.predicates_by_name.find(predicate_name);
     if (it == context.predicates_by_name.end()) {
-        error_handler(atomic_formula_of_terms_node.predicate, "Undefined predicate.");
+        error_handler(atomic_formula_of_terms_node.predicate, "");
         throw UndefinedPredicateError(predicate_name);
     }
     auto predicate = it->second;
     auto term_list = parse(atomic_formula_of_terms_node.terms, error_handler, context);
     if (predicate->get_parameters().size() != term_list.size()) {
+        error_handler(atomic_formula_of_terms_node, "");
         throw MismatchedArgumentError("parameter", "term", predicate->get_parameters().size(), term_list.size());
     }
     return context.cache.get_or_create<pddl::AtomImpl>(predicate, term_list).object;
 }
 
 pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& atomic_formula_of_terms_node, const error_handler_type& error_handler, domain::Context& context) {
+    // requires :equality
     if (!context.requirements->test(pddl::RequirementEnum::EQUALITY)) {
-        // TODO: improve error
         error_handler(atomic_formula_of_terms_node, "");
         throw UndefinedRequirementError(pddl::RequirementEnum::EQUALITY);
     }

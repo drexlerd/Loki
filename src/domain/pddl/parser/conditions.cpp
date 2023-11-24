@@ -1,5 +1,7 @@
 #include "conditions.hpp"
 
+#include "literal.hpp"
+
 #include "../../../../include/loki/common/exceptions.hpp"
 
 
@@ -10,10 +12,15 @@ pddl::Condition parse(const domain::ast::GoalDescriptor& node, const error_handl
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorAtom& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::GoalDescriptorAtom");
+    return context.cache.get_or_create<pddl::ConditionLiteralImpl>(parse(node.atom, error_handler, context)).object;
 }
 pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::GoalDescriptorLiteral");
+    // requires :negative-preconditions
+    if (!context.requirements->test(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS)) {
+        error_handler(node, "");
+        throw UndefinedRequirementError(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS);
+    }
+    return context.cache.get_or_create<pddl::ConditionLiteralImpl>(parse(node.literal, error_handler, context)).object;
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorAnd& node, const error_handler_type& error_handler, domain::Context& context) {

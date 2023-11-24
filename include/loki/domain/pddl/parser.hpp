@@ -52,16 +52,22 @@ namespace domain {
             , pddl::DomainImpl> cache;
         // Requirements for testing
         pddl::Requirements requirements;
-        
+
         std::unordered_map<std::string, pddl::Object> constants_by_name;
         std::unordered_map<std::string, pddl::Predicate> predicates_by_name;
+
+        // If true, the parsed variables are required to be in the set of defined variables.
+        bool require_defined_variables;
+        // The variables that are defined in the current scope
+        std::unordered_set<pddl::Variable> defined_variables;
 
         // Ensure that base types are not deallocated by adding one to the reference count.
         pddl::Type base_type_object;
         pddl::Type base_type_number;
 
         Context(std::unique_ptr<std::ostringstream>&& error_stream_)
-            : error_stream(std::move(error_stream_)) {
+            : error_stream(std::move(error_stream_)),
+              require_defined_variables(false) {
             // create base types.
             base_type_object = cache.get_or_create<pddl::TypeImpl>("object").object;
             base_type_number = cache.get_or_create<pddl::TypeImpl>("number").object;

@@ -46,14 +46,19 @@ pddl::Term TermVisitor::operator()(const domain::ast::Name& name_node) const {
     auto constant_name = parse(name_node, error_handler, context);
     auto result = context.cache.get_or_create<pddl::ObjectImpl>(constant_name);
     if (result.created) {
-        error_handler(name_node, constant_name + " is undefined");
+        error_handler(name_node, "");
         throw UndefinedConstantError(constant_name);
     }
     return context.cache.get_or_create<pddl::TermConstantImpl>(result.object).object;
 }
 
 pddl::Term TermVisitor::operator()(const domain::ast::Variable& variable_node) const {
-    return context.cache.get_or_create<pddl::TermVariableImpl>(parse(variable_node, error_handler, context)).object;
+    auto variable = parse(variable_node, error_handler, context);
+    if (context.require_defined_variables && !context.defined_variables.count(variable)) {
+        error_handler(variable_node, "");
+        throw UndefinedVariableError(variable->get_name());
+    }
+    return context.cache.get_or_create<pddl::TermVariableImpl>(variable).object;
 }
 
 pddl::Term TermVisitor::operator()(const domain::ast::FunctionTerm& function_term_node) const {
@@ -66,7 +71,7 @@ pddl::Term parse(const domain::ast::Term& term_node, const error_handler_type& e
 }
 
 pddl::TermList parse(const std::vector<domain::ast::Term>& term_list_node, const error_handler_type& error_handler, domain::Context& context) {
-    pddl::TermList term_list; 
+    pddl::TermList term_list;
     for (const auto& term_node : term_list_node) {
         term_list.push_back(parse(term_node, error_handler, context));
     }

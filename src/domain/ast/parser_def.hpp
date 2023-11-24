@@ -259,7 +259,7 @@ namespace loki::domain::parser {
     const auto function_expression_head_def = function_head;
 
     const auto goal_descriptor_def = goal_descriptor_not | goal_descriptor_and | goal_descriptor_or | goal_descriptor_imply
-        | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison | goal_descriptor_literal | goal_descriptor_atom;
+        | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison | goal_descriptor_atom | goal_descriptor_literal;
     const auto goal_descriptor_atom_def = atom;
     const auto goal_descriptor_literal_def = literal;
     const auto goal_descriptor_and_def = (lit('(') >> lit("and")) > *goal_descriptor > lit(')');

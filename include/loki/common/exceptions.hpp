@@ -28,6 +28,11 @@ public:
     UndefinedConstantError(const std::string& name);
 };
 
+class UndefinedVariableError : public SemanticParserError {
+public:
+    UndefinedVariableError(const std::string& name);
+};
+
 class UndefinedRequirementError : public SemanticParserError {
 public:
     UndefinedRequirementError(pddl::RequirementEnum requirement);
