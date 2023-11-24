@@ -13,6 +13,9 @@ UndefinedError::UndefinedError(const std::string& object_name, const std::string
     : SemanticParserError(
         ("Undefined object with name \"" + object_name + "\" and type" + type_name)) { }
 
+UndefinedRequirementError::UndefinedRequirementError(pddl::RequirementEnum requirement)
+    : SemanticParserError("") { }
+
 MismatchedArgumentError::MismatchedArgumentError(
     const std::string& parameter_name, const std::string& variable_name,
     int parameter_list_arity, int variable_list_arity)

@@ -26,7 +26,6 @@ using namespace std;
 namespace loki {
 
 pddl::PredicateList parse(const ast::Predicates& predicates_node, const error_handler_type& error_handler, Context& context) {
-
     pddl::PredicateList predicate_list;
     for (const auto& atomic_formula_skeleton : predicates_node.atomic_formula_skeletons) {
         const auto name = parse(atomic_formula_skeleton.predicate.name, error_handler, context);
@@ -35,6 +34,22 @@ pddl::PredicateList parse(const ast::Predicates& predicates_node, const error_ha
         const auto predicate = context.cache.get_or_create<pddl::PredicateImpl>(name, parameters).object;
         context.predicates_by_name.emplace(name, predicate);
         predicate_list.emplace_back(predicate);
+    }
+    if (context.requirements->test(pddl::RequirementEnum::EQUALITY)) {
+        // add equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
+        auto binary_parameterlist = pddl::ParameterList{
+            
+            context.cache.get_or_create<pddl::ParameterImpl>(
+                context.cache.get_or_create<pddl::VariableImpl>("?left_arg").object, 
+                pddl::TypeList{context.base_type_object}).object,
+            context.cache.get_or_create<pddl::ParameterImpl>(
+                context.cache.get_or_create<pddl::VariableImpl>("?right_arg").object, 
+                pddl::TypeList{context.base_type_object}).object
+                
+        };
+        auto equal_predicate = context.cache.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist).object;
+        context.predicates_by_name.emplace("=", equal_predicate);
+        predicate_list.emplace_back(equal_predicate);
     }
     return predicate_list;
 }

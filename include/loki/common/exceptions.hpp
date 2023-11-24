@@ -3,6 +3,8 @@
 
 #include <stdexcept>
 
+#include "../domain/pddl/requirements.hpp"
+
 
 namespace loki {
 class SyntaxParserError : public std::runtime_error {
@@ -19,6 +21,11 @@ public:
 class UndefinedError : public SemanticParserError {
 public:
     UndefinedError(const std::string& object_name, const std::string& type_name);
+};
+
+class UndefinedRequirementError : public SemanticParserError {
+public:
+    UndefinedRequirementError(pddl::RequirementEnum requirement);
 };
 
 class MismatchedArgumentError : public SemanticParserError {

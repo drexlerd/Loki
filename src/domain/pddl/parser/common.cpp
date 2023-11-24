@@ -61,7 +61,17 @@ pddl::Term TermVisitor::operator()(const domain::ast::FunctionTerm& function_ter
 }
 
 
-extern pddl::Term parse(const domain::ast::Term& term_node, const error_handler_type& error_handler, domain::Context& context);
+pddl::Term parse(const domain::ast::Term& term_node, const error_handler_type& error_handler, domain::Context& context) {
+    return boost::apply_visitor(TermVisitor(error_handler, context), term_node);
+}
+
+pddl::TermList parse(const std::vector<domain::ast::Term>& term_list_node, const error_handler_type& error_handler, domain::Context& context) {
+    pddl::TermList term_list; 
+    for (const auto& term_node : term_list_node) {
+        term_list.push_back(parse(term_node, error_handler, context));
+    }
+    return term_list;
+}
 
 /* Number */
 double parse(const domain::ast::Number& number_node, const error_handler_type&, domain::Context&) {

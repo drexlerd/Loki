@@ -18,15 +18,27 @@ struct AtomicFormulaOfTermsVisitor : boost::static_visitor<pddl::Atom> {
 
     AtomicFormulaOfTermsVisitor(const error_handler_type& error_handler_, domain::Context& context_);
 
-    pddl::Atom operator()(const domain::ast::AtomicFormulaOfTermsPredicate& predicate_node) const;
-    pddl::Atom operator()(const domain::ast::AtomicFormulaOfTermsEquality& equality_node) const;
+    template<typename Node>
+    pddl::Atom operator()(const Node& node) const {
+        return parse(node, error_handler, context);
+    }
 };
 
 extern pddl::Literal parse(const domain::ast::Atom& atom_node, const error_handler_type& error_handler, domain::Context& context);
-
 extern pddl::Literal parse(const domain::ast::NegatedAtom& negated_atom_node, const error_handler_type& error_handler, domain::Context& context);
-
 extern pddl::Literal parse(const domain::ast::Literal& literal_node, const error_handler_type& error_handler, domain::Context& context);
+
+struct LiteralVisitor : boost::static_visitor<pddl::Literal> {
+    const error_handler_type& error_handler;
+    domain::Context& context;
+
+    LiteralVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+
+    template<typename Node>
+    pddl::Literal operator()(const Node& node) const {
+        return parse(node, error_handler, context);
+    }
+};
 
 }
 

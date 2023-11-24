@@ -28,6 +28,8 @@ struct TermVisitor : boost::static_visitor<pddl::Term> {
 
 extern pddl::Term parse(const domain::ast::Term& term_node, const error_handler_type& error_handler, domain::Context& context);
 
+extern pddl::TermList parse(const std::vector<domain::ast::Term>& term_list, const error_handler_type& error_handler, domain::Context& context);
+
 /* Number */
 extern double parse(const domain::ast::Number& number_node, const error_handler_type& error_handler, domain::Context& context);
 
