@@ -60,8 +60,8 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
     pddl::TypeList types;
     if (domain_node.types.has_value()) {
         if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
-            error_handler(domain_node.types.value(), "Unexpected :types section. (Is :typing missing?)");
-            throw SemanticParserError(context.error_stream->str());
+            error_handler(domain_node.types.value(), "");
+            throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.error_stream->str());
         }
         types = parse(domain_node.types.value(), error_handler, context);
     }

@@ -18,7 +18,6 @@ namespace loki::pddl {
 
 class ParameterImpl : public Base<ParameterImpl> {
 private:
-    // TODO: Variable
     Variable m_variable;
     TypeList m_types;
 

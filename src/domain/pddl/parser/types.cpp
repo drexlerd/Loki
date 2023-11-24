@@ -67,8 +67,8 @@ pddl::TypeList TypeReferenceVisitor::operator()(const ast::Name& name_node) {
     auto name = parse(name_node, error_handler, context);
     auto insert_result = context.cache.get_or_create<pddl::TypeImpl>(name);
     if (insert_result.created) {
-        error_handler(name_node, "Used undefined type.");
-        throw SemanticParserError(context.error_stream->str());
+        error_handler(name_node, "");
+        throw UndefinedTypeError(name, context.error_stream->str());
     }
     return { insert_result.object };
 }
@@ -115,14 +115,14 @@ pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNamesRecursivel
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
         const auto name = parse(name_node, error_handler, context);
         if (name == "object") {
-            error_handler(name_node, "Unexpected type name \"object\". It is a reserved type name.");
-            throw SemanticParserError(context.error_stream->str());
+            error_handler(name_node, "");
+            throw SemanticParserError("Unexpected type name \"object\". It is a reserved type name.", context.error_stream->str());
         }
         // We also reserve type name number although PDDL specification allows it.
         // However, this allows using regular types as function types for simplicity.
         if (name == "number") {
-            error_handler(name_node, "Unexpected type name \"number\". It is a reserved type name.");
-            throw SemanticParserError(context.error_stream->str());
+            error_handler(name_node, "");
+            throw SemanticParserError("Unexpected type name \"number\". It is a reserved type name.", context.error_stream->str());
         }
         const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, types).object;
         type_list.push_back(type);

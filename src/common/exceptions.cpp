@@ -6,24 +6,29 @@ SyntaxParserError::SyntaxParserError(const std::string& message)
     : std::runtime_error(message) { }
 
 
-SemanticParserError::SemanticParserError(const std::string& message)
-    : std::runtime_error(message) { }
+SemanticParserError::SemanticParserError(const std::string& message, const std::string& error_handler_output)
+    : std::runtime_error(message + "\n" + error_handler_output) { }
 
-UndefinedPredicateError::UndefinedPredicateError(const std::string& name)
+UndefinedTypeError::UndefinedTypeError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
-        ("The predicate with name \"" + name + "\" is undefined.")) { }
+        "The type with name \"" + name + "\" is undefined.", error_handler_output) { }
 
-UndefinedConstantError::UndefinedConstantError(const std::string& name)
+UndefinedPredicateError::UndefinedPredicateError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
-        ("The constant with name \"" + name + "\" is undefined.")) { }
+        "The predicate with name \"" + name + "\" is undefined.", error_handler_output) { }
 
-UndefinedVariableError::UndefinedVariableError(const std::string& name)
+UndefinedConstantError::UndefinedConstantError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
-        ("The variable with name \"" + name + "\" is not defined in the current scope.")) { }
+        "The constant with name \"" + name + "\" is undefined.", error_handler_output) { }
 
-UndefinedRequirementError::UndefinedRequirementError(pddl::RequirementEnum requirement)
-    : SemanticParserError("") { }
+UndefinedVariableError::UndefinedVariableError(const std::string& name, const std::string& error_handler_output)
+    : SemanticParserError(
+        "The variable with name \"" + name + "\" is not defined in the current scope.", error_handler_output) { }
 
+UndefinedRequirementError::UndefinedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output)
+    : SemanticParserError("Undefined requirement", error_handler_output) { }  // todo add string of requirement enum
+
+/*
 MismatchedArgumentError::MismatchedArgumentError(
     const std::string& parameter_name, const std::string& variable_name,
     int parameter_list_arity, int variable_list_arity)
@@ -37,7 +42,7 @@ MismatchedArgumentError::MismatchedArgumentError(
             + "!="
             + std::to_string(variable_list_arity)
             + ".") { }
-
+*/
 
 NotImplementedError::NotImplementedError(const std::string& message)
     : std::runtime_error(message) { }

@@ -43,8 +43,8 @@ pddl::Action parse(const domain::ast::Action& node, const error_handler_type& er
 
 pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, const error_handler_type& error_handler, domain::Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::DERIVED_PREDICATES)) {
-        error_handler(node, "Unexpected :derived-predicates section. (Is :derived-predicates missing?)");
-        throw SemanticParserError(context.error_stream->str());
+        error_handler(node, "");
+        throw UndefinedRequirementError(pddl::RequirementEnum::DERIVED_PREDICATES, context.error_stream->str());
     }
     auto parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context),
         node.typed_list_of_variables);

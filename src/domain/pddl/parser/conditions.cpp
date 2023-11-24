@@ -18,7 +18,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, const erro
     // requires :negative-preconditions
     if (!context.requirements->test(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS)) {
         error_handler(node, "");
-        throw UndefinedRequirementError(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS);
+        throw UndefinedRequirementError(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS, context.error_stream->str());
     }
     return context.cache.get_or_create<pddl::ConditionLiteralImpl>(parse(node.literal, error_handler, context)).object;
 }

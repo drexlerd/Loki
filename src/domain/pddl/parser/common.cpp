@@ -47,7 +47,7 @@ pddl::Term TermVisitor::operator()(const domain::ast::Name& name_node) const {
     auto result = context.cache.get_or_create<pddl::ObjectImpl>(constant_name);
     if (result.created) {
         error_handler(name_node, "");
-        throw UndefinedConstantError(constant_name);
+        throw UndefinedConstantError(constant_name, context.error_stream->str());
     }
     return context.cache.get_or_create<pddl::TermConstantImpl>(result.object).object;
 }
@@ -56,13 +56,13 @@ pddl::Term TermVisitor::operator()(const domain::ast::Variable& variable_node) c
     auto variable = parse(variable_node, error_handler, context);
     if (context.require_defined_variables && !context.defined_variables.count(variable)) {
         error_handler(variable_node, "");
-        throw UndefinedVariableError(variable->get_name());
+        throw UndefinedVariableError(variable->get_name(), context.error_stream->str());
     }
     return context.cache.get_or_create<pddl::TermVariableImpl>(variable).object;
 }
 
 pddl::Term TermVisitor::operator()(const domain::ast::FunctionTerm& function_term_node) const {
-    throw NotSupportedError("Found unsupported feature FunctionTerm. Are you using :object-fluents?");
+    throw NotSupportedError("Visited node domain::ast::FunctionTerm of an unsupported feature. Loki does not support :object-fluents.");
 }
 
 
