@@ -38,7 +38,6 @@ pddl::PredicateList parse(const ast::Predicates& predicates_node, const error_ha
     if (context.requirements->test(pddl::RequirementEnum::EQUALITY)) {
         // add equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
         auto binary_parameterlist = pddl::ParameterList{
-            
             context.cache.get_or_create<pddl::ParameterImpl>(
                 context.cache.get_or_create<pddl::VariableImpl>("?left_arg").object, 
                 pddl::TypeList{context.base_type_object}).object,
