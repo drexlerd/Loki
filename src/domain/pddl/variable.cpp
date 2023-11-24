@@ -15,45 +15,41 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/domain/pddl/literal.hpp"
+#include "../../../include/loki/domain/pddl/variable.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 
 
 namespace loki::pddl {
-LiteralImpl::LiteralImpl(int identifier, bool is_negated, const Atom& atom)
+VariableImpl::VariableImpl(int identifier, const std::string& name)
     : Base(identifier)
-    , m_is_negated(is_negated)
-    , m_atom(atom)
+    , m_name(name)
 {
 }
 
-bool LiteralImpl::are_equal_impl(const LiteralImpl& other) const {
-    return (m_is_negated == other.m_is_negated) && (m_atom == other.m_atom);
+bool VariableImpl::are_equal_impl(const VariableImpl& other) const {
+    return (m_name == other.m_name);
 }
 
-size_t LiteralImpl::hash_impl() const {
-    return hash_combine(m_is_negated, m_atom);
+size_t VariableImpl::hash_impl() const {
+    return hash_combine(m_name);
 }
 
-bool LiteralImpl::is_negated() const {
-    return m_is_negated;
-}
-
-const Atom& LiteralImpl::get_atom() const {
-    return m_atom;
+const std::string& VariableImpl::get_name() const {
+    return m_name;
 }
 
 }
+
 
 namespace std {
-    bool less<loki::pddl::Literal>::operator()(
-        const loki::pddl::Literal& left_literal,
-        const loki::pddl::Literal& right_literal) const {
-        return *left_literal < *right_literal;
+    bool less<loki::pddl::Variable>::operator()(
+        const loki::pddl::Variable& left_variable,
+        const loki::pddl::Variable& right_variable) const {
+        return *left_variable < *right_variable;
     }
 
-    std::size_t hash<loki::pddl::LiteralImpl>::operator()(const loki::pddl::LiteralImpl& literal) const {
-        return literal.hash_impl();
+    std::size_t hash<loki::pddl::VariableImpl>::operator()(const loki::pddl::VariableImpl& variable) const {
+        return variable.hash_impl();
     }
 }

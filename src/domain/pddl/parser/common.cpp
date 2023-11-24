@@ -17,6 +17,8 @@
 
 #include "common.hpp"
 
+#include "../../../../include/loki/common/exceptions.hpp"
+
 using namespace loki::domain;
 using namespace std;
 
@@ -30,11 +32,36 @@ string parse(const domain::ast::Name& name_node, const error_handler_type&, doma
 }
 
 /* Variable */
-string parse(const domain::ast::Variable& variable_node, const error_handler_type& error_handler, domain::Context& context) {
+pddl::Variable parse(const domain::ast::Variable& variable_node, const error_handler_type& error_handler, domain::Context& context) {
     stringstream ss;
     ss << variable_node.question_mark << parse(variable_node.name, error_handler, context);
-    return ss.str();
+    return context.cache.get_or_create<pddl::VariableImpl>(ss.str()).object;
 }
+
+/* Term */
+TermVisitor::TermVisitor(const error_handler_type& error_handler_, domain::Context& context_)
+    : error_handler(error_handler_), context(context_) { }
+
+pddl::Term TermVisitor::operator()(const domain::ast::Name& name_node) const {
+    auto constant_name = parse(name_node, error_handler, context);
+    auto result = context.cache.get_or_create<pddl::ObjectImpl>(constant_name);
+    if (result.created) {
+        error_handler(name_node, constant_name + " is undefined");
+        throw UndefinedError(constant_name, "constant");
+    }
+    return context.cache.get_or_create<pddl::TermConstantImpl>(result.object).object;
+}
+
+pddl::Term TermVisitor::operator()(const domain::ast::Variable& variable_node) const {
+    return context.cache.get_or_create<pddl::TermVariableImpl>(parse(variable_node, error_handler, context)).object;
+}
+
+pddl::Term TermVisitor::operator()(const domain::ast::FunctionTerm& function_term_node) const {
+    throw NotSupportedError("Found unsupported feature FunctionTerm. Are you using :object-fluents?");
+}
+
+
+extern pddl::Term parse(const domain::ast::Term& term_node, const error_handler_type& error_handler, domain::Context& context);
 
 /* Number */
 double parse(const domain::ast::Number& number_node, const error_handler_type&, domain::Context&) {

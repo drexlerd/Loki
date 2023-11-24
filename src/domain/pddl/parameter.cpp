@@ -21,23 +21,23 @@
 
 
 namespace loki::pddl {
-ParameterImpl::ParameterImpl(int identifier, const std::string& name, const TypeList& types)
+ParameterImpl::ParameterImpl(int identifier, const pddl::Variable& variable, const TypeList& types)
     : Base(identifier)
-    , m_name(name)
+    , m_variable(variable)
     , m_types(types)
 {
 }
 
 bool ParameterImpl::are_equal_impl(const ParameterImpl& other) const {
-    return (m_name == other.m_name) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types));
+    return (m_variable == other.m_variable) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types));
 }
 
 size_t ParameterImpl::hash_impl() const {
-    return hash_combine(m_name, hash_vector(get_sorted_vector(m_types)));
+    return hash_combine(m_variable, hash_vector(get_sorted_vector(m_types)));
 }
 
-const std::string& ParameterImpl::get_name() const {
-    return m_name;
+const Variable& ParameterImpl::get_variable() const {
+    return m_variable;
 }
 
 const TypeList& ParameterImpl::get_bases() const {

@@ -23,7 +23,26 @@ namespace loki::pddl {
     using ObjectList = std::vector<Object>;
     using ObjectSet = std::set<Object>;
 
-    class ParameterImpl;
+    // new
+    class VariableImpl;
+    using Variable = std::shared_ptr<const VariableImpl>;
+    using VariableAssignment = std::unordered_map<Variable, Object>;
+
+    // new
+    class TermImpl;
+    using Term = std::shared_ptr<const TermImpl>;
+    using TermList = std::vector<Term>;
+    class TermConstantImpl;
+    using TermConstant = std::shared_ptr<const TermConstantImpl>;
+    class TermVariableImpl;
+    using TermVariable = std::shared_ptr<const TermVariableImpl>;
+
+    // new 
+    class AtomImpl;
+    using Atom = std::shared_ptr<const AtomImpl>;
+    using AtomList = std::vector<Atom>;
+
+    class ParameterImpl;  // TypedVariable
     using Parameter = std::shared_ptr<const ParameterImpl>;
     using ParameterList = std::vector<Parameter>;
     using ParameterAssignment = std::unordered_map<Parameter, Object>;

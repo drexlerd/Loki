@@ -18,10 +18,11 @@ namespace loki::pddl {
 
 class ParameterImpl : public Base<ParameterImpl> {
 private:
-    std::string m_name;
+    // TODO: Variable
+    Variable m_variable;
     TypeList m_types;
 
-    ParameterImpl(int identifier, const std::string& name, const TypeList& types);
+    ParameterImpl(int identifier, const Variable& variable, const TypeList& types);
 
     template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
@@ -32,7 +33,7 @@ public:
 
     size_t hash_impl() const;
 
-    const std::string& get_name() const;
+    const Variable& get_variable() const;
     const TypeList& get_bases() const;
 };
 

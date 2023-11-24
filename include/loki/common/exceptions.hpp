@@ -16,10 +16,21 @@ public:
     explicit SemanticParserError(const std::string& message);
 };
 
+class UndefinedError : public SemanticParserError {
+public:
+    UndefinedError(const std::string& object_name, const std::string& type_name);
+};
+
+
 
 class NotImplementedError : public std::runtime_error {
 public:
     explicit NotImplementedError(const std::string& message);
+};
+
+class NotSupportedError : public std::runtime_error {
+public:
+    explicit NotSupportedError(const std::string& message);
 };
 
 }

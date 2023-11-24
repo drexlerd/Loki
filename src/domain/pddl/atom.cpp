@@ -15,45 +15,47 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/domain/pddl/literal.hpp"
+#include "../../../include/loki/domain/pddl/atom.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 
 
 namespace loki::pddl {
-LiteralImpl::LiteralImpl(int identifier, bool is_negated, const Atom& atom)
+AtomImpl::AtomImpl(int identifier, const Predicate& predicate, const TermList& terms)
     : Base(identifier)
-    , m_is_negated(is_negated)
-    , m_atom(atom)
+    , m_predicate(predicate)
+    , m_terms(terms)
 {
 }
 
-bool LiteralImpl::are_equal_impl(const LiteralImpl& other) const {
-    return (m_is_negated == other.m_is_negated) && (m_atom == other.m_atom);
+bool AtomImpl::are_equal_impl(const AtomImpl& other) const {
+    return (m_predicate == other.m_predicate)
+        && (m_terms == other.m_terms);
 }
 
-size_t LiteralImpl::hash_impl() const {
-    return hash_combine(m_is_negated, m_atom);
+size_t AtomImpl::hash_impl() const {
+    return hash_combine(m_predicate, hash_vector(m_terms));
 }
 
-bool LiteralImpl::is_negated() const {
-    return m_is_negated;
+const Predicate& AtomImpl::get_predicate() const {
+    return m_predicate;
 }
 
-const Atom& LiteralImpl::get_atom() const {
-    return m_atom;
+const TermList& AtomImpl::get_terms() const {
+    return m_terms;
 }
 
 }
+
 
 namespace std {
-    bool less<loki::pddl::Literal>::operator()(
-        const loki::pddl::Literal& left_literal,
-        const loki::pddl::Literal& right_literal) const {
-        return *left_literal < *right_literal;
+    bool less<loki::pddl::Atom>::operator()(
+        const loki::pddl::Atom& left_atom,
+        const loki::pddl::Atom& right_atom) const {
+        return *left_atom < *right_atom;
     }
 
-    std::size_t hash<loki::pddl::LiteralImpl>::operator()(const loki::pddl::LiteralImpl& literal) const {
-        return literal.hash_impl();
+    std::size_t hash<loki::pddl::AtomImpl>::operator()(const loki::pddl::AtomImpl& atom) const {
+        return atom.hash_impl();
     }
 }

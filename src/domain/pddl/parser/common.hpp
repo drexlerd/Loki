@@ -9,13 +9,27 @@
 namespace loki {
 
 /* Name */
-std::string parse(const domain::ast::Name& name_node, const error_handler_type& error_handler, domain::Context& context);
+extern std::string parse(const domain::ast::Name& name_node, const error_handler_type& error_handler, domain::Context& context);
 
 /* Variable */
-std::string parse(const domain::ast::Variable& variable_node, const error_handler_type& error_handler, domain::Context& context);
+extern pddl::Variable parse(const domain::ast::Variable& variable_node, const error_handler_type& error_handler, domain::Context& context);
+
+/* Term */
+struct TermVisitor : boost::static_visitor<pddl::Term> {
+    const error_handler_type& error_handler;
+    domain::Context& context;
+
+    TermVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+
+    pddl::Term operator()(const domain::ast::Name& name_node) const;
+    pddl::Term operator()(const domain::ast::Variable& variable_node) const; 
+    pddl::Term operator()(const domain::ast::FunctionTerm& function_term_node) const;
+};
+
+extern pddl::Term parse(const domain::ast::Term& term_node, const error_handler_type& error_handler, domain::Context& context);
 
 /* Number */
-double parse(const domain::ast::Number& number_node, const error_handler_type& error_handler, domain::Context& context);
+extern double parse(const domain::ast::Number& number_node, const error_handler_type& error_handler, domain::Context& context);
 
 }
 

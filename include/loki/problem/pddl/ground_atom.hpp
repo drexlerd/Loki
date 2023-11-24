@@ -14,7 +14,7 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-class GroundAtomImpl : Base<GroundAtomImpl> {
+class GroundAtomImpl : public Base<GroundAtomImpl> {
 private:
     Predicate m_predicate;
     ObjectList m_arguments;

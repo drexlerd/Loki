@@ -16,9 +16,9 @@ namespace loki::pddl {
 class LiteralImpl : public Base<LiteralImpl> {
 private:
     bool m_is_negated;
-    Predicate m_predicate;
+    Atom m_atom;
 
-    LiteralImpl(int identifier, bool is_negated, const Predicate& predicate);
+    LiteralImpl(int identifier, bool is_negated, const Atom& atom);
 
     template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
@@ -30,7 +30,7 @@ public:
     size_t hash_impl() const;
 
     bool is_negated() const;
-    const Predicate& get_predicate() const;
+    const Atom& get_atom() const;
 };
 
 }

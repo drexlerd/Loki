@@ -2,6 +2,7 @@
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_PARSER_HPP_
 
 #include "action.hpp"
+#include "atom.hpp"
 #include "conditions.hpp"
 #include "declarations.hpp"
 #include "derived_predicate.hpp"
@@ -11,7 +12,9 @@
 #include "parameter.hpp"
 #include "predicate.hpp"
 #include "requirements.hpp"
+#include "term.hpp"
 #include "type.hpp"
+#include "variable.hpp"
 
 #include "../../common/ast/config.hpp"
 #include "../../common/factory.hpp"
@@ -31,7 +34,11 @@ namespace domain {
 
         ReferenceCountedObjectFactory<pddl::RequirementsImpl
             , pddl::TypeImpl
+            , pddl::VariableImpl
+            , pddl::TermConstantImpl
+            , pddl::TermVariableImpl
             , pddl::ObjectImpl
+            , pddl::AtomImpl
             , pddl::ParameterImpl
             , pddl::PredicateImpl
             , pddl::ConditionLiteralImpl
