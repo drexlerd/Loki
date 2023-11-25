@@ -29,16 +29,42 @@ extern pddl::Effect parse(const domain::ast::EffectConditionalForall& node, cons
 extern pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, const error_handler_type& error_handler, domain::Context& context);
 extern pddl::Effect parse(const domain::ast::EffectConditional& node, const error_handler_type& error_handler, domain::Context& context);
 
+struct EffectProductionVisitor : boost::static_visitor<pddl::Effect> {
+    const error_handler_type& error_handler;
+    domain::Context& context;
+
+    EffectProductionVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+
+    template<typename Node>
+    pddl::Effect operator()(const Node& node) const {
+        return parse(node, error_handler, context);
+    }
+};
+
+struct EffectConditionalVisitor : boost::static_visitor<pddl::Effect> {
+    const error_handler_type& error_handler;
+    domain::Context& context;
+
+    EffectConditionalVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+
+    template<typename Node>
+    pddl::Effect operator()(const Node& node) const {
+        return parse(node, error_handler, context);
+    }
+};
+
 struct EffectVisitor : boost::static_visitor<pddl::Effect> {
     const error_handler_type& error_handler;
     domain::Context& context;
 
     EffectVisitor(const error_handler_type& error_handler_, domain::Context& context_);
 
-    template<typename Node>
-    pddl::Effect operator()(const Node& node) const {
-        return parse(node, error_handler, context);
-    }
+    pddl::Effect operator()(const std::vector<domain::ast::Effect>& effect_nodes) const;
+
+    pddl::Effect operator()(const domain::ast::EffectConditional& effect_node) const;
+
+    pddl::Effect operator()(const domain::ast::EffectProduction& effect_node) const;
+
 };
 
 }
