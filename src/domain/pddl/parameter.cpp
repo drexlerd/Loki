@@ -36,8 +36,8 @@ size_t ParameterImpl::hash_impl() const {
     return hash_combine(m_variable, hash_vector(get_sorted_vector(m_types)));
 }
 
-std::string ParameterImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    return "TODO";
+void ParameterImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    out << "TODO";
 }
 
 const Variable& ParameterImpl::get_variable() const {

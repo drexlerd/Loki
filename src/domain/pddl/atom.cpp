@@ -37,8 +37,8 @@ size_t AtomImpl::hash_impl() const {
     return hash_combine(m_predicate, hash_vector(m_terms));
 }
 
-std::string AtomImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    return "TODO";
+void AtomImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    out << "TODO";
 }
 
 const Predicate& AtomImpl::get_predicate() const {

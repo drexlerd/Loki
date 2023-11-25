@@ -12,13 +12,25 @@
 
 namespace loki {
 
-// TODO
-extern pddl::Effect parse(const domain::ast::AssignOperatorAssign& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::Effect parse(const domain::ast::AssignOperatorScaleUp& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::Effect parse(const domain::ast::AssignOperatorScaleDown& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::Effect parse(const domain::ast::AssignOperatorIncrease& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::Effect parse(const domain::ast::AssignOperatorDecrease& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::Effect parse(const domain::ast::AssignOperator& node, const error_handler_type& error_handler, domain::Context& context);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorAssign& node, const error_handler_type& error_handler, domain::Context& context);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleUp& node, const error_handler_type& error_handler, domain::Context& context);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleDown& node, const error_handler_type& error_handler, domain::Context& context);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorIncrease& node, const error_handler_type& error_handler, domain::Context& context);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorDecrease& node, const error_handler_type& error_handler, domain::Context& context);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperator& node, const error_handler_type& error_handler, domain::Context& context);
+
+struct AssignOperatorVisitor : boost::static_visitor<pddl::AssignOperatorEnum> {
+    const error_handler_type& error_handler;
+    domain::Context& context;
+
+    AssignOperatorVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+
+    template<typename Node>
+    pddl::AssignOperatorEnum operator()(const Node& node) const {
+        return parse(node, error_handler, context);
+    }
+};
+
 
 extern pddl::Effect parse(const domain::ast::Effect& node, const error_handler_type& error_handler, domain::Context& context);
 extern pddl::Effect parse(const domain::ast::EffectProductionLiteral& node, const error_handler_type& error_handler, domain::Context& context);

@@ -61,7 +61,7 @@ public:
 
 class NotSupportedError : public std::runtime_error {
 public:
-    explicit NotSupportedError(const std::string& message);
+    explicit NotSupportedError(pddl::RequirementEnum requirement, const std::string& error_handler_output);
 };
 
 }

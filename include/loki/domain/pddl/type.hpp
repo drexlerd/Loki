@@ -29,7 +29,7 @@ public:
     /// @brief Test for semantic equivalence
     bool are_equal_impl(const TypeImpl& other) const;
     size_t hash_impl() const;
-    std::string str_impl(std::stringstream& out, const FormattingOptions& options) const;
+    void str_impl(std::stringstream& out, const FormattingOptions& options) const;
 
     const std::string& get_name() const;
     const TypeList& get_bases() const;

@@ -6,29 +6,33 @@
 
 namespace loki {
 
-pddl::Effect parse(const domain::ast::AssignOperatorAssign& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::AssignOperatorAssign");
+pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorAssign& node, const error_handler_type& error_handler, domain::Context& context) {
+    return pddl::AssignOperatorEnum::ASSIGN;
 }
 
-pddl::Effect parse(const domain::ast::AssignOperatorScaleUp& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::AssignOperatorScaleUp");
+pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleUp& node, const error_handler_type& error_handler, domain::Context& context) {
+    return pddl::AssignOperatorEnum::SCALE_UP;
 }
 
-pddl::Effect parse(const domain::ast::AssignOperatorScaleDown& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::AssignOperatorScaleDown");
+pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleDown& node, const error_handler_type& error_handler, domain::Context& context) {
+    return pddl::AssignOperatorEnum::SCALE_DOWN;
 }
 
-pddl::Effect parse(const domain::ast::AssignOperatorIncrease& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::AssignOperatorIncrease");
+pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorIncrease& node, const error_handler_type& error_handler, domain::Context& context) {
+    return pddl::AssignOperatorEnum::INCREASE;
 }
 
-pddl::Effect parse(const domain::ast::AssignOperatorDecrease& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::AssignOperatorDecrease");
+pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorDecrease& node, const error_handler_type& error_handler, domain::Context& context) {
+    return pddl::AssignOperatorEnum::DECREASE;
 }
 
-pddl::Effect parse(const domain::ast::AssignOperator& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::AssignOperator");
+pddl::AssignOperatorEnum parse(const domain::ast::AssignOperator& node, const error_handler_type& error_handler, domain::Context& context) {
+    return boost::apply_visitor(AssignOperatorVisitor(error_handler, context), node);
 }
+
+
+AssignOperatorVisitor::AssignOperatorVisitor(const error_handler_type& error_handler_, domain::Context& context_)
+    : error_handler(error_handler_), context(context_) { }
 
 
 pddl::Effect parse(const domain::ast::Effect& node, const error_handler_type& error_handler, domain::Context& context) {
@@ -45,7 +49,8 @@ pddl::Effect parse(const domain::ast::EffectProductionNumericFluent& node, const
 }
 
 pddl::Effect parse(const domain::ast::EffectProductionObjectFluent& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::EffectProductionObjectFluent");
+    error_handler(node, "");
+    throw NotSupportedError(pddl::RequirementEnum::OBJECT_FLUENTS, context.error_stream->str());
 }
 
 pddl::Effect parse(const domain::ast::EffectProduction& node, const error_handler_type& error_handler, domain::Context& context) {

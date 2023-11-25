@@ -53,8 +53,8 @@ size_t DomainImpl::hash_impl() const {
         hash_vector(get_sorted_vector(m_predicates)));
 }
 
-std::string DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    return "TODO";
+void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    out << "TODO";
 }
 
 const std::string& DomainImpl::get_name() const {

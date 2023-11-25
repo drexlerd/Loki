@@ -1,6 +1,7 @@
 #include "../../include/loki/common/exceptions.hpp"
 
 #include "../../include/loki/domain/pddl/predicate.hpp"
+#include "../../include/loki/domain/pddl/requirements.hpp"
 
 
 namespace loki {
@@ -29,7 +30,7 @@ UndefinedVariableError::UndefinedVariableError(const std::string& name, const st
         "The variable with name \"" + name + "\" is not defined in the current scope.", error_handler_output) { }
 
 UndefinedRequirementError::UndefinedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output)
-    : SemanticParserError("Undefined requirement", error_handler_output) { }  // todo add string of requirement enum
+    : SemanticParserError("Undefined requirement: " + to_string(requirement), error_handler_output) { }
 
 MismatchedPredicateTermList::MismatchedPredicateTermList(
     const pddl::Predicate& predicate,
@@ -49,7 +50,7 @@ NotImplementedError::NotImplementedError(const std::string& message)
     : std::runtime_error(message) { }
 
 
-NotSupportedError::NotSupportedError(const std::string& message)
-    : std::runtime_error(message) { }
+NotSupportedError::NotSupportedError(pddl::RequirementEnum requirement, const std::string& error_handler_output)
+    : std::runtime_error("Unsupported requirement: " + to_string(requirement) + "\n" + error_handler_output) { }
 
 }

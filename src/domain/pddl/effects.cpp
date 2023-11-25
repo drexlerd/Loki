@@ -48,8 +48,8 @@ size_t EffectLiteralImpl::hash_impl() const {
     return std::hash<Literal>()(m_literal);
 }
 
-std::string EffectLiteralImpl::str_impl(std::stringstream& out) const {
-    return "TODO";
+void EffectLiteralImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    out << "TODO";
 }
 
 void EffectLiteralImpl::accept(EffectVisitor& visitor) const {
@@ -78,8 +78,8 @@ size_t EffectAndImpl::hash_impl() const {
     return hash_vector(get_sorted_vector(m_effects));
 }
 
-std::string EffectAndImpl::str_impl(std::stringstream& out) const {
-    return "TODO";
+void EffectAndImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    out << "TODO";
 }
 
 void EffectAndImpl::accept(EffectVisitor& visitor) const {

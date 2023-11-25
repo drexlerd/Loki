@@ -45,8 +45,8 @@ size_t ActionImpl::hash_impl() const {
         m_effect);
 }
 
-std::string ActionImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    return "TODO";
+void ActionImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    out << "TODO";
 }
 
 const std::string& ActionImpl::get_name() const {

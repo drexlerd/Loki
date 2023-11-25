@@ -7,6 +7,7 @@
 
 #include <string>
 #include <set>
+#include <unordered_map>
 
 
 namespace loki {
@@ -16,7 +17,6 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-
 enum class RequirementEnum {
     STRIPS,
     TYPING,
@@ -41,6 +41,9 @@ enum class RequirementEnum {
 
 using RequirementEnumSet = std::set<RequirementEnum>;
 
+extern std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string;
+extern const std::string& to_string(pddl::RequirementEnum requirement);
+
 
 class RequirementsImpl : public Base<RequirementsImpl> {
 private:
@@ -55,7 +58,7 @@ public:
     /// @brief Test for semantic equivalence
     bool are_equal_impl(const RequirementsImpl& other) const;
     size_t hash_impl() const;
-    std::string str_impl(std::stringstream& out, const FormattingOptions& options) const;
+    void str_impl(std::stringstream& out, const FormattingOptions& options) const;
 
     bool test(RequirementEnum requirement) const;
 };

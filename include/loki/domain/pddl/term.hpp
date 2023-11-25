@@ -29,7 +29,7 @@ public:
     /// @brief Test for semantic equivalence
     virtual bool are_equal_impl(const TermImpl& other) const = 0;
     virtual size_t hash_impl() const = 0;
-    virtual std::string str_impl(std::stringstream& out, const FormattingOptions& options) const = 0;
+    virtual void str_impl(std::stringstream& out, const FormattingOptions& options) const = 0;
 
     virtual void accept(TermVisitor& visitor) const = 0;
 };
@@ -47,7 +47,7 @@ public:
 
     bool are_equal_impl(const TermImpl& other) const override;
     size_t hash_impl() const override;
-    std::string str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
 
     void accept(TermVisitor& visitor) const override;
 
@@ -67,7 +67,7 @@ public:
 
     bool are_equal_impl(const TermImpl& other) const override;
     size_t hash_impl() const override;
-    std::string str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
 
     void accept(TermVisitor& visitor) const override;
 

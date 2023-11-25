@@ -46,7 +46,7 @@ public:
     /// @brief Test for structural equivalence
     virtual bool are_equal_impl(const EffectImpl& other) const = 0;
 
-    virtual std::string str_impl(std::stringstream& out) const = 0;
+    virtual void str_impl(std::stringstream& out, const FormattingOptions& options) const = 0;
 
     /// @brief Accepts the visitor by calling the visit overload.
     virtual void accept(EffectVisitor& visitor) const = 0;
@@ -68,7 +68,7 @@ public:
 
     bool are_equal_impl(const EffectImpl& other) const override;
     size_t hash_impl() const;
-    std::string str_impl(std::stringstream& out) const override;
+    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
 
     void accept(EffectVisitor& visitor) const override;
 
@@ -91,7 +91,7 @@ public:
 
     bool are_equal_impl(const EffectImpl& other) const override;
     size_t hash_impl() const;
-    std::string str_impl(std::stringstream& out) const override;
+    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
 
     void accept(EffectVisitor& visitor) const override;
 

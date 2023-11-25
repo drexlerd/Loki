@@ -49,8 +49,8 @@ size_t ConditionLiteralImpl::hash_impl() const {
     return std::hash<Literal>()(m_literal);
 }
 
-std::string ConditionLiteralImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    return "TODO";
+void ConditionLiteralImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    out << "TODO";
 }
 
 void ConditionLiteralImpl::accept(ConditionVisitor& visitor) const {
@@ -83,8 +83,8 @@ size_t ConditionAndImpl::hash_impl() const {
     return hash_vector(get_sorted_vector(m_conditions));
 }
 
-std::string ConditionAndImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    return "TODO";
+void ConditionAndImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    out << "TODO";
 }
 
 void ConditionAndImpl::accept(ConditionVisitor& visitor) const {

@@ -62,7 +62,8 @@ pddl::Term TermVisitor::operator()(const domain::ast::Variable& variable_node) c
 }
 
 pddl::Term TermVisitor::operator()(const domain::ast::FunctionTerm& function_term_node) const {
-    throw NotSupportedError("Visited node domain::ast::FunctionTerm of an unsupported feature. Loki does not support :object-fluents.");
+    error_handler(function_term_node, "");
+    throw NotSupportedError(pddl::RequirementEnum::OBJECT_FLUENTS, context.error_stream->str());
 }
 
 
