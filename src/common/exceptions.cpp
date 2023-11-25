@@ -1,5 +1,8 @@
 #include "../../include/loki/common/exceptions.hpp"
 
+#include "../../include/loki/domain/pddl/predicate.hpp"
+
+
 namespace loki {
 
 SyntaxParserError::SyntaxParserError(const std::string& message)
@@ -28,21 +31,19 @@ UndefinedVariableError::UndefinedVariableError(const std::string& name, const st
 UndefinedRequirementError::UndefinedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output)
     : SemanticParserError("Undefined requirement", error_handler_output) { }  // todo add string of requirement enum
 
-/*
-MismatchedArgumentError::MismatchedArgumentError(
-    const std::string& parameter_name, const std::string& variable_name,
-    int parameter_list_arity, int variable_list_arity)
+MismatchedPredicateTermList::MismatchedPredicateTermList(
+    const pddl::Predicate& predicate,
+    const pddl::TermList& term_list,
+    const std::string& error_handler_output)
     : SemanticParserError(
-        ("Mismatched arguments to \""
-            + parameter_name
-            + "\" and \""
-            + variable_name
+        "Mismatched number of terms for predicate \""
+            + predicate->get_name()
             + "\" with sizes "
-            + std::to_string(parameter_list_arity))
+            + std::to_string(predicate->get_parameters().size())
             + "!="
-            + std::to_string(variable_list_arity)
-            + ".") { }
-*/
+            + std::to_string(term_list.size())
+            + ".",
+        error_handler_output) { }
 
 NotImplementedError::NotImplementedError(const std::string& message)
     : std::runtime_error(message) { }

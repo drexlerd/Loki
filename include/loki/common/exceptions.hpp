@@ -44,15 +44,13 @@ public:
 };
 
 
-// this exception is still weirdly constructed
-/*
-class MismatchedArgumentError : public SemanticParserError {
+class MismatchedPredicateTermList : public SemanticParserError {
 public:
-    MismatchedArgumentError(
-        const std::string& parameter_name, const std::string& variable_name,
-        int parameter_list_arity, int variable_list_arity);
+    MismatchedPredicateTermList(
+        const pddl::Predicate& predicate,
+        const pddl::TermList& term_list,
+        const std::string& error_handler_output);
 };
-*/
 
 
 class NotImplementedError : public std::runtime_error {

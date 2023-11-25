@@ -23,12 +23,10 @@ namespace loki::pddl {
     using ObjectList = std::vector<Object>;
     using ObjectSet = std::set<Object>;
 
-    // new
     class VariableImpl;
     using Variable = std::shared_ptr<const VariableImpl>;
     using VariableAssignment = std::unordered_map<Variable, Object>;
 
-    // new
     class TermImpl;
     using Term = std::shared_ptr<const TermImpl>;
     using TermList = std::vector<Term>;
@@ -37,12 +35,11 @@ namespace loki::pddl {
     class TermVariableImpl;
     using TermVariable = std::shared_ptr<const TermVariableImpl>;
 
-    // new 
     class AtomImpl;
     using Atom = std::shared_ptr<const AtomImpl>;
     using AtomList = std::vector<Atom>;
 
-    class ParameterImpl;  // TypedVariable
+    class ParameterImpl;
     using Parameter = std::shared_ptr<const ParameterImpl>;
     using ParameterList = std::vector<Parameter>;
     using ParameterAssignment = std::unordered_map<Parameter, Object>;
@@ -74,6 +71,11 @@ namespace loki::pddl {
     using EffectLiteral = std::shared_ptr<const EffectLiteralImpl>;
     class EffectAndImpl;
     using EffectAnd = std::shared_ptr<const EffectAndImpl>;
+
+    class FunctionSkeletonImpl;
+    using FunctionSkeleton = std::shared_ptr<const FunctionSkeletonImpl>;
+    using FunctionSkeletonList = std::vector<FunctionSkeleton>;
+    using FunctionSkeletonSet = std::set<FunctionSkeleton>;
 
     class FunctionImpl;
     using Function = std::shared_ptr<const FunctionImpl>;

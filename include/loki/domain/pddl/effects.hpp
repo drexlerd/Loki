@@ -15,6 +15,15 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
+enum class AssignOperatorEnum {
+    ASSIGN,
+    SCALE_UP,
+    SCALE_DOWN,
+    INCREASE,
+    DECREASE
+};
+
+
 /// @brief Defines an interface for visiting nodes in a DAG of conditions.
 class EffectVisitor {
 public:

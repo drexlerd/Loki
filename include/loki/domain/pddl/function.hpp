@@ -17,10 +17,10 @@ class ReferenceCountedObjectFactory;
 namespace loki::pddl {
 class FunctionImpl : public Base<FunctionImpl> {
 private:
-    std::string name;
-    ParameterList parameters;
+    FunctionSkeleton m_function_skeleton;
+    TermList m_terms;
 
-    FunctionImpl(int identifier, const std::string& name, const ParameterList& parameters);
+    FunctionImpl(int identifier, const FunctionSkeleton& function_skeleton, const TermList& terms);
 
     template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
@@ -31,8 +31,8 @@ public:
 
     size_t hash_impl() const;
 
-    const std::string& get_name() const;
-    const ParameterList& get_parameters() const;
+    const FunctionSkeleton& get_function_skeleton() const;
+    const TermList& get_terms() const;
 };
 
 }

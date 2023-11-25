@@ -28,6 +28,7 @@
 
 #include "parser/common.hpp"
 #include "parser/constants.hpp"
+#include "parser/functions.hpp"
 #include "parser/objects.hpp"
 #include "parser/parameters.hpp"
 #include "parser/predicates.hpp"
@@ -74,6 +75,11 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
     pddl::PredicateList predicates;
     if (domain_node.predicates.has_value()) {
         predicates = parse(domain_node.predicates.value(), error_handler, context);
+    }
+    /* Functions section */
+    pddl::FunctionSkeletonList function_skeletons;
+    if (domain_node.functions.has_value()) {
+        function_skeletons = parse(domain_node.functions.value(), error_handler, context);
     }
     /* Action Schema section */
     pddl::DerivedPredicateList derived_predicate_list;

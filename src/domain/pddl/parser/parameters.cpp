@@ -53,12 +53,11 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
     }
     // Recursively add parameters.
     auto additional_parameters = this->operator()(typed_variables_node.typed_list_of_variables);
-    parameter_list.insert(parameter_list.end(), additional_parameters.begin(), additional_parameters.end());
     return parameter_list;
 }
 
 pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVariables& node) {
-    return boost::apply_visitor(*this, node);
+    return this->operator()(node);
 }
 
 }

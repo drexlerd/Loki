@@ -16,6 +16,7 @@ class ReferenceCountedObjectFactory;
 
 namespace loki::pddl {
 
+// An alternative name is AtomSkeleton
 class PredicateImpl : public Base<PredicateImpl> {
 private:
     std::string m_name;

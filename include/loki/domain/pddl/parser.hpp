@@ -8,6 +8,8 @@
 #include "derived_predicate.hpp"
 #include "domain.hpp"
 #include "effects.hpp"
+#include "function.hpp"
+#include "function_skeleton.hpp"
 #include "literal.hpp"
 #include "object.hpp"
 #include "parameter.hpp"
@@ -43,6 +45,8 @@ namespace domain {
             , pddl::LiteralImpl
             , pddl::ParameterImpl
             , pddl::PredicateImpl
+            , pddl::FunctionImpl
+            , pddl::FunctionSkeletonImpl
             , pddl::ConditionLiteralImpl
             , pddl::ConditionAndImpl
             , pddl::EffectLiteralImpl
@@ -55,6 +59,7 @@ namespace domain {
 
         std::unordered_map<std::string, pddl::Object> constants_by_name;
         std::unordered_map<std::string, pddl::Predicate> predicates_by_name;
+        std::unordered_map<std::string, pddl::FunctionSkeleton> function_skeletons_by_name;
 
         // If true, the parsed variables are required to be in the set of defined variables.
         bool require_defined_variables;
