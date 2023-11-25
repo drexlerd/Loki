@@ -48,6 +48,10 @@ size_t EffectLiteralImpl::hash_impl() const {
     return std::hash<Literal>()(m_literal);
 }
 
+std::string EffectLiteralImpl::str_impl(std::stringstream& out) const {
+    return "TODO";
+}
+
 void EffectLiteralImpl::accept(EffectVisitor& visitor) const {
     visitor.visit(this->shared_from_this());
 }
@@ -72,6 +76,10 @@ bool EffectAndImpl::are_equal_impl(const EffectImpl& other) const {
 
 size_t EffectAndImpl::hash_impl() const {
     return hash_vector(get_sorted_vector(m_effects));
+}
+
+std::string EffectAndImpl::str_impl(std::stringstream& out) const {
+    return "TODO";
 }
 
 void EffectAndImpl::accept(EffectVisitor& visitor) const {

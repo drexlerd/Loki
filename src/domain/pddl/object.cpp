@@ -36,6 +36,10 @@ size_t ObjectImpl::hash_impl() const {
     return hash_combine(m_name, hash_vector(get_sorted_vector(m_types)));
 }
 
+std::string ObjectImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    return "TODO";
+}
+
 const std::string& ObjectImpl::get_name() const {
     return m_name;
 }

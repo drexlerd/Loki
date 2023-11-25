@@ -35,6 +35,10 @@ size_t FunctionImpl::hash_impl() const {
     return hash_combine(m_function_skeleton, hash_vector(m_terms));
 }
 
+std::string FunctionImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    return "TODO";
+}
+
 const FunctionSkeleton& FunctionImpl::get_function_skeleton() const {
     return m_function_skeleton;
 }

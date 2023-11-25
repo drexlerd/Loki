@@ -1,7 +1,10 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_BASE_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_BASE_HPP_
 
+#include "../printer.hpp"
+
 #include <algorithm>
+#include <sstream>
 #include <vector>
 
 
@@ -32,10 +35,10 @@ namespace loki {
 template<typename Derived>
 class Base {
 protected:
-    int m_idenfitier;
+    int m_identifier;
 
 public:
-    explicit Base(int identifier) : m_idenfitier(identifier) { }
+    explicit Base(int identifier) : m_identifier(identifier) { }
     ~Base() { }
 
     bool operator==(const Base& other) const {
@@ -47,15 +50,34 @@ public:
     }
 
     bool operator<(const Base& other) const {
-        return m_idenfitier < other.m_idenfitier;
+        return m_identifier < other.m_identifier;
     }
 
     bool operator>(const Base& other) const {
-        return m_idenfitier > other.m_idenfitier;
+        return m_identifier > other.m_identifier;
     }
 
     size_t hash() const {
         return static_cast<Derived*>(this)->hash_impl();
+    }
+
+    /// @brief Overload of the output stream insertion operator (operator<<).
+    friend std::ostream& operator<<(std::ostream& os, const Base& element) {
+        os << element.str();
+        return os;
+    }
+
+    /// @brief Compute a string representation of this object.
+    void str(std::stringstream& out, const FormattingOptions& options) const {
+        static_cast<const Derived*>(this)->str_impl(out, options);
+    }
+
+    /// @brief Compute a string representation of this object.
+    std::string str() const {
+        std::stringstream out;
+        FormattingOptions options{0, 4};
+        str(out, options);
+        return out.str();
     }
 };
 

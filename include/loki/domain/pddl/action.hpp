@@ -33,8 +33,8 @@ private:
 public:
     /// @brief Test for structural equivalence
     bool are_equal_impl(const ActionImpl& other) const;
-
     size_t hash_impl() const;
+    std::string str_impl(std::stringstream& out, const FormattingOptions& options) const;
 
     const std::string& get_name() const;
     const ParameterList& get_parameters() const;

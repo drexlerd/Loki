@@ -36,6 +36,10 @@ size_t LiteralImpl::hash_impl() const {
     return hash_combine(m_is_negated, m_atom);
 }
 
+std::string LiteralImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    return "TODO";
+}
+
 bool LiteralImpl::is_negated() const {
     return m_is_negated;
 }

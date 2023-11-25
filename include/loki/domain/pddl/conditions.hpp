@@ -35,7 +35,9 @@ protected:
 public:
     virtual ~ConditionImpl();
 
+    /// @brief Test for structural equivalence
     virtual bool are_equal_impl(const ConditionImpl& other) const = 0;
+    virtual std::string str_impl(std::stringstream& out, const FormattingOptions& options) const = 0;
 
     /// @brief Accepts the visitor by calling the visit overload.
     virtual void accept(ConditionVisitor& visitor) const = 0;
@@ -43,7 +45,7 @@ public:
 
 
 /* Literal */
-class ConditionLiteralImpl : public ConditionImpl, std::enable_shared_from_this<ConditionLiteralImpl> {
+class ConditionLiteralImpl : public ConditionImpl, public std::enable_shared_from_this<ConditionLiteralImpl> {
 private:
     Literal m_literal;
 
@@ -57,6 +59,7 @@ public:
 
     bool are_equal_impl(const ConditionImpl& other) const override;
     size_t hash_impl() const;
+    std::string str_impl(std::stringstream& out, const FormattingOptions& options) const override;
 
     void accept(ConditionVisitor& visitor) const override;
 
@@ -65,7 +68,7 @@ public:
 
 
 /* And */
-class ConditionAndImpl : public ConditionImpl, std::enable_shared_from_this<ConditionAndImpl> {
+class ConditionAndImpl : public ConditionImpl, public std::enable_shared_from_this<ConditionAndImpl> {
 private:
     ConditionList m_conditions;
 
@@ -78,8 +81,8 @@ public:
     ~ConditionAndImpl() override;
 
     bool are_equal_impl(const ConditionImpl& other) const override;
-
     size_t hash_impl() const;
+    std::string str_impl(std::stringstream& out, const FormattingOptions& options) const override;
 
     void accept(ConditionVisitor& visitor) const override;
 

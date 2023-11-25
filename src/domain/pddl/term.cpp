@@ -41,8 +41,17 @@ bool TermConstantImpl::are_equal_impl(const TermImpl& other) const {
     }
     return false;
 }
+
 size_t TermConstantImpl::hash_impl() const {
     return hash_combine(m_object);
+}
+
+std::string TermConstantImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    return "TODO";
+}
+
+void TermConstantImpl::accept(TermVisitor& visitor) const {
+    visitor.visit(this->shared_from_this());
 }
 
 const Object& TermConstantImpl::get_object() const {
@@ -65,6 +74,14 @@ bool TermVariableImpl::are_equal_impl(const TermImpl& other) const {
 
 size_t TermVariableImpl::hash_impl() const {
     return hash_combine(m_variable);
+}
+
+std::string TermVariableImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    return "TODO";
+}
+
+void TermVariableImpl::accept(TermVisitor& visitor) const {
+    visitor.visit(this->shared_from_this());
 }
 
 const Variable& TermVariableImpl::get_variable() const {

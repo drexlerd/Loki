@@ -34,6 +34,10 @@ size_t RequirementsImpl::hash_impl() const {
     return hash_set(m_requirements);
 }
 
+std::string RequirementsImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    return "TODO";
+}
+
 bool RequirementsImpl::test(RequirementEnum requirement) const {
     return m_requirements.count(requirement);
 }

@@ -46,13 +46,15 @@ public:
     /// @brief Test for structural equivalence
     virtual bool are_equal_impl(const EffectImpl& other) const = 0;
 
+    virtual std::string str_impl(std::stringstream& out) const = 0;
+
     /// @brief Accepts the visitor by calling the visit overload.
     virtual void accept(EffectVisitor& visitor) const = 0;
 };
 
 
 /* Literal */
-class EffectLiteralImpl : public EffectImpl, std::enable_shared_from_this<EffectLiteralImpl> {
+class EffectLiteralImpl : public EffectImpl, public std::enable_shared_from_this<EffectLiteralImpl> {
 private:
     Literal m_literal;
 
@@ -65,8 +67,8 @@ public:
     ~EffectLiteralImpl() override;
 
     bool are_equal_impl(const EffectImpl& other) const override;
-
     size_t hash_impl() const;
+    std::string str_impl(std::stringstream& out) const override;
 
     void accept(EffectVisitor& visitor) const override;
 
@@ -75,7 +77,7 @@ public:
 
 
 /* And */
-class EffectAndImpl : public EffectImpl, std::enable_shared_from_this<EffectAndImpl> {
+class EffectAndImpl : public EffectImpl, public std::enable_shared_from_this<EffectAndImpl> {
 private:
     EffectList m_effects;
 
@@ -88,8 +90,8 @@ public:
     ~EffectAndImpl() override;
 
     bool are_equal_impl(const EffectImpl& other) const override;
-
     size_t hash_impl() const;
+    std::string str_impl(std::stringstream& out) const override;
 
     void accept(EffectVisitor& visitor) const override;
 

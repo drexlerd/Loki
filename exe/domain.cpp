@@ -48,6 +48,8 @@ int main(int argc, char** argv) {
     domain::Context context(std::move(error_stream));
     pddl::Domain domain = parse(domain_node, error_handler, context);
 
+    std::cout << *domain << std::endl;
+
     return 0;
 }
 
