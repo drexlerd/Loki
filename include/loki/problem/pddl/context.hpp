@@ -17,9 +17,11 @@ namespace loki::problem {
 
         std::unique_ptr<domain::Context> domain_context;
 
-        ReferenceCountedObjectFactory<pddl::ObjectImpl
-            , pddl::GroundAtomImpl
+        ReferenceCountedObjectFactory<pddl::GroundAtomImpl
             , pddl::ProblemImpl> cache;
+
+        // Requirements for testing
+        pddl::Requirements requirements;
 
         std::unordered_map<std::string, pddl::Object> objects_by_name;
 
@@ -27,6 +29,10 @@ namespace loki::problem {
             std::unique_ptr<domain::Context>&& domain_context_)
             : error_stream(std::move(error_stream_)),
               domain_context(std::move(domain_context_)) {
+            // Make constants referenceable in the problem definition
+            for (const auto& pair : domain_context->constants_by_name) {
+                objects_by_name.insert(pair);
+            }
         }
     };
 }

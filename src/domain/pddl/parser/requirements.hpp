@@ -9,59 +9,54 @@ using namespace loki::domain;
 
 namespace loki {
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementStrips&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementStrips& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementTyping&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementTyping& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementNegativePreconditions&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementNegativePreconditions& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementDisjunctivePreconditions&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementDisjunctivePreconditions& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementEquality&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementEquality& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementExistentialPreconditions&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementExistentialPreconditions& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementUniversalPreconditions&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementUniversalPreconditions& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementQuantifiedPreconditions&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementQuantifiedPreconditions& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementConditionalEffects&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementConditionalEffects& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementFluents&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementFluents& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementObjectFluents&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementObjectFluents& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementNumericFluents&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementNumericFluents& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementAdl&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementAdl& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementDurativeActions&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementDurativeActions& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementDerivedPredicates&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementDerivedPredicates& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementTimedInitialLiterals&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementTimedInitialLiterals& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementPreferences&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementPreferences& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementConstraints&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementConstraints& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::RequirementActionCosts&, const error_handler_type&, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::RequirementActionCosts& node);
 
-extern pddl::RequirementEnumSet parse(const domain::ast::Requirement& node, const error_handler_type& error_handler, domain::Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::Requirement& node);
 
 struct RequirementVisitor : boost::static_visitor<pddl::RequirementEnumSet> {
-    const error_handler_type& error_handler;
-    domain::Context& context;
-
-    RequirementVisitor(const error_handler_type& error_handler_, domain::Context& context_);
-
     template<typename Node>
     pddl::RequirementEnumSet operator()(const Node& node) const {
-        return parse(node, error_handler, context);
+        return parse(node);
     }
 };
 
-extern pddl::Requirements parse(const domain::ast::Requirements& requirements_node, const error_handler_type& error_handler, domain::Context& context);
+extern pddl::Requirements parse(const domain::ast::Requirements& requirements_node, const error_handler_type& error_handler, Context& context);
 
 }
 

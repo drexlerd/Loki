@@ -19,6 +19,8 @@
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 
+using namespace std;
+
 
 namespace loki::pddl {
 DomainImpl::DomainImpl(int identifier,
@@ -54,7 +56,34 @@ size_t DomainImpl::hash_impl() const {
 }
 
 void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    out << string(options.indent, ' ') << "(define (domain " << m_name << ")\n";
+    auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent};
+    if (!m_requirements->get_requirements().empty()) {
+        out << string(nested_options.indent, ' ') << m_requirements->str() << "\n";
+    }
+
+    /*
+    if (node.types.has_value()) {
+        ss << string(nested_options.indent, ' ') << parse_text(node.types.value(), nested_options) << "\n";
+    }
+    if (node.constants.has_value()) {
+        ss << string(nested_options.indent, ' ') << parse_text(node.constants.value(), nested_options) << "\n";
+    }
+    if (node.predicates.has_value()) {
+        ss << string(nested_options.indent, ' ') << parse_text(node.predicates.value(), nested_options) << "\n";
+    }
+    if (node.functions.has_value()) {
+        ss << string(nested_options.indent, ' ') << parse_text(node.functions.value(), nested_options) << "\n";
+    }
+    if (node.constraints.has_value()) {
+        ss << string(nested_options.indent, ' ') << parse_text(node.constraints.value(), nested_options) << "\n";
+    }
+    for (size_t i = 0; i < node.structures.size(); ++i) {
+        ss << string(nested_options.indent, ' ') << parse_text(node.structures[i], nested_options) << "\n";
+    }
+    */
+
+    out << std::string(options.indent, ' ') << ")";
 }
 
 const std::string& DomainImpl::get_name() const {

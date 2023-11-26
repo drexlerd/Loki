@@ -37,7 +37,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
     const auto type = context.domain_context->cache.get_or_create<pddl::TypeImpl>("object").object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
-        const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type}).object;
+        const auto object = context.domain_context->cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type}).object;
         context.objects_by_name.emplace(name, object);
         object_list.emplace_back(object);
     }
@@ -51,7 +51,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
         const auto name = parse(name_node);
-        const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, types).object;
+        const auto object = context.domain_context->cache.get_or_create<pddl::ObjectImpl>(name, types).object;
         context.objects_by_name.emplace(name, object);
         object_list.emplace_back(object);
     }
@@ -67,7 +67,6 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
 
 
 pddl::ObjectList parse(const ast::Objects& objects_node, const error_handler_type& error_handler, Context& context) {
-    // Dominik: Should we copy domain constants to objects? Duplicates?
     return boost::apply_visitor(ObjectListVisitor(error_handler, context), objects_node.typed_list_of_names);
 }
 

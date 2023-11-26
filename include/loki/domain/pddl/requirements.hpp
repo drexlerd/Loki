@@ -40,6 +40,7 @@ enum class RequirementEnum {
 };
 
 using RequirementEnumSet = std::set<RequirementEnum>;
+using RequirementEnumList = std::vector<RequirementEnum>;
 
 extern std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string;
 extern const std::string& to_string(pddl::RequirementEnum requirement);
@@ -61,6 +62,8 @@ public:
     void str_impl(std::stringstream& out, const FormattingOptions& options) const;
 
     bool test(RequirementEnum requirement) const;
+
+    const RequirementEnumSet& get_requirements() const;
 };
 
 }

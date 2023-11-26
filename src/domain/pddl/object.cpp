@@ -37,7 +37,7 @@ size_t ObjectImpl::hash_impl() const {
 }
 
 void ObjectImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    out << m_name;
 }
 
 const std::string& ObjectImpl::get_name() const {

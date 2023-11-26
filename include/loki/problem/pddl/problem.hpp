@@ -17,13 +17,14 @@ class ProblemImpl : public Base<ProblemImpl> {
 private:
     Domain m_domain;
     std::string m_name;
+    Requirements m_requirements;
     ObjectList m_objects;
 
     template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
-    ProblemImpl(int identifier, const Domain& domain, const std::string& name, const ObjectList& objects);
+    ProblemImpl(int identifier, const Domain& domain, const std::string& name, const Requirements& requirements, const ObjectList& objects);
 
     /// @brief Test for semantic equivalence
     bool are_equal_impl(const ProblemImpl& other) const;
@@ -32,6 +33,7 @@ public:
 
     const Domain& get_domain() const;
     const std::string& get_name() const;
+    const Requirements& get_requirements() const;
     const ObjectList& get_objects() const;
 };
 
