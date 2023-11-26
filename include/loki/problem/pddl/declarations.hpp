@@ -12,6 +12,13 @@
 
 
 namespace loki::pddl {
+    class GroundAtomImpl;
+    using GroundAtom = std::shared_ptr<const GroundAtomImpl>;
+    using GroundAtomList = std::vector<GroundAtom>;
+
+    class ProblemImpl;
+    using Problem = std::shared_ptr<const ProblemImpl>;
+    using ProblemList = std::vector<Problem>;
 }
 
 #endif

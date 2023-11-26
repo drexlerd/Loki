@@ -7,7 +7,7 @@
 namespace loki {
 
 pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formula_of_terms_node, const error_handler_type& error_handler, domain::Context& context) {
-    auto predicate_name = parse(atomic_formula_of_terms_node.predicate.name, error_handler, context);
+    auto predicate_name = parse(atomic_formula_of_terms_node.predicate.name);
     auto it = context.predicates_by_name.find(predicate_name);
     if (it == context.predicates_by_name.end()) {
         error_handler(atomic_formula_of_terms_node.predicate, "");
@@ -17,7 +17,7 @@ pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formul
     auto term_list = parse(atomic_formula_of_terms_node.terms, error_handler, context);
     if (predicate->get_parameters().size() != term_list.size()) {
         error_handler(atomic_formula_of_terms_node, "");
-        throw MismatchedPredicateTermList(predicate, term_list, context.error_stream->str());
+        throw MismatchedPredicateTermListError(predicate, term_list, context.error_stream->str());
     }
     return context.cache.get_or_create<pddl::AtomImpl>(predicate, term_list).object;
 }

@@ -13,7 +13,7 @@
 namespace loki {
 
 std::string parse(const domain::ast::ActionSymbol& node, const error_handler_type& error_handler, domain::Context& context) {
-    return parse(node.name, error_handler, context);
+    return parse(node.name);
 }
 
 std::tuple<pddl::Condition, pddl::Effect> parse(const domain::ast::ActionBody& node, const error_handler_type& error_handler, domain::Context& context) {

@@ -6,6 +6,15 @@
 
 
 namespace loki {
+// parse a vector of goal descriptors
+template<typename T>
+static pddl::ConditionList parse(const std::vector<T>& nodes, const error_handler_type& error_handler, domain::Context& context) {
+    pddl::ConditionList condition_list;
+    for (const auto& node : nodes) {
+        condition_list.push_back(parse(node, error_handler, context));
+    }
+    return condition_list;
+}
 
 pddl::Condition parse(const domain::ast::GoalDescriptor& node, const error_handler_type& error_handler, domain::Context& context) {
     return boost::apply_visitor(ConditionVisitor(error_handler, context), node);
@@ -24,19 +33,28 @@ pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, const erro
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorAnd& node, const error_handler_type& error_handler, domain::Context& context) {
-    pddl::ConditionList condition_list;
-    for (const auto& child_node : node.goal_descriptors) {
-        condition_list.push_back(parse(child_node, error_handler, context));
-    }
+    pddl::ConditionList condition_list = parse(node.goal_descriptors, error_handler, context);
     return context.cache.get_or_create<pddl::ConditionAndImpl>(condition_list).object;
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::GoalDescriptorOr");
+    // requires :disjunctive-preconditions
+    if (!context.requirements->test(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS)) {
+        error_handler(node, "");
+        throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.error_stream->str());
+    }
+    pddl::ConditionList condition_list = parse(node.goal_descriptors, error_handler, context);
+    return context.cache.get_or_create<pddl::ConditionOrImpl>(condition_list).object;
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorNot& node, const error_handler_type& error_handler, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::GoalDescriptorNot");
+    // requires :disjunctive-preconditions
+    if (!context.requirements->test(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS)) {
+        error_handler(node, "");
+        throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.error_stream->str());
+    }
+    pddl::Condition condition = parse(node.goal_descriptor, error_handler, context);
+    return context.cache.get_or_create<pddl::ConditionNotImpl>(condition).object;
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorImply& node, const error_handler_type& error_handler, domain::Context& context) {

@@ -35,7 +35,7 @@ pddl::TypeList TypeDeclarationVisitor::operator()(const ast::Type& type_node) {
 }
 
 pddl::TypeList TypeDeclarationVisitor::operator()(const ast::Name& name_node) {
-    auto name = parse(name_node, error_handler, context);
+    auto name = parse(name_node);
     return { context.cache.get_or_create<pddl::TypeImpl>(name).object };
 }
 
@@ -64,7 +64,7 @@ pddl::TypeList TypeReferenceVisitor::operator()(const ast::Type& type_node) {
 }
 
 pddl::TypeList TypeReferenceVisitor::operator()(const ast::Name& name_node) {
-    auto name = parse(name_node, error_handler, context);
+    auto name = parse(name_node);
     auto insert_result = context.cache.get_or_create<pddl::TypeImpl>(name);
     if (insert_result.created) {
         error_handler(name_node, "");
@@ -100,7 +100,7 @@ pddl::TypeList TypeListVisitor::operator()(const std::vector<ast::Name>& name_no
     assert(!context.cache.get_or_create<pddl::TypeImpl>("object").created);
     const auto base_type = context.cache.get_or_create<pddl::TypeImpl>("object").object;
     for (const auto& name_node : name_nodes) {
-        const auto name = parse(name_node, error_handler, context);
+        const auto name = parse(name_node);
         const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, pddl::TypeList{base_type}).object;
         type_list.push_back(type);
     }
@@ -113,7 +113,7 @@ pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNamesRecursivel
                                             typed_list_of_names_recursively_node.type);
     // A non-visited vector of names has user defined base types.
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
-        const auto name = parse(name_node, error_handler, context);
+        const auto name = parse(name_node);
         if (name == "object") {
             error_handler(name_node, "");
             throw SemanticParserError("Unexpected type name \"object\". It is a reserved type name.", context.error_stream->str());

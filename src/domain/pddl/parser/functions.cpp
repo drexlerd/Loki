@@ -13,7 +13,7 @@ pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const std::ve
     pddl::FunctionSkeletonList function_skeleton_list;
     auto function_type = context.base_type_number;
     for (const auto& atomic_function_skeleton : formula_skeleton_nodes) {
-        auto function_name = parse(atomic_function_skeleton.function_symbol.name, error_handler, context);
+        auto function_name = parse(atomic_function_skeleton.function_symbol.name);
         auto function_parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context), atomic_function_skeleton.arguments);
         auto function_skeleton = context.cache.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, function_type).object;
         context.function_skeletons_by_name.emplace(function_name, function_skeleton);
@@ -27,7 +27,7 @@ pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const domain:
     // We do not parse function_skeleton_list_recursively_node.function_type because we do not support :object-fluents
     auto function_type = context.base_type_number;
     for (const auto& atomic_function_skeleton : function_skeleton_list_recursively_node.atomic_function_skeletons) {
-        auto function_name = parse(atomic_function_skeleton.function_symbol.name, error_handler, context);
+        auto function_name = parse(atomic_function_skeleton.function_symbol.name);
         auto function_parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context), atomic_function_skeleton.arguments);
         auto function_skeleton = context.cache.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, function_type).object;
         context.function_skeletons_by_name.emplace(function_name, function_skeleton);

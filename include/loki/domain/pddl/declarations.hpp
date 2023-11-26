@@ -62,6 +62,10 @@ namespace loki::pddl {
     using ConditionLiteral = std::shared_ptr<const ConditionLiteralImpl>;
     class ConditionAndImpl;
     using ConditionAnd = std::shared_ptr<const ConditionAndImpl>;
+    class ConditionOrImpl;
+    using ConditionOr = std::shared_ptr<const ConditionOrImpl>;
+    class ConditionNotImpl;
+    using ConditionNot = std::shared_ptr<const ConditionNotImpl>;
 
     class EffectImpl;
     using Effect = std::shared_ptr<const EffectImpl>;

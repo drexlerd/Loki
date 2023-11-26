@@ -24,6 +24,8 @@ public:
     pddl::ObjectList operator()(const domain::ast::TypedListOfNames& node);
 };
 
+extern pddl::ObjectList parse(const domain::ast::Constants& constants_node, const error_handler_type& error_handler, domain::Context& context);
+
 }
 
 #endif // LOKI_SRC_DOMAIN_PDDL_PARSER_CONSTANTS_HPP_

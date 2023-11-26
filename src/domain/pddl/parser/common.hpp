@@ -9,7 +9,7 @@
 namespace loki {
 
 /* Name */
-extern std::string parse(const domain::ast::Name& name_node, const error_handler_type& error_handler, domain::Context& context);
+extern std::string parse(const domain::ast::Name& name_node);
 
 /* Variable */
 extern pddl::Variable parse(const domain::ast::Variable& variable_node, const error_handler_type& error_handler, domain::Context& context);
@@ -31,7 +31,7 @@ extern pddl::Term parse(const domain::ast::Term& term_node, const error_handler_
 extern pddl::TermList parse(const std::vector<domain::ast::Term>& term_list, const error_handler_type& error_handler, domain::Context& context);
 
 /* Number */
-extern double parse(const domain::ast::Number& number_node, const error_handler_type& error_handler, domain::Context& context);
+extern double parse(const domain::ast::Number& number_node);
 
 }
 

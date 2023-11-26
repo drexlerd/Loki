@@ -2,6 +2,7 @@
 
 #include "../../include/loki/domain/pddl/predicate.hpp"
 #include "../../include/loki/domain/pddl/requirements.hpp"
+#include "../../include/loki/domain/pddl/domain.hpp"
 
 
 namespace loki {
@@ -32,7 +33,7 @@ UndefinedVariableError::UndefinedVariableError(const std::string& name, const st
 UndefinedRequirementError::UndefinedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output)
     : SemanticParserError("Undefined requirement: " + to_string(requirement), error_handler_output) { }
 
-MismatchedPredicateTermList::MismatchedPredicateTermList(
+MismatchedPredicateTermListError::MismatchedPredicateTermListError(
     const pddl::Predicate& predicate,
     const pddl::TermList& term_list,
     const std::string& error_handler_output)
@@ -43,6 +44,19 @@ MismatchedPredicateTermList::MismatchedPredicateTermList(
             + std::to_string(predicate->get_parameters().size())
             + "!="
             + std::to_string(term_list.size())
+            + ".",
+        error_handler_output) { }
+
+
+MismatchedDomainError::MismatchedDomainError(
+    const pddl::Domain& domain,
+    const std::string& domain_name,
+    const std::string& error_handler_output)
+    : SemanticParserError(
+        "Mismatched domain names \""
+            + domain->get_name()
+            + "!="
+            + domain_name
             + ".",
         error_handler_output) { }
 

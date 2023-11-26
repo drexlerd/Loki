@@ -4,7 +4,6 @@
 #include "declarations.hpp"
 
 #include "../../common/pddl/base.hpp"
-#include "../../problem/pddl/declarations.hpp"
 
 #include <string>
 
@@ -21,6 +20,8 @@ class ConditionVisitor {
 public:
     virtual void visit(const ConditionLiteral& condition) = 0;
     virtual void visit(const ConditionAnd& condition) = 0;
+    virtual void visit(const ConditionOr& condition) = 0;
+    virtual void visit(const ConditionNot& condition) = 0;
 };
 
 
@@ -89,6 +90,52 @@ public:
     const ConditionList& get_conditions() const;
 };
 
+
+/* Or */
+class ConditionOrImpl : public ConditionImpl, public std::enable_shared_from_this<ConditionOrImpl> {
+private:
+    ConditionList m_conditions;
+
+    ConditionOrImpl(int identifier, const ConditionList& conditions);
+
+    template<typename... Ts>
+    friend class loki::ReferenceCountedObjectFactory;
+
+public:
+    ~ConditionOrImpl() override;
+
+    bool are_equal_impl(const ConditionImpl& other) const override;
+    size_t hash_impl() const;
+    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+
+    void accept(ConditionVisitor& visitor) const override;
+
+    const ConditionList& get_conditions() const;
+};
+
+
+/* Not */
+class ConditionNotImpl : public ConditionImpl, public std::enable_shared_from_this<ConditionNotImpl> {
+private:
+    Condition m_condition;
+
+    ConditionNotImpl(int identifier, const Condition& condition);
+
+    template<typename... Ts>
+    friend class loki::ReferenceCountedObjectFactory;
+
+public:
+    ~ConditionNotImpl() override;
+
+    bool are_equal_impl(const ConditionImpl& other) const override;
+    size_t hash_impl() const;
+    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+
+    void accept(ConditionVisitor& visitor) const override;
+
+    const Condition& get_condition() const;
+};
+
 }
 
 
@@ -110,6 +157,18 @@ namespace std {
     struct hash<loki::pddl::ConditionAndImpl>
     {
         std::size_t operator()(const loki::pddl::ConditionAndImpl& condition) const;
+    };
+
+    template<>
+    struct hash<loki::pddl::ConditionOrImpl>
+    {
+        std::size_t operator()(const loki::pddl::ConditionOrImpl& condition) const;
+    };
+
+    template<>
+    struct hash<loki::pddl::ConditionNotImpl>
+    {
+        std::size_t operator()(const loki::pddl::ConditionNotImpl& condition) const;
     };
 }
 

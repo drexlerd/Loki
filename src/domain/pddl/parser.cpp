@@ -29,7 +29,6 @@
 #include "parser/common.hpp"
 #include "parser/constants.hpp"
 #include "parser/functions.hpp"
-#include "parser/objects.hpp"
 #include "parser/parameters.hpp"
 #include "parser/predicates.hpp"
 #include "parser/requirements.hpp"
@@ -43,7 +42,7 @@ using namespace std;
 namespace loki {
 
 std::string parse(const domain::ast::DomainName& domain_name_node, const error_handler_type& error_handler, domain::Context& context) {
-    return parse(domain_name_node.name, error_handler, context);
+    return parse(domain_name_node.name);
 }
 
 pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& error_handler, Context& context) {

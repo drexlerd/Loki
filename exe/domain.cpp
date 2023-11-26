@@ -47,7 +47,6 @@ int main(int argc, char** argv) {
     std::cout << parse_text(domain_node, FormattingOptions{0,4}) << std::endl;
     domain::Context context(std::move(error_stream));
     pddl::Domain domain = parse(domain_node, error_handler, context);
-
     std::cout << *domain << std::endl;
 
     return 0;

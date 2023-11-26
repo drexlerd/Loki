@@ -69,7 +69,6 @@ ConditionAndImpl::ConditionAndImpl(int identifier, const ConditionList& conditio
 
 ConditionAndImpl::~ConditionAndImpl() = default;
 
-
 bool ConditionAndImpl::are_equal_impl(const ConditionImpl& other) const {
     if (typeid(*this) == typeid(other)) {
         const auto& other_derived = static_cast<const ConditionAndImpl&>(other);
@@ -77,7 +76,6 @@ bool ConditionAndImpl::are_equal_impl(const ConditionImpl& other) const {
     }
     return false;
 }
-
 
 size_t ConditionAndImpl::hash_impl() const {
     return hash_vector(get_sorted_vector(m_conditions));
@@ -95,6 +93,70 @@ const ConditionList& ConditionAndImpl::get_conditions() const {
     return m_conditions;
 }
 
+
+/* Or */
+ConditionOrImpl::ConditionOrImpl(int identifier, const ConditionList& conditions)
+    : ConditionImpl(identifier)
+    , m_conditions(conditions) { }
+
+ConditionOrImpl::~ConditionOrImpl() = default;
+
+bool ConditionOrImpl::are_equal_impl(const ConditionImpl& other) const {
+    if (typeid(*this) == typeid(other)) {
+        const auto& other_derived = static_cast<const ConditionOrImpl&>(other);
+        return get_sorted_vector(m_conditions) == get_sorted_vector(other_derived.m_conditions);
+    }
+    return false;
+}
+
+size_t ConditionOrImpl::hash_impl() const {
+    return hash_vector(get_sorted_vector(m_conditions));
+}
+
+void ConditionOrImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    out << "TODO";
+}
+
+void ConditionOrImpl::accept(ConditionVisitor& visitor) const {
+    visitor.visit(this->shared_from_this());
+}
+
+const ConditionList& ConditionOrImpl::get_conditions() const {
+    return m_conditions;
+}
+
+
+/* Not */
+ConditionNotImpl::ConditionNotImpl(int identifier, const Condition& condition)
+    : ConditionImpl(identifier)
+    , m_condition(condition) { }
+
+ConditionNotImpl::~ConditionNotImpl() = default;
+
+bool ConditionNotImpl::are_equal_impl(const ConditionImpl& other) const {
+    if (typeid(*this) == typeid(other)) {
+        const auto& other_derived = static_cast<const ConditionNotImpl&>(other);
+        return m_condition == other_derived.m_condition;
+    }
+    return false;
+}
+
+size_t ConditionNotImpl::hash_impl() const {
+    return hash_combine(m_condition);
+}
+
+void ConditionNotImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    out << "TODO";
+}
+
+void ConditionNotImpl::accept(ConditionVisitor& visitor) const {
+    visitor.visit(this->shared_from_this());
+}
+
+const Condition& ConditionNotImpl::get_condition() const {
+    return m_condition;
+}
+
 }
 
 namespace std {
@@ -109,6 +171,14 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::ConditionAndImpl>::operator()(const loki::pddl::ConditionAndImpl& condition) const {
+        return condition.hash_impl();
+    }
+
+    std::size_t hash<loki::pddl::ConditionOrImpl>::operator()(const loki::pddl::ConditionOrImpl& condition) const {
+        return condition.hash_impl();
+    }
+
+    std::size_t hash<loki::pddl::ConditionNotImpl>::operator()(const loki::pddl::ConditionNotImpl& condition) const {
         return condition.hash_impl();
     }
 }

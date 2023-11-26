@@ -44,11 +44,20 @@ public:
 };
 
 
-class MismatchedPredicateTermList : public SemanticParserError {
+class MismatchedPredicateTermListError : public SemanticParserError {
 public:
-    MismatchedPredicateTermList(
+    MismatchedPredicateTermListError(
         const pddl::Predicate& predicate,
         const pddl::TermList& term_list,
+        const std::string& error_handler_output);
+};
+
+
+class MismatchedDomainError : public SemanticParserError {
+public:
+    MismatchedDomainError(
+        const pddl::Domain& domain,
+        const std::string& domain_name,
         const std::string& error_handler_output);
 };
 

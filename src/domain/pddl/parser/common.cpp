@@ -25,7 +25,7 @@ using namespace std;
 namespace loki {
 
 /* Name */
-string parse(const domain::ast::Name& name_node, const error_handler_type&, domain::Context&) {
+string parse(const domain::ast::Name& name_node) {
     stringstream ss;
     ss << name_node.alpha << name_node.suffix;
     return ss.str();
@@ -34,7 +34,7 @@ string parse(const domain::ast::Name& name_node, const error_handler_type&, doma
 /* Variable */
 pddl::Variable parse(const domain::ast::Variable& variable_node, const error_handler_type& error_handler, domain::Context& context) {
     stringstream ss;
-    ss << variable_node.question_mark << parse(variable_node.name, error_handler, context);
+    ss << variable_node.question_mark << parse(variable_node.name);
     return context.cache.get_or_create<pddl::VariableImpl>(ss.str()).object;
 }
 
@@ -43,7 +43,7 @@ TermVisitor::TermVisitor(const error_handler_type& error_handler_, domain::Conte
     : error_handler(error_handler_), context(context_) { }
 
 pddl::Term TermVisitor::operator()(const domain::ast::Name& name_node) const {
-    auto constant_name = parse(name_node, error_handler, context);
+    auto constant_name = parse(name_node);
     auto result = context.cache.get_or_create<pddl::ObjectImpl>(constant_name);
     if (result.created) {
         error_handler(name_node, "");
@@ -80,7 +80,7 @@ pddl::TermList parse(const std::vector<domain::ast::Term>& term_list_node, const
 }
 
 /* Number */
-double parse(const domain::ast::Number& number_node, const error_handler_type&, domain::Context&) {
+double parse(const domain::ast::Number& number_node) {
     return number_node.value;
 }
 

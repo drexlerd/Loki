@@ -5,6 +5,7 @@ file(GLOB SRC_FILES
     "domain/pddl/*.cpp"
     "domain/pddl/parser/*.cpp"
     "problem/ast/*.cpp"
+    "problem/pddl/*.cpp"
     "problem/pddl/parser/*.cpp")
 add_library(parsers STATIC ${SRC_FILES})
 
