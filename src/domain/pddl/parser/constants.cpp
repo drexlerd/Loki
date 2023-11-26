@@ -16,15 +16,16 @@
  */
 
 #include "constants.hpp"
-
 #include "common.hpp"
 #include "types.hpp"
+
+#include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 using namespace loki::domain;
 using namespace std;
 
-namespace loki {
 
+namespace loki {
 ConstantListVisitor::ConstantListVisitor(const error_handler_type& error_handler_, Context& context_)
     : error_handler(error_handler_), context(context_) { }
 
@@ -36,6 +37,10 @@ pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& n
     const auto type = context.cache.get_or_create<pddl::TypeImpl>("object").object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
+        if (context.constants_by_name.count(name)) {
+            error_handler(name_node, "");
+            throw MultiDefinitionConstantError(name, context.error_stream->str());
+        }
         const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type}).object;
         context.constants_by_name.emplace(name, object);
         object_list.emplace_back(object);
@@ -50,6 +55,10 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
         const auto name = parse(name_node);
+        if (context.constants_by_name.count(name)) {
+            error_handler(name_node, "");
+            throw MultiDefinitionConstantError(name, context.error_stream->str());
+        }
         const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, types).object;
         context.constants_by_name.emplace(name, object);
         object_list.emplace_back(object);

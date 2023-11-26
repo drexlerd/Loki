@@ -17,7 +17,7 @@
 
 #include "common.hpp"
 
-#include "../../../../include/loki/common/exceptions.hpp"
+#include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 using namespace loki::domain;
 using namespace std;
@@ -58,6 +58,11 @@ pddl::Term TermVisitor::operator()(const domain::ast::Variable& variable_node) c
         error_handler(variable_node, "");
         throw UndefinedVariableError(variable->get_name(), context.error_stream->str());
     }
+    if (!context.require_defined_variables && defined_variables.count(variable)) {
+        error_handler(variable_node, "");
+        throw MultiDefinitionVariableError(variable->get_name(), context.error_stream->str());
+    }
+    defined_variables.insert(variable);
     return context.cache.get_or_create<pddl::TermVariableImpl>(variable).object;
 }
 

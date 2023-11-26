@@ -18,6 +18,7 @@ extern pddl::Variable parse(const domain::ast::Variable& variable_node, const er
 struct TermVisitor : boost::static_visitor<pddl::Term> {
     const error_handler_type& error_handler;
     domain::Context& context;
+    mutable std::unordered_set<pddl::Variable> defined_variables;
 
     TermVisitor(const error_handler_type& error_handler_, domain::Context& context_);
 

@@ -18,7 +18,7 @@
 #include "parser.hpp"
 #include "unpacking_visitor.hpp"
 
-#include "../../../include/loki/common/exceptions.hpp"
+#include "../../../include/loki/domain/pddl/exceptions.hpp"
 #include "../../../include/loki/domain/pddl/parser.hpp"
 #include "../../../include/loki/domain/pddl/object.hpp"
 #include "../../../include/loki/domain/pddl/parameter.hpp"
@@ -73,6 +73,7 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
     /* Predicates section */
     pddl::PredicateList predicates;
     if (domain_node.predicates.has_value()) {
+        error_handler(domain_node.predicates.value(), "");
         predicates = parse(domain_node.predicates.value(), error_handler, context);
     }
     /* Functions section */

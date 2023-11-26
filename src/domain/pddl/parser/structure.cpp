@@ -5,7 +5,7 @@
 #include "common.hpp"
 #include "parameters.hpp"
 
-#include "../../../../include/loki/common/exceptions.hpp"
+#include "../../../../include/loki/domain/pddl/exceptions.hpp"
 #include "../../../../include/loki/domain/pddl/action.hpp"
 #include "../../../../include/loki/domain/pddl/derived_predicate.hpp"
 

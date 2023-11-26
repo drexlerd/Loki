@@ -3,6 +3,8 @@
 #include "common.hpp"
 #include "parameters.hpp"
 
+#include "../../../../include/loki/domain/pddl/exceptions.hpp"
+
 
 namespace loki {
 
@@ -14,6 +16,10 @@ pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const std::ve
     auto function_type = context.base_type_number;
     for (const auto& atomic_function_skeleton : formula_skeleton_nodes) {
         auto function_name = parse(atomic_function_skeleton.function_symbol.name);
+        if (context.function_skeletons_by_name.count(function_name)) {
+            error_handler(atomic_function_skeleton.function_symbol.name, "");
+            throw MultiDefinitionFunctionSkeletonError(function_name, context.error_stream->str());
+        }
         auto function_parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context), atomic_function_skeleton.arguments);
         auto function_skeleton = context.cache.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, function_type).object;
         context.function_skeletons_by_name.emplace(function_name, function_skeleton);
@@ -28,6 +34,10 @@ pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const domain:
     auto function_type = context.base_type_number;
     for (const auto& atomic_function_skeleton : function_skeleton_list_recursively_node.atomic_function_skeletons) {
         auto function_name = parse(atomic_function_skeleton.function_symbol.name);
+        if (context.function_skeletons_by_name.count(function_name)) {
+            error_handler(atomic_function_skeleton.function_symbol.name, "");
+            throw MultiDefinitionFunctionSkeletonError(function_name, context.error_stream->str());
+        }
         auto function_parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context), atomic_function_skeleton.arguments);
         auto function_skeleton = context.cache.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, function_type).object;
         context.function_skeletons_by_name.emplace(function_name, function_skeleton);

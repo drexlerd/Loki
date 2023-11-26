@@ -1,7 +1,7 @@
 #include "effects.hpp"
 
 #include "literal.hpp"
-#include "../../../../include/loki/common/exceptions.hpp"
+#include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 
 namespace loki {

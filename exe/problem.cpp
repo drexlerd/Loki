@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
     domain::ast::Domain domain_node;
     std::unique_ptr<std::ostringstream> domain_error_stream = std::make_unique<std::ostringstream>();
     error_handler_type domain_error_handler(domain_source.begin(), domain_source.end(), *domain_error_stream, domain_file);
-    parse_ast(domain_source, domain::domain(), domain_node);
+    parse_ast(domain_source, domain::domain(), domain_node, domain_error_handler);
     std::cout << parse_text(domain_node, FormattingOptions{0,4}) << std::endl;
     std::unique_ptr<domain::Context> domain_context = std::make_unique<domain::Context>(std::move(domain_error_stream));
     pddl::Domain domain = parse(domain_node, domain_error_handler, *domain_context);
@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
     problem::ast::Problem problem_node;
     std::unique_ptr<std::ostringstream> problem_error_stream = std::make_unique<std::ostringstream>();
     error_handler_type problem_error_handler(problem_source.begin(), problem_source.end(), *problem_error_stream, problem_file);
-    parse_ast(problem_source, problem::problem(), problem_node);
+    parse_ast(problem_source, problem::problem(), problem_node, problem_error_handler);
     std::cout << parse_text(problem_node, FormattingOptions{0,4}) << std::endl;
     problem::Context problem_context(std::move(problem_error_stream), std::move(domain_context));
     pddl::Problem problem = parse(problem_node, problem_error_handler, problem_context, domain);

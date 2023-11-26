@@ -19,6 +19,7 @@
 
 #include "../../../domain/pddl/parser/common.hpp"
 #include "../../../domain/pddl/parser/types.hpp"
+#include "../../../../include/loki/problem/pddl/exceptions.hpp"
 
 using namespace loki::problem;
 using namespace std;
@@ -51,9 +52,13 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
         const auto name = parse(name_node);
-        const auto object = context.domain_context->cache.get_or_create<pddl::ObjectImpl>(name, types).object;
-        context.objects_by_name.emplace(name, object);
-        object_list.emplace_back(object);
+        if (context.domain_context->constants_by_name.count(name)) {
+            error_handler(name_node, "");
+            throw ObjectIsConstantError(name, context.error_stream->str());
+        }
+        const auto result = context.domain_context->cache.get_or_create<pddl::ObjectImpl>(name, types);
+        context.objects_by_name.emplace(name, result.object);
+        object_list.emplace_back(result.object);
     }
     // Recursively add objects.
     auto additional_objects = this->operator()(typed_list_of_names_recursively_node.typed_list_of_names);

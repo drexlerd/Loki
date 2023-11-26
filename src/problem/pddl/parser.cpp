@@ -2,11 +2,12 @@
 
 #include "parser/objects.hpp"
 
+#include "../../../include/loki/problem/pddl/exceptions.hpp"
+
 #include "../../domain/pddl/parser/common.hpp"
 #include "../../domain/pddl/parser/requirements.hpp"
 #include "../../../include/loki/domain/pddl/domain.hpp"
 #include "../../../include/loki/domain/pddl/requirements.hpp"
-#include "../../../include/loki/common/exceptions.hpp"
 
 
 namespace loki {

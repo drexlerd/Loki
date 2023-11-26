@@ -52,6 +52,7 @@ namespace loki::domain {
         // Requirements for testing
         pddl::Requirements requirements;
 
+        std::unordered_map<std::string, pddl::Type> types_by_name;
         std::unordered_map<std::string, pddl::Object> constants_by_name;
         std::unordered_map<std::string, pddl::Predicate> predicates_by_name;
         std::unordered_map<std::string, pddl::FunctionSkeleton> function_skeletons_by_name;
@@ -61,7 +62,7 @@ namespace loki::domain {
         // The variables that are defined in the current scope
         std::unordered_set<pddl::Variable> defined_variables;
 
-        // Ensure that base types are not deallocated by adding one to the reference count.
+        // For convenience
         pddl::Type base_type_object;
         pddl::Type base_type_number;
 
@@ -71,6 +72,8 @@ namespace loki::domain {
             // create base types.
             base_type_object = cache.get_or_create<pddl::TypeImpl>("object").object;
             base_type_number = cache.get_or_create<pddl::TypeImpl>("number").object;
+            types_by_name.emplace("object", base_type_object);
+            types_by_name.emplace("number", base_type_number);
         }
     };
 }

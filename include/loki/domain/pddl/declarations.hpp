@@ -25,6 +25,7 @@ namespace loki::pddl {
 
     class VariableImpl;
     using Variable = std::shared_ptr<const VariableImpl>;
+    using VariableList = std::vector<Variable>;
     using VariableAssignment = std::unordered_map<Variable, Object>;
 
     class TermImpl;
