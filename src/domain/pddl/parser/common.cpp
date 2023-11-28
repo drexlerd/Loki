@@ -44,12 +44,12 @@ TermVisitor::TermVisitor(const error_handler_type& error_handler_, domain::Conte
 
 pddl::Term TermVisitor::operator()(const domain::ast::Name& name_node) const {
     auto constant_name = parse(name_node);
-    auto result = context.cache.get_or_create<pddl::ObjectImpl>(constant_name);
-    if (result.created) {
+    auto it = context.constants_by_name.find(constant_name);
+    if (it == context.constants_by_name.end()) {
         error_handler(name_node, "");
         throw UndefinedConstantError(constant_name, context.error_stream->str());
     }
-    return context.cache.get_or_create<pddl::TermConstantImpl>(result.object).object;
+    return context.cache.get_or_create<pddl::TermConstantImpl>(it->second).object;
 }
 
 pddl::Term TermVisitor::operator()(const domain::ast::Variable& variable_node) const {

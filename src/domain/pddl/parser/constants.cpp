@@ -64,13 +64,9 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
         object_list.emplace_back(object);
     }
     // Recursively add objects.
-    auto additional_objects = this->operator()(typed_list_of_names_recursively_node.typed_list_of_names);
+    auto additional_objects = boost::apply_visitor(ConstantListVisitor(error_handler, context), typed_list_of_names_recursively_node.typed_list_of_names.get());
     object_list.insert(object_list.end(), additional_objects.begin(), additional_objects.end());
     return object_list;
-}
-
-pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNames& node) {
-    return boost::apply_visitor(*this, node);
 }
 
 

@@ -46,6 +46,13 @@ inline std::size_t hash_vector(const std::vector<T>& vector)
     return aggregated_hash;
 }
 
+template<typename T>
+struct hash_vector_type {
+    size_t operator()(const std::vector<T>& vector) const {
+        return hash_vector(vector);
+    }
+};
+
 template<class T>
 inline std::size_t hash_set(const std::set<T>& vector)
 {

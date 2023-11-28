@@ -16,8 +16,12 @@
  */
 
 #include "../../../include/loki/domain/pddl/domain.hpp"
+
+#include "../../../include/loki/domain/pddl/type.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
+
+#include <deque>
 
 using namespace std;
 
@@ -61,6 +65,21 @@ void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& optio
     if (!m_requirements->get_requirements().empty()) {
         out << string(nested_options.indent, ' ') << m_requirements->str() << "\n";
     }
+    out << string(nested_options.indent, ' ') << "(:types ";
+    std::unordered_map<std::vector<pddl::Type>, std::vector<pddl::Type>, hash_vector_type<pddl::Type>> subtypes_by_parent_types;
+    for (const auto& type : m_types) {
+        subtypes_by_parent_types[type->get_bases()].push_back(type);
+    }
+    size_t i = 0;
+    for (const auto& pair : subtypes_by_parent_types) {
+        if (i != 0) out << "\n" << string(nested_options.indent, ' ');
+        for (const auto& subtype : pair.second) {
+            //out <<
+        }
+        out << "\n";
+        ++i;
+    }
+    out << ")\n";
 
     /*
     if (node.types.has_value()) {
