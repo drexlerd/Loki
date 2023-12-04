@@ -21,10 +21,17 @@
 
 #include "../../common/factory.hpp"
 
+#include <deque>
 #include <unordered_set>
 
 
 namespace loki::domain {
+    /// @brief Contains scoped bindings
+    struct Scope {
+        std::unordered_map<std::string, pddl::Variable> variables;
+    };
+
+
     struct Context {
         std::unique_ptr<std::ostringstream> error_stream;
 
@@ -61,6 +68,9 @@ namespace loki::domain {
         bool require_defined_variables;
         // The variables that are defined in the current scope
         std::unordered_set<pddl::Variable> defined_variables;
+
+        // Nested variable bindings
+        std::deque<Scope> scopes;
 
         // For convenience
         pddl::Type base_type_object;
