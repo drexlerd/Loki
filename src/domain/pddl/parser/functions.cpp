@@ -38,7 +38,9 @@ pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const domain:
             error_handler(atomic_function_skeleton.function_symbol.name, "");
             throw MultiDefinitionFunctionSkeletonError(function_name, context.error_stream->str());
         }
+        context.open_scope();
         auto function_parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context), atomic_function_skeleton.arguments);
+        context.close_scope();
         auto function_skeleton = context.cache.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, function_type);
         context.scopes.back()->insert<pddl::FunctionSkeletonImpl>(function_name, function_skeleton);
         function_skeleton_list.push_back(function_skeleton);
