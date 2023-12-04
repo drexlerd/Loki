@@ -22,6 +22,16 @@ public:
         const std::string& error_handler_output);
 };
 
+class UndefinedObjectError : public SemanticParserError {
+public:
+    UndefinedObjectError(const std::string& name, const std::string& error_handler_output);
+};
+
+class MultiDefinitionObjectError : public SemanticParserError {
+public:
+    MultiDefinitionObjectError(const std::string& name, const std::string& error_handler_output);
+};
+
 
 }
 

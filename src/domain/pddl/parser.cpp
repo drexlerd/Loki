@@ -53,8 +53,7 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
     } else {
         // Default requirements
         context.requirements = context.cache.get_or_create<pddl::RequirementsImpl>(
-            pddl::RequirementEnumSet{pddl::RequirementEnum::STRIPS}
-        ).object;
+            pddl::RequirementEnumSet{pddl::RequirementEnum::STRIPS});
     }
     /* Types section */
     pddl::TypeList types;
@@ -88,7 +87,7 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
         auto variant = boost::apply_visitor(StructureVisitor(error_handler, context), structure_node);
         boost::apply_visitor(UnpackingVisitor(error_handler, context, action_list, derived_predicate_list), variant);
     }
-    return context.cache.get_or_create<pddl::DomainImpl>(domain_name, context.requirements, types, constants, predicates).object;
+    return context.cache.get_or_create<pddl::DomainImpl>(domain_name, context.requirements, types, constants, predicates);
 }
 
 }

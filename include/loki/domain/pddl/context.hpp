@@ -20,6 +20,8 @@
 #include "variable.hpp"
 
 #include "../../common/factory.hpp"
+#include "../../common/cache.hpp"
+#include "../../common/pddl/scope.hpp"
 
 #include <cassert>
 #include <deque>
@@ -31,68 +33,11 @@
 
 
 namespace loki::domain {
-    template<typename... Ts>
-    class Bindings {
-        private:
-            std::tuple<std::unordered_map<std::string, std::shared_ptr<const Ts>>...> bindings;
-
-        public:
-            /// @brief Gets a binding of type T. Returns nullptr if it does not exist.
-            template<typename T> 
-            std::shared_ptr<const T> get(const std::string& key) const {
-                const auto& t_bindings = std::get<T>(bindings);
-                auto it = t_bindings.find(key);
-                if (it != t_bindings.end()) {
-                    return it->second;
-                }
-                return nullptr;
-            }
-
-            /// @brief Inserts a binding of type T
-            template<typename T>
-            void insert(const std::string& key, std::shared_ptr<const T> binding) {
-                auto& t_bindings = std::get<T>(bindings);
-                assert(!t_bindings.count(key));
-                t_bindings.emplace(key, binding);
-            }
-    };
-
-    /// @brief Contains scoped bindings
-    class Scope {
-        private:
-            std::shared_ptr<const Scope> m_parent_scope;
-
-            Bindings<pddl::TypeImpl
-                , pddl::ObjectImpl
-                , pddl::PredicateImpl 
-                , pddl::FunctionSkeletonImpl
-                , pddl::VariableImpl> bindings;
-
-        public:
-            explicit Scope(std::shared_ptr<const Scope> parent_scope = nullptr) 
-                : m_parent_scope(parent_scope) { }
-
-            /// @brief Resolves the name. Returns nullptr if the name could not be resolved.
-            template<typename T>
-            std::shared_ptr<const T> get(const std::string& name) const {
-                auto result = bindings.get<T>(name);
-                if (result) return result;
-                if (m_parent_scope) return this->get<T>(name);
-                return nullptr;
-            }
-
-            /// @brief Insert binding of type T.
-            template<typename T>
-            void insert(const std::string& name, std::shared_ptr<const T> binding) {
-                assert(!this->get<T>(name));
-                bindings.insert<T>(name, binding);
-            }
-    };
-
-
     struct Context {
+        // For retrieving error messages of the x3 error handler.
         std::unique_ptr<std::ostringstream> error_stream;
 
+        // For unique creation
         ReferenceCountedObjectFactory<pddl::RequirementsImpl
             , pddl::TypeImpl
             , pddl::VariableImpl
@@ -115,24 +60,48 @@ namespace loki::domain {
             , pddl::DerivedPredicateImpl
             , pddl::DomainImpl> cache;
 
-        std::deque<std::shared_ptr<Scope>> scopes;   
+        // Track scopes during parsing
+        std::shared_ptr<Scope> global_scope;
+        std::deque<std::shared_ptr<Scope>> scopes; 
 
-        // Singletons for convenience.
+        // For convenience.
         pddl::Requirements requirements;
         pddl::Type base_type_object;
         pddl::Type base_type_number;
+        pddl::Predicate equal_predicate;
 
         Context(std::unique_ptr<std::ostringstream>&& error_stream_)
             : error_stream(std::move(error_stream_)) {
             // Initialize the global scope
-            auto global_scope = std::make_shared<Scope>(nullptr);
+            global_scope = std::make_shared<Scope>(nullptr);
             scopes.push_back(global_scope);
 
             // create base types.
-            base_type_object = cache.get_or_create<pddl::TypeImpl>("object").object;
-            base_type_number = cache.get_or_create<pddl::TypeImpl>("number").object;
+            base_type_object = cache.get_or_create<pddl::TypeImpl>("object");
+            base_type_number = cache.get_or_create<pddl::TypeImpl>("number");
             global_scope->insert("object", base_type_object);
             global_scope->insert("number", base_type_number);
+
+            // add equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
+            auto binary_parameterlist = pddl::ParameterList{
+                cache.get_or_create<pddl::ParameterImpl>(
+                    cache.get_or_create<pddl::VariableImpl>("?left_arg"),
+                    pddl::TypeList{base_type_object}),
+                cache.get_or_create<pddl::ParameterImpl>(
+                    cache.get_or_create<pddl::VariableImpl>("?right_arg"),
+                    pddl::TypeList{base_type_object})
+
+            };
+            equal_predicate = cache.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist);
+                global_scope->insert<pddl::PredicateImpl>("=", equal_predicate);
+        }
+
+        void open_scope() {
+            scopes.push_back(std::make_shared<Scope>(scopes.back()));
+        }
+
+        void close_scope() {
+            scopes.pop_back();
         }
     };
 }

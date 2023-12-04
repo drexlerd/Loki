@@ -119,7 +119,7 @@ pddl::Requirements parse(const ast::Requirements& requirements_node, const error
         auto additional_requirements = parse(requirement);
         requirements.insert(additional_requirements.begin(), additional_requirements.end());
     }
-    return context.cache.get_or_create<pddl::RequirementsImpl>(requirements).object;
+    return context.cache.get_or_create<pddl::RequirementsImpl>(requirements);
 }
 
 }

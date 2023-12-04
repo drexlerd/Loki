@@ -41,7 +41,7 @@ pddl::Effect parse(const domain::ast::Effect& node, const error_handler_type& er
 
 pddl::Effect parse(const domain::ast::EffectProductionLiteral& node, const error_handler_type& error_handler, domain::Context& context) {
     auto literal = parse(node.literal, error_handler, context);
-    return context.cache.get_or_create<pddl::EffectLiteralImpl>(literal).object;
+    return context.cache.get_or_create<pddl::EffectLiteralImpl>(literal);
 }
 
 pddl::Effect parse(const domain::ast::EffectProductionNumericFluent& node, const error_handler_type& error_handler, domain::Context& context) {
@@ -86,7 +86,7 @@ pddl::Effect EffectVisitor::operator()(const std::vector<domain::ast::Effect>& e
     for (const auto& effect_node : effect_nodes) {
         effect_list.push_back(parse(effect_node, error_handler, context));
     }
-    return context.cache.get_or_create<pddl::EffectAndImpl>(effect_list).object;
+    return context.cache.get_or_create<pddl::EffectAndImpl>(effect_list);
 }
 
 pddl::Effect EffectVisitor::operator()(const domain::ast::EffectConditional& effect_node) const {

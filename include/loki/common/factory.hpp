@@ -1,5 +1,5 @@
-#ifndef LOKI_INCLUDE_LOKI_COMMON_CACHE_HPP_
-#define LOKI_INCLUDE_LOKI_COMMON_CACHE_HPP_
+#ifndef LOKI_INCLUDE_LOKI_COMMON_FACTORY_HPP_
+#define LOKI_INCLUDE_LOKI_COMMON_FACTORY_HPP_
 
 #include <unordered_map>
 #include <memory>
@@ -31,19 +31,13 @@ public:
     ReferenceCountedObjectFactory()
         : m_cache((std::make_shared<PerTypeCache<Ts>>())...) { }
 
-    template<typename T>
-    struct GetOrCreateResult {
-        std::shared_ptr<const T> object;
-        bool created;
-    };
-
     /// @brief Gets a shared reference to the object of type T with the given arguments.
     ///        If such an object does not exists then it creates one.
     /// @tparam ...Args The arguments that are passed to the constructor of T.
     /// @param ...args
     /// @return
     template<typename T, typename... Args>
-    GetOrCreateResult<T> get_or_create(Args&&... args) {
+    std::shared_ptr<const T> get_or_create(Args&&... args) {
         auto& t_cache = std::get<std::shared_ptr<PerTypeCache<T>>>(m_cache);
         /* Must explicitly call the constructor of T to give exclusive access to the factory. */
         auto element = std::make_unique<T>(T(m_count, args...));
@@ -53,10 +47,8 @@ public:
         auto& cached = t_cache->data[*element];
         sp = cached.lock();
         // std::lock_guard<std::mutex> hold(t_cache->mutex);
-        bool new_insertion = false;
         if (!sp) {
             ++m_count;
-            new_insertion = true;
             cached = sp = std::shared_ptr<T>(
                 element.get(),
                 [parent=t_cache, original_deleter=element.get_deleter()](T* x)
@@ -73,7 +65,7 @@ public:
             element.release();
         }
 
-        return GetOrCreateResult<T>{sp, new_insertion};
+        return sp;
     }
 };
 

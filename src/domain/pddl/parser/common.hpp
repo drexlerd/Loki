@@ -15,21 +15,28 @@ extern std::string parse(const domain::ast::Name& name_node);
 extern pddl::Variable parse(const domain::ast::Variable& variable_node, const error_handler_type& error_handler, domain::Context& context);
 
 /* Term */
-struct TermVisitor : boost::static_visitor<pddl::Term> {
+struct TermDeclarationVisitor : boost::static_visitor<pddl::Term> {
     const error_handler_type& error_handler;
     domain::Context& context;
-    mutable std::unordered_set<pddl::Variable> defined_variables;
 
-    TermVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+    TermDeclarationVisitor(const error_handler_type& error_handler_, domain::Context& context_);
 
     pddl::Term operator()(const domain::ast::Name& name_node) const;
     pddl::Term operator()(const domain::ast::Variable& variable_node) const;
     pddl::Term operator()(const domain::ast::FunctionTerm& function_term_node) const;
 };
 
-extern pddl::Term parse(const domain::ast::Term& term_node, const error_handler_type& error_handler, domain::Context& context);
+struct TermReferenceVisitor : boost::static_visitor<pddl::Term> {
+    const error_handler_type& error_handler;
+    domain::Context& context;
 
-extern pddl::TermList parse(const std::vector<domain::ast::Term>& term_list, const error_handler_type& error_handler, domain::Context& context);
+    TermReferenceVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+
+    pddl::Term operator()(const domain::ast::Name& name_node) const;
+    pddl::Term operator()(const domain::ast::Variable& variable_node) const;
+    pddl::Term operator()(const domain::ast::FunctionTerm& function_term_node) const;
+};
+
 
 /* Number */
 extern double parse(const domain::ast::Number& number_node);

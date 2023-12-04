@@ -21,4 +21,14 @@ MismatchedDomainError::MismatchedDomainError(
             + ".",
         error_handler_output) { }
 
+
+UndefinedObjectError::UndefinedObjectError(const std::string& name, const std::string& error_handler_output)
+    : SemanticParserError(
+        "The object with name \"" + name + "\" is undefined.", error_handler_output) { }
+
+MultiDefinitionObjectError::MultiDefinitionObjectError(const std::string& name, const std::string& error_handler_output)
+    : SemanticParserError(
+        "The object with name \"" + name + "\" has already been defined.", error_handler_output) { }
+
+
 }

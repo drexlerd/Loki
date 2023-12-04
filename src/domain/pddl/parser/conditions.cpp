@@ -21,7 +21,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptor& node, const error_handl
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorAtom& node, const error_handler_type& error_handler, domain::Context& context) {
-    return context.cache.get_or_create<pddl::ConditionLiteralImpl>(parse(node.atom, error_handler, context)).object;
+    return context.cache.get_or_create<pddl::ConditionLiteralImpl>(parse(node.atom, error_handler, context));
 }
 pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, const error_handler_type& error_handler, domain::Context& context) {
     // requires :negative-preconditions
@@ -29,12 +29,12 @@ pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, const erro
         error_handler(node, "");
         throw UndefinedRequirementError(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS, context.error_stream->str());
     }
-    return context.cache.get_or_create<pddl::ConditionLiteralImpl>(parse(node.literal, error_handler, context)).object;
+    return context.cache.get_or_create<pddl::ConditionLiteralImpl>(parse(node.literal, error_handler, context));
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorAnd& node, const error_handler_type& error_handler, domain::Context& context) {
     pddl::ConditionList condition_list = parse(node.goal_descriptors, error_handler, context);
-    return context.cache.get_or_create<pddl::ConditionAndImpl>(condition_list).object;
+    return context.cache.get_or_create<pddl::ConditionAndImpl>(condition_list);
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, const error_handler_type& error_handler, domain::Context& context) {
@@ -44,7 +44,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, const error_han
         throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.error_stream->str());
     }
     pddl::ConditionList condition_list = parse(node.goal_descriptors, error_handler, context);
-    return context.cache.get_or_create<pddl::ConditionOrImpl>(condition_list).object;
+    return context.cache.get_or_create<pddl::ConditionOrImpl>(condition_list);
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorNot& node, const error_handler_type& error_handler, domain::Context& context) {
@@ -54,7 +54,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorNot& node, const error_ha
         throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.error_stream->str());
     }
     pddl::Condition condition = parse(node.goal_descriptor, error_handler, context);
-    return context.cache.get_or_create<pddl::ConditionNotImpl>(condition).object;
+    return context.cache.get_or_create<pddl::ConditionNotImpl>(condition);
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorImply& node, const error_handler_type& error_handler, domain::Context& context) {
@@ -83,7 +83,7 @@ pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAnd& node, cons
     for (const auto& child_node : node.constraint_goal_descriptors) {
         condition_list.push_back(parse(child_node, error_handler, context));
     }
-    return context.cache.get_or_create<pddl::ConditionAndImpl>(condition_list).object;
+    return context.cache.get_or_create<pddl::ConditionAndImpl>(condition_list);
 }
 
 pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorForall& node, const error_handler_type& error_handler, domain::Context& context) {
@@ -144,7 +144,7 @@ pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorAnd& node, co
     for (const auto& child_node : node.precondition_goal_descriptors) {
         condition_list.push_back(parse(child_node, error_handler, context));
     }
-    return context.cache.get_or_create<pddl::ConditionAndImpl>(condition_list).object;
+    return context.cache.get_or_create<pddl::ConditionAndImpl>(condition_list);
 }
 
 pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorPreference& node, const error_handler_type& error_handler, domain::Context& context) {

@@ -30,30 +30,17 @@ pddl::PredicateList parse(const ast::Predicates& predicates_node, const error_ha
     pddl::PredicateList predicate_list;
     for (const auto& atomic_formula_skeleton : predicates_node.atomic_formula_skeletons) {
         const auto name = parse(atomic_formula_skeleton.predicate.name);
-        if (context.constants_by_name.count(name)) {
+        if (context.scopes.back()->get<pddl::PredicateImpl>(name)) {
             error_handler(atomic_formula_skeleton.predicate, "");
             throw MultiDefinitionPredicateError(name, context.error_stream->str());
         }
+        context.open_scope();
         const auto parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context),
                                                      atomic_formula_skeleton.typed_list_of_variables);
-        const auto predicate = context.cache.get_or_create<pddl::PredicateImpl>(name, parameters).object;
-        context.predicates_by_name.emplace(name, predicate);
+        context.close_scope();
+        const auto predicate = context.cache.get_or_create<pddl::PredicateImpl>(name, parameters);
+        context.scopes.back()->insert<pddl::PredicateImpl>(name, predicate);
         predicate_list.emplace_back(predicate);
-    }
-    if (context.requirements->test(pddl::RequirementEnum::EQUALITY)) {
-        // add equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
-        auto binary_parameterlist = pddl::ParameterList{
-            context.cache.get_or_create<pddl::ParameterImpl>(
-                context.cache.get_or_create<pddl::VariableImpl>("?left_arg").object,
-                pddl::TypeList{context.base_type_object}).object,
-            context.cache.get_or_create<pddl::ParameterImpl>(
-                context.cache.get_or_create<pddl::VariableImpl>("?right_arg").object,
-                pddl::TypeList{context.base_type_object}).object
-
-        };
-        auto equal_predicate = context.cache.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist).object;
-        context.predicates_by_name.emplace("=", equal_predicate);
-        predicate_list.emplace_back(equal_predicate);
     }
     return predicate_list;
 }

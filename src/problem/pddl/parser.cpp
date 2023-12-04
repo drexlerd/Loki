@@ -27,14 +27,13 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, const error_handl
     } else {
         // Default requirements
         context.requirements = context.domain_context->cache.get_or_create<pddl::RequirementsImpl>(
-            pddl::RequirementEnumSet{pddl::RequirementEnum::STRIPS}
-        ).object;
+            pddl::RequirementEnumSet{pddl::RequirementEnum::STRIPS});
     }
     pddl::ObjectList objects;
     if (problem_node.objects.has_value()) {
         objects = parse(problem_node.objects.value(), error_handler, context);
     }
-    return context.cache.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects).object;
+    return context.cache.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects);
 }
 
 }

@@ -36,11 +36,11 @@ pddl::TypeList TypeDeclarationVisitor::operator()(const ast::Type& type_node) {
 
 pddl::TypeList TypeDeclarationVisitor::operator()(const ast::Name& name_node) {
     auto name = parse(name_node);
-    return { context.cache.get_or_create<pddl::TypeImpl>(name).object };
+    return { context.cache.get_or_create<pddl::TypeImpl>(name) };
 }
 
 pddl::TypeList TypeDeclarationVisitor::operator()(const ast::TypeObject&) {
-    return { context.cache.get_or_create<pddl::TypeImpl>("object").object };
+    return { context.cache.get_or_create<pddl::TypeImpl>("object") };
 }
 
 pddl::TypeList TypeDeclarationVisitor::operator()(const ast::TypeEither& either_type_node) {
@@ -65,17 +65,16 @@ pddl::TypeList TypeReferenceVisitor::operator()(const ast::Type& type_node) {
 
 pddl::TypeList TypeReferenceVisitor::operator()(const ast::Name& name_node) {
     auto name = parse(name_node);
-    auto it = context.types_by_name.find(name);
-    if (it == context.types_by_name.end()) {
+    auto type = context.scopes.back()->get<pddl::TypeImpl>(name);
+    if (!type) {
         error_handler(name_node, "");
         throw UndefinedTypeError(name, context.error_stream->str());
     }
-    return { it->second };
+    return { type };
 }
 
 pddl::TypeList TypeReferenceVisitor::operator()(const ast::TypeObject&) {
-    assert(!context.cache.get_or_create<pddl::TypeImpl>("object").created);
-    return { context.cache.get_or_create<pddl::TypeImpl>("object").object };
+    return { context.cache.get_or_create<pddl::TypeImpl>("object") };
 }
 
 pddl::TypeList TypeReferenceVisitor::operator()(const ast::TypeEither& either_type_node) {
@@ -97,17 +96,16 @@ TypeListVisitor::TypeListVisitor(const error_handler_type& error_handler_, Conte
 pddl::TypeList TypeListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::TypeList type_list;
-    assert(!context.cache.get_or_create<pddl::TypeImpl>("object").created);
-    const auto base_type = context.cache.get_or_create<pddl::TypeImpl>("object").object;
+    const auto base_type = context.cache.get_or_create<pddl::TypeImpl>("object");
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
-        if (context.types_by_name.count(name)) {
+        if (context.scopes.back()->get<pddl::TypeImpl>(name)) {
             error_handler(name_node, "");
             throw MultiDefinitionTypeError(name, context.error_stream->str());
         }
-        const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, pddl::TypeList{base_type}).object;
+        const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, pddl::TypeList{base_type});
         type_list.push_back(type);
-        context.types_by_name.emplace(name, type);
+        context.scopes.back()->insert<pddl::TypeImpl>(name, type);
     }
     return type_list;
 }
@@ -129,13 +127,13 @@ pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNamesRecursivel
             error_handler(name_node, "");
             throw SemanticParserError("Unexpected type name \"number\". It is a reserved type name.", context.error_stream->str());
         }
-        if (context.types_by_name.count(name)) {
+        if (context.scopes.back()->get<pddl::TypeImpl>(name)) {
             error_handler(name_node, "");
             throw MultiDefinitionTypeError(name, context.error_stream->str());
         }
-        const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, types).object;
+        const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, types);
         type_list.push_back(type);
-        context.types_by_name.emplace(name, type);
+        context.scopes.back()->insert<pddl::TypeImpl>(name, type);
     }
     // Recursively add types.
     auto additional_types = this->operator()(typed_list_of_names_recursively_node.typed_list_of_names);

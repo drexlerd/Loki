@@ -20,8 +20,11 @@
 #include "common.hpp"
 #include "types.hpp"
 
+#include "../../../../include/loki/domain/pddl/exceptions.hpp"
+
 using namespace loki::domain;
 using namespace std;
+
 
 namespace loki {
 
@@ -31,11 +34,15 @@ ParameterListVisitor::ParameterListVisitor(const error_handler_type& error_handl
 pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>& variable_nodes) {
     // A visited vector of variable has single base type "object"
     pddl::ParameterList parameter_list;
-    assert(!context.cache.get_or_create<pddl::TypeImpl>("object").created);
-    const auto type = context.cache.get_or_create<pddl::TypeImpl>("object").object;
+    const auto type = context.cache.get_or_create<pddl::TypeImpl>("object");
     for (const auto& variable_node : variable_nodes) {
-        const auto name = parse(variable_node, error_handler, context);
-        const auto parameter = context.cache.get_or_create<pddl::ParameterImpl>(name, pddl::TypeList{type}).object;
+        const auto variable = parse(variable_node, error_handler, context);
+        if (context.scopes.back()->get<pddl::VariableImpl>(variable->get_name())) {
+            error_handler(variable_node, "");
+            throw MultiDefinitionVariableError(variable->get_name(), context.error_stream->str());
+        }
+        context.scopes.back()->insert(variable->get_name(), variable);
+        const auto parameter = context.cache.get_or_create<pddl::ParameterImpl>(variable, pddl::TypeList{type});
         parameter_list.emplace_back(parameter);
     }
     return parameter_list;
@@ -47,8 +54,13 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
                                             typed_variables_node.type);
     // A non-visited vector of variables has user defined types
     for (const auto& variable_node : typed_variables_node.variables) {
-        const auto name = parse(variable_node, error_handler, context);
-        const auto parameter = context.cache.get_or_create<pddl::ParameterImpl>(name, types).object;
+        const auto variable = parse(variable_node, error_handler, context);
+        if (context.scopes.back()->get<pddl::VariableImpl>(variable->get_name())) {
+            error_handler(variable_node, "");
+            throw MultiDefinitionVariableError(variable->get_name(), context.error_stream->str());
+        }
+        context.scopes.back()->insert(variable->get_name(), variable);
+        const auto parameter = context.cache.get_or_create<pddl::ParameterImpl>(variable, types);
         parameter_list.emplace_back(parameter);
     }
     // Recursively add parameters.

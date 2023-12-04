@@ -9,6 +9,8 @@
 
 #include "../../common/ast/config.hpp"
 #include "../../common/factory.hpp"
+#include "../../common/cache.hpp"
+#include "../../common/pddl/scope.hpp"
 
 
 namespace loki::problem {
@@ -20,19 +22,25 @@ namespace loki::problem {
         ReferenceCountedObjectFactory<pddl::GroundAtomImpl
             , pddl::ProblemImpl> cache;
 
-        // Requirements for testing
-        pddl::Requirements requirements;
+        // Track scopes during parsing
+        std::shared_ptr<Scope> global_scope;
+        std::deque<std::shared_ptr<Scope>> scopes; 
 
-        std::unordered_map<std::string, pddl::Object> objects_by_name;
+        // For convenience.
+        pddl::Requirements requirements;
 
         Context(std::unique_ptr<std::ostringstream>&& error_stream_,
             std::unique_ptr<domain::Context>&& domain_context_)
             : error_stream(std::move(error_stream_)),
               domain_context(std::move(domain_context_)) {
+            // Initialize the global scope
+            global_scope = std::make_shared<Scope>(nullptr);
+            scopes.push_back(global_scope);
+
             // Make constants referenceable in the problem definition
-            for (const auto& pair : domain_context->constants_by_name) {
-                objects_by_name.insert(pair);
-            }
+            //for (const auto& pair : domain_context->global_scope->get<pddl::ObjectImpl>()) {
+            //    global_scope->insert(pair.first, pair.second);
+            //}
         }
     };
 }

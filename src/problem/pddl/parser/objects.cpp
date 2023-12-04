@@ -34,12 +34,19 @@ ObjectListVisitor::ObjectListVisitor(const error_handler_type& error_handler_, C
 pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::ObjectList object_list;
-    assert(!context.domain_context->cache.get_or_create<pddl::TypeImpl>("object").created);
-    const auto type = context.domain_context->cache.get_or_create<pddl::TypeImpl>("object").object;
+    const auto type = context.domain_context->cache.get_or_create<pddl::TypeImpl>("object");
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
-        const auto object = context.domain_context->cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type}).object;
-        context.objects_by_name.emplace(name, object);
+        if (context.domain_context->global_scope->get<pddl::ObjectImpl>(name)) {
+            error_handler(name_node, "");
+            throw ObjectIsConstantError(name, context.error_stream->str());
+        }
+        else if (context.global_scope->get<pddl::ObjectImpl>(name)) {
+            error_handler(name_node, "");
+            throw MultiDefinitionObjectError(name, context.error_stream->str());
+        }
+        const auto object = context.domain_context->cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type});
+        context.global_scope->insert<pddl::ObjectImpl>(name, object);
         object_list.emplace_back(object);
     }
     return object_list;
@@ -52,13 +59,17 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
         const auto name = parse(name_node);
-        if (context.domain_context->constants_by_name.count(name)) {
+        if (context.domain_context->global_scope->get<pddl::ObjectImpl>(name)) {
             error_handler(name_node, "");
             throw ObjectIsConstantError(name, context.error_stream->str());
         }
-        const auto result = context.domain_context->cache.get_or_create<pddl::ObjectImpl>(name, types);
-        context.objects_by_name.emplace(name, result.object);
-        object_list.emplace_back(result.object);
+        else if (context.global_scope->get<pddl::ObjectImpl>(name)) {
+            error_handler(name_node, "");
+            throw MultiDefinitionObjectError(name, context.error_stream->str());
+        }
+        const auto object = context.domain_context->cache.get_or_create<pddl::ObjectImpl>(name, types);
+        context.global_scope->insert<pddl::ObjectImpl>(name, object);
+        object_list.emplace_back(object);
     }
     // Recursively add objects.
     auto additional_objects = this->operator()(typed_list_of_names_recursively_node.typed_list_of_names);
