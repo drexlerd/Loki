@@ -40,13 +40,13 @@ class Bindings {
         using KeyType = std::string;
 
         template<typename T>
-        using BindingType = std::shared_ptr<const T>;
+        using BindingPtrType = std::shared_ptr<const T>;
 
         using PositionType = boost::spirit::x3::position_tagged;
 
         template<typename T>
         struct ValueType {
-            BindingType<T> binding;
+            BindingPtrType<T> binding;
             std::optional<PositionType> position;
         };
 
@@ -55,13 +55,13 @@ class Bindings {
 
         /// @brief Gets a binding of type T. Returns nullptr if it does not exist.
         template<typename T> 
-        ValueType<T> get(const KeyType& key) const {
+        std::optional<ValueType<T>> get(const KeyType& key) const {
             const auto& t_bindings = std::get<MapType<T>>(bindings);
             auto it = t_bindings.find(key);
             if (it != t_bindings.end()) {
                 return it->second;
             }
-            return ValueType<T>();
+            return std::optional<ValueType<T>>();
         }
 
         /// @brief Gets all bindings of type T.
@@ -72,7 +72,8 @@ class Bindings {
 
         /// @brief Inserts a binding of type T
         template<typename T>
-        void insert(const KeyType& key, const BindingType<T>& binding, const std::optional<PositionType>& position = std::optional<PositionType>()) {
+        void insert(const KeyType& key, const BindingPtrType<T>& binding, const std::optional<PositionType>& position = std::optional<PositionType>()) {
+            assert(binding);
             auto& t_bindings = std::get<MapType<T>>(bindings);
             assert(!t_bindings.count(key));
             t_bindings.emplace(key, ValueType<T>{binding, position});
@@ -116,11 +117,11 @@ class Scope {
 
         /// @brief Returns the binding or nullptr if name resolution fails.
         template<typename T>
-        ValueType<T> get(const KeyType& name) const {
+        std::optional<ValueType<T>> get(const KeyType& name) const {
             auto result = bindings.get<T>(name);
-            if (result) return result;
+            if (result.has_value()) return result;
             if (m_parent_scope) return m_parent_scope->get<T>(name);
-            return nullptr;  // indicates failure of name resolution.
+            return result;
         }
 
         /// @brief Returns all bindings of type T defined in the scope includings its parent scopes.
@@ -136,7 +137,11 @@ class Scope {
 
         /// @brief Insert binding of type T.
         template<typename T>
-        void insert(const KeyType& name, const BindingType<T>& binding, const std::optional<PositionType>& position = std::optional<PositionType>()) {
+        void insert(
+            const KeyType& name, 
+            const BindingType<T>& binding, 
+            const std::optional<PositionType>& position = std::optional<PositionType>()) {
+            assert(binding);
             assert(!this->get<T>(name));
             bindings.insert<T>(name, binding, position);
         }
