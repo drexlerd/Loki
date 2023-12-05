@@ -58,7 +58,7 @@ class Bindings {
         std::tuple<MapType<Ts>...> bindings;
 
     public:
-        /// @brief Gets a binding of type T. Returns nullptr if it does not exist.
+        /// @brief Returns an existing binding.
         template<typename T>
         std::optional<ValueType<T>> get(const std::string& key) const;
 
@@ -95,7 +95,7 @@ class Scope {
         explicit Scope(std::shared_ptr<const Scope> parent_scope = nullptr)
             : m_parent_scope(parent_scope) { }
 
-        /// @brief Returns the binding or nullptr if name resolution fails.
+        /// @brief Returns a existing binding.
         template<typename T>
         std::optional<ValueType<T>> get(const std::string& name) const;
 
