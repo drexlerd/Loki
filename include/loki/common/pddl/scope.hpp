@@ -31,6 +31,8 @@
 
 
 namespace loki {
+// TODO: add boost::spirit::x3::position_tagged to binding
+// to print the location of previous definition.
 template<typename... Ts>
 class Bindings {
     private:
