@@ -40,7 +40,7 @@ namespace loki::problem {
 
         // Track scopes during parsing
         std::shared_ptr<Scope> global_scope;
-        std::deque<std::shared_ptr<Scope>> scopes; 
+        std::deque<std::shared_ptr<Scope>> scopes;
 
         // For convenience.
         pddl::Requirements requirements;
@@ -55,7 +55,7 @@ namespace loki::problem {
 
             // Make constants referenceable in the problem definition
             for (const auto& pair : domain_context->global_scope->get<pddl::ObjectImpl>()) {
-                global_scope->insert(pair.first, pair.second.binding);
+                global_scope->insert(pair.first, pair.second.object);
             }
         }
 

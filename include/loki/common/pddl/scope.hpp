@@ -34,119 +34,82 @@
 
 
 namespace loki {
+class Scope;
+
+template<typename T>
+using BindingPtrType = std::shared_ptr<const T>;
+
+using PositionType = boost::spirit::x3::position_tagged;
+
+template<typename T>
+struct ValueType {
+    BindingPtrType<T> object;
+    std::optional<PositionType> position;
+};
+
+template<typename T>
+using MapType = std::unordered_map<std::string, ValueType<T>>;
+
+
+/// @brief Encapsulates bindings for different types.
 template<typename... Ts>
 class Bindings {
+    private:
+        std::tuple<MapType<Ts>...> bindings;
+
     public:
-        using KeyType = std::string;
-
-        template<typename T>
-        using BindingPtrType = std::shared_ptr<const T>;
-
-        using PositionType = boost::spirit::x3::position_tagged;
-
-        template<typename T>
-        struct ValueType {
-            BindingPtrType<T> binding;
-            std::optional<PositionType> position;
-        };
-
-        template<typename T>
-        using MapType = std::unordered_map<KeyType, ValueType<T>>;
-
         /// @brief Gets a binding of type T. Returns nullptr if it does not exist.
-        template<typename T> 
-        std::optional<ValueType<T>> get(const KeyType& key) const {
-            const auto& t_bindings = std::get<MapType<T>>(bindings);
-            auto it = t_bindings.find(key);
-            if (it != t_bindings.end()) {
-                return it->second;
-            }
-            return std::optional<ValueType<T>>();
-        }
+        template<typename T>
+        std::optional<ValueType<T>> get(const std::string& key) const;
+
+        /// @brief Returns all bindings of type T defined in the scope includings its parent scopes.
+        template<typename T>
+        std::optional<ValueType<T>> getWithParent(const std::string& key, const Scope* parent_scope) const;
 
         /// @brief Gets all bindings of type T.
         template<typename T>
-        const MapType<T>& get() const {
-            return std::get<MapType<T>>(bindings);
-        }
+        const MapType<T>& get() const;
+
+        /// @brief Returns all bindings of type T defined in the scope includings its parent scopes.
+        template<typename T>
+        MapType<T> getWithParent(const Scope* parent_scope) const;
 
         /// @brief Inserts a binding of type T
         template<typename T>
-        void insert(const KeyType& key, const BindingPtrType<T>& binding, const std::optional<PositionType>& position = std::optional<PositionType>()) {
-            assert(binding);
-            auto& t_bindings = std::get<MapType<T>>(bindings);
-            assert(!t_bindings.count(key));
-            t_bindings.emplace(key, ValueType<T>{binding, position});
-        }
-
-    private:
-        std::tuple<MapType<Ts>...> bindings;
+        void insert(const std::string& key, const BindingPtrType<T>& binding, const std::optional<PositionType>& position);
 };
 
 
-/// @brief Contains scoped bindings
+/// @brief Wraps bindings in a scope with reference to a parent scope.
 class Scope {
     private:
-        using KeyType = std::string;
-
-        template<typename T>
-        using BindingType = std::shared_ptr<const T>;
-
-        using PositionType = boost::spirit::x3::position_tagged;
-
-        template<typename T>
-        struct ValueType {
-            BindingType<T> binding;
-            PositionType position;
-        };
-
-        template<typename T>
-        using MapType = std::unordered_map<KeyType, ValueType<T>>;
-
         std::shared_ptr<const Scope> m_parent_scope;
 
         Bindings<pddl::TypeImpl
             , pddl::ObjectImpl
-            , pddl::PredicateImpl 
+            , pddl::PredicateImpl
             , pddl::FunctionSkeletonImpl
-            , pddl::VariableImpl> bindings;            
+            , pddl::VariableImpl> bindings;
 
     public:
-        explicit Scope(std::shared_ptr<const Scope> parent_scope = nullptr) 
+        explicit Scope(std::shared_ptr<const Scope> parent_scope = nullptr)
             : m_parent_scope(parent_scope) { }
 
         /// @brief Returns the binding or nullptr if name resolution fails.
         template<typename T>
-        std::optional<ValueType<T>> get(const KeyType& name) const {
-            auto result = bindings.get<T>(name);
-            if (result.has_value()) return result;
-            if (m_parent_scope) return m_parent_scope->get<T>(name);
-            return result;
-        }
+        std::optional<ValueType<T>> get(const std::string& name) const;
 
         /// @brief Returns all bindings of type T defined in the scope includings its parent scopes.
         template<typename T>
-        MapType<T> get() const {
-            MapType<T> result = bindings.get<T>();
-            if (m_parent_scope) {
-                auto parent_bindings = m_parent_scope->get<T>();
-                result.insert(parent_bindings.begin(), parent_bindings.end());
-            }
-            return result;
-        }
+        MapType<T> get() const;
 
         /// @brief Insert binding of type T.
         template<typename T>
-        void insert(
-            const KeyType& name, 
-            const BindingType<T>& binding, 
-            const std::optional<PositionType>& position = std::optional<PositionType>()) {
-            assert(binding);
-            assert(!this->get<T>(name));
-            bindings.insert<T>(name, binding, position);
-        }
+        void insert(const std::string& name, const BindingPtrType<T>& binding, const std::optional<PositionType>& position = std::optional<PositionType>());
 };
 
 }
+
+#include "scope.tpp"
 
 #endif

@@ -43,22 +43,27 @@ TermDeclarationVisitor::TermDeclarationVisitor(const error_handler_type& error_h
     : error_handler(error_handler_), context(context_) { }
 
 pddl::Term TermDeclarationVisitor::operator()(const domain::ast::Name& name_node) const {
-    auto constant_name = parse(name_node);
-    auto constant = context.get_current_scope().get<pddl::ObjectImpl>(constant_name);
-    if (!constant) {
+    const auto constant_name = parse(name_node);
+    const auto binding = context.get_current_scope().get<pddl::ObjectImpl>(constant_name);
+    if (!binding.has_value()) {
         error_handler(name_node, "");
         throw UndefinedConstantError(constant_name, context.error_stream->str());
     }
+    const auto constant = binding.value().object;
     return context.cache.get_or_create<pddl::TermConstantImpl>(constant);
 }
 
 pddl::Term TermDeclarationVisitor::operator()(const domain::ast::Variable& variable_node) const {
-    auto variable = parse(variable_node, error_handler, context);
-    if (context.get_current_scope().get<pddl::VariableImpl>(variable->get_name())) {
-        error_handler(variable_node, "");
+    const auto variable = parse(variable_node, error_handler, context);
+    const auto binding = context.get_current_scope().get<pddl::VariableImpl>(variable->get_name());
+    if (binding.has_value()) {
+        error_handler(variable_node, "Defined here:");
+        if (binding.value().position.has_value()) {
+            error_handler(binding.value().position.value(), "First defined here:");
+        }
         throw MultiDefinitionVariableError(variable->get_name(), context.error_stream->str());
     }
-    context.get_current_scope().insert<pddl::VariableImpl>(variable->get_name(), variable);
+    context.get_current_scope().insert<pddl::VariableImpl>(variable->get_name(), variable, variable_node);
     return context.cache.get_or_create<pddl::TermVariableImpl>(variable);
 }
 
@@ -72,18 +77,20 @@ TermReferenceVisitor::TermReferenceVisitor(const error_handler_type& error_handl
     : error_handler(error_handler_), context(context_) { }
 
 pddl::Term TermReferenceVisitor::operator()(const domain::ast::Name& name_node) const {
-    auto constant_name = parse(name_node);
-    auto constant = context.get_current_scope().get<pddl::ObjectImpl>(constant_name);
-    if (!constant) {
+    const auto constant_name = parse(name_node);
+    const auto binding = context.get_current_scope().get<pddl::ObjectImpl>(constant_name);
+    if (!binding.has_value()) {
         error_handler(name_node, "");
         throw UndefinedConstantError(constant_name, context.error_stream->str());
     }
+    const auto constant = binding.value().object;
     return context.cache.get_or_create<pddl::TermConstantImpl>(constant);
 }
 
 pddl::Term TermReferenceVisitor::operator()(const domain::ast::Variable& variable_node) const {
-    auto variable = parse(variable_node, error_handler, context);
-    if (!context.get_current_scope().get<pddl::VariableImpl>(variable->get_name())) {
+    const auto variable = parse(variable_node, error_handler, context);
+    const auto binding = context.get_current_scope().get<pddl::VariableImpl>(variable->get_name());
+    if (!binding.has_value()) {
         error_handler(variable_node, "");
         throw UndefinedVariableError(variable->get_name(), context.error_stream->str());
     }

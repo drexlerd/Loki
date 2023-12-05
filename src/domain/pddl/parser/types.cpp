@@ -65,11 +65,12 @@ pddl::TypeList TypeReferenceVisitor::operator()(const ast::Type& type_node) {
 
 pddl::TypeList TypeReferenceVisitor::operator()(const ast::Name& name_node) {
     auto name = parse(name_node);
-    auto type = context.get_current_scope().get<pddl::TypeImpl>(name);
-    if (!type) {
+    auto binding = context.get_current_scope().get<pddl::TypeImpl>(name);
+    if (!binding.has_value()) {
         error_handler(name_node, "");
         throw UndefinedTypeError(name, context.error_stream->str());
     }
+    auto type = binding.value().object;
     return { type };
 }
 
