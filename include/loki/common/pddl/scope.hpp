@@ -95,7 +95,7 @@ class Scope {
         explicit Scope(std::shared_ptr<const Scope> parent_scope = nullptr)
             : m_parent_scope(parent_scope) { }
 
-        /// @brief Returns a existing binding.
+        /// @brief Returns an existing binding.
         template<typename T>
         std::optional<ValueType<T>> get(const std::string& name) const;
 
@@ -103,7 +103,7 @@ class Scope {
         template<typename T>
         MapType<T> get() const;
 
-        /// @brief Insert binding of type T.
+        /// @brief Insert a binding of type T.
         template<typename T>
         void insert(const std::string& name, const BindingPtrType<T>& binding, const std::optional<PositionType>& position = std::optional<PositionType>());
 };
