@@ -24,6 +24,8 @@
 #include "../../domain/pddl/function_skeleton.hpp"
 #include "../../domain/pddl/variable.hpp"
 
+#include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
+
 #include <cassert>
 #include <unordered_map>
 #include <memory>
@@ -31,47 +33,59 @@
 
 
 namespace loki {
-// TODO: add boost::spirit::x3::position_tagged to binding
-// to print the location of previous definition.
-template<typename... Ts>
-class Bindings {
-    private:
-        using KeyType = std::string;
 
-        template<typename T>
-        using ValueType = std::shared_ptr<const T>;
+template<template<typename> class MapTypeFunctor, typename... Ts>
+class KeyValueMap {
+private:
+    using KeyType = std::string;
 
-        template<typename T>
-        using MapType = std::unordered_map<KeyType, ValueType<T>>;
+    template<typename T>
+    using MapType = typename MapTypeFunctor<T>::type;
 
-        std::tuple<MapType<Ts>...> bindings;
+    std::tuple<MapType<Ts>...> storage;
 
     public:
-        /// @brief Gets a binding of type T. Returns nullptr if it does not exist.
         template<typename T> 
-        ValueType<T> get(const KeyType& key) const {
-            const auto& t_bindings = std::get<MapType<T>>(bindings);
-            auto it = t_bindings.find(key);
-            if (it != t_bindings.end()) {
+        auto get(const KeyType& key) const {
+            const auto& t_storage = std::get<MapType<T>>(storage);
+            auto it = t_storage.find(key);
+            if (it != t_storage.end()) {
                 return it->second;
             }
-            return nullptr;
+            return typename MapType<T>::mapped_type{}; // Default-constructed value
         }
 
-        /// @brief Gets all bindings of type T.
+        template<typename T>
+        void insert(const KeyType& key, const typename MapType<T>::mapped_type& value) {
+            auto& t_storage = std::get<MapType<T>>(storage);
+            assert(!t_storage.count(key));
+            t_storage.emplace(key, value);
+        }
+
         template<typename T>
         const MapType<T>& get() const {
-            return std::get<MapType<T>>(bindings);
-        }
-
-        /// @brief Inserts a binding of type T
-        template<typename T>
-        void insert(const KeyType& key, const ValueType<T>& binding) {
-            auto& t_bindings = std::get<MapType<T>>(bindings);
-            assert(!t_bindings.count(key));
-            t_bindings.emplace(key, binding);
+            return std::get<MapType<T>>(storage);
         }
 };
+
+// Functor to define map type for Positions, ignoring the template parameter
+template<typename T>
+struct PositionMapType {
+    using type = std::unordered_map<std::string, boost::spirit::x3::position_tagged>;
+};
+
+// Functor to define map type for Bindings
+template<typename T>
+struct BindingMapType {
+    using type = std::unordered_map<std::string, std::shared_ptr<const T>>;
+};
+
+// Specialized Storage Classes
+template<typename... Ts>
+using Positions = KeyValueMap<PositionMapType, Ts...>;
+
+template<typename... Ts>
+using Bindings = KeyValueMap<BindingMapType, Ts...>;
 
 
 /// @brief Contains scoped bindings
@@ -91,7 +105,13 @@ class Scope {
             , pddl::ObjectImpl
             , pddl::PredicateImpl 
             , pddl::FunctionSkeletonImpl
-            , pddl::VariableImpl> bindings;            
+            , pddl::VariableImpl> bindings; 
+
+        Positions<pddl::TypeImpl
+            , pddl::ObjectImpl
+            , pddl::PredicateImpl 
+            , pddl::FunctionSkeletonImpl
+            , pddl::VariableImpl> positions;           
 
     public:
         explicit Scope(std::shared_ptr<const Scope> parent_scope = nullptr) 
@@ -120,7 +140,7 @@ class Scope {
         /// @brief Insert binding of type T.
         template<typename T>
         void insert(const KeyType& name, const ValueType<T>& binding) {
-            assert(!this->get<T>(name));
+            assert(!get<T>(name));
             bindings.insert<T>(name, binding);
         }
 };
