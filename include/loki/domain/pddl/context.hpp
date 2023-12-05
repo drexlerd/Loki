@@ -37,7 +37,6 @@
 #include "variable.hpp"
 
 #include "../../common/factory.hpp"
-#include "../../common/cache.hpp"
 #include "../../common/pddl/scope.hpp"
 
 #include <cassert>
@@ -111,6 +110,11 @@ namespace loki::domain {
             };
             equal_predicate = cache.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist);
                 global_scope->insert<pddl::PredicateImpl>("=", equal_predicate);
+        }
+
+        Scope& get_current_scope() {
+            assert(!scopes.empty());
+            return *scopes.back();
         }
 
         void open_scope() {

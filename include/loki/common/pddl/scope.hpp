@@ -18,8 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_SCOPE_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_SCOPE_HPP_
 
-#include "../cache.hpp"
-
 #include "../../domain/pddl/type.hpp"
 #include "../../domain/pddl/object.hpp"
 #include "../../domain/pddl/predicate.hpp"
@@ -29,25 +27,65 @@
 #include <cassert>
 #include <unordered_map>
 #include <memory>
-#include <mutex>
-#include <iostream>
 #include <tuple>
 
 
 namespace loki {
+template<typename... Ts>
+class Bindings {
+    private:
+        using KeyType = std::string;
+
+        template<typename T>
+        using ValueType = std::shared_ptr<const T>;
+
+        template<typename T>
+        using MapType = std::unordered_map<KeyType, ValueType<T>>;
+
+        std::tuple<MapType<Ts>...> bindings;
+
+    public:
+        /// @brief Gets a binding of type T. Returns nullptr if it does not exist.
+        template<typename T> 
+        ValueType<T> get(const KeyType& key) const {
+            const auto& t_bindings = std::get<MapType<T>>(bindings);
+            auto it = t_bindings.find(key);
+            if (it != t_bindings.end()) {
+                return it->second;
+            }
+            return nullptr;
+        }
+
+        /// @brief Gets all bindings of type T.
+        template<typename T>
+        const MapType<T>& get() const {
+            return std::get<MapType<T>>(bindings);
+        }
+
+        /// @brief Inserts a binding of type T
+        template<typename T>
+        void insert(const KeyType& key, const ValueType<T>& binding) {
+            auto& t_bindings = std::get<MapType<T>>(bindings);
+            assert(!t_bindings.count(key));
+            t_bindings.emplace(key, binding);
+        }
+};
+
+
 /// @brief Contains scoped bindings
 class Scope {
     private:
-        template<typename T>
-        using ElementType = std::shared_ptr<const T>;
+        using KeyType = std::string;
 
         template<typename T>
-        using MapType = std::unordered_map<std::string, ElementType<T>>;
+        using ValueType = std::shared_ptr<const T>;
+
+        template<typename T>
+        using MapType = std::unordered_map<KeyType, ValueType<T>>;
 
         std::shared_ptr<const Scope> m_parent_scope;
 
-        Cache<std::string
-            , pddl::TypeImpl
+        Bindings<pddl::TypeImpl
             , pddl::ObjectImpl
             , pddl::PredicateImpl 
             , pddl::FunctionSkeletonImpl
@@ -59,11 +97,11 @@ class Scope {
 
         /// @brief Returns the binding or nullptr if name resolution fails.
         template<typename T>
-        ElementType<T> get(const std::string& name) const {
+        ValueType<T> get(const KeyType& name) const {
             auto result = bindings.get<T>(name);
             if (result) return result;
             if (m_parent_scope) return m_parent_scope->get<T>(name);
-            return nullptr;
+            return nullptr;  // indicates failure of name resolution.
         }
 
         /// @brief Returns all bindings of type T defined in the scope includings its parent scopes.
@@ -72,14 +110,14 @@ class Scope {
             MapType<T> result = bindings.get<T>();
             if (m_parent_scope) {
                 auto parent_bindings = m_parent_scope->get<T>();
-                result.emplace(parent_bindings.begin(), parent_bindings.end());
+                result.insert(parent_bindings.begin(), parent_bindings.end());
             }
             return result;
         }
 
         /// @brief Insert binding of type T.
         template<typename T>
-        void insert(const std::string& name, const ElementType<T>& binding) {
+        void insert(const KeyType& name, const ValueType<T>& binding) {
             assert(!this->get<T>(name));
             bindings.insert<T>(name, binding);
         }

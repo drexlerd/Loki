@@ -26,7 +26,6 @@
 
 #include "../../common/ast/config.hpp"
 #include "../../common/factory.hpp"
-#include "../../common/cache.hpp"
 #include "../../common/pddl/scope.hpp"
 
 
@@ -55,9 +54,22 @@ namespace loki::problem {
             scopes.push_back(global_scope);
 
             // Make constants referenceable in the problem definition
-            //for (const auto& pair : domain_context->global_scope->get<pddl::ObjectImpl>()) {
-            //    global_scope->insert(pair.first, pair.second);
-            //}
+            for (const auto& pair : domain_context->global_scope->get<pddl::ObjectImpl>()) {
+                global_scope->insert(pair.first, pair.second);
+            }
+        }
+
+        Scope& get_current_scope() {
+            assert(!scopes.empty());
+            return *scopes.back();
+        }
+
+        void open_scope() {
+            scopes.push_back(std::make_shared<Scope>(scopes.back()));
+        }
+
+        void close_scope() {
+            scopes.pop_back();
         }
     };
 }

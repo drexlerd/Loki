@@ -30,7 +30,7 @@ pddl::PredicateList parse(const ast::Predicates& predicates_node, const error_ha
     pddl::PredicateList predicate_list;
     for (const auto& atomic_formula_skeleton : predicates_node.atomic_formula_skeletons) {
         const auto name = parse(atomic_formula_skeleton.predicate.name);
-        if (context.scopes.back()->get<pddl::PredicateImpl>(name)) {
+        if (context.get_current_scope().get<pddl::PredicateImpl>(name)) {
             error_handler(atomic_formula_skeleton.predicate, "");
             throw MultiDefinitionPredicateError(name, context.error_stream->str());
         }
@@ -39,7 +39,7 @@ pddl::PredicateList parse(const ast::Predicates& predicates_node, const error_ha
                                                      atomic_formula_skeleton.typed_list_of_variables);
         context.close_scope();
         const auto predicate = context.cache.get_or_create<pddl::PredicateImpl>(name, parameters);
-        context.scopes.back()->insert<pddl::PredicateImpl>(name, predicate);
+        context.get_current_scope().insert<pddl::PredicateImpl>(name, predicate);
         predicate_list.emplace_back(predicate);
     }
     return predicate_list;

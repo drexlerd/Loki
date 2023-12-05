@@ -33,11 +33,9 @@ namespace loki {
 template<typename... Ts>
 class ReferenceCountedObjectFactory {
 private:
+    // Weak_ptr cannot be key, so we simply use the object itself.
     template<typename T>
-    struct PerTypeCache {
-        // Weak_ptr cannot be key, so we simply use the object itself.
-        std::unordered_map<T, std::weak_ptr<T>> data;
-    };
+    using PerTypeCache = std::unordered_map<T, std::weak_ptr<T>>;
 
     std::tuple<std::shared_ptr<PerTypeCache<Ts>>...> m_cache;
 
@@ -61,7 +59,7 @@ public:
         /* we must declare sp before locking the mutex
            s.t. the deleter is called after the mutex was released in case of stack unwinding. */
         std::shared_ptr<T> sp;
-        auto& cached = t_cache->data[*element];
+        auto& cached = (*t_cache)[*element];
         sp = cached.lock();
         // std::lock_guard<std::mutex> hold(t_cache->mutex);
         if (!sp) {
@@ -72,7 +70,7 @@ public:
                 {
                     {
                         // std::lock_guard<std::mutex> hold(parent->mutex);
-                        parent->data.erase(*x);
+                        parent->erase(*x);
                     }
                     /* After cache removal, we can call the objects destructor
                        and recursively call the deleter of children if their ref count goes to 0 */

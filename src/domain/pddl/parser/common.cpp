@@ -44,7 +44,7 @@ TermDeclarationVisitor::TermDeclarationVisitor(const error_handler_type& error_h
 
 pddl::Term TermDeclarationVisitor::operator()(const domain::ast::Name& name_node) const {
     auto constant_name = parse(name_node);
-    auto constant = context.scopes.back()->get<pddl::ObjectImpl>(constant_name);
+    auto constant = context.get_current_scope().get<pddl::ObjectImpl>(constant_name);
     if (!constant) {
         error_handler(name_node, "");
         throw UndefinedConstantError(constant_name, context.error_stream->str());
@@ -54,11 +54,11 @@ pddl::Term TermDeclarationVisitor::operator()(const domain::ast::Name& name_node
 
 pddl::Term TermDeclarationVisitor::operator()(const domain::ast::Variable& variable_node) const {
     auto variable = parse(variable_node, error_handler, context);
-    if (context.scopes.back()->get<pddl::VariableImpl>(variable->get_name())) {
+    if (context.get_current_scope().get<pddl::VariableImpl>(variable->get_name())) {
         error_handler(variable_node, "");
         throw MultiDefinitionVariableError(variable->get_name(), context.error_stream->str());
     }
-    context.scopes.back()->insert<pddl::VariableImpl>(variable->get_name(), variable);
+    context.get_current_scope().insert<pddl::VariableImpl>(variable->get_name(), variable);
     return context.cache.get_or_create<pddl::TermVariableImpl>(variable);
 }
 
@@ -73,7 +73,7 @@ TermReferenceVisitor::TermReferenceVisitor(const error_handler_type& error_handl
 
 pddl::Term TermReferenceVisitor::operator()(const domain::ast::Name& name_node) const {
     auto constant_name = parse(name_node);
-    auto constant = context.scopes.back()->get<pddl::ObjectImpl>(constant_name);
+    auto constant = context.get_current_scope().get<pddl::ObjectImpl>(constant_name);
     if (!constant) {
         error_handler(name_node, "");
         throw UndefinedConstantError(constant_name, context.error_stream->str());
@@ -83,7 +83,7 @@ pddl::Term TermReferenceVisitor::operator()(const domain::ast::Name& name_node) 
 
 pddl::Term TermReferenceVisitor::operator()(const domain::ast::Variable& variable_node) const {
     auto variable = parse(variable_node, error_handler, context);
-    if (!context.scopes.back()->get<pddl::VariableImpl>(variable->get_name())) {
+    if (!context.get_current_scope().get<pddl::VariableImpl>(variable->get_name())) {
         error_handler(variable_node, "");
         throw UndefinedVariableError(variable->get_name(), context.error_stream->str());
     }
