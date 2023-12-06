@@ -5,7 +5,7 @@
         (ball ?b)
         (gripper ?g)
         (at-robby ?r)
-        (at ?r ?r)
+        (at ?b ?r)
         (free ?g)
         (carry ?o ?g))
 

@@ -21,13 +21,12 @@
 #include "context.hpp"
 #include "declarations.hpp"
 
-#include "../../common/ast/config.hpp"
 #include "../ast/ast.hpp"
 
 
 namespace loki {
 
-extern pddl::Problem parse(const problem::ast::Problem& problem_node, const error_handler_type& error_handler, problem::Context& context, const pddl::Domain& domain);
+extern pddl::Problem parse(const problem::ast::Problem& problem_node, problem::Context& context, const pddl::Domain& domain);
 
 }
 

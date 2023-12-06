@@ -37,6 +37,7 @@
 #include "variable.hpp"
 
 #include "../../common/factory.hpp"
+#include "../../common/ast/config.hpp"
 #include "../../common/pddl/scope.hpp"
 
 #include <cassert>
@@ -52,6 +53,7 @@ namespace loki::domain {
     struct Context {
         // For retrieving error messages of the x3 error handler.
         std::unique_ptr<std::ostringstream> error_stream;
+        error_handler_type error_handler;
 
         // For unique creation
         ReferenceCountedObjectFactory<pddl::RequirementsImpl
@@ -86,8 +88,12 @@ namespace loki::domain {
         pddl::Type base_type_number;
         pddl::Predicate equal_predicate;
 
-        Context(std::unique_ptr<std::ostringstream>&& error_stream_)
-            : error_stream(std::move(error_stream_)) {
+        Context(
+            std::unique_ptr<std::ostringstream>&& error_stream_,
+            error_handler_type&& error_handler_)
+            : error_stream(std::move(error_stream_))
+            , error_handler(std::move(error_handler_)) {
+    
             // Initialize the global scope
             global_scope = std::make_shared<Scope>(nullptr);
             scopes.push_back(global_scope);

@@ -18,7 +18,6 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_EFFECTS_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_EFFECTS_HPP_
 
-#include "../../../../include/loki/common/ast/config.hpp"
 #include "../../../../include/loki/domain/ast/ast.hpp"
 #include "../../../../include/loki/domain/pddl/parser.hpp"
 #include "../../../../include/loki/domain/pddl/declarations.hpp"
@@ -29,64 +28,60 @@
 
 namespace loki {
 
-extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorAssign& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleUp& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleDown& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorIncrease& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorDecrease& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperator& node, const error_handler_type& error_handler, domain::Context& context);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorAssign& node, domain::Context& context);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleUp& node, domain::Context& context);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleDown& node, domain::Context& context);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorIncrease& node, domain::Context& context);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorDecrease& node, domain::Context& context);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperator& node, domain::Context& context);
 
 struct AssignOperatorVisitor : boost::static_visitor<pddl::AssignOperatorEnum> {
-    const error_handler_type& error_handler;
     domain::Context& context;
 
-    AssignOperatorVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+    AssignOperatorVisitor(domain::Context& context_);
 
     template<typename Node>
     pddl::AssignOperatorEnum operator()(const Node& node) const {
-        return parse(node, error_handler, context);
+        return parse(node, context);
     }
 };
 
 
-extern pddl::Effect parse(const domain::ast::Effect& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::Effect parse(const domain::ast::EffectProductionLiteral& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::Effect parse(const domain::ast::EffectProductionNumericFluent& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::Effect parse(const domain::ast::EffectProductionObjectFluent& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::Effect parse(const domain::ast::EffectProduction& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::Effect parse(const domain::ast::EffectConditionalForall& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, const error_handler_type& error_handler, domain::Context& context);
-extern pddl::Effect parse(const domain::ast::EffectConditional& node, const error_handler_type& error_handler, domain::Context& context);
+extern pddl::Effect parse(const domain::ast::Effect& node, domain::Context& context);
+extern pddl::Effect parse(const domain::ast::EffectProductionLiteral& node, domain::Context& context);
+extern pddl::Effect parse(const domain::ast::EffectProductionNumericFluent& node, domain::Context& context);
+extern pddl::Effect parse(const domain::ast::EffectProductionObjectFluent& node, domain::Context& context);
+extern pddl::Effect parse(const domain::ast::EffectProduction& node, domain::Context& context);
+extern pddl::Effect parse(const domain::ast::EffectConditionalForall& node, domain::Context& context);
+extern pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, domain::Context& context);
+extern pddl::Effect parse(const domain::ast::EffectConditional& node, domain::Context& context);
 
 struct EffectProductionVisitor : boost::static_visitor<pddl::Effect> {
-    const error_handler_type& error_handler;
     domain::Context& context;
 
-    EffectProductionVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+    EffectProductionVisitor(domain::Context& context_);
 
     template<typename Node>
     pddl::Effect operator()(const Node& node) const {
-        return parse(node, error_handler, context);
+        return parse(node, context);
     }
 };
 
 struct EffectConditionalVisitor : boost::static_visitor<pddl::Effect> {
-    const error_handler_type& error_handler;
     domain::Context& context;
 
-    EffectConditionalVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+    EffectConditionalVisitor(domain::Context& context_);
 
     template<typename Node>
     pddl::Effect operator()(const Node& node) const {
-        return parse(node, error_handler, context);
+        return parse(node, context);
     }
 };
 
 struct EffectVisitor : boost::static_visitor<pddl::Effect> {
-    const error_handler_type& error_handler;
     domain::Context& context;
 
-    EffectVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+    EffectVisitor(domain::Context& context_);
 
     pddl::Effect operator()(const std::vector<domain::ast::Effect>& effect_nodes) const;
 

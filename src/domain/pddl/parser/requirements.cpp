@@ -113,7 +113,7 @@ pddl::RequirementEnumSet parse(const ast::Requirement& node) {
     return boost::apply_visitor(RequirementVisitor(), node);
 }
 
-pddl::Requirements parse(const ast::Requirements& requirements_node, const error_handler_type& error_handler, Context& context) {
+pddl::Requirements parse(const ast::Requirements& requirements_node, Context& context) {
     pddl::RequirementEnumSet requirements;
     for (const auto& requirement : requirements_node.requirements) {
         auto additional_requirements = parse(requirement);

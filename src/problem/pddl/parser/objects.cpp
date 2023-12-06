@@ -27,8 +27,8 @@ using namespace std;
 
 namespace loki {
 
-ObjectListVisitor::ObjectListVisitor(const error_handler_type& error_handler_, Context& context_)
-    : error_handler(error_handler_), context(context_) { }
+ObjectListVisitor::ObjectListVisitor(Context& context_)
+    : context(context_) { }
 
 
 pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Name>& name_nodes) {
@@ -38,11 +38,11 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
         if (context.domain_context->get_current_scope().get<pddl::ObjectImpl>(name)) {
-            error_handler(name_node, "");
+            context.error_handler(name_node, "");
             throw ObjectIsConstantError(name, context.error_stream->str());
         }
         else if (context.get_current_scope().get<pddl::ObjectImpl>(name)) {
-            error_handler(name_node, "");
+            context.error_handler(name_node, "");
             throw MultiDefinitionObjectError(name, context.error_stream->str());
         }
         const auto object = context.domain_context->cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type});
@@ -54,17 +54,25 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
 
 pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
     pddl::ObjectList object_list;
-    const auto types = boost::apply_visitor(TypeReferenceVisitor(error_handler, *context.domain_context),
+    const auto types = boost::apply_visitor(TypeReferenceVisitor(*context.domain_context),
                                             typed_list_of_names_recursively_node.type);
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
         const auto name = parse(name_node);
-        if (context.domain_context->get_current_scope().get<pddl::ObjectImpl>(name)) {
-            error_handler(name_node, "");
-            throw ObjectIsConstantError(name, context.error_stream->str());
+        auto domain_binding = context.domain_context->get_current_scope().get<pddl::ObjectImpl>(name);
+        if (domain_binding.has_value()) {
+            context.error_handler(name_node, "Defined here:");
+            if (domain_binding.value().position.has_value()) {
+                context.domain_context->error_handler(domain_binding.value().position.value(), "First defined here:");
+            }
+            throw ObjectIsConstantError(name, context.error_stream->str() + context.domain_context->error_stream->str());
         }
-        else if (context.get_current_scope().get<pddl::ObjectImpl>(name)) {
-            error_handler(name_node, "");
+        auto problem_binding = context.get_current_scope().get<pddl::ObjectImpl>(name);
+        if (problem_binding.has_value()) {
+            context.error_handler(name_node, "Defined here:");
+            if (problem_binding.value().position.has_value()) {
+                context.error_handler(problem_binding.value().position.value(), "First defined here:");
+            }
             throw MultiDefinitionObjectError(name, context.error_stream->str());
         }
         const auto object = context.domain_context->cache.get_or_create<pddl::ObjectImpl>(name, types);
@@ -82,8 +90,8 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
 }
 
 
-pddl::ObjectList parse(const ast::Objects& objects_node, const error_handler_type& error_handler, Context& context) {
-    return boost::apply_visitor(ObjectListVisitor(error_handler, context), objects_node.typed_list_of_names);
+pddl::ObjectList parse(const ast::Objects& objects_node, Context& context) {
+    return boost::apply_visitor(ObjectListVisitor(context), objects_node.typed_list_of_names);
 }
 
 }

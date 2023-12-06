@@ -26,8 +26,8 @@ using namespace std;
 
 
 namespace loki {
-ConstantListVisitor::ConstantListVisitor(const error_handler_type& error_handler_, Context& context_)
-    : error_handler(error_handler_), context(context_) { }
+ConstantListVisitor::ConstantListVisitor(Context& context_)
+    : context(context_) { }
 
 
 pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
@@ -37,7 +37,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& n
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
         if (context.get_current_scope().get<pddl::ObjectImpl>(name)) {
-            error_handler(name_node, "");
+            context.error_handler(name_node, "");
             throw MultiDefinitionConstantError(name, context.error_stream->str());
         }
         const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type});
@@ -49,13 +49,13 @@ pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& n
 
 pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
     pddl::ObjectList object_list;
-    const auto types = boost::apply_visitor(TypeReferenceVisitor(error_handler, context),
+    const auto types = boost::apply_visitor(TypeReferenceVisitor(context),
                                             typed_list_of_names_recursively_node.type);
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
         const auto name = parse(name_node);
         if (context.get_current_scope().get<pddl::ObjectImpl>(name)) {
-            error_handler(name_node, "");
+            context.error_handler(name_node, "");
             throw MultiDefinitionConstantError(name, context.error_stream->str());
         }
         const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, types);
@@ -63,14 +63,14 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
         object_list.emplace_back(object);
     }
     // Recursively add objects.
-    auto additional_objects = boost::apply_visitor(ConstantListVisitor(error_handler, context), typed_list_of_names_recursively_node.typed_list_of_names.get());
+    auto additional_objects = boost::apply_visitor(ConstantListVisitor(context), typed_list_of_names_recursively_node.typed_list_of_names.get());
     object_list.insert(object_list.end(), additional_objects.begin(), additional_objects.end());
     return object_list;
 }
 
 
-pddl::ObjectList parse(const ast::Constants& constants_node, const error_handler_type& error_handler, Context& context) {
-    return boost::apply_visitor(ConstantListVisitor(error_handler, context), constants_node.typed_list_of_names);
+pddl::ObjectList parse(const ast::Constants& constants_node, Context& context) {
+    return boost::apply_visitor(ConstantListVisitor(context), constants_node.typed_list_of_names);
 }
 
 }

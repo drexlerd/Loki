@@ -29,21 +29,21 @@
 
 namespace loki {
 
-std::string parse(const domain::ast::ActionSymbol& node, const error_handler_type& error_handler, domain::Context& context) {
+std::string parse(const domain::ast::ActionSymbol& node, domain::Context& context) {
     return parse(node.name);
 }
 
-std::tuple<pddl::Condition, pddl::Effect> parse(const domain::ast::ActionBody& node, const error_handler_type& error_handler, domain::Context& context) {
+std::tuple<pddl::Condition, pddl::Effect> parse(const domain::ast::ActionBody& node, domain::Context& context) {
     pddl::Condition condition;
     if (node.precondition_goal_descriptor.has_value()) {
-        condition = parse(node.precondition_goal_descriptor.value(), error_handler, context);
+        condition = parse(node.precondition_goal_descriptor.value(), context);
     } else {
         // Empty And condition represents true
         condition = context.cache.get_or_create<pddl::ConditionAndImpl>(pddl::ConditionList{});
     }
     pddl::Effect effect;
     if (node.effect.has_value()) {
-        effect = parse(node.effect.value(), error_handler, context);
+        effect = parse(node.effect.value(), context);
     } else {
         // Empty And effect represents no effects
         effect = context.cache.get_or_create<pddl::EffectAndImpl>(pddl::EffectList{});
@@ -51,34 +51,34 @@ std::tuple<pddl::Condition, pddl::Effect> parse(const domain::ast::ActionBody& n
     return {condition, effect};
 }
 
-pddl::Action parse(const domain::ast::Action& node, const error_handler_type& error_handler, domain::Context& context) {
+pddl::Action parse(const domain::ast::Action& node, domain::Context& context) {
     context.open_scope();
-    auto name = parse(node.action_symbol, error_handler, context);
-    auto parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context), node.typed_list_of_variables);
-    auto [condition, effect] = parse(node.action_body, error_handler, context);
+    auto name = parse(node.action_symbol, context);
+    auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
+    auto [condition, effect] = parse(node.action_body, context);
     context.close_scope();
     return context.cache.get_or_create<pddl::ActionImpl>(name, parameters, condition, effect);
 }
 
-pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, const error_handler_type& error_handler, domain::Context& context) {
+pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, domain::Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::DERIVED_PREDICATES)) {
-        error_handler(node, "");
+        context.error_handler(node, "");
         throw UndefinedRequirementError(pddl::RequirementEnum::DERIVED_PREDICATES, context.error_stream->str());
     }
-    auto parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context),
+    auto parameters = boost::apply_visitor(ParameterListVisitor(context),
         node.typed_list_of_variables);
-    auto condition = parse(node.goal_descriptor, error_handler, context);
+    auto condition = parse(node.goal_descriptor, context);
     return context.cache.get_or_create<pddl::DerivedPredicateImpl>(parameters, condition);
 }
 
 
-StructureVisitor::StructureVisitor(const error_handler_type& error_handler_, domain::Context& context_)
-    : error_handler(error_handler_), context(context_) { }
+StructureVisitor::StructureVisitor(domain::Context& context_)
+    : context(context_) { }
 
 
 boost::variant<pddl::DerivedPredicate, pddl::Action> parse(
-    const domain::ast::Structure& node, const error_handler_type& error_handler, domain::Context& context) {
-    return boost::apply_visitor(StructureVisitor(error_handler, context), node);
+    const domain::ast::Structure& node, domain::Context& context) {
+    return boost::apply_visitor(StructureVisitor(context), node);
 }
 
 

@@ -32,6 +32,7 @@
 namespace loki::problem {
     struct Context {
         std::unique_ptr<std::ostringstream> error_stream;
+        error_handler_type error_handler;
 
         std::unique_ptr<domain::Context> domain_context;
 
@@ -46,9 +47,11 @@ namespace loki::problem {
         pddl::Requirements requirements;
 
         Context(std::unique_ptr<std::ostringstream>&& error_stream_,
+            error_handler_type&& error_handler_,
             std::unique_ptr<domain::Context>&& domain_context_)
-            : error_stream(std::move(error_stream_)),
-              domain_context(std::move(domain_context_)) {
+            : error_stream(std::move(error_stream_))
+            , error_handler(std::move(error_handler_))
+            , domain_context(std::move(domain_context_)) {
             // Initialize the global scope
             global_scope = std::make_shared<Scope>(nullptr);
             scopes.push_back(global_scope);

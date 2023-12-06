@@ -36,13 +36,12 @@ namespace loki {
 template<typename... Ts>
 class UnpackingVisitor {
 private:
-    const error_handler_type& error_handler;
     domain::Context& context;
     std::tuple<std::reference_wrapper<Ts>...> result;
 
 public:
-    UnpackingVisitor(const error_handler_type& error_handler_, domain::Context& context_, Ts& ...result)
-        : error_handler(error_handler_), context(context_), result(std::make_tuple(std::ref(result)...)) { }
+    UnpackingVisitor(domain::Context& context_, Ts& ...result)
+        : context(context_), result(std::make_tuple(std::ref(result)...)) { }
 
     template<typename T>
     void operator()(const T& element) {

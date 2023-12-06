@@ -26,16 +26,16 @@ using namespace std;
 
 
 namespace loki {
-pddl::PredicateList parse(const ast::Predicates& predicates_node, const error_handler_type& error_handler, Context& context) {
+pddl::PredicateList parse(const ast::Predicates& predicates_node, Context& context) {
     pddl::PredicateList predicate_list;
     for (const auto& atomic_formula_skeleton : predicates_node.atomic_formula_skeletons) {
         const auto name = parse(atomic_formula_skeleton.predicate.name);
         if (context.get_current_scope().get<pddl::PredicateImpl>(name)) {
-            error_handler(atomic_formula_skeleton.predicate, "");
+            context.error_handler(atomic_formula_skeleton.predicate, "");
             throw MultiDefinitionPredicateError(name, context.error_stream->str());
         }
         context.open_scope();
-        const auto parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context),
+        const auto parameters = boost::apply_visitor(ParameterListVisitor(context),
                                                      atomic_formula_skeleton.typed_list_of_variables);
         context.close_scope();
         const auto predicate = context.cache.get_or_create<pddl::PredicateImpl>(name, parameters);

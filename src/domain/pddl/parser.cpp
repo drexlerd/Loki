@@ -41,15 +41,15 @@ using namespace std;
 
 namespace loki {
 
-std::string parse(const domain::ast::DomainName& domain_name_node, const error_handler_type& error_handler, domain::Context& context) {
+static std::string parse(const domain::ast::DomainName& domain_name_node, domain::Context& context) {
     return parse(domain_name_node.name);
 }
 
-pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& error_handler, Context& context) {
-    const auto domain_name = parse(domain_node.domain_name, error_handler, context);
+pddl::Domain parse(const ast::Domain& domain_node, Context& context) {
+    const auto domain_name = parse(domain_node.domain_name, context);
     /* Requirements section */
     if (domain_node.requirements.has_value()) {
-        context.requirements = parse(domain_node.requirements.value(), error_handler, context);
+        context.requirements = parse(domain_node.requirements.value(), context);
     } else {
         // Default requirements
         context.requirements = context.cache.get_or_create<pddl::RequirementsImpl>(
@@ -59,32 +59,32 @@ pddl::Domain parse(const ast::Domain& domain_node, const error_handler_type& err
     pddl::TypeList types;
     if (domain_node.types.has_value()) {
         if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
-            error_handler(domain_node.types.value(), "");
+            context.error_handler(domain_node.types.value(), "");
             throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.error_stream->str());
         }
-        types = parse(domain_node.types.value(), error_handler, context);
+        types = parse(domain_node.types.value(), context);
     }
     /* Constants section */
     pddl::ObjectList constants;
     if (domain_node.constants.has_value()) {
-        constants = parse(domain_node.constants.value(), error_handler, context);
+        constants = parse(domain_node.constants.value(), context);
     }
     /* Predicates section */
     pddl::PredicateList predicates;
     if (domain_node.predicates.has_value()) {
-        predicates = parse(domain_node.predicates.value(), error_handler, context);
+        predicates = parse(domain_node.predicates.value(), context);
     }
     /* Functions section */
     pddl::FunctionSkeletonList function_skeletons;
     if (domain_node.functions.has_value()) {
-        function_skeletons = parse(domain_node.functions.value(), error_handler, context);
+        function_skeletons = parse(domain_node.functions.value(), context);
     }
     /* Action Schema section */
     pddl::DerivedPredicateList derived_predicate_list;
     pddl::ActionList action_list;
     for (const auto& structure_node : domain_node.structures) {
-        auto variant = boost::apply_visitor(StructureVisitor(error_handler, context), structure_node);
-        boost::apply_visitor(UnpackingVisitor(error_handler, context, action_list, derived_predicate_list), variant);
+        auto variant = boost::apply_visitor(StructureVisitor(context), structure_node);
+        boost::apply_visitor(UnpackingVisitor(context, action_list, derived_predicate_list), variant);
     }
     return context.cache.get_or_create<pddl::DomainImpl>(domain_name, context.requirements, types, constants, predicates);
 }

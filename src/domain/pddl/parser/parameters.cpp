@@ -28,20 +28,20 @@ using namespace std;
 
 namespace loki {
 
-ParameterListVisitor::ParameterListVisitor(const error_handler_type& error_handler_, Context& context_)
-    : error_handler(error_handler_), context(context_) { }
+ParameterListVisitor::ParameterListVisitor(Context& context_)
+    : context(context_) { }
 
 pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>& variable_nodes) {
     // A visited vector of variable has single base type "object"
     pddl::ParameterList parameter_list;
     const auto type = context.cache.get_or_create<pddl::TypeImpl>("object");
     for (const auto& variable_node : variable_nodes) {
-        const auto variable = parse(variable_node, error_handler, context);
+        const auto variable = parse(variable_node, context);
         const auto binding = context.get_current_scope().get<pddl::VariableImpl>(variable->get_name());
         if (binding.has_value()) {
-            error_handler(variable_node, "Defined here:");
+            context.error_handler(variable_node, "Defined here:");
             if (binding.value().position.has_value()) {
-                error_handler(binding.value().position.value(), "First defined here:");
+                context.error_handler(binding.value().position.value(), "First defined here:");
             }
             throw MultiDefinitionVariableError(variable->get_name(), context.error_stream->str());
         }
@@ -54,16 +54,16 @@ pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Vari
 
 pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVariablesRecursively& typed_variables_node) {
     pddl::ParameterList parameter_list;
-    const auto types = boost::apply_visitor(TypeReferenceVisitor(error_handler, context),
+    const auto types = boost::apply_visitor(TypeReferenceVisitor(context),
                                             typed_variables_node.type);
     // A non-visited vector of variables has user defined types
     for (const auto& variable_node : typed_variables_node.variables) {
-        const auto variable = parse(variable_node, error_handler, context);
+        const auto variable = parse(variable_node, context);
         const auto binding = context.get_current_scope().get<pddl::VariableImpl>(variable->get_name());
         if (binding.has_value()) {
-            error_handler(variable_node, "Defined here:");
+            context.error_handler(variable_node, "Defined here:");
             if (binding.value().position.has_value()) {
-                error_handler(binding.value().position.value(), "First defined here:");
+                context.error_handler(binding.value().position.value(), "First defined here:");
             }
             throw MultiDefinitionVariableError(variable->get_name(), context.error_stream->str());
         }
@@ -72,7 +72,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
         parameter_list.emplace_back(parameter);
     }
     // Recursively add parameters.
-    auto additional_parameters = boost::apply_visitor(ParameterListVisitor(error_handler, context), typed_variables_node.typed_list_of_variables.get());
+    auto additional_parameters = boost::apply_visitor(ParameterListVisitor(context), typed_variables_node.typed_list_of_variables.get());
     parameter_list.insert(parameter_list.end(), additional_parameters.begin(), additional_parameters.end());
     return parameter_list;
 }

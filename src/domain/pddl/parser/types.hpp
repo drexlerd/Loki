@@ -18,7 +18,6 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_TYPES_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_TYPES_HPP_
 
-#include "../../../../include/loki/common/ast/config.hpp"
 #include "../../../../include/loki/domain/ast/ast.hpp"
 #include "../../../../include/loki/domain/pddl/parser.hpp"
 #include "../../../../include/loki/domain/pddl/type.hpp"
@@ -28,11 +27,10 @@ namespace loki {
 
 class TypeDeclarationVisitor : boost::static_visitor<pddl::TypeList> {
 private:
-    const error_handler_type& error_handler;
     domain::Context& context;
 
 public:
-    TypeDeclarationVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+    TypeDeclarationVisitor(domain::Context& context_);
 
     pddl::TypeList operator()(const domain::ast::Type& type_node);
 
@@ -45,11 +43,10 @@ public:
 
 class TypeReferenceVisitor : boost::static_visitor<pddl::TypeList> {
 private:
-    const error_handler_type& error_handler;
     domain::Context& context;
 
 public:
-    TypeReferenceVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+    TypeReferenceVisitor(domain::Context& context_);
 
     pddl::TypeList operator()(const domain::ast::Type& type_node);
 
@@ -62,11 +59,10 @@ public:
 
 class TypeListVisitor : boost::static_visitor<pddl::TypeList> {
 private:
-    const error_handler_type& error_handler;
     domain::Context& context;
 
 public:
-    TypeListVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+    TypeListVisitor(domain::Context& context_);
 
     pddl::TypeList operator()(const std::vector<domain::ast::Name>& name_nodes);
 
@@ -76,7 +72,7 @@ public:
 };
 
 
-extern pddl::TypeList parse(const domain::ast::Types& types_node, const error_handler_type& error_handler, domain::Context& context);
+extern pddl::TypeList parse(const domain::ast::Types& types_node, domain::Context& context);
 
 }
 

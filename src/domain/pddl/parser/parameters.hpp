@@ -28,11 +28,10 @@ namespace loki {
 
 class ParameterListVisitor : boost::static_visitor<pddl::ParameterList> {
 private:
-    const error_handler_type& error_handler;
     domain::Context& context;
 
 public:
-    ParameterListVisitor(const error_handler_type& error_handler_, domain::Context& context_);
+    ParameterListVisitor(domain::Context& context_);
 
     pddl::ParameterList operator()(const std::vector<domain::ast::Variable>& variable_nodes);
 
