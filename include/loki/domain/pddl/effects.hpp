@@ -58,6 +58,11 @@ protected:
     EffectImpl(int identifier);
 
 public:
+    // delete copy/move to prevent accidental object slicing when passed by value
+    EffectImpl(const EffectImpl& other) = delete;
+    EffectImpl& operator=(const EffectImpl& other) = delete;
+    EffectImpl(EffectImpl&& other) = delete;
+    EffectImpl& operator=(EffectImpl&& other) = delete;
     virtual ~EffectImpl();
 
     /// @brief Test for structural equivalence

@@ -52,6 +52,11 @@ protected:
     ConditionImpl(int identifier);
 
 public:
+    // delete copy/move to prevent accidental object slicing when passed by value
+    ConditionImpl(const ConditionImpl& other) = delete;
+    ConditionImpl& operator=(const ConditionImpl& other) = delete;
+    ConditionImpl(ConditionImpl&& other) = delete;
+    ConditionImpl& operator=(ConditionImpl&& other) = delete;
     virtual ~ConditionImpl();
 
     /// @brief Test for structural equivalence
