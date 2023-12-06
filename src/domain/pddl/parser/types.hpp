@@ -67,8 +67,6 @@ public:
     pddl::TypeList operator()(const std::vector<domain::ast::Name>& name_nodes);
 
     pddl::TypeList operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
-
-    pddl::TypeList operator()(const domain::ast::TypedListOfNames& node);
 };
 
 

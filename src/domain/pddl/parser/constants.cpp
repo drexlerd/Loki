@@ -68,7 +68,6 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
     return object_list;
 }
 
-
 pddl::ObjectList parse(const ast::Constants& constants_node, Context& context) {
     return boost::apply_visitor(ConstantListVisitor(context), constants_node.typed_list_of_names);
 }

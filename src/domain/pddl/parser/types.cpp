@@ -135,12 +135,9 @@ pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNamesRecursivel
         context.get_current_scope().insert<pddl::TypeImpl>(name, type, name_node);
     }
     // Recursively add types.
-    auto additional_types = this->operator()(typed_list_of_names_recursively_node.typed_list_of_names);
+    auto additional_types = boost::apply_visitor(TypeListVisitor(context), typed_list_of_names_recursively_node.typed_list_of_names.get());
+    type_list.insert(type_list.end(), additional_types.begin(), additional_types.end());
     return type_list;
-}
-
-pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNames& node) {
-    return this->operator()(node);
 }
 
 /* Other functions */

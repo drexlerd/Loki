@@ -34,8 +34,6 @@ public:
     pddl::ObjectList operator()(const std::vector<domain::ast::Name>& name_nodes);
 
     pddl::ObjectList operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
-
-    pddl::ObjectList operator()(const domain::ast::TypedListOfNames& node);
 };
 
 extern pddl::ObjectList parse(const problem::ast::Objects& objects_node, problem::Context& context);
