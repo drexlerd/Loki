@@ -95,8 +95,8 @@ namespace loki::domain {
             // create base types.
             base_type_object = cache.get_or_create<pddl::TypeImpl>("object");
             base_type_number = cache.get_or_create<pddl::TypeImpl>("number");
-            global_scope->insert("object", base_type_object);
-            global_scope->insert("number", base_type_number);
+            global_scope->insert("object", base_type_object, {});
+            global_scope->insert("number", base_type_number, {});
 
             // add equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
             auto binary_parameterlist = pddl::ParameterList{
@@ -109,7 +109,7 @@ namespace loki::domain {
 
             };
             equal_predicate = cache.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist);
-                global_scope->insert<pddl::PredicateImpl>("=", equal_predicate);
+                global_scope->insert<pddl::PredicateImpl>("=", equal_predicate, {});
         }
 
         Scope& get_current_scope() {

@@ -106,7 +106,7 @@ pddl::TypeList TypeListVisitor::operator()(const std::vector<ast::Name>& name_no
         }
         const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, pddl::TypeList{base_type});
         type_list.push_back(type);
-        context.get_current_scope().insert<pddl::TypeImpl>(name, type);
+        context.get_current_scope().insert<pddl::TypeImpl>(name, type, name_node);
     }
     return type_list;
 }
@@ -134,7 +134,7 @@ pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNamesRecursivel
         }
         const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, types);
         type_list.push_back(type);
-        context.get_current_scope().insert<pddl::TypeImpl>(name, type);
+        context.get_current_scope().insert<pddl::TypeImpl>(name, type, name_node);
     }
     // Recursively add types.
     auto additional_types = this->operator()(typed_list_of_names_recursively_node.typed_list_of_names);

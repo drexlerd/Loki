@@ -41,12 +41,17 @@ using BindingPtrType = std::shared_ptr<const T>;
 
 using PositionType = boost::spirit::x3::position_tagged;
 
+/// @brief Encapsulates binding related information of a type T.
+///        The object is the entity bound to the name.
+///        The position points to the matched location 
+///        in the input stream and is used for error reporting.
 template<typename T>
 struct ValueType {
     BindingPtrType<T> object;
     std::optional<PositionType> position;
 };
 
+/// @brief Datastructure to store bindings of a type T.
 template<typename T>
 using MapType = std::unordered_map<std::string, ValueType<T>>;
 
@@ -58,7 +63,7 @@ class Bindings {
         std::tuple<MapType<Ts>...> bindings;
 
     public:
-        /// @brief Returns an existing binding.
+        /// @brief Returns a binding if it exists.
         template<typename T>
         std::optional<ValueType<T>> get(const std::string& key) const;
 
@@ -95,7 +100,7 @@ class Scope {
         explicit Scope(std::shared_ptr<const Scope> parent_scope = nullptr)
             : m_parent_scope(parent_scope) { }
 
-        /// @brief Returns an existing binding.
+        /// @brief Returns a binding if it exists.
         template<typename T>
         std::optional<ValueType<T>> get(const std::string& name) const;
 
@@ -105,7 +110,7 @@ class Scope {
 
         /// @brief Insert a binding of type T.
         template<typename T>
-        void insert(const std::string& name, const BindingPtrType<T>& binding, const std::optional<PositionType>& position = std::optional<PositionType>());
+        void insert(const std::string& name, const BindingPtrType<T>& binding, const std::optional<PositionType>& position);
 };
 
 }

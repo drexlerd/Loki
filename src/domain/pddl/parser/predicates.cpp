@@ -39,7 +39,7 @@ pddl::PredicateList parse(const ast::Predicates& predicates_node, const error_ha
                                                      atomic_formula_skeleton.typed_list_of_variables);
         context.close_scope();
         const auto predicate = context.cache.get_or_create<pddl::PredicateImpl>(name, parameters);
-        context.get_current_scope().insert<pddl::PredicateImpl>(name, predicate);
+        context.get_current_scope().insert<pddl::PredicateImpl>(name, predicate, atomic_formula_skeleton.predicate.name);
         predicate_list.emplace_back(predicate);
     }
     return predicate_list;

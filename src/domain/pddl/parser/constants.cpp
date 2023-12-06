@@ -41,7 +41,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& n
             throw MultiDefinitionConstantError(name, context.error_stream->str());
         }
         const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type});
-        context.get_current_scope().insert<pddl::ObjectImpl>(name, object);
+        context.get_current_scope().insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }
     return object_list;
@@ -59,7 +59,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
             throw MultiDefinitionConstantError(name, context.error_stream->str());
         }
         const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, types);
-        context.get_current_scope().insert<pddl::ObjectImpl>(name, object);
+        context.get_current_scope().insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }
     // Recursively add objects.
