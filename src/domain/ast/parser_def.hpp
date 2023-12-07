@@ -38,11 +38,13 @@ namespace loki::domain::parser {
     using x3::eps;
     using x3::int_;
     using x3::double_;
+    using x3::no_skip;
 
     using ascii::alpha;
     using ascii::alnum;
     using ascii::char_;
     using ascii::string;
+    using ascii::space;
 
     ///////////////////////////////////////////////////////////////////////////
     // Rule IDs
@@ -190,36 +192,39 @@ namespace loki::domain::parser {
     structure_type const structure = "structure";
     domain_type const domain = "domain";
 
-
     ///////////////////////////////////////////////////////////////////////////
     // Grammar
     ///////////////////////////////////////////////////////////////////////////
+
+    auto keyword(const std::string& keyword) {
+        return lit(keyword) >> no_skip[&(ascii::space | lit('\n') | lit('(') | lit(')'))];
+    }
 
     const auto name_def = lexeme[alpha >> *(alnum | char_('-') | char_('_'))];
     const auto variable_def = lexeme[char_('?') > name];
     const auto number_def = double_;
     const auto term_def = name | variable | function_term;
-    const auto undefined_def = lit("undefined") >> x3::attr(ast::Undefined{});
+    const auto undefined_def = keyword("undefined") >> x3::attr(ast::Undefined{});
 
-    const auto requirement_strips_def = lit(":strips") >> x3::attr(ast::RequirementStrips{});
-    const auto requirement_typing_def = lit(":typing") >> x3::attr(ast::RequirementTyping{});
-    const auto requirement_negative_preconditions_def = lit(":negative-preconditions") >> x3::attr(ast::RequirementNegativePreconditions{});
-    const auto requirement_disjunctive_preconditions_def = lit(":disjunctive-preconditions") >> x3::attr(ast::RequirementDisjunctivePreconditions{});
-    const auto requirement_equality_def = lit(":equality") >> x3::attr(ast::RequirementEquality{});
-    const auto requirement_existential_preconditions_def = lit(":existential-preconditions") >> x3::attr(ast::RequirementExistentialPreconditions{});
-    const auto requirement_universal_preconditions_def = lit(":universal-preconditions") >> x3::attr(ast::RequirementUniversalPreconditions{});
-    const auto requirement_quantified_preconditions_def = lit(":quantified-preconditions") >> x3::attr(ast::RequirementQuantifiedPreconditions{});
-    const auto requirement_conditional_effects_def = lit(":conditional-effects") >> x3::attr(ast::RequirementConditionalEffects{});
-    const auto requirement_fluents_def = lit(":fluents") >> x3::attr(ast::RequirementFluents{});
-    const auto requirement_object_fluents_def = lit(":object-fluents") >> x3::attr(ast::RequirementObjectFluents{});
-    const auto requirement_numeric_fluents_def = lit(":numeric-fluents") >> x3::attr(ast::RequirementNumericFluents{});
-    const auto requirement_adl_def = lit(":adl") >> x3::attr(ast::RequirementAdl{});
-    const auto requirement_durative_actions_def = lit(":durative-actions") >> x3::attr(ast::RequirementDurativeActions{});
-    const auto requirement_derived_predicates_def = lit(":derived-predicates") >> x3::attr(ast::RequirementDerivedPredicates{});
-    const auto requirement_timed_initial_literals_def = lit(":timed-initial-literals") >> x3::attr(ast::RequirementTimedInitialLiterals{});
-    const auto requirement_preferences_def = lit(":preferences") >> x3::attr(ast::RequirementPreferences{});
-    const auto requirement_constraints_def = lit(":constraints") >> x3::attr(ast::RequirementConstraints{});
-    const auto requirement_action_costs_def = lit(":action-costs") >> x3::attr(ast::RequirementActionCosts{});
+    const auto requirement_strips_def = keyword(":strips") >> x3::attr(ast::RequirementStrips{});
+    const auto requirement_typing_def = keyword(":typing") >> x3::attr(ast::RequirementTyping{});
+    const auto requirement_negative_preconditions_def = keyword(":negative-preconditions") >> x3::attr(ast::RequirementNegativePreconditions{});
+    const auto requirement_disjunctive_preconditions_def = keyword(":disjunctive-preconditions") >> x3::attr(ast::RequirementDisjunctivePreconditions{});
+    const auto requirement_equality_def = keyword(":equality") >> x3::attr(ast::RequirementEquality{});
+    const auto requirement_existential_preconditions_def = keyword(":existential-preconditions") >> x3::attr(ast::RequirementExistentialPreconditions{});
+    const auto requirement_universal_preconditions_def = keyword(":universal-preconditions") >> x3::attr(ast::RequirementUniversalPreconditions{});
+    const auto requirement_quantified_preconditions_def = keyword(":quantified-preconditions") >> x3::attr(ast::RequirementQuantifiedPreconditions{});
+    const auto requirement_conditional_effects_def = keyword(":conditional-effects") >> x3::attr(ast::RequirementConditionalEffects{});
+    const auto requirement_fluents_def = keyword(":fluents") >> x3::attr(ast::RequirementFluents{});
+    const auto requirement_object_fluents_def = keyword(":object-fluents") >> x3::attr(ast::RequirementObjectFluents{});
+    const auto requirement_numeric_fluents_def = keyword(":numeric-fluents") >> x3::attr(ast::RequirementNumericFluents{});
+    const auto requirement_adl_def = keyword(":adl") >> x3::attr(ast::RequirementAdl{});
+    const auto requirement_durative_actions_def = keyword(":durative-actions") >> x3::attr(ast::RequirementDurativeActions{});
+    const auto requirement_derived_predicates_def = keyword(":derived-predicates") >> x3::attr(ast::RequirementDerivedPredicates{});
+    const auto requirement_timed_initial_literals_def = keyword(":timed-initial-literals") >> x3::attr(ast::RequirementTimedInitialLiterals{});
+    const auto requirement_preferences_def = keyword(":preferences") >> x3::attr(ast::RequirementPreferences{});
+    const auto requirement_constraints_def = keyword(":constraints") >> x3::attr(ast::RequirementConstraints{});
+    const auto requirement_action_costs_def = keyword(":action-costs") >> x3::attr(ast::RequirementActionCosts{});
     const auto requirement_def = requirement_strips | requirement_typing | requirement_negative_preconditions
         | requirement_disjunctive_preconditions | requirement_equality | requirement_existential_preconditions
         | requirement_universal_preconditions | requirement_quantified_preconditions | requirement_conditional_effects
@@ -228,8 +233,8 @@ namespace loki::domain::parser {
         | requirement_preferences | requirement_constraints | requirement_action_costs;
 
     const auto type_def = name | type_object | type_either;
-    const auto type_object_def = lit("object") >> x3::attr(ast::TypeObject{});
-    const auto type_either_def = (lit('(') >> lit("either") >> +type) > lit(')');
+    const auto type_object_def = keyword("object") >> x3::attr(ast::TypeObject{});
+    const auto type_either_def = (lit('(') >> keyword("either") >> +type) > lit(')');
     const auto typed_list_of_names_recursively_def = (+name >> lit('-')) > type > typed_list_of_names;
     const auto typed_list_of_names_def = typed_list_of_names_recursively | *name;
     const auto typed_list_of_variables_recursively_def = (+variable >> lit('-')) > type > typed_list_of_variables;
@@ -251,7 +256,7 @@ namespace loki::domain::parser {
     const auto atomic_formula_of_terms_equality_def = (lit('(') >> lit('=')) > term > term > lit(')');
     const auto atomic_formula_of_terms_def = atomic_formula_of_terms_equality | atomic_formula_of_terms_predicate;
     const auto atom_def = atomic_formula_of_terms;
-    const auto negated_atom_def = (lit('(') >> lit("not")) > atomic_formula_of_terms > lit(')');
+    const auto negated_atom_def = (lit('(') >> keyword("not")) > atomic_formula_of_terms > lit(')');
     const auto literal_def = negated_atom | atom;
 
     const auto multi_operator_mul_def = lit('*') >> x3::attr(ast::MultiOperatorMul{});
@@ -275,79 +280,79 @@ namespace loki::domain::parser {
     const auto function_expression_minus_def = (lit('(') >> lit('-')) > function_expression > lit(')');
     const auto function_expression_head_def = function_head;
 
-    const auto goal_descriptor_def = goal_descriptor_not | goal_descriptor_and | goal_descriptor_or | goal_descriptor_imply
+    const auto goal_descriptor_def = goal_descriptor_not | goal_descriptor_and | goal_descriptor_imply
         | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison | goal_descriptor_atom | goal_descriptor_literal;
     const auto goal_descriptor_atom_def = atom;
     const auto goal_descriptor_literal_def = literal;
-    const auto goal_descriptor_and_def = (lit('(') >> lit("and")) > *goal_descriptor > lit(')');
-    const auto goal_descriptor_or_def = (lit('(') >> lit("or") >> *goal_descriptor) > lit(')');
-    const auto goal_descriptor_not_def = (lit('(') >> lit("not")) > goal_descriptor > lit(')');
-    const auto goal_descriptor_imply_def = (lit('(') >> lit("imply")) > goal_descriptor > goal_descriptor > lit(')');
-    const auto goal_descriptor_exists_def = (lit('(') >> lit("exists")) > typed_list_of_variables > goal_descriptor > lit(')');
-    const auto goal_descriptor_forall_def = (lit('(') >> lit("forall")) > typed_list_of_variables > goal_descriptor > lit(')');
+    const auto goal_descriptor_and_def = (lit('(') >> keyword("and")) > *goal_descriptor > lit(')');
+    const auto goal_descriptor_or_def = (lit('(') >> keyword("or") >> *goal_descriptor) > lit(')');
+    const auto goal_descriptor_not_def = (lit('(') >> keyword("not")) > goal_descriptor > lit(')');
+    const auto goal_descriptor_imply_def = (lit('(') >> keyword("imply")) > goal_descriptor > goal_descriptor > lit(')');
+    const auto goal_descriptor_exists_def = (lit('(') >> keyword("exists")) > typed_list_of_variables > goal_descriptor > lit(')');
+    const auto goal_descriptor_forall_def = (lit('(') >> keyword("forall")) > typed_list_of_variables > goal_descriptor > lit(')');
     const auto goal_descriptor_function_comparison_def = (lit('(') >> binary_comparator >> function_expression) > function_expression > lit(')');
 
     const auto constraint_goal_descriptor_def = constraint_goal_descriptor_and | constraint_goal_descriptor_forall | constraint_goal_descriptor_at_end
         | constraint_goal_descriptor_always | constraint_goal_descriptor_sometime | constraint_goal_descriptor_within
         | constraint_goal_descriptor_at_most_once | constraint_goal_descriptor_sometime_after | constraint_goal_descriptor_sometime_before
         | constraint_goal_descriptor_always_within | constraint_goal_descriptor_hold_during | constraint_goal_descriptor_hold_after;
-    const auto constraint_goal_descriptor_and_def = (lit('(') >> lit("and")) > *constraint_goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_forall_def = (lit('(') >> lit("forall")) > typed_list_of_variables > constraint_goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_at_end_def = (lit('(') >> lit("at") >> lit("end")) > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_always_def = (lit('(') >> lit("always")) > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_sometime_def = (lit('(') >> lit("sometime")) > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_within_def = (lit('(') >> lit("within")) > number > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_at_most_once_def = (lit('(') >> lit("at-most-once")) > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_sometime_after_def = (lit('(') >> lit("sometime-after")) > goal_descriptor > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_sometime_before_def = (lit('(') >> lit("sometime-before")) > goal_descriptor > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_always_within_def = (lit('(') >> lit("always-within")) > number > goal_descriptor > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_hold_during_def = (lit('(') >> lit("hold-during")) > number > number > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_hold_after_def = (lit('(') >> lit("hold-after")) > number > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_and_def = (lit('(') >> keyword("and")) > *constraint_goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_forall_def = (lit('(') >> keyword("forall")) > typed_list_of_variables > constraint_goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_at_end_def = (lit('(') >> keyword("at ") >> keyword("end")) > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_always_def = (lit('(') >> keyword("always")) > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_sometime_def = (lit('(') >> keyword("sometime")) > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_within_def = (lit('(') >> keyword("within ")) > number > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_at_most_once_def = (lit('(') >> keyword("at-most-once")) > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_sometime_after_def = (lit('(') >> keyword("sometime-after")) > goal_descriptor > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_sometime_before_def = (lit('(') >> keyword("sometime-before")) > goal_descriptor > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_always_within_def = (lit('(') >> keyword("always-within")) > number > goal_descriptor > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_hold_during_def = (lit('(') >> keyword("hold-during")) > number > number > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_hold_after_def = (lit('(') >> keyword("hold-after")) > number > goal_descriptor > lit(')');
 
     const auto precondition_goal_descriptor_def = precondition_goal_descriptor_and | precondition_goal_descriptor_preference | precondition_goal_descriptor_forall | precondition_goal_descriptor_simple;
     const auto preference_name_def = name;
     const auto precondition_goal_descriptor_simple_def = goal_descriptor;
-    const auto precondition_goal_descriptor_and_def = (lit('(') >> lit("and") >> *precondition_goal_descriptor) > lit(')');
-    const auto precondition_goal_descriptor_preference_def = (lit('(') >> lit("preference")) > preference_name > goal_descriptor > lit(')');
-    const auto precondition_goal_descriptor_forall_def = (lit('(') >> lit("forall")) > typed_list_of_variables > precondition_goal_descriptor > lit(')');
+    const auto precondition_goal_descriptor_and_def = (lit('(') >> keyword("and") >> *precondition_goal_descriptor) > lit(')');
+    const auto precondition_goal_descriptor_preference_def = (lit('(') >> keyword("preference")) > preference_name > goal_descriptor > lit(')');
+    const auto precondition_goal_descriptor_forall_def = (lit('(') >> keyword("forall")) > typed_list_of_variables > precondition_goal_descriptor > lit(')');
 
-    const auto assign_operator_assign_def = lit("assign") >> x3::attr(ast::AssignOperatorAssign{});
-    const auto assign_operator_scale_up_def = lit("scale-up") >> x3::attr(ast::AssignOperatorScaleUp{});
-    const auto assign_operator_scale_down_def = lit("scale-down") >> x3::attr(ast::AssignOperatorScaleDown{});
-    const auto assign_operator_increase_def = lit("increase") >> x3::attr(ast::AssignOperatorIncrease{});
-    const auto assign_operator_decrease_def = lit("decrease") >> x3::attr(ast::AssignOperatorDecrease{});
+    const auto assign_operator_assign_def = keyword("assign") >> x3::attr(ast::AssignOperatorAssign{});
+    const auto assign_operator_scale_up_def = keyword("scale-up") >> x3::attr(ast::AssignOperatorScaleUp{});
+    const auto assign_operator_scale_down_def = keyword("scale-down") >> x3::attr(ast::AssignOperatorScaleDown{});
+    const auto assign_operator_increase_def = keyword("increase") >> x3::attr(ast::AssignOperatorIncrease{});
+    const auto assign_operator_decrease_def = keyword("decrease") >> x3::attr(ast::AssignOperatorDecrease{});
     const auto assign_operator_def = assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
 
-    const auto effect_def = lit('(') >> lit("and") >> *effect >> lit(')') | effect_conditional | effect_production;
+    const auto effect_def = lit('(') >> keyword("and") >> *effect >> lit(')') | effect_conditional | effect_production;
     const auto effect_production_literal_def = literal;
     const auto effect_production_numeric_fluent_def = (lit('(') >> assign_operator >> function_head >> function_expression) > lit(')');
     const auto effect_production_object_fluent_def = lit('(') >> function_term >> (term | undefined);
     const auto effect_production_def = effect_production_literal | effect_production_numeric_fluent | effect_production_object_fluent;
-    const auto effect_conditional_forall_def = (lit('(') >> lit("forall")) > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
-    const auto effect_conditional_when_def = (lit('(') >> lit("when")) > goal_descriptor > effect > lit(')');
+    const auto effect_conditional_forall_def = (lit('(') >> keyword("forall")) > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
+    const auto effect_conditional_when_def = (lit('(') >> keyword("when")) > goal_descriptor > effect > lit(')');
     const auto effect_conditional_def = effect_conditional_forall | effect_conditional_when;
 
     const auto action_symbol_def = name;
-    const auto action_body_def = (lit(":precondition") > ((lit('(') >> lit(')')) | precondition_goal_descriptor))
-                                >> (lit(":effect") > ((lit('(') >> lit(')')) | effect));
-    const auto action_def = (lit('(') >> lit(":action")) > action_symbol
-                                      > lit(":parameters") > lit('(') >> typed_list_of_variables > lit(')')
+    const auto action_body_def = (keyword(":precondition") > ((lit('(') >> lit(')')) | precondition_goal_descriptor))
+                                >> (keyword(":effect") > ((lit('(') >> lit(')')) | effect));
+    const auto action_def = (lit('(') >> keyword(":action")) > action_symbol
+                                      > keyword(":parameters") > lit('(') >> typed_list_of_variables > lit(')')
                                       >> action_body
                             >> lit(')');
 
     const auto derived_predicate_def = (lit('(') >> typed_list_of_variables >> goal_descriptor) > lit(')');
 
-    const auto domain_name_def = (lit('(') >> lit("domain")) > name > lit(')');
-    const auto requirements_def = lit('(') >> lit(":requirements") >> *requirement >> lit(')');
-    const auto types_def = (lit('(') >> lit(":types") >> typed_list_of_names) > lit(')');
-    const auto constants_def = (lit('(') >> lit(":constants") >> typed_list_of_names) > lit(')');
-    const auto predicates_def = (lit('(') >> lit(":predicates") >> *atomic_formula_skeleton) > lit(')');
-    const auto functions_def = (lit('(') >> lit(":functions") >> *function_typed_list_of_atomic_function_skeletons) > lit(')');
-    const auto constraints_def = (lit('(') >> lit(":constraints")) > constraint_goal_descriptor > lit(')');
+    const auto domain_name_def = (lit('(') >> keyword("domain")) > name > lit(')');
+    const auto requirements_def = lit('(') >> keyword(":requirements") >> *requirement >> lit(')');
+    const auto types_def = (lit('(') >> keyword(":types") >> typed_list_of_names) > lit(')');
+    const auto constants_def = (lit('(') >> keyword(":constants") >> typed_list_of_names) > lit(')');
+    const auto predicates_def = (lit('(') >> keyword(":predicates") >> *atomic_formula_skeleton) > lit(')');
+    const auto functions_def = (lit('(') >> keyword(":functions") >> *function_typed_list_of_atomic_function_skeletons) > lit(')');
+    const auto constraints_def = (lit('(') >> keyword(":constraints")) > constraint_goal_descriptor > lit(')');
     const auto structure_def = action | derived_predicate;
 
     const auto domain_def =
-        lit('(') > lit("define")
+        lit('(') > keyword("define")
            > domain_name
            >> -requirements
            >> -types

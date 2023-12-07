@@ -19,6 +19,9 @@
 
 
 namespace loki {
+FileNotExistsError::FileNotExistsError(const std::string& path_to_file)
+    : std::runtime_error("File does not exist at " + path_to_file) { }
+
 SyntaxParserError::SyntaxParserError(const std::string& message)
     : std::runtime_error(message) { }
 

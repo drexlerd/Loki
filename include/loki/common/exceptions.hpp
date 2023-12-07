@@ -22,6 +22,12 @@
 
 
 namespace loki {
+class FileNotExistsError : public std::runtime_error {
+public:
+    explicit FileNotExistsError(const std::string& path_to_file);
+};
+
+
 class SyntaxParserError : public std::runtime_error {
 public:
     explicit SyntaxParserError(const std::string& message);

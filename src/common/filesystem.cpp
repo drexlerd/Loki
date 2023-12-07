@@ -17,22 +17,44 @@
 
 #include "../../include/loki/common/filesystem.hpp"
 
+#include "../../include/loki/common/exceptions.hpp"
+
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 
 namespace loki {
 
 std::string read_file(const fs::path& file_path) {
     std::ifstream file(file_path.c_str());
-    if (file.is_open()) {
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-        // TODO remove comments, change tabs to 4 spaces
-        return buffer.str();
+    if (!file.is_open()) {
+        throw FileNotExistsError(std::string(file_path.c_str()));
     }
-    throw std::runtime_error("file does not exist at " + std::string(file_path.c_str()));
+
+    std::stringstream buffer;
+    std::string line;
+
+    while (std::getline(file, line)) {
+        size_t commentPos = line.find(';');
+        if (commentPos != std::string::npos) {
+            line = line.substr(0, commentPos);
+        }
+
+        // Replace tabs with four spaces
+        size_t tabPos = 0;
+        while ((tabPos = line.find('\t', tabPos)) != std::string::npos) {
+            line.replace(tabPos, 1, "    ");
+            tabPos += 4; // Move past the new spaces
+        }
+
+        buffer << line << '\n';
+    }
+
+    std::cout << buffer.str() << std::endl;
+
+    return buffer.str();
 }
 
 }
