@@ -22,7 +22,6 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <iostream>
 
 
 namespace loki {
@@ -37,6 +36,7 @@ std::string read_file(const fs::path& file_path) {
     std::string line;
 
     while (std::getline(file, line)) {
+        // Strip comments
         size_t commentPos = line.find(';');
         if (commentPos != std::string::npos) {
             line = line.substr(0, commentPos);
@@ -51,9 +51,6 @@ std::string read_file(const fs::path& file_path) {
 
         buffer << line << '\n';
     }
-
-    std::cout << buffer.str() << std::endl;
-
     return buffer.str();
 }
 

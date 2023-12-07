@@ -196,6 +196,8 @@ namespace loki::domain::parser {
     // Grammar
     ///////////////////////////////////////////////////////////////////////////
 
+    /// @brief A separator must follow a keyword because we do not want to allow
+    ///        parsing prefix like "or" of "origin" as a keyword.
     auto keyword(const std::string& keyword) {
         return lit(keyword) >> no_skip[&(ascii::space | lit('\n') | lit('(') | lit(')'))];
     }
@@ -298,10 +300,10 @@ namespace loki::domain::parser {
         | constraint_goal_descriptor_always_within | constraint_goal_descriptor_hold_during | constraint_goal_descriptor_hold_after;
     const auto constraint_goal_descriptor_and_def = (lit('(') >> keyword("and")) > *constraint_goal_descriptor > lit(')');
     const auto constraint_goal_descriptor_forall_def = (lit('(') >> keyword("forall")) > typed_list_of_variables > constraint_goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_at_end_def = (lit('(') >> keyword("at ") >> keyword("end")) > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_at_end_def = (lit('(') >> keyword("at") >> keyword("end")) > goal_descriptor > lit(')');
     const auto constraint_goal_descriptor_always_def = (lit('(') >> keyword("always")) > goal_descriptor > lit(')');
     const auto constraint_goal_descriptor_sometime_def = (lit('(') >> keyword("sometime")) > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_within_def = (lit('(') >> keyword("within ")) > number > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_within_def = (lit('(') >> keyword("within")) > number > goal_descriptor > lit(')');
     const auto constraint_goal_descriptor_at_most_once_def = (lit('(') >> keyword("at-most-once")) > goal_descriptor > lit(')');
     const auto constraint_goal_descriptor_sometime_after_def = (lit('(') >> keyword("sometime-after")) > goal_descriptor > goal_descriptor > lit(')');
     const auto constraint_goal_descriptor_sometime_before_def = (lit('(') >> keyword("sometime-before")) > goal_descriptor > goal_descriptor > lit(')');

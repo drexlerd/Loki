@@ -108,6 +108,8 @@ namespace loki::problem::parser {
     // Grammar
     ///////////////////////////////////////////////////////////////////////////
 
+    /// @brief A separator must follow a keyword because we do not want to allow
+    ///        parsing prefix like "or" of "origin" as a keyword.
     auto keyword(const std::string& keyword) {
         return lit(keyword) >> no_skip[&(ascii::space | lit('\n') | lit('(') | lit(')'))];
     }
