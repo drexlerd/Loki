@@ -46,6 +46,8 @@ class EffectVisitor {
 public:
     virtual void visit(const EffectLiteral& condition) = 0;
     virtual void visit(const EffectAnd& condition) = 0;
+    virtual void visit(const EffectConditionalForall& condition) = 0;
+    virtual void visit(const EffectConditionalWhen& condition) = 0;
 };
 
 
@@ -116,6 +118,54 @@ public:
     const EffectList& get_effects() const;
 };
 
+
+
+/* ConditionalForall */
+class EffectConditionalForallImpl : public EffectImpl, public std::enable_shared_from_this<EffectConditionalForallImpl> {
+private:
+    ParameterList m_parameters;
+    Effect m_effect;
+
+    EffectConditionalForallImpl(int identifier, const ParameterList& parameters, const Effect& effect);
+
+    template<typename... Ts>
+    friend class loki::ReferenceCountedObjectFactory;
+
+public:
+    bool are_equal_impl(const EffectImpl& other) const override;
+    size_t hash_impl() const;
+    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+
+    void accept(EffectVisitor& visitor) const override;
+
+    const ParameterList& get_parameters() const;
+    const Effect& get_effect() const;
+};
+
+
+/* ConditionalWhen */
+class EffectConditionalWhenImpl : public EffectImpl, public std::enable_shared_from_this<EffectConditionalWhenImpl> {
+private:
+    Condition m_condition;
+    Effect m_effect;
+
+    EffectConditionalWhenImpl(int identifier, const Condition& condition, const Effect& effect);
+
+    template<typename... Ts>
+    friend class loki::ReferenceCountedObjectFactory;
+
+public:
+    bool are_equal_impl(const EffectImpl& other) const override;
+    size_t hash_impl() const;
+    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+
+    void accept(EffectVisitor& visitor) const override;
+
+    const Condition& get_condition() const;
+    const Effect& get_effect() const;
+};
+
+
 }
 
 
@@ -137,6 +187,18 @@ namespace std {
     struct hash<loki::pddl::EffectAndImpl>
     {
         std::size_t operator()(const loki::pddl::EffectAndImpl& effect) const;
+    };
+
+    template<>
+    struct hash<loki::pddl::EffectConditionalForallImpl>
+    {
+        std::size_t operator()(const loki::pddl::EffectConditionalForallImpl& effect) const;
+    };
+
+    template<>
+    struct hash<loki::pddl::EffectConditionalWhenImpl>
+    {
+        std::size_t operator()(const loki::pddl::EffectConditionalWhenImpl& effect) const;
     };
 }
 

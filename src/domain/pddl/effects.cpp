@@ -85,7 +85,74 @@ const EffectList& EffectAndImpl::get_effects() const {
     return m_effects;
 }
 
+
+EffectConditionalForallImpl::EffectConditionalForallImpl(int identifier, const ParameterList& parameters, const Effect& effect)
+    : EffectImpl(identifier), m_parameters(parameters), m_effect(effect) { }
+
+bool EffectConditionalForallImpl::are_equal_impl(const EffectImpl& other) const {
+    if (typeid(*this) == typeid(other)) {
+        const auto& other_derived = static_cast<const EffectConditionalForallImpl&>(other);
+        return m_parameters == other_derived.m_parameters
+            && m_effect == other_derived.m_effect;
+    }
+    return false;
 }
+
+size_t EffectConditionalForallImpl::hash_impl() const {
+    return hash_combine(hash_vector(m_parameters), m_effect);
+}
+
+void EffectConditionalForallImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    out << "TODO";
+}
+
+void EffectConditionalForallImpl::accept(EffectVisitor& visitor) const {
+    visitor.visit(this->shared_from_this());
+}
+
+const ParameterList& EffectConditionalForallImpl::get_parameters() const {
+    return m_parameters;
+}
+
+const Effect& EffectConditionalForallImpl::get_effect() const {
+    return m_effect;
+}
+
+
+EffectConditionalWhenImpl::EffectConditionalWhenImpl(int identifier, const Condition& condition, const Effect& effect)
+    : EffectImpl(identifier), m_condition(condition), m_effect(effect) { }
+
+bool EffectConditionalWhenImpl::are_equal_impl(const EffectImpl& other) const {
+    if (typeid(*this) == typeid(other)) {
+        const auto& other_derived = static_cast<const EffectConditionalWhenImpl&>(other);
+        return m_condition == other_derived.m_condition
+            && m_effect == other_derived.m_effect;
+    }
+    return false;
+}
+
+size_t EffectConditionalWhenImpl::hash_impl() const {
+    return hash_combine(m_condition, m_effect);
+}
+
+void EffectConditionalWhenImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    out << "TODO";
+}
+
+void EffectConditionalWhenImpl::accept(EffectVisitor& visitor) const {
+    visitor.visit(this->shared_from_this());
+}
+
+const Condition& EffectConditionalWhenImpl::get_condition() const {
+    return m_condition;
+}
+
+const Effect& EffectConditionalWhenImpl::get_effect() const {
+    return m_effect;
+}
+
+}
+
 
 namespace std {
     bool less<loki::pddl::Effect>::operator()(
@@ -99,6 +166,14 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::EffectAndImpl>::operator()(const loki::pddl::EffectAndImpl& effect) const {
+        return effect.hash_impl();
+    }
+
+    std::size_t hash<loki::pddl::EffectConditionalForallImpl>::operator()(const loki::pddl::EffectConditionalForallImpl& effect) const {
+        return effect.hash_impl();
+    }
+
+    std::size_t hash<loki::pddl::EffectConditionalWhenImpl>::operator()(const loki::pddl::EffectConditionalWhenImpl& effect) const {
         return effect.hash_impl();
     }
 }

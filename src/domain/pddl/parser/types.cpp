@@ -110,6 +110,11 @@ pddl::TypeList TypeListVisitor::operator()(const std::vector<ast::Name>& name_no
 }
 
 pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
+    // requires :typing
+    if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
+        context.error_handler(typed_list_of_names_recursively_node, "");
+        throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.error_stream->str());
+    }
     pddl::TypeList type_list;
     const auto types = boost::apply_visitor(TypeDeclarationVisitor(context),
                                             typed_list_of_names_recursively_node.type);

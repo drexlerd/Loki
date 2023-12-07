@@ -101,7 +101,7 @@
        :precondition (and (not (busy grinder))
                   (not (scheduled ?x)))
        :effect (and
-            (busy GRINDER)
+            (busy grinder)
             (scheduled ?x)
             (surface-condition ?x smooth)
             (when (not (objscheduled))
@@ -157,7 +157,7 @@
               (has-paint spray-painter ?newpaint)
               (not (busy spray-painter))
               (not (scheduled ?x))
-              (temperature ?x COLD))
+              (temperature ?x cold))
        :effect (and
             (busy spray-painter)
             (scheduled ?x)

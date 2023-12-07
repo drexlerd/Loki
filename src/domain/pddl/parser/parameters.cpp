@@ -53,6 +53,11 @@ pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Vari
 }
 
 pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVariablesRecursively& typed_variables_node) {
+    // requires :typing
+    if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
+        context.error_handler(typed_variables_node, "");
+        throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.error_stream->str());
+    }
     pddl::ParameterList parameter_list;
     const auto types = boost::apply_visitor(TypeReferenceVisitor(context),
                                             typed_variables_node.type);

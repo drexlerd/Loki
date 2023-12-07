@@ -74,13 +74,15 @@ namespace loki::domain {
             , pddl::ConditionNotImpl
             , pddl::EffectLiteralImpl
             , pddl::EffectAndImpl
+            , pddl::EffectConditionalForallImpl
+            , pddl::EffectConditionalWhenImpl
             , pddl::ActionImpl
             , pddl::DerivedPredicateImpl
             , pddl::DomainImpl> cache;
 
         // Track scopes during parsing
         std::shared_ptr<Scope> global_scope;
-        std::deque<std::shared_ptr<Scope>> scopes; 
+        std::deque<std::shared_ptr<Scope>> scopes;
 
         // For convenience.
         pddl::Requirements requirements;
@@ -93,7 +95,7 @@ namespace loki::domain {
             error_handler_type&& error_handler_)
             : error_stream(std::move(error_stream_))
             , error_handler(std::move(error_handler_)) {
-    
+
             // Initialize the global scope
             global_scope = std::make_shared<Scope>(nullptr);
             scopes.push_back(global_scope);

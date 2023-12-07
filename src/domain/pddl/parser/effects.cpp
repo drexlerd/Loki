@@ -17,7 +17,9 @@
 
 #include "effects.hpp"
 
+#include "conditions.hpp"
 #include "literal.hpp"
+#include "parameters.hpp"
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 
@@ -75,14 +77,27 @@ pddl::Effect parse(const domain::ast::EffectProduction& node, domain::Context& c
 }
 
 pddl::Effect parse(const domain::ast::EffectConditionalForall& node, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::EffectConditionalForall");
+    context.open_scope();
+    pddl::ParameterList parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
+    pddl::Effect effect = parse(node.effect, context);
+    context.close_scope();
+    return context.cache.get_or_create<pddl::EffectConditionalForallImpl>(parameter_list, effect);
 }
 
 pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, domain::Context& context) {
-    throw NotImplementedError("parse domain::ast::EffectConditionalWhen");
+    context.open_scope();
+    pddl::Condition condition = parse(node.goal_descriptor, context);
+    pddl::Effect effect = parse(node.effect, context);
+    context.close_scope();
+    return context.cache.get_or_create<pddl::EffectConditionalWhenImpl>(condition, effect);
 }
 
 pddl::Effect parse(const domain::ast::EffectConditional& node, domain::Context& context) {
+    // requires :conditional-effects
+    if (!context.requirements->test(pddl::RequirementEnum::CONDITIONAL_EFFECTS)) {
+        context.error_handler(node, "");
+        throw UndefinedRequirementError(pddl::RequirementEnum::CONDITIONAL_EFFECTS, context.error_stream->str());
+    }
     return boost::apply_visitor(EffectConditionalVisitor(context), node);
 }
 

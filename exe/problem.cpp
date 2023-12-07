@@ -45,6 +45,7 @@ int main(int argc, char** argv) {
     // 1. Parse the domain
     const auto domain_source = loki::read_file(domain_file);
     domain::ast::Domain domain_node;
+    // heap allocated because error_handler_type stores a reference which must remain valid
     std::unique_ptr<std::ostringstream> domain_error_stream = std::make_unique<std::ostringstream>();
     error_handler_type domain_error_handler(domain_source.begin(), domain_source.end(), *domain_error_stream, domain_file);
     parse_ast(domain_source, domain::domain(), domain_node, domain_error_handler);
@@ -56,6 +57,7 @@ int main(int argc, char** argv) {
     // 2. Parse the problem
     const auto problem_source = loki::read_file(problem_file);
     problem::ast::Problem problem_node;
+    // heap allocated because error_handler_type stores a reference which must remain valid
     std::unique_ptr<std::ostringstream> problem_error_stream = std::make_unique<std::ostringstream>();
     error_handler_type problem_error_handler(problem_source.begin(), problem_source.end(), *problem_error_stream, problem_file);
     parse_ast(problem_source, problem::problem(), problem_node, problem_error_handler);
@@ -63,7 +65,6 @@ int main(int argc, char** argv) {
     problem::Context problem_context(std::move(problem_error_stream), std::move(problem_error_handler), std::move(domain_context));
     pddl::Problem problem = parse(problem_node, problem_context, domain);
     std::cout << *problem << std::endl;
-
 
     return 0;
 }

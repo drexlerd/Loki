@@ -93,6 +93,10 @@ namespace loki::pddl {
     using EffectLiteral = std::shared_ptr<const EffectLiteralImpl>;
     class EffectAndImpl;
     using EffectAnd = std::shared_ptr<const EffectAndImpl>;
+    class EffectConditionalForallImpl;
+    using EffectConditionalForall = std::shared_ptr<const EffectConditionalForallImpl>;
+    class EffectConditionalWhenImpl;
+    using EffectConditionalWhen = std::shared_ptr<const EffectConditionalWhenImpl>;
 
     class FunctionSkeletonImpl;
     using FunctionSkeleton = std::shared_ptr<const FunctionSkeletonImpl>;
