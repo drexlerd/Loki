@@ -79,8 +79,6 @@ private:
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
-    ~ConditionLiteralImpl() override;
-
     bool are_equal_impl(const ConditionImpl& other) const override;
     size_t hash_impl() const;
     void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
@@ -102,8 +100,6 @@ private:
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
-    ~ConditionAndImpl() override;
-
     bool are_equal_impl(const ConditionImpl& other) const override;
     size_t hash_impl() const;
     void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
@@ -125,8 +121,6 @@ private:
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
-    ~ConditionOrImpl() override;
-
     bool are_equal_impl(const ConditionImpl& other) const override;
     size_t hash_impl() const;
     void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
@@ -148,8 +142,6 @@ private:
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
-    ~ConditionNotImpl() override;
-
     bool are_equal_impl(const ConditionImpl& other) const override;
     size_t hash_impl() const;
     void str_impl(std::stringstream& out, const FormattingOptions& options) const override;

@@ -56,7 +56,6 @@ protected:
 
 public:
     explicit Base(int identifier) : m_identifier(identifier) { }
-    ~Base() { }
 
     bool operator==(const Base& other) const {
         return static_cast<const Derived*>(this)->are_equal_impl(static_cast<const Derived&>(other));

@@ -27,7 +27,7 @@
 
 namespace loki {
 
-/// @brief A reference-counted object cache.
+/// @brief A thread-safe reference-counted object cache.
 /// Original idea by Herb Sutter.
 /// Custom deleter idea: https://stackoverflow.com/questions/49782011/herb-sutters-10-liner-with-cleanup
 template<typename... Ts>
@@ -48,22 +48,33 @@ private:
         }
     };
 
+    /// @brief Encapsulates the data of a single type.
     template<typename T>
     struct PerTypeCache {
-        // Weak_ptr cannot be key, so we use a shared_ptr<const T>.
+        // cannot use weak_ptr<T> in set, so we use it as value in map.
+        // shared_ptr<T> is key because 
+        //   1) polymorphic types do not have copy/move 
+        //   2) mapping from identifier to key for deletion
+        // We could use raw pointer as key since we do not need reference counting.
         std::unordered_map<std::shared_ptr<const T>, std::weak_ptr<T>, ValueHash<T>, ValueEqual<T>> data;
         // For removal, we use an additional mapping from the identifier to the key of the data map.
         std::unordered_map<int, std::shared_ptr<const T>> identifier_to_key;
     };
 
-    std::tuple<std::shared_ptr<PerTypeCache<Ts>>...> m_cache;
+    /// @brief Encapsulates the data of all types.
+    struct Cache {
+        std::tuple<PerTypeCache<Ts>...> data;
+        // Identifiers are shared across types since types can be polymorphic
+        int count = 0;
+        // Mutex is shared for thread-safe changes to count that is shared across types
+        std::mutex mutex;
+    };
 
-    // Identifiers are shared since types can be polymorphic
-    int m_count = 0;
+    std::shared_ptr<Cache> m_cache;
 
 public:
     ReferenceCountedObjectFactory()
-        : m_cache((std::make_shared<PerTypeCache<Ts>>())...) { }
+        : m_cache(std::make_shared<Cache>()) { }
 
     /// @brief Gets a shared reference to the object of type T with the given arguments.
     ///        If such an object does not exists then it creates one.
@@ -72,29 +83,31 @@ public:
     /// @return
     template<typename T, typename... Args>
     std::shared_ptr<const T> get_or_create(Args&&... args) {
-        auto& t_cache = std::get<std::shared_ptr<PerTypeCache<T>>>(m_cache);
-        int identifier = m_count;
-        /* Must explicitly call the constructor of T to give exclusive access to the factory. */
-        auto key = std::shared_ptr<T>(new T(identifier, args...));
         /* we must declare sp before locking the mutex
            s.t. the deleter is called after the mutex was released in case of stack unwinding. */
         std::shared_ptr<T> sp;
-        auto& cached = t_cache->data[key];
+        std::lock_guard<std::mutex> hold(m_cache->mutex);
+
+        auto& t_cache = std::get<PerTypeCache<T>>(m_cache->data);
+        int identifier = m_cache->count;
+        /* Must explicitly call the constructor of T to give exclusive access to the factory. */
+        auto key = std::shared_ptr<T>(new T(identifier, args...));
+        auto& cached = t_cache.data[key];
         sp = cached.lock();
-        // std::lock_guard<std::mutex> hold(t_cache->mutex);
         if (!sp) {
-            ++m_count;
-            t_cache->identifier_to_key.emplace(identifier, key);
+            ++m_cache->count;
+            t_cache.identifier_to_key.emplace(identifier, key);
             /* Must explicitly call the constructor of T to give exclusive access to the factory. */
             cached = sp = std::shared_ptr<T>(
                 new T(identifier, args...),
-                [parent=t_cache, identifier](T* x)
+                [cache=m_cache, identifier](T* x)
                 {
                     {
-                        // std::lock_guard<std::mutex> hold(parent->mutex);
-                        const auto& key = parent->identifier_to_key.at(identifier);
-                        parent->data.erase(key);
-                        parent->identifier_to_key.erase(identifier);
+                        std::lock_guard<std::mutex> hold(cache->mutex);
+                        auto& t_cache = std::get<PerTypeCache<T>>(cache->data);
+                        const auto& key = t_cache.identifier_to_key.at(identifier);
+                        t_cache.data.erase(key);
+                        t_cache.identifier_to_key.erase(identifier);
                     }
                     /* After cache removal, we can call the objects destructor
                        and recursively call the deleter of children if their ref count goes to 0 */

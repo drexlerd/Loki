@@ -33,9 +33,6 @@ ConditionLiteralImpl::ConditionLiteralImpl(int identifier, const Literal& litera
     : ConditionImpl(identifier)
     , m_literal(literal) { }
 
-ConditionLiteralImpl::~ConditionLiteralImpl() = default;
-
-
 bool ConditionLiteralImpl::are_equal_impl(const ConditionImpl& other) const {
     // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
     if (typeid(*this) == typeid(other)) {
@@ -67,8 +64,6 @@ ConditionAndImpl::ConditionAndImpl(int identifier, const ConditionList& conditio
     : ConditionImpl(identifier)
     , m_conditions(conditions) { }
 
-ConditionAndImpl::~ConditionAndImpl() = default;
-
 bool ConditionAndImpl::are_equal_impl(const ConditionImpl& other) const {
     if (typeid(*this) == typeid(other)) {
         const auto& other_derived = static_cast<const ConditionAndImpl&>(other);
@@ -99,8 +94,6 @@ ConditionOrImpl::ConditionOrImpl(int identifier, const ConditionList& conditions
     : ConditionImpl(identifier)
     , m_conditions(conditions) { }
 
-ConditionOrImpl::~ConditionOrImpl() = default;
-
 bool ConditionOrImpl::are_equal_impl(const ConditionImpl& other) const {
     if (typeid(*this) == typeid(other)) {
         const auto& other_derived = static_cast<const ConditionOrImpl&>(other);
@@ -130,8 +123,6 @@ const ConditionList& ConditionOrImpl::get_conditions() const {
 ConditionNotImpl::ConditionNotImpl(int identifier, const Condition& condition)
     : ConditionImpl(identifier)
     , m_condition(condition) { }
-
-ConditionNotImpl::~ConditionNotImpl() = default;
 
 bool ConditionNotImpl::are_equal_impl(const ConditionImpl& other) const {
     if (typeid(*this) == typeid(other)) {

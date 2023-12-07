@@ -86,8 +86,6 @@ private:
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
-    ~EffectLiteralImpl() override;
-
     bool are_equal_impl(const EffectImpl& other) const override;
     size_t hash_impl() const;
     void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
@@ -109,8 +107,6 @@ private:
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
-    ~EffectAndImpl() override;
-
     bool are_equal_impl(const EffectImpl& other) const override;
     size_t hash_impl() const;
     void str_impl(std::stringstream& out, const FormattingOptions& options) const override;

@@ -32,9 +32,6 @@ EffectLiteralImpl::EffectLiteralImpl(int identifier, const Literal& literal)
     : EffectImpl(identifier)
     , m_literal(literal) { }
 
-
-EffectLiteralImpl::~EffectLiteralImpl() = default;
-
 bool EffectLiteralImpl::are_equal_impl(const EffectImpl& other) const {
     // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
     if (typeid(*this) == typeid(other)) {
@@ -63,8 +60,6 @@ const Literal& EffectLiteralImpl::get_literal() const {
 
 EffectAndImpl::EffectAndImpl(int identifier, const EffectList& effects)
     : EffectImpl(identifier), m_effects(effects) { }
-
-EffectAndImpl::~EffectAndImpl() = default;
 
 bool EffectAndImpl::are_equal_impl(const EffectImpl& other) const {
     if (typeid(*this) == typeid(other)) {
