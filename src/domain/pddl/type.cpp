@@ -37,7 +37,7 @@ size_t TypeImpl::hash_impl() const {
 }
 
 void TypeImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    out << m_name;
 }
 
 const std::string& TypeImpl::get_name() const {

@@ -21,7 +21,7 @@
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 
-#include <deque>
+#include <iostream>
 
 using namespace std;
 
@@ -74,8 +74,12 @@ void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& optio
         size_t i = 0;
         for (const auto& pair : subtypes_by_parent_types) {
             if (i != 0) out << "\n" << string(nested_options.indent, ' ');
-            for (const auto& subtype : pair.second) {
-                //out <<
+            for (const auto& sub_type : pair.second) {
+                out << *sub_type << " ";
+            }
+            out << " - ";
+            for (const auto& parent_type : pair.first) {
+                out << *parent_type << " ";
             }
             out << "\n";
             ++i;
@@ -84,9 +88,6 @@ void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& optio
     }
 
     /*
-    if (node.types.has_value()) {
-        ss << string(nested_options.indent, ' ') << parse_text(node.types.value(), nested_options) << "\n";
-    }
     if (node.constants.has_value()) {
         ss << string(nested_options.indent, ' ') << parse_text(node.constants.value(), nested_options) << "\n";
     }
