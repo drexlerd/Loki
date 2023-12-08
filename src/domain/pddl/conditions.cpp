@@ -16,6 +16,8 @@
  */
 
 #include "../../../include/loki/domain/pddl/conditions.hpp"
+
+#include "../../../include/loki/domain/pddl/literal.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 
@@ -47,7 +49,7 @@ size_t ConditionLiteralImpl::hash_impl() const {
 }
 
 void ConditionLiteralImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    out << *m_literal;
 }
 
 void ConditionLiteralImpl::accept(ConditionVisitor& visitor) const {
@@ -77,7 +79,12 @@ size_t ConditionAndImpl::hash_impl() const {
 }
 
 void ConditionAndImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    out << "(and ";
+    for (size_t i = 0; i < m_conditions.size(); ++i) {
+        if (i != 0) out << " ";
+        out << *m_conditions[i];
+    }
+    out << ")";
 }
 
 void ConditionAndImpl::accept(ConditionVisitor& visitor) const {
@@ -107,7 +114,12 @@ size_t ConditionOrImpl::hash_impl() const {
 }
 
 void ConditionOrImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    out << "(or ";
+    for (size_t i = 0; i < m_conditions.size(); ++i) {
+        if (i != 0) out << " ";
+        out << *m_conditions[i];
+    }
+    out << ")";
 }
 
 void ConditionOrImpl::accept(ConditionVisitor& visitor) const {
@@ -137,7 +149,7 @@ size_t ConditionNotImpl::hash_impl() const {
 }
 
 void ConditionNotImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    out << "(not " << *m_condition << ")";
 }
 
 void ConditionNotImpl::accept(ConditionVisitor& visitor) const {

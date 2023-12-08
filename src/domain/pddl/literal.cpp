@@ -16,6 +16,8 @@
  */
 
 #include "../../../include/loki/domain/pddl/literal.hpp"
+
+#include "../../../include/loki/domain/pddl/atom.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 
@@ -37,7 +39,11 @@ size_t LiteralImpl::hash_impl() const {
 }
 
 void LiteralImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    if (m_is_negated) {
+        out << "(not " << *m_atom << ")";
+    } else {
+        out << *m_atom;
+    }
 }
 
 bool LiteralImpl::is_negated() const {

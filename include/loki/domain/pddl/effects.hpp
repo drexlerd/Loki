@@ -44,6 +44,8 @@ enum class AssignOperatorEnum {
 /// @brief Defines an interface for visiting nodes in a DAG of conditions.
 class EffectVisitor {
 public:
+    virtual ~EffectVisitor() = default;
+
     virtual void visit(const EffectLiteral& condition) = 0;
     virtual void visit(const EffectAnd& condition) = 0;
     virtual void visit(const EffectConditionalForall& condition) = 0;

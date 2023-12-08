@@ -36,6 +36,8 @@ namespace loki::pddl {
 /// @brief Defines an interface for visiting nodes in a DAG of conditions.
 class ConditionVisitor {
 public:
+    virtual ~ConditionVisitor() = default;
+
     virtual void visit(const ConditionLiteral& condition) = 0;
     virtual void visit(const ConditionAnd& condition) = 0;
     virtual void visit(const ConditionOr& condition) = 0;

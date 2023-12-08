@@ -32,6 +32,8 @@ class ReferenceCountedObjectFactory;
 namespace loki::pddl {
 class TermVisitor {
 public:
+    virtual ~TermVisitor() = default;
+
     virtual void visit(const std::shared_ptr<const TermConstantImpl>& term) = 0;
     virtual void visit(const std::shared_ptr<const TermVariableImpl>& term) = 0;
 };

@@ -17,6 +17,8 @@
 
 #include "../../../include/loki/domain/pddl/domain.hpp"
 
+#include "../../../include/loki/domain/pddl/object.hpp"
+#include "../../../include/loki/domain/pddl/predicate.hpp"
 #include "../../../include/loki/domain/pddl/type.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
@@ -77,7 +79,7 @@ void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& optio
             for (const auto& sub_type : pair.second) {
                 out << *sub_type << " ";
             }
-            out << " - ";
+            out << "- ";
             for (const auto& parent_type : pair.first) {
                 out << *parent_type << " ";
             }
@@ -86,14 +88,37 @@ void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& optio
         }
         out << ")\n";
     }
+    if (!m_constants.empty()) {
+        out << string(nested_options.indent, ' ') << "(:constants ";
+        std::unordered_map<std::vector<pddl::Type>, std::vector<pddl::Object>, hash_vector_type<pddl::Type>> constants_by_types;
+        for (const auto& constant : m_constants) {
+            constants_by_types[constant->get_bases()].push_back(constant);
+        }
+        size_t i = 0;
+        for (const auto& pair : constants_by_types) {
+            if (i != 0) out << "\n" << string(nested_options.indent, ' ');
+            for (const auto& type : pair.second) {
+                out << *type << " ";
+            }
+            out << "- ";
+            for (const auto& constant : pair.first) {
+                out << *constant << " ";
+            }
+            out << "\n";
+            ++i;
+        }
+        out << ")\n";
+    }
+    if (!m_predicates.empty()) {
+        out << string(nested_options.indent, ' ') << "(:predicates ";
+        for (size_t i = 0; i < m_predicates.size(); ++i) {
+            if (i != 0) out << " ";
+            out << *m_predicates[i];
+        }
+        out << ")\n";
+    }
 
     /*
-    if (node.constants.has_value()) {
-        ss << string(nested_options.indent, ' ') << parse_text(node.constants.value(), nested_options) << "\n";
-    }
-    if (node.predicates.has_value()) {
-        ss << string(nested_options.indent, ' ') << parse_text(node.predicates.value(), nested_options) << "\n";
-    }
     if (node.functions.has_value()) {
         ss << string(nested_options.indent, ' ') << parse_text(node.functions.value(), nested_options) << "\n";
     }

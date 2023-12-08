@@ -16,6 +16,9 @@
  */
 
 #include "../../../include/loki/domain/pddl/atom.hpp"
+
+#include "../../../include/loki/domain/pddl/predicate.hpp"
+#include "../../../include/loki/domain/pddl/term.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 
@@ -37,8 +40,29 @@ size_t AtomImpl::hash_impl() const {
     return hash_combine(m_predicate, hash_vector(m_terms));
 }
 
+class StrTermVisitor : public TermVisitor {
+public: 
+    std::stringstream& out;
+
+    explicit StrTermVisitor(std::stringstream& out_) : out(out_) { }
+
+    void visit(const std::shared_ptr<const TermConstantImpl>& term) {
+        out << *term;
+    }
+
+    void visit(const std::shared_ptr<const TermVariableImpl>& term) {
+        out << *term;
+    }
+};
+
 void AtomImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    out << "(" << m_predicate->get_name() << " ";
+    StrTermVisitor visitor(out);
+    for (size_t i = 0; i < m_terms.size(); ++i) {
+        if (i != 0) out << " ";
+        m_terms[i]->accept(visitor);
+    }
+    out << ")";
 }
 
 const Predicate& AtomImpl::get_predicate() const {

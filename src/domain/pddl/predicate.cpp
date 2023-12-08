@@ -16,6 +16,10 @@
  */
 
 #include "../../../include/loki/domain/pddl/predicate.hpp"
+
+#include "../../../include/loki/domain/pddl/parameter.hpp"
+#include "../../../include/loki/domain/pddl/variable.hpp"
+#include "../../../include/loki/domain/pddl/type.hpp"
 #include "../../../include/loki/common/hash.hpp"
 
 #include <memory>
@@ -37,7 +41,26 @@ size_t PredicateImpl::hash_impl() const {
 }
 
 void PredicateImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    out << "(" << m_name << " ";
+    for (size_t i = 0; i < m_parameters.size(); ++i) {
+        if (i != 0) out << " ";
+        const auto& parameter = m_parameters[i];
+        out << parameter->get_variable()->get_name();
+        if (parameter->get_bases().size() > 1) {
+            // either
+            out << " - (either ";
+            for (size_t j = 0; j < parameter->get_bases().size(); ++j) {
+                if (j != 0) out << " ";
+                out << parameter->get_bases()[j]->get_name();
+            }
+            out << ")";
+        } else if (parameter->get_bases().size() == 1) {
+            // TODO: if :typing is disabled, we do not want to print "object"
+            const auto& type = parameter->get_bases().front();
+            out << " - " << type->get_name();
+        }
+    }
+    out << ")";
 }
 
 const std::string& PredicateImpl::get_name() const {
