@@ -16,12 +16,14 @@
  */
 
 #include "../../../include/loki/domain/pddl/action.hpp"
+
+#include "../../../include/loki/domain/pddl/parameter.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 
 
 namespace loki::pddl {
-ActionImpl::ActionImpl(int identifier, const std::string& name, const ParameterList& parameters, const Condition& condition, const Effect& effect)
+ActionImpl::ActionImpl(int identifier, const std::string& name, const ParameterList& parameters, const std::optional<Condition>& condition, const std::optional<Effect>& effect)
     : Base(identifier)
     , m_name(name)
     , m_parameters(parameters)
@@ -33,20 +35,38 @@ ActionImpl::ActionImpl(int identifier, const std::string& name, const ParameterL
 bool ActionImpl::are_equal_impl(const ActionImpl& other) const {
     return (m_name == other.m_name)
         && (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters))
-        && (m_condition == other.m_condition)
-        && (m_effect == other.m_effect);
+        && (*m_condition == *other.m_condition)
+        && (*m_effect == *other.m_effect);
 }
 
 size_t ActionImpl::hash_impl() const {
     return hash_combine(
         m_name,
         hash_vector(m_parameters),
-        m_condition,
-        m_effect);
+        *m_condition,
+        *m_effect);
 }
 
 void ActionImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent};
+    out << std::string(options.indent, ' ') << "(action " << m_name << "\n"
+        << std::string(nested_options.indent, ' ') << ":parameters (";
+        for (size_t i = 0; i < m_parameters.size(); ++i) {
+            if (i != 0) out << " ";
+            out << *m_parameters[i];
+        }
+        out << ")";
+        out << "\n";
+        out << std::string(nested_options.indent, ' ') << ":conditions ";
+        if (m_condition.has_value()) out << *m_condition.value();
+        else out <<  "()" ;
+
+        out << "\n";
+        out << std::string(nested_options.indent, ' ') << ":effects ";
+        if (m_effect.has_value()) out << *m_effect.value();
+        else out <<  "()" ;
+
+        out << ")\n";
 }
 
 const std::string& ActionImpl::get_name() const {
@@ -57,11 +77,11 @@ const ParameterList& ActionImpl::get_parameters() const {
     return m_parameters;
 }
 
-const Condition& ActionImpl::get_condition() const {
+const std::optional<Condition>& ActionImpl::get_condition() const {
     return m_condition;
 }
 
-const Effect& ActionImpl::get_effect() const {
+const std::optional<Effect>& ActionImpl::get_effect() const {
     return m_effect;
 }
 

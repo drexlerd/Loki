@@ -17,7 +17,6 @@
 
 #include "../../../include/loki/domain/pddl/predicate.hpp"
 
-#include "../../../include/loki/common/pddl/printer.hpp"
 #include "../../../include/loki/domain/pddl/parameter.hpp"
 #include "../../../include/loki/domain/pddl/variable.hpp"
 #include "../../../include/loki/domain/pddl/type.hpp"
@@ -47,21 +46,10 @@ void PredicateImpl::str_impl(std::stringstream& out, const FormattingOptions& op
 
 void PredicateImpl::str(std::stringstream& out, const FormattingOptions& options, bool typing_enabled) const {
     out << "(" << m_name << " ";
-    write_vector_to_buffer(m_parameters, out, [typing_enabled](const Parameter& parameter, std::ostream& out){
-        out << parameter->get_variable()->get_name();
-        if (typing_enabled) {
-            const auto& base_types = parameter->get_bases();
-            out << " - ";
-            if (base_types.size() > 1) {
-                out << "(either ";
-                write_vector_to_buffer(base_types, out);
-                out << ")";
-            } else if (base_types.size() == 1) {
-                const auto& type = base_types.front();
-                out << type->get_name();
-            }
-        }
-    });
+    for (size_t i = 0; i < m_parameters.size(); ++i) {
+        if (i != 0) out << " ";
+        m_parameters[i]->str(out, options, typing_enabled);
+    }
     out << ")";
 }
 

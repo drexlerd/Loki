@@ -26,6 +26,7 @@
 
 #include <string>
 #include <functional>
+#include <optional>
 
 
 namespace loki {
@@ -39,10 +40,10 @@ class ActionImpl : public Base<ActionImpl> {
 private:
     std::string m_name;
     ParameterList m_parameters;
-    Condition m_condition;
-    Effect m_effect;
+    std::optional<Condition> m_condition;
+    std::optional<Effect> m_effect;
 
-    ActionImpl(int identifier, const std::string& name, const ParameterList& parameters, const Condition& condition, const Effect& effect);
+    ActionImpl(int identifier, const std::string& name, const ParameterList& parameters, const std::optional<Condition>& condition, const std::optional<Effect>& effect);
 
     template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
@@ -55,8 +56,8 @@ public:
 
     const std::string& get_name() const;
     const ParameterList& get_parameters() const;
-    const Condition& get_condition() const;
-    const Effect& get_effect() const;
+    const std::optional<Condition>& get_condition() const;
+    const std::optional<Effect>& get_effect() const;
 };
 
 }

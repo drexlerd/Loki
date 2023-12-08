@@ -47,7 +47,10 @@ public:
     /// @brief Test for semantic equivalence
     bool are_equal_impl(const ParameterImpl& other) const;
     size_t hash_impl() const;
+    /// @brief Returns a string representation where typing is assumed to be true.
     void str_impl(std::stringstream& out, const FormattingOptions& options) const;
+    /// @brief Returns a parseable string representation in the context of a domain.
+    void str(std::stringstream& out, const FormattingOptions& options, bool typing_enabled) const;
 
     const Variable& get_variable() const;
     const TypeList& get_bases() const;

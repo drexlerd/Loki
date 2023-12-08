@@ -17,7 +17,7 @@
 
 #include "../../../include/loki/domain/pddl/domain.hpp"
 
-#include "../../../include/loki/common/pddl/printer.hpp"
+#include "../../../include/loki/domain/pddl/action.hpp"
 #include "../../../include/loki/domain/pddl/object.hpp"
 #include "../../../include/loki/domain/pddl/predicate.hpp"
 #include "../../../include/loki/domain/pddl/type.hpp"
@@ -35,13 +35,15 @@ DomainImpl::DomainImpl(int identifier,
     const Requirements& requirements,
     const TypeList& types,
     const ObjectList& constants,
-    const PredicateList& predicates)
+    const PredicateList& predicates,
+    const ActionList& actions)
     : Base(identifier)
     , m_name(name)
     , m_requirements(requirements)
     , m_types(types)
     , m_constants(constants)
     , m_predicates(predicates)
+    , m_actions(actions)
 {
 }
 
@@ -50,7 +52,8 @@ bool DomainImpl::are_equal_impl(const DomainImpl& other) const {
         && (m_requirements == other.m_requirements)
         && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types))
         && (get_sorted_vector(m_constants) == get_sorted_vector(other.m_constants))
-        && (get_sorted_vector(m_predicates) == get_sorted_vector(other.m_predicates));
+        && (get_sorted_vector(m_predicates) == get_sorted_vector(other.m_predicates))
+        && (get_sorted_vector(m_actions) == get_sorted_vector(other.m_actions));
 }
 
 size_t DomainImpl::hash_impl() const {
@@ -59,7 +62,8 @@ size_t DomainImpl::hash_impl() const {
         m_requirements,
         hash_vector(get_sorted_vector(m_types)),
         hash_vector(get_sorted_vector(m_constants)),
-        hash_vector(get_sorted_vector(m_predicates)));
+        hash_vector(get_sorted_vector(m_predicates)),
+        hash_vector(get_sorted_vector(m_actions)));
 }
 
 void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
@@ -78,10 +82,16 @@ void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& optio
         for (const auto& pair : subtypes_by_parent_types) {
             if (i != 0) out << "\n" << string(nested_options.indent, ' ');
             const auto& sub_types = pair.second;
-            write_vector_to_buffer(sub_types, out);
+            for (size_t i = 0; i < sub_types.size(); ++i) {
+                if (i != 0) out << " ";
+                out << *sub_types[i];
+            }
             out << " - ";
             const auto& types = pair.first;
-            write_vector_to_buffer(types, out);
+            for (size_t i = 0; i < types.size(); ++i) {
+                if (i != 0) out << " ";
+                out << *types[i];
+            }
             ++i;
         }
         out << ")\n";
@@ -96,11 +106,17 @@ void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& optio
         for (const auto& pair : constants_by_types) {
             if (i != 0) out << "\n" << string(nested_options.indent, ' ');
             const auto& constants = pair.second;
-            write_vector_to_buffer(constants, out);
+            for (size_t i = 0; i < constants.size(); ++i) {
+                if (i != 0) out << " ";
+                out << *constants[i];
+            }
             if (m_requirements->test(RequirementEnum::TYPING)) {
                 out << " - ";
                 const auto& types = pair.first;
-                write_vector_to_buffer(types, out);
+                for (size_t i = 0; i < types.size(); ++i) {
+                    if (i != 0) out << " ";
+                    out << *types[i];
+                }
             }
             ++i;
         }
@@ -126,6 +142,10 @@ void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& optio
         ss << string(nested_options.indent, ' ') << parse_text(node.structures[i], nested_options) << "\n";
     }
     */
+
+    for (const auto& action : m_actions) {
+        action->str(out, nested_options);
+    }
 
     out << std::string(options.indent, ' ') << ")";
 }

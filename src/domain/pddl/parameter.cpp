@@ -16,8 +16,13 @@
  */
 
 #include "../../../include/loki/domain/pddl/parameter.hpp"
+
+#include "../../../include/loki/domain/pddl/type.hpp"
+#include "../../../include/loki/domain/pddl/variable.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
+
+#include <cassert>
 
 
 namespace loki::pddl {
@@ -37,7 +42,25 @@ size_t ParameterImpl::hash_impl() const {
 }
 
 void ParameterImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    str(out, options, true);
+}
+
+void ParameterImpl::str(std::stringstream& out, const FormattingOptions& options, bool typing_enabled) const {
+    out << *m_variable;
+    if (typing_enabled) {
+        assert(!m_types.empty());
+        out << " - ";
+        if (m_types.size() > 1) {
+            out << "(either ";
+            for (size_t i = 0; i < m_types.size(); ++i) {
+                if (i != 0) out << " ";
+                out << *m_types[i];
+            }
+            out << ")";
+        } else if (m_types.size() == 1) {
+            out << *m_types.front();
+        }
+    }
 }
 
 const Variable& ParameterImpl::get_variable() const {

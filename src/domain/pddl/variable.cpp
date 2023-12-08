@@ -36,7 +36,7 @@ size_t VariableImpl::hash_impl() const {
 }
 
 void VariableImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    out << m_name;
 }
 
 const std::string& VariableImpl::get_name() const {

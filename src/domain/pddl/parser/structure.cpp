@@ -33,20 +33,14 @@ std::string parse(const domain::ast::ActionSymbol& node, domain::Context& contex
     return parse(node.name);
 }
 
-std::tuple<pddl::Condition, pddl::Effect> parse(const domain::ast::ActionBody& node, domain::Context& context) {
-    pddl::Condition condition;
+std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(const domain::ast::ActionBody& node, domain::Context& context) {
+    std::optional<pddl::Condition> condition;
     if (node.precondition_goal_descriptor.has_value()) {
         condition = parse(node.precondition_goal_descriptor.value(), context);
-    } else {
-        // Empty And condition represents true
-        condition = context.cache.get_or_create<pddl::ConditionAndImpl>(pddl::ConditionList{});
     }
-    pddl::Effect effect;
+    std::optional<pddl::Effect> effect;
     if (node.effect.has_value()) {
         effect = parse(node.effect.value(), context);
-    } else {
-        // Empty And effect represents no effects
-        effect = context.cache.get_or_create<pddl::EffectAndImpl>(pddl::EffectList{});
     }
     return {condition, effect};
 }

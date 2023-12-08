@@ -40,13 +40,15 @@ private:
     TypeList m_types;
     ObjectList m_constants;
     PredicateList m_predicates;
+    ActionList m_actions;
 
     DomainImpl(int identifier,
         const std::string& name,
         const Requirements& requirements,
         const TypeList& types,
         const ObjectList& constants,
-        const PredicateList& predicates);
+        const PredicateList& predicates,
+        const ActionList& actions);
 
     template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
