@@ -17,6 +17,7 @@
 
 #include "../../../include/loki/domain/pddl/predicate.hpp"
 
+#include "../../../include/loki/common/pddl/printer.hpp"
 #include "../../../include/loki/domain/pddl/parameter.hpp"
 #include "../../../include/loki/domain/pddl/variable.hpp"
 #include "../../../include/loki/domain/pddl/type.hpp"
@@ -41,25 +42,26 @@ size_t PredicateImpl::hash_impl() const {
 }
 
 void PredicateImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+    str(out, options, true);
+}
+
+void PredicateImpl::str(std::stringstream& out, const FormattingOptions& options, bool typing_enabled) const {
     out << "(" << m_name << " ";
-    for (size_t i = 0; i < m_parameters.size(); ++i) {
-        if (i != 0) out << " ";
-        const auto& parameter = m_parameters[i];
+    write_vector_to_buffer(m_parameters, out, [typing_enabled](const Parameter& parameter, std::ostream& out){
         out << parameter->get_variable()->get_name();
-        if (parameter->get_bases().size() > 1) {
-            // either
-            out << " - (either ";
-            for (size_t j = 0; j < parameter->get_bases().size(); ++j) {
-                if (j != 0) out << " ";
-                out << parameter->get_bases()[j]->get_name();
+        if (typing_enabled) {
+            const auto& base_types = parameter->get_bases();
+            out << " - ";
+            if (base_types.size() > 1) {
+                out << "(either ";
+                write_vector_to_buffer(base_types, out);
+                out << ")";
+            } else if (base_types.size() == 1) {
+                const auto& type = base_types.front();
+                out << type->get_name();
             }
-            out << ")";
-        } else if (parameter->get_bases().size() == 1) {
-            // TODO: if :typing is disabled, we do not want to print "object"
-            const auto& type = parameter->get_bases().front();
-            out << " - " << type->get_name();
         }
-    }
+    });
     out << ")";
 }
 

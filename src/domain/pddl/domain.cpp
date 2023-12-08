@@ -17,6 +17,7 @@
 
 #include "../../../include/loki/domain/pddl/domain.hpp"
 
+#include "../../../include/loki/common/pddl/printer.hpp"
 #include "../../../include/loki/domain/pddl/object.hpp"
 #include "../../../include/loki/domain/pddl/predicate.hpp"
 #include "../../../include/loki/domain/pddl/type.hpp"
@@ -76,14 +77,11 @@ void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& optio
         size_t i = 0;
         for (const auto& pair : subtypes_by_parent_types) {
             if (i != 0) out << "\n" << string(nested_options.indent, ' ');
-            for (const auto& sub_type : pair.second) {
-                out << *sub_type << " ";
-            }
-            out << "- ";
-            for (const auto& parent_type : pair.first) {
-                out << *parent_type << " ";
-            }
-            out << "\n";
+            const auto& sub_types = pair.second;
+            write_vector_to_buffer(sub_types, out);
+            out << " - ";
+            const auto& types = pair.first;
+            write_vector_to_buffer(types, out);
             ++i;
         }
         out << ")\n";
@@ -97,14 +95,13 @@ void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& optio
         size_t i = 0;
         for (const auto& pair : constants_by_types) {
             if (i != 0) out << "\n" << string(nested_options.indent, ' ');
-            for (const auto& type : pair.second) {
-                out << *type << " ";
+            const auto& constants = pair.second;
+            write_vector_to_buffer(constants, out);
+            if (m_requirements->test(RequirementEnum::TYPING)) {
+                out << " - ";
+                const auto& types = pair.first;
+                write_vector_to_buffer(types, out);
             }
-            out << "- ";
-            for (const auto& constant : pair.first) {
-                out << *constant << " ";
-            }
-            out << "\n";
             ++i;
         }
         out << ")\n";
@@ -113,7 +110,7 @@ void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& optio
         out << string(nested_options.indent, ' ') << "(:predicates ";
         for (size_t i = 0; i < m_predicates.size(); ++i) {
             if (i != 0) out << " ";
-            out << *m_predicates[i];
+            m_predicates[i]->str(out, nested_options, m_requirements->test(RequirementEnum::TYPING));
         }
         out << ")\n";
     }
