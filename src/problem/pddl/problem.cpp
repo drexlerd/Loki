@@ -26,12 +26,13 @@ using namespace std;
 
 
 namespace loki::pddl {
-ProblemImpl::ProblemImpl(int identifier, const Domain& domain, const std::string& name, const Requirements& requirements, const ObjectList& objects)
+ProblemImpl::ProblemImpl(int identifier, const Domain& domain, const std::string& name, const Requirements& requirements, const ObjectList& objects, const GroundLiteralList& literals)
     : Base(identifier)
     , m_domain(domain)
     , m_name(name)
     , m_requirements(requirements)
     , m_objects(objects)
+    , m_literals(literals)
 {
 }
 
@@ -39,11 +40,17 @@ bool ProblemImpl::are_equal_impl(const ProblemImpl& other) const {
     return (m_domain == other.m_domain)
         && (m_name == other.m_name)
         && (m_requirements == other.m_requirements)
-        && (get_sorted_vector(m_objects) == get_sorted_vector(other.m_objects));
+        && (get_sorted_vector(m_objects) == get_sorted_vector(other.m_objects))
+        && (get_sorted_vector(m_literals)) == get_sorted_vector(other.m_literals);
 }
 
 size_t ProblemImpl::hash_impl() const {
-    return hash_combine(m_domain, m_name, m_requirements, hash_vector(get_sorted_vector(m_objects)));
+    return hash_combine(
+        m_domain,
+        m_name,
+        m_requirements,
+        hash_vector(get_sorted_vector(m_objects)),
+        hash_vector(get_sorted_vector(m_literals)));
 }
 
 void ProblemImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
@@ -90,6 +97,10 @@ const Requirements& ProblemImpl::get_requirements() const {
 
 const ObjectList& ProblemImpl::get_objects() const {
     return m_objects;
+}
+
+const GroundLiteralList& ProblemImpl::get_literals() const {
+    return m_literals;
 }
 
 }

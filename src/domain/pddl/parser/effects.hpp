@@ -28,21 +28,17 @@
 
 namespace loki {
 
-extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorAssign& node, domain::Context& context);
-extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleUp& node, domain::Context& context);
-extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleDown& node, domain::Context& context);
-extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorIncrease& node, domain::Context& context);
-extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorDecrease& node, domain::Context& context);
-extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperator& node, domain::Context& context);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorAssign& node);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleUp& node);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleDown& node);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorIncrease& node);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorDecrease& node);
+extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperator& node);
 
 struct AssignOperatorVisitor : boost::static_visitor<pddl::AssignOperatorEnum> {
-    domain::Context& context;
-
-    AssignOperatorVisitor(domain::Context& context_);
-
     template<typename Node>
     pddl::AssignOperatorEnum operator()(const Node& node) const {
-        return parse(node, context);
+        return parse(node);
     }
 };
 

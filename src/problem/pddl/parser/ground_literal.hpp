@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_OBJECTS_HPP_
-#define LOKI_SRC_PROBLEM_PDDL_PARSER_OBJECTS_HPP_
+#ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_GROUND_LITERAL_HPP_
+#define LOKI_SRC_PROBLEM_PDDL_PARSER_GROUND_LITERAL_HPP_
 
 #include "../../../../include/loki/problem/ast/ast.hpp"
 #include "../../../../include/loki/problem/pddl/parser.hpp"
@@ -24,21 +24,25 @@
 
 namespace loki {
 
-extern pddl::Object parse_object_reference(const domain::ast::Name& name_node, problem::Context& context);
-
-class ObjectListVisitor : boost::static_visitor<pddl::ObjectList> {
+class AtomicFormulaOfNamesVisitor : boost::static_visitor<pddl::GroundAtom> {
 private:
     problem::Context& context;
 
 public:
-    ObjectListVisitor(problem::Context& context_);
+    AtomicFormulaOfNamesVisitor(problem::Context& context_);
 
-    pddl::ObjectList operator()(const std::vector<domain::ast::Name>& name_nodes);
+    pddl::GroundAtom operator()(const problem::ast::AtomicFormulaOfNamesEquality& equality_node);
 
-    pddl::ObjectList operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
+    pddl::GroundAtom operator()(const problem::ast::AtomicFormulaOfNamesPredicate& predicate_node);
 };
 
-extern pddl::ObjectList parse(const problem::ast::Objects& objects_node, problem::Context& context);
+extern pddl::GroundAtom parse(const problem::ast::AtomicFormulaOfNames& atomic_formula_of_names_node, problem::Context& context);
+
+extern pddl::GroundAtom parse(const problem::ast::Atom& atom_node, problem::Context& context);
+
+extern pddl::GroundLiteral parse(const problem::ast::NegatedAtom& negated_atom_node, problem::Context& context);
+
+extern pddl::GroundLiteral parse(const problem::ast::Literal& literal_node, problem::Context& context);
 
 }
 

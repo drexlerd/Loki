@@ -50,7 +50,8 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, problem::Context&
     if (problem_node.objects.has_value()) {
         objects = parse(problem_node.objects.value(), context);
     }
-    return context.cache.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects);
+    pddl::GroundLiteralList literals;
+    return context.cache.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects, literals);
 }
 
 }

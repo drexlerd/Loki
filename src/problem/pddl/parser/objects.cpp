@@ -27,6 +27,16 @@ using namespace std;
 
 namespace loki {
 
+pddl::Object parse_object_reference(const domain::ast::Name& name_node, problem::Context& context) {
+    const auto name = parse(name_node);
+    const auto binding = context.get_current_scope().get<pddl::ObjectImpl>(name);
+    if (!binding.has_value()) {
+        context.error_handler(name_node, "");
+        throw UndefinedObjectError(name, context.error_stream->str());
+    }
+    return binding.value().object;
+}
+
 ObjectListVisitor::ObjectListVisitor(Context& context_)
     : context(context_) { }
 

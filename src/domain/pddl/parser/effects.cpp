@@ -25,33 +25,29 @@
 
 namespace loki {
 
-pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorAssign& node, domain::Context& context) {
+pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorAssign&) {
     return pddl::AssignOperatorEnum::ASSIGN;
 }
 
-pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleUp& node, domain::Context& context) {
+pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleUp&) {
     return pddl::AssignOperatorEnum::SCALE_UP;
 }
 
-pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleDown& node, domain::Context& context) {
+pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleDown&) {
     return pddl::AssignOperatorEnum::SCALE_DOWN;
 }
 
-pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorIncrease& node, domain::Context& context) {
+pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorIncrease&) {
     return pddl::AssignOperatorEnum::INCREASE;
 }
 
-pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorDecrease& node, domain::Context& context) {
+pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorDecrease&) {
     return pddl::AssignOperatorEnum::DECREASE;
 }
 
-pddl::AssignOperatorEnum parse(const domain::ast::AssignOperator& node, domain::Context& context) {
-    return boost::apply_visitor(AssignOperatorVisitor(context), node);
+pddl::AssignOperatorEnum parse(const domain::ast::AssignOperator& node) {
+    return boost::apply_visitor(AssignOperatorVisitor(), node);
 }
-
-
-AssignOperatorVisitor::AssignOperatorVisitor(domain::Context& context_)
-    : context(context_) { }
 
 
 pddl::Effect parse(const domain::ast::Effect& node, domain::Context& context) {

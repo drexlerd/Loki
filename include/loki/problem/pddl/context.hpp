@@ -19,6 +19,7 @@
 #define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_CONTEXT_HPP_
 
 #include "ground_atom.hpp"
+#include "ground_literal.hpp"
 #include "problem.hpp"
 
 #include "../../domain/pddl/context.hpp"
@@ -37,6 +38,7 @@ namespace loki::problem {
         std::unique_ptr<domain::Context> domain_context;
 
         ReferenceCountedObjectFactory<pddl::GroundAtomImpl
+            , pddl::GroundLiteralImpl
             , pddl::ProblemImpl> cache;
 
         // Track scopes during parsing

@@ -30,7 +30,7 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-class GroundAtomImpl : public Base<AtomImpl> {
+class GroundAtomImpl : public Base<GroundAtomImpl> {
 private:
     Predicate m_predicate;
     ObjectList m_objects;
@@ -42,12 +42,12 @@ public:
     GroundAtomImpl(int identifier, const Predicate& predicate, const ObjectList& objects);
 
     /// @brief Test for semantic equivalence
-    bool are_equal_impl(const AtomImpl& other) const;
+    bool are_equal_impl(const GroundAtomImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     const Predicate& get_predicate() const;
-    const TermList& get_terms() const;
+    const ObjectList& get_objects() const;
 };
 
 }

@@ -87,12 +87,12 @@ pddl::TypeList TypeReferenceVisitor::operator()(const ast::TypeEither& either_ty
     return type_list;
 }
 
-/* TypeListVisitor */
+/* TypeListDeclarationVisitor */
 
-TypeListVisitor::TypeListVisitor(Context& context_)
+TypeListDeclarationVisitor::TypeListDeclarationVisitor(Context& context_)
     : context(context_) { }
 
-pddl::TypeList TypeListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
+pddl::TypeList TypeListDeclarationVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::TypeList type_list;
     const auto base_type = context.cache.get_or_create<pddl::TypeImpl>("object");
@@ -109,7 +109,7 @@ pddl::TypeList TypeListVisitor::operator()(const std::vector<ast::Name>& name_no
     return type_list;
 }
 
-pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
+pddl::TypeList TypeListDeclarationVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
     // requires :typing
     if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
         context.error_handler(typed_list_of_names_recursively_node, "");
@@ -140,7 +140,7 @@ pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNamesRecursivel
         context.get_current_scope().insert<pddl::TypeImpl>(name, type, name_node);
     }
     // Recursively add types.
-    auto additional_types = boost::apply_visitor(TypeListVisitor(context), typed_list_of_names_recursively_node.typed_list_of_names.get());
+    auto additional_types = boost::apply_visitor(TypeListDeclarationVisitor(context), typed_list_of_names_recursively_node.typed_list_of_names.get());
     type_list.insert(type_list.end(), additional_types.begin(), additional_types.end());
     return type_list;
 }
@@ -148,7 +148,7 @@ pddl::TypeList TypeListVisitor::operator()(const ast::TypedListOfNamesRecursivel
 /* Other functions */
 
 pddl::TypeList parse(const ast::Types& types_node, Context& context) {
-    return boost::apply_visitor(TypeListVisitor(context), types_node.typed_list_of_names);
+    return boost::apply_visitor(TypeListDeclarationVisitor(context), types_node.typed_list_of_names);
 }
 
 }

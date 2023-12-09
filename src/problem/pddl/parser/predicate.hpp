@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_OBJECTS_HPP_
-#define LOKI_SRC_PROBLEM_PDDL_PARSER_OBJECTS_HPP_
+#ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_PREDICATE_HPP_
+#define LOKI_SRC_PROBLEM_PDDL_PARSER_PREDICATE_HPP_
 
 #include "../../../../include/loki/problem/ast/ast.hpp"
 #include "../../../../include/loki/problem/pddl/parser.hpp"
@@ -24,22 +24,8 @@
 
 namespace loki {
 
-extern pddl::Object parse_object_reference(const domain::ast::Name& name_node, problem::Context& context);
-
-class ObjectListVisitor : boost::static_visitor<pddl::ObjectList> {
-private:
-    problem::Context& context;
-
-public:
-    ObjectListVisitor(problem::Context& context_);
-
-    pddl::ObjectList operator()(const std::vector<domain::ast::Name>& name_nodes);
-
-    pddl::ObjectList operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
-};
-
-extern pddl::ObjectList parse(const problem::ast::Objects& objects_node, problem::Context& context);
+extern pddl::Predicate parse(const domain::ast::Predicate& predicate, problem::Context& context);
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_OBJECTS_HPP_
+#endif

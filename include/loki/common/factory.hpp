@@ -82,7 +82,7 @@ public:
     /// @param ...args
     /// @return
     template<typename T, typename... Args>
-    std::shared_ptr<const T> get_or_create(Args&&... args) {
+    [[nodiscard]] std::shared_ptr<const T> get_or_create(Args&&... args) {
         /* we must declare sp before locking the mutex
            s.t. the deleter is called after the mutex was released in case of stack unwinding. */
         std::shared_ptr<T> sp;

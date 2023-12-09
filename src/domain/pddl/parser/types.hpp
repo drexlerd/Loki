@@ -57,12 +57,12 @@ public:
     pddl::TypeList operator()(const domain::ast::TypeEither& either_type_node);
 };
 
-class TypeListVisitor : boost::static_visitor<pddl::TypeList> {
+class TypeListDeclarationVisitor : boost::static_visitor<pddl::TypeList> {
 private:
     domain::Context& context;
 
 public:
-    TypeListVisitor(domain::Context& context_);
+    TypeListDeclarationVisitor(domain::Context& context_);
 
     pddl::TypeList operator()(const std::vector<domain::ast::Name>& name_nodes);
 
