@@ -76,7 +76,7 @@ public:
     /// @brief Test for semantic equivalence
     bool are_equal_impl(const RequirementsImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::stringstream& out, const FormattingOptions& options) const;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     bool test(RequirementEnum requirement) const;
 

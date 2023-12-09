@@ -61,18 +61,19 @@ class EffectImpl : public Base<EffectImpl> {
 protected:
     EffectImpl(int identifier);
 
+    // protected copy/move to prevent accidental object slicing when passed by value
+    EffectImpl(const EffectImpl& other) = default;
+    EffectImpl& operator=(const EffectImpl& other) = default;
+    EffectImpl(EffectImpl&& other) = default;
+    EffectImpl& operator=(EffectImpl&& other) = default;
+
 public:
-    // delete copy/move to prevent accidental object slicing when passed by value
-    EffectImpl(const EffectImpl& other) = delete;
-    EffectImpl& operator=(const EffectImpl& other) = delete;
-    EffectImpl(EffectImpl&& other) = delete;
-    EffectImpl& operator=(EffectImpl&& other) = delete;
     virtual ~EffectImpl();
 
     /// @brief Test for structural equivalence
     virtual bool are_equal_impl(const EffectImpl& other) const = 0;
 
-    virtual void str_impl(std::stringstream& out, const FormattingOptions& options) const = 0;
+    virtual void str_impl(std::ostringstream& out, const FormattingOptions& options) const = 0;
 
     /// @brief Accepts the visitor by calling the visit overload.
     virtual void accept(EffectVisitor& visitor) const = 0;
@@ -92,7 +93,7 @@ private:
 public:
     bool are_equal_impl(const EffectImpl& other) const override;
     size_t hash_impl() const;
-    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
 
     void accept(EffectVisitor& visitor) const override;
 
@@ -113,7 +114,7 @@ private:
 public:
     bool are_equal_impl(const EffectImpl& other) const override;
     size_t hash_impl() const;
-    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
 
     void accept(EffectVisitor& visitor) const override;
 
@@ -136,7 +137,7 @@ private:
 public:
     bool are_equal_impl(const EffectImpl& other) const override;
     size_t hash_impl() const;
-    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
 
     void accept(EffectVisitor& visitor) const override;
 
@@ -159,7 +160,7 @@ private:
 public:
     bool are_equal_impl(const EffectImpl& other) const override;
     size_t hash_impl() const;
-    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
 
     void accept(EffectVisitor& visitor) const override;
 

@@ -41,14 +41,22 @@ public:
 
 class TermImpl : public Base<TermImpl> {
 protected:
-public:
     TermImpl(int identifier);
+
+    // protected copy/move to prevent accidental object slicing when passed by value
+    TermImpl(const TermImpl& other) = default;
+    TermImpl& operator=(const TermImpl& other) = default;
+    TermImpl(TermImpl&& other) = default;
+    TermImpl& operator=(TermImpl&& other) = default;
+
+public:
+
     virtual ~TermImpl();
 
     /// @brief Test for semantic equivalence
     virtual bool are_equal_impl(const TermImpl& other) const = 0;
     virtual size_t hash_impl() const = 0;
-    virtual void str_impl(std::stringstream& out, const FormattingOptions& options) const = 0;
+    virtual void str_impl(std::ostringstream& out, const FormattingOptions& options) const = 0;
 
     virtual void accept(TermVisitor& visitor) const = 0;
 };
@@ -66,7 +74,7 @@ public:
 
     bool are_equal_impl(const TermImpl& other) const override;
     size_t hash_impl() const override;
-    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
 
     void accept(TermVisitor& visitor) const override;
 
@@ -86,7 +94,7 @@ public:
 
     bool are_equal_impl(const TermImpl& other) const override;
     size_t hash_impl() const override;
-    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
 
     void accept(TermVisitor& visitor) const override;
 

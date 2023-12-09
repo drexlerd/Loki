@@ -53,17 +53,18 @@ class ConditionImpl : public Base<ConditionImpl> {
 protected:
     ConditionImpl(int identifier);
 
+    // protected copy/move to prevent accidental object slicing when passed by value
+    ConditionImpl(const ConditionImpl& other) = default;
+    ConditionImpl& operator=(const ConditionImpl& other) = default;
+    ConditionImpl(ConditionImpl&& other) = default;
+    ConditionImpl& operator=(ConditionImpl&& other) = default;
+
 public:
-    // delete copy/move to prevent accidental object slicing when passed by value
-    ConditionImpl(const ConditionImpl& other) = delete;
-    ConditionImpl& operator=(const ConditionImpl& other) = delete;
-    ConditionImpl(ConditionImpl&& other) = delete;
-    ConditionImpl& operator=(ConditionImpl&& other) = delete;
     virtual ~ConditionImpl();
 
     /// @brief Test for structural equivalence
     virtual bool are_equal_impl(const ConditionImpl& other) const = 0;
-    virtual void str_impl(std::stringstream& out, const FormattingOptions& options) const = 0;
+    virtual void str_impl(std::ostringstream& out, const FormattingOptions& options) const = 0;
 
     /// @brief Accepts the visitor by calling the visit overload.
     virtual void accept(ConditionVisitor& visitor) const = 0;
@@ -83,7 +84,7 @@ private:
 public:
     bool are_equal_impl(const ConditionImpl& other) const override;
     size_t hash_impl() const;
-    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
 
     void accept(ConditionVisitor& visitor) const override;
 
@@ -104,7 +105,7 @@ private:
 public:
     bool are_equal_impl(const ConditionImpl& other) const override;
     size_t hash_impl() const;
-    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
 
     void accept(ConditionVisitor& visitor) const override;
 
@@ -125,7 +126,7 @@ private:
 public:
     bool are_equal_impl(const ConditionImpl& other) const override;
     size_t hash_impl() const;
-    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
 
     void accept(ConditionVisitor& visitor) const override;
 
@@ -146,7 +147,7 @@ private:
 public:
     bool are_equal_impl(const ConditionImpl& other) const override;
     size_t hash_impl() const;
-    void str_impl(std::stringstream& out, const FormattingOptions& options) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
 
     void accept(ConditionVisitor& visitor) const override;
 

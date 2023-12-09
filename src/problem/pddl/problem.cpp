@@ -46,7 +46,7 @@ size_t ProblemImpl::hash_impl() const {
     return hash_combine(m_domain, m_name, m_requirements, hash_vector(get_sorted_vector(m_objects)));
 }
 
-void ProblemImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+void ProblemImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
     out << string(options.indent, ' ') << "(define (problem " << m_name << ")\n";
     auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent};
     out << string(nested_options.indent, ' ') << "(:domain " << m_domain->get_name() << ")\n";

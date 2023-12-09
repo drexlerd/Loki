@@ -84,13 +84,13 @@ public:
     }
 
     /// @brief Compute a string representation of this object.
-    void str(std::stringstream& out, const FormattingOptions& options) const {
+    void str(std::ostringstream& out, const FormattingOptions& options) const {
         static_cast<const Derived*>(this)->str_impl(out, options);
     }
 
     /// @brief Compute a string representation of this object.
     std::string str() const {
-        std::stringstream out;
+        std::ostringstream out;
         FormattingOptions options{0, 4};
         str(out, options);
         return out.str();

@@ -66,7 +66,7 @@ size_t DomainImpl::hash_impl() const {
         hash_vector(get_sorted_vector(m_actions)));
 }
 
-void DomainImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+void DomainImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
     out << string(options.indent, ' ') << "(define (domain " << m_name << ")\n";
     auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent};
     if (!m_requirements->get_requirements().empty()) {

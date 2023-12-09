@@ -16,6 +16,9 @@
  */
 
 #include "../../../include/loki/domain/pddl/term.hpp"
+
+#include "../../../include/loki/domain/pddl/object.hpp"
+#include "../../../include/loki/domain/pddl/variable.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 
@@ -46,8 +49,8 @@ size_t TermConstantImpl::hash_impl() const {
     return hash_combine(m_object);
 }
 
-void TermConstantImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+void TermConstantImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+    out << *m_object;
 }
 
 void TermConstantImpl::accept(TermVisitor& visitor) const {
@@ -60,7 +63,6 @@ const Object& TermConstantImpl::get_object() const {
 
 
 /* TermVariableImpl */
-
 TermVariableImpl::TermVariableImpl(int identifier, const Variable& variable)
     : TermImpl(identifier), m_variable(variable) { }
 
@@ -76,8 +78,8 @@ size_t TermVariableImpl::hash_impl() const {
     return hash_combine(m_variable);
 }
 
-void TermVariableImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+void TermVariableImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+    out << *m_variable;
 }
 
 void TermVariableImpl::accept(TermVisitor& visitor) const {

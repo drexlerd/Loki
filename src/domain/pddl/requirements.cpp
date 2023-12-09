@@ -65,7 +65,7 @@ size_t RequirementsImpl::hash_impl() const {
     return hash_set(m_requirements);
 }
 
-void RequirementsImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+void RequirementsImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
     out << "(:requirements ";
     int i = 0;
     for (const auto& requirement : m_requirements) {

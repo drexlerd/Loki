@@ -41,11 +41,11 @@ size_t ParameterImpl::hash_impl() const {
     return hash_combine(m_variable, hash_vector(get_sorted_vector(m_types)));
 }
 
-void ParameterImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+void ParameterImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
     str(out, options, true);
 }
 
-void ParameterImpl::str(std::stringstream& out, const FormattingOptions& options, bool typing_enabled) const {
+void ParameterImpl::str(std::ostringstream& out, const FormattingOptions& options, bool typing_enabled) const {
     out << *m_variable;
     if (typing_enabled) {
         assert(!m_types.empty());

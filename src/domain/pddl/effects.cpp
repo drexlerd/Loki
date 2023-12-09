@@ -16,6 +16,10 @@
  */
 
 #include "../../../include/loki/domain/pddl/effects.hpp"
+
+#include "../../../include/loki/domain/pddl/conditions.hpp"
+#include "../../../include/loki/domain/pddl/literal.hpp"
+#include "../../../include/loki/domain/pddl/parameter.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 
@@ -45,8 +49,8 @@ size_t EffectLiteralImpl::hash_impl() const {
     return std::hash<Literal>()(m_literal);
 }
 
-void EffectLiteralImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+void EffectLiteralImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+    out << *m_literal;
 }
 
 void EffectLiteralImpl::accept(EffectVisitor& visitor) const {
@@ -73,8 +77,13 @@ size_t EffectAndImpl::hash_impl() const {
     return hash_vector(get_sorted_vector(m_effects));
 }
 
-void EffectAndImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+void EffectAndImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+    out << "(and ";
+    for (size_t i = 0; i < m_effects.size(); ++i) {
+        if (i != 0) out << " ";
+        out << *m_effects[i];
+    }
+    out << ")";
 }
 
 void EffectAndImpl::accept(EffectVisitor& visitor) const {
@@ -102,8 +111,13 @@ size_t EffectConditionalForallImpl::hash_impl() const {
     return hash_combine(hash_vector(m_parameters), m_effect);
 }
 
-void EffectConditionalForallImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+void EffectConditionalForallImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+    out << "(forall (";
+    for (size_t i = 0; i < m_parameters.size(); ++i) {
+        if (i != 0) out << " ";
+        out << *m_parameters[i];
+    }
+    out << ") " << *m_effect << ")";
 }
 
 void EffectConditionalForallImpl::accept(EffectVisitor& visitor) const {
@@ -135,8 +149,8 @@ size_t EffectConditionalWhenImpl::hash_impl() const {
     return hash_combine(m_condition, m_effect);
 }
 
-void EffectConditionalWhenImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+void EffectConditionalWhenImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+    out << "(when " << *m_condition << " " << *m_effect << ")";
 }
 
 void EffectConditionalWhenImpl::accept(EffectVisitor& visitor) const {

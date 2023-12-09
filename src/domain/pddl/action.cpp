@@ -47,7 +47,7 @@ size_t ActionImpl::hash_impl() const {
         *m_effect);
 }
 
-void ActionImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
+void ActionImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
     auto nested_options = FormattingOptions{options.indent + options.add_indent, options.add_indent};
     out << std::string(options.indent, ' ') << "(action " << m_name << "\n"
         << std::string(nested_options.indent, ' ') << ":parameters (";

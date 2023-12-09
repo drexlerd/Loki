@@ -40,27 +40,12 @@ size_t AtomImpl::hash_impl() const {
     return hash_combine(m_predicate, hash_vector(m_terms));
 }
 
-class StrTermVisitor : public TermVisitor {
-public: 
-    std::stringstream& out;
 
-    explicit StrTermVisitor(std::stringstream& out_) : out(out_) { }
-
-    void visit(const std::shared_ptr<const TermConstantImpl>& term) {
-        out << *term;
-    }
-
-    void visit(const std::shared_ptr<const TermVariableImpl>& term) {
-        out << *term;
-    }
-};
-
-void AtomImpl::str_impl(std::stringstream& out, const FormattingOptions& options) const {
-    out << "(" << m_predicate->get_name() << " ";
-    StrTermVisitor visitor(out);
+void AtomImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+    out << "(" << m_predicate->get_name();
     for (size_t i = 0; i < m_terms.size(); ++i) {
-        if (i != 0) out << " ";
-        m_terms[i]->accept(visitor);
+        out << " ";
+        out << *m_terms[i];
     }
     out << ")";
 }
