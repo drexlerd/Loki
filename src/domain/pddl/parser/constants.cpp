@@ -49,7 +49,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& n
 
 pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
     pddl::ObjectList object_list;
-    const auto types = boost::apply_visitor(TypeReferenceVisitor(context),
+    const auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context),
                                             typed_list_of_names_recursively_node.type);
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {

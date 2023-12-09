@@ -15,20 +15,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../include/loki/common/exceptions.hpp"
+#ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_COMMON_HPP_
+#define LOKI_SRC_PROBLEM_PDDL_PARSER_COMMON_HPP_
+
+#include "../../../../include/loki/domain/ast/ast.hpp"
+#include "../../../../include/loki/problem/pddl/parser.hpp"
 
 
 namespace loki {
-FileNotExistsError::FileNotExistsError(const std::string& path_to_file)
-    : std::runtime_error("File does not exist at " + path_to_file) { }
 
-SyntaxParserError::SyntaxParserError(const std::string& message, const std::string& error_handler_output)
-    : std::runtime_error(message + "\n" + error_handler_output) { }
+struct ObjectReferenceTermVisitor : boost::static_visitor<pddl::Object> {
+    problem::Context& context;
 
-SemanticParserError::SemanticParserError(const std::string& message, const std::string& error_handler_output)
-    : std::runtime_error(message + "\n" + error_handler_output) { }
+    ObjectReferenceTermVisitor(problem::Context& context_);
 
-NotImplementedError::NotImplementedError(const std::string& message)
-    : std::runtime_error(message) { }
+    pddl::Object operator()(const domain::ast::Name& name_node) const;
+    pddl::Object operator()(const domain::ast::Variable& variable_node) const;
+    pddl::Object operator()(const domain::ast::FunctionTerm& function_term_node) const;
+};
 
 }
+
+#endif

@@ -31,20 +31,20 @@ extern std::string parse(const domain::ast::Name& name_node);
 extern pddl::Variable parse(const domain::ast::Variable& variable_node, domain::Context& context);
 
 /* Term */
-struct TermDeclarationVisitor : boost::static_visitor<pddl::Term> {
+struct TermDeclarationTermVisitor : boost::static_visitor<pddl::Term> {
     domain::Context& context;
 
-    TermDeclarationVisitor(domain::Context& context_);
+    TermDeclarationTermVisitor(domain::Context& context_);
 
     pddl::Term operator()(const domain::ast::Name& name_node) const;
     pddl::Term operator()(const domain::ast::Variable& variable_node) const;
     pddl::Term operator()(const domain::ast::FunctionTerm& function_term_node) const;
 };
 
-struct TermReferenceVisitor : boost::static_visitor<pddl::Term> {
+struct TermReferenceTermVisitor : boost::static_visitor<pddl::Term> {
     domain::Context& context;
 
-    TermReferenceVisitor(domain::Context& context_);
+    TermReferenceTermVisitor(domain::Context& context_);
 
     pddl::Term operator()(const domain::ast::Name& name_node) const;
     pddl::Term operator()(const domain::ast::Variable& variable_node) const;

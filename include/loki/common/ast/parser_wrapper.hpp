@@ -26,7 +26,7 @@
 
 namespace loki {
 template<typename Parser, typename Node>
-void parse_ast(const std::string& source, const Parser& parser, Node& out, error_handler_type& error_handler) {
+bool parse_ast(const std::string& source, const Parser& parser, Node& out, error_handler_type& error_handler) {
     out = Node(); // reinitialize
     loki::iterator_type iter(source.begin());
     const loki::iterator_type end(source.end());
@@ -42,9 +42,7 @@ void parse_ast(const std::string& source, const Parser& parser, Node& out, error
         ];
     using boost::spirit::x3::ascii::space;
     bool success = phrase_parse(iter, end, wrapped_parser, space, out);
-    if (!success) {
-        throw SyntaxParserError("Failed parse.");
-    }
+    return success;
 }
 
 template<typename Parser, typename Node>
@@ -52,7 +50,10 @@ void parse_ast(const std::string& source, const Parser& parser, Node& out) {
     loki::iterator_type iter(source.begin());
     const loki::iterator_type end(source.end());
     error_handler_type error_handler(iter, end, std::cerr);
-    parse_ast(source, parser, out, error_handler);
+    bool success = parse_ast(source, parser, out, error_handler);
+    if (!success) {
+        throw std::runtime_error("Failed parse.");
+    }
 }
 
 

@@ -32,7 +32,7 @@ pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formul
     }
     pddl::TermList term_list;
     for (const auto& term_node : atomic_formula_of_terms_node.terms) {
-        term_list.push_back(boost::apply_visitor(TermReferenceVisitor(context), term_node));
+        term_list.push_back(boost::apply_visitor(TermReferenceTermVisitor(context), term_node));
     }
     auto predicate = binding.value().object;
     if (predicate->get_parameters().size() != term_list.size()) {
@@ -48,8 +48,8 @@ pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& atomic_formula
         context.error_handler(atomic_formula_of_terms_node, "");
         throw UndefinedRequirementError(pddl::RequirementEnum::EQUALITY, context.error_stream->str());
     }
-    auto left_term = boost::apply_visitor(TermReferenceVisitor(context), atomic_formula_of_terms_node.term_left);
-    auto right_term = boost::apply_visitor(TermReferenceVisitor(context), atomic_formula_of_terms_node.term_right);
+    auto left_term = boost::apply_visitor(TermReferenceTermVisitor(context), atomic_formula_of_terms_node.term_left);
+    auto right_term = boost::apply_visitor(TermReferenceTermVisitor(context), atomic_formula_of_terms_node.term_right);
     return context.cache.get_or_create<pddl::AtomImpl>(context.equal_predicate, pddl::TermList{left_term, right_term});
 }
 

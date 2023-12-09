@@ -59,7 +59,7 @@ namespace loki::domain {
         ReferenceCountedObjectFactory<pddl::RequirementsImpl
             , pddl::TypeImpl
             , pddl::VariableImpl
-            , pddl::TermConstantImpl
+            , pddl::TermObjectImpl
             , pddl::TermVariableImpl
             , pddl::ObjectImpl
             , pddl::AtomImpl

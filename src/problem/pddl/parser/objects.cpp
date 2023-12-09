@@ -27,6 +27,14 @@ using namespace std;
 
 namespace loki {
 
+pddl::ObjectList parse_object_references(const std::vector<domain::ast::Name>& name_nodes, problem::Context& context) {
+    pddl::ObjectList object_list;
+    for (const auto& name_node : name_nodes) {
+        object_list.push_back(parse_object_reference(name_node, context));
+    }
+    return object_list;
+}
+
 pddl::Object parse_object_reference(const domain::ast::Name& name_node, problem::Context& context) {
     const auto name = parse(name_node);
     const auto binding = context.get_current_scope().get<pddl::ObjectImpl>(name);
@@ -64,7 +72,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
 
 pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
     pddl::ObjectList object_list;
-    const auto types = boost::apply_visitor(TypeReferenceVisitor(*context.domain_context),
+    const auto types = boost::apply_visitor(TypeReferenceTypeVisitor(*context.domain_context),
                                             typed_list_of_names_recursively_node.type);
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {

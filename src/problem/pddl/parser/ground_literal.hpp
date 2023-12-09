@@ -24,6 +24,12 @@
 
 namespace loki {
 
+extern pddl::Predicate parse_predicate_reference(const domain::ast::Name& node, problem::Context& context);
+
+extern pddl::GroundAtom parse(const problem::ast::AtomicFormulaOfNames& node, problem::Context& context);
+extern pddl::GroundAtom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, problem::Context& context);
+extern pddl::GroundAtom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, problem::Context& context);
+
 class AtomicFormulaOfNamesVisitor : boost::static_visitor<pddl::GroundAtom> {
 private:
     problem::Context& context;
@@ -31,18 +37,62 @@ private:
 public:
     AtomicFormulaOfNamesVisitor(problem::Context& context_);
 
-    pddl::GroundAtom operator()(const problem::ast::AtomicFormulaOfNamesEquality& equality_node);
-
-    pddl::GroundAtom operator()(const problem::ast::AtomicFormulaOfNamesPredicate& predicate_node);
+    template<typename Node>
+    pddl::GroundAtom operator()(const Node& node) const {
+        return parse(node, context);
+    }
 };
 
-extern pddl::GroundAtom parse(const problem::ast::AtomicFormulaOfNames& atomic_formula_of_names_node, problem::Context& context);
 
-extern pddl::GroundAtom parse(const problem::ast::Atom& atom_node, problem::Context& context);
+extern pddl::GroundLiteral parse(const problem::ast::Atom& node, problem::Context& context);
+extern pddl::GroundLiteral parse(const problem::ast::NegatedAtom& node, problem::Context& context);
+extern pddl::GroundLiteral parse(const problem::ast::Literal& node, problem::Context& context);
 
-extern pddl::GroundLiteral parse(const problem::ast::NegatedAtom& negated_atom_node, problem::Context& context);
+class GroundLiteralVisitor : boost::static_visitor<pddl::GroundLiteral> {
+private:
+    problem::Context& context;
 
-extern pddl::GroundLiteral parse(const problem::ast::Literal& literal_node, problem::Context& context);
+public:
+    GroundLiteralVisitor(problem::Context& context_);
+
+    template<typename Node>
+    pddl::GroundLiteral operator()(const Node& node) const {
+        return parse(node, context);
+    }
+};
+
+
+extern pddl::GroundAtom parse(const domain::ast::AtomicFormulaOfTermsPredicate& node, problem::Context& context);
+extern pddl::GroundAtom parse(const domain::ast::AtomicFormulaOfTermsEquality& node, problem::Context& context);
+extern pddl::GroundAtom parse(const domain::ast::AtomicFormulaOfTerms& node, problem::Context& context);
+
+struct AtomicFormulaOfTermsVisitor : boost::static_visitor<pddl::GroundAtom> {
+    problem::Context& context;
+
+    AtomicFormulaOfTermsVisitor(problem::Context& context_);
+
+    template<typename Node>
+    pddl::GroundAtom operator()(const Node& node) const {
+        return parse(node, context);
+    }
+};
+
+extern pddl::GroundLiteral parse(const domain::ast::Atom& node, problem::Context& context);
+extern pddl::GroundLiteral parse(const domain::ast::NegatedAtom& node, problem::Context& context);
+extern pddl::GroundLiteral parse(const domain::ast::Literal& node, problem::Context& context);
+
+class LiteralVisitor : boost::static_visitor<pddl::GroundLiteral> {
+private:
+    problem::Context& context;
+
+public:
+    LiteralVisitor(problem::Context& context_);
+
+    template<typename Node>
+    pddl::GroundLiteral operator()(const Node& node) const {
+        return parse(node, context);
+    }
+};
 
 }
 

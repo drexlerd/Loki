@@ -18,6 +18,7 @@
 #include "../../../include/loki/problem/pddl/exceptions.hpp"
 
 #include "../../../include/loki/domain/pddl/domain.hpp"
+#include "../../../include/loki/domain/pddl/predicate.hpp"
 
 
 namespace loki {
@@ -46,6 +47,24 @@ UndefinedObjectError::UndefinedObjectError(const std::string& name, const std::s
 MultiDefinitionObjectError::MultiDefinitionObjectError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
         "The object with name \"" + name + "\" has already been defined.", error_handler_output) { }
+
+MismatchedPredicateObjectListError::MismatchedPredicateObjectListError(
+    const pddl::Predicate& predicate,
+    const pddl::ObjectList& object_list,
+    const std::string& error_handler_output)
+    : SemanticParserError(
+        "Mismatched number of terms for predicate \""
+            + predicate->get_name()
+            + "\" with sizes "
+            + std::to_string(predicate->get_parameters().size())
+            + "!="
+            + std::to_string(object_list.size())
+            + ".",
+        error_handler_output) { }
+
+NonGroundVariableError::NonGroundVariableError(const std::string& name, const std::string& error_handler_output)
+    : SemanticParserError(
+        "The variable with name \"" + name + "\" is not grounded to an object.", error_handler_output) { }
 
 
 }

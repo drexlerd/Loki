@@ -39,6 +39,10 @@ namespace loki::problem {
 
         ReferenceCountedObjectFactory<pddl::GroundAtomImpl
             , pddl::GroundLiteralImpl
+            , pddl::ConditionGroundLiteralImpl
+            , pddl::ConditionAndImpl
+            , pddl::ConditionOrImpl
+            , pddl::ConditionNotImpl
             , pddl::ProblemImpl> cache;
 
         // Track scopes during parsing

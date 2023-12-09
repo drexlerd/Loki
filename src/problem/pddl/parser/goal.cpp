@@ -15,20 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../include/loki/common/exceptions.hpp"
+#include "goal.hpp"
 
 
 namespace loki {
-FileNotExistsError::FileNotExistsError(const std::string& path_to_file)
-    : std::runtime_error("File does not exist at " + path_to_file) { }
 
-SyntaxParserError::SyntaxParserError(const std::string& message, const std::string& error_handler_output)
-    : std::runtime_error(message + "\n" + error_handler_output) { }
-
-SemanticParserError::SemanticParserError(const std::string& message, const std::string& error_handler_output)
-    : std::runtime_error(message + "\n" + error_handler_output) { }
-
-NotImplementedError::NotImplementedError(const std::string& message)
-    : std::runtime_error(message) { }
 
 }

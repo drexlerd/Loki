@@ -15,16 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_PREDICATE_HPP_
-#define LOKI_SRC_PROBLEM_PDDL_PARSER_PREDICATE_HPP_
-
-#include "../../../../include/loki/problem/ast/ast.hpp"
-#include "../../../../include/loki/problem/pddl/parser.hpp"
+#ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_GOAL_HPP_
+#define LOKI_SRC_PROBLEM_PDDL_PARSER_GOAL_HPP_
 
 
 namespace loki {
-
-extern pddl::Predicate parse(const domain::ast::Predicate& predicate, problem::Context& context);
 
 }
 

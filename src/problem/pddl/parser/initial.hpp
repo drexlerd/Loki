@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_OBJECTS_HPP_
-#define LOKI_SRC_PROBLEM_PDDL_PARSER_OBJECTS_HPP_
+#ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_INITIAL_HPP_
+#define LOKI_SRC_PROBLEM_PDDL_PARSER_INITIAL_HPP_
 
 #include "../../../../include/loki/problem/ast/ast.hpp"
 #include "../../../../include/loki/problem/pddl/parser.hpp"
@@ -24,23 +24,26 @@
 
 namespace loki {
 
-extern pddl::ObjectList parse_object_references(const std::vector<domain::ast::Name>& name_nodes, problem::Context& context);
-extern pddl::Object parse_object_reference(const domain::ast::Name& name_node, problem::Context& context);
-
-class ObjectListVisitor : boost::static_visitor<pddl::ObjectList> {
+class InitialElementVisitor : boost::static_visitor<boost::variant<pddl::GroundLiteral>> {
 private:
     problem::Context& context;
 
 public:
-    ObjectListVisitor(problem::Context& context_);
+    InitialElementVisitor(problem::Context& context_);
 
-    pddl::ObjectList operator()(const std::vector<domain::ast::Name>& name_nodes);
+    boost::variant<pddl::GroundLiteral> operator()(const problem::ast::InitialElementLiteral& node);
 
-    pddl::ObjectList operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
+    boost::variant<pddl::GroundLiteral> operator()(const problem::ast::InitialElementTimedLiterals& node);
+
+    boost::variant<pddl::GroundLiteral> operator()(const problem::ast::InitialElementNumericFluents& node);
+
+    boost::variant<pddl::GroundLiteral> operator()(const problem::ast::InitialElementObjectFluents& node);
 };
 
-extern pddl::ObjectList parse(const problem::ast::Objects& objects_node, problem::Context& context);
+
+extern std::vector<boost::variant<pddl::GroundLiteral>> parse(
+    const problem::ast::Initial& initial_node, problem::Context& context);
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_OBJECTS_HPP_
+#endif

@@ -25,12 +25,12 @@
 
 namespace loki {
 
-class TypeDeclarationVisitor : boost::static_visitor<pddl::TypeList> {
+class TypeDeclarationTypeVisitor : boost::static_visitor<pddl::TypeList> {
 private:
     domain::Context& context;
 
 public:
-    TypeDeclarationVisitor(domain::Context& context_);
+    TypeDeclarationTypeVisitor(domain::Context& context_);
 
     pddl::TypeList operator()(const domain::ast::Type& type_node);
 
@@ -41,12 +41,12 @@ public:
     pddl::TypeList operator()(const domain::ast::TypeEither& either_type_node);
 };
 
-class TypeReferenceVisitor : boost::static_visitor<pddl::TypeList> {
+class TypeReferenceTypeVisitor : boost::static_visitor<pddl::TypeList> {
 private:
     domain::Context& context;
 
 public:
-    TypeReferenceVisitor(domain::Context& context_);
+    TypeReferenceTypeVisitor(domain::Context& context_);
 
     pddl::TypeList operator()(const domain::ast::Type& type_node);
 

@@ -48,8 +48,8 @@ namespace loki::pddl {
     class TermImpl;
     using Term = std::shared_ptr<const TermImpl>;
     using TermList = std::vector<Term>;
-    class TermConstantImpl;
-    using TermConstant = std::shared_ptr<const TermConstantImpl>;
+    class TermObjectImpl;
+    using TermObject = std::shared_ptr<const TermObjectImpl>;
     class TermVariableImpl;
     using TermVariable = std::shared_ptr<const TermVariableImpl>;
 

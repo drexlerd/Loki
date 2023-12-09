@@ -84,7 +84,7 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context) {
     pddl::ActionList action_list;
     for (const auto& structure_node : domain_node.structures) {
         auto variant = boost::apply_visitor(StructureVisitor(context), structure_node);
-        boost::apply_visitor(UnpackingVisitor(context, action_list, derived_predicate_list), variant);
+        boost::apply_visitor(UnpackingVisitor(action_list, derived_predicate_list), variant);
     }
     return context.cache.get_or_create<pddl::DomainImpl>(domain_name, context.requirements, types, constants, predicates, action_list);
 }

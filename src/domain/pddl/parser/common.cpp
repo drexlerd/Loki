@@ -39,10 +39,10 @@ pddl::Variable parse(const domain::ast::Variable& variable_node, domain::Context
 }
 
 /* Term */
-TermDeclarationVisitor::TermDeclarationVisitor(domain::Context& context_)
+TermDeclarationTermVisitor::TermDeclarationTermVisitor(domain::Context& context_)
     : context(context_) { }
 
-pddl::Term TermDeclarationVisitor::operator()(const domain::ast::Name& name_node) const {
+pddl::Term TermDeclarationTermVisitor::operator()(const domain::ast::Name& name_node) const {
     const auto constant_name = parse(name_node);
     const auto binding = context.get_current_scope().get<pddl::ObjectImpl>(constant_name);
     if (!binding.has_value()) {
@@ -50,10 +50,10 @@ pddl::Term TermDeclarationVisitor::operator()(const domain::ast::Name& name_node
         throw UndefinedConstantError(constant_name, context.error_stream->str());
     }
     const auto constant = binding.value().object;
-    return context.cache.get_or_create<pddl::TermConstantImpl>(constant);
+    return context.cache.get_or_create<pddl::TermObjectImpl>(constant);
 }
 
-pddl::Term TermDeclarationVisitor::operator()(const domain::ast::Variable& variable_node) const {
+pddl::Term TermDeclarationTermVisitor::operator()(const domain::ast::Variable& variable_node) const {
     const auto variable = parse(variable_node, context);
     const auto binding = context.get_current_scope().get<pddl::VariableImpl>(variable->get_name());
     if (binding.has_value()) {
@@ -67,16 +67,16 @@ pddl::Term TermDeclarationVisitor::operator()(const domain::ast::Variable& varia
     return context.cache.get_or_create<pddl::TermVariableImpl>(variable);
 }
 
-pddl::Term TermDeclarationVisitor::operator()(const domain::ast::FunctionTerm& function_term_node) const {
+pddl::Term TermDeclarationTermVisitor::operator()(const domain::ast::FunctionTerm& function_term_node) const {
     context.error_handler(function_term_node, "");
     throw NotSupportedError(pddl::RequirementEnum::OBJECT_FLUENTS, context.error_stream->str());
 }
 
 
-TermReferenceVisitor::TermReferenceVisitor(domain::Context& context_)
+TermReferenceTermVisitor::TermReferenceTermVisitor(domain::Context& context_)
     : context(context_) { }
 
-pddl::Term TermReferenceVisitor::operator()(const domain::ast::Name& name_node) const {
+pddl::Term TermReferenceTermVisitor::operator()(const domain::ast::Name& name_node) const {
     const auto constant_name = parse(name_node);
     const auto binding = context.get_current_scope().get<pddl::ObjectImpl>(constant_name);
     if (!binding.has_value()) {
@@ -84,10 +84,10 @@ pddl::Term TermReferenceVisitor::operator()(const domain::ast::Name& name_node) 
         throw UndefinedConstantError(constant_name, context.error_stream->str());
     }
     const auto constant = binding.value().object;
-    return context.cache.get_or_create<pddl::TermConstantImpl>(constant);
+    return context.cache.get_or_create<pddl::TermObjectImpl>(constant);
 }
 
-pddl::Term TermReferenceVisitor::operator()(const domain::ast::Variable& variable_node) const {
+pddl::Term TermReferenceTermVisitor::operator()(const domain::ast::Variable& variable_node) const {
     const auto variable = parse(variable_node, context);
     const auto binding = context.get_current_scope().get<pddl::VariableImpl>(variable->get_name());
     if (!binding.has_value()) {
@@ -97,7 +97,7 @@ pddl::Term TermReferenceVisitor::operator()(const domain::ast::Variable& variabl
     return context.cache.get_or_create<pddl::TermVariableImpl>(variable);
 }
 
-pddl::Term TermReferenceVisitor::operator()(const domain::ast::FunctionTerm& function_term_node) const {
+pddl::Term TermReferenceTermVisitor::operator()(const domain::ast::FunctionTerm& function_term_node) const {
     context.error_handler(function_term_node, "");
     throw NotSupportedError(pddl::RequirementEnum::OBJECT_FLUENTS, context.error_stream->str());
 }

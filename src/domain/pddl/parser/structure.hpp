@@ -25,8 +25,6 @@
 #include "../../../../include/loki/domain/pddl/action.hpp"
 
 
-#include <variant>
-
 namespace loki {
 
 extern std::string parse(const domain::ast::ActionSymbol& node, domain::Context& context);

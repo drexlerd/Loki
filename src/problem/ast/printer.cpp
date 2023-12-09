@@ -216,7 +216,7 @@ namespace loki {
 
     string parse_text(const problem::ast::Initial& node, const FormattingOptions& options) {
         stringstream ss;
-        ss << "(:init " << parse_text(node.initial_element, options) << ")";
+        ss << "(:init " << parse_text(node.initial_elements, options) << ")";
         return ss.str();
     }
 

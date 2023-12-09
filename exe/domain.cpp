@@ -43,7 +43,10 @@ int main(int argc, char** argv) {
     domain::ast::Domain domain_node;
     std::unique_ptr<std::ostringstream> error_stream = std::make_unique<std::ostringstream>();
     error_handler_type error_handler(source.begin(), source.end(), *error_stream, domain_file);
-    parse_ast(source, domain::domain(), domain_node, error_handler);
+    bool success = parse_ast(source, domain::domain(), domain_node, error_handler);
+    if (!success) {
+        throw SyntaxParserError("", error_stream->str());
+    }
     std::cout << parse_text(domain_node, FormattingOptions{0,4}) << std::endl;
     domain::Context context(std::move(error_stream), std::move(error_handler));
     pddl::Domain domain = parse(domain_node, context);

@@ -33,31 +33,31 @@ TermImpl::TermImpl(int identifier)
 TermImpl::~TermImpl() = default;
 
 
-/* TermConstantImpl */
-TermConstantImpl::TermConstantImpl(int identifier, const Object& object)
+/* TermObjectImpl */
+TermObjectImpl::TermObjectImpl(int identifier, const Object& object)
     : TermImpl(identifier), m_object(object) { }
 
-bool TermConstantImpl::are_equal_impl(const TermImpl& other) const {
+bool TermObjectImpl::are_equal_impl(const TermImpl& other) const {
     if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const TermConstantImpl&>(other);
+        const auto& other_derived = static_cast<const TermObjectImpl&>(other);
         return m_object == other_derived.m_object;
     }
     return false;
 }
 
-size_t TermConstantImpl::hash_impl() const {
+size_t TermObjectImpl::hash_impl() const {
     return hash_combine(m_object);
 }
 
-void TermConstantImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void TermObjectImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
     out << *m_object;
 }
 
-void TermConstantImpl::accept(TermVisitor& visitor) const {
+void TermObjectImpl::accept(TermVisitor& visitor) const {
     visitor.visit(this->shared_from_this());
 }
 
-const Object& TermConstantImpl::get_object() const {
+const Object& TermObjectImpl::get_object() const {
     return m_object;
 }
 
@@ -99,7 +99,7 @@ namespace std {
         return *left_term < *right_term;
     }
 
-    std::size_t hash<loki::pddl::TermConstantImpl>::operator()(const loki::pddl::TermConstantImpl& term) const {
+    std::size_t hash<loki::pddl::TermObjectImpl>::operator()(const loki::pddl::TermObjectImpl& term) const {
         return term.hash_impl();
     }
 

@@ -30,7 +30,7 @@ public:
 
 class SyntaxParserError : public std::runtime_error {
 public:
-    explicit SyntaxParserError(const std::string& message);
+    explicit SyntaxParserError(const std::string& message, const std::string& error_handler_output);
 };
 
 
@@ -44,6 +44,7 @@ class NotImplementedError : public std::runtime_error {
 public:
     explicit NotImplementedError(const std::string& message);
 };
+
 
 }
 

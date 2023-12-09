@@ -18,11 +18,13 @@
 #include "../../../include/loki/problem/pddl/parser.hpp"
 
 #include "parser/objects.hpp"
+#include "parser/initial.hpp"
 
 #include "../../../include/loki/problem/pddl/exceptions.hpp"
 
 #include "../../domain/pddl/parser/common.hpp"
 #include "../../domain/pddl/parser/requirements.hpp"
+#include "../../domain/pddl/unpacking_visitor.hpp"
 #include "../../../include/loki/domain/pddl/domain.hpp"
 #include "../../../include/loki/domain/pddl/requirements.hpp"
 
@@ -46,12 +48,21 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, problem::Context&
         context.requirements = context.domain_context->cache.get_or_create<pddl::RequirementsImpl>(
             pddl::RequirementEnumSet{pddl::RequirementEnum::STRIPS});
     }
+    /* Objects section */
     pddl::ObjectList objects;
     if (problem_node.objects.has_value()) {
         objects = parse(problem_node.objects.value(), context);
     }
-    pddl::GroundLiteralList literals;
-    return context.cache.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects, literals);
+    /* Initial section */
+    pddl::GroundLiteralList initial_literals;
+    const auto initial_elements = parse(problem_node.initial, context);
+    for (const auto& initial_element : initial_elements) {
+        boost::apply_visitor(UnpackingVisitor(initial_literals), initial_element);
+    }
+    /* Goal section */
+    pddl::Condition goal_condition;
+    // TODO
+    return context.cache.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects, initial_literals, goal_condition);
 }
 
 }

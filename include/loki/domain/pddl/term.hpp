@@ -34,7 +34,7 @@ class TermVisitor {
 public:
     virtual ~TermVisitor() = default;
 
-    virtual void visit(const std::shared_ptr<const TermConstantImpl>& term) = 0;
+    virtual void visit(const std::shared_ptr<const TermObjectImpl>& term) = 0;
     virtual void visit(const std::shared_ptr<const TermVariableImpl>& term) = 0;
 };
 
@@ -62,7 +62,7 @@ public:
 };
 
 
-class TermConstantImpl : public TermImpl, public std::enable_shared_from_this<TermConstantImpl> {
+class TermObjectImpl : public TermImpl, public std::enable_shared_from_this<TermObjectImpl> {
 private:
     Object m_object;
 
@@ -70,7 +70,7 @@ private:
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
-    TermConstantImpl(int identifier, const Object& object);
+    TermObjectImpl(int identifier, const Object& object);
 
     bool are_equal_impl(const TermImpl& other) const override;
     size_t hash_impl() const override;
@@ -114,9 +114,9 @@ namespace std {
     };
 
     template<>
-    struct hash<loki::pddl::TermConstantImpl>
+    struct hash<loki::pddl::TermObjectImpl>
     {
-        std::size_t operator()(const loki::pddl::TermConstantImpl& term) const;
+        std::size_t operator()(const loki::pddl::TermObjectImpl& term) const;
     };
 
     template<>

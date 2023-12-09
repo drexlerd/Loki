@@ -15,27 +15,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "predicate.hpp"
 
+#include "common.hpp"
+
+#include "objects.hpp"
 #include "../../../domain/pddl/parser/common.hpp"
-#include "../../../domain/pddl/parser/types.hpp"
 #include "../../../../include/loki/problem/pddl/exceptions.hpp"
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
-using namespace loki::problem;
-using namespace std;
-
-
 namespace loki {
 
-pddl::Predicate parse(const domain::ast::Predicate& predicate, problem::Context& context) {
-    const auto name = parse(predicate.name);
-    const auto binding = context.domain_context->get_current_scope().get<pddl::PredicateImpl>(name);
-    if (!binding.has_value()) {
-        context.error_handler(predicate, "");
-        throw UndefinedPredicateError(name, context.error_stream->str());
-    }
-    return binding.value().object;
+ObjectReferenceTermVisitor::ObjectReferenceTermVisitor(problem::Context& context_) : context(context_) { }
+
+pddl::Object ObjectReferenceTermVisitor::operator()(const domain::ast::Name& name_node) const {
+    return parse_object_reference(name_node, context);
+}
+
+pddl::Object ObjectReferenceTermVisitor::operator()(const domain::ast::Variable& variable_node) const {
+    const auto variable_name = parse(variable_node.name);
+    context.error_handler(variable_node, "");
+    throw NonGroundVariableError(variable_name, context.error_stream->str());
+}
+
+pddl::Object ObjectReferenceTermVisitor::operator()(const domain::ast::FunctionTerm& function_term_node) const {
+    context.error_handler(function_term_node, "");
+    throw NotSupportedError(pddl::RequirementEnum::OBJECT_FLUENTS, context.error_stream->str());
 }
 
 }

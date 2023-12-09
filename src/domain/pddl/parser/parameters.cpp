@@ -59,7 +59,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
         throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.error_stream->str());
     }
     pddl::ParameterList parameter_list;
-    const auto types = boost::apply_visitor(TypeReferenceVisitor(context),
+    const auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context),
                                             typed_variables_node.type);
     // A non-visited vector of variables has user defined types
     for (const auto& variable_node : typed_variables_node.variables) {

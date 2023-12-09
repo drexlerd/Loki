@@ -264,7 +264,7 @@ namespace loki::problem::ast
     };
 
     struct Initial : x3::position_tagged {
-        std::vector<InitialElement> initial_element;
+        std::vector<InitialElement> initial_elements;
     };
 
     struct Goal : x3::position_tagged {

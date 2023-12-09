@@ -49,6 +49,19 @@ public:
     MultiDefinitionObjectError(const std::string& name, const std::string& error_handler_output);
 };
 
+class MismatchedPredicateObjectListError : public SemanticParserError {
+public:
+    MismatchedPredicateObjectListError(
+        const pddl::Predicate& predicate,
+        const pddl::ObjectList& object_list,
+        const std::string& error_handler_output);
+};
+
+class NonGroundVariableError : public SemanticParserError {
+public:
+    NonGroundVariableError(const std::string& name, const std::string& error_handler_output);
+};
+
 
 }
 

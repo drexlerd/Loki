@@ -40,6 +40,12 @@ namespace loki::pddl {
     class ProblemImpl;
     using Problem = std::shared_ptr<const ProblemImpl>;
     using ProblemList = std::vector<Problem>;
+
+    class ConditionGroundLiteralImpl;
+    using ConditionGroundLiteral = std::shared_ptr<const ConditionGroundLiteralImpl>;
+
+    class EffectGroundLiteralImpl;
+    using EffectGroundLiteral = std::shared_ptr<const EffectGroundLiteralImpl>;
 }
 
 #endif

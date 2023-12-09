@@ -19,6 +19,7 @@
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_EFFECTS_HPP_
 
 #include "declarations.hpp"
+#include "../../problem/pddl/declarations.hpp"
 
 #include "../../common/pddl/base.hpp"
 
@@ -47,6 +48,7 @@ public:
     virtual ~EffectVisitor() = default;
 
     virtual void visit(const EffectLiteral& condition) = 0;
+    virtual void visit(const EffectGroundLiteral& condition) = 0;
     virtual void visit(const EffectAnd& condition) = 0;
     virtual void visit(const EffectConditionalForall& condition) = 0;
     virtual void visit(const EffectConditionalWhen& condition) = 0;
