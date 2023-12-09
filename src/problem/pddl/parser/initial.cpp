@@ -17,7 +17,7 @@
 
 #include "initial.hpp"
 
-#include "ground_literal.hpp"
+#include "literal.hpp"
 
 #include "../../../../include/loki/common/exceptions.hpp"
 
@@ -27,26 +27,26 @@ namespace loki {
 InitialElementVisitor::InitialElementVisitor(problem::Context& context_)
     : context(context_) { }
 
-boost::variant<pddl::GroundLiteral> InitialElementVisitor::operator()(const problem::ast::InitialElementLiteral& node) {
+boost::variant<pddl::Literal> InitialElementVisitor::operator()(const problem::ast::InitialElementLiteral& node) {
     return parse(node.literal, context);
 }
 
-boost::variant<pddl::GroundLiteral> InitialElementVisitor::operator()(const problem::ast::InitialElementTimedLiterals& node) {
+boost::variant<pddl::Literal> InitialElementVisitor::operator()(const problem::ast::InitialElementTimedLiterals& node) {
     throw NotImplementedError("InitialElementVisitor::operator()(const problem::ast::InitialElementTimedLiterals& node)");
 }
 
-boost::variant<pddl::GroundLiteral> InitialElementVisitor::operator()(const problem::ast::InitialElementNumericFluents& node) {
+boost::variant<pddl::Literal> InitialElementVisitor::operator()(const problem::ast::InitialElementNumericFluents& node) {
     throw NotImplementedError("InitialElementVisitor::operator()(const problem::ast::InitialElementNumericFluents& node)");
 }
 
-boost::variant<pddl::GroundLiteral> InitialElementVisitor::operator()(const problem::ast::InitialElementObjectFluents& node) {
+boost::variant<pddl::Literal> InitialElementVisitor::operator()(const problem::ast::InitialElementObjectFluents& node) {
     throw NotImplementedError("InitialElementVisitor::operator()(const problem::ast::InitialElementObjectFluents& node)");
 }
 
 
-std::vector<boost::variant<pddl::GroundLiteral>> parse(
+std::vector<boost::variant<pddl::Literal>> parse(
     const problem::ast::Initial& initial_node, problem::Context& context) {
-    std::vector<boost::variant<pddl::GroundLiteral>> initial_element_list;
+    std::vector<boost::variant<pddl::Literal>> initial_element_list;
     for (const auto& initial_element : initial_node.initial_elements) {
         initial_element_list.push_back(boost::apply_visitor(InitialElementVisitor(context), initial_element));
     }

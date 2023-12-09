@@ -24,7 +24,6 @@
 
 namespace loki {
 
-extern pddl::ObjectList parse_object_references(const std::vector<domain::ast::Name>& name_nodes, problem::Context& context);
 extern pddl::Object parse_object_reference(const domain::ast::Name& name_node, problem::Context& context);
 
 class ObjectListVisitor : boost::static_visitor<pddl::ObjectList> {

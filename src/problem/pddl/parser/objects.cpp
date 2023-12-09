@@ -27,14 +27,6 @@ using namespace std;
 
 namespace loki {
 
-pddl::ObjectList parse_object_references(const std::vector<domain::ast::Name>& name_nodes, problem::Context& context) {
-    pddl::ObjectList object_list;
-    for (const auto& name_node : name_nodes) {
-        object_list.push_back(parse_object_reference(name_node, context));
-    }
-    return object_list;
-}
-
 pddl::Object parse_object_reference(const domain::ast::Name& name_node, problem::Context& context) {
     const auto name = parse(name_node);
     const auto binding = context.get_current_scope().get<pddl::ObjectImpl>(name);
@@ -55,7 +47,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
     const auto type = context.domain_context->cache.get_or_create<pddl::TypeImpl>("object");
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
-        if (context.domain_context->get_current_scope().get<pddl::ObjectImpl>(name)) {
+        if (context.get_current_scope().get<pddl::ObjectImpl>(name)) {
             context.error_handler(name_node, "");
             throw ObjectIsConstantError(name, context.error_stream->str());
         }
@@ -63,7 +55,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
             context.error_handler(name_node, "");
             throw MultiDefinitionObjectError(name, context.error_stream->str());
         }
-        const auto object = context.domain_context->cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type});
+        const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type});
         context.get_current_scope().insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }
@@ -81,7 +73,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
         if (domain_binding.has_value()) {
             context.error_handler(name_node, "Defined here:");
             if (domain_binding.value().position.has_value()) {
-                context.domain_context->error_handler(domain_binding.value().position.value(), "First defined here:");
+                context.error_handler(domain_binding.value().position.value(), "First defined here:");
             }
             throw ObjectIsConstantError(name, context.error_stream->str() + context.domain_context->error_stream->str());
         }
@@ -93,7 +85,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
             }
             throw MultiDefinitionObjectError(name, context.error_stream->str());
         }
-        const auto object = context.domain_context->cache.get_or_create<pddl::ObjectImpl>(name, types);
+        const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, types);
         context.get_current_scope().insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }

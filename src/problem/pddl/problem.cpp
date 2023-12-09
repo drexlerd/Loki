@@ -15,10 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/problem/pddl/ground_literal.hpp"
 #include "../../../include/loki/problem/pddl/problem.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
+#include "../../../include/loki/domain/pddl/literal.hpp"
 #include "../../../include/loki/domain/pddl/domain.hpp"
 #include "../../../include/loki/domain/pddl/requirements.hpp"
 #include "../../../include/loki/domain/pddl/object.hpp"
@@ -27,7 +27,7 @@ using namespace std;
 
 
 namespace loki::pddl {
-ProblemImpl::ProblemImpl(int identifier, const Domain& domain, const std::string& name, const Requirements& requirements, const ObjectList& objects, const GroundLiteralList& initial_literals, const Condition& goal_condition)
+ProblemImpl::ProblemImpl(int identifier, const Domain& domain, const std::string& name, const Requirements& requirements, const ObjectList& objects, const LiteralList& initial_literals, const Condition& goal_condition)
     : Base(identifier)
     , m_domain(domain)
     , m_name(name)
@@ -109,7 +109,7 @@ const ObjectList& ProblemImpl::get_objects() const {
     return m_objects;
 }
 
-const GroundLiteralList& ProblemImpl::get_initial_literals() const {
+const LiteralList& ProblemImpl::get_initial_literals() const {
     return m_initial_literals;
 }
 

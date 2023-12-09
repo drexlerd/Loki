@@ -24,16 +24,6 @@
 
 namespace loki {
 
-struct ObjectReferenceTermVisitor : boost::static_visitor<pddl::Object> {
-    problem::Context& context;
-
-    ObjectReferenceTermVisitor(problem::Context& context_);
-
-    pddl::Object operator()(const domain::ast::Name& name_node) const;
-    pddl::Object operator()(const domain::ast::Variable& variable_node) const;
-    pddl::Object operator()(const domain::ast::FunctionTerm& function_term_node) const;
-};
-
 }
 
 #endif

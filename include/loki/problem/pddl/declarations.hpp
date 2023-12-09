@@ -29,23 +29,9 @@
 
 
 namespace loki::pddl {
-    class GroundAtomImpl;
-    using GroundAtom = std::shared_ptr<const GroundAtomImpl>;
-    using GroundAtomList = std::vector<GroundAtom>;
-
-    class GroundLiteralImpl;
-    using GroundLiteral = std::shared_ptr<const GroundLiteralImpl>;
-    using GroundLiteralList = std::vector<GroundLiteral>;
-
     class ProblemImpl;
     using Problem = std::shared_ptr<const ProblemImpl>;
     using ProblemList = std::vector<Problem>;
-
-    class ConditionGroundLiteralImpl;
-    using ConditionGroundLiteral = std::shared_ptr<const ConditionGroundLiteralImpl>;
-
-    class EffectGroundLiteralImpl;
-    using EffectGroundLiteral = std::shared_ptr<const EffectGroundLiteralImpl>;
 }
 
 #endif

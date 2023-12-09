@@ -20,7 +20,6 @@
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_CONDITIONS_HPP_
 
 #include "declarations.hpp"
-#include "../../problem/pddl/declarations.hpp"
 
 #include "../../common/pddl/base.hpp"
 
@@ -40,7 +39,6 @@ public:
     virtual ~ConditionVisitor() = default;
 
     virtual void visit(const ConditionLiteral& condition) = 0;
-    virtual void visit(const ConditionGroundLiteral& condition) = 0;
     virtual void visit(const ConditionAnd& condition) = 0;
     virtual void visit(const ConditionOr& condition) = 0;
     virtual void visit(const ConditionNot& condition) = 0;

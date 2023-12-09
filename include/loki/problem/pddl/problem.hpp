@@ -36,14 +36,14 @@ private:
     std::string m_name;
     Requirements m_requirements;
     ObjectList m_objects;
-    GroundLiteralList m_initial_literals;
+    LiteralList m_initial_literals;
     Condition m_goal_condition;
 
     template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
-    ProblemImpl(int identifier, const Domain& domain, const std::string& name, const Requirements& requirements, const ObjectList& objects, const GroundLiteralList& initial_literals, const Condition& goal_condition);
+    ProblemImpl(int identifier, const Domain& domain, const std::string& name, const Requirements& requirements, const ObjectList& objects, const LiteralList& initial_literals, const Condition& goal_condition);
 
     /// @brief Test for semantic equivalence
     bool are_equal_impl(const ProblemImpl& other) const;
@@ -54,7 +54,7 @@ public:
     const std::string& get_name() const;
     const Requirements& get_requirements() const;
     const ObjectList& get_objects() const;
-    const GroundLiteralList& get_initial_literals() const;
+    const LiteralList& get_initial_literals() const;
     const Condition& get_goal_condition() const;
 };
 

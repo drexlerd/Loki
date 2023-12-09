@@ -54,7 +54,7 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, problem::Context&
         objects = parse(problem_node.objects.value(), context);
     }
     /* Initial section */
-    pddl::GroundLiteralList initial_literals;
+    pddl::LiteralList initial_literals;
     const auto initial_elements = parse(problem_node.initial, context);
     for (const auto& initial_element : initial_elements) {
         boost::apply_visitor(UnpackingVisitor(initial_literals), initial_element);
