@@ -24,11 +24,9 @@
 
 namespace loki {
 
-extern pddl::Predicate parse_predicate_reference(const domain::ast::Name& node, problem::Context& context);
-
-extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNames& node, problem::Context& context);
-extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, problem::Context& context);
 extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, problem::Context& context);
+extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, problem::Context& context);
+extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNames& node, problem::Context& context);
 
 class AtomicFormulaOfNamesVisitor : boost::static_visitor<pddl::Atom> {
 private:

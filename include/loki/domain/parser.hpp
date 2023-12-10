@@ -32,8 +32,6 @@ private:
 
     pddl::Domain m_domain;
 
-    friend class ProblemParser;
-
 public:
     explicit DomainParser(const fs::path& file_path);
 

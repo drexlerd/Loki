@@ -27,17 +27,26 @@
 
 namespace loki {
 
-pddl::Predicate parse_predicate_reference(const domain::ast::Name& node, problem::Context& context) {
-    const auto name = parse(node);
+AtomicFormulaOfNamesVisitor::AtomicFormulaOfNamesVisitor(problem::Context& context_) : context(context_) { }
+
+pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, problem::Context& context) {
+    const auto name = parse(node.predicate.name);
     const auto binding = context.domain_context.get_current_scope().get<pddl::PredicateImpl>(name);
     if (!binding.has_value()) {
         context.error_handler(node, "");
         throw UndefinedPredicateError(name, context.error_stream->str());
     }
-    return binding.value().object;
+    pddl::TermList term_list;
+    for (const auto& name_node : node.names) {
+        term_list.push_back(context.cache.get_or_create<pddl::TermObjectImpl>(parse_object_reference(name_node, context)));
+    }
+    auto predicate = binding.value().object;
+    if (predicate->get_parameters().size() != term_list.size()) {
+        context.error_handler(node, "");
+        throw MismatchedPredicateTermListError(predicate, term_list, context.error_stream->str());
+    }
+    return context.cache.get_or_create<pddl::AtomImpl>(predicate, term_list);
 }
-
-AtomicFormulaOfNamesVisitor::AtomicFormulaOfNamesVisitor(problem::Context& context_) : context(context_) { }
 
 pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, problem::Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::EQUALITY)) {
@@ -49,16 +58,6 @@ pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, problem
     const auto term_right = context.cache.get_or_create<pddl::TermObjectImpl>(parse_object_reference(node.name_right, context));
     return context.cache.get_or_create<pddl::AtomImpl>(equal_predicate, pddl::TermList{term_left, term_right});
 }
-
-pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, problem::Context& context) {
-    const auto predicate = parse_predicate_reference(node.predicate.name, context);
-    pddl::TermList term_list;
-    for (const auto& name_node : node.names) {
-        term_list.push_back(context.cache.get_or_create<pddl::TermObjectImpl>(parse_object_reference(name_node, context)));
-    }
-    return context.cache.get_or_create<pddl::AtomImpl>(predicate, term_list);
-}
-
 
 pddl::Atom parse(const problem::ast::AtomicFormulaOfNames& node, problem::Context& context) {
     return boost::apply_visitor(AtomicFormulaOfNamesVisitor(context), node);
