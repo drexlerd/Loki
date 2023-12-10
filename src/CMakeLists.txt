@@ -1,9 +1,11 @@
 file(GLOB SRC_FILES
     "common/*.cpp"
     "common/pddl/*.cpp"
+    "domain/*.cpp"
     "domain/ast/*.cpp"
     "domain/pddl/*.cpp"
     "domain/pddl/parser/*.cpp"
+    "problem/*.cpp"
     "problem/ast/*.cpp"
     "problem/pddl/*.cpp"
     "problem/pddl/parser/*.cpp")

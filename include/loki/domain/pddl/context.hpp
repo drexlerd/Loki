@@ -125,6 +125,11 @@ namespace loki::domain {
             return *scopes.back();
         }
 
+        const Scope& get_current_scope() const {
+            assert(!scopes.empty());
+            return *scopes.back();
+        }
+
         void open_scope() {
             scopes.push_back(std::make_shared<Scope>(scopes.back()));
         }

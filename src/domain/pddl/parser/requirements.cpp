@@ -113,13 +113,13 @@ pddl::RequirementEnumSet parse(const ast::Requirement& node) {
     return boost::apply_visitor(RequirementVisitor(), node);
 }
 
-pddl::Requirements parse(const ast::Requirements& requirements_node, Context& context) {
+pddl::RequirementEnumSet parse(const ast::Requirements& requirements_node) {
     pddl::RequirementEnumSet requirements;
     for (const auto& requirement : requirements_node.requirements) {
         auto additional_requirements = parse(requirement);
         requirements.insert(additional_requirements.begin(), additional_requirements.end());
     }
-    return context.cache.get_or_create<pddl::RequirementsImpl>(requirements);
+    return requirements;
 }
 
 }

@@ -42,10 +42,11 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, problem::Context&
     const auto problem_name = parse(problem_node.problem_name.name);
     /* Requirements section */
     if (problem_node.requirements.has_value()) {
-        context.requirements = parse(problem_node.requirements.value(), *context.domain_context);
+        context.requirements = context.cache.get_or_create<pddl::RequirementsImpl>(
+            parse(problem_node.requirements.value()));
     } else {
         // Default requirements
-        context.requirements = context.domain_context->cache.get_or_create<pddl::RequirementsImpl>(
+        context.requirements = context.cache.get_or_create<pddl::RequirementsImpl>(
             pddl::RequirementEnumSet{pddl::RequirementEnum::STRIPS});
     }
     /* Objects section */

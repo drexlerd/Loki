@@ -20,6 +20,7 @@
 
 #include "problem.hpp"
 
+#include "../../domain/pddl/requirements.hpp"
 #include "../../domain/pddl/context.hpp"
 #include "../../domain/pddl/object.hpp"
 
@@ -33,7 +34,7 @@ namespace loki::problem {
         std::unique_ptr<std::ostringstream> error_stream;
         error_handler_type error_handler;
 
-        std::unique_ptr<domain::Context> domain_context;
+        const domain::Context& domain_context;
 
         // We want different pointers for problem specific objects
         ReferenceCountedObjectFactory<pddl::ObjectImpl
@@ -44,6 +45,7 @@ namespace loki::problem {
             , pddl::ConditionAndImpl
             , pddl::ConditionOrImpl
             , pddl::ConditionNotImpl
+            , pddl::RequirementsImpl
             , pddl::ProblemImpl> cache;
 
         // Track scopes during parsing
@@ -55,16 +57,16 @@ namespace loki::problem {
 
         Context(std::unique_ptr<std::ostringstream>&& error_stream_,
             error_handler_type&& error_handler_,
-            std::unique_ptr<domain::Context>&& domain_context_)
+            const domain::Context& domain_context_)
             : error_stream(std::move(error_stream_))
             , error_handler(std::move(error_handler_))
-            , domain_context(std::move(domain_context_)) {
+            , domain_context(domain_context_) {
             // Initialize the global scope
             global_scope = std::make_shared<Scope>(nullptr);
             scopes.push_back(global_scope);
 
             // Make constants more easily referenceable in the problem definition
-            for (const auto& pair : domain_context->global_scope->get<pddl::ObjectImpl>()) {
+            for (const auto& pair : domain_context.global_scope->get<pddl::ObjectImpl>()) {
                 global_scope->insert(pair.first, pair.second.object, {});
             }
         }

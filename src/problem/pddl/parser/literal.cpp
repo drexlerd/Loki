@@ -29,7 +29,7 @@ namespace loki {
 
 pddl::Predicate parse_predicate_reference(const domain::ast::Name& node, problem::Context& context) {
     const auto name = parse(node);
-    const auto binding = context.domain_context->get_current_scope().get<pddl::PredicateImpl>(name);
+    const auto binding = context.domain_context.get_current_scope().get<pddl::PredicateImpl>(name);
     if (!binding.has_value()) {
         context.error_handler(node, "");
         throw UndefinedPredicateError(name, context.error_stream->str());
@@ -44,7 +44,7 @@ pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, problem
         context.error_handler(node, "");
         throw UndefinedRequirementError(pddl::RequirementEnum::EQUALITY, context.error_stream->str());
     }
-    const auto& equal_predicate = context.domain_context->equal_predicate;
+    const auto& equal_predicate = context.domain_context.equal_predicate;
     const auto term_left = context.cache.get_or_create<pddl::TermObjectImpl>(parse_object_reference(node.name_left, context));
     const auto term_right = context.cache.get_or_create<pddl::TermObjectImpl>(parse_object_reference(node.name_right, context));
     return context.cache.get_or_create<pddl::AtomImpl>(equal_predicate, pddl::TermList{term_left, term_right});

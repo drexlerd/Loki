@@ -15,12 +15,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "goal.hpp"
+#ifndef LOKI_INCLUDE_LOKI_DOMAIN_PARSER_HPP_
+#define LOKI_INCLUDE_LOKI_DOMAIN_PARSER_HPP_
+
+#include "pddl/declarations.hpp"
+#include "pddl/context.hpp"
+
+#include "../common/filesystem.hpp"
 
 
 namespace loki {
 
-pddl::Condition parse(const problem::ast::Goal& node, problem::Context& context) {
-}
+class DomainParser {
+private:
+    std::unique_ptr<domain::Context> m_context;
+
+    pddl::Domain m_domain;
+
+    friend class ProblemParser;
+
+public:
+    explicit DomainParser(const fs::path& file_path);
+
+    const pddl::Domain& get_domain() const;
+    const domain::Context& get_context() const;
+};
 
 }
+
+#endif

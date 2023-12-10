@@ -15,20 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../include/loki/common/ast/config.hpp"
-#include "../include/loki/common/ast/parser_wrapper.hpp"
-#include "../include/loki/common/filesystem.hpp"
-#include "../include/loki/domain/ast/ast.hpp"
-#include "../include/loki/domain/ast/parser.hpp"
-#include "../include/loki/domain/ast/printer.hpp"
-#include "../include/loki/domain/pddl/parser.hpp"
+#include "../include/loki/domain/parser.hpp"
 
 #include <iostream>
-#include <memory>
-#include <vector>
-
-using namespace loki;
-using namespace std;
 
 
 int main(int argc, char** argv) {
@@ -36,20 +25,11 @@ int main(int argc, char** argv) {
         std::cout << "Usage: interpreter <domain:str>" << std::endl;
         return 1;
     }
-    string domain_file = argv[1];
+    std::string domain_file = argv[1];
 
     // 1. Parse the domain
-    const auto source = loki::read_file(domain_file);
-    domain::ast::Domain domain_node;
-    std::unique_ptr<std::ostringstream> error_stream = std::make_unique<std::ostringstream>();
-    error_handler_type error_handler(source.begin(), source.end(), *error_stream, domain_file);
-    bool success = parse_ast(source, domain::domain(), domain_node, error_handler);
-    if (!success) {
-        throw SyntaxParserError("", error_stream->str());
-    }
-    std::cout << parse_text(domain_node, FormattingOptions{0,4}) << std::endl;
-    domain::Context context(std::move(error_stream), std::move(error_handler));
-    pddl::Domain domain = parse(domain_node, context);
+    const auto domain_parser = loki::DomainParser(domain_file);
+    const auto domain = domain_parser.get_domain();
     std::cout << *domain << std::endl;
 
     return 0;

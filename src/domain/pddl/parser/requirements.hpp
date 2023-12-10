@@ -73,7 +73,7 @@ struct RequirementVisitor : boost::static_visitor<pddl::RequirementEnumSet> {
     }
 };
 
-extern pddl::Requirements parse(const domain::ast::Requirements& requirements_node, Context& context);
+extern pddl::RequirementEnumSet parse(const domain::ast::Requirements& requirements_node);
 
 }
 

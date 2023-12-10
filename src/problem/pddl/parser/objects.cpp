@@ -44,7 +44,7 @@ ObjectListVisitor::ObjectListVisitor(Context& context_)
 pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::ObjectList object_list;
-    const auto type = context.domain_context->cache.get_or_create<pddl::TypeImpl>("object");
+    const auto type = context.domain_context.base_type_object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
         if (context.get_current_scope().get<pddl::ObjectImpl>(name)) {
@@ -64,18 +64,18 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
 
 pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
     pddl::ObjectList object_list;
-    const auto types = boost::apply_visitor(TypeReferenceTypeVisitor(*context.domain_context),
+    const auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context.domain_context),
                                             typed_list_of_names_recursively_node.type);
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
         const auto name = parse(name_node);
-        auto domain_binding = context.domain_context->get_current_scope().get<pddl::ObjectImpl>(name);
+        auto domain_binding = context.domain_context.get_current_scope().get<pddl::ObjectImpl>(name);
         if (domain_binding.has_value()) {
             context.error_handler(name_node, "Defined here:");
             if (domain_binding.value().position.has_value()) {
                 context.error_handler(domain_binding.value().position.value(), "First defined here:");
             }
-            throw ObjectIsConstantError(name, context.error_stream->str() + context.domain_context->error_stream->str());
+            throw ObjectIsConstantError(name, context.error_stream->str() + context.domain_context.error_stream->str());
         }
         auto problem_binding = context.get_current_scope().get<pddl::ObjectImpl>(name);
         if (problem_binding.has_value()) {

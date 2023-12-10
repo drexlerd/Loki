@@ -55,7 +55,7 @@ pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeEither& eit
 
 /* TypeReferenceTypeVisitor */
 
-TypeReferenceTypeVisitor::TypeReferenceTypeVisitor(Context& context_)
+TypeReferenceTypeVisitor::TypeReferenceTypeVisitor(const Context& context_)
     : context(context_) { }
 
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Type& type_node) {
@@ -74,7 +74,7 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Name& name_node) 
 }
 
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeObject&) {
-    return { context.cache.get_or_create<pddl::TypeImpl>("object") };
+    return { context.base_type_object };
 }
 
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& either_type_node) {
@@ -87,12 +87,12 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& eithe
     return type_list;
 }
 
-/* TypeListDeclarationVisitor */
+/* TypeDeclarationTypedListOfNamesVisitor */
 
-TypeListDeclarationVisitor::TypeListDeclarationVisitor(Context& context_)
+TypeDeclarationTypedListOfNamesVisitor::TypeDeclarationTypedListOfNamesVisitor(Context& context_)
     : context(context_) { }
 
-pddl::TypeList TypeListDeclarationVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
+pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::TypeList type_list;
     const auto base_type = context.cache.get_or_create<pddl::TypeImpl>("object");
@@ -109,7 +109,7 @@ pddl::TypeList TypeListDeclarationVisitor::operator()(const std::vector<ast::Nam
     return type_list;
 }
 
-pddl::TypeList TypeListDeclarationVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
+pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
     // requires :typing
     if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
         context.error_handler(typed_list_of_names_recursively_node, "");
@@ -140,7 +140,7 @@ pddl::TypeList TypeListDeclarationVisitor::operator()(const ast::TypedListOfName
         context.get_current_scope().insert<pddl::TypeImpl>(name, type, name_node);
     }
     // Recursively add types.
-    auto additional_types = boost::apply_visitor(TypeListDeclarationVisitor(context), typed_list_of_names_recursively_node.typed_list_of_names.get());
+    auto additional_types = boost::apply_visitor(TypeDeclarationTypedListOfNamesVisitor(context), typed_list_of_names_recursively_node.typed_list_of_names.get());
     type_list.insert(type_list.end(), additional_types.begin(), additional_types.end());
     return type_list;
 }
@@ -148,7 +148,7 @@ pddl::TypeList TypeListDeclarationVisitor::operator()(const ast::TypedListOfName
 /* Other functions */
 
 pddl::TypeList parse(const ast::Types& types_node, Context& context) {
-    return boost::apply_visitor(TypeListDeclarationVisitor(context), types_node.typed_list_of_names);
+    return boost::apply_visitor(TypeDeclarationTypedListOfNamesVisitor(context), types_node.typed_list_of_names);
 }
 
 }

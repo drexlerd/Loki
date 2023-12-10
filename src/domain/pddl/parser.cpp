@@ -49,7 +49,8 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context) {
     const auto domain_name = parse(domain_node.domain_name, context);
     /* Requirements section */
     if (domain_node.requirements.has_value()) {
-        context.requirements = parse(domain_node.requirements.value(), context);
+        context.requirements = context.cache.get_or_create<pddl::RequirementsImpl>(
+            parse(domain_node.requirements.value()));
     } else {
         // Default requirements
         context.requirements = context.cache.get_or_create<pddl::RequirementsImpl>(
