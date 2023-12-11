@@ -49,8 +49,7 @@ namespace loki::problem {
             , pddl::ProblemImpl> cache;
 
         // Track scopes during parsing
-        std::shared_ptr<Scope> global_scope;
-        std::deque<std::shared_ptr<Scope>> scopes;
+        ScopeStack scopes;
 
         // For convenience.
         pddl::Requirements requirements;
@@ -61,27 +60,11 @@ namespace loki::problem {
             : error_stream(std::move(error_stream_))
             , error_handler(std::move(error_handler_))
             , domain_context(domain_context_) {
-            // Initialize the global scope
-            global_scope = std::make_shared<Scope>(nullptr);
-            scopes.push_back(global_scope);
 
             // Make constants more easily referenceable in the problem definition
-            for (const auto& pair : domain_context.global_scope->get<pddl::ObjectImpl>()) {
-                global_scope->insert(pair.first, pair.second.object, {});
+            for (const auto& pair : domain_context.scopes.get_current_scope().get<pddl::ObjectImpl>()) {
+                scopes.get_current_scope().insert(pair.first, pair.second.object, {});
             }
-        }
-
-        Scope& get_current_scope() {
-            assert(!scopes.empty());
-            return *scopes.back();
-        }
-
-        void open_scope() {
-            scopes.push_back(std::make_shared<Scope>(scopes.back()));
-        }
-
-        void close_scope() {
-            scopes.pop_back();
         }
     };
 }

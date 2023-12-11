@@ -37,7 +37,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Vari
     const auto type = context.cache.get_or_create<pddl::TypeImpl>("object");
     for (const auto& variable_node : variable_nodes) {
         const auto variable = parse(variable_node, context);
-        const auto binding = context.get_current_scope().get<pddl::VariableImpl>(variable->get_name());
+        const auto binding = context.scopes.get_current_scope().get<pddl::VariableImpl>(variable->get_name());
         if (binding.has_value()) {
             context.error_handler(variable_node, "Defined here:");
             if (binding.value().position.has_value()) {
@@ -45,7 +45,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Vari
             }
             throw MultiDefinitionVariableError(variable->get_name(), context.error_stream->str());
         }
-        context.get_current_scope().insert(variable->get_name(), variable, variable_node);
+        context.scopes.get_current_scope().insert(variable->get_name(), variable, variable_node);
         const auto parameter = context.cache.get_or_create<pddl::ParameterImpl>(variable, pddl::TypeList{type});
         parameter_list.emplace_back(parameter);
     }
@@ -64,7 +64,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
     // A non-visited vector of variables has user defined types
     for (const auto& variable_node : typed_variables_node.variables) {
         const auto variable = parse(variable_node, context);
-        const auto binding = context.get_current_scope().get<pddl::VariableImpl>(variable->get_name());
+        const auto binding = context.scopes.get_current_scope().get<pddl::VariableImpl>(variable->get_name());
         if (binding.has_value()) {
             context.error_handler(variable_node, "Defined here:");
             if (binding.value().position.has_value()) {
@@ -72,7 +72,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
             }
             throw MultiDefinitionVariableError(variable->get_name(), context.error_stream->str());
         }
-        context.get_current_scope().insert(variable->get_name(), variable, variable_node);
+        context.scopes.get_current_scope().insert(variable->get_name(), variable, variable_node);
         const auto parameter = context.cache.get_or_create<pddl::ParameterImpl>(variable, types);
         parameter_list.emplace_back(parameter);
     }

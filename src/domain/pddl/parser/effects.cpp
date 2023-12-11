@@ -73,18 +73,18 @@ pddl::Effect parse(const domain::ast::EffectProduction& node, domain::Context& c
 }
 
 pddl::Effect parse(const domain::ast::EffectConditionalForall& node, domain::Context& context) {
-    context.open_scope();
+    context.scopes.open_scope();
     pddl::ParameterList parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
     pddl::Effect effect = parse(node.effect, context);
-    context.close_scope();
+    context.scopes.close_scope();
     return context.cache.get_or_create<pddl::EffectConditionalForallImpl>(parameter_list, effect);
 }
 
 pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, domain::Context& context) {
-    context.open_scope();
+    context.scopes.open_scope();
     pddl::Condition condition = parse(node.goal_descriptor, context);
     pddl::Effect effect = parse(node.effect, context);
-    context.close_scope();
+    context.scopes.close_scope();
     return context.cache.get_or_create<pddl::EffectConditionalWhenImpl>(condition, effect);
 }
 

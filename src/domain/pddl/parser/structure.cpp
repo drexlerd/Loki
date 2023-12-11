@@ -46,11 +46,11 @@ std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(co
 }
 
 pddl::Action parse(const domain::ast::Action& node, domain::Context& context) {
-    context.open_scope();
+    context.scopes.open_scope();
     auto name = parse(node.action_symbol, context);
     auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
     auto [condition, effect] = parse(node.action_body, context);
-    context.close_scope();
+    context.scopes.close_scope();
     return context.cache.get_or_create<pddl::ActionImpl>(name, parameters, condition, effect);
 }
 

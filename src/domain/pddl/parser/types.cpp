@@ -64,7 +64,7 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Type& type_node) 
 
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Name& name_node) {
     auto name = parse(name_node);
-    auto binding = context.get_current_scope().get<pddl::TypeImpl>(name);
+    auto binding = context.scopes.get_current_scope().get<pddl::TypeImpl>(name);
     if (!binding.has_value()) {
         context.error_handler(name_node, "");
         throw UndefinedTypeError(name, context.error_stream->str());
@@ -98,13 +98,13 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vec
     const auto base_type = context.cache.get_or_create<pddl::TypeImpl>("object");
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
-        if (context.get_current_scope().get<pddl::TypeImpl>(name)) {
+        if (context.scopes.get_current_scope().get<pddl::TypeImpl>(name)) {
             context.error_handler(name_node, "");
             throw MultiDefinitionTypeError(name, context.error_stream->str());
         }
         const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, pddl::TypeList{base_type});
         type_list.push_back(type);
-        context.get_current_scope().insert<pddl::TypeImpl>(name, type, name_node);
+        context.scopes.get_current_scope().insert<pddl::TypeImpl>(name, type, name_node);
     }
     return type_list;
 }
@@ -131,13 +131,13 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::Typ
             context.error_handler(name_node, "");
             throw SemanticParserError("Unexpected type name \"number\". It is a reserved type name.", context.error_stream->str());
         }
-        if (context.get_current_scope().get<pddl::TypeImpl>(name)) {
+        if (context.scopes.get_current_scope().get<pddl::TypeImpl>(name)) {
             context.error_handler(name_node, "");
             throw MultiDefinitionTypeError(name, context.error_stream->str());
         }
         const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, types);
         type_list.push_back(type);
-        context.get_current_scope().insert<pddl::TypeImpl>(name, type, name_node);
+        context.scopes.get_current_scope().insert<pddl::TypeImpl>(name, type, name_node);
     }
     // Recursively add types.
     auto additional_types = boost::apply_visitor(TypeDeclarationTypedListOfNamesVisitor(context), typed_list_of_names_recursively_node.typed_list_of_names.get());

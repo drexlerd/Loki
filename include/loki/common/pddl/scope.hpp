@@ -31,6 +31,7 @@
 #include <memory>
 #include <tuple>
 #include <optional>
+#include <deque>
 
 
 namespace loki {
@@ -111,6 +112,35 @@ class Scope {
         /// @brief Insert a binding of type T.
         template<typename T>
         void insert(const std::string& name, const BindingPtrType<T>& binding, const std::optional<PositionType>& position);
+};
+
+
+class ScopeStack {
+    private:
+        std::deque<std::shared_ptr<Scope>> m_stack; 
+
+    public:
+        ScopeStack() : m_stack(std::deque{std::make_shared<Scope>()}) { 
+            assert(m_stack.size() == 1);
+        }
+
+        void open_scope() {
+            m_stack.push_back(std::make_shared<Scope>(get_current_scope()));
+        }
+
+        void close_scope() {
+            m_stack.pop_back();
+        }
+
+        Scope& get_current_scope() {
+            assert(!m_stack.empty());
+            return *m_stack.back();
+        }
+
+        const Scope& get_current_scope() const {
+            assert(!m_stack.empty());
+            return *m_stack.back();
+        }
 };
 
 }

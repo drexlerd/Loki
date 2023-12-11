@@ -29,7 +29,7 @@ namespace loki {
 
 pddl::Object parse_object_reference(const domain::ast::Name& name_node, problem::Context& context) {
     const auto name = parse(name_node);
-    const auto binding = context.get_current_scope().get<pddl::ObjectImpl>(name);
+    const auto binding = context.scopes.get_current_scope().get<pddl::ObjectImpl>(name);
     if (!binding.has_value()) {
         context.error_handler(name_node, "");
         throw UndefinedObjectError(name, context.error_stream->str());
@@ -47,7 +47,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
     const auto type = context.domain_context.base_type_object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
-        auto domain_binding = context.domain_context.get_current_scope().get<pddl::ObjectImpl>(name);
+        auto domain_binding = context.domain_context.scopes.get_current_scope().get<pddl::ObjectImpl>(name);
         if (domain_binding.has_value()) {
             context.error_handler(name_node, "Defined here:");
             if (domain_binding.value().position.has_value()) {
@@ -55,7 +55,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
             }
             throw ObjectIsConstantError(name, context.error_stream->str() + context.domain_context.error_stream->str());
         }
-        auto problem_binding = context.get_current_scope().get<pddl::ObjectImpl>(name);
+        auto problem_binding = context.scopes.get_current_scope().get<pddl::ObjectImpl>(name);
         if (problem_binding.has_value()) {
             context.error_handler(name_node, "Defined here:");
             if (problem_binding.value().position.has_value()) {
@@ -64,7 +64,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
             throw MultiDefinitionObjectError(name, context.error_stream->str());
         }
         const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type});
-        context.get_current_scope().insert<pddl::ObjectImpl>(name, object, name_node);
+        context.scopes.get_current_scope().insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }
     return object_list;
@@ -77,7 +77,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
         const auto name = parse(name_node);
-        auto domain_binding = context.domain_context.get_current_scope().get<pddl::ObjectImpl>(name);
+        auto domain_binding = context.domain_context.scopes.get_current_scope().get<pddl::ObjectImpl>(name);
         if (domain_binding.has_value()) {
             context.error_handler(name_node, "Defined here:");
             if (domain_binding.value().position.has_value()) {
@@ -85,7 +85,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
             }
             throw ObjectIsConstantError(name, context.error_stream->str() + context.domain_context.error_stream->str());
         }
-        auto problem_binding = context.get_current_scope().get<pddl::ObjectImpl>(name);
+        auto problem_binding = context.scopes.get_current_scope().get<pddl::ObjectImpl>(name);
         if (problem_binding.has_value()) {
             context.error_handler(name_node, "Defined here:");
             if (problem_binding.value().position.has_value()) {
@@ -94,7 +94,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
             throw MultiDefinitionObjectError(name, context.error_stream->str());
         }
         const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, types);
-        context.get_current_scope().insert<pddl::ObjectImpl>(name, object, name_node);
+        context.scopes.get_current_scope().insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }
     // Recursively add objects.

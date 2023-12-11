@@ -81,8 +81,7 @@ namespace loki::domain {
             , pddl::DomainImpl> cache;
 
         // Track scopes during parsing
-        std::shared_ptr<Scope> global_scope;
-        std::deque<std::shared_ptr<Scope>> scopes;
+        ScopeStack scopes;
 
         // For convenience.
         pddl::Requirements requirements;
@@ -96,15 +95,11 @@ namespace loki::domain {
             : error_stream(std::move(error_stream_))
             , error_handler(std::move(error_handler_)) {
 
-            // Initialize the global scope
-            global_scope = std::make_shared<Scope>(nullptr);
-            scopes.push_back(global_scope);
-
             // create base types.
             base_type_object = cache.get_or_create<pddl::TypeImpl>("object");
             base_type_number = cache.get_or_create<pddl::TypeImpl>("number");
-            global_scope->insert("object", base_type_object, {});
-            global_scope->insert("number", base_type_number, {});
+            scopes.get_current_scope().insert("object", base_type_object, {});
+            scopes.get_current_scope().insert("number", base_type_number, {});
 
             // add equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
             auto binary_parameterlist = pddl::ParameterList{
@@ -117,25 +112,7 @@ namespace loki::domain {
 
             };
             equal_predicate = cache.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist);
-                global_scope->insert<pddl::PredicateImpl>("=", equal_predicate, {});
-        }
-
-        Scope& get_current_scope() {
-            assert(!scopes.empty());
-            return *scopes.back();
-        }
-
-        const Scope& get_current_scope() const {
-            assert(!scopes.empty());
-            return *scopes.back();
-        }
-
-        void open_scope() {
-            scopes.push_back(std::make_shared<Scope>(scopes.back()));
-        }
-
-        void close_scope() {
-            scopes.pop_back();
+                scopes.get_current_scope().insert<pddl::PredicateImpl>("=", equal_predicate, {});
         }
     };
 }

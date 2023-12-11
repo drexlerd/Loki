@@ -31,7 +31,7 @@ AtomicFormulaOfNamesVisitor::AtomicFormulaOfNamesVisitor(problem::Context& conte
 
 pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, problem::Context& context) {
     const auto name = parse(node.predicate.name);
-    const auto binding = context.domain_context.get_current_scope().get<pddl::PredicateImpl>(name);
+    const auto binding = context.domain_context.scopes.get_current_scope().get<pddl::PredicateImpl>(name);
     if (!binding.has_value()) {
         context.error_handler(node, "");
         throw UndefinedPredicateError(name, context.error_stream->str());
