@@ -28,8 +28,7 @@ struct Context {
     // For the unique construction of PDDL objects
     PddlFactory cache;
     // For referencing to existing bindings
-    ScopeStack scopes;
-
+    std::unique_ptr<ScopeStack> scopes;
     // For convenience, to avoid an additional parameter
     pddl::Requirements requirements;
 };

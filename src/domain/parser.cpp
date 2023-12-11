@@ -15,28 +15,26 @@ namespace loki {
 DomainParser::DomainParser(const fs::path& file_path) {
     const auto domain_source = loki::read_file(file_path);
     domain::ast::Domain node;
-    // heap allocated because error_handler_type stores a reference which must remain valid
-    auto domain_error_stream = std::make_unique<std::ostringstream>();
-    auto domain_error_handler = std::make_unique<error_handler_type>(domain_source.begin(), domain_source.end(), *domain_error_stream, file_path);
-    bool success = parse_ast(domain_source, domain::domain(), node, *domain_error_handler);
+
+    auto error_handler = ErrorHandler(domain_source, file_path);
+    bool success = parse_ast(domain_source, domain::domain(), node, error_handler.get_error_handler());
     if (!success) {
-        throw SyntaxParserError("", domain_error_stream->str());
+        throw SyntaxParserError("", error_handler.get_error_stream().str());
     }
 
     Context context{
         PddlFactory(),
-        ScopeStack(std::move(domain_error_handler), std::move(domain_error_stream)),
+        std::make_unique<ScopeStack>(std::move(error_handler)),
         nullptr
     };
     // Initialize global scope
-    context.scopes.open_scope();
+    context.scopes->open_scope();
 
     // Create base types.
-    auto& scope = context.scopes.get_current_scope();
     const auto base_type_object = context.cache.get_or_create<pddl::TypeImpl>("object");
     const auto base_type_number = context.cache.get_or_create<pddl::TypeImpl>("number");
-    scope.insert("object", base_type_object, {});
-    scope.insert("number", base_type_number, {});
+    context.scopes->insert("object", base_type_object, {});
+    context.scopes->insert("number", base_type_number, {});
 
     // Create equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
     const auto binary_parameterlist = pddl::ParameterList{
@@ -49,7 +47,7 @@ DomainParser::DomainParser(const fs::path& file_path) {
 
     };
     const auto equal_predicate = context.cache.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist);
-        scope.insert<pddl::PredicateImpl>("=", equal_predicate, {});
+        context.scopes->insert<pddl::PredicateImpl>("=", equal_predicate, {});
 
     // Parse the domain
     m_domain = parse(node, context);

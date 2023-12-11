@@ -50,24 +50,16 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
     const auto type = type_binding.value().value.object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
-        auto domain_binding = current_scope.get<pddl::ObjectImpl>(name);
-        if (domain_binding.has_value()) {
-            const auto current_definition_error_message = current_scope.get_error_message(name_node, "Defined here:");
-            auto first_definition_error_message = std::string("");
-            const auto& first_definition_scope = domain_binding.value().scope;
-            const auto position = domain_binding.value().value.position;
-            if (position.has_value()) {
-                first_definition_error_message = first_definition_scope->get_error_message(position.value(), "First defined here:");
+        // TODO: we must pass domain to check whether object is constant
+        auto object_binding = current_scope.get<pddl::ObjectImpl>(name);
+        if (object_binding.has_value()) {
+            const auto message_1 = current_scope.get_error_message(name_node, "Defined here:");
+            auto message_2 = std::string("");
+            if (object_binding.value().value.position.has_value()) {
+                object_binding.value().scope->get_error_message(
+                    object_binding.value().value.position.value(), "First defined here:");
             }
-            throw ObjectIsConstantError(name, current_definition_error_message + first_definition_error_message);
-        }
-        auto problem_binding = context.scopes.get_current_scope().get<pddl::ObjectImpl>(name);
-        if (problem_binding.has_value()) {
-            context.error_handler(name_node, "Defined here:");
-            if (problem_binding.value().position.has_value()) {
-                context.error_handler(problem_binding.value().position.value(), "First defined here:");
-            }
-            throw MultiDefinitionObjectError(name, context.error_stream->str());
+            throw MultiDefinitionObjectError(name, message_1 + message_2);
         }
         const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type});
         context.scopes.get_current_scope().insert<pddl::ObjectImpl>(name, object, name_node);
@@ -78,7 +70,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
 
 pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
     pddl::ObjectList object_list;
-    const auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context.domain_context),
+    const auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context),
                                             typed_list_of_names_recursively_node.type);
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
