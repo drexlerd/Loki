@@ -57,10 +57,8 @@ pddl::Term TermDeclarationTermVisitor::operator()(const domain::ast::Variable& v
     const auto binding = context.scopes->get<pddl::VariableImpl>(variable->get_name());
     if (binding.has_value()) {
         const auto message_1 = context.scopes->get_error_handler()(variable_node, "Defined here:");
-        auto message_2 = std::string("");
-        if (binding.value().value.position.has_value()) {
-            message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
-        }
+        assert(binding.value().value.position.has_value());
+        const auto message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
         throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
     }
     context.scopes->insert<pddl::VariableImpl>(variable->get_name(), variable, variable_node);

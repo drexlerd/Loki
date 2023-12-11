@@ -30,16 +30,23 @@ pddl::PredicateList parse(const ast::Predicates& predicates_node, Context& conte
     pddl::PredicateList predicate_list;
     for (const auto& atomic_formula_skeleton : predicates_node.atomic_formula_skeletons) {
         const auto name = parse(atomic_formula_skeleton.predicate.name);
-        if (context.scopes.get_current_scope().get<pddl::PredicateImpl>(name)) {
-            context.error_handler(atomic_formula_skeleton.predicate, "");
-            throw MultiDefinitionPredicateError(name, context.error_stream->str());
+        const auto binding = context.scopes->get<pddl::ObjectImpl>(name);
+        if (binding.has_value()) {
+            const auto message_1 = context.scopes->get_error_handler()(atomic_formula_skeleton.predicate.name, "Defined here:");
+            auto message_2 = std::string("");
+            if (binding.value().value.position.has_value()) {
+                message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
+            } else {
+                // Reserved type?
+            }
+            throw MultiDefinitionPredicateError(name, message_1 + message_2);
         }
-        context.scopes.open_scope();
+        context.scopes->open_scope();
         const auto parameters = boost::apply_visitor(ParameterListVisitor(context),
                                                      atomic_formula_skeleton.typed_list_of_variables);
-        context.scopes.close_scope();
+        context.scopes->close_scope();
         const auto predicate = context.cache.get_or_create<pddl::PredicateImpl>(name, parameters);
-        context.scopes.get_current_scope().insert<pddl::PredicateImpl>(name, predicate, atomic_formula_skeleton.predicate.name);
+        context.scopes->insert<pddl::PredicateImpl>(name, predicate, atomic_formula_skeleton.predicate.name);
         predicate_list.emplace_back(predicate);
     }
     return predicate_list;

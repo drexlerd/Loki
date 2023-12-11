@@ -64,8 +64,7 @@ pddl::Effect parse(const domain::ast::EffectProductionNumericFluent& node, Conte
 }
 
 pddl::Effect parse(const domain::ast::EffectProductionObjectFluent& node, Context& context) {
-    const auto& scope = context.scopes.get_current_scope();
-    throw NotSupportedError(pddl::RequirementEnum::OBJECT_FLUENTS, scope.get_error_message(node, ""));
+    throw NotSupportedError(pddl::RequirementEnum::OBJECT_FLUENTS, context.scopes->get_error_handler()(node, ""));
 }
 
 pddl::Effect parse(const domain::ast::EffectProduction& node, Context& context) {
@@ -73,26 +72,25 @@ pddl::Effect parse(const domain::ast::EffectProduction& node, Context& context) 
 }
 
 pddl::Effect parse(const domain::ast::EffectConditionalForall& node, Context& context) {
-    context.scopes.open_scope();
+    context.scopes->open_scope();
     pddl::ParameterList parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
     pddl::Effect effect = parse(node.effect, context);
-    context.scopes.close_scope();
+    context.scopes->close_scope();
     return context.cache.get_or_create<pddl::EffectConditionalForallImpl>(parameter_list, effect);
 }
 
 pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, Context& context) {
-    context.scopes.open_scope();
+    context.scopes->open_scope();
     pddl::Condition condition = parse(node.goal_descriptor, context);
     pddl::Effect effect = parse(node.effect, context);
-    context.scopes.close_scope();
+    context.scopes->close_scope();
     return context.cache.get_or_create<pddl::EffectConditionalWhenImpl>(condition, effect);
 }
 
 pddl::Effect parse(const domain::ast::EffectConditional& node, Context& context) {
     // requires :conditional-effects
     if (!context.requirements->test(pddl::RequirementEnum::CONDITIONAL_EFFECTS)) {
-        const auto& scope = context.scopes.get_current_scope();
-        throw UndefinedRequirementError(pddl::RequirementEnum::CONDITIONAL_EFFECTS, scope.get_error_message(node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::CONDITIONAL_EFFECTS, context.scopes->get_error_handler()(node, ""));
     }
     return boost::apply_visitor(EffectConditionalVisitor(context), node);
 }
