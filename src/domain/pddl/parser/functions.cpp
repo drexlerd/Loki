@@ -25,7 +25,7 @@
 
 namespace loki {
 
-FunctionSkeletonListVisitor::FunctionSkeletonListVisitor(domain::Context& context_)
+FunctionSkeletonListVisitor::FunctionSkeletonListVisitor(Context& context_)
     : context(context_) { }
 
 pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const std::vector<domain::ast::AtomicFunctionSkeleton>& formula_skeleton_nodes) {
@@ -72,7 +72,7 @@ pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const domain:
     return this->operator()(function_skeleton_list_node);
 }
 
-pddl::FunctionSkeletonList parse(const domain::ast::Functions& functions_node, domain::Context& context) {
+pddl::FunctionSkeletonList parse(const domain::ast::Functions& functions_node, Context& context) {
     return boost::apply_visitor(FunctionSkeletonListVisitor(context), functions_node.function_types_list_of_atomic_function_skeletons);
 }
 

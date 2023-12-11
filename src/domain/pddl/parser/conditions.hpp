@@ -28,41 +28,41 @@
 
 namespace loki {
 
-extern pddl::Condition parse(const domain::ast::GoalDescriptor& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::GoalDescriptorAtom& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::GoalDescriptorAnd& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::GoalDescriptorNot& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::GoalDescriptorImply& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::GoalDescriptorExists& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::GoalDescriptorForall& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::GoalDescriptorFunctionComparison& node, domain::Context& context);
+extern pddl::Condition parse(const domain::ast::GoalDescriptor& node, Context& context);
+extern pddl::Condition parse(const domain::ast::GoalDescriptorAtom& node, Context& context);
+extern pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, Context& context);
+extern pddl::Condition parse(const domain::ast::GoalDescriptorAnd& node, Context& context);
+extern pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, Context& context);
+extern pddl::Condition parse(const domain::ast::GoalDescriptorNot& node, Context& context);
+extern pddl::Condition parse(const domain::ast::GoalDescriptorImply& node, Context& context);
+extern pddl::Condition parse(const domain::ast::GoalDescriptorExists& node, Context& context);
+extern pddl::Condition parse(const domain::ast::GoalDescriptorForall& node, Context& context);
+extern pddl::Condition parse(const domain::ast::GoalDescriptorFunctionComparison& node, Context& context);
 
-extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptor& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAnd& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorForall& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAtEnd& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAlways& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometime& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorWithin& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAtMostOnce& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometimeAfter& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometimeBefore& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAlwaysWithin& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorHoldDuring& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorHoldAfter& node, domain::Context& context);
+extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptor& node, Context& context);
+extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAnd& node, Context& context);
+extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorForall& node, Context& context);
+extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAtEnd& node, Context& context);
+extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAlways& node, Context& context);
+extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometime& node, Context& context);
+extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorWithin& node, Context& context);
+extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAtMostOnce& node, Context& context);
+extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometimeAfter& node, Context& context);
+extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometimeBefore& node, Context& context);
+extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAlwaysWithin& node, Context& context);
+extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorHoldDuring& node, Context& context);
+extern pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorHoldAfter& node, Context& context);
 
-extern pddl::Condition parse(const domain::ast::PreconditionGoalDescriptor& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorSimple& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorAnd& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorPreference& node, domain::Context& context);
-extern pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorForall& node, domain::Context& context);
+extern pddl::Condition parse(const domain::ast::PreconditionGoalDescriptor& node, Context& context);
+extern pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorSimple& node, Context& context);
+extern pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorAnd& node, Context& context);
+extern pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorPreference& node, Context& context);
+extern pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorForall& node, Context& context);
 
 struct ConditionVisitor : boost::static_visitor<pddl::Condition> {
-    domain::Context& context;
+    Context& context;
 
-    ConditionVisitor(domain::Context& context_);
+    ConditionVisitor(Context& context_);
 
     template<typename Node>
     pddl::Condition operator()(const Node& node) const {

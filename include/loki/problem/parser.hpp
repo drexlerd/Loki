@@ -19,8 +19,8 @@
 #define LOKI_INCLUDE_LOKI_PROBLEM_PARSER_HPP_
 
 #include "pddl/declarations.hpp"
-#include "pddl/context.hpp"
 
+#include "../common/pddl/context.hpp"
 #include "../common/filesystem.hpp"
 #include "../domain/parser.hpp"
 

@@ -25,7 +25,7 @@
 namespace loki {
 // parse a vector of goal descriptors
 template<typename T>
-static pddl::ConditionList parse(const std::vector<T>& nodes, domain::Context& context) {
+static pddl::ConditionList parse(const std::vector<T>& nodes, Context& context) {
     pddl::ConditionList condition_list;
     for (const auto& node : nodes) {
         condition_list.push_back(parse(node, context));
@@ -33,69 +33,69 @@ static pddl::ConditionList parse(const std::vector<T>& nodes, domain::Context& c
     return condition_list;
 }
 
-pddl::Condition parse(const domain::ast::GoalDescriptor& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::GoalDescriptor& node, Context& context) {
     return boost::apply_visitor(ConditionVisitor(context), node);
 }
 
-pddl::Condition parse(const domain::ast::GoalDescriptorAtom& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::GoalDescriptorAtom& node, Context& context) {
     return context.cache.get_or_create<pddl::ConditionLiteralImpl>(parse(node.atom, context));
 }
-pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, Context& context) {
     // requires :negative-preconditions
     if (!context.requirements->test(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS)) {
-        context.error_handler(node, "");
-        throw UndefinedRequirementError(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS, context.error_stream->str());
+        const auto& scope = context.scopes.get_current_scope();
+        throw UndefinedRequirementError(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS, scope.get_error_message(node, ""));
     }
     return context.cache.get_or_create<pddl::ConditionLiteralImpl>(parse(node.literal, context));
 }
 
-pddl::Condition parse(const domain::ast::GoalDescriptorAnd& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::GoalDescriptorAnd& node, Context& context) {
     pddl::ConditionList condition_list = parse(node.goal_descriptors, context);
     return context.cache.get_or_create<pddl::ConditionAndImpl>(condition_list);
 }
 
-pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, Context& context) {
     // requires :disjunctive-preconditions
     if (!context.requirements->test(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS)) {
-        context.error_handler(node, "");
-        throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.error_stream->str());
+        const auto& scope = context.scopes.get_current_scope();
+        throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, scope.get_error_message(node, ""));
     }
     pddl::ConditionList condition_list = parse(node.goal_descriptors, context);
     return context.cache.get_or_create<pddl::ConditionOrImpl>(condition_list);
 }
 
-pddl::Condition parse(const domain::ast::GoalDescriptorNot& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::GoalDescriptorNot& node, Context& context) {
     // requires :disjunctive-preconditions
     if (!context.requirements->test(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS)) {
-        context.error_handler(node, "");
-        throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.error_stream->str());
+        const auto& scope = context.scopes.get_current_scope();
+        throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, scope.get_error_message(node, ""));
     }
     pddl::Condition condition = parse(node.goal_descriptor, context);
     return context.cache.get_or_create<pddl::ConditionNotImpl>(condition);
 }
 
-pddl::Condition parse(const domain::ast::GoalDescriptorImply& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::GoalDescriptorImply& node, Context& context) {
     throw NotImplementedError("parse domain::ast::GoalDescriptorImply");
 }
 
-pddl::Condition parse(const domain::ast::GoalDescriptorExists& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::GoalDescriptorExists& node, Context& context) {
     throw NotImplementedError("parse domain::ast::GoalDescriptorExists");
 }
 
-pddl::Condition parse(const domain::ast::GoalDescriptorForall& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::GoalDescriptorForall& node, Context& context) {
     throw NotImplementedError("parse domain::ast::GoalDescriptorForall");
 }
 
-pddl::Condition parse(const domain::ast::GoalDescriptorFunctionComparison& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::GoalDescriptorFunctionComparison& node, Context& context) {
     throw NotImplementedError("parse domain::ast::GoalDescriptorFunctionComparison");
 }
 
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptor& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptor& node, Context& context) {
     return boost::apply_visitor(ConditionVisitor(context), node);
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAnd& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAnd& node, Context& context) {
     pddl::ConditionList condition_list;
     for (const auto& child_node : node.constraint_goal_descriptors) {
         condition_list.push_back(parse(child_node, context));
@@ -103,60 +103,60 @@ pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAnd& node, doma
     return context.cache.get_or_create<pddl::ConditionAndImpl>(condition_list);
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorForall& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorForall& node, Context& context) {
     throw NotImplementedError("parse domain::ast::ConstraintGoalDescriptorForall");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAtEnd& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAtEnd& node, Context& context) {
     throw NotImplementedError("parse domain::ast::ConstraintGoalDescriptorAtEnd");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAlways& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAlways& node, Context& context) {
     throw NotImplementedError("parse domain::ast::ConstraintGoalDescriptorAlways");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometime& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometime& node, Context& context) {
     throw NotImplementedError("parse domain::ast::ConstraintGoalDescriptorSometime");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorWithin& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorWithin& node, Context& context) {
     throw NotImplementedError("parse domain::ast::ConstraintGoalDescriptorWithin");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAtMostOnce& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAtMostOnce& node, Context& context) {
     throw NotImplementedError("parse domain::ast::ConstraintGoalDescriptorAtMostOnce");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometimeAfter& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometimeAfter& node, Context& context) {
     throw NotImplementedError("parse domain::ast::ConstraintGoalDescriptorSometimeAfter");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometimeBefore& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometimeBefore& node, Context& context) {
     throw NotImplementedError("parse domain::ast::ConstraintGoalDescriptorSometimeBefore");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAlwaysWithin& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAlwaysWithin& node, Context& context) {
     throw NotImplementedError("parse domain::ast::ConstraintGoalDescriptorAlwaysWithin");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorHoldDuring& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorHoldDuring& node, Context& context) {
     throw NotImplementedError("parse domain::ast::ConstraintGoalDescriptorHoldDuring");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorHoldAfter& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorHoldAfter& node, Context& context) {
     throw NotImplementedError("parse domain::ast::ConstraintGoalDescriptorHoldAfter");
 }
 
 
-pddl::Condition parse(const domain::ast::PreconditionGoalDescriptor& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::PreconditionGoalDescriptor& node, Context& context) {
     return boost::apply_visitor(ConditionVisitor(context), node);
 }
 
-pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorSimple& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorSimple& node, Context& context) {
     return parse(node.goal_descriptor, context);
 }
 
-pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorAnd& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorAnd& node, Context& context) {
     pddl::ConditionList condition_list;
     for (const auto& child_node : node.precondition_goal_descriptors) {
         condition_list.push_back(parse(child_node, context));
@@ -164,17 +164,17 @@ pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorAnd& node, do
     return context.cache.get_or_create<pddl::ConditionAndImpl>(condition_list);
 }
 
-pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorPreference& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorPreference& node, Context& context) {
     throw NotImplementedError("parse domain::ast::PreconditionGoalDescriptorPreference");
 }
 
-pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorForall& node, domain::Context& context) {
+pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorForall& node, Context& context) {
     throw NotImplementedError("parse domain::ast::PreconditionGoalDescriptorForall");
 }
 
 
 
-ConditionVisitor::ConditionVisitor(domain::Context& context_)
+ConditionVisitor::ConditionVisitor(Context& context_)
     : context(context_) { }
 
 }

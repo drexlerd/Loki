@@ -23,7 +23,7 @@
 
 namespace loki {
 
-pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formula_of_terms_node, domain::Context& context) {
+pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formula_of_terms_node, Context& context) {
     auto predicate_name = parse(atomic_formula_of_terms_node.predicate.name);
     auto binding = context.scopes.get_current_scope().get<pddl::PredicateImpl>(predicate_name);
     if (!binding.has_value()) {
@@ -42,7 +42,7 @@ pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formul
     return context.cache.get_or_create<pddl::AtomImpl>(predicate, term_list);
 }
 
-pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& atomic_formula_of_terms_node, domain::Context& context) {
+pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& atomic_formula_of_terms_node, Context& context) {
     // requires :equality
     if (!context.requirements->test(pddl::RequirementEnum::EQUALITY)) {
         context.error_handler(atomic_formula_of_terms_node, "");
@@ -53,29 +53,29 @@ pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& atomic_formula
     return context.cache.get_or_create<pddl::AtomImpl>(context.equal_predicate, pddl::TermList{left_term, right_term});
 }
 
-pddl::Atom parse(const domain::ast::AtomicFormulaOfTerms& atomic_formula_of_terms_node, domain::Context& context) {
+pddl::Atom parse(const domain::ast::AtomicFormulaOfTerms& atomic_formula_of_terms_node, Context& context) {
     return boost::apply_visitor(AtomicFormulaOfTermsVisitor(context), atomic_formula_of_terms_node);
 }
 
 
-AtomicFormulaOfTermsVisitor::AtomicFormulaOfTermsVisitor(domain::Context& context_)
+AtomicFormulaOfTermsVisitor::AtomicFormulaOfTermsVisitor(Context& context_)
     : context(context_) { }
 
 
-pddl::Literal parse(const domain::ast::Atom& atom_node, domain::Context& context) {
+pddl::Literal parse(const domain::ast::Atom& atom_node, Context& context) {
     return context.cache.get_or_create<pddl::LiteralImpl>(false, parse(atom_node.atomic_formula_of_terms, context));
 }
 
-pddl::Literal parse(const domain::ast::NegatedAtom& negated_atom_node, domain::Context& context) {
+pddl::Literal parse(const domain::ast::NegatedAtom& negated_atom_node, Context& context) {
     return context.cache.get_or_create<pddl::LiteralImpl>(true, parse(negated_atom_node.atomic_formula_of_terms, context));
 }
 
-pddl::Literal parse(const domain::ast::Literal& literal_node, domain::Context& context) {
+pddl::Literal parse(const domain::ast::Literal& literal_node, Context& context) {
     return boost::apply_visitor(LiteralVisitor(context), literal_node);
 }
 
 
-LiteralVisitor::LiteralVisitor(domain::Context& context_)
+LiteralVisitor::LiteralVisitor(Context& context_)
     : context(context_) { }
 
 }

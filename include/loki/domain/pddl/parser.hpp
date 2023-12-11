@@ -18,13 +18,15 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_PARSER_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_PARSER_HPP_
 
-#include "context.hpp"
+#include "../../common/pddl/context.hpp"
+#include "declarations.hpp"
+
 #include "../ast/ast.hpp"
 
 
 namespace loki {
 
-extern pddl::Domain parse(const domain::ast::Domain& domain_node, domain::Context& context);
+extern pddl::Domain parse(const domain::ast::Domain& domain_node, Context& context);
 
 }
 

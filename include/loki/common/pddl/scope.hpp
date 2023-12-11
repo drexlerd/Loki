@@ -18,6 +18,7 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_SCOPE_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_SCOPE_HPP_
 
+#include "../../common/ast/config.hpp"
 #include "../../domain/pddl/type.hpp"
 #include "../../domain/pddl/object.hpp"
 #include "../../domain/pddl/predicate.hpp"
@@ -44,7 +45,7 @@ using PositionType = boost::spirit::x3::position_tagged;
 
 /// @brief Encapsulates binding related information of a type T.
 ///        The object is the entity bound to the name.
-///        The position points to the matched location 
+///        The position points to the matched location
 ///        in the input stream and is used for error reporting.
 template<typename T>
 struct ValueType {
@@ -68,31 +69,30 @@ class Bindings {
         template<typename T>
         std::optional<ValueType<T>> get(const std::string& key) const;
 
-        /// @brief Returns all bindings of type T defined in the scope includings its parent scopes.
-        template<typename T>
-        std::optional<ValueType<T>> getWithParent(const std::string& key, const Scope* parent_scope) const;
-
-        /// @brief Gets all bindings of type T.
-        template<typename T>
-        const MapType<T>& get() const;
-
-        /// @brief Returns all bindings of type T defined in the scope includings its parent scopes.
-        template<typename T>
-        MapType<T> getWithParent(const Scope* parent_scope) const;
-
         /// @brief Inserts a binding of type T
         template<typename T>
-        void insert(const std::string& key, const BindingPtrType<T>& binding, const std::optional<PositionType>& position);
+        void insert(
+            const std::string& key,
+            const BindingPtrType<T>& binding,
+            const std::optional<PositionType>& position);
+};
+
+
+/// @brief Combined information of value and scope
+template<typename T>
+struct SearchResult {
+    ValueType<T> value;
+    std::shared_ptr<const Scope> scope;
 };
 
 
 /// @brief Wraps bindings in a scope with reference to a parent scope.
-class Scope {
+class Scope : public std::enable_shared_from_this<Scope> {
     private:
-        std::shared_ptr<const Scope> m_parent_scope;
-
         std::shared_ptr<error_handler_type> m_error_handler;
         std::shared_ptr<std::ostringstream> m_error_stream;
+
+        std::shared_ptr<const Scope> m_parent_scope;
 
         Bindings<pddl::TypeImpl
             , pddl::ObjectImpl
@@ -111,21 +111,24 @@ class Scope {
 
         /// @brief Returns a binding if it exists.
         template<typename T>
-        std::optional<ValueType<T>> get(const std::string& name) const;
-
-        /// @brief Returns all bindings of type T defined in the scope includings its parent scopes.
-        template<typename T>
-        MapType<T> get() const;
+        std::optional<SearchResult<T>> get(const std::string& name) const;
 
         /// @brief Insert a binding of type T.
         template<typename T>
         void insert(const std::string& name, const BindingPtrType<T>& binding, const std::optional<PositionType>& position);
+
+        /// @brief Returns a human readable error message.
+        std::string get_error_message(const PositionType& position, const std::string& message) const {
+            m_error_stream->clear();
+            m_error_handler->operator()(position, message);
+            return m_error_stream->str();
+        }
 };
 
 
 class ScopeStack {
     private:
-        std::deque<std::shared_ptr<Scope>> m_stack; 
+        std::deque<std::shared_ptr<Scope>> m_stack;
 
         std::shared_ptr<error_handler_type> m_error_handler;
         std::shared_ptr<std::ostringstream> m_error_stream;
@@ -134,12 +137,13 @@ class ScopeStack {
         ScopeStack(
             std::unique_ptr<error_handler_type>&& error_handler,
             std::unique_ptr<std::ostringstream>&& error_stream)
-            : m_error_handler(std::move(error_handler)), m_error_stream(std::move(error_stream)) { }
+            : m_error_handler(std::move(error_handler))
+            , m_error_stream(std::move(error_stream)) { }
 
         void open_scope() {
-            m_stack.push_back(m_stack.empty() 
-                ? std::make_shared<Scope>(m_error_handler, m_error_stream) 
-                : std::make_shared<Scope>(m_error_handler, m_error_stream, get_current_scope()));
+            m_stack.push_back(m_stack.empty()
+                ? std::make_shared<Scope>(m_error_handler, m_error_stream)
+                : std::make_shared<Scope>(m_error_handler, m_error_stream, m_stack.back()));
         }
 
         void close_scope() {
@@ -155,6 +159,14 @@ class ScopeStack {
         const Scope& get_current_scope() const {
             assert(!m_stack.empty());
             return *m_stack.back();
+        }
+
+        void push_scope(std::shared_ptr<Scope> scope) {
+            m_stack.push_back(scope);
+        }
+
+        const std::deque<std::shared_ptr<Scope>>& get_stack() const {
+            return m_stack;
         }
 };
 

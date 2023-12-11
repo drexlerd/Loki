@@ -27,14 +27,14 @@ using namespace std;
 
 namespace loki {
 
-pddl::Object parse_object_reference(const domain::ast::Name& name_node, problem::Context& context) {
+pddl::Object parse_object_reference(const domain::ast::Name& name_node, Context& context) {
     const auto name = parse(name_node);
-    const auto binding = context.scopes.get_current_scope().get<pddl::ObjectImpl>(name);
+    const auto& scope = context.scopes.get_current_scope();
+    const auto binding = scope.get<pddl::ObjectImpl>(name);
     if (!binding.has_value()) {
-        context.error_handler(name_node, "");
-        throw UndefinedObjectError(name, context.error_stream->str());
+        throw UndefinedObjectError(name, binding.value().scope->get_error_message(name_node, ""));
     }
-    return binding.value().object;
+    return binding.value().value.object;
 }
 
 ObjectListVisitor::ObjectListVisitor(Context& context_)
@@ -44,16 +44,22 @@ ObjectListVisitor::ObjectListVisitor(Context& context_)
 pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::ObjectList object_list;
-    const auto type = context.domain_context.base_type_object;
+    const auto& current_scope = context.scopes.get_current_scope();
+    const auto type_binding = current_scope.get<pddl::TypeImpl>("object");
+    assert(type_binding.has_value());
+    const auto type = type_binding.value().value.object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
-        auto domain_binding = context.domain_context.scopes.get_current_scope().get<pddl::ObjectImpl>(name);
+        auto domain_binding = current_scope.get<pddl::ObjectImpl>(name);
         if (domain_binding.has_value()) {
-            context.error_handler(name_node, "Defined here:");
-            if (domain_binding.value().position.has_value()) {
-                context.error_handler(domain_binding.value().position.value(), "First defined here:");
+            const auto current_definition_error_message = current_scope.get_error_message(name_node, "Defined here:");
+            auto first_definition_error_message = std::string("");
+            const auto& first_definition_scope = domain_binding.value().scope;
+            const auto position = domain_binding.value().value.position;
+            if (position.has_value()) {
+                first_definition_error_message = first_definition_scope->get_error_message(position.value(), "First defined here:");
             }
-            throw ObjectIsConstantError(name, context.error_stream->str() + context.domain_context.error_stream->str());
+            throw ObjectIsConstantError(name, current_definition_error_message + first_definition_error_message);
         }
         auto problem_binding = context.scopes.get_current_scope().get<pddl::ObjectImpl>(name);
         if (problem_binding.has_value()) {

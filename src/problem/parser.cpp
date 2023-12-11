@@ -1,11 +1,13 @@
 #include "../../include/loki/problem/parser.hpp"
 
+#include "../../include/loki/common/pddl/context.hpp"
 #include "../../include/loki/common/filesystem.hpp"
 #include "../../include/loki/common/ast/parser_wrapper.hpp"
-#include "../../include/loki/domain/pddl/context.hpp"
 #include "../../include/loki/problem/ast/parser.hpp"
 #include "../../include/loki/problem/ast/ast.hpp"
 #include "../../include/loki/problem/pddl/parser.hpp"
+
+#include <cassert>
 
 
 namespace loki {
@@ -20,8 +22,20 @@ ProblemParser::ProblemParser(const fs::path& file_path, const DomainParser& doma
     if (!success) {
         throw SyntaxParserError("", problem_error_stream->str());
     }
-    problem::Context problem_context(std::move(problem_error_handler), std::move(problem_error_stream), domain_parser.get_context());
-    m_problem = parse(problem_node, problem_context, domain_parser.get_domain());
+
+    Context context{
+        PddlFactory(),
+        ScopeStack(std::move(problem_error_handler), std::move(problem_error_stream)),
+        nullptr
+    };
+    // Push global scope of domain to retrieve domain specific bindings
+    const auto& domain_scopes = domain_parser.get_context().scopes.get_stack();
+    assert(domain_scopes.size() == 1);
+    context.scopes.push_scope(domain_scopes.back());
+    // Initialize global scope
+    context.scopes.open_scope();
+
+    m_problem = parse(problem_node, context, domain_parser.get_domain());
 }
 
 const pddl::Problem& ProblemParser::get_problem() const {

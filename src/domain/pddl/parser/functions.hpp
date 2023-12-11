@@ -30,10 +30,10 @@ namespace loki {
 
 class FunctionSkeletonListVisitor : boost::static_visitor<pddl::FunctionSkeletonList> {
 private:
-    domain::Context& context;
+    Context& context;
 
 public:
-    FunctionSkeletonListVisitor(domain::Context& context_);
+    FunctionSkeletonListVisitor(Context& context_);
 
     pddl::FunctionSkeletonList operator()(const std::vector<domain::ast::AtomicFunctionSkeleton>& formula_skeleton_nodes);
 
@@ -42,7 +42,7 @@ public:
     pddl::FunctionSkeletonList operator()(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletons& function_skeleton_list_node);
 };
 
-extern pddl::FunctionSkeletonList parse(const domain::ast::Functions& functions_node, domain::Context& context);
+extern pddl::FunctionSkeletonList parse(const domain::ast::Functions& functions_node, Context& context);
 
 }
 

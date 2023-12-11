@@ -24,16 +24,16 @@
 
 namespace loki {
 
-extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, problem::Context& context);
-extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, problem::Context& context);
-extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNames& node, problem::Context& context);
+extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, Context& context);
+extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, Context& context);
+extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNames& node, Context& context);
 
 class AtomicFormulaOfNamesVisitor : boost::static_visitor<pddl::Atom> {
 private:
-    problem::Context& context;
+    Context& context;
 
 public:
-    AtomicFormulaOfNamesVisitor(problem::Context& context_);
+    AtomicFormulaOfNamesVisitor(Context& context_);
 
     template<typename Node>
     pddl::Atom operator()(const Node& node) const {
@@ -42,16 +42,16 @@ public:
 };
 
 
-extern pddl::Literal parse(const problem::ast::Atom& node, problem::Context& context);
-extern pddl::Literal parse(const problem::ast::NegatedAtom& node, problem::Context& context);
-extern pddl::Literal parse(const problem::ast::Literal& node, problem::Context& context);
+extern pddl::Literal parse(const problem::ast::Atom& node, Context& context);
+extern pddl::Literal parse(const problem::ast::NegatedAtom& node, Context& context);
+extern pddl::Literal parse(const problem::ast::Literal& node, Context& context);
 
 class LiteralVisitor : boost::static_visitor<pddl::Literal> {
 private:
-    problem::Context& context;
+    Context& context;
 
 public:
-    LiteralVisitor(problem::Context& context_);
+    LiteralVisitor(Context& context_);
 
     template<typename Node>
     pddl::Literal operator()(const Node& node) const {

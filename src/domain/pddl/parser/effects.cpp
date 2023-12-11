@@ -50,29 +50,29 @@ pddl::AssignOperatorEnum parse(const domain::ast::AssignOperator& node) {
 }
 
 
-pddl::Effect parse(const domain::ast::Effect& node, domain::Context& context) {
+pddl::Effect parse(const domain::ast::Effect& node, Context& context) {
     return boost::apply_visitor(EffectVisitor(context), node);
 }
 
-pddl::Effect parse(const domain::ast::EffectProductionLiteral& node, domain::Context& context) {
+pddl::Effect parse(const domain::ast::EffectProductionLiteral& node, Context& context) {
     auto literal = parse(node.literal, context);
     return context.cache.get_or_create<pddl::EffectLiteralImpl>(literal);
 }
 
-pddl::Effect parse(const domain::ast::EffectProductionNumericFluent& node, domain::Context& context) {
+pddl::Effect parse(const domain::ast::EffectProductionNumericFluent& node, Context& context) {
     throw NotImplementedError("parse domain::ast::EffectProductionNumericFluent");
 }
 
-pddl::Effect parse(const domain::ast::EffectProductionObjectFluent& node, domain::Context& context) {
-    context.error_handler(node, "");
-    throw NotSupportedError(pddl::RequirementEnum::OBJECT_FLUENTS, context.error_stream->str());
+pddl::Effect parse(const domain::ast::EffectProductionObjectFluent& node, Context& context) {
+    const auto& scope = context.scopes.get_current_scope();
+    throw NotSupportedError(pddl::RequirementEnum::OBJECT_FLUENTS, scope.get_error_message(node, ""));
 }
 
-pddl::Effect parse(const domain::ast::EffectProduction& node, domain::Context& context) {
+pddl::Effect parse(const domain::ast::EffectProduction& node, Context& context) {
     return boost::apply_visitor(EffectProductionVisitor(context), node);
 }
 
-pddl::Effect parse(const domain::ast::EffectConditionalForall& node, domain::Context& context) {
+pddl::Effect parse(const domain::ast::EffectConditionalForall& node, Context& context) {
     context.scopes.open_scope();
     pddl::ParameterList parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
     pddl::Effect effect = parse(node.effect, context);
@@ -80,7 +80,7 @@ pddl::Effect parse(const domain::ast::EffectConditionalForall& node, domain::Con
     return context.cache.get_or_create<pddl::EffectConditionalForallImpl>(parameter_list, effect);
 }
 
-pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, domain::Context& context) {
+pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, Context& context) {
     context.scopes.open_scope();
     pddl::Condition condition = parse(node.goal_descriptor, context);
     pddl::Effect effect = parse(node.effect, context);
@@ -88,25 +88,25 @@ pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, domain::Conte
     return context.cache.get_or_create<pddl::EffectConditionalWhenImpl>(condition, effect);
 }
 
-pddl::Effect parse(const domain::ast::EffectConditional& node, domain::Context& context) {
+pddl::Effect parse(const domain::ast::EffectConditional& node, Context& context) {
     // requires :conditional-effects
     if (!context.requirements->test(pddl::RequirementEnum::CONDITIONAL_EFFECTS)) {
-        context.error_handler(node, "");
-        throw UndefinedRequirementError(pddl::RequirementEnum::CONDITIONAL_EFFECTS, context.error_stream->str());
+        const auto& scope = context.scopes.get_current_scope();
+        throw UndefinedRequirementError(pddl::RequirementEnum::CONDITIONAL_EFFECTS, scope.get_error_message(node, ""));
     }
     return boost::apply_visitor(EffectConditionalVisitor(context), node);
 }
 
 
-EffectProductionVisitor::EffectProductionVisitor(domain::Context& context_)
+EffectProductionVisitor::EffectProductionVisitor(Context& context_)
     : context(context_) { }
 
 
-EffectConditionalVisitor::EffectConditionalVisitor(domain::Context& context_)
+EffectConditionalVisitor::EffectConditionalVisitor(Context& context_)
     : context(context_) { }
 
 
-EffectVisitor::EffectVisitor(domain::Context& context_)
+EffectVisitor::EffectVisitor(Context& context_)
     : context(context_) { }
 
 pddl::Effect EffectVisitor::operator()(const std::vector<domain::ast::Effect>& effect_nodes) const {

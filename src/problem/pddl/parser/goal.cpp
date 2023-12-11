@@ -20,7 +20,7 @@
 
 namespace loki {
 
-pddl::Condition parse(const problem::ast::Goal& node, problem::Context& context) {
+pddl::Condition parse(const problem::ast::Goal& node, Context& context) {
 }
 
 }

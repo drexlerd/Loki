@@ -19,8 +19,8 @@
 #define LOKI_INCLUDE_LOKI_DOMAIN_PARSER_HPP_
 
 #include "pddl/declarations.hpp"
-#include "pddl/context.hpp"
 
+#include "../common/pddl/context.hpp"
 #include "../common/filesystem.hpp"
 
 
@@ -28,7 +28,7 @@ namespace loki {
 
 class DomainParser {
 private:
-    std::unique_ptr<domain::Context> m_context;
+    std::unique_ptr<Context> m_context;
 
     pddl::Domain m_domain;
 
@@ -36,7 +36,7 @@ public:
     explicit DomainParser(const fs::path& file_path);
 
     const pddl::Domain& get_domain() const;
-    const domain::Context& get_context() const;
+    const Context& get_context() const;
 };
 
 }

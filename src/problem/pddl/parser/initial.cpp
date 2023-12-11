@@ -24,7 +24,7 @@
 
 namespace loki {
 
-InitialElementVisitor::InitialElementVisitor(problem::Context& context_)
+InitialElementVisitor::InitialElementVisitor(Context& context_)
     : context(context_) { }
 
 boost::variant<pddl::Literal> InitialElementVisitor::operator()(const problem::ast::InitialElementLiteral& node) {
@@ -45,7 +45,7 @@ boost::variant<pddl::Literal> InitialElementVisitor::operator()(const problem::a
 
 
 std::vector<boost::variant<pddl::Literal>> parse(
-    const problem::ast::Initial& initial_node, problem::Context& context) {
+    const problem::ast::Initial& initial_node, Context& context) {
     std::vector<boost::variant<pddl::Literal>> initial_element_list;
     for (const auto& initial_element : initial_node.initial_elements) {
         initial_element_list.push_back(boost::apply_visitor(InitialElementVisitor(context), initial_element));

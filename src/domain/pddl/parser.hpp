@@ -29,9 +29,9 @@ namespace loki {
 template<typename T>
 class SetInsertVisitor : boost::static_visitor<T> {
 private:
-    domain::Context& context;
+    Context& context;
 
-    SetInsertVisitor(domain::Context& context_);
+    SetInsertVisitor(Context& context_);
 
 public:
 };

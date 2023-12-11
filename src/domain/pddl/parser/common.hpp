@@ -28,13 +28,13 @@ namespace loki {
 extern std::string parse(const domain::ast::Name& name_node);
 
 /* Variable */
-extern pddl::Variable parse(const domain::ast::Variable& variable_node, domain::Context& context);
+extern pddl::Variable parse(const domain::ast::Variable& variable_node, Context& context);
 
 /* Term */
 struct TermDeclarationTermVisitor : boost::static_visitor<pddl::Term> {
-    domain::Context& context;
+    Context& context;
 
-    TermDeclarationTermVisitor(domain::Context& context_);
+    TermDeclarationTermVisitor(Context& context_);
 
     pddl::Term operator()(const domain::ast::Name& name_node) const;
     pddl::Term operator()(const domain::ast::Variable& variable_node) const;
@@ -42,9 +42,9 @@ struct TermDeclarationTermVisitor : boost::static_visitor<pddl::Term> {
 };
 
 struct TermReferenceTermVisitor : boost::static_visitor<pddl::Term> {
-    domain::Context& context;
+    Context& context;
 
-    TermReferenceTermVisitor(domain::Context& context_);
+    TermReferenceTermVisitor(Context& context_);
 
     pddl::Term operator()(const domain::ast::Name& name_node) const;
     pddl::Term operator()(const domain::ast::Variable& variable_node) const;

@@ -27,9 +27,9 @@
 
 namespace loki {
 
-AtomicFormulaOfNamesVisitor::AtomicFormulaOfNamesVisitor(problem::Context& context_) : context(context_) { }
+AtomicFormulaOfNamesVisitor::AtomicFormulaOfNamesVisitor(Context& context_) : context(context_) { }
 
-pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, problem::Context& context) {
+pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, Context& context) {
     const auto name = parse(node.predicate.name);
     const auto binding = context.domain_context.scopes.get_current_scope().get<pddl::PredicateImpl>(name);
     if (!binding.has_value()) {
@@ -48,7 +48,7 @@ pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, proble
     return context.cache.get_or_create<pddl::AtomImpl>(predicate, term_list);
 }
 
-pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, problem::Context& context) {
+pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::EQUALITY)) {
         context.error_handler(node, "");
         throw UndefinedRequirementError(pddl::RequirementEnum::EQUALITY, context.error_stream->str());
@@ -59,23 +59,23 @@ pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, problem
     return context.cache.get_or_create<pddl::AtomImpl>(equal_predicate, pddl::TermList{term_left, term_right});
 }
 
-pddl::Atom parse(const problem::ast::AtomicFormulaOfNames& node, problem::Context& context) {
+pddl::Atom parse(const problem::ast::AtomicFormulaOfNames& node, Context& context) {
     return boost::apply_visitor(AtomicFormulaOfNamesVisitor(context), node);
 }
 
 
-LiteralVisitor::LiteralVisitor(problem::Context& context_) : context(context_) { }
+LiteralVisitor::LiteralVisitor(Context& context_) : context(context_) { }
 
 
-pddl::Literal parse(const problem::ast::Atom& node, problem::Context& context) {
+pddl::Literal parse(const problem::ast::Atom& node, Context& context) {
     return context.cache.get_or_create<pddl::LiteralImpl>(false, parse(node.atomic_formula_of_names, context));
 }
 
-pddl::Literal parse(const problem::ast::NegatedAtom& node, problem::Context& context) {
+pddl::Literal parse(const problem::ast::NegatedAtom& node, Context& context) {
     return context.cache.get_or_create<pddl::LiteralImpl>(true, parse(node.atomic_formula_of_names, context));
 }
 
-pddl::Literal parse(const problem::ast::Literal& node, problem::Context& context) {
+pddl::Literal parse(const problem::ast::Literal& node, Context& context) {
     return boost::apply_visitor(LiteralVisitor(context), node);
 }
 

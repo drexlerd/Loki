@@ -26,10 +26,10 @@ namespace loki {
 
 class InitialElementVisitor : boost::static_visitor<boost::variant<pddl::Literal>> {
 private:
-    problem::Context& context;
+    Context& context;
 
 public:
-    InitialElementVisitor(problem::Context& context_);
+    InitialElementVisitor(Context& context_);
 
     boost::variant<pddl::Literal> operator()(const problem::ast::InitialElementLiteral& node);
 
@@ -42,7 +42,7 @@ public:
 
 
 extern std::vector<boost::variant<pddl::Literal>> parse(
-    const problem::ast::Initial& initial_node, problem::Context& context);
+    const problem::ast::Initial& initial_node, Context& context);
 
 }
 

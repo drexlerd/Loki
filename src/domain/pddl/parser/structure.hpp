@@ -27,18 +27,18 @@
 
 namespace loki {
 
-extern std::string parse(const domain::ast::ActionSymbol& node, domain::Context& context);
+extern std::string parse(const domain::ast::ActionSymbol& node, Context& context);
 
-extern std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(const domain::ast::ActionBody& node, domain::Context& context);
+extern std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(const domain::ast::ActionBody& node, Context& context);
 
-extern pddl::Action parse(const domain::ast::Action& node, domain::Context& context);
+extern pddl::Action parse(const domain::ast::Action& node, Context& context);
 
-extern pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, domain::Context& context);
+extern pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, Context& context);
 
 struct StructureVisitor : boost::static_visitor<boost::variant<pddl::DerivedPredicate, pddl::Action>> {
-    domain::Context& context;
+    Context& context;
 
-    StructureVisitor(domain::Context& context_);
+    StructureVisitor(Context& context_);
 
     template<typename Node>
     boost::variant<pddl::DerivedPredicate, pddl::Action> operator()(const Node& node) const {
@@ -48,7 +48,7 @@ struct StructureVisitor : boost::static_visitor<boost::variant<pddl::DerivedPred
 
 // TODO return durative action in the future as well.
 extern boost::variant<pddl::DerivedPredicate, pddl::Action> parse(
-    const domain::ast::Structure& node, domain::Context& context);
+    const domain::ast::Structure& node, Context& context);
 
 
 }

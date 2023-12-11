@@ -27,17 +27,17 @@ namespace loki {
 
 class ConstantListVisitor : boost::static_visitor<pddl::ObjectList> {
 private:
-    domain::Context& context;
+    Context& context;
 
 public:
-    ConstantListVisitor(domain::Context& context_);
+    ConstantListVisitor(Context& context_);
 
     pddl::ObjectList operator()(const std::vector<domain::ast::Name>& name_nodes);
 
     pddl::ObjectList operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
 };
 
-extern pddl::ObjectList parse(const domain::ast::Constants& constants_node, domain::Context& context);
+extern pddl::ObjectList parse(const domain::ast::Constants& constants_node, Context& context);
 
 }
 

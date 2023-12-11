@@ -20,36 +20,18 @@
 
 #include "scope.hpp"
 #include "types.hpp"
-#include "../factory.hpp"
-
-#include "../../domain/pddl/action.hpp"
-#include "../../domain/pddl/atom.hpp"
-#include "../../domain/pddl/conditions.hpp"
-#include "../../domain/pddl/derived_predicate.hpp"
-#include "../../domain/pddl/domain.hpp"
-#include "../../domain/pddl/effects.hpp"
-#include "../../domain/pddl/function_skeleton.hpp"
-#include "../../domain/pddl/function.hpp"
-#include "../../domain/pddl/literal.hpp"
-#include "../../domain/pddl/object.hpp"
-#include "../../domain/pddl/parameter.hpp"
-#include "../../domain/pddl/predicate.hpp"
-#include "../../domain/pddl/requirements.hpp"
-#include "../../domain/pddl/term.hpp"
-#include "../../domain/pddl/type.hpp"
-#include "../../domain/pddl/variable.hpp"
-#include "../../problem/pddl/problem.hpp"
 
 
 namespace loki {
 
 struct Context {
+    // For the unique construction of PDDL objects
     PddlFactory cache;
+    // For referencing to existing bindings
+    ScopeStack scopes;
 
-    const ScopeStack& readable_scopes;
-    ScopeStack& writeable_scopes;
-
-    
+    // For convenience, to avoid an additional parameter
+    pddl::Requirements requirements;
 };
 
 }

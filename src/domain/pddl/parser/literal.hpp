@@ -24,14 +24,14 @@
 
 namespace loki {
 
-extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formula_of_terms_node, domain::Context& context);
-extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& atomic_formula_of_terms_node, domain::Context& context);
-extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTerms& atomic_formula_of_terms_node, domain::Context& context);
+extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formula_of_terms_node, Context& context);
+extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& atomic_formula_of_terms_node, Context& context);
+extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTerms& atomic_formula_of_terms_node, Context& context);
 
 struct AtomicFormulaOfTermsVisitor : boost::static_visitor<pddl::Atom> {
-    domain::Context& context;
+    Context& context;
 
-    AtomicFormulaOfTermsVisitor(domain::Context& context_);
+    AtomicFormulaOfTermsVisitor(Context& context_);
 
     template<typename Node>
     pddl::Atom operator()(const Node& node) const {
@@ -39,14 +39,14 @@ struct AtomicFormulaOfTermsVisitor : boost::static_visitor<pddl::Atom> {
     }
 };
 
-extern pddl::Literal parse(const domain::ast::Atom& atom_node, domain::Context& context);
-extern pddl::Literal parse(const domain::ast::NegatedAtom& negated_atom_node, domain::Context& context);
-extern pddl::Literal parse(const domain::ast::Literal& literal_node, domain::Context& context);
+extern pddl::Literal parse(const domain::ast::Atom& atom_node, Context& context);
+extern pddl::Literal parse(const domain::ast::NegatedAtom& negated_atom_node, Context& context);
+extern pddl::Literal parse(const domain::ast::Literal& literal_node, Context& context);
 
 struct LiteralVisitor : boost::static_visitor<pddl::Literal> {
-    domain::Context& context;
+    Context& context;
 
-    LiteralVisitor(domain::Context& context_);
+    LiteralVisitor(Context& context_);
 
     template<typename Node>
     pddl::Literal operator()(const Node& node) const {

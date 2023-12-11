@@ -41,7 +41,7 @@ using namespace std;
 
 namespace loki {
 
-static std::string parse(const domain::ast::DomainName& domain_name_node, domain::Context& context) {
+static std::string parse(const domain::ast::DomainName& domain_name_node, Context& context) {
     return parse(domain_name_node.name);
 }
 
@@ -57,11 +57,11 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context) {
             pddl::RequirementEnumSet{pddl::RequirementEnum::STRIPS});
     }
     /* Types section */
+    const auto& scope = context.scopes.get_current_scope();
     pddl::TypeList types;
     if (domain_node.types.has_value()) {
         if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
-            context.error_handler(domain_node.types.value(), "");
-            throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.error_stream->str());
+            throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, scope.get_error_message(domain_node.types.value(), ""));
         }
         types = parse(domain_node.types.value(), context);
     }

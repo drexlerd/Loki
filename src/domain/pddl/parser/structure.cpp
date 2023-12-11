@@ -29,11 +29,11 @@
 
 namespace loki {
 
-std::string parse(const domain::ast::ActionSymbol& node, domain::Context& context) {
+std::string parse(const domain::ast::ActionSymbol& node, Context& context) {
     return parse(node.name);
 }
 
-std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(const domain::ast::ActionBody& node, domain::Context& context) {
+std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(const domain::ast::ActionBody& node, Context& context) {
     std::optional<pddl::Condition> condition;
     if (node.precondition_goal_descriptor.has_value()) {
         condition = parse(node.precondition_goal_descriptor.value(), context);
@@ -45,7 +45,7 @@ std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(co
     return {condition, effect};
 }
 
-pddl::Action parse(const domain::ast::Action& node, domain::Context& context) {
+pddl::Action parse(const domain::ast::Action& node, Context& context) {
     context.scopes.open_scope();
     auto name = parse(node.action_symbol, context);
     auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
@@ -54,7 +54,7 @@ pddl::Action parse(const domain::ast::Action& node, domain::Context& context) {
     return context.cache.get_or_create<pddl::ActionImpl>(name, parameters, condition, effect);
 }
 
-pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, domain::Context& context) {
+pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::DERIVED_PREDICATES)) {
         context.error_handler(node, "");
         throw UndefinedRequirementError(pddl::RequirementEnum::DERIVED_PREDICATES, context.error_stream->str());
@@ -66,12 +66,12 @@ pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, domain::
 }
 
 
-StructureVisitor::StructureVisitor(domain::Context& context_)
+StructureVisitor::StructureVisitor(Context& context_)
     : context(context_) { }
 
 
 boost::variant<pddl::DerivedPredicate, pddl::Action> parse(
-    const domain::ast::Structure& node, domain::Context& context) {
+    const domain::ast::Structure& node, Context& context) {
     return boost::apply_visitor(StructureVisitor(context), node);
 }
 

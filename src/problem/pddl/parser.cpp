@@ -31,12 +31,12 @@
 
 namespace loki {
 
-pddl::Problem parse(const problem::ast::Problem& problem_node, problem::Context& context, const pddl::Domain& domain) {
+pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context, const pddl::Domain& domain) {
     /* Domain name section */
     const auto domain_name = parse(problem_node.domain_name.name);
     if (domain_name != domain->get_name()) {
-        context.error_handler(problem_node.domain_name, "");
-        throw MismatchedDomainError(domain, domain_name, context.error_stream->str());
+        const auto& scope = context.scopes.get_current_scope();
+        throw MismatchedDomainError(domain, domain_name, scope.get_error_message(problem_node.domain_name, ""));
     }
     /* Problem name section */
     const auto problem_name = parse(problem_node.problem_name.name);

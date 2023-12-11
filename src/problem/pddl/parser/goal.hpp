@@ -25,7 +25,7 @@
 
 namespace loki {
 
-extern pddl::Condition parse(const problem::ast::Goal& node, problem::Context& context);
+extern pddl::Condition parse(const problem::ast::Goal& node, Context& context);
 
 }
 

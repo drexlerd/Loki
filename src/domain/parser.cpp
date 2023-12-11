@@ -22,22 +22,44 @@ DomainParser::DomainParser(const fs::path& file_path) {
     if (!success) {
         throw SyntaxParserError("", domain_error_stream->str());
     }
+
+    Context context{
+        PddlFactory(),
+        ScopeStack(std::move(domain_error_handler), std::move(domain_error_stream)),
+        nullptr
+    };
     // Initialize global scope
-    ScopeStack scopes(std::move(domain_error_handler), std::move(domain_error_stream));
-    scopes.open_scope();
-    // Initialize empty factory
-    PddlFactory factory;
+    context.scopes.open_scope();
 
-    Context context{PddlFactory(), scopes, scopes}
+    // Create base types.
+    auto& scope = context.scopes.get_current_scope();
+    const auto base_type_object = context.cache.get_or_create<pddl::TypeImpl>("object");
+    const auto base_type_number = context.cache.get_or_create<pddl::TypeImpl>("number");
+    scope.insert("object", base_type_object, {});
+    scope.insert("number", base_type_number, {});
 
-    m_domain = parse(node, factory, scopes, scopes);
+    // Create equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
+    const auto binary_parameterlist = pddl::ParameterList{
+        context.cache.get_or_create<pddl::ParameterImpl>(
+            context.cache.get_or_create<pddl::VariableImpl>("?left_arg"),
+            pddl::TypeList{base_type_object}),
+        context.cache.get_or_create<pddl::ParameterImpl>(
+            context.cache.get_or_create<pddl::VariableImpl>("?right_arg"),
+            pddl::TypeList{base_type_object})
+
+    };
+    const auto equal_predicate = context.cache.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist);
+        scope.insert<pddl::PredicateImpl>("=", equal_predicate, {});
+
+    // Parse the domain
+    m_domain = parse(node, context);
 }
 
 const pddl::Domain& DomainParser::get_domain() const {
     return m_domain;
 }
 
-const domain::Context& DomainParser::get_context() const {
+const Context& DomainParser::get_context() const {
     return *m_context;
 }
 
