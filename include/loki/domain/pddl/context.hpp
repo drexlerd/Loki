@@ -51,10 +51,6 @@
 
 namespace loki::domain {
     struct Context {
-        // For retrieving error messages of the x3 error handler.
-        std::unique_ptr<std::ostringstream> error_stream;
-        error_handler_type error_handler;
-
         // For unique creation
         ReferenceCountedObjectFactory<pddl::RequirementsImpl
             , pddl::TypeImpl
@@ -90,10 +86,11 @@ namespace loki::domain {
         pddl::Predicate equal_predicate;
 
         Context(
-            std::unique_ptr<std::ostringstream>&& error_stream_,
-            error_handler_type&& error_handler_)
-            : error_stream(std::move(error_stream_))
-            , error_handler(std::move(error_handler_)) {
+            std::unique_ptr<error_handler_type>&& error_handler_,
+            std::unique_ptr<std::ostringstream>&& error_stream_)
+            : scopes(ScopeStack(std::move(error_handler_), std::move(error_stream_))) {
+            // Initialize global scope
+            scopes.open_scope();
 
             // create base types.
             base_type_object = cache.get_or_create<pddl::TypeImpl>("object");

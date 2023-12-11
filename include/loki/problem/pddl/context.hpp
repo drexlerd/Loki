@@ -60,6 +60,8 @@ namespace loki::problem {
             : error_stream(std::move(error_stream_))
             , error_handler(std::move(error_handler_))
             , domain_context(domain_context_) {
+            // Initialize global scope
+            scopes.open_scope();
 
             // Make constants more easily referenceable in the problem definition
             for (const auto& pair : domain_context.scopes.get_current_scope().get<pddl::ObjectImpl>()) {

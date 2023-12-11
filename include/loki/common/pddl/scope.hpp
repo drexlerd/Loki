@@ -91,6 +91,9 @@ class Scope {
     private:
         std::shared_ptr<const Scope> m_parent_scope;
 
+        std::shared_ptr<error_handler_type> m_error_handler;
+        std::shared_ptr<std::ostringstream> m_error_stream;
+
         Bindings<pddl::TypeImpl
             , pddl::ObjectImpl
             , pddl::PredicateImpl
@@ -98,8 +101,13 @@ class Scope {
             , pddl::VariableImpl> bindings;
 
     public:
-        explicit Scope(std::shared_ptr<const Scope> parent_scope = nullptr)
-            : m_parent_scope(parent_scope) { }
+        Scope(
+            std::shared_ptr<error_handler_type> error_handler,
+            std::shared_ptr<std::ostringstream> error_stream,
+            std::shared_ptr<const Scope> parent_scope = nullptr)
+            : m_error_handler(error_handler)
+            , m_error_stream(error_stream)
+            , m_parent_scope(parent_scope) { }
 
         /// @brief Returns a binding if it exists.
         template<typename T>
@@ -119,16 +127,23 @@ class ScopeStack {
     private:
         std::deque<std::shared_ptr<Scope>> m_stack; 
 
+        std::shared_ptr<error_handler_type> m_error_handler;
+        std::shared_ptr<std::ostringstream> m_error_stream;
+
     public:
-        ScopeStack() : m_stack(std::deque{std::make_shared<Scope>()}) { 
-            assert(m_stack.size() == 1);
-        }
+        ScopeStack(
+            std::unique_ptr<error_handler_type>&& error_handler,
+            std::unique_ptr<std::ostringstream>&& error_stream)
+            : m_error_handler(std::move(error_handler)), m_error_stream(std::move(error_stream)) { }
 
         void open_scope() {
-            m_stack.push_back(std::make_shared<Scope>(get_current_scope()));
+            m_stack.push_back(m_stack.empty() 
+                ? std::make_shared<Scope>(m_error_handler, m_error_stream) 
+                : std::make_shared<Scope>(m_error_handler, m_error_stream, get_current_scope()));
         }
 
         void close_scope() {
+            assert(!m_stack.empty());
             m_stack.pop_back();
         }
 
