@@ -41,4 +41,8 @@ const ErrorHandler& ScopeStack::get_error_handler() const {
     return m_error_handler;
 }
 
+const std::deque<std::unique_ptr<Scope>>& ScopeStack::get_stack() const {
+    return m_stack;
+}
+
 }

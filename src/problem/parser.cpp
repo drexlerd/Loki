@@ -13,6 +13,7 @@
 namespace loki {
 
 ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_parser) {
+    /* Parse the AST */
     const auto problem_source = loki::read_file(file_path);
     problem::ast::Problem problem_node;
 
@@ -22,6 +23,8 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
         throw SyntaxParserError("", error_handler.get_error_stream().str());
     }
 
+
+    /* Parse the problem to PDDL */
     auto scopes = ScopeStack(std::move(error_handler), domain_parser.m_scopes.get());
 
     Context context{
@@ -33,6 +36,9 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
     context.scopes.open_scope();
 
     m_problem = parse(problem_node, context, domain_parser.get_domain());
+
+    // Only the global scope remains
+    assert(context.scopes.get_stack().size() == 1);
 }
 
 const pddl::Problem& ProblemParser::get_problem() const {

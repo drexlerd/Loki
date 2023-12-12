@@ -13,6 +13,7 @@
 namespace loki {
 
 DomainParser::DomainParser(const fs::path& file_path) {
+    /* Parse the AST */
     const auto domain_source = loki::read_file(file_path);
     domain::ast::Domain node;
 
@@ -22,6 +23,8 @@ DomainParser::DomainParser(const fs::path& file_path) {
         throw SyntaxParserError("", error_handler.get_error_stream().str());
     }
 
+
+    /* Parse the domain to PDDL */
     m_factory = std::make_unique<PddlFactory>();
     m_scopes = std::make_unique<ScopeStack>(std::move(error_handler));
 
@@ -52,8 +55,10 @@ DomainParser::DomainParser(const fs::path& file_path) {
     const auto equal_predicate = context.cache.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist);
         context.scopes.insert<pddl::PredicateImpl>("=", equal_predicate, {});
 
-    // Parse the domain
     m_domain = parse(node, context);
+
+    // Only the global scope remains
+    assert(context.scopes.get_stack().size() == 1);
 }
 
 const pddl::Domain& DomainParser::get_domain() const {

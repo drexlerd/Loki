@@ -141,6 +141,9 @@ class ScopeStack {
 
         /// @brief Get the error handler to print an error message.
         const ErrorHandler& get_error_handler() const;
+
+        // For testing purposes only.
+        const std::deque<std::unique_ptr<Scope>>& get_stack() const;
 };
 
 
