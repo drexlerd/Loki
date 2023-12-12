@@ -22,9 +22,12 @@ DomainParser::DomainParser(const fs::path& file_path) {
         throw SyntaxParserError("", error_handler.get_error_stream().str());
     }
 
+    m_factory = std::make_unique<PddlFactory>();
+    m_scopes = std::make_unique<ScopeStack>(std::move(error_handler));
+
     Context context{
-        PddlFactory(),
-        std::make_unique<ScopeStack>(std::move(error_handler)),
+        *m_factory,
+        *m_scopes,
         nullptr
     };
     // Initialize global scope
@@ -57,8 +60,12 @@ const pddl::Domain& DomainParser::get_domain() const {
     return m_domain;
 }
 
-const Context& DomainParser::get_context() const {
-    return *m_context;
+const Context& DomainParser::get_factory() const {
+    return *m_factory;
+}
+
+const ScopeStack& DomainParser::get_scopes() const {
+    return m_scopes;
 }
 
 }

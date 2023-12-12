@@ -28,7 +28,8 @@ namespace loki {
 
 class DomainParser {
 private:
-    std::unique_ptr<Context> m_context;
+    std::unique_ptr<PddlFactory> m_factory;
+    std::unique_ptr<ScopeStack> m_scopes;
 
     pddl::Domain m_domain;
 
@@ -36,7 +37,8 @@ public:
     explicit DomainParser(const fs::path& file_path);
 
     const pddl::Domain& get_domain() const;
-    const Context& get_context() const;
+    const Context& get_factory() const;
+    const ScopeStack& get_scopes() const;
 };
 
 }

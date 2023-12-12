@@ -46,12 +46,12 @@ extern pddl::Literal parse(const problem::ast::Atom& node, Context& context);
 extern pddl::Literal parse(const problem::ast::NegatedAtom& node, Context& context);
 extern pddl::Literal parse(const problem::ast::Literal& node, Context& context);
 
-class LiteralVisitor : boost::static_visitor<pddl::Literal> {
+class GroundLiteralVisitor : boost::static_visitor<pddl::Literal> {
 private:
     Context& context;
 
 public:
-    LiteralVisitor(Context& context_);
+    GroundLiteralVisitor(Context& context_);
 
     template<typename Node>
     pddl::Literal operator()(const Node& node) const {

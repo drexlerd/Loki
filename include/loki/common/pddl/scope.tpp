@@ -58,23 +58,6 @@ void Scope::insert(const std::string& name, const BindingPtrType<T>& binding, co
 }
 
 
-ScopeStack::ScopeStack(
-    ErrorHandler&& error_handler,
-    const ScopeStack* parent)
-    : m_error_handler(std::move(error_handler))
-    , m_parent(parent) { }
-
-void ScopeStack::open_scope() {
-    m_stack.push_back(m_stack.empty()
-        ? std::make_unique<Scope>()
-        : std::make_unique<Scope>(m_stack.back().get()));
-}
-
-void ScopeStack::close_scope() {
-    assert(!m_stack.empty());
-    m_stack.pop_back();
-}
-
 /// @brief Returns a binding if it exists.
 template<typename T>
 std::optional<SearchResult<T>> ScopeStack::get(const std::string& name) const {
@@ -92,8 +75,5 @@ void ScopeStack::insert(const std::string& name, const BindingPtrType<T>& bindin
     m_stack.back()->insert(name, binding, position);
 }
 
-const ErrorHandler& ScopeStack::get_error_handler() const {
-    return m_error_handler;
-}
 
 }

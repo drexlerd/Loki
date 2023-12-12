@@ -27,42 +27,38 @@ using namespace std;
 
 namespace loki {
 
-pddl::Object parse_object_reference(const domain::ast::Name& name_node, Context& context) {
-    const auto name = parse(name_node);
-    const auto& scope = context.scopes.get_current_scope();
-    const auto binding = scope.get<pddl::ObjectImpl>(name);
-    if (!binding.has_value()) {
-        throw UndefinedObjectError(name, binding.value().scope->get_error_message(name_node, ""));
-    }
-    return binding.value().value.object;
-}
-
 ObjectListVisitor::ObjectListVisitor(Context& context_)
     : context(context_) { }
+
+
+pddl::Object parse_object_reference(const domain::ast::Name& name_node, Context& context) {
+    const auto name = parse(name_node);
+    const auto binding = context.scopes->get<pddl::ObjectImpl>(name);
+    if (!binding.has_value()) {
+        throw UndefinedObjectError(name, context.scopes->get_error_handler()(name_node, ""));
+    }
+    return binding->value.object;
+}
 
 
 pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::ObjectList object_list;
-    const auto& current_scope = context.scopes.get_current_scope();
-    const auto type_binding = current_scope.get<pddl::TypeImpl>("object");
-    assert(type_binding.has_value());
-    const auto type = type_binding.value().value.object;
+    assert(context.scopes->get<pddl::TypeImpl>("object").has_value());
+    const auto type = context.scopes->get<pddl::TypeImpl>("object")->value.object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
-        // TODO: we must pass domain to check whether object is constant
-        auto object_binding = current_scope.get<pddl::ObjectImpl>(name);
-        if (object_binding.has_value()) {
-            const auto message_1 = current_scope.get_error_message(name_node, "Defined here:");
+        const auto binding = context.scopes->get<pddl::ObjectImpl>(name);
+        if (binding.has_value()) {
+            const auto message_1 = context.scopes->get_error_handler()(name_node, "Defined here:");
             auto message_2 = std::string("");
-            if (object_binding.value().value.position.has_value()) {
-                object_binding.value().scope->get_error_message(
-                    object_binding.value().value.position.value(), "First defined here:");
+            if (binding.value().value.position.has_value()) {
+                message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
             }
             throw MultiDefinitionObjectError(name, message_1 + message_2);
         }
         const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type});
-        context.scopes.get_current_scope().insert<pddl::ObjectImpl>(name, object, name_node);
+        context.scopes->insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }
     return object_list;
@@ -75,24 +71,17 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
         const auto name = parse(name_node);
-        auto domain_binding = context.domain_context.scopes.get_current_scope().get<pddl::ObjectImpl>(name);
-        if (domain_binding.has_value()) {
-            context.error_handler(name_node, "Defined here:");
-            if (domain_binding.value().position.has_value()) {
-                context.error_handler(domain_binding.value().position.value(), "First defined here:");
+        const auto binding = context.scopes->get<pddl::ObjectImpl>(name);
+        if (binding.has_value()) {
+            const auto message_1 = context.scopes->get_error_handler()(name_node, "Defined here:");
+            auto message_2 = std::string("");
+            if (binding.value().value.position.has_value()) {
+                message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
             }
-            throw ObjectIsConstantError(name, context.error_stream->str() + context.domain_context.error_stream->str());
-        }
-        auto problem_binding = context.scopes.get_current_scope().get<pddl::ObjectImpl>(name);
-        if (problem_binding.has_value()) {
-            context.error_handler(name_node, "Defined here:");
-            if (problem_binding.value().position.has_value()) {
-                context.error_handler(problem_binding.value().position.value(), "First defined here:");
-            }
-            throw MultiDefinitionObjectError(name, context.error_stream->str());
+            throw MultiDefinitionObjectError(name, message_1 + message_2);
         }
         const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, types);
-        context.scopes.get_current_scope().insert<pddl::ObjectImpl>(name, object, name_node);
+        context.scopes->insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }
     // Recursively add objects.

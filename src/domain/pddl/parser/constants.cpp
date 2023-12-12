@@ -33,7 +33,8 @@ ConstantListVisitor::ConstantListVisitor(Context& context_)
 pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::ObjectList object_list;
-    const auto type = context.cache.get_or_create<pddl::TypeImpl>("object");
+    assert(context.scopes->get<pddl::TypeImpl>("object").has_value());
+    const auto type = context.scopes->get<pddl::TypeImpl>("object")->value.object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
         const auto binding = context.scopes->get<pddl::ObjectImpl>(name);
@@ -42,8 +43,6 @@ pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& n
             auto message_2 = std::string("");
             if (binding.value().value.position.has_value()) {
                 message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
-            } else {
-                // Reserved type?
             }
             throw MultiDefinitionConstantError(name, message_1 + message_2);
         }
@@ -67,8 +66,6 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
             auto message_2 = std::string("");
             if (binding.value().value.position.has_value()) {
                 message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
-            } else {
-                // Reserved type?
             }
             throw MultiDefinitionConstantError(name, message_1 + message_2);
         }

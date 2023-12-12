@@ -26,7 +26,7 @@
 
 namespace loki {
 template<typename Parser, typename Node>
-bool parse_ast(const std::string& source, const Parser& parser, Node& out, const error_handler_type& error_handler) {
+bool parse_ast(const std::string& source, const Parser& parser, Node& out, error_handler_type& error_handler) {
     out = Node(); // reinitialize
     loki::iterator_type iter(source.begin());
     const loki::iterator_type end(source.end());

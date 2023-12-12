@@ -37,15 +37,16 @@ pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Vari
     const auto type = context.cache.get_or_create<pddl::TypeImpl>("object");
     for (const auto& variable_node : variable_nodes) {
         const auto variable = parse(variable_node, context);
-        const auto binding = context.scopes.get_current_scope().get<pddl::VariableImpl>(variable->get_name());
+        const auto binding = context.scopes->get<pddl::VariableImpl>(variable->get_name());
         if (binding.has_value()) {
-            context.error_handler(variable_node, "Defined here:");
-            if (binding.value().position.has_value()) {
-                context.error_handler(binding.value().position.value(), "First defined here:");
+            const auto message_1 = context.scopes->get_error_handler()(variable_node, "Defined here:");
+            auto message_2 = std::string("");
+            if (binding.value().value.position.has_value()) {
+                message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
             }
-            throw MultiDefinitionVariableError(variable->get_name(), context.error_stream->str());
+            throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
         }
-        context.scopes.get_current_scope().insert(variable->get_name(), variable, variable_node);
+        context.scopes->insert(variable->get_name(), variable, variable_node);
         const auto parameter = context.cache.get_or_create<pddl::ParameterImpl>(variable, pddl::TypeList{type});
         parameter_list.emplace_back(parameter);
     }
@@ -55,8 +56,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Vari
 pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVariablesRecursively& typed_variables_node) {
     // requires :typing
     if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
-        context.error_handler(typed_variables_node, "");
-        throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.error_stream->str());
+        throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes->get_error_handler()(typed_variables_node, ""));
     }
     pddl::ParameterList parameter_list;
     const auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context),
@@ -64,15 +64,16 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
     // A non-visited vector of variables has user defined types
     for (const auto& variable_node : typed_variables_node.variables) {
         const auto variable = parse(variable_node, context);
-        const auto binding = context.scopes.get_current_scope().get<pddl::VariableImpl>(variable->get_name());
+        const auto binding = context.scopes->get<pddl::VariableImpl>(variable->get_name());
         if (binding.has_value()) {
-            context.error_handler(variable_node, "Defined here:");
-            if (binding.value().position.has_value()) {
-                context.error_handler(binding.value().position.value(), "First defined here:");
+            const auto message_1 = context.scopes->get_error_handler()(variable_node, "Defined here:");
+            auto message_2 = std::string("");
+            if (binding.value().value.position.has_value()) {
+                message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
             }
-            throw MultiDefinitionVariableError(variable->get_name(), context.error_stream->str());
+            throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
         }
-        context.scopes.get_current_scope().insert(variable->get_name(), variable, variable_node);
+        context.scopes->insert(variable->get_name(), variable, variable_node);
         const auto parameter = context.cache.get_or_create<pddl::ParameterImpl>(variable, types);
         parameter_list.emplace_back(parameter);
     }

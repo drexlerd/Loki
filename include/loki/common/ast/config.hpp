@@ -81,6 +81,10 @@ namespace loki
                 return *m_error_handler;
             }
 
+            error_handler_type& get_error_handler() {
+                return *m_error_handler;
+            }
+
             const std::ostringstream& get_error_stream() const {
                 return *m_error_stream;
             }

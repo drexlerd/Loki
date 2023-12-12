@@ -15,24 +15,30 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_CONTEXT_HPP_
-#define LOKI_INCLUDE_LOKI_COMMON_PDDL_CONTEXT_HPP_
-
-#include "scope.hpp"
-#include "types.hpp"
+#include "../../../include/loki/common/pddl/scope.hpp"
 
 
 namespace loki {
 
-struct Context {
-    // For the unique construction of PDDL objects
-    PddlFactory& cache;
-    // For referencing to existing bindings
-    ScopeStack& scopes;
-    // For convenience, to avoid an additional parameters when parsing
-    pddl::Requirements requirements;
-};
+ScopeStack::ScopeStack(
+    ErrorHandler&& error_handler,
+    const ScopeStack* parent)
+    : m_error_handler(std::move(error_handler))
+    , m_parent(parent) { }
 
+void ScopeStack::open_scope() {
+    m_stack.push_back(m_stack.empty()
+        ? std::make_unique<Scope>()
+        : std::make_unique<Scope>(m_stack.back().get()));
 }
 
-#endif
+void ScopeStack::close_scope() {
+    assert(!m_stack.empty());
+    m_stack.pop_back();
+}
+
+const ErrorHandler& ScopeStack::get_error_handler() const {
+    return m_error_handler;
+}
+
+}
