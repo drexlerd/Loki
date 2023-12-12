@@ -81,7 +81,7 @@ class Bindings {
 /// @brief Wraps bindings in a scope with reference to a parent scope.
 class Scope {
     private:
-        std::shared_ptr<const Scope> m_parent_scope;
+        Scope const *m_parent_scope;
 
         Bindings<pddl::TypeImpl
             , pddl::ObjectImpl
@@ -90,7 +90,7 @@ class Scope {
             , pddl::VariableImpl> bindings;
 
     public:
-        explicit Scope(std::shared_ptr<const Scope> parent_scope = nullptr) : m_parent_scope(parent_scope) { }
+        explicit Scope(Scope const *parent_scope = nullptr) : m_parent_scope(parent_scope) { }
 
         /// @brief Returns a binding if it exists.
         template<typename T>
@@ -114,7 +114,7 @@ struct SearchResult {
 ///        Allows stacking of ScopeStacks because each ScopeStack has a different ErrorHandler.
 class ScopeStack {
     private:
-        std::deque<std::shared_ptr<Scope>> m_stack;
+        std::deque<std::unique_ptr<Scope>> m_stack;
 
         ErrorHandler m_error_handler;
 
@@ -125,10 +125,10 @@ class ScopeStack {
             ErrorHandler&& error_handler,
             ScopeStack const *parent=nullptr);
 
-        /// @brief Pushes a new scope on the top of the stack.
+        /// @brief Inserts a new scope on the top of the stack.
         void open_scope();
 
-        /// @brief Pops the topmost scope from the stack.
+        /// @brief Deletes the topmost scope from the stack.
         void close_scope();
 
         /// @brief Returns a binding if it exists.

@@ -25,7 +25,7 @@ std::optional<ValueType<T>> Bindings<Ts...>::get(const std::string& key) const {
     if (it != t_bindings.end()) {
         return {it->second};
     }
-    return std::optional<ValueType<T>>();
+    return std::nullopt;
 }
 
 
@@ -66,8 +66,8 @@ ScopeStack::ScopeStack(
 
 void ScopeStack::open_scope() {
     m_stack.push_back(m_stack.empty()
-        ? std::make_shared<Scope>()
-        : std::make_shared<Scope>(m_stack.back()));
+        ? std::make_unique<Scope>()
+        : std::make_unique<Scope>(m_stack.back().get()));
 }
 
 void ScopeStack::close_scope() {
