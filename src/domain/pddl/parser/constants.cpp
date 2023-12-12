@@ -54,6 +54,9 @@ pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& n
 }
 
 pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
+    if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
+        throw NotSupportedError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_list_of_names_recursively_node, ""));
+    }
     pddl::ObjectList object_list;
     const auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context),
                                             typed_list_of_names_recursively_node.type);

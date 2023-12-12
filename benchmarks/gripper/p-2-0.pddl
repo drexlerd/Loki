@@ -14,7 +14,7 @@
 (free left)
 (free right)
 (at ball1 rooma)
-(at ball2 rooma )
+(at ball2 rooma)
 (at-robby rooma)
 )
 (:goal
