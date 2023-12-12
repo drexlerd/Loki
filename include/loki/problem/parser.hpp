@@ -31,7 +31,7 @@ private:
     pddl::Problem m_problem;
 
 public:
-    explicit ProblemParser(const fs::path& file_path, const DomainParser& domain_parser);
+    explicit ProblemParser(const fs::path& file_path, DomainParser& domain_parser);
 
     const pddl::Problem& get_problem() const;
 };

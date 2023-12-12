@@ -33,13 +33,13 @@ ConstantListVisitor::ConstantListVisitor(Context& context_)
 pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::ObjectList object_list;
-    assert(context.scopes->get<pddl::TypeImpl>("object").has_value());
-    const auto type = context.scopes->get<pddl::TypeImpl>("object")->value.object;
+    assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
+    const auto type = context.scopes.get<pddl::TypeImpl>("object")->value.object;
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
-        const auto binding = context.scopes->get<pddl::ObjectImpl>(name);
+        const auto binding = context.scopes.get<pddl::ObjectImpl>(name);
         if (binding.has_value()) {
-            const auto message_1 = context.scopes->get_error_handler()(name_node, "Defined here:");
+            const auto message_1 = context.scopes.get_error_handler()(name_node, "Defined here:");
             auto message_2 = std::string("");
             if (binding.value().value.position.has_value()) {
                 message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
@@ -47,7 +47,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& n
             throw MultiDefinitionConstantError(name, message_1 + message_2);
         }
         const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type});
-        context.scopes->insert<pddl::ObjectImpl>(name, object, name_node);
+        context.scopes.insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }
     return object_list;
@@ -60,9 +60,9 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
     // A non-visited vector of names has user defined base types
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
         const auto name = parse(name_node);
-        const auto binding = context.scopes->get<pddl::ObjectImpl>(name);
+        const auto binding = context.scopes.get<pddl::ObjectImpl>(name);
         if (binding.has_value()) {
-            const auto message_1 = context.scopes->get_error_handler()(name_node, "Defined here:");
+            const auto message_1 = context.scopes.get_error_handler()(name_node, "Defined here:");
             auto message_2 = std::string("");
             if (binding.value().value.position.has_value()) {
                 message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
@@ -70,7 +70,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
             throw MultiDefinitionConstantError(name, message_1 + message_2);
         }
         const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, types);
-        context.scopes->insert<pddl::ObjectImpl>(name, object, name_node);
+        context.scopes.insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }
     // Recursively add objects.

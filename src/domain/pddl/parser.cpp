@@ -60,7 +60,7 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context) {
     pddl::TypeList types;
     if (domain_node.types.has_value()) {
         if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
-            throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes->get_error_handler()(domain_node.types.value(), ""));
+            throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(domain_node.types.value(), ""));
         }
         types = parse(domain_node.types.value(), context);
     }

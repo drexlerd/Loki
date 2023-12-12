@@ -33,12 +33,12 @@ private:
 
     pddl::Domain m_domain;
 
+    friend class ProblemParser;
+
 public:
     explicit DomainParser(const fs::path& file_path);
 
     const pddl::Domain& get_domain() const;
-    const Context& get_factory() const;
-    const ScopeStack& get_scopes() const;
 };
 
 }

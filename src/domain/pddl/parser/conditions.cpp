@@ -43,7 +43,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorAtom& node, Context& cont
 pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, Context& context) {
     // requires :negative-preconditions
     if (!context.requirements->test(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS)) {
-        throw UndefinedRequirementError(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS, context.scopes->get_error_handler()(node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
     return context.cache.get_or_create<pddl::ConditionLiteralImpl>(parse(node.literal, context));
 }
@@ -56,7 +56,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorAnd& node, Context& conte
 pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, Context& context) {
     // requires :disjunctive-preconditions
     if (!context.requirements->test(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS)) {
-        throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.scopes->get_error_handler()(node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
     pddl::ConditionList condition_list = parse(node.goal_descriptors, context);
     return context.cache.get_or_create<pddl::ConditionOrImpl>(condition_list);
@@ -65,7 +65,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, Context& contex
 pddl::Condition parse(const domain::ast::GoalDescriptorNot& node, Context& context) {
     // requires :disjunctive-preconditions
     if (!context.requirements->test(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS)) {
-        throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.scopes->get_error_handler()(node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
     pddl::Condition condition = parse(node.goal_descriptor, context);
     return context.cache.get_or_create<pddl::ConditionNotImpl>(condition);

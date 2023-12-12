@@ -64,17 +64,17 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Type& type_node) 
 
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Name& name_node) {
     auto name = parse(name_node);
-    auto binding = context.scopes->get<pddl::TypeImpl>(name);
+    auto binding = context.scopes.get<pddl::TypeImpl>(name);
     if (!binding.has_value()) {
-        throw UndefinedTypeError(name, context.scopes->get_error_handler()(name_node, ""));
+        throw UndefinedTypeError(name, context.scopes.get_error_handler()(name_node, ""));
     }
     auto type = binding.value().value.object;
     return { type };
 }
 
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeObject&) {
-    assert(context.scopes->get<pddl::TypeImpl>("object").has_value());
-    return { context.scopes->get<pddl::TypeImpl>("object")->value.object };
+    assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
+    return { context.scopes.get<pddl::TypeImpl>("object")->value.object };
 }
 
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& either_type_node) {
@@ -98,9 +98,9 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vec
     const auto base_type = context.cache.get_or_create<pddl::TypeImpl>("object");
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
-        const auto binding = context.scopes->get<pddl::TypeImpl>(name);
+        const auto binding = context.scopes.get<pddl::TypeImpl>(name);
         if (binding.has_value()) {
-            const auto message_1 = context.scopes->get_error_handler()(name_node, "Defined here:");
+            const auto message_1 = context.scopes.get_error_handler()(name_node, "Defined here:");
             auto message_2 = std::string("");
             if (binding.value().value.position.has_value()) {
                 message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
@@ -111,7 +111,7 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vec
         }
         const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, pddl::TypeList{base_type});
         type_list.push_back(type);
-        context.scopes->insert<pddl::TypeImpl>(name, type, name_node);
+        context.scopes.insert<pddl::TypeImpl>(name, type, name_node);
     }
     return type_list;
 }
@@ -119,7 +119,7 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vec
 pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
     // requires :typing
     if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
-        throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes->get_error_handler()(typed_list_of_names_recursively_node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_list_of_names_recursively_node, ""));
     }
     pddl::TypeList type_list;
     const auto types = boost::apply_visitor(TypeDeclarationTypeVisitor(context),
@@ -128,16 +128,16 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::Typ
     for (const auto& name_node : typed_list_of_names_recursively_node.names) {
         const auto name = parse(name_node);
         if (name == "object") {
-            throw SemanticParserError("Unexpected type name \"object\". It is a reserved type name.", context.scopes->get_error_handler()(name_node, ""));
+            throw SemanticParserError("Unexpected type name \"object\". It is a reserved type name.", context.scopes.get_error_handler()(name_node, ""));
         }
         // We also reserve type name number although PDDL specification allows it.
         // However, this allows using regular types as function types for simplicity.
         if (name == "number") {
-            throw SemanticParserError("Unexpected type name \"number\". It is a reserved type name.", context.scopes->get_error_handler()(name_node, ""));
+            throw SemanticParserError("Unexpected type name \"number\". It is a reserved type name.", context.scopes.get_error_handler()(name_node, ""));
         }
-        const auto binding = context.scopes->get<pddl::TypeImpl>(name);
+        const auto binding = context.scopes.get<pddl::TypeImpl>(name);
         if (binding.has_value()) {
-            const auto message_1 = context.scopes->get_error_handler()(name_node, "Defined here:");
+            const auto message_1 = context.scopes.get_error_handler()(name_node, "Defined here:");
             auto message_2 = std::string("");
             if (binding.value().value.position.has_value()) {
                 message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
@@ -148,7 +148,7 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::Typ
         }
         const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, types);
         type_list.push_back(type);
-        context.scopes->insert<pddl::TypeImpl>(name, type, name_node);
+        context.scopes.insert<pddl::TypeImpl>(name, type, name_node);
     }
     // Recursively add types.
     auto additional_types = boost::apply_visitor(TypeDeclarationTypedListOfNamesVisitor(context), typed_list_of_names_recursively_node.typed_list_of_names.get());

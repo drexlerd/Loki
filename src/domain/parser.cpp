@@ -31,13 +31,13 @@ DomainParser::DomainParser(const fs::path& file_path) {
         nullptr
     };
     // Initialize global scope
-    context.scopes->open_scope();
+    context.scopes.open_scope();
 
     // Create base types.
     const auto base_type_object = context.cache.get_or_create<pddl::TypeImpl>("object");
     const auto base_type_number = context.cache.get_or_create<pddl::TypeImpl>("number");
-    context.scopes->insert("object", base_type_object, {});
-    context.scopes->insert("number", base_type_number, {});
+    context.scopes.insert("object", base_type_object, {});
+    context.scopes.insert("number", base_type_number, {});
 
     // Create equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
     const auto binary_parameterlist = pddl::ParameterList{
@@ -50,7 +50,7 @@ DomainParser::DomainParser(const fs::path& file_path) {
 
     };
     const auto equal_predicate = context.cache.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist);
-        context.scopes->insert<pddl::PredicateImpl>("=", equal_predicate, {});
+        context.scopes.insert<pddl::PredicateImpl>("=", equal_predicate, {});
 
     // Parse the domain
     m_domain = parse(node, context);
@@ -58,14 +58,6 @@ DomainParser::DomainParser(const fs::path& file_path) {
 
 const pddl::Domain& DomainParser::get_domain() const {
     return m_domain;
-}
-
-const Context& DomainParser::get_factory() const {
-    return *m_factory;
-}
-
-const ScopeStack& DomainParser::get_scopes() const {
-    return m_scopes;
 }
 
 }

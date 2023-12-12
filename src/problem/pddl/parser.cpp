@@ -35,7 +35,7 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
     /* Domain name section */
     const auto domain_name = parse(problem_node.domain_name.name);
     if (domain_name != domain->get_name()) {
-        throw MismatchedDomainError(domain, domain_name, context.scopes->get_error_handler()(problem_node.domain_name, ""));
+        throw MismatchedDomainError(domain, domain_name, context.scopes.get_error_handler()(problem_node.domain_name, ""));
     }
     /* Problem name section */
     const auto problem_name = parse(problem_node.problem_name.name);

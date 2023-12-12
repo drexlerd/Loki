@@ -46,17 +46,17 @@ std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(co
 }
 
 pddl::Action parse(const domain::ast::Action& node, Context& context) {
-    context.scopes->open_scope();
+    context.scopes.open_scope();
     auto name = parse(node.action_symbol, context);
     auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
     auto [condition, effect] = parse(node.action_body, context);
-    context.scopes->close_scope();
+    context.scopes.close_scope();
     return context.cache.get_or_create<pddl::ActionImpl>(name, parameters, condition, effect);
 }
 
 pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::DERIVED_PREDICATES)) {
-        throw UndefinedRequirementError(pddl::RequirementEnum::DERIVED_PREDICATES, context.scopes->get_error_handler()(node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::DERIVED_PREDICATES, context.scopes.get_error_handler()(node, ""));
     }
     auto parameters = boost::apply_visitor(ParameterListVisitor(context),
         node.typed_list_of_variables);
