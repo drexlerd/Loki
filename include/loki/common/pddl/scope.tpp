@@ -35,7 +35,7 @@ void Bindings<Ts...>::insert(const std::string& key, const BindingPtrType<T>& bi
     assert(binding);
     auto& t_bindings = std::get<MapType<T>>(bindings);
     assert(!t_bindings.count(key));
-    t_bindings.emplace(key, ValueType<T>{binding, position});
+    t_bindings.emplace(key, std::make_tuple(binding, position));
 }
 
 
@@ -63,7 +63,12 @@ template<typename T>
 std::optional<SearchResult<T>> ScopeStack::get(const std::string& name) const {
     assert(!m_stack.empty());
     auto result = m_stack.back()->get<T>(name);
-    if (result.has_value()) return SearchResult<T>{result.value(), m_error_handler};
+    if (result.has_value()) {
+        return std::make_tuple(
+            std::get<0>(result.value()),
+            std::get<1>(result.value()),
+            std::cref(m_error_handler));
+    }
     if (m_parent) return m_parent->get<T>(name);
     return std::nullopt;
 }

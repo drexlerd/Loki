@@ -48,10 +48,7 @@ using PositionType = boost::spirit::x3::position_tagged;
 ///        The position points to the matched location
 ///        in the input stream and is used for error reporting.
 template<typename T>
-struct ValueType {
-    BindingPtrType<T> object;
-    std::optional<PositionType> position;
-};
+using ValueType = std::tuple<BindingPtrType<T>, std::optional<PositionType>>;
 
 /// @brief Datastructure to store bindings of a type T.
 template<typename T>
@@ -102,12 +99,9 @@ class Scope {
 };
 
 
-/// @brief Combined information of ValueType and ErrorHandler
+/// @brief Encapsulates the result of search for a binding with the corresponding ErrorHandler.
 template<typename T>
-struct SearchResult {
-    ValueType<T> value;
-    const ErrorHandler& error_handler;
-};
+using SearchResult = std::tuple<const BindingPtrType<T>, const std::optional<PositionType>, const ErrorHandler&>;
 
 
 /// @brief Implements a scoping mechanism with a given ErrorHandler.
