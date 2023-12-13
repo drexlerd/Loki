@@ -98,6 +98,8 @@ public:
             ++m_cache->count;
             t_cache.identifier_to_key.emplace(identifier, key);
             /* Must explicitly call the constructor of T to give exclusive access to the factory. */
+            // Extensions: To ensure that the memory for T and the control block is allocated once,
+            // we could use std::allocated_shared and provide a custom allocator.
             cached = sp = std::shared_ptr<T>(
                 new T(identifier, args...),
                 [cache=m_cache, identifier](T* x)

@@ -76,13 +76,10 @@ pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const domain:
         function_skeleton_list.push_back(function_skeleton);
     }
     if (function_skeleton_list_recursively_node.function_typed_list_of_atomic_function_skeletons.has_value()) {
-        auto add_function_skeleton_list = this->operator()(function_skeleton_list_recursively_node.function_typed_list_of_atomic_function_skeletons.value());
+        auto add_function_skeleton_list = boost::apply_visitor(FunctionSkeletonListVisitor(context), function_skeleton_list_recursively_node.function_typed_list_of_atomic_function_skeletons.value().get());
+        function_skeleton_list.insert(function_skeleton_list.end(), add_function_skeleton_list.begin(), add_function_skeleton_list.end());
     }
     return function_skeleton_list;
-}
-
-pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletons& function_skeleton_list_node) {
-    return this->operator()(function_skeleton_list_node);
 }
 
 pddl::FunctionSkeletonList parse(const domain::ast::Functions& functions_node, Context& context) {

@@ -38,8 +38,6 @@ public:
     pddl::FunctionSkeletonList operator()(const std::vector<domain::ast::AtomicFunctionSkeleton>& formula_skeleton_nodes);
 
     pddl::FunctionSkeletonList operator()(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& function_skeleton_list_recursively_node);
-
-    pddl::FunctionSkeletonList operator()(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletons& function_skeleton_list_node);
 };
 
 extern pddl::FunctionSkeletonList parse(const domain::ast::Functions& functions_node, Context& context);

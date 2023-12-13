@@ -275,7 +275,7 @@ namespace loki::domain::parser {
     const auto binary_comparator_less_equal_def = lit("<=") >> x3::attr(ast::BinaryComparatorLessEqual{});
     const auto binary_comparator_def = binary_comparator_greater | binary_comparator_less | binary_comparator_equal | binary_comparator_greater_equal | binary_comparator_less_equal;
 
-    const auto function_head_def = ((lit('(') >> function_symbol >> *term) > lit(')')) | (function_symbol >> x3::attr(std::vector<ast::Term>{}));
+    const auto function_head_def = (lit('(') >> function_symbol >> *term) > lit(')');
     const auto function_expression_def = function_expression_binary_op | function_expression_minus | function_expression_head | function_expression_number;
     const auto function_expression_number_def = number;
     const auto function_expression_binary_op_def = (lit('(') >> binary_operator >> function_expression >> function_expression) > lit(')');
@@ -329,7 +329,7 @@ namespace loki::domain::parser {
     const auto effect_production_literal_def = literal;
     const auto effect_production_numeric_fluent_def = (lit('(') >> assign_operator >> function_head >> function_expression) > lit(')');
     const auto effect_production_object_fluent_def = lit('(') >> function_term >> (term | undefined);
-    const auto effect_production_def = effect_production_literal | effect_production_numeric_fluent | effect_production_object_fluent;
+    const auto effect_production_def = effect_production_numeric_fluent | effect_production_object_fluent | effect_production_literal;
     const auto effect_conditional_forall_def = (lit('(') >> keyword("forall")) > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
     const auto effect_conditional_when_def = (lit('(') >> keyword("when")) > goal_descriptor > effect > lit(')');
     const auto effect_conditional_def = effect_conditional_forall | effect_conditional_when;
