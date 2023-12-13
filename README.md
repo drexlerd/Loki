@@ -1,12 +1,6 @@
 # Loki
 
-Loki is a C++ library for syntactic and semantic parsing of PDDL files.
-Loki can provide meaningful error messages to the user, and
-uniquely construct PDDL objects across a whole class of problems over a common domain
-allowing for efficient copying, comparison, and hashing of PDDL objects in constant time.
-Furthermore, Loki can detect syntactically equivalent problems up to reordering.
-Loki also implements an automatic garbage collection which can be useful
-for many sorts of compilations where intermediate results are supposed to be recycled.
+Loki is a C++ library for syntactic and semantic parsing of PDDL files. Loki can provide meaningful error messages to the user, and uniquely construct PDDL objects across a whole class of problems over a common domain allowing for efficient copying, comparison, and hashing of PDDL objects in constant time. Furthermore, Loki can detect syntactically equivalent problems up to reordering. Loki also implements an automatic garbage collection which can be useful for many sorts of compilations where intermediate results are supposed to be recycled.
 
 ## Supported PDDL Requirements
 
@@ -33,15 +27,9 @@ for many sorts of compilations where intermediate results are supposed to be rec
 
 ## Grammar Simplifications
 
-Loki simplifies the PDDL grammar to make the resulting data structure less complex
-but easier to work with while preserving the same expressivity.
-Therefore, Loki might throw an error even for PDDL input files that conform to the PDDL specification.
+Loki simplifies the PDDL grammar to make the resulting data structure less complex but easier to work with while preserving the same expressivity. Therefore, Loki might throw an error even for PDDL input files that conform to the PDDL specification.
 
-- In the PDDL specification, "object" is a reserved PDDL type, and "object" and "number"
-are reserved PDDL function types. Loki additionally reserves "number" as a PDDL type
-to reuse the standard PDDL types as function types as well.
-Hence, Loki throws an error if "number" is used in the types specification
-even if it is legal according to the PDDL specification.
+- In the PDDL specification, "object" is a reserved PDDL type, and "object" and "number" are reserved PDDL function types. Loki additionally reserves "number" as a PDDL type to reuse the standard PDDL types as function types as well. Hence, Loki throws an error if "number" is used in the types specification even if it is legal according to the PDDL specification.
 
 
 ## Dependencies
