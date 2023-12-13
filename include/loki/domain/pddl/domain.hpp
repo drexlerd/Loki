@@ -40,6 +40,7 @@ private:
     TypeList m_types;
     ObjectList m_constants;
     PredicateList m_predicates;
+    FunctionSkeletonList m_functions;
     ActionList m_actions;
 
     DomainImpl(int identifier,
@@ -48,6 +49,7 @@ private:
         const TypeList& types,
         const ObjectList& constants,
         const PredicateList& predicates,
+        const FunctionSkeletonList& functions,
         const ActionList& actions);
 
     template<typename... Ts>
@@ -64,6 +66,7 @@ public:
     const TypeList& get_types() const;
     const ObjectList& get_constants() const;
     const PredicateList& get_predicates() const;
+    const FunctionSkeletonList& get_functions() const;
 };
 
 }

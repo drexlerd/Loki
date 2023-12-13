@@ -18,6 +18,7 @@
 #include "../../../include/loki/domain/pddl/domain.hpp"
 
 #include "../../../include/loki/domain/pddl/action.hpp"
+#include "../../../include/loki/domain/pddl/function_skeleton.hpp"
 #include "../../../include/loki/domain/pddl/object.hpp"
 #include "../../../include/loki/domain/pddl/predicate.hpp"
 #include "../../../include/loki/domain/pddl/type.hpp"
@@ -36,6 +37,7 @@ DomainImpl::DomainImpl(int identifier,
     const TypeList& types,
     const ObjectList& constants,
     const PredicateList& predicates,
+    const FunctionSkeletonList& functions,
     const ActionList& actions)
     : Base(identifier)
     , m_name(name)
@@ -43,6 +45,7 @@ DomainImpl::DomainImpl(int identifier,
     , m_types(types)
     , m_constants(constants)
     , m_predicates(predicates)
+    , m_functions(functions)
     , m_actions(actions)
 {
 }
@@ -53,6 +56,7 @@ bool DomainImpl::are_equal_impl(const DomainImpl& other) const {
         && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types))
         && (get_sorted_vector(m_constants) == get_sorted_vector(other.m_constants))
         && (get_sorted_vector(m_predicates) == get_sorted_vector(other.m_predicates))
+        && (get_sorted_vector(m_functions) == get_sorted_vector(other.m_functions))
         && (get_sorted_vector(m_actions) == get_sorted_vector(other.m_actions));
 }
 
@@ -63,6 +67,7 @@ size_t DomainImpl::hash_impl() const {
         hash_vector(get_sorted_vector(m_types)),
         hash_vector(get_sorted_vector(m_constants)),
         hash_vector(get_sorted_vector(m_predicates)),
+        hash_vector(get_sorted_vector(m_functions)),
         hash_vector(get_sorted_vector(m_actions)));
 }
 
@@ -130,11 +135,14 @@ void DomainImpl::str_impl(std::ostringstream& out, const FormattingOptions& opti
         }
         out << ")\n";
     }
+    if (!m_functions.empty()) {
+        out << string(nested_options.indent, ' ') << "(:functions ";
+        for (size_t i = 0; i < m_functions.size(); ++i) {
+            out << *m_functions[i];
+        }
+    }
 
     /*
-    if (node.functions.has_value()) {
-        ss << string(nested_options.indent, ' ') << parse_text(node.functions.value(), nested_options) << "\n";
-    }
     if (node.constraints.has_value()) {
         ss << string(nested_options.indent, ' ') << parse_text(node.constraints.value(), nested_options) << "\n";
     }
