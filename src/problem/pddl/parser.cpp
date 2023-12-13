@@ -19,12 +19,13 @@
 
 #include "parser/objects.hpp"
 #include "parser/initial.hpp"
-
-#include "../../../include/loki/problem/pddl/exceptions.hpp"
+#include "parser/goal.hpp"
 
 #include "../../domain/pddl/parser/common.hpp"
 #include "../../domain/pddl/parser/requirements.hpp"
 #include "../../domain/pddl/unpacking_visitor.hpp"
+
+#include "../../../include/loki/problem/pddl/exceptions.hpp"
 #include "../../../include/loki/domain/pddl/domain.hpp"
 #include "../../../include/loki/domain/pddl/requirements.hpp"
 
@@ -60,8 +61,7 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
         boost::apply_visitor(UnpackingVisitor(initial_literals), initial_element);
     }
     /* Goal section */
-    pddl::Condition goal_condition;
-    // TODO
+    pddl::Condition goal_condition = parse(problem_node.goal, context);
     return context.cache.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects, initial_literals, goal_condition);
 }
 

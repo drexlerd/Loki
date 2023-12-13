@@ -7,19 +7,19 @@ Loki aims to provide meaningful error messages.
 
 TODO
 
-- [ ] :strips
-- [ ] :typing
-- [ ] :negative-preconditions
-- [ ] :disjunctive-preconditions
-- [ ] :equality
-- [ ] :existential-preconditions
-- [ ] :universal-preconditions
-- [ ] :quantified-preconditions
-- [ ] :conditional-effects
+- [x] :strips
+- [x] :typing
+- [x] :negative-preconditions
+- [x] :disjunctive-preconditions
+- [x] :equality
+- [x] :existential-preconditions
+- [x] :universal-preconditions
+- [x] :quantified-preconditions
+- [x] :conditional-effects
 - [ ] :fluents
-- [ ] :numeric-fluents
+- [x] :numeric-fluents
 - [ ] :object-fluents
-- [ ] :adl
+- [x] :adl
 - [ ] :durative-actions
 - [ ] :derived-predicates
 - [ ] :timed-initial-literals
@@ -62,11 +62,11 @@ cmake --build build -j16
 Parsing a domain file into an abstract syntax tree and printing it.
 
 ```console
-./build/exe/domain benchmarks/schedule/domain.pddl
+./build/exe/domain benchmarks/gripper/domain.pddl
 ```
 
 Parsing a problem file into an abstract syntax tree and printing it.
 
 ```console
-./build/exe/problem benchmarks/schedule/domain.pddl benchmarks/schedule/probschedule-51-2.pddl
+./build/exe/problem benchmarks/gripper/domain.pddl benchmarks/gripper/p-2-0.pddl
 ```

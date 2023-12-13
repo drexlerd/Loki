@@ -17,10 +17,13 @@
 
 #include "goal.hpp"
 
+#include "../../../domain/pddl/parser/conditions.hpp"
+
 
 namespace loki {
 
 pddl::Condition parse(const problem::ast::Goal& node, Context& context) {
+    return parse(node.precondition_goal_descriptor, context);
 }
 
 }

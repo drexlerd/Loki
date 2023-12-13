@@ -18,6 +18,7 @@
 #include "../../../include/loki/problem/pddl/problem.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
+#include "../../../include/loki/domain/pddl/conditions.hpp"
 #include "../../../include/loki/domain/pddl/literal.hpp"
 #include "../../../include/loki/domain/pddl/domain.hpp"
 #include "../../../include/loki/domain/pddl/requirements.hpp"
@@ -78,9 +79,9 @@ void ProblemImpl::str_impl(std::ostringstream& out, const FormattingOptions& opt
         out << *m_initial_literals[i];
     }
     out << ")\n";
+    out << string(nested_options.indent, ' ') << "(:goal " << *m_goal_condition << ")\n";
+
     /*
-    ss << string(nested_options.indent, ' ') << parse_text(node.initial, nested_options) << "\n";
-    ss << string(nested_options.indent, ' ') << parse_text(node.goal, nested_options) << "\n";
     if (node.constraints.has_value()) {
         ss << string(nested_options.indent, ' ') << parse_text(node.constraints.value(), nested_options) << "\n";
     }

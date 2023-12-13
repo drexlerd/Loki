@@ -1,5 +1,6 @@
 (define (problem schedule-51-2)
 (:domain schedule)
+(:requirements :adl :typing)
 (:objects
     E2
     D2
