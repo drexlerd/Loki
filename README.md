@@ -5,8 +5,6 @@ Loki aims to provide meaningful error messages.
 
 ## Supported PDDL Requirements
 
-TODO
-
 - [x] :strips
 - [x] :typing
 - [x] :negative-preconditions
