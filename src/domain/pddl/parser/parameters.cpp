@@ -33,7 +33,7 @@ ParameterListVisitor::ParameterListVisitor(Context& context_)
 
 pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>& variable_nodes) {
     // A visited vector of variable has single base type "object"
-    pddl::ParameterList parameter_list;
+    auto parameter_list = pddl::ParameterList();
     const auto type = context.cache.get_or_create<pddl::TypeImpl>("object");
     for (const auto& variable_node : variable_nodes) {
         const auto variable = parse(variable_node, context);
@@ -41,8 +41,9 @@ pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Vari
         if (binding.has_value()) {
             const auto message_1 = context.scopes.get_error_handler()(variable_node, "Defined here:");
             auto message_2 = std::string("");
-            if (binding.value().value.position.has_value()) {
-                message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
+            const auto& [_variable, position, error_handler] = binding.value();
+            if (position.has_value()) {
+                message_2 = error_handler(position.value(), "First defined here:");
             }
             throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
         }
@@ -58,7 +59,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
     if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_variables_node, ""));
     }
-    pddl::ParameterList parameter_list;
+    auto parameter_list = pddl::ParameterList();
     const auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context),
                                             typed_variables_node.type);
     // A non-visited vector of variables has user defined types
@@ -68,8 +69,9 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
         if (binding.has_value()) {
             const auto message_1 = context.scopes.get_error_handler()(variable_node, "Defined here:");
             auto message_2 = std::string("");
-            if (binding.value().value.position.has_value()) {
-                message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
+            const auto& [_variable, position, error_handler] = binding.value();
+            if (position.has_value()) {
+                message_2 = error_handler(position.value(), "First defined here:");
             }
             throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
         }

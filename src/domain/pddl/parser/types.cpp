@@ -68,13 +68,14 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Name& name_node) 
     if (!binding.has_value()) {
         throw UndefinedTypeError(name, context.scopes.get_error_handler()(name_node, ""));
     }
-    auto type = binding.value().value.object;
+    const auto& [type, _position, _error_handler] = binding.value();
     return { type };
 }
 
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeObject&) {
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
-    return { context.scopes.get<pddl::TypeImpl>("object")->value.object };
+    const auto& [type_object, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
+    return { type_object };
 }
 
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& either_type_node) {
@@ -95,21 +96,23 @@ TypeDeclarationTypedListOfNamesVisitor::TypeDeclarationTypedListOfNamesVisitor(C
 pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::TypeList type_list;
-    const auto base_type = context.cache.get_or_create<pddl::TypeImpl>("object");
+    assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
+    const auto& [type_object, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
     for (const auto& name_node : name_nodes) {
         const auto name = parse(name_node);
         const auto binding = context.scopes.get<pddl::TypeImpl>(name);
         if (binding.has_value()) {
             const auto message_1 = context.scopes.get_error_handler()(name_node, "Defined here:");
             auto message_2 = std::string("");
-            if (binding.value().value.position.has_value()) {
-                message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
+            const auto& [_type, position, error_handler] = binding.value();
+            if (position.has_value()) {
+                message_2 = error_handler(position.value(), "First defined here:");
             } else {
                 // Reserved type?
             }
             throw MultiDefinitionTypeError(name, message_1 + message_2);
         }
-        const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, pddl::TypeList{base_type});
+        const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, pddl::TypeList{type_object});
         type_list.push_back(type);
         context.scopes.insert<pddl::TypeImpl>(name, type, name_node);
     }
@@ -139,8 +142,9 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::Typ
         if (binding.has_value()) {
             const auto message_1 = context.scopes.get_error_handler()(name_node, "Defined here:");
             auto message_2 = std::string("");
-            if (binding.value().value.position.has_value()) {
-                message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
+            const auto& [_type, position, error_handler] = binding.value();
+            if (position.has_value()) {
+                message_2 = error_handler(position.value(), "First defined here:");
             } else {
                 // Reserved type?
             }

@@ -29,22 +29,23 @@ FunctionSkeletonListVisitor::FunctionSkeletonListVisitor(Context& context_)
     : context(context_) { }
 
 pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const std::vector<domain::ast::AtomicFunctionSkeleton>& formula_skeleton_nodes) {
-    pddl::FunctionSkeletonList function_skeleton_list;
+    auto function_skeleton_list = pddl::FunctionSkeletonList();
     assert(context.scopes.get<pddl::TypeImpl>("number").has_value());
-    auto function_type = context.scopes.get<pddl::TypeImpl>("number")->value.object;
+    const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
     for (const auto& atomic_function_skeleton : formula_skeleton_nodes) {
         auto function_name = parse(atomic_function_skeleton.function_symbol.name);
         const auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
         if (binding.has_value()) {
             const auto message_1 = context.scopes.get_error_handler()(atomic_function_skeleton.function_symbol.name, "Defined here:");
             auto message_2 = std::string("");
-            if (binding.value().value.position.has_value()) {
-                message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
+            const auto& [_function_skeleton, position, error_handler] = binding.value();
+            if (position.has_value()) {
+                message_2 = error_handler(position.value(), "First defined here:");
             }
             throw MultiDefinitionFunctionSkeletonError(function_name, message_1 + message_2);
         }
         auto function_parameters = boost::apply_visitor(ParameterListVisitor(context), atomic_function_skeleton.arguments);
-        auto function_skeleton = context.cache.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, function_type);
+        auto function_skeleton = context.cache.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, type);
         context.scopes.insert<pddl::FunctionSkeletonImpl>(function_name, function_skeleton, atomic_function_skeleton.function_symbol.name);
         function_skeleton_list.push_back(function_skeleton);
     }
@@ -52,25 +53,25 @@ pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const std::ve
 }
 
 pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& function_skeleton_list_recursively_node) {
-    pddl::FunctionSkeletonList function_skeleton_list;
-    // We do not parse function_skeleton_list_recursively_node.function_type because we do not support :object-fluents
+    auto function_skeleton_list = pddl::FunctionSkeletonList();
     assert(context.scopes.get<pddl::TypeImpl>("number").has_value());
-    auto function_type = context.scopes.get<pddl::TypeImpl>("number")->value.object;
+    const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
     for (const auto& atomic_function_skeleton : function_skeleton_list_recursively_node.atomic_function_skeletons) {
         auto function_name = parse(atomic_function_skeleton.function_symbol.name);
         const auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
         if (binding.has_value()) {
             const auto message_1 = context.scopes.get_error_handler()(atomic_function_skeleton.function_symbol.name, "Defined here:");
             auto message_2 = std::string("");
-            if (binding.value().value.position.has_value()) {
-                message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
+            const auto& [_function_skeleton, position, error_handler] = binding.value();
+            if (position.has_value()) {
+                message_2 = error_handler(position.value(), "First defined here:");
             }
             throw MultiDefinitionFunctionSkeletonError(function_name, message_1 + message_2);
         }
         context.scopes.open_scope();
         auto function_parameters = boost::apply_visitor(ParameterListVisitor(context), atomic_function_skeleton.arguments);
         context.scopes.close_scope();
-        auto function_skeleton = context.cache.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, function_type);
+        auto function_skeleton = context.cache.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, type);
         context.scopes.insert<pddl::FunctionSkeletonImpl>(function_name, function_skeleton, atomic_function_skeleton.function_symbol.name);
         function_skeleton_list.push_back(function_skeleton);
     }

@@ -39,7 +39,7 @@ pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, Contex
     for (const auto& name_node : node.names) {
         term_list.push_back(context.cache.get_or_create<pddl::TermObjectImpl>(parse_object_reference(name_node, context)));
     }
-    auto predicate = binding->value.object;
+    const auto& [predicate, _position, _error_handler] = binding.value();
     if (predicate->get_parameters().size() != term_list.size()) {
         throw MismatchedPredicateTermListError(predicate, term_list, context.scopes.get_error_handler()(node, ""));
     }
@@ -51,7 +51,7 @@ pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, Context
         throw UndefinedRequirementError(pddl::RequirementEnum::EQUALITY, context.scopes.get_error_handler()(node, ""));
     }
     assert(context.scopes.get<pddl::PredicateImpl>("=").has_value());
-    const auto equal_predicate = context.scopes.get<pddl::PredicateImpl>("=")->value.object;
+    const auto& [equal_predicate, _position, _error_handler] = context.scopes.get<pddl::PredicateImpl>("=").value();
     const auto term_left = context.cache.get_or_create<pddl::TermObjectImpl>(parse_object_reference(node.name_left, context));
     const auto term_right = context.cache.get_or_create<pddl::TermObjectImpl>(parse_object_reference(node.name_right, context));
     return context.cache.get_or_create<pddl::AtomImpl>(equal_predicate, pddl::TermList{term_left, term_right});

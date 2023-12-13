@@ -34,8 +34,9 @@ pddl::PredicateList parse(const ast::Predicates& predicates_node, Context& conte
         if (binding.has_value()) {
             const auto message_1 = context.scopes.get_error_handler()(atomic_formula_skeleton.predicate.name, "Defined here:");
             auto message_2 = std::string("");
-            if (binding.value().value.position.has_value()) {
-                message_2 = binding.value().error_handler(binding.value().value.position.value(), "First defined here:");
+            const auto& [_predicate, position, error_handler] = binding.value();
+            if (position.has_value()) {
+                message_2 = error_handler(position.value(), "First defined here:");
             } else {
                 // Reserved type?
             }
