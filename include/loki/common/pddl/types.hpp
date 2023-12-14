@@ -52,6 +52,10 @@ using PddlFactory = ReferenceCountedObjectFactory<pddl::RequirementsImpl
     , pddl::LiteralImpl
     , pddl::ParameterImpl
     , pddl::PredicateImpl
+    , pddl::FunctionExpressionNumberImpl
+    , pddl::FunctionExpressionBinaryOperatorImpl
+    , pddl::FunctionExpressionMinusImpl
+    , pddl::FunctionExpressionFunctionImpl
     , pddl::FunctionImpl
     , pddl::FunctionSkeletonImpl
     , pddl::ConditionLiteralImpl
@@ -60,6 +64,7 @@ using PddlFactory = ReferenceCountedObjectFactory<pddl::RequirementsImpl
     , pddl::ConditionNotImpl
     , pddl::EffectLiteralImpl
     , pddl::EffectAndImpl
+    , pddl::EffectNumericImpl
     , pddl::EffectConditionalForallImpl
     , pddl::EffectConditionalWhenImpl
     , pddl::ActionImpl

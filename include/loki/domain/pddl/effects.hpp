@@ -40,6 +40,9 @@ enum class AssignOperatorEnum {
     DECREASE
 };
 
+extern std::unordered_map<AssignOperatorEnum, std::string> assign_operator_enum_to_string;
+extern const std::string& to_string(pddl::AssignOperatorEnum assign_operator);
+
 
 /// @brief Defines an interface for visiting nodes in a DAG of conditions.
 class EffectVisitor {
@@ -48,6 +51,7 @@ public:
 
     virtual void visit(const EffectLiteral& condition) = 0;
     virtual void visit(const EffectAnd& condition) = 0;
+    virtual void visit(const EffectNumeric& condition) = 0;
     virtual void visit(const EffectConditionalForall& condition) = 0;
     virtual void visit(const EffectConditionalWhen& condition) = 0;
 };
@@ -122,6 +126,30 @@ public:
 };
 
 
+/* EffectNumeric */
+class EffectNumericImpl : public EffectImpl, public std::enable_shared_from_this<EffectNumericImpl> {
+private:
+    AssignOperatorEnum m_assign_operator;
+    Function m_function;
+    FunctionExpression m_function_expression;
+
+    EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, const Function& function, const FunctionExpression& function_expression);
+
+    template<typename... Ts>
+    friend class loki::ReferenceCountedObjectFactory;
+
+public:
+    bool are_equal_impl(const EffectImpl& other) const override;
+    size_t hash_impl() const;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
+
+    void accept(EffectVisitor& visitor) const override;
+
+    AssignOperatorEnum get_assign_operator() const;
+    const Function& get_function() const;
+    const FunctionExpression& get_function_expression() const;
+};
+
 
 /* ConditionalForall */
 class EffectConditionalForallImpl : public EffectImpl, public std::enable_shared_from_this<EffectConditionalForallImpl> {
@@ -190,6 +218,12 @@ namespace std {
     struct hash<loki::pddl::EffectAndImpl>
     {
         std::size_t operator()(const loki::pddl::EffectAndImpl& effect) const;
+    };
+
+    template<>
+    struct hash<loki::pddl::EffectNumericImpl>
+    {
+        std::size_t operator()(const loki::pddl::EffectNumericImpl& effect) const;
     };
 
     template<>

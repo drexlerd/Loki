@@ -275,7 +275,7 @@ namespace loki::domain::parser {
     const auto binary_comparator_less_equal_def = lit("<=") >> x3::attr(ast::BinaryComparatorLessEqual{});
     const auto binary_comparator_def = binary_comparator_greater | binary_comparator_less | binary_comparator_equal | binary_comparator_greater_equal | binary_comparator_less_equal;
 
-    const auto function_head_def = (lit('(') >> function_symbol >> *term) > lit(')');
+    const auto function_head_def = (lit('(') >> function_symbol >> *term) > lit(')') | (function_symbol >> x3::attr(std::vector<ast::Term>{}));
     const auto function_expression_def = function_expression_binary_op | function_expression_minus | function_expression_head | function_expression_number;
     const auto function_expression_number_def = number;
     const auto function_expression_binary_op_def = (lit('(') >> binary_operator >> function_expression >> function_expression) > lit(')');

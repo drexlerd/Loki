@@ -92,6 +92,14 @@ public:
         const std::string& error_handler_output);
 };
 
+class MismatchedFunctionSkeletonTermListError : public SemanticParserError {
+public:
+    MismatchedFunctionSkeletonTermListError(
+        const pddl::FunctionSkeleton& function_skeleton,
+        const pddl::TermList& term_list,
+        const std::string& error_handler_output);
+};
+
 class NotSupportedError : public std::runtime_error {
 public:
     explicit NotSupportedError(pddl::RequirementEnum requirement, const std::string& error_handler_output);

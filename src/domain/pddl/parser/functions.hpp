@@ -22,11 +22,59 @@
 #include "../../../../include/loki/domain/pddl/parser.hpp"
 #include "../../../../include/loki/domain/pddl/declarations.hpp"
 #include "../../../../include/loki/domain/pddl/function_skeleton.hpp"
+#include "../../../../include/loki/domain/pddl/function_expressions.hpp"
 
 #include <variant>
 
 
 namespace loki {
+
+extern pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperatorMul& node);
+extern pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperatorPlus& node);
+extern pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperator& node);
+
+struct MultiOperatorVisitor : boost::static_visitor<pddl::ArithmeticOperatorEnum> {
+    template<typename Node>
+    pddl::ArithmeticOperatorEnum operator()(const Node& node) const {
+        return parse(node);
+    }
+};
+
+
+extern pddl::ArithmeticOperatorEnum parse(const domain::ast::BinaryOperatorDiv& node);
+extern pddl::ArithmeticOperatorEnum parse(const domain::ast::BinaryOperatorMinus& node);
+extern pddl::ArithmeticOperatorEnum parse(const domain::ast::BinaryOperator& node);
+
+struct BinaryOperatorVisitor : boost::static_visitor<pddl::ArithmeticOperatorEnum> {
+    template<typename Node>
+    pddl::ArithmeticOperatorEnum operator()(const Node& node) const {
+        return parse(node);
+    }
+};
+
+
+extern pddl::FunctionExpression parse(const domain::ast::FunctionExpressionNumber& node, Context& context);
+extern pddl::FunctionExpression parse(const domain::ast::FunctionExpressionBinaryOp& node, Context& context);
+extern pddl::FunctionExpression parse(const domain::ast::FunctionExpressionMinus& node, Context& context);
+extern pddl::FunctionExpression parse(const domain::ast::FunctionExpressionHead node, Context& context);
+
+class FunctionExpressionVisitor : boost::static_visitor<pddl::FunctionExpression> {
+private:
+    Context& context;
+
+public:
+    FunctionExpressionVisitor(Context& context_);
+
+    template<typename Node>
+    pddl::FunctionExpression operator()(const Node& node) const {
+        return parse(node, context);
+    }
+};
+
+extern pddl::FunctionExpression parse(const domain::ast::FunctionExpression& node, Context& context);
+
+extern pddl::Function parse(const domain::ast::FunctionHead& node, Context& context);
+
 
 class FunctionSkeletonListVisitor : boost::static_visitor<pddl::FunctionSkeletonList> {
 private:

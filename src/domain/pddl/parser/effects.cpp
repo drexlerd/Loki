@@ -20,6 +20,7 @@
 #include "conditions.hpp"
 #include "literal.hpp"
 #include "parameters.hpp"
+#include "functions.hpp"
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 
@@ -60,7 +61,10 @@ pddl::Effect parse(const domain::ast::EffectProductionLiteral& node, Context& co
 }
 
 pddl::Effect parse(const domain::ast::EffectProductionNumericFluent& node, Context& context) {
-    throw NotImplementedError("parse domain::ast::EffectProductionNumericFluent");
+    const auto assign_operator = parse(node.assign_operator);
+    const auto function = parse(node.function_head, context);
+    const auto function_expression = parse(node.function_expression, context);
+    return context.cache.get_or_create<pddl::EffectNumericImpl>(assign_operator, function, function_expression);
 }
 
 pddl::Effect parse(const domain::ast::EffectProductionObjectFluent& node, Context& context) {

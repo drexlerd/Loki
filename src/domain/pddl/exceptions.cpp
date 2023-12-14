@@ -19,6 +19,7 @@
 
 #include "../../../include/loki/domain/pddl/predicate.hpp"
 #include "../../../include/loki/domain/pddl/domain.hpp"
+#include "../../../include/loki/domain/pddl/function_skeleton.hpp"
 
 
 namespace loki {
@@ -78,6 +79,21 @@ MismatchedPredicateTermListError::MismatchedPredicateTermListError(
             + std::to_string(term_list.size())
             + ".",
         error_handler_output) { }
+
+MismatchedFunctionSkeletonTermListError::MismatchedFunctionSkeletonTermListError(
+    const pddl::FunctionSkeleton& function_skeleton,
+    const pddl::TermList& term_list,
+    const std::string& error_handler_output)
+    : SemanticParserError(
+        "Mismatched number of terms for function skeleton \""
+            + function_skeleton->get_name()
+            + "\" with sizes "
+            + std::to_string(function_skeleton->get_parameters().size())
+            + "!="
+            + std::to_string(term_list.size())
+            + ".",
+        error_handler_output) { }
+
 
 NotSupportedError::NotSupportedError(pddl::RequirementEnum requirement, const std::string& error_handler_output)
     : std::runtime_error("Unsupported requirement: " + to_string(requirement) + "\n" + error_handler_output) { }

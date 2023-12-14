@@ -16,6 +16,8 @@
  */
 
 #include "../../../include/loki/domain/pddl/function_skeleton.hpp"
+
+#include "../../../include/loki/domain/pddl/parameter.hpp"
 #include "../../../include/loki/common/hash.hpp"
 
 
@@ -37,7 +39,16 @@ size_t FunctionSkeletonImpl::hash_impl() const {
 }
 
 void FunctionSkeletonImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    str(out, options, true);
+}
+
+void FunctionSkeletonImpl::str(std::ostringstream& out, const FormattingOptions& options, bool typing_enabled) const {
+    out << "(" << m_name;
+    for (size_t i = 0; i < m_parameters.size(); ++i) {
+        out << " ";
+        m_parameters[i]->str(out, options, typing_enabled);
+    }
+    out << ")";
 }
 
 const std::string& FunctionSkeletonImpl::get_name() const {

@@ -25,6 +25,81 @@
 
 namespace loki {
 
+pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperatorMul&) {
+    return pddl::ArithmeticOperatorEnum::MUL;
+}
+
+pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperatorPlus&) {
+    return pddl::ArithmeticOperatorEnum::PLUS;
+}
+
+pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperator& node) {
+    return boost::apply_visitor(MultiOperatorVisitor(), node);
+}
+
+
+pddl::ArithmeticOperatorEnum parse(const domain::ast::BinaryOperatorDiv&) {
+    return pddl::ArithmeticOperatorEnum::DIV;
+}
+
+pddl::ArithmeticOperatorEnum parse(const domain::ast::BinaryOperatorMinus&) {
+    return pddl::ArithmeticOperatorEnum::MINUS;
+}
+
+pddl::ArithmeticOperatorEnum parse(const domain::ast::BinaryOperator& node) {
+    return boost::apply_visitor(BinaryOperatorVisitor(), node);
+}
+
+
+pddl::FunctionExpression parse(const domain::ast::FunctionExpressionNumber& node, Context& context) {
+    const auto number = parse(node.number);
+    return context.cache.get_or_create<pddl::FunctionExpressionNumberImpl>(number);
+}
+
+pddl::FunctionExpression parse(const domain::ast::FunctionExpressionBinaryOp& node, Context& context) {
+    const auto binary_operator = parse(node.binary_operator);
+    const auto left_function_expression = parse(node.function_expression_left, context);
+    const auto right_function_expression = parse(node.function_expression_right, context);
+    return context.cache.get_or_create<pddl::FunctionExpressionBinaryOperatorImpl>(binary_operator, left_function_expression, right_function_expression);
+}
+
+pddl::FunctionExpression parse(const domain::ast::FunctionExpressionMinus& node, Context& context) {
+    const auto function_expression = parse(node.function_expression, context);
+    return context.cache.get_or_create<pddl::FunctionExpressionMinusImpl>(function_expression);
+}
+
+pddl::FunctionExpression parse(const domain::ast::FunctionExpressionHead node, Context& context) {
+    const auto function = parse(node.function_head, context);
+    return context.cache.get_or_create<pddl::FunctionExpressionFunctionImpl>(function);
+}
+
+
+FunctionExpressionVisitor::FunctionExpressionVisitor(Context& context_)
+    : context(context_) { }
+
+
+pddl::FunctionExpression parse(const domain::ast::FunctionExpression& node, Context& context) {
+    return boost::apply_visitor(FunctionExpressionVisitor(context), node);
+}
+
+pddl::Function parse(const domain::ast::FunctionHead& node, Context& context) {
+    auto function_name = parse(node.function_symbol.name);
+    auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
+    if (!binding.has_value()) {
+        throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node.function_symbol, ""));
+    }
+    pddl::TermList term_list;
+    for (const auto& term_node : node.terms) {
+        term_list.push_back(boost::apply_visitor(TermReferenceTermVisitor(context), term_node));
+    }
+    const auto& [function_skeleton, _position, _error_handler] = binding.value();
+    if (function_skeleton->get_parameters().size() != term_list.size()) {
+        throw MismatchedFunctionSkeletonTermListError(function_skeleton, term_list, context.scopes.get_error_handler()(node, ""));
+    }
+    return context.cache.get_or_create<pddl::FunctionImpl>(function_skeleton, term_list);
+}
+
+
 FunctionSkeletonListVisitor::FunctionSkeletonListVisitor(Context& context_)
     : context(context_) { }
 

@@ -16,6 +16,9 @@
  */
 
 #include "../../../include/loki/domain/pddl/function.hpp"
+
+#include "../../../include/loki/domain/pddl/function_skeleton.hpp"
+#include "../../../include/loki/domain/pddl/term.hpp"
 #include "../../../include/loki/common/hash.hpp"
 
 
@@ -36,7 +39,16 @@ size_t FunctionImpl::hash_impl() const {
 }
 
 void FunctionImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
-    out << "TODO";
+    if (m_terms.empty()) {
+        out << m_function_skeleton->get_name();
+    } else {
+        out << "(" << m_function_skeleton->get_name() << "(";
+        for (size_t i = 0; i < m_terms.size(); ++i) {
+            if (i != 0) out << " ";
+            out << *m_terms[i];
+        }
+        out << "))";
+    }
 }
 
 const FunctionSkeleton& FunctionImpl::get_function_skeleton() const {

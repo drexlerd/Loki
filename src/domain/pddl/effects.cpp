@@ -20,11 +20,30 @@
 #include "../../../include/loki/domain/pddl/conditions.hpp"
 #include "../../../include/loki/domain/pddl/literal.hpp"
 #include "../../../include/loki/domain/pddl/parameter.hpp"
+#include "../../../include/loki/domain/pddl/function.hpp"
+#include "../../../include/loki/domain/pddl/function_expressions.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 
+#include <cassert>
+
 
 namespace loki::pddl {
+
+std::unordered_map<AssignOperatorEnum, std::string> assign_operator_enum_to_string = {
+    { AssignOperatorEnum::ASSIGN, "assign" },
+    { AssignOperatorEnum::SCALE_UP, "scale-up" },
+    { AssignOperatorEnum::SCALE_DOWN, "scale-down" },
+    { AssignOperatorEnum::INCREASE, "increase" },
+    { AssignOperatorEnum::DECREASE, "decrease" },
+};
+
+const std::string& to_string(pddl::AssignOperatorEnum assign_operator) {
+    assert(assign_operator_enum_to_string.count(assign_operator));
+    return assign_operator_enum_to_string.at(assign_operator);
+}
+
+
 /* BaseCondition */
 EffectImpl::EffectImpl(int identifier)
     : Base(identifier) { }
@@ -95,6 +114,49 @@ const EffectList& EffectAndImpl::get_effects() const {
 }
 
 
+/* EffectNumeric */
+EffectNumericImpl::EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, const Function& function, const FunctionExpression& function_expression)
+    : EffectImpl(identifier)
+    , m_assign_operator(assign_operator)
+    , m_function(function)
+    , m_function_expression(function_expression) { }
+
+bool EffectNumericImpl::are_equal_impl(const EffectImpl& other) const {
+    if (typeid(*this) == typeid(other)) {
+        const auto& other_derived = static_cast<const EffectNumericImpl&>(other);
+        return m_assign_operator == other_derived.m_assign_operator
+            && m_function == other_derived.m_function
+            && m_function_expression == other_derived.m_function_expression;
+    }
+    return false;
+}
+
+size_t EffectNumericImpl::hash_impl() const {
+    return hash_combine(m_assign_operator, m_function, m_function_expression);
+}
+
+void EffectNumericImpl::str_impl(std::ostringstream& out, const FormattingOptions&) const {
+    out << "(" << to_string(m_assign_operator) << " " << *m_function << " " << *m_function_expression << ")";
+}
+
+void EffectNumericImpl::accept(EffectVisitor& visitor) const {
+    visitor.visit(this->shared_from_this());
+}
+
+AssignOperatorEnum EffectNumericImpl::get_assign_operator() const {
+    return m_assign_operator;
+}
+
+const Function& EffectNumericImpl::get_function() const {
+    return m_function;
+}
+
+const FunctionExpression& EffectNumericImpl::get_function_expression() const {
+    return m_function_expression;
+}
+
+
+/* ConditionalForall */
 EffectConditionalForallImpl::EffectConditionalForallImpl(int identifier, const ParameterList& parameters, const Effect& effect)
     : EffectImpl(identifier), m_parameters(parameters), m_effect(effect) { }
 
@@ -111,7 +173,7 @@ size_t EffectConditionalForallImpl::hash_impl() const {
     return hash_combine(hash_vector(m_parameters), m_effect);
 }
 
-void EffectConditionalForallImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void EffectConditionalForallImpl::str_impl(std::ostringstream& out, const FormattingOptions&) const {
     out << "(forall (";
     for (size_t i = 0; i < m_parameters.size(); ++i) {
         if (i != 0) out << " ";
@@ -180,6 +242,10 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::EffectAndImpl>::operator()(const loki::pddl::EffectAndImpl& effect) const {
+        return effect.hash_impl();
+    }
+
+    std::size_t hash<loki::pddl::EffectNumericImpl>::operator()(const loki::pddl::EffectNumericImpl& effect) const {
         return effect.hash_impl();
     }
 

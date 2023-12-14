@@ -138,6 +138,7 @@ void DomainImpl::str_impl(std::ostringstream& out, const FormattingOptions& opti
     if (!m_functions.empty()) {
         out << string(nested_options.indent, ' ') << "(:functions ";
         for (size_t i = 0; i < m_functions.size(); ++i) {
+            if (i != 0) out << " ";
             out << *m_functions[i];
         }
     }
