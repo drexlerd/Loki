@@ -24,24 +24,24 @@
 
 namespace loki {
 
-class InitialElementVisitor : boost::static_visitor<boost::variant<pddl::Literal>> {
+class InitialElementVisitor : boost::static_visitor<boost::variant<pddl::Literal, pddl::NumericFluent>> {
 private:
     Context& context;
 
 public:
     InitialElementVisitor(Context& context_);
 
-    boost::variant<pddl::Literal> operator()(const problem::ast::InitialElementLiteral& node);
+    boost::variant<pddl::Literal, pddl::NumericFluent> operator()(const problem::ast::InitialElementLiteral& node);
 
-    boost::variant<pddl::Literal> operator()(const problem::ast::InitialElementTimedLiterals& node);
+    boost::variant<pddl::Literal, pddl::NumericFluent> operator()(const problem::ast::InitialElementTimedLiterals& node);
 
-    boost::variant<pddl::Literal> operator()(const problem::ast::InitialElementNumericFluents& node);
+    boost::variant<pddl::Literal, pddl::NumericFluent> operator()(const problem::ast::InitialElementNumericFluents& node);
 
-    boost::variant<pddl::Literal> operator()(const problem::ast::InitialElementObjectFluents& node);
+    boost::variant<pddl::Literal, pddl::NumericFluent> operator()(const problem::ast::InitialElementObjectFluents& node);
 };
 
 
-extern std::vector<boost::variant<pddl::Literal>> parse(
+extern std::vector<boost::variant<pddl::Literal, pddl::NumericFluent>> parse(
     const problem::ast::Initial& initial_node, Context& context);
 
 }

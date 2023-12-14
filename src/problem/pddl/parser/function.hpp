@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Dominik Drexler and Simon Stahlberg
+ * Copyright (C) 2023 Dominik Drexler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,27 +15,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_DECLARATIONS_HPP_
-#define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_DECLARATIONS_HPP_
+#ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_FUNCTION_HPP_
+#define LOKI_SRC_PROBLEM_PDDL_PARSER_FUNCTION_HPP_
 
-#include "../../domain/pddl/declarations.hpp"
-
-#include <memory>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <set>
-#include <vector>
+#include "../../../../include/loki/problem/ast/ast.hpp"
+#include "../../../../include/loki/problem/pddl/parser.hpp"
 
 
-namespace loki::pddl {
-    class ProblemImpl;
-    using Problem = std::shared_ptr<const ProblemImpl>;
-    using ProblemList = std::vector<Problem>;
 
-    class NumericFluentImpl;
-    using NumericFluent = std::shared_ptr<const NumericFluentImpl>;
-    using NumericFluentList = std::vector<NumericFluent>;
+namespace loki {
+
+extern pddl::Function parse(const problem::ast::BasicFunctionTerm& node, Context& context);
+
 }
 
 #endif

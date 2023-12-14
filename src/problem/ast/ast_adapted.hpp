@@ -34,7 +34,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::NegatedAtom, atomic_formula_of_nam
 
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementLiteral, literal)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementTimedLiterals, number, literal)
-BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementNumericFluents, function_head, number)
+BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementNumericFluents, basic_function_term, number)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementObjectFluents, basic_function_term, name)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionNumber, number)

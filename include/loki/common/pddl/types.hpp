@@ -37,6 +37,7 @@
 #include "../../domain/pddl/type.hpp"
 #include "../../domain/pddl/variable.hpp"
 #include "../../problem/pddl/problem.hpp"
+#include "../../problem/pddl/numeric_fluent.hpp"
 
 
 namespace loki {
@@ -69,6 +70,7 @@ using PddlFactory = ReferenceCountedObjectFactory<pddl::RequirementsImpl
     , pddl::EffectConditionalWhenImpl
     , pddl::ActionImpl
     , pddl::DerivedPredicateImpl
+    , pddl::NumericFluentImpl
     , pddl::DomainImpl
     , pddl::ProblemImpl>;
 

@@ -99,7 +99,7 @@ namespace loki {
 
     string parse_text(const problem::ast::InitialElementNumericFluents& node, const FormattingOptions& options) {
         stringstream ss;
-        ss << "(= " << parse_text(node.function_head, options) << " " << parse_text(node.number, options) << ")";
+        ss << "(= " << parse_text(node.basic_function_term, options) << " " << parse_text(node.number, options) << ")";
         return ss.str();
     }
 

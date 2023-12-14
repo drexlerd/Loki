@@ -125,8 +125,8 @@ namespace loki::problem::parser {
 
     const auto initial_element_literals_def = literal;
     const auto initial_element_timed_literals_def = (lit('(') >> lit("at") >> domain::number()) > literal > lit(')');
-    const auto initial_element_numeric_fluents_def = (lit('(') >> lit('=') >> domain::function_head()) > domain::number() > lit(')');
-    const auto initial_element_object_fluents_def = (lit('(') >> lit('=') >> basic_function_term) > domain::name() > lit(')');
+    const auto initial_element_numeric_fluents_def = (lit('(') >> lit('=') >> basic_function_term) >> domain::number() > lit(')');
+    const auto initial_element_object_fluents_def = (lit('(') >> lit('=') >> basic_function_term) >> domain::name() > lit(')');
     const auto initial_element_def = initial_element_timed_literals | initial_element_numeric_fluents
         | initial_element_object_fluents | initial_element_literals;
 

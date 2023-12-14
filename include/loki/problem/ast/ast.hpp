@@ -35,8 +35,6 @@ namespace loki::problem::ast
     ///////////////////////////////////////////////////////////////////////////
     namespace x3 = boost::spirit::x3;
 
-    struct BasicFunctionTermArityGreaterZero;
-    struct BasicFunctionTermArityZero;
     struct BasicFunctionTerm;
 
     struct AtomicFormulaOfNamesPredicate;
@@ -141,7 +139,7 @@ namespace loki::problem::ast
     };
 
     struct InitialElementNumericFluents : x3::position_tagged {
-        domain::ast::FunctionHead function_head;
+        BasicFunctionTerm basic_function_term;
         domain::ast::Number number;
     };
 

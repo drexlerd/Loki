@@ -15,12 +15,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_PROBLEM_HPP_
-#define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_PROBLEM_HPP_
+#ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_NUMERIC_FLUENT_HPP_
+#define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_NUMERIC_FLUENT_HPP_
 
 #include "declarations.hpp"
 
 #include "../../common/pddl/base.hpp"
+#include "../../domain/pddl/function.hpp"
 
 
 namespace loki {
@@ -30,34 +31,24 @@ class ReferenceCountedObjectFactory;
 
 
 namespace loki::pddl {
-class ProblemImpl : public Base<ProblemImpl> {
+class NumericFluentImpl : public Base<NumericFluentImpl> {
 private:
-    Domain m_domain;
-    std::string m_name;
-    Requirements m_requirements;
-    ObjectList m_objects;
-    LiteralList m_initial_literals;
-    NumericFluentList m_numeric_fluents;
-    Condition m_goal_condition;
+    Function m_function;
+    double m_number;
 
     template<typename... Ts>
     friend class loki::ReferenceCountedObjectFactory;
 
 public:
-    ProblemImpl(int identifier, const Domain& domain, const std::string& name, const Requirements& requirements, const ObjectList& objects, const LiteralList& initial_literals, const NumericFluentList& numeric_fluents, const Condition& goal_condition);
+    NumericFluentImpl(int identifier, const Function& function, double number);
 
     /// @brief Test for semantic equivalence
-    bool are_equal_impl(const ProblemImpl& other) const;
+    bool are_equal_impl(const NumericFluentImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
-    const Domain& get_domain() const;
-    const std::string& get_name() const;
-    const Requirements& get_requirements() const;
-    const ObjectList& get_objects() const;
-    const LiteralList& get_initial_literals() const;
-    const NumericFluentList& numeric_fluents() const;
-    const Condition& get_goal_condition() const;
+    const Function& get_function() const;
+    double get_number() const;
 };
 
 }
@@ -66,15 +57,15 @@ public:
 namespace std {
     // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
     template<>
-    struct less<loki::pddl::Problem>
+    struct less<loki::pddl::NumericFluent>
     {
-        bool operator()(const loki::pddl::Problem& left_problem, const loki::pddl::Problem& right_problem) const;
+        bool operator()(const loki::pddl::NumericFluent& left_numeric_fluent, const loki::pddl::NumericFluent& right_numeric_fluent) const;
     };
 
     template<>
-    struct hash<loki::pddl::ProblemImpl>
+    struct hash<loki::pddl::NumericFluentImpl>
     {
-        std::size_t operator()(const loki::pddl::ProblemImpl& problem) const;
+        std::size_t operator()(const loki::pddl::NumericFluentImpl& numeric_fluent) const;
     };
 }
 

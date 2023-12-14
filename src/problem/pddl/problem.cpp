@@ -16,6 +16,7 @@
  */
 
 #include "../../../include/loki/problem/pddl/problem.hpp"
+#include "../../../include/loki/problem/pddl/numeric_fluent.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 #include "../../../include/loki/domain/pddl/conditions.hpp"
@@ -28,13 +29,14 @@ using namespace std;
 
 
 namespace loki::pddl {
-ProblemImpl::ProblemImpl(int identifier, const Domain& domain, const std::string& name, const Requirements& requirements, const ObjectList& objects, const LiteralList& initial_literals, const Condition& goal_condition)
+ProblemImpl::ProblemImpl(int identifier, const Domain& domain, const std::string& name, const Requirements& requirements, const ObjectList& objects, const LiteralList& initial_literals, const NumericFluentList& numeric_fluents, const Condition& goal_condition)
     : Base(identifier)
     , m_domain(domain)
     , m_name(name)
     , m_requirements(requirements)
     , m_objects(objects)
     , m_initial_literals(initial_literals)
+    , m_numeric_fluents(numeric_fluents)
     , m_goal_condition(goal_condition)
 {
 }
@@ -78,6 +80,11 @@ void ProblemImpl::str_impl(std::ostringstream& out, const FormattingOptions& opt
         if (i != 0) out << " ";
         out << *m_initial_literals[i];
     }
+    out << " ";
+    for (size_t i = 0; i < m_numeric_fluents.size(); ++i) {
+        if (i != 0) out << " ";
+        out << *m_numeric_fluents[i];
+    }
     out << ")\n";
     out << string(nested_options.indent, ' ') << "(:goal " << *m_goal_condition << ")\n";
 
@@ -112,6 +119,10 @@ const ObjectList& ProblemImpl::get_objects() const {
 
 const LiteralList& ProblemImpl::get_initial_literals() const {
     return m_initial_literals;
+}
+
+const NumericFluentList& ProblemImpl::numeric_fluents() const {
+    return m_numeric_fluents;
 }
 
 const Condition& ProblemImpl::get_goal_condition() const {
