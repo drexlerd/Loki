@@ -36,7 +36,7 @@ size_t TypeImpl::hash_impl() const {
     return hash_combine(m_name, hash_vector(get_sorted_vector(m_bases)));
 }
 
-void TypeImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void TypeImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << m_name;
 }
 

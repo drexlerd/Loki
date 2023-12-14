@@ -35,7 +35,7 @@ size_t VariableImpl::hash_impl() const {
     return hash_combine(m_name);
 }
 
-void VariableImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void VariableImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << m_name;
 }
 

@@ -49,7 +49,7 @@ size_t TermObjectImpl::hash_impl() const {
     return hash_combine(m_object);
 }
 
-void TermObjectImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void TermObjectImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << *m_object;
 }
 
@@ -78,7 +78,7 @@ size_t TermVariableImpl::hash_impl() const {
     return hash_combine(m_variable);
 }
 
-void TermVariableImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void TermVariableImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << *m_variable;
 }
 

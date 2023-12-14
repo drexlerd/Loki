@@ -38,7 +38,7 @@ size_t FunctionImpl::hash_impl() const {
     return hash_combine(m_function_skeleton, hash_vector(m_terms));
 }
 
-void FunctionImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void FunctionImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     if (m_terms.empty()) {
         out << m_function_skeleton->get_name();
     } else {

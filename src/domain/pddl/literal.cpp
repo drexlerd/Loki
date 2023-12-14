@@ -38,7 +38,7 @@ size_t LiteralImpl::hash_impl() const {
     return hash_combine(m_is_negated, m_atom);
 }
 
-void LiteralImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void LiteralImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     if (m_is_negated) {
         out << "(not " << *m_atom << ")";
     } else {

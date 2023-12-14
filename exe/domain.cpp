@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
         std::cout << "Usage: interpreter <domain:str>" << std::endl;
         return 1;
     }
-    std::string domain_file = argv[1];
+    const auto domain_file = std::string{argv[1]};
 
     // 1. Parse the domain
     const auto domain_parser = loki::DomainParser(domain_file);

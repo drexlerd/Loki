@@ -63,7 +63,7 @@ size_t FunctionExpressionNumberImpl::hash_impl() const {
     return std::hash<double>()(m_number);
 }
 
-void FunctionExpressionNumberImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void FunctionExpressionNumberImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << m_number;
 }
 
@@ -101,7 +101,7 @@ size_t FunctionExpressionBinaryOperatorImpl::hash_impl() const {
     return hash_combine(m_binary_operator, m_left_function_expression, m_right_function_expression);
 }
 
-void FunctionExpressionBinaryOperatorImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void FunctionExpressionBinaryOperatorImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << "(" << to_string(m_binary_operator) << " " << *m_left_function_expression << " " << *m_right_function_expression << ")";
 }
 
@@ -139,7 +139,7 @@ size_t FunctionExpressionMinusImpl::hash_impl() const {
     return hash_combine(m_function_expression);
 }
 
-void FunctionExpressionMinusImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void FunctionExpressionMinusImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << "(- " << m_function_expression << ")";
 }
 
@@ -169,7 +169,7 @@ size_t FunctionExpressionFunctionImpl::hash_impl() const {
     return hash_combine(m_function);
 }
 
-void FunctionExpressionFunctionImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void FunctionExpressionFunctionImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << *m_function;
 }
 

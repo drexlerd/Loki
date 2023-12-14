@@ -37,7 +37,7 @@ size_t DerivedPredicateImpl::hash_impl() const {
     return hash_combine(hash_vector(get_sorted_vector(m_parameters)), m_condition);
 }
 
-void DerivedPredicateImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void DerivedPredicateImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << "TODO";
 }
 

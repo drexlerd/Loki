@@ -48,7 +48,7 @@ size_t ConditionLiteralImpl::hash_impl() const {
     return std::hash<Literal>()(m_literal);
 }
 
-void ConditionLiteralImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void ConditionLiteralImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << *m_literal;
 }
 
@@ -78,7 +78,7 @@ size_t ConditionAndImpl::hash_impl() const {
     return hash_vector(get_sorted_vector(m_conditions));
 }
 
-void ConditionAndImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void ConditionAndImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << "(and ";
     for (size_t i = 0; i < m_conditions.size(); ++i) {
         if (i != 0) out << " ";
@@ -113,7 +113,7 @@ size_t ConditionOrImpl::hash_impl() const {
     return hash_vector(get_sorted_vector(m_conditions));
 }
 
-void ConditionOrImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void ConditionOrImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << "(or ";
     for (size_t i = 0; i < m_conditions.size(); ++i) {
         if (i != 0) out << " ";
@@ -148,7 +148,7 @@ size_t ConditionNotImpl::hash_impl() const {
     return hash_combine(m_condition);
 }
 
-void ConditionNotImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void ConditionNotImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << "(not " << *m_condition << ")";
 }
 

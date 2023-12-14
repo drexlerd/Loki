@@ -68,7 +68,7 @@ size_t EffectLiteralImpl::hash_impl() const {
     return std::hash<Literal>()(m_literal);
 }
 
-void EffectLiteralImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void EffectLiteralImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << *m_literal;
 }
 
@@ -96,7 +96,7 @@ size_t EffectAndImpl::hash_impl() const {
     return hash_vector(get_sorted_vector(m_effects));
 }
 
-void EffectAndImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void EffectAndImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << "(and ";
     for (size_t i = 0; i < m_effects.size(); ++i) {
         if (i != 0) out << " ";
@@ -135,7 +135,7 @@ size_t EffectNumericImpl::hash_impl() const {
     return hash_combine(m_assign_operator, m_function, m_function_expression);
 }
 
-void EffectNumericImpl::str_impl(std::ostringstream& out, const FormattingOptions&) const {
+void EffectNumericImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << "(" << to_string(m_assign_operator) << " " << *m_function << " " << *m_function_expression << ")";
 }
 
@@ -173,7 +173,7 @@ size_t EffectConditionalForallImpl::hash_impl() const {
     return hash_combine(hash_vector(m_parameters), m_effect);
 }
 
-void EffectConditionalForallImpl::str_impl(std::ostringstream& out, const FormattingOptions&) const {
+void EffectConditionalForallImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << "(forall (";
     for (size_t i = 0; i < m_parameters.size(); ++i) {
         if (i != 0) out << " ";
@@ -211,7 +211,7 @@ size_t EffectConditionalWhenImpl::hash_impl() const {
     return hash_combine(m_condition, m_effect);
 }
 
-void EffectConditionalWhenImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void EffectConditionalWhenImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << "(when " << *m_condition << " " << *m_effect << ")";
 }
 

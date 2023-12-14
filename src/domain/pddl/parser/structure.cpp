@@ -29,10 +29,6 @@
 
 namespace loki {
 
-std::string parse(const domain::ast::ActionSymbol& node, Context& context) {
-    return parse(node.name);
-}
-
 std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(const domain::ast::ActionBody& node, Context& context) {
     std::optional<pddl::Condition> condition;
     if (node.precondition_goal_descriptor.has_value()) {
@@ -47,7 +43,7 @@ std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(co
 
 pddl::Action parse(const domain::ast::Action& node, Context& context) {
     context.scopes.open_scope();
-    auto name = parse(node.action_symbol, context);
+    auto name = parse(node.action_symbol.name);
     auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
     auto [condition, effect] = parse(node.action_body, context);
     context.scopes.close_scope();

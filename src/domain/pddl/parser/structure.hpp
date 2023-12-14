@@ -27,8 +27,6 @@
 
 namespace loki {
 
-extern std::string parse(const domain::ast::ActionSymbol& node, Context& context);
-
 extern std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(const domain::ast::ActionBody& node, Context& context);
 
 extern pddl::Action parse(const domain::ast::Action& node, Context& context);

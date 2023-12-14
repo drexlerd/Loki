@@ -34,7 +34,7 @@ size_t NumericFluentImpl::hash_impl() const {
     return hash_combine(m_function, m_number);
 }
 
-void NumericFluentImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void NumericFluentImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << "(= " << *m_function << " " << m_number << ")";
 }
 

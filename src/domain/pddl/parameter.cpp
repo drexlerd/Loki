@@ -45,7 +45,7 @@ void ParameterImpl::str_impl(std::ostringstream& out, const FormattingOptions& o
     str(out, options, true);
 }
 
-void ParameterImpl::str(std::ostringstream& out, const FormattingOptions& options, bool typing_enabled) const {
+void ParameterImpl::str(std::ostringstream& out, const FormattingOptions& /*options*/, bool typing_enabled) const {
     out << *m_variable;
     if (typing_enabled) {
         assert(!m_types.empty());

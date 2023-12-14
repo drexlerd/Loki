@@ -41,12 +41,8 @@ using namespace std;
 
 namespace loki {
 
-static std::string parse(const domain::ast::DomainName& domain_name_node, Context& context) {
-    return parse(domain_name_node.name);
-}
-
 pddl::Domain parse(const ast::Domain& domain_node, Context& context) {
-    const auto domain_name = parse(domain_node.domain_name, context);
+    const auto domain_name = parse(domain_node.domain_name.name);
     /* Requirements section */
     if (domain_node.requirements.has_value()) {
         context.requirements = context.cache.get_or_create<pddl::RequirementsImpl>(

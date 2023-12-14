@@ -41,7 +41,7 @@ size_t AtomImpl::hash_impl() const {
 }
 
 
-void AtomImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void AtomImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << "(" << m_predicate->get_name();
     for (size_t i = 0; i < m_terms.size(); ++i) {
         out << " ";
