@@ -54,7 +54,7 @@ void TermObjectImpl::str_impl(std::ostringstream& out, const FormattingOptions& 
 }
 
 void TermObjectImpl::accept(TermVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 const Object& TermObjectImpl::get_object() const {
@@ -83,7 +83,7 @@ void TermVariableImpl::str_impl(std::ostringstream& out, const FormattingOptions
 }
 
 void TermVariableImpl::accept(TermVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 const Variable& TermVariableImpl::get_variable() const {

@@ -29,7 +29,6 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
 
     Context context{
         domain_parser.m_factory,
-        domain_parser.m_persistent_factory,
         scopes,
         nullptr
     };

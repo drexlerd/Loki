@@ -53,7 +53,7 @@ void ConditionLiteralImpl::str_impl(std::ostringstream& out, const FormattingOpt
 }
 
 void ConditionLiteralImpl::accept(ConditionVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 const Literal& ConditionLiteralImpl::get_literal() const {
@@ -88,7 +88,7 @@ void ConditionAndImpl::str_impl(std::ostringstream& out, const FormattingOptions
 }
 
 void ConditionAndImpl::accept(ConditionVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 const ConditionList& ConditionAndImpl::get_conditions() const {
@@ -123,7 +123,7 @@ void ConditionOrImpl::str_impl(std::ostringstream& out, const FormattingOptions&
 }
 
 void ConditionOrImpl::accept(ConditionVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 const ConditionList& ConditionOrImpl::get_conditions() const {
@@ -153,7 +153,7 @@ void ConditionNotImpl::str_impl(std::ostringstream& out, const FormattingOptions
 }
 
 void ConditionNotImpl::accept(ConditionVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 const Condition& ConditionNotImpl::get_condition() const {

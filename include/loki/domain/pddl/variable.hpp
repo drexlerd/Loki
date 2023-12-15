@@ -25,7 +25,7 @@
 
 namespace loki {
 template<typename... Ts>
-class ReferenceCountedObjectFactory;
+class PersistentFactory;
 }
 
 
@@ -37,7 +37,7 @@ private:
     VariableImpl(int identifier, const std::string& name);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     /// @brief Test for semantic equivalence

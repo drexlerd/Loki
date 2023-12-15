@@ -25,7 +25,7 @@
 
 namespace loki {
 template<typename... Ts>
-class ReferenceCountedObjectFactory;
+class PersistentFactory;
 }
 
 
@@ -34,8 +34,8 @@ class TermVisitor {
 public:
     virtual ~TermVisitor() = default;
 
-    virtual void visit(const std::shared_ptr<const TermObjectImpl>& term) = 0;
-    virtual void visit(const std::shared_ptr<const TermVariableImpl>& term) = 0;
+    virtual void visit(const TermObject& term) = 0;
+    virtual void visit(const TermVariable& term) = 0;
 };
 
 
@@ -62,12 +62,12 @@ public:
 };
 
 
-class TermObjectImpl : public TermImpl, public std::enable_shared_from_this<TermObjectImpl> {
+class TermObjectImpl : public TermImpl {
 private:
     Object m_object;
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     TermObjectImpl(int identifier, const Object& object);
@@ -82,12 +82,12 @@ public:
 };
 
 
-class TermVariableImpl : public TermImpl, public std::enable_shared_from_this<TermVariableImpl> {
+class TermVariableImpl : public TermImpl {
 private:
     Variable m_variable;
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     TermVariableImpl(int identifier, const Variable& variable);

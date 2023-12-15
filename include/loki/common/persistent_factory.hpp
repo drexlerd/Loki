@@ -65,14 +65,14 @@ public:
     /// @param ...args
     /// @return
     template<typename T, typename... Args>
-    [[nodiscard]] T const * get_or_create(Args&&... args) {
+    [[nodiscard]] T const* get_or_create(Args&&... args) {
         /* we must declare sp before locking the mutex
            s.t. the deleter is called after the mutex was released in case of stack unwinding. */
         std::lock_guard<std::mutex> hold(m_mutex);
         auto& t_cache = std::get<PerTypeCache<T>>(m_data);
         int identifier = m_count;
         /* Must explicitly call the constructor of T to give exclusive access to the factory. */
-        const auto [it, inserted] = t_cache.insert(std::make_unique<T>(T(identifier, args...)));
+        const auto [it, inserted] = t_cache.data.insert(std::make_unique<T>(T(identifier, args...)));
         if (inserted) {
             ++m_count;
         }

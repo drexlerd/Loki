@@ -26,28 +26,6 @@
 
 
 namespace loki {
-
-template<typename Derived>
-class ObserverPtr {
-private:
-    int m_identifier;
-    Derived const *m_object;
-
-public:
-    ObserverPtr(int identifier, Derived const *object)
-        : m_identifier(identifier), m_object(object) { }
-
-    // TODO: add other useful functions from Base
-
-    int get_identifier() const {
-        return m_identifier;
-    }
-
-    Derived const* get_object() const {
-        return m_object;
-    }
-};
-
 /// @brief Implements a common base class for PDDL objects.
 ///
 ///        Each PDDL object has an identifier.
@@ -120,11 +98,6 @@ public:
     /// @brief Returns the identifier
     int get_identifier() const {
         return m_identifier;
-    }
-
-    /// @brief Returns a non-owning ptr.
-    ObserverPtr<Derived> get_observer_ptr() const {
-        return ObserverPtr<Derived>(m_identifier, static_cast<Derived const*>(this));
     }
 };
 

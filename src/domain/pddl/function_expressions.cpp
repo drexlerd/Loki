@@ -68,7 +68,7 @@ void FunctionExpressionNumberImpl::str_impl(std::ostringstream& out, const Forma
 }
 
 void FunctionExpressionNumberImpl::accept(FunctionExpressionVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 double FunctionExpressionNumberImpl::get_number() const {
@@ -106,7 +106,7 @@ void FunctionExpressionBinaryOperatorImpl::str_impl(std::ostringstream& out, con
 }
 
 void FunctionExpressionBinaryOperatorImpl::accept(FunctionExpressionVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 ArithmeticOperatorEnum FunctionExpressionBinaryOperatorImpl::get_binary_operator() const {
@@ -144,7 +144,7 @@ void FunctionExpressionMinusImpl::str_impl(std::ostringstream& out, const Format
 }
 
 void FunctionExpressionMinusImpl::accept(FunctionExpressionVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 const FunctionExpression& FunctionExpressionMinusImpl::get_function_expression() const {
@@ -174,7 +174,7 @@ void FunctionExpressionFunctionImpl::str_impl(std::ostringstream& out, const For
 }
 
 void FunctionExpressionFunctionImpl::accept(FunctionExpressionVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 const Function& FunctionExpressionFunctionImpl::get_function() const {

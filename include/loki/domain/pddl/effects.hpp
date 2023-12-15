@@ -27,7 +27,7 @@
 
 namespace loki {
 template<typename... Ts>
-class ReferenceCountedObjectFactory;
+class PersistentFactory;
 }
 
 
@@ -85,14 +85,14 @@ public:
 
 
 /* Literal */
-class EffectLiteralImpl : public EffectImpl, public std::enable_shared_from_this<EffectLiteralImpl> {
+class EffectLiteralImpl : public EffectImpl {
 private:
     Literal m_literal;
 
     EffectLiteralImpl(int identifier, const Literal& literal);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const EffectImpl& other) const override;
@@ -106,14 +106,14 @@ public:
 
 
 /* And */
-class EffectAndImpl : public EffectImpl, public std::enable_shared_from_this<EffectAndImpl> {
+class EffectAndImpl : public EffectImpl {
 private:
     EffectList m_effects;
 
     EffectAndImpl(int identifier, const EffectList& effects);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const EffectImpl& other) const override;
@@ -127,7 +127,7 @@ public:
 
 
 /* EffectNumeric */
-class EffectNumericImpl : public EffectImpl, public std::enable_shared_from_this<EffectNumericImpl> {
+class EffectNumericImpl : public EffectImpl {
 private:
     AssignOperatorEnum m_assign_operator;
     Function m_function;
@@ -136,7 +136,7 @@ private:
     EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, const Function& function, const FunctionExpression& function_expression);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const EffectImpl& other) const override;
@@ -152,7 +152,7 @@ public:
 
 
 /* ConditionalForall */
-class EffectConditionalForallImpl : public EffectImpl, public std::enable_shared_from_this<EffectConditionalForallImpl> {
+class EffectConditionalForallImpl : public EffectImpl {
 private:
     ParameterList m_parameters;
     Effect m_effect;
@@ -160,7 +160,7 @@ private:
     EffectConditionalForallImpl(int identifier, const ParameterList& parameters, const Effect& effect);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const EffectImpl& other) const override;
@@ -175,7 +175,7 @@ public:
 
 
 /* ConditionalWhen */
-class EffectConditionalWhenImpl : public EffectImpl, public std::enable_shared_from_this<EffectConditionalWhenImpl> {
+class EffectConditionalWhenImpl : public EffectImpl {
 private:
     Condition m_condition;
     Effect m_effect;
@@ -183,7 +183,7 @@ private:
     EffectConditionalWhenImpl(int identifier, const Condition& condition, const Effect& effect);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const EffectImpl& other) const override;

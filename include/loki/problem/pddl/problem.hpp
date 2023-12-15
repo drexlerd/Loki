@@ -25,7 +25,7 @@
 
 namespace loki {
 template<typename... Ts>
-class ReferenceCountedObjectFactory;
+class PersistentFactory;
 }
 
 
@@ -41,7 +41,7 @@ private:
     Condition m_goal_condition;
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     ProblemImpl(int identifier, const Domain& domain, const std::string& name, const Requirements& requirements, const ObjectList& objects, const LiteralList& initial_literals, const NumericFluentList& numeric_fluents, const Condition& goal_condition);

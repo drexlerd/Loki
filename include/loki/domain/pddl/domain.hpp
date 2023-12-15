@@ -28,7 +28,7 @@
 
 namespace loki {
 template<typename... Ts>
-class ReferenceCountedObjectFactory;
+class PersistentFactory;
 }
 
 namespace loki::pddl {
@@ -53,7 +53,7 @@ private:
         const ActionList& actions);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     /// @brief Test for structural equivalence

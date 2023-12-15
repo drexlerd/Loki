@@ -25,7 +25,7 @@
 
 namespace loki {
 template<typename... Ts>
-class ReferenceCountedObjectFactory;
+class PersistentFactory;
 }
 
 
@@ -38,7 +38,7 @@ private:
     LiteralImpl(int identifier, bool is_negated, const Atom& atom);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     /// @brief Test for semantic equivalence

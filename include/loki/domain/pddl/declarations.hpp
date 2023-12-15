@@ -28,116 +28,116 @@
 
 namespace loki::pddl {
     class RequirementsImpl;
-    using Requirements = std::shared_ptr<const RequirementsImpl>;
+    using Requirements = RequirementsImpl const *;
 
     class TypeImpl;
-    using Type = std::shared_ptr<const TypeImpl>;
+    using Type = TypeImpl const *;
     using TypeList = std::vector<Type>;
     using TypeSet = std::set<Type>;
 
     class ObjectImpl;
-    using Object = std::shared_ptr<const ObjectImpl>;
+    using Object = ObjectImpl const *;
     using ObjectList = std::vector<Object>;
     using ObjectSet = std::set<Object>;
 
     class VariableImpl;
-    using Variable = std::shared_ptr<const VariableImpl>;
+    using Variable = VariableImpl const *;
     using VariableList = std::vector<Variable>;
     using VariableAssignment = std::unordered_map<Variable, Object>;
 
     class TermImpl;
-    using Term = std::shared_ptr<const TermImpl>;
+    using Term = TermImpl const *;
     using TermList = std::vector<Term>;
     class TermObjectImpl;
-    using TermObject = std::shared_ptr<const TermObjectImpl>;
+    using TermObject = TermObjectImpl const *;
     class TermVariableImpl;
-    using TermVariable = std::shared_ptr<const TermVariableImpl>;
+    using TermVariable = TermVariableImpl const *;
 
     class AtomImpl;
-    using Atom = std::shared_ptr<const AtomImpl>;
+    using Atom = AtomImpl const *;
     using AtomList = std::vector<Atom>;
 
     class ParameterImpl;
-    using Parameter = std::shared_ptr<const ParameterImpl>;
+    using Parameter = ParameterImpl const *;
     using ParameterList = std::vector<Parameter>;
     using ParameterAssignment = std::unordered_map<Parameter, Object>;
 
     class PredicateImpl;
-    using Predicate = std::shared_ptr<const PredicateImpl>;
+    using Predicate = PredicateImpl const *;
     using PredicateList = std::vector<Predicate>;
     using PredicateSet = std::set<Predicate>;
 
     class LiteralImpl;
-    using Literal = std::shared_ptr<const LiteralImpl>;
+    using Literal = LiteralImpl const *;
     using LiteralList = std::vector<Literal>;
     using LiteralSet = std::set<Literal>;
 
     class ConditionImpl;
-    using Condition = std::shared_ptr<const ConditionImpl>;
+    using Condition = ConditionImpl const *;
     using ConditionList = std::vector<Condition>;
     using ConditionSet = std::set<Condition>;
     class ConditionLiteralImpl;
-    using ConditionLiteral = std::shared_ptr<const ConditionLiteralImpl>;
+    using ConditionLiteral = ConditionLiteralImpl const *;
     class ConditionAndImpl;
-    using ConditionAnd = std::shared_ptr<const ConditionAndImpl>;
+    using ConditionAnd = ConditionAndImpl const *;
     class ConditionOrImpl;
-    using ConditionOr = std::shared_ptr<const ConditionOrImpl>;
+    using ConditionOr = ConditionOrImpl const *;
     class ConditionNotImpl;
-    using ConditionNot = std::shared_ptr<const ConditionNotImpl>;
+    using ConditionNot = ConditionNotImpl const *;
 
     class EffectImpl;
-    using Effect = std::shared_ptr<const EffectImpl>;
+    using Effect = EffectImpl const *;
     using EffectList = std::vector<Effect>;
     using EffectSet = std::set<Effect>;
     class EffectLiteralImpl;
-    using EffectLiteral = std::shared_ptr<const EffectLiteralImpl>;
+    using EffectLiteral = EffectLiteralImpl const *;
     class EffectAndImpl;
-    using EffectAnd = std::shared_ptr<const EffectAndImpl>;
+    using EffectAnd = EffectAndImpl const *;
     class EffectNumericImpl;
-    using EffectNumeric = std::shared_ptr<const EffectNumericImpl>;
+    using EffectNumeric = EffectNumericImpl const *;
     class EffectConditionalForallImpl;
-    using EffectConditionalForall = std::shared_ptr<const EffectConditionalForallImpl>;
+    using EffectConditionalForall = EffectConditionalForallImpl const *;
     class EffectConditionalWhenImpl;
-    using EffectConditionalWhen = std::shared_ptr<const EffectConditionalWhenImpl>;
+    using EffectConditionalWhen = EffectConditionalWhenImpl const *;
 
     class FunctionExpressionImpl;
-    using FunctionExpression = std::shared_ptr<const FunctionExpressionImpl>;
+    using FunctionExpression = FunctionExpressionImpl const *;
     class FunctionExpressionNumberImpl;
-    using FunctionExpressionNumber = std::shared_ptr<const FunctionExpressionNumberImpl>;
+    using FunctionExpressionNumber = FunctionExpressionNumberImpl const *;
     class FunctionExpressionBinaryOperatorImpl;
-    using FunctionExpressionBinaryOperator = std::shared_ptr<const FunctionExpressionBinaryOperatorImpl>;
+    using FunctionExpressionBinaryOperator = FunctionExpressionBinaryOperatorImpl const *;
     class FunctionExpressionMinusImpl;
-    using FunctionExpressionMinus = std::shared_ptr<const FunctionExpressionMinusImpl>;
+    using FunctionExpressionMinus = FunctionExpressionMinusImpl const *;
     class FunctionExpressionFunctionImpl;
-    using FunctionExpressionFunction = std::shared_ptr<const FunctionExpressionFunctionImpl>;
+    using FunctionExpressionFunction = FunctionExpressionFunctionImpl const *;
 
     class FunctionSkeletonImpl;
-    using FunctionSkeleton = std::shared_ptr<const FunctionSkeletonImpl>;
+    using FunctionSkeleton = FunctionSkeletonImpl const *;
     using FunctionSkeletonList = std::vector<FunctionSkeleton>;
     using FunctionSkeletonSet = std::set<FunctionSkeleton>;
 
     class FunctionImpl;
-    using Function = std::shared_ptr<const FunctionImpl>;
+    using Function = FunctionImpl const *;
     using FunctionList = std::vector<Function>;
     using FunctionSet = std::set<Function>;
 
     class ConstraintImpl;
-    using Constraint = std::shared_ptr<const ConstraintImpl>;
+    using Constraint = ConstraintImpl const *;
     using ConstraintList = std::vector<Constraint>;
     using ConstraintSet = std::set<Constraint>;
 
     class ActionImpl;
-    using Action = std::shared_ptr<const ActionImpl>;
+    using Action = ActionImpl const *;
     using ActionList = std::vector<Action>;
     using ActionSet = std::set<Action>;
 
     class DerivedPredicateImpl;
-    using DerivedPredicate = std::shared_ptr<const DerivedPredicateImpl>;
+    using DerivedPredicate = DerivedPredicateImpl const *;
     using DerivedPredicateList = std::vector<DerivedPredicate>;
     using DerivedPredicateSet = std::set<DerivedPredicate>;
 
     class DomainImpl;
-    using Domain = std::shared_ptr<const DomainImpl>;
+    using Domain = DomainImpl const *;
     using DomainList = std::vector<Domain>;
     using DomainSet = std::set<Domain>;
 }

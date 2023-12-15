@@ -29,7 +29,6 @@ DomainParser::DomainParser(const fs::path& file_path) {
 
     Context context{
         m_factory,
-        m_persistent_factory,
         *m_scopes,
         nullptr
     };

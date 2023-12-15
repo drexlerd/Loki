@@ -39,7 +39,7 @@ namespace loki {
 class Scope;
 
 template<typename T>
-using BindingPtrType = std::shared_ptr<const T>;
+using BindingPtrType = T const*;
 
 using PositionType = boost::spirit::x3::position_tagged;
 

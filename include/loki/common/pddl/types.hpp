@@ -45,40 +45,7 @@
 namespace loki {
 
 /// @brief Factory for the unique creation of garbage collected objects
-using PddlFactory = ReferenceCountedObjectFactory<pddl::RequirementsImpl
-    , pddl::TypeImpl
-    , pddl::VariableImpl
-    , pddl::TermObjectImpl
-    , pddl::TermVariableImpl
-    , pddl::ObjectImpl
-    , pddl::AtomImpl
-    , pddl::LiteralImpl
-    , pddl::ParameterImpl
-    , pddl::PredicateImpl
-    , pddl::FunctionExpressionNumberImpl
-    , pddl::FunctionExpressionBinaryOperatorImpl
-    , pddl::FunctionExpressionMinusImpl
-    , pddl::FunctionExpressionFunctionImpl
-    , pddl::FunctionImpl
-    , pddl::FunctionSkeletonImpl
-    , pddl::ConditionLiteralImpl
-    , pddl::ConditionAndImpl
-    , pddl::ConditionOrImpl
-    , pddl::ConditionNotImpl
-    , pddl::EffectLiteralImpl
-    , pddl::EffectAndImpl
-    , pddl::EffectNumericImpl
-    , pddl::EffectConditionalForallImpl
-    , pddl::EffectConditionalWhenImpl
-    , pddl::ActionImpl
-    , pddl::DerivedPredicateImpl
-    , pddl::NumericFluentImpl
-    , pddl::DomainImpl
-    , pddl::ProblemImpl>;
-
-
-/// @brief Factory the unique creation of persistent objects
-using PersistentPddlFactory = PersistentFactory<pddl::RequirementsImpl
+using PddlFactory = PersistentFactory<pddl::RequirementsImpl
     , pddl::TypeImpl
     , pddl::VariableImpl
     , pddl::TermObjectImpl

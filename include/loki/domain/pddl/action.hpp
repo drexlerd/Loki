@@ -31,7 +31,7 @@
 
 namespace loki {
 template<typename... Ts>
-class ReferenceCountedObjectFactory;
+class PersistentFactory;
 }
 
 
@@ -46,7 +46,7 @@ private:
     ActionImpl(int identifier, const std::string& name, const ParameterList& parameters, const std::optional<Condition>& condition, const std::optional<Effect>& effect);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     /// @brief Test for structural equivalence

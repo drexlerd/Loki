@@ -30,11 +30,11 @@
 
 namespace loki::pddl {
     class ProblemImpl;
-    using Problem = std::shared_ptr<const ProblemImpl>;
+    using Problem = ProblemImpl const *;
     using ProblemList = std::vector<Problem>;
 
     class NumericFluentImpl;
-    using NumericFluent = std::shared_ptr<const NumericFluentImpl>;
+    using NumericFluent = NumericFluentImpl const *;
     using NumericFluentList = std::vector<NumericFluent>;
 }
 

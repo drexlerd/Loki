@@ -28,7 +28,7 @@
 
 namespace loki {
 template<typename... Ts>
-class ReferenceCountedObjectFactory;
+class PersistentFactory;
 }
 
 
@@ -72,14 +72,14 @@ public:
 
 
 /* Literal */
-class ConditionLiteralImpl : public ConditionImpl, public std::enable_shared_from_this<ConditionLiteralImpl> {
+class ConditionLiteralImpl : public ConditionImpl {
 private:
     Literal m_literal;
 
     ConditionLiteralImpl(int identifier, const Literal& literal);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const ConditionImpl& other) const override;
@@ -93,14 +93,14 @@ public:
 
 
 /* And */
-class ConditionAndImpl : public ConditionImpl, public std::enable_shared_from_this<ConditionAndImpl> {
+class ConditionAndImpl : public ConditionImpl {
 private:
     ConditionList m_conditions;
 
     ConditionAndImpl(int identifier, const ConditionList& conditions);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const ConditionImpl& other) const override;
@@ -114,14 +114,14 @@ public:
 
 
 /* Or */
-class ConditionOrImpl : public ConditionImpl, public std::enable_shared_from_this<ConditionOrImpl> {
+class ConditionOrImpl : public ConditionImpl {
 private:
     ConditionList m_conditions;
 
     ConditionOrImpl(int identifier, const ConditionList& conditions);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const ConditionImpl& other) const override;
@@ -135,14 +135,14 @@ public:
 
 
 /* Not */
-class ConditionNotImpl : public ConditionImpl, public std::enable_shared_from_this<ConditionNotImpl> {
+class ConditionNotImpl : public ConditionImpl {
 private:
     Condition m_condition;
 
     ConditionNotImpl(int identifier, const Condition& condition);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const ConditionImpl& other) const override;

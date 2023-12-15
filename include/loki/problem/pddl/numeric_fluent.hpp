@@ -26,7 +26,7 @@
 
 namespace loki {
 template<typename... Ts>
-class ReferenceCountedObjectFactory;
+class PersistentFactory;
 }
 
 
@@ -37,7 +37,7 @@ private:
     double m_number;
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     NumericFluentImpl(int identifier, const Function& function, double number);

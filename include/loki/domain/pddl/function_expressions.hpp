@@ -27,7 +27,7 @@
 
 namespace loki {
 template<typename... Ts>
-class ReferenceCountedObjectFactory;
+class PersistentFactory;
 }
 
 namespace loki::pddl {
@@ -77,14 +77,14 @@ public:
 
 
 /* FunctionExpressionNumber */
-class FunctionExpressionNumberImpl : public FunctionExpressionImpl, public std::enable_shared_from_this<FunctionExpressionNumberImpl> {
+class FunctionExpressionNumberImpl : public FunctionExpressionImpl {
 private:
     double m_number;
 
     FunctionExpressionNumberImpl(int identifier, double number);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const FunctionExpressionImpl& other) const override;
@@ -98,7 +98,7 @@ public:
 
 
 /* FunctionExpressionBinaryOperator */
-class FunctionExpressionBinaryOperatorImpl : public FunctionExpressionImpl, public std::enable_shared_from_this<FunctionExpressionBinaryOperatorImpl> {
+class FunctionExpressionBinaryOperatorImpl : public FunctionExpressionImpl {
 private:
     ArithmeticOperatorEnum m_binary_operator;
     FunctionExpression m_left_function_expression;
@@ -110,7 +110,7 @@ private:
         const FunctionExpression& right_function_expression);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const FunctionExpressionImpl& other) const override;
@@ -126,14 +126,14 @@ public:
 
 
 /* FunctionExpressionMinus */
-class FunctionExpressionMinusImpl : public FunctionExpressionImpl, public std::enable_shared_from_this<FunctionExpressionMinusImpl> {
+class FunctionExpressionMinusImpl : public FunctionExpressionImpl {
 private:
     FunctionExpression m_function_expression;
 
     FunctionExpressionMinusImpl(int identifier, const FunctionExpression& function_expression);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const FunctionExpressionImpl& other) const override;
@@ -147,14 +147,14 @@ public:
 
 
 /* FunctionExpressionFunction */
-class FunctionExpressionFunctionImpl : public FunctionExpressionImpl, public std::enable_shared_from_this<FunctionExpressionFunctionImpl> {
+class FunctionExpressionFunctionImpl : public FunctionExpressionImpl {
 private:
     Function m_function;
 
     FunctionExpressionFunctionImpl(int identifier, const Function& function);
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const FunctionExpressionImpl& other) const override;

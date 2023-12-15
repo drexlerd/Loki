@@ -73,7 +73,7 @@ void EffectLiteralImpl::str_impl(std::ostringstream& out, const FormattingOption
 }
 
 void EffectLiteralImpl::accept(EffectVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 const Literal& EffectLiteralImpl::get_literal() const {
@@ -106,7 +106,7 @@ void EffectAndImpl::str_impl(std::ostringstream& out, const FormattingOptions& /
 }
 
 void EffectAndImpl::accept(EffectVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 const EffectList& EffectAndImpl::get_effects() const {
@@ -140,7 +140,7 @@ void EffectNumericImpl::str_impl(std::ostringstream& out, const FormattingOption
 }
 
 void EffectNumericImpl::accept(EffectVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 AssignOperatorEnum EffectNumericImpl::get_assign_operator() const {
@@ -183,7 +183,7 @@ void EffectConditionalForallImpl::str_impl(std::ostringstream& out, const Format
 }
 
 void EffectConditionalForallImpl::accept(EffectVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 const ParameterList& EffectConditionalForallImpl::get_parameters() const {
@@ -216,7 +216,7 @@ void EffectConditionalWhenImpl::str_impl(std::ostringstream& out, const Formatti
 }
 
 void EffectConditionalWhenImpl::accept(EffectVisitor& visitor) const {
-    visitor.visit(this->shared_from_this());
+    visitor.visit(this);
 }
 
 const Condition& EffectConditionalWhenImpl::get_condition() const {

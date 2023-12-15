@@ -26,7 +26,7 @@
 
 namespace loki {
 template<typename... Ts>
-class ReferenceCountedObjectFactory;
+class PersistentFactory;
 }
 
 
@@ -37,7 +37,7 @@ private:
     TermList m_terms;
 
     template<typename... Ts>
-    friend class loki::ReferenceCountedObjectFactory;
+    friend class loki::PersistentFactory;
 
 public:
     AtomImpl(int identifier, const Predicate& predicate, const TermList& terms);
