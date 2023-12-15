@@ -18,6 +18,7 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_CONTEXT_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_CONTEXT_HPP_
 
+#include "reference.hpp"
 #include "scope.hpp"
 #include "types.hpp"
 
@@ -29,8 +30,16 @@ struct Context {
     PDDLFactories& factories;
     // For referencing to existing bindings
     ScopeStack& scopes;
+    // For checking that bindings were references at least once
+    ReferencedBindings& references;
     // For convenience, to avoid an additional parameters when parsing
     pddl::Requirements requirements;
+
+    Context(PDDLFactories& factories_, ScopeStack& scopes_, ReferencedBindings& references_)
+    : factories(factories_)
+    , scopes(scopes_)
+    , references(references_)
+    , requirements(nullptr) { }
 };
 
 }

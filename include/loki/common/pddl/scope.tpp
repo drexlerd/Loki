@@ -15,6 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 namespace loki {
 
 template<typename... Ts>
@@ -58,7 +59,6 @@ void Scope::insert(const std::string& name, const BindingPtrType<T>& binding, co
 }
 
 
-/// @brief Returns a binding if it exists.
 template<typename T>
 std::optional<SearchResult<T>> ScopeStack::get(const std::string& name) const {
     assert(!m_stack.empty());

@@ -41,7 +41,6 @@ class Scope;
 template<typename T>
 using BindingPtrType = T const*;
 
-using PositionType = boost::spirit::x3::position_tagged;
 
 /// @brief Encapsulates binding related information of a type T.
 ///        The object is the entity bound to the name.
@@ -110,13 +109,12 @@ class ScopeStack {
     private:
         std::deque<std::unique_ptr<Scope>> m_stack;
 
-        ErrorHandler m_error_handler;
+        const ErrorHandler& m_error_handler;
 
         ScopeStack const *m_parent;
 
     public:
-        ScopeStack(
-            ErrorHandler&& error_handler,
+        ScopeStack(const ErrorHandler& error_handler,
             ScopeStack const *parent=nullptr);
 
         /// @brief Inserts a new scope on the top of the stack.
