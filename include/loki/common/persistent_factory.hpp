@@ -57,8 +57,6 @@ private:
     std::mutex m_mutex;
 
 public:
-    PersistentFactory() { }
-
     /// @brief Gets a shared reference to the object of type T with the given arguments.
     ///        If such an object does not exists then it creates one.
     /// @tparam ...Args The arguments that are passed to the constructor of T.
