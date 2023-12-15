@@ -27,9 +27,12 @@
 
 namespace loki {
 
+/* Not used anymore but still a useful piece of code. */
+
 /// @brief A thread-safe reference-counted object cache.
-/// Original idea by Herb Sutter.
-/// Custom deleter idea: https://stackoverflow.com/questions/49782011/herb-sutters-10-liner-with-cleanup
+///        An idea by Herb Sutter.
+///        Custom deleter idea: https://stackoverflow.com/questions/49782011/herb-sutters-10-liner-with-cleanup
+///        TODO: improve the quality of the answer on stackoverflow
 template<typename... Ts>
 class ReferenceCountedObjectFactory {
 private:

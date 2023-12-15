@@ -18,6 +18,8 @@
 #include "../include/loki/domain/parser.hpp"
 #include "../include/loki/problem/parser.hpp"
 
+#include <iostream>
+
 
 int main() {
     // Parse the domain

@@ -18,6 +18,8 @@
 #include "../include/loki/domain/parser.hpp"
 #include "../include/loki/problem/parser.hpp"
 
+#include <iostream>
+
 
 /// @brief This example illustrates incorrect ownership handling
 int main() {
@@ -28,7 +30,7 @@ int main() {
         domain = domain_parser.get_domain();
         std::cout << *domain << std::endl;
 
-        /* Destructors of domain_parser is called and all PDDL objects are destructed. */
+        /* Destructor of DomainParser is called and all domain and problem specific PDDL objects are destroyed. */
     }
 
     /* Undefined behavior when accessing the domain, usually the program crashes because memory was overwritten */
