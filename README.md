@@ -80,3 +80,8 @@ Parsing a problem file into an abstract syntax tree and printing it.
 ```console
 ./build/exe/problem benchmarks/gripper/domain.pddl benchmarks/gripper/p-2-0.pddl
 ```
+
+
+## Acknowledgements
+
+This work was partially supported by the Wallenberg AI, Autonomous Systems and Software Program (WASP) funded by the Knut and Alice Wallenberg Foundation.
