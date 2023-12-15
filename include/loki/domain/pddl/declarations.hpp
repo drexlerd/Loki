@@ -28,116 +28,116 @@
 
 namespace loki::pddl {
     class RequirementsImpl;
-    using Requirements = RequirementsImpl const *;
+    using Requirements = const RequirementsImpl*;
 
     class TypeImpl;
-    using Type = TypeImpl const *;
+    using Type = const TypeImpl*;
     using TypeList = std::vector<Type>;
     using TypeSet = std::set<Type>;
 
     class ObjectImpl;
-    using Object = ObjectImpl const *;
+    using Object = const ObjectImpl*;
     using ObjectList = std::vector<Object>;
     using ObjectSet = std::set<Object>;
 
     class VariableImpl;
-    using Variable = VariableImpl const *;
+    using Variable = const VariableImpl*;
     using VariableList = std::vector<Variable>;
     using VariableAssignment = std::unordered_map<Variable, Object>;
 
     class TermImpl;
-    using Term = TermImpl const *;
+    using Term = const TermImpl*;
     using TermList = std::vector<Term>;
     class TermObjectImpl;
-    using TermObject = TermObjectImpl const *;
+    using TermObject = const TermObjectImpl*;
     class TermVariableImpl;
-    using TermVariable = TermVariableImpl const *;
+    using TermVariable = const TermVariableImpl*;
 
     class AtomImpl;
-    using Atom = AtomImpl const *;
+    using Atom = const AtomImpl*;
     using AtomList = std::vector<Atom>;
 
     class ParameterImpl;
-    using Parameter = ParameterImpl const *;
+    using Parameter = const ParameterImpl*;
     using ParameterList = std::vector<Parameter>;
     using ParameterAssignment = std::unordered_map<Parameter, Object>;
 
     class PredicateImpl;
-    using Predicate = PredicateImpl const *;
+    using Predicate = const PredicateImpl*;
     using PredicateList = std::vector<Predicate>;
     using PredicateSet = std::set<Predicate>;
 
     class LiteralImpl;
-    using Literal = LiteralImpl const *;
+    using Literal = const LiteralImpl*;
     using LiteralList = std::vector<Literal>;
     using LiteralSet = std::set<Literal>;
 
     class ConditionImpl;
-    using Condition = ConditionImpl const *;
+    using Condition = const ConditionImpl*;
     using ConditionList = std::vector<Condition>;
     using ConditionSet = std::set<Condition>;
     class ConditionLiteralImpl;
-    using ConditionLiteral = ConditionLiteralImpl const *;
+    using ConditionLiteral = const ConditionLiteralImpl*;
     class ConditionAndImpl;
-    using ConditionAnd = ConditionAndImpl const *;
+    using ConditionAnd = const ConditionAndImpl*;
     class ConditionOrImpl;
-    using ConditionOr = ConditionOrImpl const *;
+    using ConditionOr = const ConditionOrImpl*;
     class ConditionNotImpl;
-    using ConditionNot = ConditionNotImpl const *;
+    using ConditionNot = const ConditionNotImpl*;
 
     class EffectImpl;
-    using Effect = EffectImpl const *;
+    using Effect = const EffectImpl*;
     using EffectList = std::vector<Effect>;
     using EffectSet = std::set<Effect>;
     class EffectLiteralImpl;
-    using EffectLiteral = EffectLiteralImpl const *;
+    using EffectLiteral = const EffectLiteralImpl*;
     class EffectAndImpl;
-    using EffectAnd = EffectAndImpl const *;
+    using EffectAnd = const EffectAndImpl*;
     class EffectNumericImpl;
-    using EffectNumeric = EffectNumericImpl const *;
+    using EffectNumeric = const EffectNumericImpl*;
     class EffectConditionalForallImpl;
-    using EffectConditionalForall = EffectConditionalForallImpl const *;
+    using EffectConditionalForall = const EffectConditionalForallImpl*;
     class EffectConditionalWhenImpl;
-    using EffectConditionalWhen = EffectConditionalWhenImpl const *;
+    using EffectConditionalWhen = const EffectConditionalWhenImpl*;
 
     class FunctionExpressionImpl;
-    using FunctionExpression = FunctionExpressionImpl const *;
+    using FunctionExpression = const FunctionExpressionImpl*;
     class FunctionExpressionNumberImpl;
-    using FunctionExpressionNumber = FunctionExpressionNumberImpl const *;
+    using FunctionExpressionNumber = const FunctionExpressionNumberImpl*;
     class FunctionExpressionBinaryOperatorImpl;
-    using FunctionExpressionBinaryOperator = FunctionExpressionBinaryOperatorImpl const *;
+    using FunctionExpressionBinaryOperator = const FunctionExpressionBinaryOperatorImpl*;
     class FunctionExpressionMinusImpl;
-    using FunctionExpressionMinus = FunctionExpressionMinusImpl const *;
+    using FunctionExpressionMinus = const FunctionExpressionMinusImpl*;
     class FunctionExpressionFunctionImpl;
-    using FunctionExpressionFunction = FunctionExpressionFunctionImpl const *;
+    using FunctionExpressionFunction = const FunctionExpressionFunctionImpl*;
 
     class FunctionSkeletonImpl;
-    using FunctionSkeleton = FunctionSkeletonImpl const *;
+    using FunctionSkeleton = const FunctionSkeletonImpl*;
     using FunctionSkeletonList = std::vector<FunctionSkeleton>;
     using FunctionSkeletonSet = std::set<FunctionSkeleton>;
 
     class FunctionImpl;
-    using Function = FunctionImpl const *;
+    using Function = const FunctionImpl*;
     using FunctionList = std::vector<Function>;
     using FunctionSet = std::set<Function>;
 
     class ConstraintImpl;
-    using Constraint = ConstraintImpl const *;
+    using Constraint = const ConstraintImpl*;
     using ConstraintList = std::vector<Constraint>;
     using ConstraintSet = std::set<Constraint>;
 
     class ActionImpl;
-    using Action = ActionImpl const *;
+    using Action = const ActionImpl*;
     using ActionList = std::vector<Action>;
     using ActionSet = std::set<Action>;
 
     class DerivedPredicateImpl;
-    using DerivedPredicate = DerivedPredicateImpl const *;
+    using DerivedPredicate = const DerivedPredicateImpl*;
     using DerivedPredicateList = std::vector<DerivedPredicate>;
     using DerivedPredicateSet = std::set<DerivedPredicate>;
 
     class DomainImpl;
-    using Domain = DomainImpl const *;
+    using Domain = const DomainImpl*;
     using DomainList = std::vector<Domain>;
     using DomainSet = std::set<Domain>;
 }

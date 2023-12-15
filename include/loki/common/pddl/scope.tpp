@@ -20,8 +20,8 @@ namespace loki {
 
 template<typename... Ts>
 template<typename T>
-std::optional<ValueType<T>> Bindings<Ts...>::get(const std::string& key) const {
-    const auto& t_bindings = std::get<MapType<T>>(bindings);
+std::optional<BindingValueType<T>> Bindings<Ts...>::get(const std::string& key) const {
+    const auto& t_bindings = std::get<BindingMapType<T>>(bindings);
     auto it = t_bindings.find(key);
     if (it != t_bindings.end()) {
         return {it->second};
@@ -34,14 +34,14 @@ template<typename... Ts>
 template<typename T>
 void Bindings<Ts...>::insert(const std::string& key, const BindingPtrType<T>& binding, const std::optional<PositionType>& position) {
     assert(binding);
-    auto& t_bindings = std::get<MapType<T>>(bindings);
+    auto& t_bindings = std::get<BindingMapType<T>>(bindings);
     assert(!t_bindings.count(key));
     t_bindings.emplace(key, std::make_tuple(binding, position));
 }
 
 
 template<typename T>
-std::optional<ValueType<T>> Scope::get(const std::string& name) const {
+std::optional<BindingValueType<T>> Scope::get(const std::string& name) const {
     const auto result = bindings.get<T>(name);
     if (result.has_value()) return result.value();
     if (m_parent_scope) {
@@ -60,7 +60,7 @@ void Scope::insert(const std::string& name, const BindingPtrType<T>& binding, co
 
 
 template<typename T>
-std::optional<SearchResult<T>> ScopeStack::get(const std::string& name) const {
+std::optional<ScopeStackSearchResult<T>> ScopeStack::get(const std::string& name) const {
     assert(!m_stack.empty());
     auto result = m_stack.back()->get<T>(name);
     if (result.has_value()) {

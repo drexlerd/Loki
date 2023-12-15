@@ -39,7 +39,7 @@ namespace loki {
 class Scope;
 
 template<typename T>
-using BindingPtrType = T const*;
+using BindingPtrType = const T*;
 
 
 /// @brief Encapsulates binding related information of a type T.
@@ -47,23 +47,23 @@ using BindingPtrType = T const*;
 ///        The position points to the matched location
 ///        in the input stream and is used for error reporting.
 template<typename T>
-using ValueType = std::tuple<BindingPtrType<T>, std::optional<PositionType>>;
+using BindingValueType = std::tuple<BindingPtrType<T>, std::optional<PositionType>>;
 
 /// @brief Datastructure to store bindings of a type T.
 template<typename T>
-using MapType = std::unordered_map<std::string, ValueType<T>>;
+using BindingMapType = std::unordered_map<std::string, BindingValueType<T>>;
 
 
 /// @brief Encapsulates bindings for different types.
 template<typename... Ts>
 class Bindings {
     private:
-        std::tuple<MapType<Ts>...> bindings;
+        std::tuple<BindingMapType<Ts>...> bindings;
 
     public:
         /// @brief Returns a binding if it exists.
         template<typename T>
-        std::optional<ValueType<T>> get(const std::string& key) const;
+        std::optional<BindingValueType<T>> get(const std::string& key) const;
 
         /// @brief Inserts a binding of type T
         template<typename T>
@@ -77,7 +77,7 @@ class Bindings {
 /// @brief Wraps bindings in a scope with reference to a parent scope.
 class Scope {
     private:
-        Scope const *m_parent_scope;
+        const Scope* m_parent_scope;
 
         Bindings<pddl::TypeImpl
             , pddl::ObjectImpl
@@ -86,11 +86,11 @@ class Scope {
             , pddl::VariableImpl> bindings;
 
     public:
-        explicit Scope(Scope const *parent_scope = nullptr) : m_parent_scope(parent_scope) { }
+        explicit Scope(const Scope* parent_scope = nullptr) : m_parent_scope(parent_scope) { }
 
         /// @brief Returns a binding if it exists.
         template<typename T>
-        std::optional<ValueType<T>> get(const std::string& name) const;
+        std::optional<BindingValueType<T>> get(const std::string& name) const;
 
         /// @brief Insert a binding of type T.
         template<typename T>
@@ -100,7 +100,7 @@ class Scope {
 
 /// @brief Encapsulates the result of search for a binding with the corresponding ErrorHandler.
 template<typename T>
-using SearchResult = std::tuple<const BindingPtrType<T>, const std::optional<PositionType>, const ErrorHandler&>;
+using ScopeStackSearchResult = std::tuple<const BindingPtrType<T>, const std::optional<PositionType>, const ErrorHandler&>;
 
 
 /// @brief Implements a scoping mechanism with a given ErrorHandler.
@@ -111,11 +111,11 @@ class ScopeStack {
 
         const ErrorHandler& m_error_handler;
 
-        ScopeStack const *m_parent;
+        const ScopeStack* m_parent;
 
     public:
         ScopeStack(const ErrorHandler& error_handler,
-            ScopeStack const *parent=nullptr);
+            const ScopeStack* parent=nullptr);
 
         /// @brief Inserts a new scope on the top of the stack.
         void open_scope();
@@ -125,7 +125,7 @@ class ScopeStack {
 
         /// @brief Returns a binding if it exists.
         template<typename T>
-        std::optional<SearchResult<T>> get(const std::string& name) const;
+        std::optional<ScopeStackSearchResult<T>> get(const std::string& name) const;
 
         /// @brief Insert a binding of type T.
         template<typename T>

@@ -24,38 +24,32 @@ References<Ts...>::References(const ErrorHandler& error_handler) : m_error_handl
 
 template<typename... Ts>
 template<typename T>
-std::optional<std::tuple<const PositionType, const ErrorHandler&>> References<Ts...>::get(const std::string& key) const {
-    const auto& t_references = std::get<MapType<T>>(references);
-    auto it = t_references.find(key);
-    if (it != t_references.end()) {
-        return std::make_tuple(it->second, m_error_handler);
-    }
-    return std::nullopt;
+bool References<Ts...>::exists(const T* reference) const {
+    const auto& t_references = std::get<ReferenceSetType<T>>(references);
+    return t_references.count(reference);
 }
 
 
 template<typename... Ts>
 template<typename T>
-void References<Ts...>::insert(const std::string& key, const PositionType& position) {
-    auto& t_references = std::get<MapType<T>>(references);
-    assert(!t_references.count(key));
-    t_references.emplace(key, position);
+void References<Ts...>::insert(const T* reference) {
+    auto& t_references = std::get<ReferenceSetType<T>>(references);
+    assert(!t_references.count(reference));
+    t_references.insert(reference);
 }
 
 
 template<typename... Ts>
 template<typename T>
-void References<Ts...>::erase(const std::string& key) {
-    auto& t_references = std::get<MapType<T>>(references);
-    assert(t_references.count(key));
-    t_references.erase(key);
+void References<Ts...>::erase(const T* reference) {
+    auto& t_references = std::get<ReferenceSetType<T>>(references);
+    assert(t_references.count(reference));
+    t_references.erase(reference);
 }
-
 
 template<typename... Ts>
 const ErrorHandler& References<Ts...>::get_error_handler() const {
     return m_error_handler;
 }
-
 
 }

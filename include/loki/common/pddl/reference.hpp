@@ -28,7 +28,7 @@
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 
 #include <cassert>
-#include <unordered_map>
+#include <unordered_set>
 #include <memory>
 #include <tuple>
 #include <optional>
@@ -36,7 +36,9 @@
 
 
 namespace loki {
-class Scope;
+template<typename T>
+using ReferenceSetType = std::unordered_set<const T*>;
+
 
 /// @brief Encapsulates referenced bindings.
 ///        We require that each binding must be referenced at least one in a child scope
@@ -45,34 +47,28 @@ class Scope;
 ///        and delete it after checking whether it was referenced.
 template<typename... Ts>
 class References {
-    /// @brief Datastructure to store bindings of a type T.
-    template<typename T>
-    using MapType = std::unordered_map<std::string, PositionType>;
+    private:
+        std::tuple<ReferenceSetType<Ts>...> references;
 
-    const ErrorHandler& m_error_handler;
+        const ErrorHandler& m_error_handler;
 
     public:
         explicit References(const ErrorHandler& error_handler);
 
         /// @brief Returns a binding if it exists.
         template<typename T>
-        std::optional<std::tuple<const PositionType, const ErrorHandler&>> get(const std::string& key) const;
+        bool exists(const T* reference) const;
 
         /// @brief Inserts a binding of type T
         template<typename T>
-        void insert(
-            const std::string& key,
-            const PositionType& position);
+        void insert(const T* reference);
 
         /// @brief Erases a binding of Type T
         template<typename T>
-        void erase(const std::string& key);
+        void erase(const T* reference);
 
         /// @brief Get the error handler to print an error message.
         const ErrorHandler& get_error_handler() const;
-
-    private:
-        std::tuple<MapType<Ts>...> references;
 };
 
 using ReferencedBindings = References<pddl::TypeImpl
@@ -80,7 +76,6 @@ using ReferencedBindings = References<pddl::TypeImpl
     , pddl::PredicateImpl
     , pddl::FunctionSkeletonImpl
     , pddl::VariableImpl>;
-
 
 }
 
