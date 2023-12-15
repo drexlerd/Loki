@@ -1,5 +1,7 @@
 # Loki
 
+ATTENTION: Loki's testing framework is still very weak and Loki itself has not been tested in production yet. Therefore, we strongly advise against using it already. However, we are thankful for feedback, suggestions, and feature requests of all kinds.
+
 Loki is a modern C++ library for efficient syntactic and semantic parsing of PDDL files with exhaustive error handling to provide meaningful error messages to the user. Loki uniquely constructs PDDL objects across a whole class of problems over a common domain.
 
 ## Supported PDDL Requirements
