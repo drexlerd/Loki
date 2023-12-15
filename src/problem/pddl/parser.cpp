@@ -42,11 +42,11 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
     const auto problem_name = parse(problem_node.problem_name.name);
     /* Requirements section */
     if (problem_node.requirements.has_value()) {
-        context.requirements = context.cache.get_or_create<pddl::RequirementsImpl>(
+        context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(
             parse(problem_node.requirements.value()));
     } else {
         // Default requirements
-        context.requirements = context.cache.get_or_create<pddl::RequirementsImpl>(
+        context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(
             pddl::RequirementEnumSet{pddl::RequirementEnum::STRIPS});
     }
     /* Objects section */
@@ -63,7 +63,7 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
     }
     /* Goal section */
     pddl::Condition goal_condition = parse(problem_node.goal, context);
-    return context.cache.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects, initial_literals, numeric_fluents, goal_condition);
+    return context.factories.problems.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects, initial_literals, numeric_fluents, goal_condition);
 }
 
 }

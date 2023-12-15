@@ -28,7 +28,7 @@ namespace loki {
 
 class DomainParser {
 private:
-    PddlFactory m_factory;
+    PDDLFactories m_factories;
     std::unique_ptr<ScopeStack> m_scopes;
 
     pddl::Domain m_domain;

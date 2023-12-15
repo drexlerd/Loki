@@ -33,13 +33,13 @@ pddl::Function parse(const problem::ast::BasicFunctionTerm& node, Context& conte
     }
     pddl::TermList term_list;
     for (const auto& name_node : node.names) {
-        term_list.push_back(context.cache.get_or_create<pddl::TermObjectImpl>(parse_object_reference(name_node, context)));
+        term_list.push_back(context.factories.terms.get_or_create<pddl::TermObjectImpl>(parse_object_reference(name_node, context)));
     }
     const auto& [function_skeleton, _position, _error_handler] = binding.value();
     if (function_skeleton->get_parameters().size() != term_list.size()) {
         throw MismatchedFunctionSkeletonTermListError(function_skeleton, term_list, context.scopes.get_error_handler()(node, ""));
     }
-    return context.cache.get_or_create<pddl::FunctionImpl>(function_skeleton, term_list);
+    return context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, term_list);
 }
 
 }

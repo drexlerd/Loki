@@ -26,7 +26,7 @@ namespace loki {
 
 struct Context {
     // For the unique construction of PDDL objects
-    PddlFactory& cache;
+    PDDLFactories& factories;
     // For referencing to existing bindings
     ScopeStack& scopes;
     // For convenience, to avoid an additional parameters when parsing

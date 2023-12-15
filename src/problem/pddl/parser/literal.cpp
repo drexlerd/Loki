@@ -18,7 +18,6 @@
 #include "literal.hpp"
 
 #include "objects.hpp"
-#include "common.hpp"
 
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 #include "../../../../include/loki/problem/pddl/exceptions.hpp"
@@ -37,13 +36,13 @@ pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, Contex
     }
     pddl::TermList term_list;
     for (const auto& name_node : node.names) {
-        term_list.push_back(context.cache.get_or_create<pddl::TermObjectImpl>(parse_object_reference(name_node, context)));
+        term_list.push_back(context.factories.terms.get_or_create<pddl::TermObjectImpl>(parse_object_reference(name_node, context)));
     }
     const auto& [predicate, _position, _error_handler] = binding.value();
     if (predicate->get_parameters().size() != term_list.size()) {
         throw MismatchedPredicateTermListError(predicate, term_list, context.scopes.get_error_handler()(node, ""));
     }
-    return context.cache.get_or_create<pddl::AtomImpl>(predicate, term_list);
+    return context.factories.atoms.get_or_create<pddl::AtomImpl>(predicate, term_list);
 }
 
 pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, Context& context) {
@@ -52,9 +51,9 @@ pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, Context
     }
     assert(context.scopes.get<pddl::PredicateImpl>("=").has_value());
     const auto& [equal_predicate, _position, _error_handler] = context.scopes.get<pddl::PredicateImpl>("=").value();
-    const auto term_left = context.cache.get_or_create<pddl::TermObjectImpl>(parse_object_reference(node.name_left, context));
-    const auto term_right = context.cache.get_or_create<pddl::TermObjectImpl>(parse_object_reference(node.name_right, context));
-    return context.cache.get_or_create<pddl::AtomImpl>(equal_predicate, pddl::TermList{term_left, term_right});
+    const auto term_left = context.factories.terms.get_or_create<pddl::TermObjectImpl>(parse_object_reference(node.name_left, context));
+    const auto term_right = context.factories.terms.get_or_create<pddl::TermObjectImpl>(parse_object_reference(node.name_right, context));
+    return context.factories.atoms.get_or_create<pddl::AtomImpl>(equal_predicate, pddl::TermList{term_left, term_right});
 }
 
 pddl::Atom parse(const problem::ast::AtomicFormulaOfNames& node, Context& context) {
@@ -66,11 +65,11 @@ GroundLiteralVisitor::GroundLiteralVisitor(Context& context_) : context(context_
 
 
 pddl::Literal parse(const problem::ast::Atom& node, Context& context) {
-    return context.cache.get_or_create<pddl::LiteralImpl>(false, parse(node.atomic_formula_of_names, context));
+    return context.factories.literals.get_or_create<pddl::LiteralImpl>(false, parse(node.atomic_formula_of_names, context));
 }
 
 pddl::Literal parse(const problem::ast::NegatedAtom& node, Context& context) {
-    return context.cache.get_or_create<pddl::LiteralImpl>(true, parse(node.atomic_formula_of_names, context));
+    return context.factories.literals.get_or_create<pddl::LiteralImpl>(true, parse(node.atomic_formula_of_names, context));
 }
 
 pddl::Literal parse(const problem::ast::Literal& node, Context& context) {

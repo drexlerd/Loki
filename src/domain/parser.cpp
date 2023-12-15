@@ -28,7 +28,7 @@ DomainParser::DomainParser(const fs::path& file_path) {
     m_scopes = std::make_unique<ScopeStack>(std::move(error_handler));
 
     Context context{
-        m_factory,
+        m_factories,
         *m_scopes,
         nullptr
     };
@@ -36,22 +36,22 @@ DomainParser::DomainParser(const fs::path& file_path) {
     context.scopes.open_scope();
 
     // Create base types.
-    const auto base_type_object = context.cache.get_or_create<pddl::TypeImpl>("object");
-    const auto base_type_number = context.cache.get_or_create<pddl::TypeImpl>("number");
+    const auto base_type_object = context.factories.types.get_or_create<pddl::TypeImpl>("object");
+    const auto base_type_number = context.factories.types.get_or_create<pddl::TypeImpl>("number");
     context.scopes.insert("object", base_type_object, {});
     context.scopes.insert("number", base_type_number, {});
 
     // Create equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
     const auto binary_parameterlist = pddl::ParameterList{
-        context.cache.get_or_create<pddl::ParameterImpl>(
-            context.cache.get_or_create<pddl::VariableImpl>("?left_arg"),
+        context.factories.parameters.get_or_create<pddl::ParameterImpl>(
+            context.factories.variables.get_or_create<pddl::VariableImpl>("?left_arg"),
             pddl::TypeList{base_type_object}),
-        context.cache.get_or_create<pddl::ParameterImpl>(
-            context.cache.get_or_create<pddl::VariableImpl>("?right_arg"),
+        context.factories.parameters.get_or_create<pddl::ParameterImpl>(
+            context.factories.variables.get_or_create<pddl::VariableImpl>("?right_arg"),
             pddl::TypeList{base_type_object})
 
     };
-    const auto equal_predicate = context.cache.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist);
+    const auto equal_predicate = context.factories.predicates.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist);
         context.scopes.insert<pddl::PredicateImpl>("=", equal_predicate, {});
 
     m_domain = parse(node, context);

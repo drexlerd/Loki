@@ -35,7 +35,7 @@ string parse(const domain::ast::Name& name_node) {
 pddl::Variable parse(const domain::ast::Variable& variable_node, Context& context) {
     stringstream ss;
     ss << variable_node.question_mark << parse(variable_node.name);
-    return context.cache.get_or_create<pddl::VariableImpl>(ss.str());
+    return context.factories.variables.get_or_create<pddl::VariableImpl>(ss.str());
 }
 
 /* Term */
@@ -49,7 +49,7 @@ pddl::Term TermDeclarationTermVisitor::operator()(const domain::ast::Name& name_
         throw UndefinedConstantError(constant_name, context.scopes.get_error_handler()(name_node, ""));
     }
     const auto& [constant, _position, _error_handler] = binding.value();
-    return context.cache.get_or_create<pddl::TermObjectImpl>(constant);
+    return context.factories.terms.get_or_create<pddl::TermObjectImpl>(constant);
 }
 
 pddl::Term TermDeclarationTermVisitor::operator()(const domain::ast::Variable& variable_node) const {
@@ -63,7 +63,7 @@ pddl::Term TermDeclarationTermVisitor::operator()(const domain::ast::Variable& v
         throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
     }
     context.scopes.insert<pddl::VariableImpl>(variable->get_name(), variable, variable_node);
-    return context.cache.get_or_create<pddl::TermVariableImpl>(variable);
+    return context.factories.terms.get_or_create<pddl::TermVariableImpl>(variable);
 }
 
 pddl::Term TermDeclarationTermVisitor::operator()(const domain::ast::FunctionTerm& function_term_node) const {
@@ -83,7 +83,7 @@ pddl::Term TermReferenceTermVisitor::operator()(const domain::ast::Name& name_no
         throw UndefinedConstantError(constant_name, context.scopes.get_error_handler()(name_node, ""));
     }
     const auto& [constant, position, error_handler] = binding.value();
-    return context.cache.get_or_create<pddl::TermObjectImpl>(constant);
+    return context.factories.terms.get_or_create<pddl::TermObjectImpl>(constant);
 }
 
 pddl::Term TermReferenceTermVisitor::operator()(const domain::ast::Variable& variable_node) const {
@@ -92,7 +92,7 @@ pddl::Term TermReferenceTermVisitor::operator()(const domain::ast::Variable& var
     if (!binding.has_value()) {
         throw UndefinedVariableError(variable->get_name(), context.scopes.get_error_handler()(variable_node, ""));
     }
-    return context.cache.get_or_create<pddl::TermVariableImpl>(variable);
+    return context.factories.terms.get_or_create<pddl::TermVariableImpl>(variable);
 }
 
 pddl::Term TermReferenceTermVisitor::operator()(const domain::ast::FunctionTerm& function_term_node) const {

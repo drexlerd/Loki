@@ -36,11 +36,11 @@ pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::Type& type_node
 
 pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::Name& name_node) {
     auto name = parse(name_node);
-    return { context.cache.get_or_create<pddl::TypeImpl>(name) };
+    return { context.factories.types.get_or_create<pddl::TypeImpl>(name) };
 }
 
 pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeObject&) {
-    return { context.cache.get_or_create<pddl::TypeImpl>("object") };
+    return { context.factories.types.get_or_create<pddl::TypeImpl>("object") };
 }
 
 pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeEither& either_type_node) {
@@ -112,7 +112,7 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vec
             }
             throw MultiDefinitionTypeError(name, message_1 + message_2);
         }
-        const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, pddl::TypeList{type_object});
+        const auto type = context.factories.types.get_or_create<pddl::TypeImpl>(name, pddl::TypeList{type_object});
         type_list.push_back(type);
         context.scopes.insert<pddl::TypeImpl>(name, type, name_node);
     }
@@ -150,7 +150,7 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::Typ
             }
             throw MultiDefinitionTypeError(name, message_1 + message_2);
         }
-        const auto type = context.cache.get_or_create<pddl::TypeImpl>(name, types);
+        const auto type = context.factories.types.get_or_create<pddl::TypeImpl>(name, types);
         type_list.push_back(type);
         context.scopes.insert<pddl::TypeImpl>(name, type, name_node);
     }

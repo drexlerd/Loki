@@ -61,7 +61,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
             }
             throw MultiDefinitionObjectError(name, message_1 + message_2);
         }
-        const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type});
+        const auto object = context.factories.objects.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type});
         context.scopes.insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }
@@ -88,7 +88,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
             }
             throw MultiDefinitionObjectError(name, message_1 + message_2);
         }
-        const auto object = context.cache.get_or_create<pddl::ObjectImpl>(name, types);
+        const auto object = context.factories.objects.get_or_create<pddl::ObjectImpl>(name, types);
         context.scopes.insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }

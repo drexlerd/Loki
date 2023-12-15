@@ -34,7 +34,7 @@ ParameterListVisitor::ParameterListVisitor(Context& context_)
 pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>& variable_nodes) {
     // A visited vector of variable has single base type "object"
     auto parameter_list = pddl::ParameterList();
-    const auto type = context.cache.get_or_create<pddl::TypeImpl>("object");
+    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("object");
     for (const auto& variable_node : variable_nodes) {
         const auto variable = parse(variable_node, context);
         const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
@@ -48,7 +48,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Vari
             throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
         }
         context.scopes.insert(variable->get_name(), variable, variable_node);
-        const auto parameter = context.cache.get_or_create<pddl::ParameterImpl>(variable, pddl::TypeList{type});
+        const auto parameter = context.factories.parameters.get_or_create<pddl::ParameterImpl>(variable, pddl::TypeList{type});
         parameter_list.emplace_back(parameter);
     }
     return parameter_list;
@@ -76,7 +76,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
             throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
         }
         context.scopes.insert(variable->get_name(), variable, variable_node);
-        const auto parameter = context.cache.get_or_create<pddl::ParameterImpl>(variable, types);
+        const auto parameter = context.factories.parameters.get_or_create<pddl::ParameterImpl>(variable, types);
         parameter_list.emplace_back(parameter);
     }
     // Recursively add parameters.

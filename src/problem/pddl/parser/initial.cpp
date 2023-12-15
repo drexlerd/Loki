@@ -40,7 +40,7 @@ boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operat
 boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operator()(const problem::ast::InitialElementNumericFluents& node) {
     const auto basic_function_term = parse(node.basic_function_term, context);
     double number = parse(node.number);
-    return context.cache.get_or_create<pddl::NumericFluentImpl>(basic_function_term, number);
+    return context.factories.numeric_fluents.get_or_create<pddl::NumericFluentImpl>(basic_function_term, number);
 }
 
 boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operator()(const problem::ast::InitialElementObjectFluents& node) {
