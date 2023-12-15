@@ -1,6 +1,6 @@
 # Loki
 
-Loki is a C++ library for efficient syntactic and semantic parsing of PDDL files with exhaustive error handling to provide meaningful error messages to the user. Loki uniquely constructs PDDL objects across a whole class of problems over a common domain allowing for the detection of syntactically equivalent problems (up to reordering). Loki provides three levels of abstraction (shared_ptr, non-owning raw pointer, integer handle) allowing for efficient copying, comparison and hashing of PDDL object following the zero-cost abstraction principle: don't pay for what you don't use! Loki also implements an automatic garbage collection which can be useful for many sorts of compilations where intermediate results are supposed to be recycled.
+Loki is a C++ library for efficient syntactic and semantic parsing of PDDL files with exhaustive error handling to provide meaningful error messages to the user. Loki uniquely constructs PDDL objects across a whole class of problems over a common domain allowing for the detection of syntactically equivalent problems (up to reordering). Loki also implements an automatic garbage collection which can be useful for many sorts of compilations where intermediate results are supposed to be recycled.
 
 ## Supported PDDL Requirements
 
