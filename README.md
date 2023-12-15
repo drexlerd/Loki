@@ -32,7 +32,7 @@ Loki ensures that each PDDL object is immutable to reduce usage errors.
 
 ### Private Constructors
 
-Loki ensures the controlled creation of PDDL objects through a factory to ensure uniqueness.
+Loki ensures the controlled creation of PDDL objects through a factory to ensure uniqueness (up to reordering). Uniqueness ensures other important properties such as efficient hashing (just take the pointer!) and comparison for equality (just compare the pointers) or the detection of structurally equivalent problems.
 
 ### Shared Owners vs. Single Owner of PDDL objects
 
