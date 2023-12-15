@@ -36,11 +36,11 @@ Loki ensures the controlled creation of PDDL objects through a factory to ensure
 
 ### Shared Owners vs. Single Owner of PDDL objects
 
-Loki represents each PDDL object as a non-owning raw pointer to avoid mutex locks due to atomic increments of reference counters.
+Loki represents each PDDL object as a non-owning raw pointer to avoid mutex locks due to atomic increments of reference counters. This gives the user a little bit more responsibility, i.e., the user has to keep the parsers in memory to avoid the deallocation of PDDL objects.
 
 ### Non-fragmented Indexing Schemes
 
-Loki ensures that each class of PDDL objects (Object, Predicate, Atom, Conditions, ...) get assigned identifiers 0,1,2,... allowing for simple association with bitsets and vectors which are commonly used in planning systems for efficiency.
+Loki ensures that objects from each class of PDDL objects (Object, Predicate, Atom, Conditions, ...) get assigned identifiers following a non-fragmented indexing scheme (0,1,2,...) allowing for simple association in bitsets and vectors which are commonly used in planning systems for efficiency reasons.
 
 ## Grammar Simplifications
 
