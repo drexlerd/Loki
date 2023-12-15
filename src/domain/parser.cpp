@@ -46,10 +46,9 @@ DomainParser::DomainParser(const fs::path& file_path) {
 
 
     /* Parse the domain to PDDL */
-    m_scopes = std::make_unique<ScopeStack>(error_handler);
-    auto references = ReferencedBindings(error_handler);
+    m_scopes = std::make_unique<ScopeStack>(std::move(error_handler));
 
-    auto context = Context(m_factories, *m_scopes, references);
+    auto context = Context(m_factories, *m_scopes);
 
     // Initialize global scope
     context.scopes.open_scope();

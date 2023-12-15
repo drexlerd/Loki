@@ -39,6 +39,10 @@ MultiDefinitionPredicateError::MultiDefinitionPredicateError(const std::string& 
     : SemanticParserError(
         "The predicate with name \"" + name + "\" has already been defined.", error_handler_output) { }
 
+UnusedConstantError::UnusedConstantError(const std::string& name, const std::string& error_handler_output)
+    : SemanticParserError(
+        "The constant with name \"" + name + "\" is was never referred to.", error_handler_output) { }
+
 UndefinedConstantError::UndefinedConstantError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
         "The constant with name \"" + name + "\" is undefined.", error_handler_output) { }

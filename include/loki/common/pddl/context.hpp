@@ -31,14 +31,14 @@ struct Context {
     // For referencing to existing bindings
     ScopeStack& scopes;
     // For checking that bindings were references at least once
-    ReferencedBindings& references;
+    ReferencedBindings references;
     // For convenience, to avoid an additional parameters when parsing
     pddl::Requirements requirements;
 
-    Context(PDDLFactories& factories_, ScopeStack& scopes_, ReferencedBindings& references_)
+    Context(PDDLFactories& factories_, ScopeStack& scopes_)
     : factories(factories_)
     , scopes(scopes_)
-    , references(references_)
+    , references(ReferencedBindings())
     , requirements(nullptr) { }
 };
 

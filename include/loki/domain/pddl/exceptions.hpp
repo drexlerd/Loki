@@ -49,6 +49,11 @@ public:
     MultiDefinitionPredicateError(const std::string& name, const std::string& error_handler_output);
 };
 
+class UnusedConstantError : public SemanticParserError {
+public:
+    UnusedConstantError(const std::string& name, const std::string& error_handler_output);
+};
+
 class UndefinedConstantError : public SemanticParserError {
 public:
     UndefinedConstantError(const std::string& name, const std::string& error_handler_output);

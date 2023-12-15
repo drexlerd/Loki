@@ -46,10 +46,9 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
 
 
     /* Parse the problem to PDDL */
-    auto scopes = ScopeStack(error_handler, domain_parser.m_scopes.get());
-    auto references = ReferencedBindings(error_handler);
+    auto scopes = ScopeStack(std::move(error_handler), domain_parser.m_scopes.get());
 
-    auto context = Context(domain_parser.m_factories, scopes, references);
+    auto context = Context(domain_parser.m_factories, scopes);
 
     // Initialize global scope
     context.scopes.open_scope();

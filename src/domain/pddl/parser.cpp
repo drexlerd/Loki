@@ -25,6 +25,7 @@
 #include "../../../include/loki/domain/pddl/predicate.hpp"
 #include "../../../include/loki/domain/pddl/type.hpp"
 #include "../../../include/loki/domain/pddl/domain.hpp"
+#include "../../../include/loki/domain/pddl/object.hpp"
 
 #include "parser/common.hpp"
 #include "parser/constants.hpp"
@@ -82,6 +83,16 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context) {
         auto variant = boost::apply_visitor(StructureVisitor(context), structure_node);
         boost::apply_visitor(UnpackingVisitor(action_list, derived_predicate_list), variant);
     }
+    // Check references
+    // cannot do that with constants
+    /*
+    for (const auto& constant : constants) {
+        if (!context.references.exists(constant)) {
+            const auto& [_constant, position, error_handler] = context.scopes.get<pddl::ObjectImpl>(constant->get_name()).value();
+            throw UnusedConstantError(constant->get_name(), error_handler(position.value(), ""));
+        }
+    }
+    */
     return context.factories.domains.get_or_create<pddl::DomainImpl>(domain_name, context.requirements, types, constants, predicates, function_skeletons, action_list);
 }
 

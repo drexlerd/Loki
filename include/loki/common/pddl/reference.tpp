@@ -20,9 +20,6 @@
 namespace loki {
 
 template<typename... Ts>
-References<Ts...>::References(const ErrorHandler& error_handler) : m_error_handler(error_handler) { }
-
-template<typename... Ts>
 template<typename T>
 bool References<Ts...>::exists(const T* reference) const {
     const auto& t_references = std::get<ReferenceSetType<T>>(references);
@@ -34,7 +31,6 @@ template<typename... Ts>
 template<typename T>
 void References<Ts...>::insert(const T* reference) {
     auto& t_references = std::get<ReferenceSetType<T>>(references);
-    assert(!t_references.count(reference));
     t_references.insert(reference);
 }
 
@@ -45,11 +41,6 @@ void References<Ts...>::erase(const T* reference) {
     auto& t_references = std::get<ReferenceSetType<T>>(references);
     assert(t_references.count(reference));
     t_references.erase(reference);
-}
-
-template<typename... Ts>
-const ErrorHandler& References<Ts...>::get_error_handler() const {
-    return m_error_handler;
 }
 
 }

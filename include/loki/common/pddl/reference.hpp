@@ -50,11 +50,7 @@ class References {
     private:
         std::tuple<ReferenceSetType<Ts>...> references;
 
-        const ErrorHandler& m_error_handler;
-
     public:
-        explicit References(const ErrorHandler& error_handler);
-
         /// @brief Returns a binding if it exists.
         template<typename T>
         bool exists(const T* reference) const;
@@ -66,11 +62,9 @@ class References {
         /// @brief Erases a binding of Type T
         template<typename T>
         void erase(const T* reference);
-
-        /// @brief Get the error handler to print an error message.
-        const ErrorHandler& get_error_handler() const;
 };
 
+// Note: we cannot do that with domain constants.
 using ReferencedBindings = References<pddl::TypeImpl
     , pddl::ObjectImpl
     , pddl::PredicateImpl
