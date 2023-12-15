@@ -24,11 +24,11 @@ References<Ts...>::References(const ErrorHandler& error_handler) : m_error_handl
 
 template<typename... Ts>
 template<typename T>
-std::optional<PositionType> References<Ts...>::get(const std::string& key) const {
+std::optional<std::tuple<const PositionType, const ErrorHandler&>> References<Ts...>::get(const std::string& key) const {
     const auto& t_references = std::get<MapType<T>>(references);
     auto it = t_references.find(key);
     if (it != t_references.end()) {
-        return {it->second};
+        return std::make_tuple(it->second, m_error_handler);
     }
     return std::nullopt;
 }

@@ -56,7 +56,7 @@ class References {
 
         /// @brief Returns a binding if it exists.
         template<typename T>
-        std::optional<PositionType> get(const std::string& key) const;
+        std::optional<std::tuple<const PositionType, const ErrorHandler&>> get(const std::string& key) const;
 
         /// @brief Inserts a binding of type T
         template<typename T>
