@@ -28,13 +28,13 @@
 namespace loki {
 
 template<typename Derived>
-class Handle {
+class ObserverPtr {
 private:
     int m_identifier;
     Derived const *m_object;
 
 public:
-    Handle(int identifier, Derived const *object)
+    ObserverPtr(int identifier, Derived const *object)
         : m_identifier(identifier), m_object(object) { }
 
     // TODO: add other useful functions from Base
@@ -47,23 +47,6 @@ public:
         return m_object;
     }
 };
-
-template<typename Derived>
-class HandleLight {
-private:
-    int m_identifier;
-
-public:
-    explicit HandleLight(int identifier)
-        : m_identifier(identifier) { }
-
-    // TODO: add other useful functions from Base
-
-    int get_identifier() const {
-        return m_identifier;
-    }
-};
-
 
 /// @brief Implements a common base class for PDDL objects.
 ///
@@ -139,14 +122,9 @@ public:
         return m_identifier;
     }
 
-    /// @brief Returns a handle that represents the object and access to the data.
-    Handle<Derived> get_handle() const {
-        return Handle<Derived>(m_identifier, static_cast<Derived const*>(this));
-    }
-
-    /// @brief Returns a lightweight handle that represents the object.
-    HandleLight<Derived> get_handle_light() const {
-        return HandleLight<Derived>(m_identifier);
+    /// @brief Returns a non-owning ptr.
+    ObserverPtr<Derived> get_observer_ptr() const {
+        return ObserverPtr<Derived>(m_identifier, static_cast<Derived const*>(this));
     }
 };
 

@@ -19,6 +19,7 @@
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_TYPES_HPP_
 
 #include "../factory.hpp"
+#include "../persistent_factory.hpp"
 
 #include "../../domain/pddl/action.hpp"
 #include "../../domain/pddl/atom.hpp"
@@ -26,6 +27,7 @@
 #include "../../domain/pddl/derived_predicate.hpp"
 #include "../../domain/pddl/domain.hpp"
 #include "../../domain/pddl/effects.hpp"
+#include "../../domain/pddl/function_expressions.hpp"
 #include "../../domain/pddl/function_skeleton.hpp"
 #include "../../domain/pddl/function.hpp"
 #include "../../domain/pddl/literal.hpp"
@@ -42,8 +44,41 @@
 
 namespace loki {
 
-// For unique creation
+/// @brief Factory for the unique creation of garbage collected objects
 using PddlFactory = ReferenceCountedObjectFactory<pddl::RequirementsImpl
+    , pddl::TypeImpl
+    , pddl::VariableImpl
+    , pddl::TermObjectImpl
+    , pddl::TermVariableImpl
+    , pddl::ObjectImpl
+    , pddl::AtomImpl
+    , pddl::LiteralImpl
+    , pddl::ParameterImpl
+    , pddl::PredicateImpl
+    , pddl::FunctionExpressionNumberImpl
+    , pddl::FunctionExpressionBinaryOperatorImpl
+    , pddl::FunctionExpressionMinusImpl
+    , pddl::FunctionExpressionFunctionImpl
+    , pddl::FunctionImpl
+    , pddl::FunctionSkeletonImpl
+    , pddl::ConditionLiteralImpl
+    , pddl::ConditionAndImpl
+    , pddl::ConditionOrImpl
+    , pddl::ConditionNotImpl
+    , pddl::EffectLiteralImpl
+    , pddl::EffectAndImpl
+    , pddl::EffectNumericImpl
+    , pddl::EffectConditionalForallImpl
+    , pddl::EffectConditionalWhenImpl
+    , pddl::ActionImpl
+    , pddl::DerivedPredicateImpl
+    , pddl::NumericFluentImpl
+    , pddl::DomainImpl
+    , pddl::ProblemImpl>;
+
+
+/// @brief Factory the unique creation of persistent objects
+using PersistentPddlFactory = PersistentFactory<pddl::RequirementsImpl
     , pddl::TypeImpl
     , pddl::VariableImpl
     , pddl::TermObjectImpl

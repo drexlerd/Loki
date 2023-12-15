@@ -25,8 +25,10 @@
 namespace loki {
 
 struct Context {
-    // For the unique construction of PDDL objects
+    // For the unique construction of garbage collected PDDL objects
     PddlFactory& cache;
+    // For the unique construction of persistent PDDL objects (primitive types)
+    PersistentPddlFactory& persistent_cache;
     // For referencing to existing bindings
     ScopeStack& scopes;
     // For convenience, to avoid an additional parameters when parsing

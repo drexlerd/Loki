@@ -28,7 +28,8 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
     auto scopes = ScopeStack(std::move(error_handler), domain_parser.m_scopes.get());
 
     Context context{
-        *domain_parser.m_factory,
+        domain_parser.m_factory,
+        domain_parser.m_persistent_factory,
         scopes,
         nullptr
     };

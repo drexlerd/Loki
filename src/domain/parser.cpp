@@ -25,11 +25,11 @@ DomainParser::DomainParser(const fs::path& file_path) {
 
 
     /* Parse the domain to PDDL */
-    m_factory = std::make_unique<PddlFactory>();
     m_scopes = std::make_unique<ScopeStack>(std::move(error_handler));
 
     Context context{
-        *m_factory,
+        m_factory,
+        m_persistent_factory,
         *m_scopes,
         nullptr
     };
