@@ -3,6 +3,7 @@ file(GLOB SRC_FILES
     "common/pddl/*.cpp"
     "domain/*.cpp"
     "domain/ast/*.cpp"
+    "domain/ast/stage_1/*.cpp"
     "domain/pddl/*.cpp"
     "domain/pddl/parser/*.cpp"
     "problem/*.cpp"

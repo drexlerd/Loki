@@ -1,0 +1,6 @@
+(
+define
+(
+domain gripper-strips
+)
+)

@@ -36,11 +36,10 @@
 
 
 namespace loki {
-class Scope;
 
+/// @brief Pointer type of the binding
 template<typename T>
 using BindingPtrType = const T*;
-
 
 /// @brief Encapsulates binding related information of a type T.
 ///        The object is the entity bound to the name.
@@ -103,8 +102,20 @@ template<typename T>
 using ScopeStackSearchResult = std::tuple<const BindingPtrType<T>, const std::optional<PositionType>, const ErrorHandler&>;
 
 
-/// @brief Implements a scoping mechanism with a given ErrorHandler.
-///        Allows stacking of ScopeStacks because each ScopeStack has a different ErrorHandler.
+/// @brief Implements a scoping mechanism to store bindings which are mappings from name to a pointer to a PDDL object
+///        type and a position in the input stream that can be used to construct error messages with the given ErrorHandler.
+///
+///        We use ScopeStacks indicated with surrounding "[.]" to stack scopes indicated with surrounding "(.)" to store bindings.
+///        We initialize the parsing step by creating a ScopeStack with a single scope that we call the global scope.
+///        During parsing we can open and close new scopes but we must ensure that only the single global scope remains.
+///        We can access bindings by calling the get method and the matching binding in the nearest scope is returned.
+///        We can also insert new bindings in the current scope.
+///
+///        During domain file parsing, we have a single scope stack structured as follows:
+///        [ (Domain Scope Global), (Domain Scope Child 1), (Domain Scope Child 2), ... ]
+///
+///        During problem file parsing, we get access to bindings from the domain through additional composition as follows:
+///        [ (Domain Scope Global) ], [ (Problem Scope Global), (Problem Scope Child 1), (Problem Scope Child 2), ... ]
 class ScopeStack {
     private:
         std::deque<std::unique_ptr<Scope>> m_stack;
