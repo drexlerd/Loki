@@ -50,4 +50,4 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-// cmake -S . -B build && cmake --build build -j16 && ./build/exe_v2/domain benchmarks/gripper/domain.pddl
+// cmake -S . -B build && cmake --build build -j16 && ./build/exe_v2/domain_v2 benchmarks/gripper/domain.pddl
