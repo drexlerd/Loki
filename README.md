@@ -28,9 +28,9 @@ Loki is a modern C++ library for efficient syntactic and semantic parsing of PDD
 
 ## Design Decisions and its Implied Properties
 
-### Syntactic Parsing (ongoing)
+### Syntactic Parsing
 
-Loki implements the canonical parser structure of boost spirit x3's described [here](https://www.boost.org/doc/libs/1_83_0/libs/spirit/doc/x3/html/spirit_x3/tutorials/rexpr.html) with the additional restriction of not using the sequential operator (>>). Loki instead instead fully relies on the expectation operator (>) to be able to provide an error for each failed syntactical parse. This restriction results in a multi-step parsing where the abstract syntax tree is iteratively refined.
+Loki implements the canonical parser structure of boost spirit x3 described [here](https://www.boost.org/doc/libs/1_83_0/libs/spirit/doc/x3/html/spirit_x3/tutorials/rexpr.html)
 
 ### Immutability
 
