@@ -30,7 +30,6 @@ namespace loki::common::ast {
     ///////////////////////////////////////////////////////////////////////////
     namespace x3 = boost::spirit::x3;
 
-    struct Word;
     struct Name;
     struct Variable;
     struct FunctionSymbol;
@@ -40,12 +39,6 @@ namespace loki::common::ast {
     struct Predicate;
     struct Undefined;
 
-
-    /* <word> */
-    struct Word : x3::position_tagged
-    {
-        std::string word;
-    };
 
     /* <name> */
     struct Name : x3::position_tagged

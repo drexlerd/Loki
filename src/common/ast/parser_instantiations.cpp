@@ -26,7 +26,6 @@ namespace loki::common::parser
     using phrase_context_type = loki::phrase_context_type;
     using context_type = loki::context_type;
 
-    BOOST_SPIRIT_INSTANTIATE(word_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(name_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(variable_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(function_symbol_type, iterator_type, context_type)

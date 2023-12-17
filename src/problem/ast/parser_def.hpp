@@ -119,7 +119,7 @@ namespace loki::problem::parser {
     const auto literal_def = atom | negated_atom;
 
     const auto initial_element_literals_def = literal;
-    const auto initial_element_timed_literals_def = (lit('(') >> lit("at") > common::number()) > literal > lit(')');
+    const auto initial_element_timed_literals_def = (lit('(') >> lit("at") >> common::number()) > literal > lit(')');
     const auto initial_element_numeric_fluents_def = (lit('(') >> lit('=') > basic_function_term) > common::number() > lit(')');
     const auto initial_element_object_fluents_def = (lit('(') >> lit('=') > basic_function_term) > common::name() > lit(')');
     const auto initial_element_def = initial_element_timed_literals | initial_element_numeric_fluents

@@ -37,7 +37,6 @@ namespace loki::common {
     // parser public interface
     ///////////////////////////////////////////////////////////////////////////
     namespace parser {
-        struct WordClass;
         struct NameClass;
         struct VariableClass;
         struct FunctionSymbolClass;
@@ -47,7 +46,6 @@ namespace loki::common {
         struct PredicateClass;
         struct UndefinedClass;
 
-        typedef x3::rule<WordClass, ast::Word> word_type;
         typedef x3::rule<NameClass, ast::Name> name_type;
         typedef x3::rule<VariableClass, ast::Variable> variable_type;
         typedef x3::rule<FunctionSymbolClass, ast::FunctionSymbol> function_symbol_type;
@@ -57,8 +55,7 @@ namespace loki::common {
         typedef x3::rule<PredicateClass, ast::Predicate> predicate_type;
         typedef x3::rule<UndefinedClass, ast::Undefined> undefined_type;
 
-        BOOST_SPIRIT_DECLARE(word_type, name_type, variable_type, function_symbol_type, function_term_type,
-            term_type, number_type, predicate_type, undefined_type)
+        BOOST_SPIRIT_DECLARE(name_type, variable_type, function_symbol_type, function_term_type, term_type, number_type, predicate_type, undefined_type)
 
 
         /* Keyword parsers that do not synthesize a node */
@@ -74,7 +71,6 @@ namespace loki::common {
 
     }
 
-    parser::word_type const& word();
     parser::name_type const& name();
     parser::variable_type const& variable();
     parser::number_type const& number();

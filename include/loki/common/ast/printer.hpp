@@ -25,7 +25,6 @@
 namespace loki {
 
 // create string representations from ast nodes.
-extern std::string parse_text(const common::ast::Word& node, const FormattingOptions& options={});
 extern std::string parse_text(const common::ast::Name& node, const FormattingOptions& options={});
 extern std::string parse_text(const common::ast::Variable& node, const FormattingOptions& options={});
 extern std::string parse_text(const common::ast::Number& node, const FormattingOptions& options={});

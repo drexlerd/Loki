@@ -22,12 +22,8 @@
 using namespace loki::common;
 using namespace std;
 
-namespace loki {
 
-/* Word */
-string parse(const ast::Word& node) {
-    return node.word;
-}
+namespace loki {
 
 /* Name */
 string parse(const ast::Name& node) {

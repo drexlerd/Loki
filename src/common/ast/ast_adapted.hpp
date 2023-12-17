@@ -25,7 +25,6 @@
 
 // We need to tell fusion about our rexpr and rexpr_key_value
 // to make them a first-class fusion citizens
-BOOST_FUSION_ADAPT_STRUCT(loki::common::ast::Word, word)
 BOOST_FUSION_ADAPT_STRUCT(loki::common::ast::Name, alpha, suffix)
 BOOST_FUSION_ADAPT_STRUCT(loki::common::ast::Variable, question_mark, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::common::ast::FunctionSymbol, name)

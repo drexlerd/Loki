@@ -52,7 +52,6 @@ namespace loki::common::parser {
     // Rules
     ///////////////////////////////////////////////////////////////////////////
 
-    word_type const word = "word";
     name_type const name = "name";
     variable_type const variable = "variable";
     function_symbol_type const function_symbol = "function_symbol";
@@ -71,7 +70,6 @@ namespace loki::common::parser {
     ///////////////////////////////////////////////////////////////////////////
 
 
-    const auto word_def = lexeme[+(char_ - separator())];
     const auto name_def = lexeme[alpha >> *(alnum | char_('-') | char_('_'))];
     const auto variable_def = lexeme[char_('?') > name];
     const auto function_symbol_def = name;
@@ -81,8 +79,7 @@ namespace loki::common::parser {
     const auto predicate_def = name;
     const auto undefined_def = keyword("undefined") > x3::attr(ast::Undefined{});
 
-    BOOST_SPIRIT_DEFINE(word, name, variable, function_symbol, function_term, term, number,
-        predicate, undefined)
+    BOOST_SPIRIT_DEFINE(name, variable, function_symbol, function_term, term, number, predicate, undefined)
 
 
     const auto define_keyword_def = keyword("define");
@@ -96,7 +93,6 @@ namespace loki::common::parser {
     // Annotation and Error handling
     ///////////////////////////////////////////////////////////////////////////
 
-    struct WordClass : x3::annotate_on_success {};
     struct NameClass : x3::annotate_on_success {};
     struct VariableClass : x3::annotate_on_success {};
     struct FunctionSymbolClass : x3::annotate_on_success {};
@@ -111,9 +107,6 @@ namespace loki::common::parser {
 
 namespace loki::common
 {
-    parser::word_type const& word() {
-        return parser::word;
-    }
     parser::name_type const& name() {
         return parser::name;
     }

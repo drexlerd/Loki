@@ -44,11 +44,6 @@ namespace loki
         }
     };
 
-    string parse_text(const common::ast::Word& node, const FormattingOptions&)
-    {
-        return node.word;
-    }
-
     string parse_text(const common::ast::Name& node, const FormattingOptions&)
     {
         stringstream ss;
