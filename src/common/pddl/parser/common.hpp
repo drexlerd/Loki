@@ -15,20 +15,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_COMMON_HPP_
-#define LOKI_SRC_DOMAIN_PDDL_PARSER_COMMON_HPP_
+#ifndef LOKI_SRC_COMMON_PDDL_PARSER_COMMON_HPP_
+#define LOKI_SRC_COMMON_PDDL_PARSER_COMMON_HPP_
 
-#include "../../../../include/loki/domain/ast/ast.hpp"
-#include "../../../../include/loki/domain/pddl/parser.hpp"
+#include "../../../../include/loki/common/ast/ast.hpp"
+
+
+#include "../../../../include/loki/common/pddl/context.hpp"
 
 
 namespace loki {
 
 /* Name */
-extern std::string parse(const domain::ast::Name& name_node);
+extern std::string parse(const common::ast::Name& node);
 
 /* Variable */
-extern pddl::Variable parse(const domain::ast::Variable& variable_node, Context& context);
+extern pddl::Variable parse(const common::ast::Variable& node, Context& context);
 
 /* Term */
 struct TermDeclarationTermVisitor : boost::static_visitor<pddl::Term> {
@@ -36,9 +38,9 @@ struct TermDeclarationTermVisitor : boost::static_visitor<pddl::Term> {
 
     TermDeclarationTermVisitor(Context& context_);
 
-    pddl::Term operator()(const domain::ast::Name& name_node) const;
-    pddl::Term operator()(const domain::ast::Variable& variable_node) const;
-    pddl::Term operator()(const domain::ast::FunctionTerm& function_term_node) const;
+    pddl::Term operator()(const common::ast::Name& node) const;
+    pddl::Term operator()(const common::ast::Variable& node) const;
+    pddl::Term operator()(const common::ast::FunctionTerm& node) const;
 };
 
 struct TermReferenceTermVisitor : boost::static_visitor<pddl::Term> {
@@ -46,14 +48,14 @@ struct TermReferenceTermVisitor : boost::static_visitor<pddl::Term> {
 
     TermReferenceTermVisitor(Context& context_);
 
-    pddl::Term operator()(const domain::ast::Name& name_node) const;
-    pddl::Term operator()(const domain::ast::Variable& variable_node) const;
-    pddl::Term operator()(const domain::ast::FunctionTerm& function_term_node) const;
+    pddl::Term operator()(const common::ast::Name& node) const;
+    pddl::Term operator()(const common::ast::Variable& node) const;
+    pddl::Term operator()(const common::ast::FunctionTerm& node) const;
 };
 
 
 /* Number */
-extern double parse(const domain::ast::Number& number_node);
+extern double parse(const common::ast::Number& node);
 
 }
 

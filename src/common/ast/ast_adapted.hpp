@@ -15,16 +15,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SRC_DOMAIN_AST_STAGE_1_AST_ADAPTED_HPP_
-#define LOKI_SRC_DOMAIN_AST_STAGE_1_AST_ADAPTED_HPP_
+#ifndef LOKI_SRC_DOMAIN_AST_AST_ADAPTED_HPP_
+#define LOKI_SRC_DOMAIN_AST_AST_ADAPTED_HPP_
 
-#include "../../../../include/loki/domain/ast/stage_1/ast.hpp"
+#include "../../../include/loki/common/ast/ast.hpp"
 
 #include <boost/fusion/include/adapt_struct.hpp>
-
+#include <boost/fusion/include/std_pair.hpp>
 
 // We need to tell fusion about our rexpr and rexpr_key_value
 // to make them a first-class fusion citizens
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::stage_1::ast::Node, entries)
+BOOST_FUSION_ADAPT_STRUCT(loki::common::ast::Word, word)
+BOOST_FUSION_ADAPT_STRUCT(loki::common::ast::Name, alpha, suffix)
+BOOST_FUSION_ADAPT_STRUCT(loki::common::ast::Variable, question_mark, name)
+BOOST_FUSION_ADAPT_STRUCT(loki::common::ast::FunctionSymbol, name)
+BOOST_FUSION_ADAPT_STRUCT(loki::common::ast::FunctionTerm, function_symbol, terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::common::ast::Predicate, name)
+BOOST_FUSION_ADAPT_STRUCT(loki::common::ast::Number, value)
+
 
 #endif

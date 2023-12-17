@@ -25,20 +25,13 @@
 
 // We need to tell fusion about our rexpr and rexpr_key_value
 // to make them a first-class fusion citizens
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Name, alpha, suffix)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Variable, question_mark, name)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Number, value)
-
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypeEither, types)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypedListOfNamesRecursively, names, type, typed_list_of_names)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::TypedListOfVariablesRecursively, variables, type, typed_list_of_variables)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Predicate, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaSkeleton, predicate, typed_list_of_variables)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionSymbol, name)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTerm, function_symbol, terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypeNumber, number)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypeType, type)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFunctionSkeleton, function_symbol, arguments)

@@ -17,12 +17,12 @@
 
 #include <gtest/gtest.h>
 
-#include "../../src/domain/ast/parser.hpp"
+#include "../../src/common/ast/parser.hpp"
 #include "../../include/loki/common/ast/parser_wrapper.hpp"
-#include "../../include/loki/domain/ast/printer.hpp"
+#include "../../include/loki/common/ast/printer.hpp"
 
 
-namespace loki::domain::tests {
+namespace loki::common::tests {
 
 TEST(LokiTests, FunctionSymbolTest) {
     // A function symbol is just a name

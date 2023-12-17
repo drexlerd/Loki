@@ -72,8 +72,6 @@ add_subdirectory(src)
 
 add_subdirectory(exe)
 
-add_subdirectory(exe_v2)
-
 add_subdirectory(examples)
 
 set(ENABLE_TESTING True)

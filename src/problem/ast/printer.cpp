@@ -16,6 +16,8 @@
  */
 
 #include "../../../include/loki/problem/ast/printer.hpp"
+
+#include "../../../include/loki/common/ast/printer.hpp"
 #include "../../../include/loki/domain/ast/printer.hpp"
 
 #include <sstream>

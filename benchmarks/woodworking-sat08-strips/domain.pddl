@@ -4,7 +4,7 @@
 (define (domain woodworking)
   (:requirements :typing :action-costs)
   (:types
-      acolour awood woodobj machine 
+      acolour awood woodobj machine
       surface treatmentstatus
       aboardsize apartsize - object
       highspeed-saw glazer grinder immersion-varnisher
@@ -17,7 +17,7 @@
               natural - acolour
               small medium large - apartsize)
 
-  (:predicates 
+  (:predicates
             (unused ?obj - part)
             (available ?obj - woodobj)
 
@@ -35,7 +35,7 @@
             (contains-part ?b - board ?p - part)
             (grind-treatment-change ?old ?new - treatmentstatus)
             (is-smooth ?surface - surface))
-      
+
   (:functions (total-cost) - number
             (spray-varnish-cost ?obj - part) - number
             (glaze-cost ?obj - part) - number
@@ -43,7 +43,7 @@
             (plane-cost ?obj - part) - number)
 
   (:action do-immersion-varnish
-    :parameters (?x - part ?m - immersion-varnisher 
+    :parameters (?x - part ?m - immersion-varnisher
                  ?newcolour - acolour ?surface - surface)
     :precondition (and
             (available ?x)
@@ -59,7 +59,7 @@
             (colour ?x ?newcolour)))
 
   (:action do-spray-varnish
-    :parameters (?x - part ?m - spray-varnisher 
+    :parameters (?x - part ?m - spray-varnisher
                  ?newcolour - acolour ?surface - surface)
     :precondition (and
             (available ?x)
@@ -67,7 +67,7 @@
             (surface-condition ?x ?surface)
             (is-smooth ?surface)
             (treatment ?x untreated))
-    :effect (and 
+    :effect (and
             (increase (total-cost) (spray-varnish-cost ?x))
             (not (treatment ?x untreated))
             (treatment ?x varnished)
@@ -75,13 +75,13 @@
             (colour ?x ?newcolour)))
 
   (:action do-glaze
-    :parameters (?x - part ?m - glazer 
+    :parameters (?x - part ?m - glazer
                  ?newcolour - acolour)
     :precondition (and
             (available ?x)
             (has-colour ?m ?newcolour)
             (treatment ?x untreated))
-    :effect (and 
+    :effect (and
             (increase (total-cost) (glaze-cost ?x))
             (not (treatment ?x untreated))
             (treatment ?x glazed)
@@ -90,9 +90,9 @@
 
   (:action do-grind
     :parameters (?x - part ?m - grinder ?oldsurface - surface
-                 ?oldcolour - acolour 
-                 ?oldtreatment ?newtreatment - treatmentstatus) 
-    :precondition (and 
+                 ?oldcolour - acolour
+                 ?oldtreatment ?newtreatment - treatmentstatus)
+    :precondition (and
             (available ?x)
             (surface-condition ?x ?oldsurface)
             (is-smooth ?oldsurface)
@@ -110,8 +110,8 @@
 
   (:action do-plane
     :parameters (?x - part ?m - planer ?oldsurface - surface
-                 ?oldcolour - acolour ?oldtreatment - treatmentstatus) 
-    :precondition (and 
+                 ?oldcolour - acolour ?oldtreatment - treatmentstatus)
+    :precondition (and
             (available ?x)
             (surface-condition ?x ?oldsurface)
             (treatment ?x ?oldtreatment)
@@ -135,7 +135,7 @@
             (not (available ?b))
             (not (empty ?m))
             (in-highspeed-saw ?b ?m)))
-            
+
   (:action unload-highspeed-saw
     :parameters (?b - board ?m - highspeed-saw)
     :precondition (in-highspeed-saw ?b ?m)
@@ -144,7 +144,7 @@
             (available ?b)
             (not (in-highspeed-saw ?b ?m))
             (empty ?m)))
-            
+
   (:action cut-board-small
     :parameters (?b - board ?p - part ?m - highspeed-saw ?w - awood
                  ?surface - surface ?size_before ?size_after - aboardsize)
@@ -168,7 +168,7 @@
 
   (:action cut-board-medium
     :parameters (?b - board ?p - part ?m - highspeed-saw ?w - awood
-                 ?surface - surface 
+                 ?surface - surface
                  ?size_before ?s1 ?size_after - aboardsize)
     :precondition (and
             (unused ?p)
@@ -191,7 +191,7 @@
 
   (:action cut-board-large
     :parameters (?b - board ?p - part ?m - highspeed-saw ?w - awood
-                 ?surface - surface 
+                 ?surface - surface
                  ?size_before ?s1 ?s2 ?size_after - aboardsize)
     :precondition (and
             (unused ?p)
@@ -215,8 +215,8 @@
 
   (:action do-saw-small
     :parameters (?b - board ?p - part ?m - saw ?w - awood
-                 ?surface - surface ?size_before ?size_after - aboardsize) 
-    :precondition (and 
+                 ?surface - surface ?size_before ?size_after - aboardsize)
+    :precondition (and
             (unused ?p)
             (goalsize ?p small)
             (available ?b)
@@ -230,15 +230,15 @@
             (available ?p)
             (wood ?p ?w)
             (surface-condition ?p ?surface)
-            (colour ?p natural) 
+            (colour ?p natural)
             (treatment ?p untreated)
             (boardsize ?b ?size_after)))
 
   (:action do-saw-medium
     :parameters (?b - board ?p - part ?m - saw ?w - awood
-                 ?surface - surface 
-                 ?size_before ?s1 ?size_after - aboardsize) 
-    :precondition (and 
+                 ?surface - surface
+                 ?size_before ?s1 ?size_after - aboardsize)
+    :precondition (and
             (unused ?p)
             (goalsize ?p medium)
             (available ?b)
@@ -253,15 +253,15 @@
             (available ?p)
             (wood ?p ?w)
             (surface-condition ?p ?surface)
-            (colour ?p natural) 
+            (colour ?p natural)
             (treatment ?p untreated)
             (boardsize ?b ?size_after)))
 
   (:action do-saw-large
     :parameters (?b - board ?p - part ?m - saw ?w - awood
-                 ?surface - surface 
-                 ?size_before ?s1 ?s2 ?size_after - aboardsize) 
-    :precondition (and 
+                 ?surface - surface
+                 ?size_before ?s1 ?s2 ?size_after - aboardsize)
+    :precondition (and
             (unused ?p)
             (goalsize ?p large)
             (available ?b)
@@ -277,7 +277,7 @@
             (available ?p)
             (wood ?p ?w)
             (surface-condition ?p ?surface)
-            (colour ?p natural) 
+            (colour ?p natural)
             (treatment ?p untreated)
             (boardsize ?b ?size_after)))
 )

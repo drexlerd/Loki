@@ -16,12 +16,13 @@
  */
 
 #include "types.hpp"
-#include "common.hpp"
 
+#include "../../../common/pddl/parser/common.hpp"
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 using namespace loki::domain;
 using namespace std;
+
 
 namespace loki {
 
@@ -34,13 +35,9 @@ pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::Type& type_node
     return boost::apply_visitor(*this, type_node);
 }
 
-pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::Name& name_node) {
+pddl::TypeList TypeDeclarationTypeVisitor::operator()(const common::ast::Name& name_node) {
     auto name = parse(name_node);
     return { context.factories.types.get_or_create<pddl::TypeImpl>(name) };
-}
-
-pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeObject&) {
-    return { context.factories.types.get_or_create<pddl::TypeImpl>("object") };
 }
 
 pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeEither& either_type_node) {
@@ -62,7 +59,7 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Type& type_node) 
     return boost::apply_visitor(*this, type_node);
 }
 
-pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Name& name_node) {
+pddl::TypeList TypeReferenceTypeVisitor::operator()(const common::ast::Name& name_node) {
     auto name = parse(name_node);
     auto binding = context.scopes.get<pddl::TypeImpl>(name);
     if (!binding.has_value()) {
@@ -70,12 +67,6 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Name& name_node) 
     }
     const auto& [type, _position, _error_handler] = binding.value();
     return { type };
-}
-
-pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeObject&) {
-    assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
-    const auto& [type_object, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
-    return { type_object };
 }
 
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& either_type_node) {
@@ -93,7 +84,7 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& eithe
 TypeDeclarationTypedListOfNamesVisitor::TypeDeclarationTypedListOfNamesVisitor(Context& context_)
     : context(context_) { }
 
-pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
+pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vector<common::ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     pddl::TypeList type_list;
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());

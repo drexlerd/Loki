@@ -17,9 +17,9 @@
 
 #include "functions.hpp"
 
-#include "common.hpp"
 #include "parameters.hpp"
 
+#include "../../../common/pddl/parser/common.hpp"
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 

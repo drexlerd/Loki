@@ -25,12 +25,6 @@
 namespace loki {
 
 // create string representations from ast nodes.
-extern std::string parse_text(const domain::ast::Name& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::Variable& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::Number& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::Term& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::Undefined& node, const FormattingOptions& options={});
-
 extern std::string parse_text(const domain::ast::RequirementStrips& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::RequirementTyping& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::RequirementNegativePreconditions& node, const FormattingOptions& options={});
@@ -53,18 +47,14 @@ extern std::string parse_text(const domain::ast::RequirementActionCosts& node, c
 extern std::string parse_text(const domain::ast::Requirement& node, const FormattingOptions& options={});
 
 extern std::string parse_text(const domain::ast::Type& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::TypeObject& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::TypeEither& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::TypedListOfNamesRecursively& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::TypedListOfNames& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::TypedListOfVariablesRecursively& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::TypedListOfVariables& node, const FormattingOptions& options={});
 
-extern std::string parse_text(const domain::ast::Predicate& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::AtomicFormulaSkeleton& node, const FormattingOptions& options={});
 
-extern std::string parse_text(const domain::ast::FunctionSymbol& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::FunctionTerm& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::FunctionTypeNumber& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::FunctionTypeType& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::FunctionType& node, const FormattingOptions& options={});

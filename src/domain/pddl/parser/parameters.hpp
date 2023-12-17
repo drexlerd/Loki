@@ -33,7 +33,7 @@ private:
 public:
     ParameterListVisitor(Context& context_);
 
-    pddl::ParameterList operator()(const std::vector<domain::ast::Variable>& variable_nodes);
+    pddl::ParameterList operator()(const std::vector<common::ast::Variable>& variable_nodes);
 
     pddl::ParameterList operator()(const domain::ast::TypedListOfVariablesRecursively& typed_variables_node);
 };

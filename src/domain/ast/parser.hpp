@@ -30,12 +30,6 @@ namespace loki::domain {
     // parser public interface for testing
     ///////////////////////////////////////////////////////////////////////////
     namespace parser {
-        struct NameClass;
-        struct VariableClass;
-        struct NumberClass;
-        struct TermClass;
-        struct UndefinedClass;
-
         struct RequirementStripsClass;
         struct RequirementTypingClass;
         struct RequirementNegativePreconditionsClass;
@@ -58,18 +52,14 @@ namespace loki::domain {
         struct RequirementClass;
 
         struct TypeClass;
-        struct TypeObjectClass;
         struct TypeEitherClass;
         struct TypedListOfNamesRecursivelyClass;
         struct TypedListOfNamesClass;
         struct TypedListOfVariablesRecursivelyClass;
         struct TypedListOfVariablesClass;
 
-        struct PredicateClass;
         struct AtomicFormulaSkeletonClass;
 
-        struct FunctionSymbolClass;
-        struct FunctionTermClass;
         struct FunctionTypeNumberClass;
         struct FunctionTypeTypeClass;
         struct FunctionTypeClass;
@@ -168,12 +158,6 @@ namespace loki::domain {
         struct StructureClass;
 
 
-        typedef x3::rule<NameClass, ast::Name> name_type;
-        typedef x3::rule<VariableClass, ast::Variable> variable_type;
-        typedef x3::rule<NumberClass, ast::Number> number_type;
-        typedef x3::rule<TermClass, ast::Term> term_type;
-        typedef x3::rule<UndefinedClass, ast::Undefined> undefined_type;
-
         typedef x3::rule<RequirementStripsClass, ast::RequirementStrips> requirement_strips_type;
         typedef x3::rule<RequirementTypingClass, ast::RequirementTyping> requirement_typing_type;
         typedef x3::rule<RequirementNegativePreconditionsClass, ast::RequirementNegativePreconditions> requirement_negative_preconditions_type;
@@ -196,18 +180,14 @@ namespace loki::domain {
         typedef x3::rule<RequirementClass, ast::Requirement> requirement_type;
 
         typedef x3::rule<TypeClass, ast::Type> type_type;
-        typedef x3::rule<TypeObjectClass, ast::TypeObject> type_object_type;
         typedef x3::rule<TypeEitherClass, ast::TypeEither> type_either_type;
         typedef x3::rule<TypedListOfNamesRecursivelyClass, ast::TypedListOfNamesRecursively> typed_list_of_names_recursively_type;
         typedef x3::rule<TypedListOfNamesClass, ast::TypedListOfNames> typed_list_of_names_type;
         typedef x3::rule<TypedListOfVariablesRecursivelyClass, ast::TypedListOfVariablesRecursively> typed_list_of_variables_recursively_type;
         typedef x3::rule<TypedListOfVariablesClass, ast::TypedListOfVariables> typed_list_of_variables_type;
 
-        typedef x3::rule<PredicateClass, ast::Predicate> predicate_type;
         typedef x3::rule<AtomicFormulaSkeletonClass, ast::AtomicFormulaSkeleton> atomic_formula_skeleton_type;
 
-        typedef x3::rule<FunctionSymbolClass, ast::FunctionSymbol> function_symbol_type;
-        typedef x3::rule<FunctionTermClass, ast::FunctionTerm> function_term_type;
         typedef x3::rule<FunctionTypeNumberClass, ast::FunctionTypeNumber> function_type_number_type;
         typedef x3::rule<FunctionTypeTypeClass, ast::FunctionTypeType> function_type_type_type;
         typedef x3::rule<FunctionTypeClass, ast::FunctionType> function_type_type;
@@ -305,9 +285,6 @@ namespace loki::domain {
         typedef x3::rule<ConstraintsClass, ast::Constraints> constraints_type;
         typedef x3::rule<StructureClass, ast::Structure> structure_type;
 
-
-        BOOST_SPIRIT_DECLARE(name_type, variable_type, number_type, term_type, undefined_type)
-
         BOOST_SPIRIT_DECLARE(
             requirement_strips_type, requirement_typing_type, requirement_negative_preconditions_type, requirement_disjunctive_preconditions_type,
             requirement_equality_type, requirement_existential_preconditions_type, requirement_universal_preconditions_type,
@@ -317,12 +294,12 @@ namespace loki::domain {
             requirement_constraints_type, requirement_action_costs_type, requirement_type)
 
         BOOST_SPIRIT_DECLARE(
-            type_type, type_object_type, type_either_type, typed_list_of_names_recursively_type, typed_list_of_names_type,
+            type_type, type_either_type, typed_list_of_names_recursively_type, typed_list_of_names_type,
             typed_list_of_variables_recursively_type, typed_list_of_variables_type)
 
-        BOOST_SPIRIT_DECLARE(predicate_type, atomic_formula_skeleton_type)
+        BOOST_SPIRIT_DECLARE(atomic_formula_skeleton_type)
 
-        BOOST_SPIRIT_DECLARE(function_symbol_type, function_term_type, function_type_number_type, function_type_type_type, function_type_type, atomic_function_skeleton_type, function_typed_list_of_atomic_function_skeletons_recursively_type, function_typed_list_of_atomic_function_skeletons_type)
+        BOOST_SPIRIT_DECLARE(function_type_number_type, function_type_type_type, function_type_type, atomic_function_skeleton_type, function_typed_list_of_atomic_function_skeletons_recursively_type, function_typed_list_of_atomic_function_skeletons_type)
 
         BOOST_SPIRIT_DECLARE(atomic_formula_of_terms_type, atom_type, negated_atom_type, literal_type)
 
@@ -366,12 +343,6 @@ namespace loki::domain {
             predicates_type, functions_type, constraints_type, structure_type)
     }
 
-    parser::name_type const& name();
-    parser::variable_type const& variable();
-    parser::number_type const& number();
-    parser::term_type const& term();
-    parser::undefined_type const& undefined();
-
     parser::requirement_strips_type const& requirement_strips();
     parser::requirement_typing_type const& requirement_typing();
     parser::requirement_negative_preconditions_type const& requirement_negative_preconditions();
@@ -394,14 +365,12 @@ namespace loki::domain {
     parser::requirement_type const& requirement();
 
     parser::type_type const& type();
-    parser::type_object_type const& type_object();
     parser::type_either_type const& type_either();
     parser::typed_list_of_names_recursively_type const& typed_list_of_names_recursively();
     parser::typed_list_of_names_type const& typed_list_of_names();
     parser::typed_list_of_variables_recursively_type const& typed_list_of_variables_recursively();
     parser::typed_list_of_variables_type const& typed_list_of_variables();
 
-    parser::predicate_type const& predicate();
     parser::atomic_formula_skeleton_type const& atomic_formula_skeleton();
 
     parser::multi_operator_mul_type const& multi_operator_mul();
@@ -418,8 +387,6 @@ namespace loki::domain {
     parser::binary_comparator_less_equal_type const& binary_comparator_less_equal();
     parser::binary_comparator_type const& binary_comparator();
 
-    parser::function_symbol_type const& function_symbol();
-    parser::function_term_type const& function_term();
     parser::function_type_number_type const& function_type_number();
     parser::function_type_type_type const& function_type_type_();
     parser::function_type_type const& function_type();

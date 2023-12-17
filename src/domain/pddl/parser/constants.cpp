@@ -16,9 +16,9 @@
  */
 
 #include "constants.hpp"
-#include "common.hpp"
 #include "types.hpp"
 
+#include "../../../common/pddl/parser/common.hpp"
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 using namespace loki::domain;
@@ -30,7 +30,7 @@ ConstantListVisitor::ConstantListVisitor(Context& context_)
     : context(context_) { }
 
 
-pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
+pddl::ObjectList ConstantListVisitor::operator()(const std::vector<common::ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     auto object_list = pddl::ObjectList();
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());

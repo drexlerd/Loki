@@ -17,7 +17,7 @@
 
 #include "literal.hpp"
 
-#include "common.hpp"
+#include "../../../common/pddl/parser/common.hpp"
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 

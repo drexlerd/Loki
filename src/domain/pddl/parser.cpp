@@ -27,7 +27,6 @@
 #include "../../../include/loki/domain/pddl/domain.hpp"
 #include "../../../include/loki/domain/pddl/object.hpp"
 
-#include "parser/common.hpp"
 #include "parser/constants.hpp"
 #include "parser/functions.hpp"
 #include "parser/parameters.hpp"
@@ -35,6 +34,8 @@
 #include "parser/requirements.hpp"
 #include "parser/types.hpp"
 #include "parser/structure.hpp"
+
+#include "../../common/pddl/parser/common.hpp"
 
 using namespace loki::domain;
 using namespace std;

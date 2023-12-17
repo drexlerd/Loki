@@ -16,9 +16,9 @@
  */
 
 #include "predicates.hpp"
-#include "common.hpp"
 #include "parameters.hpp"
 
+#include "../../../common/pddl/parser/common.hpp"
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 using namespace loki::domain;
