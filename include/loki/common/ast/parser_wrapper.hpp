@@ -25,14 +25,13 @@
 
 
 namespace loki {
-template<typename Parser, typename Node>
-bool parse_ast(const std::string& source, const Parser& parser, Node& out, error_handler_type& error_handler) {
-    out = Node(); // reinitialize
-    loki::iterator_type iter(source.begin());
-    const loki::iterator_type end(source.end());
 
-    assert(error_handler.get_position_cache().first() == iter &&
-           error_handler.get_position_cache().last() == end);
+template<typename Iterator, typename Parser, typename Node>
+bool parse_ast(Iterator& iter, Iterator end, const Parser& parser, Node& out, error_handler_type& error_handler) {
+    out = Node(); // reinitialize
+
+    //assert(error_handler.get_position_cache().first() <= iter &&
+    //       end < error_handler.get_position_cache().last());
 
     using boost::spirit::x3::with;
     auto const wrapped_parser =
@@ -43,6 +42,12 @@ bool parse_ast(const std::string& source, const Parser& parser, Node& out, error
     using boost::spirit::x3::ascii::space;
     bool success = phrase_parse(iter, end, wrapped_parser, space, out);
     return success;
+}
+
+template<typename Parser, typename Node>
+bool parse_ast(const std::string& source, const Parser& parser, Node& out, error_handler_type& error_handler) {
+    auto iter = source.begin();
+    return parse_ast(iter, source.end(), parser, out, error_handler);
 }
 
 template<typename Parser, typename Node>

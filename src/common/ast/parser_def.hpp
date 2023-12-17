@@ -70,18 +70,8 @@ namespace loki::common::parser {
     // Grammar
     ///////////////////////////////////////////////////////////////////////////
 
-    inline auto separator() {
-        return (ascii::space | lit('\n') | lit('(') | lit(')'));  // TODO: is ) correct?
-    }
 
-    /// @brief A separator must follow a keyword because we do not want to allow
-    ///        parsing prefix like "or" of "origin" as a keyword.
-    inline auto keyword(const std::string& keyword) {
-        return lit(keyword) >> no_skip[&separator()];
-    }
-
-
-    const auto word_def = lexeme[+(!separator()) - separator()];
+    const auto word_def = lexeme[+(char_ - separator())];
     const auto name_def = lexeme[alpha >> *(alnum | char_('-') | char_('_'))];
     const auto variable_def = lexeme[char_('?') > name];
     const auto function_symbol_def = name;
@@ -115,7 +105,6 @@ namespace loki::common::parser {
     struct NumberClass : x3::annotate_on_success {};
     struct PredicateClass : x3::annotate_on_success {};
     struct UndefinedClass : x3::annotate_on_success {};
-
 
     // keywords need no annotation
 }

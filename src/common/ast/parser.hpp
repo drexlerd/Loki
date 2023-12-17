@@ -84,11 +84,14 @@ namespace loki::common {
     parser::predicate_type const& predicate();
     parser::undefined_type const& undefined();
 
+    inline auto separator() {
+        return (ascii::space | lit('\n') | lit('(') | lit(')'));  // TODO: is ) correct?
+    }
 
     /// @brief A separator must follow a keyword because we do not want to allow
     ///        parsing prefix like "or" of "origin" as a keyword.
     inline auto keyword(const std::string& keyword) {
-        return lit(keyword) >> no_skip[&(ascii::space | lit('\n') | lit('(') | lit(')'))];
+        return lit(keyword) >> no_skip[&separator()];
     }
 
     parser::define_keyword_type const& define_keyword();

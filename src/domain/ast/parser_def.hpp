@@ -22,6 +22,7 @@
 #include "parser.hpp"
 
 #include "../../common/ast/parser.hpp"
+#include "../../../include/loki/common/ast/parser_wrapper.hpp"
 #include "../../../include/loki/domain/ast/ast.hpp"
 #include "../../../include/loki/domain/ast/error_handler.hpp"
 #include "../../../include/loki/domain/ast/parser.hpp"
@@ -218,6 +219,29 @@ namespace loki::domain::parser {
     const auto typed_list_of_names_recursively_def = (+common::name() >> lit('-')) > type > typed_list_of_names;
     const auto typed_list_of_names_def = typed_list_of_names_recursively | *common::name();
     const auto typed_list_of_variables_recursively_def = (+common::variable() >> lit('-')) > type > typed_list_of_variables;
+    // TODO we are working here
+    // original: const auto typed_list_of_variables_def = typed_list_of_variables_recursively | *common::variable();
+
+    const auto verify_is_variable = [](auto& ctx) {
+        const auto& words = _attr(ctx);
+        auto& error_handler = x3::get<error_handler_tag>(ctx).get();
+        for (const auto& word : words) {
+            auto range = error_handler.position_of(word);
+            iterator_type word_begin = range.begin();
+            iterator_type word_end = range.end();
+            bool success = parse_ast(word_begin, word_end, common::variable(), error_handler);
+            if (!success) {
+                // TODO: throw some error.
+                _pass(ctx) = false;
+                throw std::runtime_error("asd");
+            }
+        }
+        _pass(ctx) = true;
+    };
+
+    // The commented line fails
+    // const auto typed_list_of_variables_def = typed_list_of_variables_recursively | ((*common::word())[verify_is_variable]);
+    // The direct line succeeds
     const auto typed_list_of_variables_def = typed_list_of_variables_recursively | *common::variable();
 
     const auto atomic_formula_skeleton_def = lit('(') > common::predicate() > typed_list_of_variables > lit(')');
