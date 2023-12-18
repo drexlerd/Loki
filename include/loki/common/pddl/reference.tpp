@@ -29,7 +29,7 @@ bool References<Ts...>::exists(const T* reference) const {
 
 template<typename... Ts>
 template<typename T>
-void References<Ts...>::insert(const T* reference) {
+void References<Ts...>::track(const T* reference) {
     auto& t_references = std::get<ReferenceSetType<T>>(references);
     t_references.insert(reference);
 }
@@ -37,9 +37,8 @@ void References<Ts...>::insert(const T* reference) {
 
 template<typename... Ts>
 template<typename T>
-void References<Ts...>::erase(const T* reference) {
+void References<Ts...>::untrack(const T* reference) {
     auto& t_references = std::get<ReferenceSetType<T>>(references);
-    assert(t_references.count(reference));
     t_references.erase(reference);
 }
 

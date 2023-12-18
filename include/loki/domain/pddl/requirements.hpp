@@ -62,6 +62,12 @@ using RequirementEnumList = std::vector<RequirementEnum>;
 extern std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string;
 extern const std::string& to_string(pddl::RequirementEnum requirement);
 
+/// @brief We want to be able to treat requirements as other PDDL objects.
+///        Hence, we create a separate class for each.
+class RequirementImpl : public Base<RequirementImpl> {
+private:
+};
+
 
 class RequirementsImpl : public Base<RequirementsImpl> {
 private:

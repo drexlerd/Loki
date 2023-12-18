@@ -48,6 +48,7 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
     // Initialize the context
     auto scopes = ScopeStack(std::move(error_handler), domain_parser.m_scopes.get());
     auto composite_factories = CompositeOfPDDLFactories{
+        domain_parser.m_factories.requirement_enums,
         domain_parser.m_factories.requirements,
         domain_parser.m_factories.types,
         domain_parser.m_factories.variables,

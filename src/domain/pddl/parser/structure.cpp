@@ -45,7 +45,16 @@ pddl::Action parse(const domain::ast::Action& node, Context& context) {
     context.scopes.open_scope();
     auto name = parse(node.action_symbol.name);
     auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
+    for (const auto& parameter : parameters) {
+        context.references.track(parameter->get_variable());
+    }
     auto [condition, effect] = parse(node.action_body, context);
+    for (const auto& parameter : parameters) {
+        if (context.references.exists(parameter->get_variable())) {
+            const auto& [variable, position, error_handler] = context.scopes.get<pddl::VariableImpl>(parameter->get_variable()->get_name()).value();
+            throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
+        }
+    }
     context.scopes.close_scope();
     return context.factories.actions.get_or_create<pddl::ActionImpl>(name, parameters, condition, effect);
 }

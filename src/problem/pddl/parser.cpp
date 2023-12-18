@@ -43,7 +43,7 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
     /* Requirements section */
     if (problem_node.requirements.has_value()) {
         context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(
-            parse(problem_node.requirements.value()));
+            parse(problem_node.requirements.value(), context));
     } else {
         // Default requirements
         context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(

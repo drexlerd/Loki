@@ -43,18 +43,24 @@ pddl::Variable parse(const ast::Variable& node, Context& context) {
 TermDeclarationTermVisitor::TermDeclarationTermVisitor(Context& context_)
     : context(context_) { }
 
+
 pddl::Term TermDeclarationTermVisitor::operator()(const ast::Name& node) const {
     const auto constant_name = parse(node);
+    // Test for undefined constant.
     const auto binding = context.scopes.get<pddl::ObjectImpl>(constant_name);
     if (!binding.has_value()) {
         throw UndefinedConstantError(constant_name, context.scopes.get_error_handler()(node, ""));
     }
+    // Constant are not tracked and hence must not be untracked.
+    // Construct Term and return it
     const auto& [constant, _position, _error_handler] = binding.value();
     return context.factories.terms.get_or_create<pddl::TermObjectImpl>(constant);
 }
 
+
 pddl::Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) const {
     const auto variable = parse(node, context);
+    // Test for multiple definition
     const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
     if (binding.has_value()) {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
@@ -63,14 +69,19 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) con
         const auto message_2 = error_handler(position.value(), "First defined here:");
         throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
     }
+    // Add binding to scope
     context.scopes.insert<pddl::VariableImpl>(variable->get_name(), variable, node);
+    // Construct Term and return it
     return context.factories.terms.get_or_create<pddl::TermVariableImpl>(variable);
 }
 
 pddl::Term TermDeclarationTermVisitor::operator()(const ast::FunctionTerm& node) const {
-    throw UnsupportedRequirementError(
-        pddl::RequirementEnum::OBJECT_FLUENTS,
-        context.scopes.get_error_handler()(node, ""));
+    if (!context.requirements->test(pddl::RequirementEnum::OBJECT_FLUENTS)) {
+        throw UndefinedRequirementError(pddl::RequirementEnum::OBJECT_FLUENTS, context.scopes.get_error_handler()(node, ""));
+    }
+    context.references.untrack(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::OBJECT_FLUENTS));
+
+    throw NotImplementedError("pddl::Term TermDeclarationTermVisitor::operator()(const ast::FunctionTerm& node) const");
 }
 
 
@@ -79,27 +90,37 @@ TermReferenceTermVisitor::TermReferenceTermVisitor(Context& context_)
 
 pddl::Term TermReferenceTermVisitor::operator()(const ast::Name& node) const {
     const auto constant_name = parse(node);
+    // Test for undefined constant.
     const auto binding = context.scopes.get<pddl::ObjectImpl>(constant_name);
     if (!binding.has_value()) {
         throw UndefinedConstantError(constant_name, context.scopes.get_error_handler()(node, ""));
     }
+    // Constant are not tracked and hence must not be untracked.
+    // Get Term and return it
     const auto& [constant, position, error_handler] = binding.value();
     return context.factories.terms.get_or_create<pddl::TermObjectImpl>(constant);
 }
 
 pddl::Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const {
     const auto variable = parse(node, context);
+    // Test for undefined variable
     const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
     if (!binding.has_value()) {
         throw UndefinedVariableError(variable->get_name(), context.scopes.get_error_handler()(node, ""));
     }
+    // Declare variable as being referenced.
+    context.references.untrack(variable);
+    // Get Term and return it
     return context.factories.terms.get_or_create<pddl::TermVariableImpl>(variable);
 }
 
 pddl::Term TermReferenceTermVisitor::operator()(const ast::FunctionTerm& node) const {
-    throw UnsupportedRequirementError(
-        pddl::RequirementEnum::OBJECT_FLUENTS,
-        context.scopes.get_error_handler()(node, ""));
+    if (!context.requirements->test(pddl::RequirementEnum::OBJECT_FLUENTS)) {
+        throw UndefinedRequirementError(pddl::RequirementEnum::OBJECT_FLUENTS, context.scopes.get_error_handler()(node, ""));
+    }
+    context.references.untrack(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::OBJECT_FLUENTS));
+
+    throw NotImplementedError("pddl::Term TermReferenceTermVisitor::operator()(const ast::FunctionTerm& node) const");
 }
 
 

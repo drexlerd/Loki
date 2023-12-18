@@ -46,6 +46,7 @@ namespace loki {
 
 /// @brief Collection of factories for the unique creation of PDDL objects.
 struct CollectionOfPDDLFactories {
+    PersistentFactory<pddl::RequirementEnum> requirement_enums;
     PersistentFactory<pddl::RequirementsImpl> requirements;
     PersistentFactory<pddl::TypeImpl> types;
     PersistentFactory<pddl::VariableImpl> variables;
@@ -93,6 +94,7 @@ struct CollectionOfPDDLFactories {
 ///        by using problem specific factories.
 ///        We currently use problem specific factories for atoms and literals
 struct CompositeOfPDDLFactories {
+    PersistentFactory<pddl::RequirementEnum>& requirement_enums;
     PersistentFactory<pddl::RequirementsImpl>& requirements;
     PersistentFactory<pddl::TypeImpl>& types;
     PersistentFactory<pddl::VariableImpl>& variables;

@@ -24,6 +24,7 @@
 #include "../../domain/pddl/predicate.hpp"
 #include "../../domain/pddl/function_skeleton.hpp"
 #include "../../domain/pddl/variable.hpp"
+#include "../../domain/pddl/requirements.hpp"
 
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 
@@ -43,8 +44,13 @@ using ReferenceSetType = std::unordered_set<const T*>;
 /// @brief Encapsulates referenced bindings.
 ///        We require that each binding must be referenced at least one in a child scope
 ///        and if it was not referenced then we report an error message.
-///        Insert a reference when it is made
-///        and delete it after checking whether it was referenced.
+///
+///        Example usage:
+///        1. Track all variables of the parameters of an action.
+///        2. Parse the conditions and effects while untracking
+///           variables that are referenced.
+///        3. Verify that all variables are untracked, meaning
+///           that they were referenced at least once.
 template<typename... Ts>
 class References {
     private:
@@ -57,11 +63,11 @@ class References {
 
         /// @brief Inserts a binding of type T
         template<typename T>
-        void insert(const T* reference);
+        void track(const T* reference);
 
         /// @brief Erases a binding of Type T
         template<typename T>
-        void erase(const T* reference);
+        void untrack(const T* reference);
 };
 
 // Note: we cannot do that with domain constants.

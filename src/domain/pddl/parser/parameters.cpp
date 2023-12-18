@@ -28,6 +28,19 @@ using namespace std;
 
 namespace loki {
 
+static void test_multiple_definition_variable(const pddl::Variable& variable, const ast::Variable& node, const Context& context) {
+    const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
+    if (binding.has_value()) {
+        const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
+        auto message_2 = std::string("");
+        const auto& [_variable, position, error_handler] = binding.value();
+        if (position.has_value()) {
+            message_2 = error_handler(position.value(), "First defined here:");
+        }
+        throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
+    }
+}
+
 ParameterListVisitor::ParameterListVisitor(Context& context_)
     : context(context_) { }
 
@@ -37,16 +50,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Vari
     const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("object");
     for (const auto& variable_node : variable_nodes) {
         const auto variable = parse(variable_node, context);
-        const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
-        if (binding.has_value()) {
-            const auto message_1 = context.scopes.get_error_handler()(variable_node, "Defined here:");
-            auto message_2 = std::string("");
-            const auto& [_variable, position, error_handler] = binding.value();
-            if (position.has_value()) {
-                message_2 = error_handler(position.value(), "First defined here:");
-            }
-            throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
-        }
+        test_multiple_definition_variable(variable, variable_node, context);
         context.scopes.insert(variable->get_name(), variable, variable_node);
         const auto parameter = context.factories.parameters.get_or_create<pddl::ParameterImpl>(variable, pddl::TypeList{type});
         parameter_list.emplace_back(parameter);
@@ -65,16 +69,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
     // A non-visited vector of variables has user defined types
     for (const auto& variable_node : typed_variables_node.variables) {
         const auto variable = parse(variable_node, context);
-        const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
-        if (binding.has_value()) {
-            const auto message_1 = context.scopes.get_error_handler()(variable_node, "Defined here:");
-            auto message_2 = std::string("");
-            const auto& [_variable, position, error_handler] = binding.value();
-            if (position.has_value()) {
-                message_2 = error_handler(position.value(), "First defined here:");
-            }
-            throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
-        }
+        test_multiple_definition_variable(variable, variable_node, context);
         context.scopes.insert(variable->get_name(), variable, variable_node);
         const auto parameter = context.factories.parameters.get_or_create<pddl::ParameterImpl>(variable, types);
         parameter_list.emplace_back(parameter);

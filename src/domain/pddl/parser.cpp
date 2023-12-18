@@ -47,7 +47,7 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context) {
     /* Requirements section */
     if (domain_node.requirements.has_value()) {
         context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(
-            parse(domain_node.requirements.value()));
+            parse(domain_node.requirements.value(), context));
     } else {
         // Default requirements
         context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(
