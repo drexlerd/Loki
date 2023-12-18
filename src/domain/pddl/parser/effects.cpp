@@ -68,7 +68,7 @@ pddl::Effect parse(const domain::ast::EffectProductionNumericFluent& node, Conte
 }
 
 pddl::Effect parse(const domain::ast::EffectProductionObjectFluent& node, Context& context) {
-    throw UnsupportedRequirementError(pddl::RequirementEnum::OBJECT_FLUENTS, context.scopes.get_error_handler()(node, ""));
+    throw NotImplementedError("parse(const domain::ast::EffectProductionObjectFluent& node, Context& context)");
 }
 
 pddl::Effect parse(const domain::ast::EffectProduction& node, Context& context) {

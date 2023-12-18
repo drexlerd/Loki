@@ -63,6 +63,7 @@ pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, Context&
     if (!context.requirements->test(pddl::RequirementEnum::DERIVED_PREDICATES)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::DERIVED_PREDICATES, context.scopes.get_error_handler()(node, ""));
     }
+    context.referenced_enums.untrack(pddl::RequirementEnum::DERIVED_PREDICATES);
     auto parameters = boost::apply_visitor(ParameterListVisitor(context),
         node.typed_list_of_variables);
     auto condition = parse(node.goal_descriptor, context);

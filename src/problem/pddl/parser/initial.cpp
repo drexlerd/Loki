@@ -21,6 +21,7 @@
 #include "function.hpp"
 
 #include "../../../../include/loki/common/exceptions.hpp"
+#include "../../../../include/loki/domain/pddl/exceptions.hpp"
 #include "../../../domain/pddl/parser/common.hpp"
 
 
@@ -39,6 +40,10 @@ boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operat
 }
 
 boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operator()(const problem::ast::InitialElementNumericFluents& node) {
+    if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS)) {
+        throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.scopes.get_error_handler()(node, ""));
+    }
+    context.referenced_enums.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
     const auto basic_function_term = parse(node.basic_function_term, context);
     double number = parse(node.number);
     return context.factories.numeric_fluents.get_or_create<pddl::NumericFluentImpl>(basic_function_term, number);
