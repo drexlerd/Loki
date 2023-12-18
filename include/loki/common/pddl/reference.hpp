@@ -45,7 +45,7 @@ template<typename T>
 using ValueReferenceSetType = std::unordered_set<T>;
 
 
-/// @brief Encapsulates referenced bindings.
+/// @brief Encapsulates referenced pointers of bindings.
 ///        We require that each binding must be referenced at least one in a child scope
 ///        and if it was not referenced then we report an error message.
 ///
@@ -61,35 +61,36 @@ class PointerReferences {
         std::tuple<ReferenceSetType<Ts>...> references;
 
     public:
-        /// @brief Returns a binding if it exists.
+        /// @brief Returns a pointer if it exists.
         template<typename T>
         bool exists(const T* reference) const;
 
-        /// @brief Inserts a binding of type T
+        /// @brief Inserts a pointer of type T
         template<typename T>
         void track(const T* reference);
 
-        /// @brief Erases a binding of Type T
+        /// @brief Erases a pointer of Type T
         template<typename T>
         void untrack(const T* reference);
 };
 
-// We use it to track RequirementEnum
+/// @brief Encapsulates referenced values of enums.
+///        Usage is similar to PointerReferences.
 template<typename... Ts>
 class EnumReferences {
     private:
         std::tuple<ValueReferenceSetType<Ts>...> references;
 
     public:
-        /// @brief Returns a binding if it exists.
+        /// @brief Returns a value if it exists.
         template<typename T>
         bool exists(T value) const;
 
-        /// @brief Inserts a binding of type T
+        /// @brief Inserts a value of type T
         template<typename T>
         void track(T value);
 
-        /// @brief Erases a binding of Type T
+        /// @brief Erases a value of Type T
         template<typename T>
         void untrack(T value);
 };
