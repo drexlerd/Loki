@@ -31,13 +31,15 @@ namespace loki
         CompositeOfPDDLFactories &factories;
         // For referencing to existing bindings
         ScopeStack &scopes;
-        // For checking that bindings were references at least once
-        ReferencedBindings references;
+        // For checking that binding pointers were referenced at least once
+        ReferencedPointers referenced_pointers;
+        // For checking that enum values were referenced at least once
+        ReferencedEnums referenced_enums;
         // For convenience, to avoid an additional parameter during semantic parsing
         pddl::Requirements requirements;
 
         Context(CompositeOfPDDLFactories &factories_, ScopeStack &scopes_)
-            : factories(factories_), scopes(scopes_), references(ReferencedBindings()), requirements(nullptr) {}
+            : factories(factories_), scopes(scopes_), referenced_pointers(ReferencedPointers()), referenced_enums(ReferencedEnums()), requirements(nullptr) {}
     };
 
 }

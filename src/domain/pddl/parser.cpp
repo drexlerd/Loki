@@ -83,11 +83,11 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context) {
         auto variant = boost::apply_visitor(StructureVisitor(context), structure_node);
         boost::apply_visitor(UnpackingVisitor(action_list, derived_predicate_list), variant);
     }
-    // Check references
+    // Check referenced_pointers
     // cannot do that with constants
     /*
     for (const auto& constant : constants) {
-        if (!context.references.exists(constant)) {
+        if (!context.referenced_pointers.exists(constant)) {
             const auto& [_constant, position, error_handler] = context.scopes.get<pddl::ObjectImpl>(constant->get_name()).value();
             throw UnusedConstantError(constant->get_name(), error_handler(position.value(), ""));
         }

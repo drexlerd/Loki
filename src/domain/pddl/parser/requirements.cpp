@@ -31,45 +31,45 @@ pddl::RequirementEnumSet parse(const ast::RequirementStrips&, Context& context) 
 
 pddl::RequirementEnumSet parse(const ast::RequirementTyping&, Context& context) {
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::TYPING));
+    context.referenced_enums.track(pddl::RequirementEnum::TYPING);
     return { pddl::RequirementEnum::TYPING };
 }
 
 pddl::RequirementEnumSet parse(const ast::RequirementNegativePreconditions&, Context& context) {
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS));
+    context.referenced_enums.track(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS);
     return { pddl::RequirementEnum::NEGATIVE_PRECONDITIONS };
 }
 
 pddl::RequirementEnumSet parse(const ast::RequirementDisjunctivePreconditions&, Context& context) {
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS));
+    context.referenced_enums.track(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
     return { pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS };
 }
 
 pddl::RequirementEnumSet parse(const ast::RequirementEquality&, Context& context) {
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::EQUALITY));
+    context.referenced_enums.track(pddl::RequirementEnum::EQUALITY);
     return { pddl::RequirementEnum::EQUALITY };
 }
 
 pddl::RequirementEnumSet parse(const ast::RequirementExistentialPreconditions&, Context& context) {
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS));
+    context.referenced_enums.track(pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS);
     return { pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS };
 }
 
 pddl::RequirementEnumSet parse(const ast::RequirementUniversalPreconditions&, Context& context) {
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS));
+    context.referenced_enums.track(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS);
     return { pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS };
 }
 
 pddl::RequirementEnumSet parse(const ast::RequirementQuantifiedPreconditions&, Context& context) {
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::QUANTIFIED_PRECONDITIONS));
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS));
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS));
+    context.referenced_enums.track(pddl::RequirementEnum::QUANTIFIED_PRECONDITIONS);
+    context.referenced_enums.track(pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS);
+    context.referenced_enums.track(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS);
     return { pddl::RequirementEnum::QUANTIFIED_PRECONDITIONS,
              pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS,
              pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS };
@@ -77,15 +77,15 @@ pddl::RequirementEnumSet parse(const ast::RequirementQuantifiedPreconditions&, C
 
 pddl::RequirementEnumSet parse(const ast::RequirementConditionalEffects&, Context& context) {
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::CONDITIONAL_EFFECTS));
+    context.referenced_enums.track(pddl::RequirementEnum::CONDITIONAL_EFFECTS);
     return { pddl::RequirementEnum::CONDITIONAL_EFFECTS };
 }
 
 pddl::RequirementEnumSet parse(const ast::RequirementFluents&, Context& context) {
     // Track
     // FLUENTS as a composite must not be tracked
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::OBJECT_FLUENTS));
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::NUMERIC_FLUENTS));
+    context.referenced_enums.track(pddl::RequirementEnum::OBJECT_FLUENTS);
+    context.referenced_enums.track(pddl::RequirementEnum::NUMERIC_FLUENTS);
     return { pddl::RequirementEnum::FLUENTS,
              pddl::RequirementEnum::OBJECT_FLUENTS,
              pddl::RequirementEnum::NUMERIC_FLUENTS };
@@ -93,7 +93,7 @@ pddl::RequirementEnumSet parse(const ast::RequirementFluents&, Context& context)
 
 pddl::RequirementEnumSet parse(const ast::RequirementObjectFluents& node, Context& context) {
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::OBJECT_FLUENTS));
+    context.referenced_enums.track(pddl::RequirementEnum::OBJECT_FLUENTS);
     throw UnsupportedRequirementError(
         pddl::RequirementEnum::OBJECT_FLUENTS,
         context.scopes.get_error_handler()(node, ""));
@@ -103,7 +103,7 @@ pddl::RequirementEnumSet parse(const ast::RequirementObjectFluents& node, Contex
 
 pddl::RequirementEnumSet parse(const ast::RequirementNumericFluents&, Context& context) {
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::NUMERIC_FLUENTS));
+    context.referenced_enums.track(pddl::RequirementEnum::NUMERIC_FLUENTS);
     return { pddl::RequirementEnum::NUMERIC_FLUENTS };
 }
 
@@ -111,11 +111,11 @@ pddl::RequirementEnumSet parse(const ast::RequirementAdl&, Context& context) {
     // Track
     // Strips as the minimal requirement must not be tracked.
     // ADL as a composite must not be tracked
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::TYPING));
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS));
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::EQUALITY));
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::QUANTIFIED_PRECONDITIONS));
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::CONDITIONAL_EFFECTS));
+    context.referenced_enums.track(pddl::RequirementEnum::TYPING);
+    context.referenced_enums.track(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
+    context.referenced_enums.track(pddl::RequirementEnum::EQUALITY);
+    context.referenced_enums.track(pddl::RequirementEnum::QUANTIFIED_PRECONDITIONS);
+    context.referenced_enums.track(pddl::RequirementEnum::CONDITIONAL_EFFECTS);
     return { pddl::RequirementEnum::ADL,
              pddl::RequirementEnum::STRIPS,
              pddl::RequirementEnum::TYPING,
@@ -131,7 +131,7 @@ pddl::RequirementEnumSet parse(const ast::RequirementDurativeActions& node, Cont
         context.scopes.get_error_handler()(node, ""));
 
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::DURATIVE_ACTIONS));
+    context.referenced_enums.track(pddl::RequirementEnum::DURATIVE_ACTIONS);
     return { pddl::RequirementEnum::DURATIVE_ACTIONS };
 }
 
@@ -141,7 +141,7 @@ pddl::RequirementEnumSet parse(const ast::RequirementDerivedPredicates& node, Co
         context.scopes.get_error_handler()(node, ""));
 
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::DERIVED_PREDICATES));
+    context.referenced_enums.track(pddl::RequirementEnum::DERIVED_PREDICATES);
     return { pddl::RequirementEnum::DERIVED_PREDICATES };
 }
 
@@ -151,8 +151,8 @@ pddl::RequirementEnumSet parse(const ast::RequirementTimedInitialLiterals& node,
         context.scopes.get_error_handler()(node, ""));
 
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::TIMED_INITIAL_LITERALS));
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::DURATIVE_ACTIONS));
+    context.referenced_enums.track(pddl::RequirementEnum::TIMED_INITIAL_LITERALS);
+    context.referenced_enums.track(pddl::RequirementEnum::DURATIVE_ACTIONS);
     return { pddl::RequirementEnum::TIMED_INITIAL_LITERALS,
              pddl::RequirementEnum::DURATIVE_ACTIONS };
 }
@@ -163,7 +163,7 @@ pddl::RequirementEnumSet parse(const ast::RequirementPreferences& node, Context&
         context.scopes.get_error_handler()(node, ""));
 
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::PREFERENCES));
+    context.referenced_enums.track(pddl::RequirementEnum::PREFERENCES);
     return { pddl::RequirementEnum::PREFERENCES };
 }
 
@@ -173,14 +173,14 @@ pddl::RequirementEnumSet parse(const ast::RequirementConstraints& node, Context&
         context.scopes.get_error_handler()(node, ""));
 
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::CONSTRAINTS));
+    context.referenced_enums.track(pddl::RequirementEnum::CONSTRAINTS);
     return { pddl::RequirementEnum::CONSTRAINTS };
 
 }
 
 pddl::RequirementEnumSet parse(const ast::RequirementActionCosts&, Context& context) {
     // Track
-    context.references.track(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::ACTION_COSTS));
+    context.referenced_enums.track(pddl::RequirementEnum::ACTION_COSTS);
     return { pddl::RequirementEnum::ACTION_COSTS };
 }
 

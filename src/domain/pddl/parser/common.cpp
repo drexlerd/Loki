@@ -79,7 +79,7 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::FunctionTerm& node)
     if (!context.requirements->test(pddl::RequirementEnum::OBJECT_FLUENTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::OBJECT_FLUENTS, context.scopes.get_error_handler()(node, ""));
     }
-    context.references.untrack(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::OBJECT_FLUENTS));
+    context.referenced_enums.untrack(pddl::RequirementEnum::OBJECT_FLUENTS);
 
     throw NotImplementedError("pddl::Term TermDeclarationTermVisitor::operator()(const ast::FunctionTerm& node) const");
 }
@@ -109,7 +109,7 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const
         throw UndefinedVariableError(variable->get_name(), context.scopes.get_error_handler()(node, ""));
     }
     // Declare variable as being referenced.
-    context.references.untrack(variable);
+    context.referenced_pointers.untrack(variable);
     // Get Term and return it
     return context.factories.terms.get_or_create<pddl::TermVariableImpl>(variable);
 }
@@ -118,7 +118,7 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::FunctionTerm& node) c
     if (!context.requirements->test(pddl::RequirementEnum::OBJECT_FLUENTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::OBJECT_FLUENTS, context.scopes.get_error_handler()(node, ""));
     }
-    context.references.untrack(context.factories.requirement_enums.get_or_create<pddl::RequirementEnum>(pddl::RequirementEnum::OBJECT_FLUENTS));
+    context.referenced_enums.untrack(pddl::RequirementEnum::OBJECT_FLUENTS);
 
     throw NotImplementedError("pddl::Term TermReferenceTermVisitor::operator()(const ast::FunctionTerm& node) const");
 }

@@ -21,7 +21,7 @@ namespace loki {
 
 template<typename... Ts>
 template<typename T>
-bool References<Ts...>::exists(const T* reference) const {
+bool BindingReferences<Ts...>::exists(const T* reference) const {
     const auto& t_references = std::get<ReferenceSetType<T>>(references);
     return t_references.count(reference);
 }
@@ -29,7 +29,7 @@ bool References<Ts...>::exists(const T* reference) const {
 
 template<typename... Ts>
 template<typename T>
-void References<Ts...>::track(const T* reference) {
+void BindingReferences<Ts...>::track(const T* reference) {
     auto& t_references = std::get<ReferenceSetType<T>>(references);
     t_references.insert(reference);
 }
@@ -37,8 +37,31 @@ void References<Ts...>::track(const T* reference) {
 
 template<typename... Ts>
 template<typename T>
-void References<Ts...>::untrack(const T* reference) {
+void BindingReferences<Ts...>::untrack(const T* reference) {
     auto& t_references = std::get<ReferenceSetType<T>>(references);
+    t_references.erase(reference);
+}
+
+template<typename... Ts>
+template<typename T>
+bool EnumReferences<Ts...>::exists(T reference) const {
+    const auto& t_references = std::get<ValueReferenceSetType<T>>(references);
+    return t_references.count(reference);
+}
+
+
+template<typename... Ts>
+template<typename T>
+void EnumReferences<Ts...>::track(T reference) {
+    auto& t_references = std::get<ValueReferenceSetType<T>>(references);
+    t_references.insert(reference);
+}
+
+
+template<typename... Ts>
+template<typename T>
+void EnumReferences<Ts...>::untrack(T reference) {
+    auto& t_references = std::get<ValueReferenceSetType<T>>(references);
     t_references.erase(reference);
 }
 

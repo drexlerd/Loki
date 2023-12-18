@@ -50,7 +50,6 @@ DomainParser::DomainParser(const fs::path& file_path) {
     // Initialize the context
     m_scopes = std::make_unique<ScopeStack>(std::move(error_handler));
     auto composite_factories = CompositeOfPDDLFactories{
-        m_factories.requirement_enums,
         m_factories.requirements,
         m_factories.types,
         m_factories.variables,

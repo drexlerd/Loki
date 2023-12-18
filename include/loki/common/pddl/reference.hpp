@@ -22,6 +22,7 @@
 #include "../../domain/pddl/type.hpp"
 #include "../../domain/pddl/object.hpp"
 #include "../../domain/pddl/predicate.hpp"
+#include "../../domain/pddl/requirements.hpp"
 #include "../../domain/pddl/function_skeleton.hpp"
 #include "../../domain/pddl/variable.hpp"
 #include "../../domain/pddl/requirements.hpp"
@@ -40,6 +41,9 @@ namespace loki {
 template<typename T>
 using ReferenceSetType = std::unordered_set<const T*>;
 
+template<typename T>
+using ValueReferenceSetType = std::unordered_set<T>;
+
 
 /// @brief Encapsulates referenced bindings.
 ///        We require that each binding must be referenced at least one in a child scope
@@ -52,7 +56,7 @@ using ReferenceSetType = std::unordered_set<const T*>;
 ///        3. Verify that all variables are untracked, meaning
 ///           that they were referenced at least once.
 template<typename... Ts>
-class References {
+class BindingReferences {
     private:
         std::tuple<ReferenceSetType<Ts>...> references;
 
@@ -70,12 +74,33 @@ class References {
         void untrack(const T* reference);
 };
 
-// Note: we cannot do that with domain constants.
-using ReferencedBindings = References<pddl::TypeImpl
+// We use it to track RequirementEnum
+template<typename... Ts>
+class EnumReferences {
+    private:
+        std::tuple<ValueReferenceSetType<Ts>...> references;
+
+    public:
+        /// @brief Returns a binding if it exists.
+        template<typename T>
+        bool exists(T value) const;
+
+        /// @brief Inserts a binding of type T
+        template<typename T>
+        void track(T value);
+
+        /// @brief Erases a binding of Type T
+        template<typename T>
+        void untrack(T value);
+};
+
+using ReferencedPointers = BindingReferences<pddl::TypeImpl
     , pddl::ObjectImpl
     , pddl::PredicateImpl
     , pddl::FunctionSkeletonImpl
     , pddl::VariableImpl>;
+
+using ReferencedEnums = EnumReferences<pddl::RequirementEnum>;
 
 }
 
