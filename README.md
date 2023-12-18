@@ -52,9 +52,11 @@ Loki simplifies the PDDL grammar to make the resulting data structure less compl
 
 ## Understanding the code base
 
+Loki has a significant amount of code because of the number of grammar rules and PDDL object types. However, the core functionality is implemented in only a few and small classes.
+
 ### Syntactic parsing
 
-Loki implements the canonical parser structure of boost spirit x3 described [here](https://www.boost.org/doc/libs/1_83_0/libs/spirit/doc/x3/html/spirit_x3/tutorials/rexpr.html)
+Loki implements the canonical parser structure of boost spirit x3 described [here](https://www.boost.org/doc/libs/1_83_0/libs/spirit/doc/x3/html/spirit_x3/tutorials/rexpr.html).
 
 ### Semantic parsing
 
