@@ -60,6 +60,7 @@ namespace loki::problem::parser
     BOOST_SPIRIT_INSTANTIATE(preference_constraint_goal_descriptor_preference_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(preference_constraint_goal_descriptor_simple_type, iterator_type, context_type)
 
+    BOOST_SPIRIT_INSTANTIATE(problem_keyword_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(problem_name_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(domain_name_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(objects_type, iterator_type, context_type)
@@ -67,6 +68,5 @@ namespace loki::problem::parser
     BOOST_SPIRIT_INSTANTIATE(goal_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(constraints_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(metric_specification_type, iterator_type, context_type)
-
     BOOST_SPIRIT_INSTANTIATE(problem_type, iterator_type, context_type)
 }

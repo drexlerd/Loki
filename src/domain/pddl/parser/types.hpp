@@ -34,7 +34,7 @@ public:
 
     pddl::TypeList operator()(const domain::ast::Type& type_node);
 
-    pddl::TypeList operator()(const common::ast::Name& name_node);
+    pddl::TypeList operator()(const domain::ast::Name& name_node);
 
     pddl::TypeList operator()(const domain::ast::TypeEither& either_type_node);
 };
@@ -48,7 +48,7 @@ public:
 
     pddl::TypeList operator()(const domain::ast::Type& type_node);
 
-    pddl::TypeList operator()(const common::ast::Name& name_node);
+    pddl::TypeList operator()(const domain::ast::Name& name_node);
 
     pddl::TypeList operator()(const domain::ast::TypeEither& either_type_node);
 };
@@ -60,7 +60,7 @@ private:
 public:
     TypeDeclarationTypedListOfNamesVisitor(Context& context_);
 
-    pddl::TypeList operator()(const std::vector<common::ast::Name>& name_nodes);
+    pddl::TypeList operator()(const std::vector<domain::ast::Name>& name_nodes);
 
     pddl::TypeList operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
 };

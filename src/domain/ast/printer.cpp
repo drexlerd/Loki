@@ -17,7 +17,6 @@
 
 #include "../../../include/loki/domain/ast/printer.hpp"
 
-#include "../../../include/loki/common/ast/printer.hpp"
 #include "../../../include/loki/problem/ast/printer.hpp"
 
 #include <sstream>
@@ -46,6 +45,53 @@ namespace loki
             return parse_text(node, *options);
         }
     };
+
+    string parse_text(const domain::ast::Name& node, const FormattingOptions&)
+    {
+        stringstream ss;
+        ss << node.alpha << node.suffix;
+        return ss.str();
+    }
+
+    string parse_text(const domain::ast::Variable& node, const FormattingOptions& options)
+    {
+        stringstream ss;
+        ss << node.question_mark << parse_text(node.name, options);
+        return ss.str();
+    }
+
+    std::string parse_text(const domain::ast::FunctionSymbol& node, const FormattingOptions& options)
+    {
+        return parse_text(node.name, options);
+    }
+
+    std::string parse_text(const domain::ast::FunctionTerm& node, const FormattingOptions& options)
+    {
+        std::stringstream ss;
+        ss << "("
+           << parse_text(node.function_symbol, options) << " "
+           << parse_text(node.terms, options) << ")";
+        return ss.str();
+    }
+
+    string parse_text(const domain::ast::Term& node, const FormattingOptions& options)
+    {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+    std::string parse_text(const domain::ast::Predicate& node, const FormattingOptions& options)
+    {
+        return parse_text(node.name, options);
+    }
+
+    string parse_text(const domain::ast::Number& node, const FormattingOptions&)
+    {
+        stringstream ss;
+        ss << node.value;
+        return ss.str();
+    }
+
+    std::string parse_text(const domain::ast::Undefined&, const FormattingOptions&) { return "undefined"; }
 
     std::string parse_text(const domain::ast::RequirementStrips&, const FormattingOptions&) { return ":strips"; }
     std::string parse_text(const domain::ast::RequirementTyping&, const FormattingOptions&) { return ":typing"; }

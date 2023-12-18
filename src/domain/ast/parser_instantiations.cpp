@@ -26,6 +26,15 @@ namespace loki::domain::parser
     using phrase_context_type = loki::phrase_context_type;
     using context_type = loki::context_type;
 
+    BOOST_SPIRIT_INSTANTIATE(name_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(variable_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(function_symbol_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(function_term_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(term_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(number_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(predicate_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(undefined_type, iterator_type, context_type)
+
     BOOST_SPIRIT_INSTANTIATE(requirement_strips_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(requirement_typing_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(requirement_negative_preconditions_type, iterator_type, context_type)
@@ -144,6 +153,8 @@ namespace loki::domain::parser
 
     BOOST_SPIRIT_INSTANTIATE(derived_predicate_type, iterator_type, context_type)
 
+    BOOST_SPIRIT_INSTANTIATE(define_keyword_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(domain_keyword_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(domain_name_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(requirements_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(types_type, iterator_type, context_type)

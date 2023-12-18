@@ -21,7 +21,7 @@
 #include "function.hpp"
 
 #include "../../../../include/loki/common/exceptions.hpp"
-#include "../../../common/pddl/parser/common.hpp"
+#include "../../../domain/pddl/parser/common.hpp"
 
 
 

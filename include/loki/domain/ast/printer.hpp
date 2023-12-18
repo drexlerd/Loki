@@ -25,6 +25,15 @@
 namespace loki {
 
 // create string representations from ast nodes.
+extern std::string parse_text(const domain::ast::Name& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::Variable& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::Number& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::FunctionSymbol& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::FunctionTerm& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::Term& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::Predicate& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::Undefined& node, const FormattingOptions& options={});
+
 extern std::string parse_text(const domain::ast::RequirementStrips& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::RequirementTyping& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::RequirementNegativePreconditions& node, const FormattingOptions& options={});

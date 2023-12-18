@@ -17,12 +17,12 @@
 
 #include <gtest/gtest.h>
 
-#include "../../src/common/ast/parser.hpp"
+#include "../../src/domain/ast/parser.hpp"
 #include "../../include/loki/common/ast/parser_wrapper.hpp"
-#include "../../include/loki/common/ast/printer.hpp"
+#include "../../include/loki/domain/ast/printer.hpp"
 
 
-namespace loki::common::tests {
+namespace loki::domain::tests {
 
 TEST(LokiTests, PredicateTest) {
     // A predicate is just a name

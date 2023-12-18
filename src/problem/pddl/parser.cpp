@@ -21,7 +21,7 @@
 #include "parser/initial.hpp"
 #include "parser/goal.hpp"
 
-#include "../../common/pddl/parser/common.hpp"
+#include "../../domain/pddl/parser/common.hpp"
 #include "../../domain/pddl/parser/requirements.hpp"
 #include "../../domain/pddl/unpacking_visitor.hpp"
 

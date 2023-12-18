@@ -21,7 +21,6 @@
 #include "ast_adapted.hpp"
 #include "parser.hpp"
 
-#include "../../common/ast/parser.hpp"
 #include "../../../include/loki/common/ast/parser_wrapper.hpp"
 #include "../../../include/loki/domain/ast/ast.hpp"
 #include "../../../include/loki/domain/ast/error_handler.hpp"
@@ -56,6 +55,15 @@ namespace loki::domain::parser {
     ///////////////////////////////////////////////////////////////////////////
     // Rules
     ///////////////////////////////////////////////////////////////////////////
+
+    name_type const name = "name";
+    variable_type const variable = "variable";
+    function_symbol_type const function_symbol = "function_symbol";
+    function_term_type const function_term = "function_term";
+    term_type const term = "term";
+    number_type const number = "number";
+    predicate_type const predicate = "predicate";
+    undefined_type const undefined = "undefined";
 
     requirement_strips_type const requirement_strips = "requirement_strips";
     requirement_typing_type const requirement_typing = "requirement_typing";
@@ -174,6 +182,8 @@ namespace loki::domain::parser {
     action_type const action = "action";
     derived_predicate_type const derived_predicate = "derived_predicate";
 
+    define_keyword_type const define_keyword = "define";
+    domain_keyword_type const domain_keyword = "domain";
     domain_name_type const domain_name = "domain_name";
     requirements_type const requirements = "requirements";
     types_type const types = "types";
@@ -188,25 +198,34 @@ namespace loki::domain::parser {
     // Grammar
     ///////////////////////////////////////////////////////////////////////////
 
-    const auto requirement_strips_def = common::keyword(":strips") > x3::attr(ast::RequirementStrips{});
-    const auto requirement_typing_def = common::keyword(":typing") > x3::attr(ast::RequirementTyping{});
-    const auto requirement_negative_preconditions_def = common::keyword(":negative-preconditions") > x3::attr(ast::RequirementNegativePreconditions{});
-    const auto requirement_disjunctive_preconditions_def = common::keyword(":disjunctive-preconditions") > x3::attr(ast::RequirementDisjunctivePreconditions{});
-    const auto requirement_equality_def = common::keyword(":equality") > x3::attr(ast::RequirementEquality{});
-    const auto requirement_existential_preconditions_def = common::keyword(":existential-preconditions") > x3::attr(ast::RequirementExistentialPreconditions{});
-    const auto requirement_universal_preconditions_def = common::keyword(":universal-preconditions") > x3::attr(ast::RequirementUniversalPreconditions{});
-    const auto requirement_quantified_preconditions_def = common::keyword(":quantified-preconditions") > x3::attr(ast::RequirementQuantifiedPreconditions{});
-    const auto requirement_conditional_effects_def = common::keyword(":conditional-effects") > x3::attr(ast::RequirementConditionalEffects{});
-    const auto requirement_fluents_def = common::keyword(":fluents") >> x3::attr(ast::RequirementFluents{});
-    const auto requirement_object_fluents_def = common::keyword(":object-fluents") > x3::attr(ast::RequirementObjectFluents{});
-    const auto requirement_numeric_fluents_def = common::keyword(":numeric-fluents") > x3::attr(ast::RequirementNumericFluents{});
-    const auto requirement_adl_def = common::keyword(":adl") >> x3::attr(ast::RequirementAdl{});
-    const auto requirement_durative_actions_def = common::keyword(":durative-actions") > x3::attr(ast::RequirementDurativeActions{});
-    const auto requirement_derived_predicates_def = common::keyword(":derived-predicates") > x3::attr(ast::RequirementDerivedPredicates{});
-    const auto requirement_timed_initial_literals_def = common::keyword(":timed-initial-literals") > x3::attr(ast::RequirementTimedInitialLiterals{});
-    const auto requirement_preferences_def = common::keyword(":preferences") > x3::attr(ast::RequirementPreferences{});
-    const auto requirement_constraints_def = common::keyword(":constraints") > x3::attr(ast::RequirementConstraints{});
-    const auto requirement_action_costs_def = common::keyword(":action-costs") > x3::attr(ast::RequirementActionCosts{});
+    const auto name_def = lexeme[alpha >> *(alnum | char_('-') | char_('_'))];
+    const auto variable_def = lexeme[char_('?') > name];
+    const auto function_symbol_def = name;
+    const auto function_term_def = (lit('(') > function_symbol) > *term > lit(')');
+    const auto term_def = name | variable | function_term;
+    const auto number_def = double_;
+    const auto predicate_def = name;
+    const auto undefined_def = keyword("undefined") > x3::attr(ast::Undefined{});
+
+    const auto requirement_strips_def = keyword(":strips") > x3::attr(ast::RequirementStrips{});
+    const auto requirement_typing_def = keyword(":typing") > x3::attr(ast::RequirementTyping{});
+    const auto requirement_negative_preconditions_def = keyword(":negative-preconditions") > x3::attr(ast::RequirementNegativePreconditions{});
+    const auto requirement_disjunctive_preconditions_def = keyword(":disjunctive-preconditions") > x3::attr(ast::RequirementDisjunctivePreconditions{});
+    const auto requirement_equality_def = keyword(":equality") > x3::attr(ast::RequirementEquality{});
+    const auto requirement_existential_preconditions_def = keyword(":existential-preconditions") > x3::attr(ast::RequirementExistentialPreconditions{});
+    const auto requirement_universal_preconditions_def = keyword(":universal-preconditions") > x3::attr(ast::RequirementUniversalPreconditions{});
+    const auto requirement_quantified_preconditions_def = keyword(":quantified-preconditions") > x3::attr(ast::RequirementQuantifiedPreconditions{});
+    const auto requirement_conditional_effects_def = keyword(":conditional-effects") > x3::attr(ast::RequirementConditionalEffects{});
+    const auto requirement_fluents_def = keyword(":fluents") >> x3::attr(ast::RequirementFluents{});
+    const auto requirement_object_fluents_def = keyword(":object-fluents") > x3::attr(ast::RequirementObjectFluents{});
+    const auto requirement_numeric_fluents_def = keyword(":numeric-fluents") > x3::attr(ast::RequirementNumericFluents{});
+    const auto requirement_adl_def = keyword(":adl") >> x3::attr(ast::RequirementAdl{});
+    const auto requirement_durative_actions_def = keyword(":durative-actions") > x3::attr(ast::RequirementDurativeActions{});
+    const auto requirement_derived_predicates_def = keyword(":derived-predicates") > x3::attr(ast::RequirementDerivedPredicates{});
+    const auto requirement_timed_initial_literals_def = keyword(":timed-initial-literals") > x3::attr(ast::RequirementTimedInitialLiterals{});
+    const auto requirement_preferences_def = keyword(":preferences") > x3::attr(ast::RequirementPreferences{});
+    const auto requirement_constraints_def = keyword(":constraints") > x3::attr(ast::RequirementConstraints{});
+    const auto requirement_action_costs_def = keyword(":action-costs") > x3::attr(ast::RequirementActionCosts{});
     const auto requirement_def = requirement_strips | requirement_typing | requirement_negative_preconditions
         | requirement_disjunctive_preconditions | requirement_equality | requirement_existential_preconditions
         | requirement_universal_preconditions | requirement_quantified_preconditions | requirement_conditional_effects
@@ -214,27 +233,27 @@ namespace loki::domain::parser {
         | requirement_durative_actions | requirement_derived_predicates | requirement_timed_initial_literals
         | requirement_preferences | requirement_constraints | requirement_action_costs;
 
-    const auto type_def = type_either | common::name();
-    const auto type_either_def = (lit('(') >> common::keyword("either") >> +type) > lit(')');
-    const auto typed_list_of_names_recursively_def = (+common::name() >> lit('-')) > type > typed_list_of_names;
-    const auto typed_list_of_names_def = typed_list_of_names_recursively | *common::name();
-    const auto typed_list_of_variables_recursively_def = (+common::variable() >> lit('-')) > type > typed_list_of_variables;
-    const auto typed_list_of_variables_def = typed_list_of_variables_recursively | *common::variable();
+    const auto type_def = type_either | name;
+    const auto type_either_def = (lit('(') >> keyword("either") >> +type) > lit(')');
+    const auto typed_list_of_names_recursively_def = (+name >> lit('-')) > type > typed_list_of_names;
+    const auto typed_list_of_names_def = typed_list_of_names_recursively | *name;
+    const auto typed_list_of_variables_recursively_def = (+variable >> lit('-')) > type > typed_list_of_variables;
+    const auto typed_list_of_variables_def = typed_list_of_variables_recursively | *variable;
 
-    const auto atomic_formula_skeleton_def = lit('(') > common::predicate() > typed_list_of_variables > lit(')');
+    const auto atomic_formula_skeleton_def = lit('(') > predicate > typed_list_of_variables > lit(')');
 
-    const auto function_type_number_def = common::number();
+    const auto function_type_number_def = number;
     const auto function_type_type__def = type;
     const auto function_type_def = function_type_number | function_type_type_;
-    const auto atomic_function_skeleton_def = lit('(') > common::function_symbol() > typed_list_of_variables > lit(')');
+    const auto atomic_function_skeleton_def = lit('(') > function_symbol > typed_list_of_variables > lit(')');
     const auto function_typed_list_of_atomic_function_skeletons_recursively_def = (+atomic_function_skeleton >> lit('-')) > function_type > -function_typed_list_of_atomic_function_skeletons;
     const auto function_typed_list_of_atomic_function_skeletons_def = function_typed_list_of_atomic_function_skeletons_recursively | +atomic_function_skeleton;
 
-    const auto atomic_formula_of_terms_predicate_def = (lit('(') >> common::predicate()) > *common::term() > lit(')');
-    const auto atomic_formula_of_terms_equality_def = (lit('(') >> lit('=')) > common::term() > common::term() > lit(')');
+    const auto atomic_formula_of_terms_predicate_def = (lit('(') >> predicate) > *term > lit(')');
+    const auto atomic_formula_of_terms_equality_def = (lit('(') >> lit('=')) > term > term > lit(')');
     const auto atomic_formula_of_terms_def = atomic_formula_of_terms_equality | atomic_formula_of_terms_predicate;
     const auto atom_def = atomic_formula_of_terms;
-    const auto negated_atom_def = (lit('(') >> common::keyword("not")) > atomic_formula_of_terms > lit(')');
+    const auto negated_atom_def = (lit('(') >> keyword("not")) > atomic_formula_of_terms > lit(')');
     const auto literal_def = negated_atom | atom;
 
     const auto multi_operator_mul_def = lit('*') > x3::attr(ast::MultiOperatorMul{});
@@ -251,9 +270,9 @@ namespace loki::domain::parser {
     const auto binary_comparator_less_equal_def = lit("<=") > x3::attr(ast::BinaryComparatorLessEqual{});
     const auto binary_comparator_def = binary_comparator_greater | binary_comparator_less | binary_comparator_equal | binary_comparator_greater_equal | binary_comparator_less_equal;
 
-    const auto function_head_def = ((lit('(') >> common::function_symbol() > *common::term()) > lit(')')) | (common::function_symbol() > x3::attr(std::vector<common::ast::Term>{}));
+    const auto function_head_def = ((lit('(') >> function_symbol > *term) > lit(')')) | (function_symbol > x3::attr(std::vector<ast::Term>{}));
     const auto function_expression_def = function_expression_binary_op | function_expression_minus | function_expression_head | function_expression_number;
-    const auto function_expression_number_def = common::number();
+    const auto function_expression_number_def = number;
     // distinguishing unary from binary minus requires some more backtracking
     const auto function_expression_binary_op_def = (lit('(') >> binary_operator >> function_expression >> function_expression) > lit(')');
     const auto function_expression_minus_def = (lit('(') >> lit('-')) >> function_expression > lit(')');
@@ -263,76 +282,78 @@ namespace loki::domain::parser {
         | goal_descriptor_exists | goal_descriptor_forall | goal_descriptor_function_comparison | goal_descriptor_atom | goal_descriptor_literal;
     const auto goal_descriptor_atom_def = atom;
     const auto goal_descriptor_literal_def = literal;
-    const auto goal_descriptor_and_def = (lit('(') >> common::keyword("and")) > *goal_descriptor > lit(')');
-    const auto goal_descriptor_or_def = (lit('(') >> common::keyword("or") > *goal_descriptor) > lit(')');
-    const auto goal_descriptor_not_def = (lit('(') >> common::keyword("not")) > goal_descriptor > lit(')');
-    const auto goal_descriptor_imply_def = (lit('(') >> common::keyword("imply")) > goal_descriptor > goal_descriptor > lit(')');
-    const auto goal_descriptor_exists_def = (lit('(') >> common::keyword("exists")) > typed_list_of_variables > goal_descriptor > lit(')');
-    const auto goal_descriptor_forall_def = (lit('(') >> common::keyword("forall")) > typed_list_of_variables > goal_descriptor > lit(')');
+    const auto goal_descriptor_and_def = (lit('(') >> keyword("and")) > *goal_descriptor > lit(')');
+    const auto goal_descriptor_or_def = (lit('(') >> keyword("or") > *goal_descriptor) > lit(')');
+    const auto goal_descriptor_not_def = (lit('(') >> keyword("not")) > goal_descriptor > lit(')');
+    const auto goal_descriptor_imply_def = (lit('(') >> keyword("imply")) > goal_descriptor > goal_descriptor > lit(')');
+    const auto goal_descriptor_exists_def = (lit('(') >> keyword("exists")) > typed_list_of_variables > goal_descriptor > lit(')');
+    const auto goal_descriptor_forall_def = (lit('(') >> keyword("forall")) > typed_list_of_variables > goal_descriptor > lit(')');
     const auto goal_descriptor_function_comparison_def = (lit('(') >> binary_comparator) > function_expression > function_expression > lit(')');
 
     const auto constraint_goal_descriptor_def = constraint_goal_descriptor_and | constraint_goal_descriptor_forall | constraint_goal_descriptor_at_end
         | constraint_goal_descriptor_always | constraint_goal_descriptor_sometime | constraint_goal_descriptor_within
         | constraint_goal_descriptor_at_most_once | constraint_goal_descriptor_sometime_after | constraint_goal_descriptor_sometime_before
         | constraint_goal_descriptor_always_within | constraint_goal_descriptor_hold_during | constraint_goal_descriptor_hold_after;
-    const auto constraint_goal_descriptor_and_def = (lit('(') >> common::keyword("and")) > *constraint_goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_forall_def = (lit('(') >> common::keyword("forall")) > typed_list_of_variables > constraint_goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_at_end_def = (lit('(') >> common::keyword("at") >> common::keyword("end")) > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_always_def = (lit('(') >> common::keyword("always")) > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_sometime_def = (lit('(') >> common::keyword("sometime")) > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_within_def = (lit('(') >> common::keyword("within")) > common::number() > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_at_most_once_def = (lit('(') >> common::keyword("at-most-once")) > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_sometime_after_def = (lit('(') >> common::keyword("sometime-after")) > goal_descriptor > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_sometime_before_def = (lit('(') >> common::keyword("sometime-before")) > goal_descriptor > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_always_within_def = (lit('(') >> common::keyword("always-within")) > common::number() > goal_descriptor > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_hold_during_def = (lit('(') >> common::keyword("hold-during")) > common::number() > common::number() > goal_descriptor > lit(')');
-    const auto constraint_goal_descriptor_hold_after_def = (lit('(') >> common::keyword("hold-after")) > common::number() > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_and_def = (lit('(') >> keyword("and")) > *constraint_goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_forall_def = (lit('(') >> keyword("forall")) > typed_list_of_variables > constraint_goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_at_end_def = (lit('(') >> keyword("at") >> keyword("end")) > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_always_def = (lit('(') >> keyword("always")) > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_sometime_def = (lit('(') >> keyword("sometime")) > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_within_def = (lit('(') >> keyword("within")) > number > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_at_most_once_def = (lit('(') >> keyword("at-most-once")) > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_sometime_after_def = (lit('(') >> keyword("sometime-after")) > goal_descriptor > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_sometime_before_def = (lit('(') >> keyword("sometime-before")) > goal_descriptor > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_always_within_def = (lit('(') >> keyword("always-within")) > number > goal_descriptor > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_hold_during_def = (lit('(') >> keyword("hold-during")) > number > number > goal_descriptor > lit(')');
+    const auto constraint_goal_descriptor_hold_after_def = (lit('(') >> keyword("hold-after")) > number > goal_descriptor > lit(')');
 
     const auto precondition_goal_descriptor_def = precondition_goal_descriptor_and | precondition_goal_descriptor_preference | precondition_goal_descriptor_forall | precondition_goal_descriptor_simple;
-    const auto preference_name_def = common::name();
+    const auto preference_name_def = name;
     const auto precondition_goal_descriptor_simple_def = goal_descriptor;
-    const auto precondition_goal_descriptor_and_def = (lit('(') >> common::keyword("and") > *precondition_goal_descriptor) > lit(')');
-    const auto precondition_goal_descriptor_preference_def = (lit('(') >> common::keyword("preference")) > preference_name > goal_descriptor > lit(')');
-    const auto precondition_goal_descriptor_forall_def = (lit('(') >> common::keyword("forall")) > typed_list_of_variables > precondition_goal_descriptor > lit(')');
+    const auto precondition_goal_descriptor_and_def = (lit('(') >> keyword("and") > *precondition_goal_descriptor) > lit(')');
+    const auto precondition_goal_descriptor_preference_def = (lit('(') >> keyword("preference")) > preference_name > goal_descriptor > lit(')');
+    const auto precondition_goal_descriptor_forall_def = (lit('(') >> keyword("forall")) > typed_list_of_variables > precondition_goal_descriptor > lit(')');
 
-    const auto assign_operator_assign_def = common::keyword("assign") > x3::attr(ast::AssignOperatorAssign{});
-    const auto assign_operator_scale_up_def = common::keyword("scale-up") > x3::attr(ast::AssignOperatorScaleUp{});
-    const auto assign_operator_scale_down_def = common::keyword("scale-down") > x3::attr(ast::AssignOperatorScaleDown{});
-    const auto assign_operator_increase_def = common::keyword("increase") > x3::attr(ast::AssignOperatorIncrease{});
-    const auto assign_operator_decrease_def = common::keyword("decrease") > x3::attr(ast::AssignOperatorDecrease{});
+    const auto assign_operator_assign_def = keyword("assign") > x3::attr(ast::AssignOperatorAssign{});
+    const auto assign_operator_scale_up_def = keyword("scale-up") > x3::attr(ast::AssignOperatorScaleUp{});
+    const auto assign_operator_scale_down_def = keyword("scale-down") > x3::attr(ast::AssignOperatorScaleDown{});
+    const auto assign_operator_increase_def = keyword("increase") > x3::attr(ast::AssignOperatorIncrease{});
+    const auto assign_operator_decrease_def = keyword("decrease") > x3::attr(ast::AssignOperatorDecrease{});
     const auto assign_operator_def = assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
 
-    const auto effect_def = ((lit('(') >> common::keyword("and")) > *effect > lit(')')) | effect_conditional | effect_production;
+    const auto effect_def = ((lit('(') >> keyword("and")) > *effect > lit(')')) | effect_conditional | effect_production;
     const auto effect_production_literal_def = literal;
     // distinguishing numeric from object fluents requires some more backtracking since only function_expression and term|undefined distinguishes them
     const auto effect_production_numeric_fluent_def = (lit('(') >> assign_operator >> function_head >> function_expression) > lit(')');
-    const auto effect_production_object_fluent_def = lit('(') >> common::keyword("assign") >> common::function_term() >> (common::term() | common::undefined()) > lit(')');
+    const auto effect_production_object_fluent_def = lit('(') >> keyword("assign") >> function_term >> (term | undefined) > lit(')');
     const auto effect_production_def = effect_production_numeric_fluent | effect_production_object_fluent | effect_production_literal;
-    const auto effect_conditional_forall_def = (lit('(') >> common::keyword("forall")) > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
-    const auto effect_conditional_when_def = (lit('(') >> common::keyword("when")) > goal_descriptor > effect > lit(')');
+    const auto effect_conditional_forall_def = (lit('(') >> keyword("forall")) > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
+    const auto effect_conditional_when_def = (lit('(') >> keyword("when")) > goal_descriptor > effect > lit(')');
     const auto effect_conditional_def = effect_conditional_forall | effect_conditional_when;
 
-    const auto action_symbol_def = common::name();
-    const auto action_body_def = -(common::keyword(":precondition") > ((lit('(') >> lit(')')) | precondition_goal_descriptor))
-                               > -(common::keyword(":effect") > ((lit('(') >> lit(')')) | effect));
-    const auto action_def = (lit('(') >> common::keyword(":action")) > action_symbol
-                                      > common::keyword(":parameters") > lit('(') > typed_list_of_variables > lit(')')
+    const auto action_symbol_def = name;
+    const auto action_body_def = -(keyword(":precondition") > ((lit('(') >> lit(')')) | precondition_goal_descriptor))
+                               > -(keyword(":effect") > ((lit('(') >> lit(')')) | effect));
+    const auto action_def = (lit('(') >> keyword(":action")) > action_symbol
+                                      > keyword(":parameters") > lit('(') > typed_list_of_variables > lit(')')
                                       > action_body
                             >> lit(')');
 
     const auto derived_predicate_def = (lit('(') >> typed_list_of_variables >> goal_descriptor) > lit(')');
 
-    const auto domain_name_def = (lit('(') > common::domain_keyword()) > common::name() > lit(')');
-    const auto requirements_def = lit('(') >> common::keyword(":requirements") > *requirement >> lit(')');
-    const auto types_def = (lit('(') >> common::keyword(":types") > typed_list_of_names) > lit(')');
-    const auto constants_def = (lit('(') >> common::keyword(":constants") > typed_list_of_names) > lit(')');
-    const auto predicates_def = (lit('(') >> common::keyword(":predicates") > *atomic_formula_skeleton) > lit(')');
-    const auto functions_def = (lit('(') >> common::keyword(":functions") > *function_typed_list_of_atomic_function_skeletons) > lit(')');
-    const auto constraints_def = (lit('(') >> common::keyword(":constraints")) > constraint_goal_descriptor > lit(')');
+    const auto define_keyword_def = keyword("define");
+    const auto domain_keyword_def = keyword("domain");
+    const auto domain_name_def = (lit('(') > domain_keyword) > name > lit(')');
+    const auto requirements_def = lit('(') >> keyword(":requirements") > *requirement >> lit(')');
+    const auto types_def = (lit('(') >> keyword(":types") > typed_list_of_names) > lit(')');
+    const auto constants_def = (lit('(') >> keyword(":constants") > typed_list_of_names) > lit(')');
+    const auto predicates_def = (lit('(') >> keyword(":predicates") > *atomic_formula_skeleton) > lit(')');
+    const auto functions_def = (lit('(') >> keyword(":functions") > *function_typed_list_of_atomic_function_skeletons) > lit(')');
+    const auto constraints_def = (lit('(') >> keyword(":constraints")) > constraint_goal_descriptor > lit(')');
     const auto structure_def = action | derived_predicate;
 
     const auto domain_def =
-        lit('(') > common::define_keyword()
+        lit('(') > define_keyword
            > domain_name
            > -requirements
            > -types
@@ -342,6 +363,9 @@ namespace loki::domain::parser {
            > -constraints
            > *structure
         > lit(')');
+
+
+    BOOST_SPIRIT_DEFINE(name, variable, function_symbol, function_term, term, number, predicate, undefined)
 
     BOOST_SPIRIT_DEFINE(requirement_strips, requirement_typing, requirement_negative_preconditions,
         requirement_disjunctive_preconditions, requirement_equality, requirement_existential_preconditions,
@@ -395,13 +419,22 @@ namespace loki::domain::parser {
         effect_conditional_when, effect_conditional, action_symbol,
         action_body, action, derived_predicate)
 
-    BOOST_SPIRIT_DEFINE(domain_name, requirements, types, constants, predicates, functions,
-        constraints, structure, domain)
+    BOOST_SPIRIT_DEFINE(define_keyword, domain_keyword, domain_name, requirements, types,
+    constants, predicates, functions, constraints, structure, domain)
 
 
     ///////////////////////////////////////////////////////////////////////////
     // Annotation and Error handling
     ///////////////////////////////////////////////////////////////////////////
+
+    struct NameClass : x3::annotate_on_success {};
+    struct VariableClass : x3::annotate_on_success {};
+    struct FunctionSymbolClass : x3::annotate_on_success {};
+    struct FunctionTermClass : x3::annotate_on_success {};
+    struct TermClass : x3::annotate_on_success {};
+    struct NumberClass : x3::annotate_on_success {};
+    struct PredicateClass : x3::annotate_on_success {};
+    struct UndefinedClass : x3::annotate_on_success {};
 
     struct RequirementStripsClass : x3::annotate_on_success {};
     struct RequirementTypingClass : x3::annotate_on_success {};
@@ -536,6 +569,31 @@ namespace loki::domain::parser {
 
 namespace loki::domain
 {
+    parser::name_type const& name() {
+        return parser::name;
+    }
+    parser::variable_type const& variable() {
+        return parser::variable;
+    }
+    parser::function_symbol_type const& function_symbol() {
+        return parser::function_symbol;
+    }
+    parser::function_term_type const& function_term() {
+        return parser::function_term;
+    }
+    parser::term_type const& term() {
+        return parser::term;
+    }
+    parser::number_type const& number() {
+        return parser::number;
+    }
+    parser::predicate_type const& predicate() {
+        return parser::predicate;
+    }
+    parser::undefined_type const& undefined() {
+        return parser::undefined;
+    }
+
     parser::requirement_strips_type const& requirement_strips() {
         return parser::requirement_strips;
     }
@@ -861,6 +919,12 @@ namespace loki::domain
         return parser::derived_predicate;
     }
 
+    parser::define_keyword_type const& define_keyword() {
+        return parser::define_keyword;
+    }
+    parser::domain_keyword_type const& domain_keyword() {
+        return parser::domain_keyword;
+    }
     parser::domain_name_type const& domain_name() {
         return parser::domain_name;
     }

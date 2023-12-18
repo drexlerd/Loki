@@ -34,8 +34,7 @@
 #include "parser/requirements.hpp"
 #include "parser/types.hpp"
 #include "parser/structure.hpp"
-
-#include "../../common/pddl/parser/common.hpp"
+#include "parser/common.hpp"
 
 using namespace loki::domain;
 using namespace std;

@@ -25,11 +25,27 @@
 
 namespace loki::domain {
     namespace x3 = boost::spirit::x3;
+    namespace ascii = boost::spirit::x3::ascii;
+
+    using x3::lit;
+    using x3::no_skip;
+
+    using ascii::char_;
+    using ascii::space;
 
     ///////////////////////////////////////////////////////////////////////////
     // parser public interface for testing
     ///////////////////////////////////////////////////////////////////////////
     namespace parser {
+        struct NameClass;
+        struct VariableClass;
+        struct FunctionSymbolClass;
+        struct FunctionTermClass;
+        struct TermClass;
+        struct NumberClass;
+        struct PredicateClass;
+        struct UndefinedClass;
+
         struct RequirementStripsClass;
         struct RequirementTypingClass;
         struct RequirementNegativePreconditionsClass;
@@ -148,6 +164,8 @@ namespace loki::domain {
         struct DurativeActionClass;  // TODO
         struct DerivedPredicateClass;
 
+        struct DefineKeywordClass;
+        struct DomainKeywordClass;
         struct DomainNameClass;
         struct RequirementsClass;
         struct TypesClass;
@@ -157,6 +175,14 @@ namespace loki::domain {
         struct ConstraintsClass;
         struct StructureClass;
 
+        typedef x3::rule<NameClass, ast::Name> name_type;
+        typedef x3::rule<VariableClass, ast::Variable> variable_type;
+        typedef x3::rule<FunctionSymbolClass, ast::FunctionSymbol> function_symbol_type;
+        typedef x3::rule<FunctionTermClass, ast::FunctionTerm> function_term_type;
+        typedef x3::rule<TermClass, ast::Term> term_type;
+        typedef x3::rule<NumberClass, ast::Number> number_type;
+        typedef x3::rule<PredicateClass, ast::Predicate> predicate_type;
+        typedef x3::rule<UndefinedClass, ast::Undefined> undefined_type;
 
         typedef x3::rule<RequirementStripsClass, ast::RequirementStrips> requirement_strips_type;
         typedef x3::rule<RequirementTypingClass, ast::RequirementTyping> requirement_typing_type;
@@ -276,6 +302,8 @@ namespace loki::domain {
 
         typedef x3::rule<DerivedPredicateClass, ast::DerivedPredicate> derived_predicate_type;
 
+        typedef x3::rule<DefineKeywordClass, x3::unused_type> define_keyword_type;
+        typedef x3::rule<DomainKeywordClass, x3::unused_type> domain_keyword_type;
         typedef x3::rule<DomainNameClass, ast::DomainName> domain_name_type;
         typedef x3::rule<RequirementsClass, ast::Requirements> requirements_type;
         typedef x3::rule<TypesClass, ast::Types> types_type;
@@ -284,6 +312,8 @@ namespace loki::domain {
         typedef x3::rule<FunctionsClass, ast::Functions> functions_type;
         typedef x3::rule<ConstraintsClass, ast::Constraints> constraints_type;
         typedef x3::rule<StructureClass, ast::Structure> structure_type;
+
+        BOOST_SPIRIT_DECLARE(name_type, variable_type, function_symbol_type, function_term_type, term_type, number_type, predicate_type, undefined_type)
 
         BOOST_SPIRIT_DECLARE(
             requirement_strips_type, requirement_typing_type, requirement_negative_preconditions_type, requirement_disjunctive_preconditions_type,
@@ -339,9 +369,29 @@ namespace loki::domain {
             effect_conditional_when_type, effect_conditional_type, action_symbol_type, action_body_type, action_type,
             derived_predicate_type)
 
-        BOOST_SPIRIT_DECLARE(domain_name_type, requirements_type, types_type, constants_type,
-            predicates_type, functions_type, constraints_type, structure_type)
+
+        BOOST_SPIRIT_DECLARE(define_keyword_type, domain_keyword_type, domain_name_type, requirements_type,
+            types_type, constants_type, predicates_type, functions_type, constraints_type, structure_type)
     }
+
+    inline auto separator() {
+        return (ascii::space | lit('\n') | lit('(') | lit(')'));  // TODO: is ) correct?
+    }
+
+    /// @brief A separator must follow a keyword because we do not want to allow
+    ///        parsing prefix like "or" of "origin" as a keyword.
+    inline auto keyword(const std::string& keyword) {
+        return lit(keyword) >> no_skip[&separator()];
+    }
+
+    parser::name_type const& name();
+    parser::variable_type const& variable();
+    parser::number_type const& number();
+    parser::function_symbol_type const& function_symbol();
+    parser::function_term_type const& function_term();
+    parser::term_type const& term();
+    parser::predicate_type const& predicate();
+    parser::undefined_type const& undefined();
 
     parser::requirement_strips_type const& requirement_strips();
     parser::requirement_typing_type const& requirement_typing();
@@ -461,6 +511,8 @@ namespace loki::domain {
     parser::action_type const& action();
     parser::derived_predicate_type const& derived_predicate();
 
+    parser::define_keyword_type const& define_keyword();
+    parser::domain_keyword_type const& domain_keyword();
     parser::domain_name_type const& domain_name();
     parser::requirements_type const& requirements();
     parser::types_type const& types();

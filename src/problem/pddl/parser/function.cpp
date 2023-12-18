@@ -19,7 +19,7 @@
 
 #include "objects.hpp"
 
-#include "../../../common/pddl/parser/common.hpp"
+#include "../../../domain/pddl/parser/common.hpp"
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 

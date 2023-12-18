@@ -18,8 +18,8 @@
 #include "parameters.hpp"
 
 #include "types.hpp"
+#include "common.hpp"
 
-#include "../../../common/pddl/parser/common.hpp"
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 using namespace loki::domain;
@@ -31,7 +31,7 @@ namespace loki {
 ParameterListVisitor::ParameterListVisitor(Context& context_)
     : context(context_) { }
 
-pddl::ParameterList ParameterListVisitor::operator()(const std::vector<common::ast::Variable>& variable_nodes) {
+pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>& variable_nodes) {
     // A visited vector of variable has single base type "object"
     auto parameter_list = pddl::ParameterList();
     const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("object");

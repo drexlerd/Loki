@@ -24,7 +24,7 @@
 
 namespace loki {
 
-extern pddl::Object parse_object_reference(const common::ast::Name& name_node, Context& context);
+extern pddl::Object parse_object_reference(const domain::ast::Name& name_node, Context& context);
 
 class ObjectListVisitor : boost::static_visitor<pddl::ObjectList> {
 private:
@@ -33,7 +33,7 @@ private:
 public:
     ObjectListVisitor(Context& context_);
 
-    pddl::ObjectList operator()(const std::vector<common::ast::Name>& name_nodes);
+    pddl::ObjectList operator()(const std::vector<domain::ast::Name>& name_nodes);
 
     pddl::ObjectList operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
 };

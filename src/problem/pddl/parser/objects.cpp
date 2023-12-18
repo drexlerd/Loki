@@ -17,7 +17,7 @@
 
 #include "objects.hpp"
 
-#include "../../../common/pddl/parser/common.hpp"
+#include "../../../domain/pddl/parser/common.hpp"
 #include "../../../domain/pddl/parser/types.hpp"
 #include "../../../../include/loki/problem/pddl/exceptions.hpp"
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
@@ -33,7 +33,7 @@ ObjectListVisitor::ObjectListVisitor(Context& context_)
     : context(context_) { }
 
 
-pddl::Object parse_object_reference(const common::ast::Name& name_node, Context& context) {
+pddl::Object parse_object_reference(const domain::ast::Name& name_node, Context& context) {
     const auto name = parse(name_node);
     const auto binding = context.scopes.get<pddl::ObjectImpl>(name);
     if (!binding.has_value()) {
@@ -44,7 +44,7 @@ pddl::Object parse_object_reference(const common::ast::Name& name_node, Context&
 }
 
 
-pddl::ObjectList ObjectListVisitor::operator()(const std::vector<common::ast::Name>& name_nodes) {
+pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     auto object_list = pddl::ObjectList();
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());

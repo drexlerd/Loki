@@ -18,8 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_AST_AST_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_AST_AST_HPP_
 
-#include "../../common/ast/ast.hpp"
-
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/optional.hpp>
@@ -35,6 +33,15 @@ namespace loki::domain::ast
     //  The AST
     ///////////////////////////////////////////////////////////////////////////
     namespace x3 = boost::spirit::x3;
+
+    struct Name;
+    struct Variable;
+    struct FunctionSymbol;
+    struct FunctionTerm;
+    struct Term;
+    struct Number;
+    struct Predicate;
+    struct Undefined;
 
     struct RequirementStrips;
     struct RequirementTyping;
@@ -165,6 +172,59 @@ namespace loki::domain::ast
     struct Structure;
     struct Domain;
 
+
+    /* <name> */
+    struct Name : x3::position_tagged
+    {
+        char alpha;
+        std::string suffix;
+    };
+
+    /* <variable> */
+    struct Variable : x3::position_tagged
+    {
+        char question_mark;
+        Name name;
+    };
+
+    /* <function-symbol> */
+    struct FunctionSymbol : x3::position_tagged
+    {
+        Name name;
+    };
+
+    /* <function-term> */
+    struct FunctionTerm : x3::position_tagged {
+        FunctionSymbol function_symbol;
+        std::vector<Term> terms;
+    };
+
+    /* <term> */
+    struct Term : x3::position_tagged,
+                  x3::variant<
+                      Name,
+                      Variable,
+                      x3::forward_ast<FunctionTerm>>
+    {
+        using base_type::base_type;
+        using base_type::operator=;
+    };
+
+    /* <number> */
+    struct Number : x3::position_tagged
+    {
+        double value;
+    };
+
+    /* <predicate-symbol> */
+    struct Predicate : x3::position_tagged
+    {
+        Name name;
+    };
+
+    /* <undefined> */
+    struct Undefined : x3::position_tagged { };
+
     /* <require-def> */
     struct RequirementStrips : x3::position_tagged
     {
@@ -276,7 +336,7 @@ namespace loki::domain::ast
     /* <typed list (name)> */
     struct Type : x3::position_tagged,
                   x3::variant<
-                      common::ast::Name,
+                      Name,
                       x3::forward_ast<TypeEither>>
     {
         using base_type::base_type;
@@ -290,14 +350,14 @@ namespace loki::domain::ast
 
     struct TypedListOfNamesRecursively : x3::position_tagged
     {
-        std::vector<common::ast::Name> names;
+        std::vector<Name> names;
         Type type;
         x3::forward_ast<TypedListOfNames> typed_list_of_names;
     };
 
     struct TypedListOfNames : x3::position_tagged,
                               x3::variant<
-                                  std::vector<common::ast::Name>,  // base type is object
+                                  std::vector<Name>,  // base type is object
                                   TypedListOfNamesRecursively>
     {
         using base_type::base_type;
@@ -307,14 +367,14 @@ namespace loki::domain::ast
     /* <typed list (variable)> */
     struct TypedListOfVariablesRecursively : x3::position_tagged
     {
-        std::vector<common::ast::Variable> variables;
+        std::vector<Variable> variables;
         Type type;
         x3::forward_ast<TypedListOfVariables> typed_list_of_variables;
     };
 
     struct TypedListOfVariables : x3::position_tagged,
                                   x3::variant<
-                                      std::vector<common::ast::Variable>,
+                                      std::vector<Variable>,
                                       TypedListOfVariablesRecursively>
     {
         using base_type::base_type;
@@ -324,14 +384,14 @@ namespace loki::domain::ast
     /* <atomic function skeleton> */
     struct AtomicFormulaSkeleton : x3::position_tagged
     {
-        common::ast::Predicate predicate;
+        Predicate predicate;
         TypedListOfVariables typed_list_of_variables;
     };
 
     /* <function typed list (atomic function skeleton)> */
     struct FunctionTypeNumber : x3::position_tagged
     {
-        common::ast::Number number;
+        Number number;
     };
 
     struct FunctionTypeType  : x3::position_tagged
@@ -349,7 +409,7 @@ namespace loki::domain::ast
 
     struct AtomicFunctionSkeleton : x3::position_tagged
     {
-        common::ast::FunctionSymbol function_symbol;
+        FunctionSymbol function_symbol;
         TypedListOfVariables arguments;
     };
 
@@ -372,14 +432,14 @@ namespace loki::domain::ast
     /* Atomic formulas */
     struct AtomicFormulaOfTermsPredicate : x3::position_tagged
     {
-        common::ast::Predicate predicate;
-        std::vector<common::ast::Term> terms;
+        Predicate predicate;
+        std::vector<Term> terms;
     };
 
     struct AtomicFormulaOfTermsEquality : x3::position_tagged
     {
-        common::ast::Term term_left;
-        common::ast::Term term_right;
+        Term term_left;
+        Term term_right;
     };
 
     struct AtomicFormulaOfTerms : x3::position_tagged,
@@ -480,8 +540,8 @@ namespace loki::domain::ast
 
     struct FunctionHead : x3::position_tagged
     {
-        common::ast::FunctionSymbol function_symbol;
-        std::vector<common::ast::Term> terms;
+        FunctionSymbol function_symbol;
+        std::vector<Term> terms;
     };
 
     struct FunctionExpression : x3::position_tagged,
@@ -497,7 +557,7 @@ namespace loki::domain::ast
 
     struct FunctionExpressionNumber : x3::position_tagged
     {
-        common::ast::Number number;
+        Number number;
     };
 
     struct FunctionExpressionBinaryOp : x3::position_tagged
@@ -632,7 +692,7 @@ namespace loki::domain::ast
 
     struct ConstraintGoalDescriptorWithin : x3::position_tagged
     {
-        common::ast::Number number;
+        Number number;
         GoalDescriptor goal_descriptor;
     };
 
@@ -655,28 +715,28 @@ namespace loki::domain::ast
 
     struct ConstraintGoalDescriptorAlwaysWithin : x3::position_tagged
     {
-        common::ast::Number number;
+        Number number;
         GoalDescriptor goal_descriptor_left;
         GoalDescriptor goal_descriptor_right;
     };
 
     struct ConstraintGoalDescriptorHoldDuring : x3::position_tagged
     {
-        common::ast::Number number_left;
-        common::ast::Number number_right;
+        Number number_left;
+        Number number_right;
         GoalDescriptor goal_descriptor;
     };
 
     struct ConstraintGoalDescriptorHoldAfter : x3::position_tagged
     {
-        common::ast::Number number;
+        Number number;
         GoalDescriptor goal_descriptor;
     };
 
     /* <pre-GD> */
     struct PreferenceName : x3::position_tagged
     {
-        common::ast::Name name;
+        Name name;
     };
 
     struct PreconditionGoalDescriptor : x3::position_tagged,
@@ -770,8 +830,8 @@ namespace loki::domain::ast
     };
 
     struct EffectProductionObjectFluent : x3::position_tagged {
-        common::ast::FunctionTerm function_term;
-        boost::variant<common::ast::Term, common::ast::Undefined> term;
+        FunctionTerm function_term;
+        boost::variant<Term, Undefined> term;
     };
 
     struct EffectProduction : x3::position_tagged,
@@ -808,7 +868,7 @@ namespace loki::domain::ast
     /* <action-def> */
     struct ActionSymbol : x3::position_tagged
     {
-        common::ast::Name name;
+        Name name;
     };
 
     struct ActionBody : x3::position_tagged
@@ -874,7 +934,7 @@ namespace loki::domain::ast
     /* <domain> */
     struct DomainName : x3::position_tagged
     {
-        common::ast::Name name;
+        Name name;
     };
 
     struct Domain : x3::position_tagged

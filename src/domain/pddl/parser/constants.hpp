@@ -32,7 +32,7 @@ private:
 public:
     ConstantListVisitor(Context& context_);
 
-    pddl::ObjectList operator()(const std::vector<common::ast::Name>& name_nodes);
+    pddl::ObjectList operator()(const std::vector<domain::ast::Name>& name_nodes);
 
     pddl::ObjectList operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
 };

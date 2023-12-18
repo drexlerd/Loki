@@ -64,6 +64,7 @@ namespace loki::problem {
         struct PreferenceConstraintGoalDescriptorPreferenceClass;
         struct PreferenceConstraintGoalDescriptorSimpleClass;
 
+        struct ProblemKeywordClass;
         struct ProblemNameClass;
         struct DomainNameClass;
         struct ObjectsClass;
@@ -107,6 +108,7 @@ namespace loki::problem {
         typedef x3::rule<PreferenceConstraintGoalDescriptorPreferenceClass, ast::PreferenceConstraintGoalDescriptorPreference> preference_constraint_goal_descriptor_preference_type;
         typedef x3::rule<PreferenceConstraintGoalDescriptorSimpleClass, ast::PreferenceConstraintGoalDescriptorSimple> preference_constraint_goal_descriptor_simple_type;
 
+        typedef x3::rule<ProblemKeywordClass, x3::unused_type> problem_keyword_type;
         typedef x3::rule<ProblemNameClass, ast::ProblemName> problem_name_type;
         typedef x3::rule<DomainNameClass, ast::DomainName> domain_name_type;
         typedef x3::rule<ObjectsClass, ast::Objects> objects_type;
@@ -140,8 +142,8 @@ namespace loki::problem {
             preference_constraint_goal_descriptor_preference_type,
             preference_constraint_goal_descriptor_simple_type)
 
-        BOOST_SPIRIT_DECLARE(problem_name_type, domain_name_type, objects_type, initial_type, goal_type,
-            constraints_type, metric_specification_type)
+        BOOST_SPIRIT_DECLARE(problem_keyword_type, problem_name_type, domain_name_type, objects_type,
+            initial_type, goal_type, constraints_type, metric_specification_type)
     }
 
 
@@ -179,6 +181,7 @@ namespace loki::problem {
     parser::preference_constraint_goal_descriptor_preference_type const& preference_constraint_goal_descriptor_preference();
     parser::preference_constraint_goal_descriptor_simple_type const& preference_constraint_goal_descriptor_simple();
 
+    parser::problem_keyword_type const& problem_keyword();
     parser::problem_name_type const& problem_name();
     parser::domain_name_type const& domain_name();
     parser::objects_type const& objects();

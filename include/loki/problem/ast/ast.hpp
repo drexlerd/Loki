@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PROBLEM_AST_AST_HPP_
 #define LOKI_INCLUDE_LOKI_PROBLEM_AST_AST_HPP_
 
-#include "../../common/ast/ast.hpp"
 #include "../../domain/ast/ast.hpp"
 
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
@@ -83,22 +82,22 @@ namespace loki::problem::ast
 
     /* <basic-function-term> */
     struct BasicFunctionTerm : x3::position_tagged {
-        common::ast::FunctionSymbol function_symbol;
-        std::vector<common::ast::Name> names;
+        domain::ast::FunctionSymbol function_symbol;
+        std::vector<domain::ast::Name> names;
     };
 
 
     /* Atomic formulas */
     struct AtomicFormulaOfNamesPredicate : x3::position_tagged
     {
-        common::ast::Predicate predicate;
-        std::vector<common::ast::Name> names;
+        domain::ast::Predicate predicate;
+        std::vector<domain::ast::Name> names;
     };
 
     struct AtomicFormulaOfNamesEquality : x3::position_tagged
     {
-        common::ast::Name name_left;
-        common::ast::Name name_right;
+        domain::ast::Name name_left;
+        domain::ast::Name name_right;
     };
 
     struct AtomicFormulaOfNames : x3::position_tagged,
@@ -135,18 +134,18 @@ namespace loki::problem::ast
     };
 
     struct InitialElementTimedLiterals : x3::position_tagged {
-        common::ast::Number number;
+        domain::ast::Number number;
         Literal literal;
     };
 
     struct InitialElementNumericFluents : x3::position_tagged {
         BasicFunctionTerm basic_function_term;
-        common::ast::Number number;
+        domain::ast::Number number;
     };
 
     struct InitialElementObjectFluents : x3::position_tagged {
         BasicFunctionTerm basic_function_term;
-        common::ast::Name name;
+        domain::ast::Name name;
     };
 
     struct InitialElement : x3::position_tagged,
@@ -175,7 +174,7 @@ namespace loki::problem::ast
     };
 
     struct MetricFunctionExpressionNumber : x3::position_tagged {
-        common::ast::Number number;
+        domain::ast::Number number;
     };
 
     struct MetricFunctionExpressionBinaryOperator : x3::position_tagged {
@@ -251,11 +250,11 @@ namespace loki::problem::ast
 
     /* <problem> */
     struct ProblemName : x3::position_tagged {
-        common::ast::Name name;
+        domain::ast::Name name;
     };
 
     struct DomainName : x3::position_tagged {
-        common::ast::Name name;
+        domain::ast::Name name;
     };
 
     struct Objects : x3::position_tagged {
