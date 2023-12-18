@@ -74,7 +74,7 @@ cmake --build build -j16
 
 The examples illustrate best practises on how to use Loki.
 
-The first examples shows how to get the ownership semantics correct.
+The first examples shows incorrect handling of the ownership semantics. The example is supposed to crash when trying to print the domain for the second time.
 
 ```console
 ./build/examples/undefined_behavior

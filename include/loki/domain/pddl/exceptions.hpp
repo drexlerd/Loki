@@ -28,6 +28,11 @@
 
 namespace loki {
 
+/* Type */
+class UnusedTypeError : public SemanticParserError {
+public:
+    UnusedTypeError(const std::string& name, const std::string& error_handler_output);
+};
 
 class UndefinedTypeError : public SemanticParserError {
 public:
@@ -37,6 +42,12 @@ public:
 class MultiDefinitionTypeError : public SemanticParserError {
 public:
     MultiDefinitionTypeError(const std::string& name, const std::string& error_handler_output);
+};
+
+/* Predicate */
+class UnusedPredicateError : public SemanticParserError {
+public:
+    UnusedPredicateError(const std::string& name, const std::string& error_handler_output);
 };
 
 class UndefinedPredicateError : public SemanticParserError {
@@ -49,11 +60,8 @@ public:
     MultiDefinitionPredicateError(const std::string& name, const std::string& error_handler_output);
 };
 
-class UnusedConstantError : public SemanticParserError {
-public:
-    UnusedConstantError(const std::string& name, const std::string& error_handler_output);
-};
-
+/* Constant */
+// UnusedConstantError is not a valid exception because constants are not required to be used in all problems
 class UndefinedConstantError : public SemanticParserError {
 public:
     UndefinedConstantError(const std::string& name, const std::string& error_handler_output);
@@ -62,6 +70,12 @@ public:
 class MultiDefinitionConstantError : public SemanticParserError {
 public:
     MultiDefinitionConstantError(const std::string& name, const std::string& error_handler_output);
+};
+
+/* Variable */
+class UnusedVariableError : public SemanticParserError {
+public:
+    UnusedVariableError(const std::string& name, const std::string& error_handler_output);
 };
 
 class UndefinedVariableError : public SemanticParserError {
@@ -74,6 +88,12 @@ public:
     MultiDefinitionVariableError(const std::string& name, const std::string& error_handler_output);
 };
 
+/* FunctionSkeleton */
+class UnusedFunctionSkeletonError : public SemanticParserError {
+public:
+    UnusedFunctionSkeletonError(const std::string& name, const std::string& error_handler_output);
+};
+
 class UndefinedFunctionSkeletonError : public SemanticParserError {
 public:
     UndefinedFunctionSkeletonError(const std::string& name, const std::string& error_handler_output);
@@ -84,11 +104,24 @@ public:
     MultiDefinitionFunctionSkeletonError(const std::string& name, const std::string& error_handler_output);
 };
 
+/* Requirement */
+class UnusedRequirementError : public SemanticParserError {
+public:
+    UnusedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output);
+};
+
 class UndefinedRequirementError : public SemanticParserError {
 public:
     UndefinedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output);
 };
 
+class UnsupportedRequirementError : public std::runtime_error {
+public:
+    explicit UnsupportedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output);
+};
+
+
+/* Compatibility errors */
 class MismatchedPredicateTermListError : public SemanticParserError {
 public:
     MismatchedPredicateTermListError(
@@ -103,11 +136,6 @@ public:
         const pddl::FunctionSkeleton& function_skeleton,
         const pddl::TermList& term_list,
         const std::string& error_handler_output);
-};
-
-class NotSupportedError : public std::runtime_error {
-public:
-    explicit NotSupportedError(pddl::RequirementEnum requirement, const std::string& error_handler_output);
 };
 
 }

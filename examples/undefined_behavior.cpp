@@ -33,6 +33,8 @@ int main() {
         /* Destructor of DomainParser is called and all domain and problem specific PDDL objects are destroyed. */
     }
 
+    std::cout << "Bye ;(" << std::endl;
+
     /* Undefined behavior when accessing the domain, usually the program crashes because memory was overwritten */
     std::cout << *domain << std::endl;
 

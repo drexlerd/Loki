@@ -23,6 +23,11 @@
 
 
 namespace loki {
+/* Type */
+UnusedTypeError::UnusedTypeError(const std::string& name, const std::string& error_handler_output)
+    : SemanticParserError(
+        "The type with name \"" + name + "\" was never referred to.", error_handler_output) { }
+
 UndefinedTypeError::UndefinedTypeError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
         "The type with name \"" + name + "\" is undefined.", error_handler_output) { }
@@ -30,6 +35,11 @@ UndefinedTypeError::UndefinedTypeError(const std::string& name, const std::strin
 MultiDefinitionTypeError::MultiDefinitionTypeError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
         "The type with name \"" + name + "\" has already been defined.", error_handler_output) { }
+
+/* Predicate */
+UnusedPredicateError::UnusedPredicateError(const std::string& name, const std::string& error_handler_output)
+    : SemanticParserError(
+        "The predicate with name \"" + name + "\" was never referred to.", error_handler_output) { }
 
 UndefinedPredicateError::UndefinedPredicateError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
@@ -39,10 +49,7 @@ MultiDefinitionPredicateError::MultiDefinitionPredicateError(const std::string& 
     : SemanticParserError(
         "The predicate with name \"" + name + "\" has already been defined.", error_handler_output) { }
 
-UnusedConstantError::UnusedConstantError(const std::string& name, const std::string& error_handler_output)
-    : SemanticParserError(
-        "The constant with name \"" + name + "\" is was never referred to.", error_handler_output) { }
-
+/* Constant */
 UndefinedConstantError::UndefinedConstantError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
         "The constant with name \"" + name + "\" is undefined.", error_handler_output) { }
@@ -50,6 +57,11 @@ UndefinedConstantError::UndefinedConstantError(const std::string& name, const st
 MultiDefinitionConstantError::MultiDefinitionConstantError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
         "The constant with name \"" + name + "\" has already been defined.", error_handler_output) { }
+
+/* Variable */
+UnusedVariableError::UnusedVariableError(const std::string& name, const std::string& error_handler_output)
+    : SemanticParserError(
+        "The variable with name \"" + name + "\" was never referred to.", error_handler_output) { }
 
 UndefinedVariableError::UndefinedVariableError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
@@ -59,6 +71,11 @@ MultiDefinitionVariableError::MultiDefinitionVariableError(const std::string& na
     : SemanticParserError(
         "The variable with name \"" + name + "\" has already been defined.", error_handler_output) { }
 
+/* FunctionSkeleton */
+UnusedFunctionSkeletonError::UnusedFunctionSkeletonError(const std::string& name, const std::string& error_handler_output)
+    : SemanticParserError(
+        "The function skeleton with name \"" + name + "\" was never referred to.", error_handler_output) { }
+
 UndefinedFunctionSkeletonError::UndefinedFunctionSkeletonError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
         "The function skeleton with name \"" + name + "\" is not defined in the current scope.", error_handler_output) { }
@@ -67,9 +84,19 @@ MultiDefinitionFunctionSkeletonError::MultiDefinitionFunctionSkeletonError(const
     : SemanticParserError(
         "The function skeleton with name \"" + name + "\" has already been defined.", error_handler_output) { }
 
+/* Requirement */
+UnusedRequirementError::UnusedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output)
+    : SemanticParserError(
+        "The requirement with name \"" + to_string(requirement) + "\" was never used.", error_handler_output) { }
+
 UndefinedRequirementError::UndefinedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output)
     : SemanticParserError("Undefined requirement: " + to_string(requirement), error_handler_output) { }
 
+UnsupportedRequirementError::UnsupportedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output)
+    : std::runtime_error("Unsupported requirement: " + to_string(requirement) + "\n" + error_handler_output) { }
+
+
+/* Compatibility errors */
 MismatchedPredicateTermListError::MismatchedPredicateTermListError(
     const pddl::Predicate& predicate,
     const pddl::TermList& term_list,
@@ -98,8 +125,5 @@ MismatchedFunctionSkeletonTermListError::MismatchedFunctionSkeletonTermListError
             + ".",
         error_handler_output) { }
 
-
-NotSupportedError::NotSupportedError(pddl::RequirementEnum requirement, const std::string& error_handler_output)
-    : std::runtime_error("Unsupported requirement: " + to_string(requirement) + "\n" + error_handler_output) { }
 
 }

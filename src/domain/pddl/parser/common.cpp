@@ -68,7 +68,7 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) con
 }
 
 pddl::Term TermDeclarationTermVisitor::operator()(const ast::FunctionTerm& node) const {
-    throw NotSupportedError(
+    throw UnsupportedRequirementError(
         pddl::RequirementEnum::OBJECT_FLUENTS,
         context.scopes.get_error_handler()(node, ""));
 }
@@ -97,7 +97,7 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const
 }
 
 pddl::Term TermReferenceTermVisitor::operator()(const ast::FunctionTerm& node) const {
-    throw NotSupportedError(
+    throw UnsupportedRequirementError(
         pddl::RequirementEnum::OBJECT_FLUENTS,
         context.scopes.get_error_handler()(node, ""));
 }
