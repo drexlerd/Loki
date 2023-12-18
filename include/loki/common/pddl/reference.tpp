@@ -21,7 +21,7 @@ namespace loki {
 
 template<typename... Ts>
 template<typename T>
-bool BindingReferences<Ts...>::exists(const T* reference) const {
+bool PointerReferences<Ts...>::exists(const T* reference) const {
     const auto& t_references = std::get<ReferenceSetType<T>>(references);
     return t_references.count(reference);
 }
@@ -29,7 +29,7 @@ bool BindingReferences<Ts...>::exists(const T* reference) const {
 
 template<typename... Ts>
 template<typename T>
-void BindingReferences<Ts...>::track(const T* reference) {
+void PointerReferences<Ts...>::track(const T* reference) {
     auto& t_references = std::get<ReferenceSetType<T>>(references);
     t_references.insert(reference);
 }
@@ -37,7 +37,7 @@ void BindingReferences<Ts...>::track(const T* reference) {
 
 template<typename... Ts>
 template<typename T>
-void BindingReferences<Ts...>::untrack(const T* reference) {
+void PointerReferences<Ts...>::untrack(const T* reference) {
     auto& t_references = std::get<ReferenceSetType<T>>(references);
     t_references.erase(reference);
 }

@@ -56,7 +56,7 @@ using ValueReferenceSetType = std::unordered_set<T>;
 ///        3. Verify that all variables are untracked, meaning
 ///           that they were referenced at least once.
 template<typename... Ts>
-class BindingReferences {
+class PointerReferences {
     private:
         std::tuple<ReferenceSetType<Ts>...> references;
 
@@ -94,7 +94,7 @@ class EnumReferences {
         void untrack(T value);
 };
 
-using ReferencedPointers = BindingReferences<pddl::TypeImpl
+using ReferencedPointers = PointerReferences<pddl::TypeImpl
     , pddl::ObjectImpl
     , pddl::PredicateImpl
     , pddl::FunctionSkeletonImpl
