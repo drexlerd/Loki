@@ -44,11 +44,31 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
         throw SyntaxParserError("", error_handler.get_error_stream().str());
     }
 
-
     /* Parse the problem to PDDL */
+    // Initialize the context
     auto scopes = ScopeStack(std::move(error_handler), domain_parser.m_scopes.get());
-
-    auto context = Context(domain_parser.m_factories, scopes);
+    auto composite_factories = CompositeOfPDDLFactories{
+        domain_parser.m_factories.requirements,
+        domain_parser.m_factories.types,
+        domain_parser.m_factories.variables,
+        domain_parser.m_factories.terms,
+        domain_parser.m_factories.objects,  // use factory shared between domain and problem to include constants in indexing 0,1,...
+        domain_parser.m_factories.problem_atoms,  // use problem specific factory to obtain indexing 0,1,...
+        domain_parser.m_factories.problem_literals,  // use problem specific factory to obtain indexing 0,1,...
+        domain_parser.m_factories.parameters,
+        domain_parser.m_factories.predicates,
+        domain_parser.m_factories.function_expressions,
+        domain_parser.m_factories.functions,
+        domain_parser.m_factories.function_skeletons,
+        domain_parser.m_factories.conditions,
+        domain_parser.m_factories.effects,
+        domain_parser.m_factories.actions,
+        domain_parser.m_factories.derived_predicates,
+        domain_parser.m_factories.numeric_fluents,
+        domain_parser.m_factories.domains,
+        domain_parser.m_factories.problems
+    };
+    auto context = Context(composite_factories, scopes);
 
     // Initialize global scope
     context.scopes.open_scope();

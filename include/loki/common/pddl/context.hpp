@@ -22,25 +22,23 @@
 #include "scope.hpp"
 #include "types.hpp"
 
+namespace loki
+{
 
-namespace loki {
+    struct Context
+    {
+        // For the unique construction of PDDL objects
+        CompositeOfPDDLFactories &factories;
+        // For referencing to existing bindings
+        ScopeStack &scopes;
+        // For checking that bindings were references at least once
+        ReferencedBindings references;
+        // For convenience, to avoid an additional parameter during semantic parsing
+        pddl::Requirements requirements;
 
-struct Context {
-    // For the unique construction of PDDL objects
-    PDDLFactories& factories;
-    // For referencing to existing bindings
-    ScopeStack& scopes;
-    // For checking that bindings were references at least once
-    ReferencedBindings references;
-    // For convenience, to avoid an additional parameters when parsing
-    pddl::Requirements requirements;
-
-    Context(PDDLFactories& factories_, ScopeStack& scopes_)
-    : factories(factories_)
-    , scopes(scopes_)
-    , references(ReferencedBindings())
-    , requirements(nullptr) { }
-};
+        Context(CompositeOfPDDLFactories &factories_, ScopeStack &scopes_)
+            : factories(factories_), scopes(scopes_), references(ReferencedBindings()), requirements(nullptr) {}
+    };
 
 }
 

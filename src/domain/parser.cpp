@@ -46,10 +46,31 @@ DomainParser::DomainParser(const fs::path& file_path) {
 
 
     /* Parse the domain to PDDL */
+
+    // Initialize the context
     m_scopes = std::make_unique<ScopeStack>(std::move(error_handler));
-
-    auto context = Context(m_factories, *m_scopes);
-
+    auto composite_factories = CompositeOfPDDLFactories{
+        m_factories.requirements,
+        m_factories.types,
+        m_factories.variables,
+        m_factories.terms,
+        m_factories.objects,  // use factory shared between domain and problem to include constants in indexing 0,1,...
+        m_factories.domain_atoms,  // use domain specific factory
+        m_factories.domain_literals,  // use domain specific factory
+        m_factories.parameters,
+        m_factories.predicates,
+        m_factories.function_expressions,
+        m_factories.functions,
+        m_factories.function_skeletons,
+        m_factories.conditions,
+        m_factories.effects,
+        m_factories.actions,
+        m_factories.derived_predicates,
+        m_factories.numeric_fluents,
+        m_factories.domains,
+        m_factories.problems
+    };
+    auto context = Context(composite_factories, *m_scopes);
     // Initialize global scope
     context.scopes.open_scope();
 

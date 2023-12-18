@@ -38,11 +38,11 @@ Loki ensures that each PDDL object is immutable to reduce usage errors and is es
 
 ### Private Constructors
 
-Loki ensures the controlled creation of PDDL objects through a factory to ensure uniqueness (up to reordering). Uniqueness ensures other important properties such as efficient hashing (just take the pointer!) and comparison for equality (just compare the pointers!) or the detection of structurally equivalent problems.
+Loki ensures the controlled creation of PDDL objects through a factory to ensure uniqueness (up to reordering). Uniqueness ensures other important properties such as efficient hashing (just take the pointer) and comparison for equality (just compare the pointers) or the detection of structurally equivalent problems.
 
 ### Shared Owners vs. Single Owner of PDDL objects
 
-Loki represents each PDDL object as a non-owning raw pointer to avoid mutex locks due to atomic increments of reference counters. This gives the user a little bit more responsibility, i.e., the user has to keep the parsers in memory to avoid the deallocation of PDDL objects.
+Loki represents each PDDL object as a non-owning raw pointer to avoid mutex locks due to atomic increments of reference counters. This gives the user a little bit more responsibility, i.e., the user has to keep the parsers in memory to avoid the deallocation of PDDL objects, illustrated [here](https://github.com/drexlerd/Loki/blob/main/examples/undefined_behavior.cpp).
 
 ### Non-fragmented Indexing Schemes
 
@@ -70,8 +70,30 @@ cmake -S . -B build
 cmake --build build -j16
 ```
 
+## Running the Examples
 
-## Running
+The examples illustrate best practises on how to use Loki.
+
+The first examples shows how to get the ownership semantics correct.
+
+```console
+./build/examples/undefined_behavior
+```
+
+The second example shows how to parse a domain and problem file which is supposed to be used in a planning system where a non-fragmented indexing of atoms and literals is preferred.
+
+```console
+./build/examples/single_problem
+```
+
+The third examples shows how to detect structurally equivalent problems over a common domain.
+
+```console
+./build/examples/multiple_problems
+```
+
+
+## Running the Executables
 
 Parsing a domain file into an abstract syntax tree and printing it.
 
@@ -79,7 +101,7 @@ Parsing a domain file into an abstract syntax tree and printing it.
 ./build/exe/domain benchmarks/gripper/domain.pddl
 ```
 
-Parsing a problem file into an abstract syntax tree and printing it.
+Parsing a domain and problem file into an abstract syntax tree and printing it.
 
 ```console
 ./build/exe/problem benchmarks/gripper/domain.pddl benchmarks/gripper/p-2-0.pddl

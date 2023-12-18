@@ -37,12 +37,12 @@ namespace loki {
 ///        For the following type of PDDL objects, loki detects semantic equivalence:
 ///            * Type
 ///            * Object
+///            * Variable
 ///            * Atom
 ///            * Literal
 ///            * Parameter
 ///            * Function
-///            * GroundAtom
-///            * GroundLiteral
+///            * FunctionSkeleton
 ///            * Requirements
 ///        For the remaining type of PDDL objects, loki approximates semantic equivalence
 ///        with structural equivalence where collections of objects are sorted by the identifier.
@@ -55,6 +55,12 @@ protected:
 
 public:
     explicit Base(int identifier) : m_identifier(identifier) { }
+
+    // moveable but not copyable
+    Base(const Base& other) = delete;
+    Base& operator=(const Base& other) = delete;
+    Base(Base&& other) = default;
+    Base& operator=(Base&& other) = default;
 
     bool operator==(const Base& other) const {
         return static_cast<Derived const*>(this)->are_equal_impl(static_cast<const Derived&>(other));

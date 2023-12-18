@@ -41,7 +41,9 @@ int main() {
     assert(problem1 == problem2);
 
     /* Note: since the PDDL objects are shared over the whole class of problems,
-             the idexing scheme is most likely fragmented per problem. */
+             the idexing scheme is most likely fragmented per problem.
+             (In this specific case, it is not fragmented because both problems are structurally equivalent) */
+
 
     return 0;
 }

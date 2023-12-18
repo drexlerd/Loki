@@ -87,6 +87,12 @@ class Scope {
     public:
         explicit Scope(const Scope* parent_scope = nullptr) : m_parent_scope(parent_scope) { }
 
+        // delete copy and move to avoid dangling references.
+        Scope(const Scope& other) = delete;
+        Scope& operator=(const Scope& other) = delete;
+        Scope(Scope&& other) = delete;
+        Scope& operator=(Scope&& other) = delete;
+
         /// @brief Returns a binding if it exists.
         template<typename T>
         std::optional<BindingValueType<T>> get(const std::string& name) const;
@@ -127,6 +133,12 @@ class ScopeStack {
     public:
         ScopeStack(ErrorHandler&& error_handler,
             const ScopeStack* parent=nullptr);
+
+        // delete copy and move to avoid dangling references.
+        ScopeStack(const ScopeStack& other) = delete;
+        ScopeStack& operator=(const ScopeStack& other) = delete;
+        ScopeStack(ScopeStack&& other) = delete;
+        ScopeStack& operator=(ScopeStack&& other) = delete;
 
         /// @brief Inserts a new scope on the top of the stack.
         void open_scope();

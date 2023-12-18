@@ -30,7 +30,6 @@ namespace loki {
 ConstantListVisitor::ConstantListVisitor(Context& context_)
     : context(context_) { }
 
-
 pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
     auto object_list = pddl::ObjectList();
