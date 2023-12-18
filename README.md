@@ -28,23 +28,19 @@ Loki is a modern C++ library for efficient syntactic and semantic parsing of PDD
 
 ## Design Decisions and its Implied Properties
 
-### Syntactic Parsing
-
-Loki implements the canonical parser structure of boost spirit x3 described [here](https://www.boost.org/doc/libs/1_83_0/libs/spirit/doc/x3/html/spirit_x3/tutorials/rexpr.html)
-
-### Immutability
+### PDDL objects are immutable
 
 Loki ensures that each PDDL object is immutable to reduce usage errors and is especially important in multi-threaded applications.
 
-### Private Constructors
+### PDDL object constructors are private
 
 Loki ensures the controlled creation of PDDL objects through a factory to ensure uniqueness (up to reordering). Uniqueness ensures other important properties such as efficient hashing (just take the pointer) and comparison for equality (just compare the pointers) or the detection of structurally equivalent problems.
 
-### Shared Owners vs. Single Owner of PDDL objects
+### PDDL objects have a single Owner
 
 Loki represents each PDDL object as a non-owning raw pointer to avoid mutex locks due to atomic increments of reference counters. This gives the user a little bit more responsibility, i.e., the user has to keep the parsers in memory to avoid the deallocation of PDDL objects, illustrated [here](https://github.com/drexlerd/Loki/blob/main/examples/undefined_behavior.cpp).
 
-### Non-fragmented Indexing Schemes
+### PDDL objects have a non-fragmented indexing scheme
 
 Loki ensures that objects from each class of PDDL objects (Object, Predicate, Atom, Conditions, ...) get assigned identifiers following a non-fragmented indexing scheme (0,1,2,...) allowing for simple association in bitsets and vectors which are commonly used in planning systems for efficiency reasons.
 
@@ -53,6 +49,16 @@ Loki ensures that objects from each class of PDDL objects (Object, Predicate, At
 Loki simplifies the PDDL grammar to make the resulting data structure less complex but easier to work with while preserving the same expressivity. Therefore, Loki might throw an error even for PDDL input files that conform to the PDDL specification.
 
 - In the PDDL specification, "object" is a reserved PDDL type, and "object" and "number" are reserved PDDL function types. Loki additionally reserves "number" as a PDDL type to reuse the standard PDDL types as function types as well. Hence, Loki throws an error if "number" is used in the types specification even if it is legal according to the PDDL specification.
+
+## Understanding the code base
+
+### Syntactic parsing
+
+Loki implements the canonical parser structure of boost spirit x3 described [here](https://www.boost.org/doc/libs/1_83_0/libs/spirit/doc/x3/html/spirit_x3/tutorials/rexpr.html)
+
+### Semantic parsing
+
+Loki implements a common [base class](https://github.com/drexlerd/Loki/blob/main/include/loki/common/pddl/base.hpp) for PDDL objects, uses a [factory](https://github.com/drexlerd/Loki/blob/main/include/loki/common/persistent_factory.hpp) for the unique creation of PDDL objects, uses a [binding mechanism](https://github.com/drexlerd/Loki/blob/main/include/loki/common/pddl/scope.hpp) to access previously defined objects and error handling, and uses a [reference mechanism](https://github.com/drexlerd/Loki/blob/main/include/loki/common/pddl/reference.hpp) to detect unused bindings.
 
 
 ## Dependencies
@@ -72,9 +78,9 @@ cmake --build build -j16
 
 ## Running the Examples
 
-The examples illustrate best practises on how to use Loki.
+The examples illustrate best practices on how to use Loki.
 
-The first examples shows incorrect handling of the ownership semantics. The example is supposed to crash when trying to print the domain for the second time.
+The first example shows the incorrect handling of the ownership semantics. The example is supposed to crash when trying to print the domain for the second time.
 
 ```console
 ./build/examples/undefined_behavior
@@ -86,7 +92,7 @@ The second example shows how to parse a domain and problem file which is suppose
 ./build/examples/single_problem
 ```
 
-The third examples shows how to detect structurally equivalent problems over a common domain.
+The third example shows how to detect structurally equivalent problems over a common domain.
 
 ```console
 ./build/examples/multiple_problems

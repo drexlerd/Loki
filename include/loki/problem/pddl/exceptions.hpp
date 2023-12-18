@@ -25,18 +25,10 @@
 
 
 namespace loki {
-
-class ObjectIsConstantError : public SemanticParserError {
+/* Object */
+class UnusedObjectError : public SemanticParserError {
 public:
-    ObjectIsConstantError(const std::string& name, const std::string& error_handler_output);
-};
-
-class MismatchedDomainError : public SemanticParserError {
-public:
-    MismatchedDomainError(
-        const pddl::Domain& domain,
-        const std::string& domain_name,
-        const std::string& error_handler_output);
+    UnusedObjectError(const std::string& name, const std::string& error_handler_output);
 };
 
 class UndefinedObjectError : public SemanticParserError {
@@ -49,6 +41,15 @@ public:
     MultiDefinitionObjectError(const std::string& name, const std::string& error_handler_output);
 };
 
+/* Compatibility errors */
+class MismatchedDomainError : public SemanticParserError {
+public:
+    MismatchedDomainError(
+        const pddl::Domain& domain,
+        const std::string& domain_name,
+        const std::string& error_handler_output);
+};
+
 class MismatchedPredicateObjectListError : public SemanticParserError {
 public:
     MismatchedPredicateObjectListError(
@@ -57,10 +58,6 @@ public:
         const std::string& error_handler_output);
 };
 
-class NonGroundVariableError : public SemanticParserError {
-public:
-    NonGroundVariableError(const std::string& name, const std::string& error_handler_output);
-};
 
 
 }

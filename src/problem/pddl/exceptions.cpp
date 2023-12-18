@@ -22,11 +22,20 @@
 
 
 namespace loki {
-
-ObjectIsConstantError::ObjectIsConstantError(const std::string& name, const std::string& error_handler_output)
+/* Object */
+UnusedObjectError::UnusedObjectError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
-        "The object with name \"" + name + "\" was previously defined as domain constant.", error_handler_output) { }
+        "The object with name \"" + name + "\" was never referred to.", error_handler_output) { }
 
+UndefinedObjectError::UndefinedObjectError(const std::string& name, const std::string& error_handler_output)
+    : SemanticParserError(
+        "The object with name \"" + name + "\" is undefined.", error_handler_output) { }
+
+MultiDefinitionObjectError::MultiDefinitionObjectError(const std::string& name, const std::string& error_handler_output)
+    : SemanticParserError(
+        "The object with name \"" + name + "\" has already been defined.", error_handler_output) { }
+
+/* Compatibility errors */
 MismatchedDomainError::MismatchedDomainError(
     const pddl::Domain& domain,
     const std::string& domain_name,
@@ -38,15 +47,6 @@ MismatchedDomainError::MismatchedDomainError(
             + domain_name
             + ".",
         error_handler_output) { }
-
-
-UndefinedObjectError::UndefinedObjectError(const std::string& name, const std::string& error_handler_output)
-    : SemanticParserError(
-        "The object with name \"" + name + "\" is undefined.", error_handler_output) { }
-
-MultiDefinitionObjectError::MultiDefinitionObjectError(const std::string& name, const std::string& error_handler_output)
-    : SemanticParserError(
-        "The object with name \"" + name + "\" has already been defined.", error_handler_output) { }
 
 MismatchedPredicateObjectListError::MismatchedPredicateObjectListError(
     const pddl::Predicate& predicate,
@@ -61,10 +61,5 @@ MismatchedPredicateObjectListError::MismatchedPredicateObjectListError(
             + std::to_string(object_list.size())
             + ".",
         error_handler_output) { }
-
-NonGroundVariableError::NonGroundVariableError(const std::string& name, const std::string& error_handler_output)
-    : SemanticParserError(
-        "The variable with name \"" + name + "\" is not grounded to an object.", error_handler_output) { }
-
 
 }

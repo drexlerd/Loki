@@ -95,7 +95,6 @@ UndefinedRequirementError::UndefinedRequirementError(pddl::RequirementEnum requi
 UnsupportedRequirementError::UnsupportedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output)
     : std::runtime_error("Unsupported requirement: " + to_string(requirement) + "\n" + error_handler_output) { }
 
-
 /* Compatibility errors */
 MismatchedPredicateTermListError::MismatchedPredicateTermListError(
     const pddl::Predicate& predicate,
