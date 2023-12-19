@@ -38,7 +38,7 @@ Loki ensures the controlled creation of PDDL objects through a factory to ensure
 
 ### PDDL objects have a single owner
 
-Loki represents each PDDL object as a non-owning raw pointer to avoid mutex locks due to atomic increments of reference counters. This gives the user a little bit more responsibility, i.e., the user has to keep the parsers in memory to avoid the deallocation of PDDL objects, illustrated [here](https://github.com/drexlerd/Loki/blob/main/examples/undefined_behavior.cpp).
+Loki represents each PDDL object as a non-owning raw pointer. The alternatives were a) value type or b) shared pointer. Main reason again a) is that it is less convenient to work with value type because objects must either be copied more costly or inconveniently accessed through a storage using a handle. The advantage is clearly cache locality. Main reason against b) is that while automated garbage collection through a combination of shared and weak pointers is quite handy, it is very efficient compared to the alternatives, especially in multi-threaded environments. Non-owning raw pointers are a good default.
 
 ### PDDL objects have a non-fragmented indexing scheme
 
