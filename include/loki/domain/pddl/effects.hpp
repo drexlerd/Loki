@@ -89,7 +89,7 @@ class EffectLiteralImpl : public EffectImpl {
 private:
     Literal m_literal;
 
-    EffectLiteralImpl(int identifier, const Literal& literal);
+    EffectLiteralImpl(int identifier, Literal literal);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;
@@ -110,7 +110,7 @@ class EffectAndImpl : public EffectImpl {
 private:
     EffectList m_effects;
 
-    EffectAndImpl(int identifier, const EffectList& effects);
+    EffectAndImpl(int identifier, EffectList effects);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;
@@ -133,7 +133,7 @@ private:
     Function m_function;
     FunctionExpression m_function_expression;
 
-    EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, const Function& function, const FunctionExpression& function_expression);
+    EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;
@@ -157,7 +157,7 @@ private:
     ParameterList m_parameters;
     Effect m_effect;
 
-    EffectConditionalForallImpl(int identifier, const ParameterList& parameters, const Effect& effect);
+    EffectConditionalForallImpl(int identifier, ParameterList parameters, Effect effect);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;
@@ -180,7 +180,7 @@ private:
     Condition m_condition;
     Effect m_effect;
 
-    EffectConditionalWhenImpl(int identifier, const Condition& condition, const Effect& effect);
+    EffectConditionalWhenImpl(int identifier, Condition condition, Effect effect);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;

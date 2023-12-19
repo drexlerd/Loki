@@ -70,7 +70,7 @@ public:
         auto& t_cache = std::get<PerTypeCache<T>>(m_data);
         int identifier = m_count;
         /* Must explicitly call the constructor of T to give exclusive access to the factory. */
-        const auto [it, inserted] = t_cache.data.insert(std::make_unique<T>(T(identifier, args...)));
+        const auto [it, inserted] = t_cache.data.emplace(std::make_unique<T>(std::move(T(identifier, std::move(args)...))));
         if (inserted) {
             ++m_count;
         }

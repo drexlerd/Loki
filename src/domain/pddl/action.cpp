@@ -23,12 +23,12 @@
 
 
 namespace loki::pddl {
-ActionImpl::ActionImpl(int identifier, const std::string& name, const ParameterList& parameters, const std::optional<Condition>& condition, const std::optional<Effect>& effect)
+ActionImpl::ActionImpl(int identifier, std::string name, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect)
     : Base(identifier)
-    , m_name(name)
-    , m_parameters(parameters)
-    , m_condition(condition)
-    , m_effect(effect)
+    , m_name(std::move(name))
+    , m_parameters(std::move(parameters))
+    , m_condition(std::move(condition))
+    , m_effect(std::move(effect))
 {
 }
 

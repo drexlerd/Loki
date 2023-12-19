@@ -29,15 +29,15 @@ using namespace std;
 
 
 namespace loki::pddl {
-ProblemImpl::ProblemImpl(int identifier, const Domain& domain, const std::string& name, const Requirements& requirements, const ObjectList& objects, const LiteralList& initial_literals, const NumericFluentList& numeric_fluents, const Condition& goal_condition)
+ProblemImpl::ProblemImpl(int identifier, Domain domain, std::string name, Requirements requirements, ObjectList objects, LiteralList initial_literals, NumericFluentList numeric_fluents, Condition goal_condition)
     : Base(identifier)
-    , m_domain(domain)
-    , m_name(name)
-    , m_requirements(requirements)
-    , m_objects(objects)
-    , m_initial_literals(initial_literals)
-    , m_numeric_fluents(numeric_fluents)
-    , m_goal_condition(goal_condition)
+    , m_domain(std::move(domain))
+    , m_name(std::move(name))
+    , m_requirements(std::move(requirements))
+    , m_objects(std::move(objects))
+    , m_initial_literals(std::move(initial_literals))
+    , m_numeric_fluents(std::move(numeric_fluents))
+    , m_goal_condition(std::move(goal_condition))
 {
 }
 

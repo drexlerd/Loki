@@ -24,10 +24,10 @@
 
 
 namespace loki::pddl {
-AtomImpl::AtomImpl(int identifier, const Predicate& predicate, const TermList& terms)
+AtomImpl::AtomImpl(int identifier, Predicate predicate, TermList terms)
     : Base(identifier)
-    , m_predicate(predicate)
-    , m_terms(terms)
+    , m_predicate(std::move(predicate))
+    , m_terms(std::move(terms))
 {
 }
 

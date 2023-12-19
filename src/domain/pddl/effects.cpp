@@ -51,9 +51,9 @@ EffectImpl::EffectImpl(int identifier)
 EffectImpl::~EffectImpl() = default;
 
 /* Literal */
-EffectLiteralImpl::EffectLiteralImpl(int identifier, const Literal& literal)
+EffectLiteralImpl::EffectLiteralImpl(int identifier, Literal literal)
     : EffectImpl(identifier)
-    , m_literal(literal) { }
+    , m_literal(std::move(literal)) { }
 
 bool EffectLiteralImpl::are_equal_impl(const EffectImpl& other) const {
     // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
@@ -81,8 +81,8 @@ const Literal& EffectLiteralImpl::get_literal() const {
 }
 
 
-EffectAndImpl::EffectAndImpl(int identifier, const EffectList& effects)
-    : EffectImpl(identifier), m_effects(effects) { }
+EffectAndImpl::EffectAndImpl(int identifier, EffectList effects)
+    : EffectImpl(identifier), m_effects(std::move(effects)) { }
 
 bool EffectAndImpl::are_equal_impl(const EffectImpl& other) const {
     if (typeid(*this) == typeid(other)) {
@@ -115,11 +115,11 @@ const EffectList& EffectAndImpl::get_effects() const {
 
 
 /* EffectNumeric */
-EffectNumericImpl::EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, const Function& function, const FunctionExpression& function_expression)
+EffectNumericImpl::EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression)
     : EffectImpl(identifier)
     , m_assign_operator(assign_operator)
-    , m_function(function)
-    , m_function_expression(function_expression) { }
+    , m_function(std::move(function))
+    , m_function_expression(std::move(function_expression)) { }
 
 bool EffectNumericImpl::are_equal_impl(const EffectImpl& other) const {
     if (typeid(*this) == typeid(other)) {
@@ -157,8 +157,8 @@ const FunctionExpression& EffectNumericImpl::get_function_expression() const {
 
 
 /* ConditionalForall */
-EffectConditionalForallImpl::EffectConditionalForallImpl(int identifier, const ParameterList& parameters, const Effect& effect)
-    : EffectImpl(identifier), m_parameters(parameters), m_effect(effect) { }
+EffectConditionalForallImpl::EffectConditionalForallImpl(int identifier, ParameterList parameters, Effect effect)
+    : EffectImpl(identifier), m_parameters(std::move(parameters)), m_effect(std::move(effect)) { }
 
 bool EffectConditionalForallImpl::are_equal_impl(const EffectImpl& other) const {
     if (typeid(*this) == typeid(other)) {
@@ -195,8 +195,8 @@ const Effect& EffectConditionalForallImpl::get_effect() const {
 }
 
 
-EffectConditionalWhenImpl::EffectConditionalWhenImpl(int identifier, const Condition& condition, const Effect& effect)
-    : EffectImpl(identifier), m_condition(condition), m_effect(effect) { }
+EffectConditionalWhenImpl::EffectConditionalWhenImpl(int identifier, Condition condition, Effect effect)
+    : EffectImpl(identifier), m_condition(std::move(condition)), m_effect(std::move(effect)) { }
 
 bool EffectConditionalWhenImpl::are_equal_impl(const EffectImpl& other) const {
     if (typeid(*this) == typeid(other)) {

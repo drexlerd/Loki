@@ -43,7 +43,7 @@ private:
     std::optional<Condition> m_condition;
     std::optional<Effect> m_effect;
 
-    ActionImpl(int identifier, const std::string& name, const ParameterList& parameters, const std::optional<Condition>& condition, const std::optional<Effect>& effect);
+    ActionImpl(int identifier, std::string name, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;

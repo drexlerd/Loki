@@ -76,7 +76,7 @@ class ConditionLiteralImpl : public ConditionImpl {
 private:
     Literal m_literal;
 
-    ConditionLiteralImpl(int identifier, const Literal& literal);
+    ConditionLiteralImpl(int identifier, Literal literal);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;
@@ -97,7 +97,7 @@ class ConditionAndImpl : public ConditionImpl {
 private:
     ConditionList m_conditions;
 
-    ConditionAndImpl(int identifier, const ConditionList& conditions);
+    ConditionAndImpl(int identifier, ConditionList conditions);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;
@@ -118,7 +118,7 @@ class ConditionOrImpl : public ConditionImpl {
 private:
     ConditionList m_conditions;
 
-    ConditionOrImpl(int identifier, const ConditionList& conditions);
+    ConditionOrImpl(int identifier, ConditionList conditions);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;
@@ -139,7 +139,7 @@ class ConditionNotImpl : public ConditionImpl {
 private:
     Condition m_condition;
 
-    ConditionNotImpl(int identifier, const Condition& condition);
+    ConditionNotImpl(int identifier, Condition condition);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;

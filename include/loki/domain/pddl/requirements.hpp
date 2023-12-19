@@ -67,7 +67,7 @@ class RequirementsImpl : public Base<RequirementsImpl> {
 private:
     RequirementEnumSet m_requirements;
 
-    RequirementsImpl(int identifier, const RequirementEnumSet& requirements);
+    RequirementsImpl(int identifier, RequirementEnumSet requirements);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;

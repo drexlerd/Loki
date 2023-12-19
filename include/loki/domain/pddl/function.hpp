@@ -37,7 +37,7 @@ private:
     FunctionSkeleton m_function_skeleton;
     TermList m_terms;
 
-    FunctionImpl(int identifier, const FunctionSkeleton& function_skeleton, const TermList& terms);
+    FunctionImpl(int identifier, FunctionSkeleton function_skeleton, TermList terms);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;

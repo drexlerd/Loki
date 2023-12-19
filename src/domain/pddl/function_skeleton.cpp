@@ -22,11 +22,11 @@
 
 
 namespace loki::pddl {
-FunctionSkeletonImpl::FunctionSkeletonImpl(int identifier, const std::string& name, const ParameterList& parameters, const Type& type)
+FunctionSkeletonImpl::FunctionSkeletonImpl(int identifier, std::string name, ParameterList parameters, Type type)
     : Base(identifier)
-    , m_name(name)
-    , m_parameters(parameters)
-    , m_type(type)
+    , m_name(std::move(name))
+    , m_parameters(std::move(parameters))
+    , m_type(std::move(type))
 {
 }
 

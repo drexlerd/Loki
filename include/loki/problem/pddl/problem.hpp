@@ -44,7 +44,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    ProblemImpl(int identifier, const Domain& domain, const std::string& name, const Requirements& requirements, const ObjectList& objects, const LiteralList& initial_literals, const NumericFluentList& numeric_fluents, const Condition& goal_condition);
+    ProblemImpl(int identifier, Domain domain, std::string name, Requirements requirements, ObjectList objects, LiteralList initial_literals, NumericFluentList numeric_fluents, Condition goal_condition);
 
     /// @brief Test for semantic equivalence
     bool are_equal_impl(const ProblemImpl& other) const;

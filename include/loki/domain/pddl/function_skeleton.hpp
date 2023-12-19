@@ -38,7 +38,7 @@ private:
     ParameterList m_parameters;
     Type m_type;
 
-    FunctionSkeletonImpl(int identifier, const std::string& name, const ParameterList& parameters, const Type& type);
+    FunctionSkeletonImpl(int identifier, std::string name, ParameterList parameters, Type type);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;

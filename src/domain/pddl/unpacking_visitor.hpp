@@ -48,6 +48,6 @@ public:
     }
 };
 
-};
+}
 
 #endif  // LOKI_SRC_DOMAIN_PDDL_INSERT_VISITOR_HPP_

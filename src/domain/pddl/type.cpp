@@ -21,10 +21,10 @@
 
 
 namespace loki::pddl {
-TypeImpl::TypeImpl(int identifier, const std::string& name, const TypeList& bases)
+TypeImpl::TypeImpl(int identifier, std::string name, TypeList bases)
     : Base(identifier)
-    , m_name(name)
-    , m_bases(bases)
+    , m_name(std::move(name))
+    , m_bases(std::move(bases))
 {
 }
 

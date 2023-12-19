@@ -34,8 +34,8 @@ TermImpl::~TermImpl() = default;
 
 
 /* TermObjectImpl */
-TermObjectImpl::TermObjectImpl(int identifier, const Object& object)
-    : TermImpl(identifier), m_object(object) { }
+TermObjectImpl::TermObjectImpl(int identifier, Object object)
+    : TermImpl(identifier), m_object(std::move(object)) { }
 
 bool TermObjectImpl::are_equal_impl(const TermImpl& other) const {
     if (typeid(*this) == typeid(other)) {
@@ -63,8 +63,8 @@ const Object& TermObjectImpl::get_object() const {
 
 
 /* TermVariableImpl */
-TermVariableImpl::TermVariableImpl(int identifier, const Variable& variable)
-    : TermImpl(identifier), m_variable(variable) { }
+TermVariableImpl::TermVariableImpl(int identifier, Variable variable)
+    : TermImpl(identifier), m_variable(std::move(variable)) { }
 
 bool TermVariableImpl::are_equal_impl(const TermImpl& other) const {
     if (typeid(*this) == typeid(other)) {

@@ -21,10 +21,10 @@
 
 
 namespace loki::pddl {
-DerivedPredicateImpl::DerivedPredicateImpl(int identifier, const ParameterList& parameters, const Condition& condition)
+DerivedPredicateImpl::DerivedPredicateImpl(int identifier, ParameterList parameters, Condition condition)
     : Base(identifier)
-    , m_parameters(parameters)
-    , m_condition(condition)
+    , m_parameters(std::move(parameters))
+    , m_condition(std::move(condition))
 {
 }
 

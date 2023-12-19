@@ -25,10 +25,10 @@
 #include <memory>
 
 namespace loki::pddl {
-PredicateImpl::PredicateImpl(int identifier, const std::string& name, const ParameterList& parameters)
+PredicateImpl::PredicateImpl(int identifier, std::string name, ParameterList parameters)
     : Base(identifier)
-    , m_name(name)
-    , m_parameters(parameters)
+    , m_name(std::move(name))
+    , m_parameters(std::move(parameters))
 {
 }
 

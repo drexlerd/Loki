@@ -35,7 +35,7 @@ private:
     bool m_is_negated;
     Atom m_atom;
 
-    LiteralImpl(int identifier, bool is_negated, const Atom& atom);
+    LiteralImpl(int identifier, bool is_negated, Atom atom);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;

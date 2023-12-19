@@ -44,13 +44,13 @@ private:
     ActionList m_actions;
 
     DomainImpl(int identifier,
-        const std::string& name,
-        const Requirements& requirements,
-        const TypeList& types,
-        const ObjectList& constants,
-        const PredicateList& predicates,
-        const FunctionSkeletonList& functions,
-        const ActionList& actions);
+        std::string name,
+        Requirements requirements,
+        TypeList types,
+        ObjectList constants,
+        PredicateList predicates,
+        FunctionSkeletonList functions,
+        ActionList actions);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;

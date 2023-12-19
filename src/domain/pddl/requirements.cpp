@@ -51,9 +51,9 @@ const std::string& to_string(pddl::RequirementEnum requirement) {
 }
 
 
-RequirementsImpl::RequirementsImpl(int identifier, const RequirementEnumSet& requirements)
+RequirementsImpl::RequirementsImpl(int identifier, RequirementEnumSet requirements)
     : Base(identifier)
-    , m_requirements(requirements)
+    , m_requirements(std::move(requirements))
 {
 }
 

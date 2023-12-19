@@ -37,7 +37,7 @@ private:
     std::string m_name;
     TypeList m_bases;
 
-    TypeImpl(int identifier, const std::string& name, const TypeList& bases = {});
+    TypeImpl(int identifier, std::string name, TypeList bases = {});
 
     template<typename... Ts>
     friend class loki::PersistentFactory;

@@ -31,9 +31,9 @@ ConditionImpl::~ConditionImpl() = default;
 
 
 /* Literal */
-ConditionLiteralImpl::ConditionLiteralImpl(int identifier, const Literal& literal)
+ConditionLiteralImpl::ConditionLiteralImpl(int identifier, Literal literal)
     : ConditionImpl(identifier)
-    , m_literal(literal) { }
+    , m_literal(std::move(literal)) { }
 
 bool ConditionLiteralImpl::are_equal_impl(const ConditionImpl& other) const {
     // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
@@ -62,9 +62,9 @@ const Literal& ConditionLiteralImpl::get_literal() const {
 
 
 /* And */
-ConditionAndImpl::ConditionAndImpl(int identifier, const ConditionList& conditions)
+ConditionAndImpl::ConditionAndImpl(int identifier, ConditionList conditions)
     : ConditionImpl(identifier)
-    , m_conditions(conditions) { }
+    , m_conditions(std::move(conditions)) { }
 
 bool ConditionAndImpl::are_equal_impl(const ConditionImpl& other) const {
     if (typeid(*this) == typeid(other)) {
@@ -97,9 +97,9 @@ const ConditionList& ConditionAndImpl::get_conditions() const {
 
 
 /* Or */
-ConditionOrImpl::ConditionOrImpl(int identifier, const ConditionList& conditions)
+ConditionOrImpl::ConditionOrImpl(int identifier, ConditionList conditions)
     : ConditionImpl(identifier)
-    , m_conditions(conditions) { }
+    , m_conditions(std::move(conditions)) { }
 
 bool ConditionOrImpl::are_equal_impl(const ConditionImpl& other) const {
     if (typeid(*this) == typeid(other)) {
@@ -132,9 +132,9 @@ const ConditionList& ConditionOrImpl::get_conditions() const {
 
 
 /* Not */
-ConditionNotImpl::ConditionNotImpl(int identifier, const Condition& condition)
+ConditionNotImpl::ConditionNotImpl(int identifier, Condition condition)
     : ConditionImpl(identifier)
-    , m_condition(condition) { }
+    , m_condition(std::move(condition)) { }
 
 bool ConditionNotImpl::are_equal_impl(const ConditionImpl& other) const {
     if (typeid(*this) == typeid(other)) {

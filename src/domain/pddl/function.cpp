@@ -23,10 +23,10 @@
 
 
 namespace loki::pddl {
-FunctionImpl::FunctionImpl(int identifier, const FunctionSkeleton& function_skeleton, const TermList& terms)
+FunctionImpl::FunctionImpl(int identifier, FunctionSkeleton function_skeleton, TermList terms)
     : Base(identifier)
-    , m_function_skeleton(function_skeleton)
-    , m_terms(terms)
+    , m_function_skeleton(std::move(function_skeleton))
+    , m_terms(std::move(terms))
 {
 }
 

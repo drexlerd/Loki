@@ -79,12 +79,12 @@ double FunctionExpressionNumberImpl::get_number() const {
 /* FunctionExpressionBinaryOperator */
 FunctionExpressionBinaryOperatorImpl::FunctionExpressionBinaryOperatorImpl(int identifier,
     ArithmeticOperatorEnum binary_operator,
-    const FunctionExpression& left_function_expression,
-    const FunctionExpression& right_function_expression)
+    FunctionExpression left_function_expression,
+    FunctionExpression right_function_expression)
     : FunctionExpressionImpl(identifier)
     , m_binary_operator(binary_operator)
-    , m_left_function_expression(left_function_expression)
-    , m_right_function_expression(right_function_expression) { }
+    , m_left_function_expression(std::move(left_function_expression))
+    , m_right_function_expression(std::move(right_function_expression)) { }
 
 bool FunctionExpressionBinaryOperatorImpl::are_equal_impl(const FunctionExpressionImpl& other) const {
     // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
@@ -123,8 +123,8 @@ const FunctionExpression& FunctionExpressionBinaryOperatorImpl::get_right_functi
 
 
 /* FunctionExpressionMinus */
-FunctionExpressionMinusImpl::FunctionExpressionMinusImpl(int identifier, const FunctionExpression& function_expression)
-    : FunctionExpressionImpl(identifier), m_function_expression(function_expression) { }
+FunctionExpressionMinusImpl::FunctionExpressionMinusImpl(int identifier, FunctionExpression function_expression)
+    : FunctionExpressionImpl(identifier), m_function_expression(std::move(function_expression)) { }
 
 bool FunctionExpressionMinusImpl::are_equal_impl(const FunctionExpressionImpl& other) const {
     // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
@@ -153,8 +153,8 @@ const FunctionExpression& FunctionExpressionMinusImpl::get_function_expression()
 
 
 /* FunctionExpressionFunction */
-FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(int identifier, const Function& function)
-    : FunctionExpressionImpl(identifier), m_function(function) { }
+FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(int identifier, Function function)
+    : FunctionExpressionImpl(identifier), m_function(std::move(function)) { }
 
 bool FunctionExpressionFunctionImpl::are_equal_impl(const FunctionExpressionImpl& other) const {
     // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti

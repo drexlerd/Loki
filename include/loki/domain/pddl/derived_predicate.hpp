@@ -40,7 +40,7 @@ private:
     ParameterList m_parameters;
     Condition m_condition;
 
-    DerivedPredicateImpl(int identifier, const ParameterList& parameters, const Condition& condition);
+    DerivedPredicateImpl(int identifier, ParameterList parameters, Condition condition);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;

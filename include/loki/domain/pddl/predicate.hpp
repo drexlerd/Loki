@@ -39,7 +39,7 @@ private:
     std::string m_name;
     ParameterList m_parameters;
 
-    PredicateImpl(int identifier, const std::string& name, const ParameterList& parameters);
+    PredicateImpl(int identifier, std::string name, ParameterList parameters);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;

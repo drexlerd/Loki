@@ -40,7 +40,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    AtomImpl(int identifier, const Predicate& predicate, const TermList& terms);
+    AtomImpl(int identifier, Predicate predicate, TermList terms);
 
     /// @brief Test for semantic equivalence
     bool are_equal_impl(const AtomImpl& other) const;

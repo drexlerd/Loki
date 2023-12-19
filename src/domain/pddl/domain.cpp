@@ -32,21 +32,21 @@ using namespace std;
 
 namespace loki::pddl {
 DomainImpl::DomainImpl(int identifier,
-    const std::string& name,
-    const Requirements& requirements,
-    const TypeList& types,
-    const ObjectList& constants,
-    const PredicateList& predicates,
-    const FunctionSkeletonList& functions,
-    const ActionList& actions)
+    std::string name,
+    Requirements requirements,
+    TypeList types,
+    ObjectList constants,
+    PredicateList predicates,
+    FunctionSkeletonList functions,
+    ActionList actions)
     : Base(identifier)
-    , m_name(name)
-    , m_requirements(requirements)
-    , m_types(types)
-    , m_constants(constants)
-    , m_predicates(predicates)
-    , m_functions(functions)
-    , m_actions(actions)
+    , m_name(std::move(name))
+    , m_requirements(std::move(requirements))
+    , m_types(std::move(types))
+    , m_constants(std::move(constants))
+    , m_predicates(std::move(predicates))
+    , m_functions(std::move(functions))
+    , m_actions(std::move(actions))
 {
 }
 

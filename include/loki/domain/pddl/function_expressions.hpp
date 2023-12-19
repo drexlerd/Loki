@@ -106,8 +106,8 @@ private:
 
     FunctionExpressionBinaryOperatorImpl(int identifier,
         ArithmeticOperatorEnum binary_operator,
-        const FunctionExpression& left_function_expression,
-        const FunctionExpression& right_function_expression);
+        FunctionExpression left_function_expression,
+        FunctionExpression right_function_expression);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;
@@ -130,7 +130,7 @@ class FunctionExpressionMinusImpl : public FunctionExpressionImpl {
 private:
     FunctionExpression m_function_expression;
 
-    FunctionExpressionMinusImpl(int identifier, const FunctionExpression& function_expression);
+    FunctionExpressionMinusImpl(int identifier, FunctionExpression function_expression);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;
@@ -151,7 +151,7 @@ class FunctionExpressionFunctionImpl : public FunctionExpressionImpl {
 private:
     Function m_function;
 
-    FunctionExpressionFunctionImpl(int identifier, const Function& function);
+    FunctionExpressionFunctionImpl(int identifier, Function function);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;

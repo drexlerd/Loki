@@ -23,10 +23,10 @@
 
 
 namespace loki::pddl {
-LiteralImpl::LiteralImpl(int identifier, bool is_negated, const Atom& atom)
+LiteralImpl::LiteralImpl(int identifier, bool is_negated, Atom atom)
     : Base(identifier)
     , m_is_negated(is_negated)
-    , m_atom(atom)
+    , m_atom(std::move(atom))
 {
 }
 

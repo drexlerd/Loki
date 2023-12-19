@@ -21,9 +21,9 @@
 
 
 namespace loki::pddl {
-VariableImpl::VariableImpl(int identifier, const std::string& name)
+VariableImpl::VariableImpl(int identifier, std::string name)
     : Base(identifier)
-    , m_name(name)
+    , m_name(std::move(name))
 {
 }
 

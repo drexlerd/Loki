@@ -26,10 +26,10 @@
 
 
 namespace loki::pddl {
-ParameterImpl::ParameterImpl(int identifier, const pddl::Variable& variable, const TypeList& types)
+ParameterImpl::ParameterImpl(int identifier, pddl::Variable variable, TypeList types)
     : Base(identifier)
-    , m_variable(variable)
-    , m_types(types)
+    , m_variable(std::move(variable))
+    , m_types(std::move(types))
 {
 }
 

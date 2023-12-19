@@ -40,7 +40,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    NumericFluentImpl(int identifier, const Function& function, double number);
+    NumericFluentImpl(int identifier, Function function, double number);
 
     /// @brief Test for semantic equivalence
     bool are_equal_impl(const NumericFluentImpl& other) const;

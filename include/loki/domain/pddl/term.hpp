@@ -50,7 +50,6 @@ protected:
     TermImpl& operator=(TermImpl&& other) = default;
 
 public:
-
     virtual ~TermImpl();
 
     /// @brief Test for semantic equivalence
@@ -66,12 +65,12 @@ class TermObjectImpl : public TermImpl {
 private:
     Object m_object;
 
+    TermObjectImpl(int identifier, Object object);
+
     template<typename... Ts>
     friend class loki::PersistentFactory;
 
 public:
-    TermObjectImpl(int identifier, const Object& object);
-
     bool are_equal_impl(const TermImpl& other) const override;
     size_t hash_impl() const override;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
@@ -86,12 +85,12 @@ class TermVariableImpl : public TermImpl {
 private:
     Variable m_variable;
 
+    TermVariableImpl(int identifier, Variable variable);
+
     template<typename... Ts>
     friend class loki::PersistentFactory;
 
 public:
-    TermVariableImpl(int identifier, const Variable& variable);
-
     bool are_equal_impl(const TermImpl& other) const override;
     size_t hash_impl() const override;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;

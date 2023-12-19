@@ -34,7 +34,7 @@ class VariableImpl : public Base<VariableImpl> {
 private:
     std::string m_name;
 
-    VariableImpl(int identifier, const std::string& name);
+    VariableImpl(int identifier, std::string name);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;

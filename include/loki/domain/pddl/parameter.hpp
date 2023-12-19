@@ -38,7 +38,7 @@ private:
     Variable m_variable;
     TypeList m_types;
 
-    ParameterImpl(int identifier, const Variable& variable, const TypeList& types);
+    ParameterImpl(int identifier, Variable variable, TypeList types);
 
     template<typename... Ts>
     friend class loki::PersistentFactory;
