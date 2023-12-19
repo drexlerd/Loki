@@ -45,7 +45,7 @@ pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& atomic_formula
     if (!context.requirements->test(pddl::RequirementEnum::EQUALITY)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::EQUALITY, context.scopes.get_error_handler()(atomic_formula_of_terms_node, ""));
     }
-    context.referenced_enums.untrack(pddl::RequirementEnum::EQUALITY);
+    context.referenced_values.untrack(pddl::RequirementEnum::EQUALITY);
     assert(context.scopes.get<pddl::PredicateImpl>("=").has_value());
     const auto& [equal_predicate, _position, _error_handler] = context.scopes.get<pddl::PredicateImpl>("=").value();
     auto left_term = boost::apply_visitor(TermReferenceTermVisitor(context), atomic_formula_of_terms_node.term_left);

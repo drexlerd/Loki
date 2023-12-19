@@ -21,9 +21,9 @@
 namespace loki {
 
 ScopeStack::ScopeStack(
-    ErrorHandler&& error_handler,
+    const ErrorHandler& error_handler,
     const ScopeStack* parent)
-    : m_error_handler(std::move(error_handler))
+    : m_error_handler(error_handler)
     , m_parent(parent) { }
 
 void ScopeStack::open_scope() {

@@ -63,7 +63,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
     if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_variables_node, ""));
     }
-    context.referenced_enums.untrack(pddl::RequirementEnum::TYPING);
+    context.referenced_values.untrack(pddl::RequirementEnum::TYPING);
     auto parameter_list = pddl::ParameterList();
     const auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context),
                                             typed_variables_node.type);

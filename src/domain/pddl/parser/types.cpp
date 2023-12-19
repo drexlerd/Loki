@@ -115,7 +115,7 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::Typ
     if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_list_of_names_recursively_node, ""));
     }
-    context.referenced_enums.untrack(pddl::RequirementEnum::TYPING);
+    context.referenced_values.untrack(pddl::RequirementEnum::TYPING);
     pddl::TypeList type_list;
     const auto types = boost::apply_visitor(TypeDeclarationTypeVisitor(context),
                                             typed_list_of_names_recursively_node.type);

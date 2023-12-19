@@ -31,6 +31,12 @@ class ProblemParser {
 private:
     pddl::Problem m_problem;
 
+    std::string m_problem_source; 
+    ErrorHandler m_error_handler;
+    ScopeStack m_scopes;
+
+    // Add mappings from PDDL object to positions?
+
 public:
     explicit ProblemParser(const fs::path& file_path, DomainParser& domain_parser);
 

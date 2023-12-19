@@ -38,13 +38,6 @@
 
 
 namespace loki {
-template<typename T>
-using ReferenceSetType = std::unordered_set<const T*>;
-
-template<typename T>
-using ValueReferenceSetType = std::unordered_set<T>;
-
-
 /// @brief Encapsulates referenced pointers of bindings.
 ///        We require that each binding must be referenced at least one in a child scope
 ///        and if it was not referenced then we report an error message.
@@ -58,7 +51,7 @@ using ValueReferenceSetType = std::unordered_set<T>;
 template<typename... Ts>
 class PointerReferences {
     private:
-        std::tuple<ReferenceSetType<Ts>...> references;
+        std::tuple<std::unordered_set<const Ts*>...> references;
 
     public:
         /// @brief Returns a pointer if it exists.
@@ -77,9 +70,9 @@ class PointerReferences {
 /// @brief Encapsulates referenced values of enums.
 ///        Usage is similar to PointerReferences.
 template<typename... Ts>
-class EnumReferences {
+class ValueReferences {
     private:
-        std::tuple<ValueReferenceSetType<Ts>...> references;
+        std::tuple<std::unordered_set<Ts>...> references;
 
     public:
         /// @brief Returns a value if it exists.
@@ -101,7 +94,7 @@ using ReferencedPointers = PointerReferences<pddl::TypeImpl
     , pddl::FunctionSkeletonImpl
     , pddl::VariableImpl>;
 
-using ReferencedEnums = EnumReferences<pddl::RequirementEnum>;
+using ReferencedValues = ValueReferences<pddl::RequirementEnum>;
 
 }
 

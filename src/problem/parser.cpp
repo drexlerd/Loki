@@ -30,23 +30,23 @@
 
 namespace loki {
 
-ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_parser) {
+ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_parser)
+    : m_problem_source(loki::read_file(file_path))
+    , m_error_handler(ErrorHandler(m_problem_source.begin(), m_problem_source.end(), file_path))
+    , m_scopes(ScopeStack(m_error_handler, &domain_parser.m_scopes)) {
     const auto start = std::chrono::high_resolution_clock::now();
     std::cout << "Started parsing problem file: " << file_path << std::endl;
 
     /* Parse the AST */
-    const auto problem_source = loki::read_file(file_path);
     auto problem_node = problem::ast::Problem();
 
-    auto error_handler = ErrorHandler(problem_source, file_path);
-    bool success = parse_ast(problem_source, problem::problem(), problem_node, error_handler.get_error_handler());
+    bool success = parse_ast(m_problem_source, problem::problem(), problem_node, m_error_handler.get_error_handler());
     if (!success) {
-        throw SyntaxParserError("", error_handler.get_error_stream().str());
+        throw SyntaxParserError("", m_error_handler.get_error_stream().str());
     }
 
     /* Parse the problem to PDDL */
     // Initialize the context
-    auto scopes = ScopeStack(std::move(error_handler), domain_parser.m_scopes.get());
     auto composite_factories = CompositeOfPDDLFactories{
         domain_parser.m_factories.requirements,
         domain_parser.m_factories.types,
@@ -68,7 +68,7 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
         domain_parser.m_factories.domains,
         domain_parser.m_factories.problems
     };
-    auto context = Context(composite_factories, scopes);
+    auto context = Context(composite_factories, m_scopes);
 
     // Initialize global scope
     context.scopes.open_scope();

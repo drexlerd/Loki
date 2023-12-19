@@ -126,12 +126,12 @@ class ScopeStack {
     private:
         std::deque<std::unique_ptr<Scope>> m_stack;
 
-        const ErrorHandler m_error_handler;
+        const ErrorHandler& m_error_handler;
 
         const ScopeStack* m_parent;
 
     public:
-        ScopeStack(ErrorHandler&& error_handler,
+        ScopeStack(const ErrorHandler& error_handler,
             const ScopeStack* parent=nullptr);
 
         // delete copy and move to avoid dangling references.

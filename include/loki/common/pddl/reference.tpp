@@ -22,7 +22,7 @@ namespace loki {
 template<typename... Ts>
 template<typename T>
 bool PointerReferences<Ts...>::exists(const T* reference) const {
-    const auto& t_references = std::get<ReferenceSetType<T>>(references);
+    const auto& t_references = std::get<std::unordered_set<const T*>>(references);
     return t_references.count(reference);
 }
 
@@ -30,7 +30,7 @@ bool PointerReferences<Ts...>::exists(const T* reference) const {
 template<typename... Ts>
 template<typename T>
 void PointerReferences<Ts...>::track(const T* reference) {
-    auto& t_references = std::get<ReferenceSetType<T>>(references);
+    auto& t_references = std::get<std::unordered_set<const T*>>(references);
     t_references.insert(reference);
 }
 
@@ -38,30 +38,30 @@ void PointerReferences<Ts...>::track(const T* reference) {
 template<typename... Ts>
 template<typename T>
 void PointerReferences<Ts...>::untrack(const T* reference) {
-    auto& t_references = std::get<ReferenceSetType<T>>(references);
+    auto& t_references = std::get<std::unordered_set<const T*>>(references);
     t_references.erase(reference);
 }
 
 template<typename... Ts>
 template<typename T>
-bool EnumReferences<Ts...>::exists(T reference) const {
-    const auto& t_references = std::get<ValueReferenceSetType<T>>(references);
+bool ValueReferences<Ts...>::exists(T reference) const {
+    const auto& t_references = std::get<std::unordered_set<T>>(references);
     return t_references.count(reference);
 }
 
 
 template<typename... Ts>
 template<typename T>
-void EnumReferences<Ts...>::track(T reference) {
-    auto& t_references = std::get<ValueReferenceSetType<T>>(references);
+void ValueReferences<Ts...>::track(T reference) {
+    auto& t_references = std::get<std::unordered_set<T>>(references);
     t_references.insert(reference);
 }
 
 
 template<typename... Ts>
 template<typename T>
-void EnumReferences<Ts...>::untrack(T reference) {
-    auto& t_references = std::get<ValueReferenceSetType<T>>(references);
+void ValueReferences<Ts...>::untrack(T reference) {
+    auto& t_references = std::get<std::unordered_set<T>>(references);
     t_references.erase(reference);
 }
 

@@ -58,7 +58,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
     if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
         throw UnsupportedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_list_of_names_recursively_node, ""));
     }
-    context.referenced_enums.untrack(pddl::RequirementEnum::TYPING);
+    context.referenced_values.untrack(pddl::RequirementEnum::TYPING);
     auto object_list = pddl::ObjectList();
     const auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context),
                                             typed_list_of_names_recursively_node.type);

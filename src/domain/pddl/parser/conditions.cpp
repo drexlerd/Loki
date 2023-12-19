@@ -45,7 +45,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, Context& c
     if (!context.requirements->test(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
-    context.referenced_enums.untrack(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS);
+    context.referenced_values.untrack(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS);
     return context.factories.conditions.get_or_create<pddl::ConditionLiteralImpl>(parse(node.literal, context));
 }
 
@@ -59,7 +59,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, Context& contex
     if (!context.requirements->test(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
-    context.referenced_enums.untrack(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
+    context.referenced_values.untrack(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
     pddl::ConditionList condition_list = parse(node.goal_descriptors, context);
     return context.factories.conditions.get_or_create<pddl::ConditionOrImpl>(condition_list);
 }
@@ -69,7 +69,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorNot& node, Context& conte
     if (!context.requirements->test(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
-    context.referenced_enums.untrack(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
+    context.referenced_values.untrack(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
     pddl::Condition condition = parse(node.goal_descriptor, context);
     return context.factories.conditions.get_or_create<pddl::ConditionNotImpl>(condition);
 }
