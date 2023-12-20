@@ -39,7 +39,9 @@ pddl::Function parse(const problem::ast::BasicFunctionTerm& node, Context& conte
     if (function_skeleton->get_parameters().size() != term_list.size()) {
         throw MismatchedFunctionSkeletonTermListError(function_skeleton, term_list, context.scopes.get_error_handler()(node, ""));
     }
-    return context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, term_list);
+    const auto function = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, term_list);
+    context.positions.push_back(function, node);
+    return function;
 }
 
 }

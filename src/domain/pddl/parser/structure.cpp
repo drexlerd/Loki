@@ -56,7 +56,9 @@ pddl::Action parse(const domain::ast::Action& node, Context& context) {
         }
     }
     context.scopes.close_scope();
-    return context.factories.actions.get_or_create<pddl::ActionImpl>(name, parameters, condition, effect);
+    const auto action = context.factories.actions.get_or_create<pddl::ActionImpl>(name, parameters, condition, effect);
+    context.positions.push_back(action, node);
+    return action;
 }
 
 pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, Context& context) {
@@ -67,7 +69,9 @@ pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, Context&
     auto parameters = boost::apply_visitor(ParameterListVisitor(context),
         node.typed_list_of_variables);
     auto condition = parse(node.goal_descriptor, context);
-    return context.factories.derived_predicates.get_or_create<pddl::DerivedPredicateImpl>(parameters, condition);
+    const auto derived_predicate = context.factories.derived_predicates.get_or_create<pddl::DerivedPredicateImpl>(parameters, condition);
+    context.positions.push_back(derived_predicate, node);
+    return derived_predicate;
 }
 
 

@@ -79,28 +79,17 @@ using ProblemFactory = PersistentFactory<pddl::ProblemImpl>;
 using PDDLPositionCache = PositionCache<pddl::RequirementsImpl
     , pddl::TypeImpl
     , pddl::VariableImpl
-    , pddl::TermObjectImpl
-    , pddl::TermVariableImpl
+    , pddl::TermImpl
     , pddl::ObjectImpl
     , pddl::AtomImpl
     , pddl::LiteralImpl
     , pddl::ParameterImpl
     , pddl::PredicateImpl
-    , pddl::FunctionExpressionNumberImpl
-    , pddl::FunctionExpressionBinaryOperatorImpl
-    , pddl::FunctionExpressionMinusImpl
-    , pddl::FunctionExpressionFunctionImpl
+    , pddl::FunctionExpressionImpl
     , pddl::FunctionImpl
     , pddl::FunctionSkeletonImpl
-    , pddl::ConditionLiteralImpl
-    , pddl::ConditionAndImpl
-    , pddl::ConditionOrImpl
-    , pddl::ConditionNotImpl
-    , pddl::EffectLiteralImpl
-    , pddl::EffectAndImpl
-    , pddl::EffectNumericImpl
-    , pddl::EffectConditionalForallImpl
-    , pddl::EffectConditionalWhenImpl
+    , pddl::ConditionImpl
+    , pddl::EffectImpl
     , pddl::ActionImpl
     , pddl::DerivedPredicateImpl
     , pddl::NumericFluentImpl

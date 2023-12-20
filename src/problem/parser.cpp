@@ -22,6 +22,7 @@
 #include "../../include/loki/common/pddl/context.hpp"
 #include "../../include/loki/common/filesystem.hpp"
 #include "../../include/loki/common/ast/parser_wrapper.hpp"
+#include "../../include/loki/common/exceptions.hpp"
 #include "../../include/loki/problem/ast/parser.hpp"
 #include "../../include/loki/problem/ast/ast.hpp"
 #include "../../include/loki/problem/pddl/parser.hpp"

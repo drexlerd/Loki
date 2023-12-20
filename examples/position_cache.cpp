@@ -42,5 +42,7 @@ int main() {
         }
     }
 
+    // Note: iterators can be compared to find positions of elements that are within other elements.
+
     return 0;
 }

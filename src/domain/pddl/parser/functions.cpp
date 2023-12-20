@@ -53,24 +53,32 @@ pddl::ArithmeticOperatorEnum parse(const domain::ast::BinaryOperator& node) {
 
 pddl::FunctionExpression parse(const domain::ast::FunctionExpressionNumber& node, Context& context) {
     const auto number = parse(node.number);
-    return context.factories.function_expressions.get_or_create<pddl::FunctionExpressionNumberImpl>(number);
+    const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionNumberImpl>(number);
+    context.positions.push_back<pddl::FunctionExpressionImpl>(function_expression, node);
+    return function_expression;
 }
 
 pddl::FunctionExpression parse(const domain::ast::FunctionExpressionBinaryOp& node, Context& context) {
     const auto binary_operator = parse(node.binary_operator);
     const auto left_function_expression = parse(node.function_expression_left, context);
     const auto right_function_expression = parse(node.function_expression_right, context);
-    return context.factories.function_expressions.get_or_create<pddl::FunctionExpressionBinaryOperatorImpl>(binary_operator, left_function_expression, right_function_expression);
+    const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionBinaryOperatorImpl>(binary_operator, left_function_expression, right_function_expression);
+    context.positions.push_back<pddl::FunctionExpressionImpl>(function_expression, node);
+    return function_expression;
 }
 
 pddl::FunctionExpression parse(const domain::ast::FunctionExpressionMinus& node, Context& context) {
-    const auto function_expression = parse(node.function_expression, context);
-    return context.factories.function_expressions.get_or_create<pddl::FunctionExpressionMinusImpl>(function_expression);
+    const auto child_function_expression = parse(node.function_expression, context);
+    const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionMinusImpl>(child_function_expression);
+    context.positions.push_back<pddl::FunctionExpressionImpl>(function_expression, node);
+    return function_expression;
 }
 
 pddl::FunctionExpression parse(const domain::ast::FunctionExpressionHead node, Context& context) {
     const auto function = parse(node.function_head, context);
-    return context.factories.function_expressions.get_or_create<pddl::FunctionExpressionFunctionImpl>(function);
+    const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionFunctionImpl>(function);
+    context.positions.push_back<pddl::FunctionExpressionImpl>(function_expression, node);
+    return function_expression;
 }
 
 
@@ -96,7 +104,9 @@ pddl::Function parse(const domain::ast::FunctionHead& node, Context& context) {
     if (function_skeleton->get_parameters().size() != term_list.size()) {
         throw MismatchedFunctionSkeletonTermListError(function_skeleton, term_list, context.scopes.get_error_handler()(node, ""));
     }
-    return context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, term_list);
+    const auto function = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, term_list);
+    context.positions.push_back(function, node);
+    return function;
 }
 
 
@@ -119,8 +129,11 @@ pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const std::ve
             }
             throw MultiDefinitionFunctionSkeletonError(function_name, message_1 + message_2);
         }
+        context.scopes.open_scope();
         auto function_parameters = boost::apply_visitor(ParameterListVisitor(context), atomic_function_skeleton.arguments);
+        context.scopes.close_scope();
         auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, type);
+        context.positions.push_back(function_skeleton, atomic_function_skeleton);
         context.scopes.insert<pddl::FunctionSkeletonImpl>(function_name, function_skeleton, atomic_function_skeleton.function_symbol.name);
         function_skeleton_list.push_back(function_skeleton);
     }
@@ -148,6 +161,7 @@ pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const domain:
         context.scopes.close_scope();
         auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, type);
         context.scopes.insert<pddl::FunctionSkeletonImpl>(function_name, function_skeleton, atomic_function_skeleton.function_symbol.name);
+        context.positions.push_back(function_skeleton, atomic_function_skeleton);
         function_skeleton_list.push_back(function_skeleton);
     }
     if (function_skeleton_list_recursively_node.function_typed_list_of_atomic_function_skeletons.has_value()) {

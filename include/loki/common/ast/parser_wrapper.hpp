@@ -19,7 +19,6 @@
 #define LOKI_INCLUDE_COMMON_AST_PARSER_WRAPPER_HPP_
 
 #include "config.hpp"
-#include "../exceptions.hpp"
 
 #include <iostream>
 

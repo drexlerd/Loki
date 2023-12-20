@@ -21,7 +21,7 @@
 #include "config.hpp"
 
 #include <unordered_map>
-#include <iostream>
+#include <string>
 
 
 namespace loki

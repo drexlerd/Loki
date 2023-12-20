@@ -44,26 +44,29 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
     if (problem_node.requirements.has_value()) {
         context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(
             parse(problem_node.requirements.value(), context));
+        context.positions.push_back(context.requirements, problem_node.requirements.value());
     } else {
         // Default requirements
         context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(
             pddl::RequirementEnumSet{pddl::RequirementEnum::STRIPS});
     }
     /* Objects section */
-    pddl::ObjectList objects;
+    auto objects = pddl::ObjectList();
     if (problem_node.objects.has_value()) {
         objects = parse(problem_node.objects.value(), context);
     }
     /* Initial section */
-    pddl::LiteralList initial_literals;
-    pddl::NumericFluentList numeric_fluents;
+    auto initial_literals = pddl::LiteralList();
+    auto numeric_fluents = pddl::NumericFluentList();
     const auto initial_elements = parse(problem_node.initial, context);
     for (const auto& initial_element : initial_elements) {
         boost::apply_visitor(UnpackingVisitor(initial_literals, numeric_fluents), initial_element);
     }
     /* Goal section */
-    pddl::Condition goal_condition = parse(problem_node.goal, context);
-    return context.factories.problems.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects, initial_literals, numeric_fluents, goal_condition);
+    const auto goal_condition = parse(problem_node.goal, context);
+    const auto problem = context.factories.problems.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects, initial_literals, numeric_fluents, goal_condition);
+    context.positions.push_back(problem, problem_node);
+    return problem;
 }
 
 }

@@ -57,14 +57,18 @@ pddl::Effect parse(const domain::ast::Effect& node, Context& context) {
 
 pddl::Effect parse(const domain::ast::EffectProductionLiteral& node, Context& context) {
     auto literal = parse(node.literal, context);
-    return context.factories.effects.get_or_create<pddl::EffectLiteralImpl>(literal);
+    const auto effect = context.factories.effects.get_or_create<pddl::EffectLiteralImpl>(literal);
+    context.positions.push_back<pddl::EffectImpl>(effect, node);
+    return effect;
 }
 
 pddl::Effect parse(const domain::ast::EffectProductionNumericFluent& node, Context& context) {
     const auto assign_operator = parse(node.assign_operator);
     const auto function = parse(node.function_head, context);
     const auto function_expression = parse(node.function_expression, context);
-    return context.factories.effects.get_or_create<pddl::EffectNumericImpl>(assign_operator, function, function_expression);
+    const auto effect = context.factories.effects.get_or_create<pddl::EffectNumericImpl>(assign_operator, function, function_expression);
+    context.positions.push_back<pddl::EffectImpl>(effect, node);
+    return effect;
 }
 
 pddl::Effect parse(const domain::ast::EffectProductionObjectFluent& node, Context& context) {
@@ -77,18 +81,22 @@ pddl::Effect parse(const domain::ast::EffectProduction& node, Context& context) 
 
 pddl::Effect parse(const domain::ast::EffectConditionalForall& node, Context& context) {
     context.scopes.open_scope();
-    pddl::ParameterList parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
-    pddl::Effect effect = parse(node.effect, context);
+    const auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
+    const auto child_effect = parse(node.effect, context);
     context.scopes.close_scope();
-    return context.factories.effects.get_or_create<pddl::EffectConditionalForallImpl>(parameter_list, effect);
+    const auto effect = context.factories.effects.get_or_create<pddl::EffectConditionalForallImpl>(parameter_list, child_effect);
+    context.positions.push_back<pddl::EffectImpl>(effect, node);
+    return effect;
 }
 
 pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, Context& context) {
     context.scopes.open_scope();
-    pddl::Condition condition = parse(node.goal_descriptor, context);
-    pddl::Effect effect = parse(node.effect, context);
+    const auto condition = parse(node.goal_descriptor, context);
+    const auto child_effect = parse(node.effect, context);
     context.scopes.close_scope();
-    return context.factories.effects.get_or_create<pddl::EffectConditionalWhenImpl>(condition, effect);
+    const auto effect = context.factories.effects.get_or_create<pddl::EffectConditionalWhenImpl>(condition, child_effect);
+    context.positions.push_back<pddl::EffectImpl>(effect, node);
+    return effect;
 }
 
 pddl::Effect parse(const domain::ast::EffectConditional& node, Context& context) {
@@ -96,7 +104,9 @@ pddl::Effect parse(const domain::ast::EffectConditional& node, Context& context)
     if (!context.requirements->test(pddl::RequirementEnum::CONDITIONAL_EFFECTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::CONDITIONAL_EFFECTS, context.scopes.get_error_handler()(node, ""));
     }
-    return boost::apply_visitor(EffectConditionalVisitor(context), node);
+    const auto effect = boost::apply_visitor(EffectConditionalVisitor(context), node);
+    context.positions.push_back<pddl::EffectImpl>(effect, node);
+    return effect;
 }
 
 
@@ -119,12 +129,16 @@ pddl::Effect EffectVisitor::operator()(const std::vector<domain::ast::Effect>& e
     return context.factories.effects.get_or_create<pddl::EffectAndImpl>(effect_list);
 }
 
-pddl::Effect EffectVisitor::operator()(const domain::ast::EffectConditional& effect_node) const {
-    return boost::apply_visitor(EffectConditionalVisitor(context), effect_node);
+pddl::Effect EffectVisitor::operator()(const domain::ast::EffectConditional& node) const {
+    const auto effect = boost::apply_visitor(EffectConditionalVisitor(context), node);
+    context.positions.push_back(effect, node);
+    return effect;
 }
 
-pddl::Effect EffectVisitor::operator()(const domain::ast::EffectProduction& effect_node) const {
-    return boost::apply_visitor(EffectProductionVisitor(context), effect_node);
+pddl::Effect EffectVisitor::operator()(const domain::ast::EffectProduction& node) const {
+    const auto effect = boost::apply_visitor(EffectProductionVisitor(context), node);
+    context.positions.push_back(effect, node);
+    return effect;
 }
 
 }

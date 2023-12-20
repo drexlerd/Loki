@@ -37,7 +37,9 @@ pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formul
     if (predicate->get_parameters().size() != term_list.size()) {
         throw MismatchedPredicateTermListError(predicate, term_list, context.scopes.get_error_handler()(atomic_formula_of_terms_node, ""));
     }
-    return context.factories.atoms.get_or_create<pddl::AtomImpl>(predicate, term_list);
+    const auto atom = context.factories.atoms.get_or_create<pddl::AtomImpl>(predicate, term_list);
+    context.positions.push_back(atom, atomic_formula_of_terms_node);
+    return atom;
 }
 
 pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& atomic_formula_of_terms_node, Context& context) {
@@ -51,9 +53,11 @@ pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& atomic_formula
     auto left_term = boost::apply_visitor(TermReferenceTermVisitor(context), atomic_formula_of_terms_node.term_left);
     auto right_term = boost::apply_visitor(TermReferenceTermVisitor(context), atomic_formula_of_terms_node.term_right);
     assert(context.scopes.get<pddl::PredicateImpl>("=").has_value());
-    return context.factories.atoms.get_or_create<pddl::AtomImpl>(
+    const auto atom = context.factories.atoms.get_or_create<pddl::AtomImpl>(
         equal_predicate,
         pddl::TermList{left_term, right_term});
+    context.positions.push_back(atom, atomic_formula_of_terms_node);
+    return atom;
 }
 
 pddl::Atom parse(const domain::ast::AtomicFormulaOfTerms& atomic_formula_of_terms_node, Context& context) {
@@ -66,11 +70,15 @@ AtomicFormulaOfTermsVisitor::AtomicFormulaOfTermsVisitor(Context& context_)
 
 
 pddl::Literal parse(const domain::ast::Atom& atom_node, Context& context) {
-    return context.factories.literals.get_or_create<pddl::LiteralImpl>(false, parse(atom_node.atomic_formula_of_terms, context));
+    const auto literal = context.factories.literals.get_or_create<pddl::LiteralImpl>(false, parse(atom_node.atomic_formula_of_terms, context));
+    context.positions.push_back(literal, atom_node);
+    return literal;
 }
 
 pddl::Literal parse(const domain::ast::NegatedAtom& negated_atom_node, Context& context) {
-    return context.factories.literals.get_or_create<pddl::LiteralImpl>(true, parse(negated_atom_node.atomic_formula_of_terms, context));
+    const auto literal = context.factories.literals.get_or_create<pddl::LiteralImpl>(true, parse(negated_atom_node.atomic_formula_of_terms, context));
+    context.positions.push_back(literal, negated_atom_node);
+    return literal;
 }
 
 pddl::Literal parse(const domain::ast::Literal& literal_node, Context& context) {

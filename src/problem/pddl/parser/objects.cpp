@@ -40,6 +40,7 @@ pddl::Object parse_object_reference(const domain::ast::Name& name_node, Context&
         throw UndefinedObjectError(name, context.scopes.get_error_handler()(name_node, ""));
     }
     const auto& [object, _position, _error_handler] = binding.value();
+    context.positions.push_back(object, name_node);
     return object;
 }
 
@@ -62,6 +63,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
             throw MultiDefinitionObjectError(name, message_1 + message_2);
         }
         const auto object = context.factories.objects.get_or_create<pddl::ObjectImpl>(name, pddl::TypeList{type});
+        context.positions.push_back(object, name_node);
         context.scopes.insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }
@@ -90,6 +92,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
             throw MultiDefinitionObjectError(name, message_1 + message_2);
         }
         const auto object = context.factories.objects.get_or_create<pddl::ObjectImpl>(name, types);
+        context.positions.push_back(object, name_node);
         context.scopes.insert<pddl::ObjectImpl>(name, object, name_node);
         object_list.emplace_back(object);
     }

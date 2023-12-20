@@ -53,6 +53,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Vari
         test_multiple_definition_variable(variable, variable_node, context);
         context.scopes.insert(variable->get_name(), variable, variable_node);
         const auto parameter = context.factories.parameters.get_or_create<pddl::ParameterImpl>(variable, pddl::TypeList{type});
+        context.positions.push_back(parameter, variable_node);
         parameter_list.emplace_back(parameter);
     }
     return parameter_list;
@@ -73,6 +74,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
         test_multiple_definition_variable(variable, variable_node, context);
         context.scopes.insert(variable->get_name(), variable, variable_node);
         const auto parameter = context.factories.parameters.get_or_create<pddl::ParameterImpl>(variable, types);
+        context.positions.push_back(parameter, variable_node);
         parameter_list.emplace_back(parameter);
     }
     // Recursively add parameters.
