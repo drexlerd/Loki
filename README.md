@@ -100,6 +100,12 @@ The third example shows how to detect structurally equivalent problems over a co
 ./build/examples/multiple_problems
 ```
 
+The fourth example shows how to find matches positions of each PDDL object in the input stream and report customized clang-style error reports.
+
+```console
+./build/examples/position_cache
+```
+
 
 ## Running the Executables
 
