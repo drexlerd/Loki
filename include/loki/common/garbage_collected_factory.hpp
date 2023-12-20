@@ -19,9 +19,9 @@
 #define LOKI_INCLUDE_LOKI_COMMON_FACTORY_HPP_
 
 #include <unordered_map>
+#include <unordered_set>
 #include <memory>
 #include <mutex>
-#include <iostream>
 #include <tuple>
 
 
@@ -36,32 +36,12 @@ namespace loki {
 template<typename... Ts>
 class ReferenceCountedObjectFactory {
 private:
-    template<typename T>
-    struct ValueHash {
-        std::size_t operator()(const std::shared_ptr<const T>& ptr) const {
-            return std::hash<T>()(*ptr);
-        }
-    };
-
-    /// @brief Equality comparison of the objects underlying the pointers.
-    template<typename T>
-    struct ValueEqual {
-        bool operator()(const std::shared_ptr<const T>& left, const std::shared_ptr<const T>& right) const {
-            return *left == *right;
-        }
-    };
 
     /// @brief Encapsulates the data of a single type.
     template<typename T>
     struct PerTypeCache {
-        // cannot use weak_ptr<T> in set, so we use it as value in map.
-        // shared_ptr<T> is key because
-        //   1) polymorphic types do not have copy/move
-        //   2) mapping from identifier to key for deletion
-        // We could use raw pointer as key since we do not need reference counting.
-        std::unordered_map<std::shared_ptr<const T>, std::weak_ptr<T>, ValueHash<T>, ValueEqual<T>> data;
-        // For removal, we use an additional mapping from the identifier to the key of the data map.
-        std::unordered_map<int, std::shared_ptr<const T>> identifier_to_key;
+        std::unordered_set<T> uniqueness;
+        std::unordered_map<int, std::weak_ptr<const T>> identifier_to_object;
     };
 
     /// @brief Encapsulates the data of all types.
@@ -85,7 +65,7 @@ public:
     /// @param ...args
     /// @return
     template<typename T, typename... Args>
-    [[nodiscard]] std::shared_ptr<const T> get_or_create(Args&&... args) {
+    [[nodiscard]] std::shared_ptr<const T> get_or_create(Args... args) {
         /* we must declare sp before locking the mutex
            s.t. the deleter is called after the mutex was released in case of stack unwinding. */
         std::shared_ptr<T> sp;
@@ -93,34 +73,32 @@ public:
 
         auto& t_cache = std::get<PerTypeCache<T>>(m_cache->data);
         int identifier = m_cache->count;
-        /* Must explicitly call the constructor of T to give exclusive access to the factory. */
-        auto key = std::make_shared<T>(T(identifier, args...));
-        auto& cached = t_cache.data[key];
-        sp = cached.lock();
-        if (!sp) {
-            ++m_cache->count;
-            t_cache.identifier_to_key.emplace(identifier, key);
-            /* Must explicitly call the constructor of T to give exclusive access to the factory. */
-            // Extensions: To ensure that the memory for T and the control block is allocated once,
-            // we could use std::allocated_shared and provide a custom allocator.
-            cached = sp = std::shared_ptr<T>(
-                new T(identifier, args...),
-                [cache=m_cache, identifier](T* x)
-                {
-                    {
-                        std::lock_guard<std::mutex> hold(cache->mutex);
-                        auto& t_cache = std::get<PerTypeCache<T>>(cache->data);
-                        const auto& key = t_cache.identifier_to_key.at(identifier);
-                        t_cache.data.erase(key);
-                        t_cache.identifier_to_key.erase(identifier);
-                    }
-                    /* After cache removal, we can call the objects destructor
-                       and recursively call the deleter of children if their ref count goes to 0 */
-                    delete x;
-                }
-            );
+        auto key = T(identifier, args...);
+        const auto& [it, inserted] = t_cache.uniqueness.insert(key);
+        if (!inserted) {
+            assert(t_cache.identifier_to_object.count(it->get_identifier()));
+            return t_cache.identifier_to_object.at(it->get_identifier()).lock();
         }
-
+        ++m_cache->count;
+        /* Must explicitly call the constructor of T to give exclusive access to the factory. */
+        // Extensions: To ensure that the memory for T and the control block is allocated once,
+        // we could use std::allocated_shared and provide a custom allocator.
+        sp = std::shared_ptr<T>(
+            new T(identifier, args...),
+            [cache=m_cache, identifier](T* x)
+            {
+                {
+                    std::lock_guard<std::mutex> hold(cache->mutex);
+                    auto& t_cache = std::get<PerTypeCache<T>>(cache->data);
+                    t_cache.uniqueness.erase(*x);
+                    t_cache.identifier_to_object.erase(identifier);
+                }
+                /* After cache removal, we can call the objects destructor
+                    and recursively call the deleter of children if their ref count goes to 0 */
+                delete x;
+            }
+        );
+        t_cache.identifier_to_object.emplace(identifier, sp);
         return sp;
     }
 };

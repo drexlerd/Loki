@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_TYPES_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_TYPES_HPP_
 
-#include "../factory.hpp"
 #include "../persistent_factory.hpp"
 
 #include "../../domain/pddl/action.hpp"

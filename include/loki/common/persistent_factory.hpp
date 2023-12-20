@@ -63,7 +63,7 @@ public:
     /// @param ...args
     /// @return
     template<typename T, typename... Args>
-    [[nodiscard]] T const* get_or_create(Args&&... args) {
+    [[nodiscard]] T const* get_or_create(Args... args) {
         /* we must declare sp before locking the mutex
            s.t. the deleter is called after the mutex was released in case of stack unwinding. */
         std::lock_guard<std::mutex> hold(m_mutex);
