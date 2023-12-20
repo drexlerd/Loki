@@ -28,13 +28,16 @@ namespace loki {
 
 class DomainParser {
 private:
+    fs::path m_file_path;
+    // We need to keep the source in memory for error reporting.
+    std::string m_source;
+
     CollectionOfPDDLFactories m_factories;
 
-    std::string m_domain_source; 
-    ErrorHandler m_error_handler;
-    ScopeStack m_scopes;
+    // The matched positions in the input PDDL file.
+    std::unique_ptr<PDDLPositionCache> m_position_cache;
 
-    // Add mappings from PDDL object to positions?
+    std::unique_ptr<ScopeStack> m_scopes;
 
     // Parsed result
     pddl::Domain m_domain;
@@ -44,11 +47,14 @@ private:
 public:
     explicit DomainParser(const fs::path& file_path);
 
+    /// @brief Get factories to create additional PDDL objects.
+    CollectionOfPDDLFactories& get_factories();
+
+    /// @brief Get position caches to be able to reference back to the input PDDL file.
+    const PDDLPositionCache& get_position_cache() const;
+
     /// @brief Get the parsed domain.
     const pddl::Domain& get_domain() const;
-
-    /// @brief Get factories to create additional PDDL objects. 
-    CollectionOfPDDLFactories& get_factories();
 };
 
 }

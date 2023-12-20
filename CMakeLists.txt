@@ -63,10 +63,9 @@ include_directories(${Boost_INCLUDE_DIRS})
 # Add library and executable targets
 ##############################################################
 
-add_compile_definitions(BOOST_PHOENIX_STL_TUPLE_H_)
-
 include_directories(include/)
 include_directories("${PROJECT_SOURCE_DIR}")
+# include_directories(BEFORE ${PROJECT_SOURCE_DIR}/external/spirit/include)
 
 add_subdirectory(src)
 

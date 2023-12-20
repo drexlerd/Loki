@@ -18,6 +18,7 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_TYPES_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_TYPES_HPP_
 
+#include "position.hpp"
 #include "../persistent_factory.hpp"
 
 #include "../../domain/pddl/action.hpp"
@@ -43,40 +44,93 @@
 
 namespace loki {
 
+using RequirementFactory = PersistentFactory<pddl::RequirementsImpl>;
+using TypeFactory = PersistentFactory<pddl::TypeImpl>;
+using VariableFactory = PersistentFactory<pddl::VariableImpl>;
+using TermFactory = PersistentFactory<pddl::TermObjectImpl
+    , pddl::TermVariableImpl>;
+using ObjectFactory = PersistentFactory<pddl::ObjectImpl>;
+using AtomFactory = PersistentFactory<pddl::AtomImpl>;
+using LiteralFactory = PersistentFactory<pddl::LiteralImpl>;
+using ParameterFactory = PersistentFactory<pddl::ParameterImpl>;
+using PredicateFactory = PersistentFactory<pddl::PredicateImpl>;
+using FunctionExpressionFactory = PersistentFactory<pddl::FunctionExpressionNumberImpl
+    , pddl::FunctionExpressionBinaryOperatorImpl
+    , pddl::FunctionExpressionMinusImpl
+    , pddl::FunctionExpressionFunctionImpl>;
+using FunctionFactory = PersistentFactory<pddl::FunctionImpl>;
+using FunctionSkeletonFactory = PersistentFactory<pddl::FunctionSkeletonImpl>;
+using ConditionFactory = PersistentFactory<pddl::ConditionLiteralImpl
+    , pddl::ConditionAndImpl
+    , pddl::ConditionOrImpl
+    , pddl::ConditionNotImpl>;
+using EffectFactory = PersistentFactory<pddl::EffectLiteralImpl
+    , pddl::EffectAndImpl
+    , pddl::EffectNumericImpl
+    , pddl::EffectConditionalForallImpl
+    , pddl::EffectConditionalWhenImpl>;
+using ActionFactory = PersistentFactory<pddl::ActionImpl>;
+using DerivedPredicateFactory = PersistentFactory<pddl::DerivedPredicateImpl>;
+using NumericFluentFactory = PersistentFactory<pddl::NumericFluentImpl>;
+using DomainFactory = PersistentFactory<pddl::DomainImpl>;
+using ProblemFactory = PersistentFactory<pddl::ProblemImpl>;
+
+
+using PDDLPositionCache = PositionCache<pddl::RequirementsImpl
+    , pddl::TypeImpl
+    , pddl::VariableImpl
+    , pddl::TermObjectImpl
+    , pddl::TermVariableImpl
+    , pddl::ObjectImpl
+    , pddl::AtomImpl
+    , pddl::LiteralImpl
+    , pddl::ParameterImpl
+    , pddl::PredicateImpl
+    , pddl::FunctionExpressionNumberImpl
+    , pddl::FunctionExpressionBinaryOperatorImpl
+    , pddl::FunctionExpressionMinusImpl
+    , pddl::FunctionExpressionFunctionImpl
+    , pddl::FunctionImpl
+    , pddl::FunctionSkeletonImpl
+    , pddl::ConditionLiteralImpl
+    , pddl::ConditionAndImpl
+    , pddl::ConditionOrImpl
+    , pddl::ConditionNotImpl
+    , pddl::EffectLiteralImpl
+    , pddl::EffectAndImpl
+    , pddl::EffectNumericImpl
+    , pddl::EffectConditionalForallImpl
+    , pddl::EffectConditionalWhenImpl
+    , pddl::ActionImpl
+    , pddl::DerivedPredicateImpl
+    , pddl::NumericFluentImpl
+    , pddl::DomainImpl
+    , pddl::ProblemImpl>;
+
+
 /// @brief Collection of factories for the unique creation of PDDL objects.
 struct CollectionOfPDDLFactories {
-    PersistentFactory<pddl::RequirementsImpl> requirements;
-    PersistentFactory<pddl::TypeImpl> types;
-    PersistentFactory<pddl::VariableImpl> variables;
-    PersistentFactory<pddl::TermObjectImpl
-        , pddl::TermVariableImpl> terms;
-    PersistentFactory<pddl::ObjectImpl> objects;
-    PersistentFactory<pddl::AtomImpl> domain_atoms;
-    PersistentFactory<pddl::AtomImpl> problem_atoms;  // ground atoms
-    PersistentFactory<pddl::LiteralImpl> domain_literals;
-    PersistentFactory<pddl::LiteralImpl> problem_literals;  // ground literals
-    PersistentFactory<pddl::ParameterImpl> parameters;
-    PersistentFactory<pddl::PredicateImpl> predicates;
-    PersistentFactory<pddl::FunctionExpressionNumberImpl
-        , pddl::FunctionExpressionBinaryOperatorImpl
-        , pddl::FunctionExpressionMinusImpl
-        , pddl::FunctionExpressionFunctionImpl> function_expressions;
-    PersistentFactory<pddl::FunctionImpl> functions;
-    PersistentFactory<pddl::FunctionSkeletonImpl> function_skeletons;
-    PersistentFactory<pddl::ConditionLiteralImpl
-        , pddl::ConditionAndImpl
-        , pddl::ConditionOrImpl
-        , pddl::ConditionNotImpl> conditions;
-    PersistentFactory<pddl::EffectLiteralImpl
-        , pddl::EffectAndImpl
-        , pddl::EffectNumericImpl
-        , pddl::EffectConditionalForallImpl
-        , pddl::EffectConditionalWhenImpl> effects;
-    PersistentFactory<pddl::ActionImpl> actions;
-    PersistentFactory<pddl::DerivedPredicateImpl> derived_predicates;
-    PersistentFactory<pddl::NumericFluentImpl> numeric_fluents;
-    PersistentFactory<pddl::DomainImpl> domains;
-    PersistentFactory<pddl::ProblemImpl> problems;
+    RequirementFactory requirements;
+    TypeFactory types;
+    VariableFactory variables;
+    TermFactory terms;
+    ObjectFactory objects;
+    AtomFactory domain_atoms;
+    AtomFactory problem_atoms;  // ground atoms
+    LiteralFactory domain_literals;
+    LiteralFactory problem_literals;  // ground literals
+    ParameterFactory parameters;
+    PredicateFactory predicates;
+    FunctionExpressionFactory function_expressions;
+    FunctionFactory functions;
+    FunctionSkeletonFactory function_skeletons;
+    ConditionFactory conditions;
+    EffectFactory effects;
+    ActionFactory actions;
+    DerivedPredicateFactory derived_predicates;
+    NumericFluentFactory numeric_fluents;
+    DomainFactory domains;
+    ProblemFactory problems;
 
     CollectionOfPDDLFactories() = default;
 
@@ -92,36 +146,25 @@ struct CollectionOfPDDLFactories {
 ///        by using problem specific factories.
 ///        We currently use problem specific factories for atoms and literals
 struct CompositeOfPDDLFactories {
-    PersistentFactory<pddl::RequirementsImpl>& requirements;
-    PersistentFactory<pddl::TypeImpl>& types;
-    PersistentFactory<pddl::VariableImpl>& variables;
-    PersistentFactory<pddl::TermObjectImpl
-        , pddl::TermVariableImpl>& terms;
-    PersistentFactory<pddl::ObjectImpl>& objects;
-    PersistentFactory<pddl::AtomImpl>& atoms;
-    PersistentFactory<pddl::LiteralImpl>& literals;
-    PersistentFactory<pddl::ParameterImpl>& parameters;
-    PersistentFactory<pddl::PredicateImpl>& predicates;
-    PersistentFactory<pddl::FunctionExpressionNumberImpl
-        , pddl::FunctionExpressionBinaryOperatorImpl
-        , pddl::FunctionExpressionMinusImpl
-        , pddl::FunctionExpressionFunctionImpl>& function_expressions;
-    PersistentFactory<pddl::FunctionImpl>& functions;
-    PersistentFactory<pddl::FunctionSkeletonImpl>& function_skeletons;
-    PersistentFactory<pddl::ConditionLiteralImpl
-        , pddl::ConditionAndImpl
-        , pddl::ConditionOrImpl
-        , pddl::ConditionNotImpl>& conditions;
-    PersistentFactory<pddl::EffectLiteralImpl
-        , pddl::EffectAndImpl
-        , pddl::EffectNumericImpl
-        , pddl::EffectConditionalForallImpl
-        , pddl::EffectConditionalWhenImpl>& effects;
-    PersistentFactory<pddl::ActionImpl>& actions;
-    PersistentFactory<pddl::DerivedPredicateImpl>& derived_predicates;
-    PersistentFactory<pddl::NumericFluentImpl>& numeric_fluents;
-    PersistentFactory<pddl::DomainImpl>& domains;
-    PersistentFactory<pddl::ProblemImpl>& problems;
+    RequirementFactory& requirements;
+    TypeFactory& types;
+    VariableFactory& variables;
+    TermFactory& terms;
+    ObjectFactory& objects;
+    AtomFactory& atoms;
+    LiteralFactory& literals;
+    ParameterFactory& parameters;
+    PredicateFactory& predicates;
+    FunctionExpressionFactory& function_expressions;
+    FunctionFactory& functions;
+    FunctionSkeletonFactory& function_skeletons;
+    ConditionFactory& conditions;
+    EffectFactory& effects;
+    ActionFactory& actions;
+    DerivedPredicateFactory& derived_predicates;
+    NumericFluentFactory& numeric_fluents;
+    DomainFactory& domains;
+    ProblemFactory& problems;
 };
 
 }

@@ -18,6 +18,7 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_CONTEXT_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_CONTEXT_HPP_
 
+#include "position.hpp"
 #include "reference.hpp"
 #include "scope.hpp"
 #include "types.hpp"
@@ -28,9 +29,11 @@ namespace loki
     struct Context
     {
         // For the unique construction of PDDL objects
-        CompositeOfPDDLFactories &factories;
+        CompositeOfPDDLFactories& factories;
+        // For storing the positions in the input PDDL file
+        PDDLPositionCache& positions;
         // For referencing to existing bindings
-        ScopeStack &scopes;
+        ScopeStack& scopes;
         // For checking that binding pointers were referenced at least once
         ReferencedPointers referenced_pointers;
         // For checking that enum values were referenced at least once
@@ -38,8 +41,8 @@ namespace loki
         // For convenience, to avoid an additional parameter during semantic parsing
         pddl::Requirements requirements;
 
-        Context(CompositeOfPDDLFactories &factories_, ScopeStack &scopes_)
-            : factories(factories_), scopes(scopes_), referenced_pointers(ReferencedPointers()), referenced_values(ReferencedValues()), requirements(nullptr) {}
+        Context(CompositeOfPDDLFactories &factories_, PDDLPositionCache& positions_, ScopeStack &scopes_)
+            : factories(factories_), positions(positions_), scopes(scopes_), referenced_pointers(ReferencedPointers()), referenced_values(ReferencedValues()), requirements(nullptr) {}
     };
 
 }

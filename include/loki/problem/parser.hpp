@@ -29,17 +29,25 @@ namespace loki {
 
 class ProblemParser {
 private:
+    fs::path m_file_path;
+    // We need to keep the source in memory for error reporting.
+    std::string m_source;
+
+    // The matched positions in the input PDDL file.
+    std::unique_ptr<PDDLPositionCache> m_position_cache;
+
+    std::unique_ptr<ScopeStack> m_scopes;
+
+    // Parsed result
     pddl::Problem m_problem;
-
-    std::string m_problem_source; 
-    ErrorHandler m_error_handler;
-    ScopeStack m_scopes;
-
-    // Add mappings from PDDL object to positions?
 
 public:
     explicit ProblemParser(const fs::path& file_path, DomainParser& domain_parser);
 
+    /// @brief Get position caches to be able to reference back to the input PDDL file.
+    const PDDLPositionCache& get_position_cache() const;
+
+    /// @brief Get the parsed problem.
     const pddl::Problem& get_problem() const;
 };
 

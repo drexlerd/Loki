@@ -17,6 +17,8 @@
 
 #include "../../include/loki/problem/parser.hpp"
 
+#include "../../include/loki/common/ast/error_reporting.hpp"
+#include "../../include/loki/common/pddl/error_reporting.hpp"
 #include "../../include/loki/common/pddl/context.hpp"
 #include "../../include/loki/common/filesystem.hpp"
 #include "../../include/loki/common/ast/parser_wrapper.hpp"
@@ -31,18 +33,19 @@
 namespace loki {
 
 ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_parser)
-    : m_problem_source(loki::read_file(file_path))
-    , m_error_handler(ErrorHandler(m_problem_source.begin(), m_problem_source.end(), file_path))
-    , m_scopes(ScopeStack(m_error_handler, &domain_parser.m_scopes)) {
+    : m_file_path(file_path)
+    , m_source(loki::read_file(file_path))
+    , m_position_cache(nullptr)
+    , m_scopes(nullptr) {
     const auto start = std::chrono::high_resolution_clock::now();
     std::cout << "Started parsing problem file: " << file_path << std::endl;
 
     /* Parse the AST */
     auto problem_node = problem::ast::Problem();
-
-    bool success = parse_ast(m_problem_source, problem::problem(), problem_node, m_error_handler.get_error_handler());
+    auto x3_error_handler = X3ErrorHandler(m_source.begin(), m_source.end(), file_path);
+    bool success = parse_ast(m_source, problem::problem(), problem_node, x3_error_handler.get_error_handler());
     if (!success) {
-        throw SyntaxParserError("", m_error_handler.get_error_stream().str());
+        throw SyntaxParserError("", x3_error_handler.get_error_stream().str());
     }
 
     /* Parse the problem to PDDL */
@@ -68,7 +71,10 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
         domain_parser.m_factories.domains,
         domain_parser.m_factories.problems
     };
-    auto context = Context(composite_factories, m_scopes);
+    m_position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, file_path);
+    m_scopes = std::make_unique<ScopeStack>(m_position_cache->get_error_handler(), domain_parser.m_scopes.get());
+
+    auto context = Context(composite_factories, *m_position_cache, *m_scopes);
 
     // Initialize global scope
     context.scopes.open_scope();
@@ -81,6 +87,10 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
     const auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     std::cout << "Finished parsing after " << duration.count() << " milliseconds." << std::endl;
+}
+
+const PDDLPositionCache& ProblemParser::get_position_cache() const {
+    return *m_position_cache;
 }
 
 const pddl::Problem& ProblemParser::get_problem() const {

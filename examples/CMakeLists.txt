@@ -1,6 +1,9 @@
 add_executable(multiple_problems "multiple_problems.cpp")
 target_link_libraries(multiple_problems parsers)
 
+add_executable(position_cache "position_cache.cpp")
+target_link_libraries(position_cache parsers)
+
 add_executable(single_problem "single_problem.cpp")
 target_link_libraries(single_problem parsers)
 

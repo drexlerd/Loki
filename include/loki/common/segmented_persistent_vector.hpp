@@ -29,10 +29,55 @@ namespace loki {
 template<typename T, size_t N>
 class SegmentedPersistentVector {
 private:
-    std::vector<std::array<T, N>> data;
+    std::vector<std::array<T, N>> m_data;
+
+    int m_block_index;
+    int m_index_in_block;
+
+    size_t m_size;
+    size_t m_capacity;
+
+    void increase_capacity() {
+        // Add an additional array with capacity N (1 allocation on average)
+        m_data.resize(m_data.size() + 1);
+        // Move to the next free block
+        ++m_block_index;
+        // Set index to next free position in block
+        m_index_in_block = 0;
+        // Increase total capacity
+        m_capacity += N;
+    }
 
 public:
+    explicit SegmentedPersistentVector() : m_block_index(-1), m_index_in_block(0), m_size(0), m_capacity(0) { }
 
+    T* push_back(T value) {
+        // Increase capacity if necessary
+        if (m_size >= m_capacity) {
+            increase_capacity();
+        }
+
+        auto& block = m_data[m_block_index];
+
+        // Take ownership of memory
+        block[m_index_in_block] = std::move(value);
+        // Fetch return value
+        T* return_value = &block[m_index_in_block];
+        // Move index to next free position in block
+        ++m_index_in_block;
+
+        ++m_size;
+
+        return return_value;
+    }
+
+    size_t size() const {
+        return m_size;
+    }
+
+    size_t capacity() const {
+        return m_capacity;
+    }
 };
 
 }

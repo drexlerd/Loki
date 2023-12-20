@@ -18,6 +18,8 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_SCOPE_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_SCOPE_HPP_
 
+#include "config.hpp"
+
 #include "../../common/ast/config.hpp"
 #include "../../domain/pddl/type.hpp"
 #include "../../domain/pddl/object.hpp"
@@ -87,7 +89,7 @@ class Scope {
             , pddl::VariableImpl> bindings;
 
     public:
-        explicit Scope(const Scope* parent_scope = nullptr) : m_parent_scope(parent_scope) { }
+        explicit Scope(const Scope* parent_scope = nullptr);
 
         // delete copy and move to avoid dangling references.
         Scope(const Scope& other) = delete;
@@ -107,7 +109,7 @@ class Scope {
 
 /// @brief Encapsulates the result of search for a binding with the corresponding ErrorHandler.
 template<typename T>
-using ScopeStackSearchResult = std::tuple<const BindingPtrType<T>, const std::optional<PositionType>, const ErrorHandler&>;
+using ScopeStackSearchResult = std::tuple<const BindingPtrType<T>, const std::optional<PositionType>, const PDDLErrorHandler&>;
 
 
 /// @brief Implements a scoping mechanism to store bindings which are mappings from name to a pointer to a PDDL object
@@ -128,12 +130,12 @@ class ScopeStack {
     private:
         std::deque<std::unique_ptr<Scope>> m_stack;
 
-        const ErrorHandler& m_error_handler;
+        const PDDLErrorHandler& m_error_handler;
 
         const ScopeStack* m_parent;
 
     public:
-        ScopeStack(const ErrorHandler& error_handler,
+        ScopeStack(const PDDLErrorHandler& error_handler,
             const ScopeStack* parent=nullptr);
 
         // delete copy and move to avoid dangling references.
@@ -157,7 +159,7 @@ class ScopeStack {
         void insert(const std::string& name, const BindingPtrType<T>& binding, const std::optional<PositionType>& position);
 
         /// @brief Get the error handler to print an error message.
-        const ErrorHandler& get_error_handler() const;
+        const PDDLErrorHandler& get_error_handler() const;
 
         // For testing purposes only.
         const std::deque<std::unique_ptr<Scope>>& get_stack() const;

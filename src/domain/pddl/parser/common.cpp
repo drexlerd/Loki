@@ -54,7 +54,10 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Name& node) const {
     // Constant are not tracked and hence must not be untracked.
     // Construct Term and return it
     const auto& [constant, _position, _error_handler] = binding.value();
-    return context.factories.terms.get_or_create<pddl::TermObjectImpl>(constant);
+    const auto term = context.factories.terms.get_or_create<pddl::TermObjectImpl>(constant);
+    // Add position of PDDL object
+    context.positions.push_back(term, node);
+    return term;
 }
 
 
@@ -72,7 +75,10 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) con
     // Add binding to scope
     context.scopes.insert<pddl::VariableImpl>(variable->get_name(), variable, node);
     // Construct Term and return it
-    return context.factories.terms.get_or_create<pddl::TermVariableImpl>(variable);
+    const auto term = context.factories.terms.get_or_create<pddl::TermVariableImpl>(variable);
+    // Add position of PDDL object
+    context.positions.push_back(term, node);
+    return term;
 }
 
 pddl::Term TermDeclarationTermVisitor::operator()(const ast::FunctionTerm& node) const {
@@ -96,9 +102,12 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::Name& node) const {
         throw UndefinedConstantError(constant_name, context.scopes.get_error_handler()(node, ""));
     }
     // Constant are not tracked and hence must not be untracked.
-    // Get Term and return it
-    const auto& [constant, position, error_handler] = binding.value();
-    return context.factories.terms.get_or_create<pddl::TermObjectImpl>(constant);
+    // Construct Term and return it
+    const auto& [constant, _position, _error_handler] = binding.value();
+    const auto term = context.factories.terms.get_or_create<pddl::TermObjectImpl>(constant);
+    // Add position of PDDL object
+    context.positions.push_back(term, node);
+    return term;
 }
 
 pddl::Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const {
@@ -110,8 +119,11 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const
     }
     // Declare variable as being referenced.
     context.referenced_pointers.untrack(variable);
-    // Get Term and return it
-    return context.factories.terms.get_or_create<pddl::TermVariableImpl>(variable);
+    // Construct Term and return it
+    const auto term = context.factories.terms.get_or_create<pddl::TermVariableImpl>(variable);
+    // Add position of PDDL object
+    context.positions.push_back(term, node);
+    return term;
 }
 
 pddl::Term TermReferenceTermVisitor::operator()(const ast::FunctionTerm& node) const {

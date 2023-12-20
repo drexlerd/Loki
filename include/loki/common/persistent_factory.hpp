@@ -18,6 +18,8 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PERSISTENT_FACTORY_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PERSISTENT_FACTORY_HPP_
 
+#include "segmented_persistent_vector.hpp"
+
 #include <unordered_set>
 #include <memory>
 #include <mutex>
@@ -48,6 +50,7 @@ private:
     template<typename T>
     struct PerTypeCache {
         std::unordered_set<std::unique_ptr<const T>, DerferencedHash<T>, DereferencedEquality<T>> data;
+        // SegmentedPersistentVector<const T, N> vector;
     };
 
     std::tuple<PerTypeCache<Ts>...> m_data;

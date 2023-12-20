@@ -17,6 +17,8 @@
 
 #include "../../include/loki/domain/parser.hpp"
 
+#include "../../include/loki/common/ast/error_reporting.hpp"
+#include "../../include/loki/common/pddl/error_reporting.hpp"
 #include "../../include/loki/common/pddl/context.hpp"
 #include "../../include/loki/common/filesystem.hpp"
 #include "../../include/loki/common/ast/parser_wrapper.hpp"
@@ -26,22 +28,25 @@
 
 #include <tuple>
 #include <chrono>
+#include <memory>
 
 
 namespace loki {
 
 DomainParser::DomainParser(const fs::path& file_path)
-    : m_domain_source(loki::read_file(file_path))
-    , m_error_handler(ErrorHandler(m_domain_source.begin(), m_domain_source.end(), file_path))
-    , m_scopes(ScopeStack(m_error_handler)) {
+    : m_file_path(file_path)
+    , m_source(loki::read_file(file_path))
+    , m_position_cache(nullptr)
+    , m_scopes(nullptr) {
     const auto start = std::chrono::high_resolution_clock::now();
     std::cout << "Started parsing domain file: " << file_path << std::endl;
 
     /* Parse the AST */
     auto node = domain::ast::Domain();
-    bool success = parse_ast(m_domain_source, domain::domain(), node, m_error_handler.get_error_handler());
+    auto x3_error_handler = X3ErrorHandler(m_source.begin(), m_source.end(), file_path);
+    bool success = parse_ast(m_source, domain::domain(), node, x3_error_handler.get_error_handler());
     if (!success) {
-        throw SyntaxParserError("", m_error_handler.get_error_stream().str());
+        throw SyntaxParserError("", x3_error_handler.get_error_stream().str());
     }
 
     /* Parse the domain to PDDL */
@@ -67,7 +72,11 @@ DomainParser::DomainParser(const fs::path& file_path)
         m_factories.domains,
         m_factories.problems
     };
-    auto context = Context(composite_factories, m_scopes);
+
+    m_position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, file_path);
+    m_scopes = std::make_unique<ScopeStack>(m_position_cache->get_error_handler());
+
+    auto context = Context(composite_factories, *m_position_cache, *m_scopes);
     // Initialize global scope
     context.scopes.open_scope();
 
@@ -100,12 +109,16 @@ DomainParser::DomainParser(const fs::path& file_path)
     std::cout << "Finished parsing after " << duration.count() << " milliseconds." << std::endl;
 }
 
-const pddl::Domain& DomainParser::get_domain() const {
-    return m_domain;
-}
-
 CollectionOfPDDLFactories& DomainParser::get_factories() {
     return m_factories;
+}
+
+const PDDLPositionCache& DomainParser::get_position_cache() const {
+    return *m_position_cache;
+}
+
+const pddl::Domain& DomainParser::get_domain() const {
+    return m_domain;
 }
 
 }

@@ -20,8 +20,11 @@
 
 namespace loki {
 
+Scope::Scope(const Scope* parent_scope) : m_parent_scope(parent_scope) { }
+
+
 ScopeStack::ScopeStack(
-    const ErrorHandler& error_handler,
+    const PDDLErrorHandler& error_handler,
     const ScopeStack* parent)
     : m_error_handler(error_handler)
     , m_parent(parent) { }
@@ -37,7 +40,7 @@ void ScopeStack::close_scope() {
     m_stack.pop_back();
 }
 
-const ErrorHandler& ScopeStack::get_error_handler() const {
+const PDDLErrorHandler& ScopeStack::get_error_handler() const {
     return m_error_handler;
 }
 
