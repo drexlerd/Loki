@@ -151,7 +151,6 @@ namespace loki::domain {
         struct AssignOperatorDecreaseClass;
         struct AssignOperatorClass;
 
-        struct StaticFunctionClass;
         struct NumericTermClass;
 
         struct EffectClass;
@@ -293,7 +292,6 @@ namespace loki::domain {
         typedef x3::rule<AssignOperatorDecreaseClass, ast::AssignOperatorDecrease> assign_operator_decrease_type;
         typedef x3::rule<AssignOperatorClass, ast::AssignOperator> assign_operator_type;
 
-        typedef x3::rule<StaticFunctionClass, ast::FunctionHead> static_function_type;
         typedef x3::rule<NumericTermClass, ast::NumericTerm> numeric_term_type;
 
         typedef x3::rule<EffectClass, ast::Effect> effect_type;
@@ -374,7 +372,7 @@ namespace loki::domain {
         BOOST_SPIRIT_DECLARE(assign_operator_assign_type, assign_operator_scale_up_type, assign_operator_scale_down_type,
             assign_operator_increase_type, assign_operator_decrease_type, assign_operator_type)
 
-        BOOST_SPIRIT_DECLARE(static_function_type, numeric_term_type)
+        BOOST_SPIRIT_DECLARE(numeric_term_type)
 
         BOOST_SPIRIT_DECLARE(effect_type, effect_production_literal_type, 
             effect_production_numeric_fluent_total_cost_type, effect_production_numeric_fluent_general_type,
@@ -511,7 +509,6 @@ namespace loki::domain {
     parser::assign_operator_decrease_type const& assign_operator_decrease();
     parser::assign_operator_type const& assign_operator();
 
-    parser::static_function_type const& static_function();
     parser::numeric_term_type const& numeric_term();
 
     parser::effect_type const& effect();

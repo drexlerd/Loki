@@ -170,7 +170,6 @@ namespace loki::domain::parser {
     assign_operator_decrease_type const assign_operator_decrease = "assign_operator_decrease";
     assign_operator_type const assign_operator = "assign_operator";
 
-    static_function_type const static_function = "static_function";
     numeric_term_type const numeric_term = "numeric_term";
 
     effect_type const effect = "effect";
@@ -327,7 +326,6 @@ namespace loki::domain::parser {
     const auto assign_operator_def = assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
 
     // For action cost effects only
-    const auto static_function_def = lit('(') > function_symbol > *term > lit(')');
     const auto numeric_term_def = function_expression_number | function_expression_head;
 
     const auto effect_def = ((lit('(') >> keyword("and")) > *effect > lit(')')) | effect_conditional | effect_production;
@@ -422,7 +420,7 @@ namespace loki::domain::parser {
     BOOST_SPIRIT_DEFINE(assign_operator_assign, assign_operator_scale_up, assign_operator_scale_down,
         assign_operator_increase, assign_operator_decrease, assign_operator)
 
-    BOOST_SPIRIT_DEFINE(static_function, numeric_term)
+    BOOST_SPIRIT_DEFINE(numeric_term)
 
     BOOST_SPIRIT_DEFINE(effect, effect_production_literal, 
         effect_production_numeric_fluent_total_cost, effect_production_numeric_fluent_general,
@@ -554,7 +552,6 @@ namespace loki::domain::parser {
     struct AssignOperatorDecreaseClass : x3::annotate_on_success {};
     struct AssignOperatorClass : x3::annotate_on_success {};
 
-    struct StaticFunctionClass : x3::annotate_on_success {};
     struct NumericTermClass : x3::annotate_on_success {};
 
     struct EffectClass : x3::annotate_on_success {};
@@ -900,9 +897,6 @@ namespace loki::domain
         return parser::assign_operator;
     }
 
-    parser::static_function_type const& static_function() {
-        return parser::static_function;
-    }
     parser::numeric_term_type const& numeric_term() {
         return parser::numeric_term;
     }
