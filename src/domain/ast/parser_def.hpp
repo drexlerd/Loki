@@ -328,7 +328,7 @@ namespace loki::domain::parser {
 
     // For action cost effects only
     const auto static_function_def = lit('(') > function_symbol > *term > lit(')');
-    const auto numeric_term_def = function_expression_number | static_function;
+    const auto numeric_term_def = function_expression_number | function_expression_head;
 
     const auto effect_def = ((lit('(') >> keyword("and")) > *effect > lit(')')) | effect_conditional | effect_production;
     const auto effect_production_literal_def = literal;

@@ -148,6 +148,7 @@ namespace loki::domain::ast
     struct AssignOperatorDecrease;
     struct AssignOperator;
 
+    // A restricted version of a FunctionExpression used to define action costs
     struct NumericTerm;
 
     struct Effect;
@@ -814,7 +815,7 @@ namespace loki::domain::ast
 
 
     struct NumericTerm : x3::position_tagged,
-        x3::variant<FunctionExpressionNumber, FunctionHead> {
+        x3::variant<FunctionExpressionNumber, FunctionExpressionHead> {
         using base_type::base_type;
         using base_type::operator=;
     };
