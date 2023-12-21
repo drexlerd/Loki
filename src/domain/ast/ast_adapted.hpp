@@ -83,10 +83,8 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorAnd, prec
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorPreference, preference_name, goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorForall, typed_list_of_variables, precondition_goal_descriptor)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::StaticFunction, function_symbol, terms)
-
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionLiteral, literal)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionNumericFluentTotalCost, numeric_term)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionNumericFluentTotalCost, assign_operator_increase, function_symbol_total_cost, numeric_term)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionNumericFluentGeneral, assign_operator, function_head, function_expression)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectConditionalForall, typed_list_of_variables, effect)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectConditionalWhen, goal_descriptor, effect)

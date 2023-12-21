@@ -81,15 +81,6 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) con
     return term;
 }
 
-pddl::Term TermDeclarationTermVisitor::operator()(const ast::FunctionTerm& node) const {
-    if (!context.requirements->test(pddl::RequirementEnum::OBJECT_FLUENTS)) {
-        throw UndefinedRequirementError(pddl::RequirementEnum::OBJECT_FLUENTS, context.scopes.get_error_handler()(node, ""));
-    }
-    context.referenced_values.untrack(pddl::RequirementEnum::OBJECT_FLUENTS);
-
-    throw NotImplementedError("pddl::Term TermDeclarationTermVisitor::operator()(const ast::FunctionTerm& node) const");
-}
-
 
 TermReferenceTermVisitor::TermReferenceTermVisitor(Context& context_)
     : context(context_) { }
@@ -125,16 +116,6 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const
     context.positions.push_back<pddl::TermImpl>(term, node);
     return term;
 }
-
-pddl::Term TermReferenceTermVisitor::operator()(const ast::FunctionTerm& node) const {
-    if (!context.requirements->test(pddl::RequirementEnum::OBJECT_FLUENTS)) {
-        throw UndefinedRequirementError(pddl::RequirementEnum::OBJECT_FLUENTS, context.scopes.get_error_handler()(node, ""));
-    }
-    context.referenced_values.untrack(pddl::RequirementEnum::OBJECT_FLUENTS);
-
-    throw NotImplementedError("pddl::Term TermReferenceTermVisitor::operator()(const ast::FunctionTerm& node) const");
-}
-
 
 /* Number */
 double parse(const ast::Number& node) {

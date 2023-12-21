@@ -62,25 +62,34 @@ pddl::Effect parse(const domain::ast::EffectProductionLiteral& node, Context& co
     return effect;
 }
 
-pddl::Effect parse(const domain::ast::EffectProductionNumericFluent& node, Context& context) {
-    const auto assign_operator = parse(node.assign_operator);
-    const auto function = parse(node.function_head, context);
-    if ((!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS))
-        || (function->get_function_skeleton()->get_name() != "total-cost")
-        || (function->get_function_skeleton()->get_parameters().size() > 0)) {
+pddl::Effect parse(const domain::ast::EffectProductionNumericFluentTotalCost& node, Context& context) {
+    if (!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::ACTION_COSTS, context.scopes.get_error_handler()(node, ""));
-    } else if ((!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS))
-        && (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS))) {
-        throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.scopes.get_error_handler()(node, ""));
     }
-    const auto function_expression = parse(node.function_expression, context);
-    const auto effect = context.factories.effects.get_or_create<pddl::EffectNumericImpl>(assign_operator, function, function_expression);
+    const auto assign_operator_increase = parse(node.assign_operator_increase);
+    auto function_name = "total-cost";
+    auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
+    if (!binding.has_value()) {
+        throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node.function_symbol_total_cost, ""));
+    }
+    const auto& [function_skeleton, _position, _error_handler] = binding.value();
+    const auto function = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, pddl::TermList{});
+    const auto function_expression = boost::apply_visitor(FunctionExpressionVisitor(context), node.numeric_term);
+    const auto effect = context.factories.effects.get_or_create<pddl::EffectNumericImpl>(assign_operator_increase, function, function_expression);
     context.positions.push_back<pddl::EffectImpl>(effect, node);
     return effect;
 }
 
-pddl::Effect parse(const domain::ast::EffectProductionObjectFluent& node, Context& context) {
-    throw NotImplementedError("parse(const domain::ast::EffectProductionObjectFluent& node, Context& context)");
+pddl::Effect parse(const domain::ast::EffectProductionNumericFluentGeneral& node, Context& context) {
+    if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS)) {
+        throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.scopes.get_error_handler()(node, ""));
+    }
+    const auto assign_operator = parse(node.assign_operator);
+    const auto function = parse(node.function_head, context);
+    const auto function_expression = parse(node.function_expression, context);
+    const auto effect = context.factories.effects.get_or_create<pddl::EffectNumericImpl>(assign_operator, function, function_expression);
+    context.positions.push_back<pddl::EffectImpl>(effect, node);
+    return effect;
 }
 
 pddl::Effect parse(const domain::ast::EffectProduction& node, Context& context) {

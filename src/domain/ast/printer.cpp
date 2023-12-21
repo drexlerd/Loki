@@ -60,6 +60,11 @@ namespace loki
         return ss.str();
     }
 
+    std::string parse_text(const domain::ast::FunctionSymbolTotalCost& node, const FormattingOptions& options)
+    {
+        return "total-cost";
+    }
+
     std::string parse_text(const domain::ast::FunctionSymbol& node, const FormattingOptions& options)
     {
         return parse_text(node.name, options);
@@ -524,17 +529,6 @@ namespace loki
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
 
-
-    std::string parse_text(const domain::ast::StaticFunction& node, const FormattingOptions& options) {
-        std::stringstream ss; 
-        ss << "(" << parse_text(node.function_symbol.name, options);
-        for (const auto& term_node : node.terms) {
-            ss << " " << parse_text(term_node, options);
-        }
-        ss << ")";
-        return ss.str();
-    }
-
     std::string parse_text(const domain::ast::NumericTerm& node, const FormattingOptions& options) {
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
@@ -550,7 +544,9 @@ namespace loki
 
     std::string parse_text(const domain::ast::EffectProductionNumericFluentTotalCost& node, const FormattingOptions& options) {
         std::stringstream ss;
-        ss << "(increase (total-cost) " << parse_text(node.numeric_term, options) << ")";
+        ss << "(" << parse_text(node.assign_operator_increase, options) << " "
+                  << parse_text(node.function_symbol_total_cost, options) << " "
+                  << parse_text(node.numeric_term, options) << ")";
         return ss.str();
     }
 

@@ -39,6 +39,7 @@ namespace loki::domain {
     namespace parser {
         struct NameClass;
         struct VariableClass;
+        struct FunctionSymbolTotalCostClass;
         struct FunctionSymbolClass;
         struct TermClass;
         struct NumberClass;
@@ -180,6 +181,7 @@ namespace loki::domain {
 
         typedef x3::rule<NameClass, ast::Name> name_type;
         typedef x3::rule<VariableClass, ast::Variable> variable_type;
+        typedef x3::rule<FunctionSymbolTotalCostClass, ast::FunctionSymbolTotalCost> function_symbol_total_cost_type;
         typedef x3::rule<FunctionSymbolClass, ast::FunctionSymbol> function_symbol_type;
         typedef x3::rule<TermClass, ast::Term> term_type;
         typedef x3::rule<NumberClass, ast::Number> number_type;
@@ -291,7 +293,7 @@ namespace loki::domain {
         typedef x3::rule<AssignOperatorDecreaseClass, ast::AssignOperatorDecrease> assign_operator_decrease_type;
         typedef x3::rule<AssignOperatorClass, ast::AssignOperator> assign_operator_type;
 
-        typedef x3::rule<StaticFunctionClass, ast::StaticFunction> static_function_type;
+        typedef x3::rule<StaticFunctionClass, ast::FunctionHead> static_function_type;
         typedef x3::rule<NumericTermClass, ast::NumericTerm> numeric_term_type;
 
         typedef x3::rule<EffectClass, ast::Effect> effect_type;
@@ -319,7 +321,7 @@ namespace loki::domain {
         typedef x3::rule<ConstraintsClass, ast::Constraints> constraints_type;
         typedef x3::rule<StructureClass, ast::Structure> structure_type;
 
-        BOOST_SPIRIT_DECLARE(name_type, variable_type, function_symbol_type, term_type, number_type, predicate_type)
+        BOOST_SPIRIT_DECLARE(name_type, variable_type, function_symbol_total_cost_type, function_symbol_type, term_type, number_type, predicate_type)
 
         BOOST_SPIRIT_DECLARE(
             requirement_strips_type, requirement_typing_type, requirement_negative_preconditions_type, requirement_disjunctive_preconditions_type,
@@ -398,6 +400,7 @@ namespace loki::domain {
     parser::name_type const& name();
     parser::variable_type const& variable();
     parser::number_type const& number();
+    parser::function_symbol_total_cost_type const& function_symbol_total_cost();
     parser::function_symbol_type const& function_symbol();
     parser::term_type const& term();
     parser::predicate_type const& predicate();

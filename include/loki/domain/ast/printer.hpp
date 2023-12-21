@@ -28,6 +28,7 @@ namespace loki {
 extern std::string parse_text(const domain::ast::Name& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::Variable& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::Number& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::FunctionSymbolTotalCost& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::FunctionSymbol& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::Term& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::Predicate& node, const FormattingOptions& options={});
@@ -138,7 +139,6 @@ extern std::string parse_text(const domain::ast::AssignOperatorIncrease& node, c
 extern std::string parse_text(const domain::ast::AssignOperatorDecrease& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::AssignOperator& node, const FormattingOptions& options={});
 
-extern std::string parse_text(const domain::ast::StaticFunction& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::NumericTerm& node, const FormattingOptions& options={});
 
 extern std::string parse_text(const domain::ast::Effect& node, const FormattingOptions& options={});

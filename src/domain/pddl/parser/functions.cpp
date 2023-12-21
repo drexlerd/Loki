@@ -90,6 +90,7 @@ pddl::FunctionExpression parse(const domain::ast::FunctionExpression& node, Cont
     return boost::apply_visitor(FunctionExpressionVisitor(context), node);
 }
 
+
 pddl::Function parse(const domain::ast::FunctionHead& node, Context& context) {
     auto function_name = parse(node.function_symbol.name);
     auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);

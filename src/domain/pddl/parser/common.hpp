@@ -39,7 +39,6 @@ struct TermDeclarationTermVisitor : boost::static_visitor<pddl::Term> {
 
     pddl::Term operator()(const domain::ast::Name& node) const;
     pddl::Term operator()(const domain::ast::Variable& node) const;
-    pddl::Term operator()(const domain::ast::FunctionTerm& node) const;
 };
 
 struct TermReferenceTermVisitor : boost::static_visitor<pddl::Term> {
@@ -49,7 +48,6 @@ struct TermReferenceTermVisitor : boost::static_visitor<pddl::Term> {
 
     pddl::Term operator()(const domain::ast::Name& node) const;
     pddl::Term operator()(const domain::ast::Variable& node) const;
-    pddl::Term operator()(const domain::ast::FunctionTerm& node) const;
 };
 
 

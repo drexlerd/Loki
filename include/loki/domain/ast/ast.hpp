@@ -36,6 +36,7 @@ namespace loki::domain::ast
 
     struct Name;
     struct Variable;
+    struct FunctionSymbolTotalCost;
     struct FunctionSymbol;
     struct Term;
     struct Number;
@@ -147,7 +148,6 @@ namespace loki::domain::ast
     struct AssignOperatorDecrease;
     struct AssignOperator;
 
-    struct StaticFunction;
     struct NumericTerm;
 
     struct Effect;
@@ -188,6 +188,10 @@ namespace loki::domain::ast
     {
         char question_mark;
         Name name;
+    };
+
+    struct FunctionSymbolTotalCost : x3::position_tagged { 
+        // total-cost
     };
 
     /* <function-symbol> */
@@ -808,13 +812,9 @@ namespace loki::domain::ast
         using base_type::operator=;
     };
 
-    struct StaticFunction : x3::position_tagged {
-        FunctionSymbol function_symbol;
-        std::vector<Term> terms;
-    };
 
     struct NumericTerm : x3::position_tagged,
-        x3::variant<Number, StaticFunction> {
+        x3::variant<FunctionExpressionNumber, FunctionHead> {
         using base_type::base_type;
         using base_type::operator=;
     };
@@ -838,6 +838,8 @@ namespace loki::domain::ast
 
     struct EffectProductionNumericFluentTotalCost : x3::position_tagged
     {
+        AssignOperatorIncrease assign_operator_increase;
+        FunctionSymbolTotalCost function_symbol_total_cost;
         NumericTerm numeric_term;
     };
 

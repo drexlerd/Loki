@@ -42,11 +42,10 @@ struct AssignOperatorVisitor : boost::static_visitor<pddl::AssignOperatorEnum> {
     }
 };
 
-
 extern pddl::Effect parse(const domain::ast::Effect& node, Context& context);
 extern pddl::Effect parse(const domain::ast::EffectProductionLiteral& node, Context& context);
-extern pddl::Effect parse(const domain::ast::EffectProductionNumericFluent& node, Context& context);
-extern pddl::Effect parse(const domain::ast::EffectProductionObjectFluent& node, Context& context);
+extern pddl::Effect parse(const domain::ast::EffectProductionNumericFluentTotalCost& node, Context& context);
+extern pddl::Effect parse(const domain::ast::EffectProductionNumericFluentGeneral& node, Context& context);
 extern pddl::Effect parse(const domain::ast::EffectProduction& node, Context& context);
 extern pddl::Effect parse(const domain::ast::EffectConditionalForall& node, Context& context);
 extern pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, Context& context);

@@ -35,6 +35,7 @@ namespace loki::domain::parser {
     namespace ascii = boost::spirit::x3::ascii;
 
     using x3::lit;
+    using x3::string;
     using x3::lexeme;
     using x3::eps;
     using x3::int_;
@@ -44,7 +45,6 @@ namespace loki::domain::parser {
     using ascii::alpha;
     using ascii::alnum;
     using ascii::char_;
-    using ascii::string;
     using ascii::space;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -58,6 +58,7 @@ namespace loki::domain::parser {
 
     name_type const name = "name";
     variable_type const variable = "variable";
+    function_symbol_total_cost_type const function_symbol_total_cost = "function_symbol_total_cost";
     function_symbol_type const function_symbol = "function_symbol";
     term_type const term = "term";
     number_type const number = "number";
@@ -203,6 +204,7 @@ namespace loki::domain::parser {
 
     const auto name_def = lexeme[alpha >> *(alnum | char_('-') | char_('_'))];
     const auto variable_def = lexeme[char_('?') > name];
+    const auto function_symbol_total_cost_def = lit("total-cost") > x3::attr(ast::FunctionSymbolTotalCost{});
     const auto function_symbol_def = name;
     const auto term_def = name | variable;
     const auto number_def = double_;
@@ -326,11 +328,11 @@ namespace loki::domain::parser {
 
     // For action cost effects only
     const auto static_function_def = lit('(') > function_symbol > *term > lit(')');
-    const auto numeric_term_def = number | static_function;
+    const auto numeric_term_def = function_expression_number | static_function;
 
     const auto effect_def = ((lit('(') >> keyword("and")) > *effect > lit(')')) | effect_conditional | effect_production;
     const auto effect_production_literal_def = literal;
-    const auto effect_production_numeric_fluent_total_cost_def = (lit('(') >> keyword("increase") >> lit('(') >> keyword("total-cost")) > lit(')') > numeric_term > lit(')');
+    const auto effect_production_numeric_fluent_total_cost_def = (lit('(') >> assign_operator_increase >> lit('(') >> function_symbol_total_cost) > lit(')') > numeric_term > lit(')');
     const auto effect_production_numeric_fluent_general_def = (lit('(') >> assign_operator >> function_head >> function_expression) > lit(')');
     const auto effect_production_def = effect_production_numeric_fluent_total_cost | effect_production_numeric_fluent_general | effect_production_literal;
     const auto effect_conditional_forall_def = (lit('(') >> keyword("forall")) > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
@@ -371,7 +373,7 @@ namespace loki::domain::parser {
         > lit(')');
 
 
-    BOOST_SPIRIT_DEFINE(name, variable, function_symbol, term, number, predicate)
+    BOOST_SPIRIT_DEFINE(name, variable, function_symbol_total_cost, function_symbol, term, number, predicate)
 
     BOOST_SPIRIT_DEFINE(requirement_strips, requirement_typing, requirement_negative_preconditions,
         requirement_disjunctive_preconditions, requirement_equality, requirement_existential_preconditions,
@@ -438,12 +440,11 @@ namespace loki::domain::parser {
 
     struct NameClass : x3::annotate_on_success {};
     struct VariableClass : x3::annotate_on_success {};
+    struct FunctionSymbolTotalCostClass : x3::annotate_on_success {};
     struct FunctionSymbolClass : x3::annotate_on_success {};
-    struct FunctionTermClass : x3::annotate_on_success {};
     struct TermClass : x3::annotate_on_success {};
     struct NumberClass : x3::annotate_on_success {};
     struct PredicateClass : x3::annotate_on_success {};
-    struct UndefinedClass : x3::annotate_on_success {};
 
     struct RequirementStripsClass : x3::annotate_on_success {};
     struct RequirementTypingClass : x3::annotate_on_success {};
@@ -588,6 +589,9 @@ namespace loki::domain
     }
     parser::variable_type const& variable() {
         return parser::variable;
+    }
+    parser::function_symbol_total_cost_type const& function_symbol_total_cost() {
+        return parser::function_symbol_total_cost;
     }
     parser::function_symbol_type const& function_symbol() {
         return parser::function_symbol;
