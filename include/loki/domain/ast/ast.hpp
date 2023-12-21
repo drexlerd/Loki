@@ -36,13 +36,10 @@ namespace loki::domain::ast
 
     struct Name;
     struct Variable;
-    struct NameOrVariable;
     struct FunctionSymbol;
-    struct FunctionTerm;
     struct Term;
     struct Number;
     struct Predicate;
-    struct Undefined;
 
     struct RequirementStrips;
     struct RequirementTyping;
@@ -157,8 +154,6 @@ namespace loki::domain::ast
     struct EffectProductionLiteral;
     struct EffectProductionNumericFluentTotalCost;
     struct EffectProductionNumericFluentGeneral;
-    struct EffectProductionNumericFluent;
-    struct EffectProductionObjectFluent;
     struct EffectProduction;
     struct EffectConditionalForall;
     struct EffectConditionalWhen;
@@ -195,30 +190,17 @@ namespace loki::domain::ast
         Name name;
     };
 
-    struct NameOrVariable : x3::position_tagged,
-        x3::variant<Name, Variable> {
-        using base_type::base_type;
-        using base_type::operator=;
-    };
-
     /* <function-symbol> */
     struct FunctionSymbol : x3::position_tagged
     {
         Name name;
     };
 
-    /* <function-term> */
-    struct FunctionTerm : x3::position_tagged {
-        FunctionSymbol function_symbol;
-        std::vector<Term> terms;
-    };
-
     /* <term> */
     struct Term : x3::position_tagged,
                   x3::variant<
                       Name,
-                      Variable,
-                      x3::forward_ast<FunctionTerm>>
+                      Variable>
     {
         using base_type::base_type;
         using base_type::operator=;
@@ -235,9 +217,6 @@ namespace loki::domain::ast
     {
         Name name;
     };
-
-    /* <undefined> */
-    struct Undefined : x3::position_tagged { };
 
     /* <require-def> */
     struct RequirementStrips : x3::position_tagged
@@ -831,11 +810,13 @@ namespace loki::domain::ast
 
     struct StaticFunction : x3::position_tagged {
         FunctionSymbol function_symbol;
-        std::vector<NameOrVariable> terms;
+        std::vector<Term> terms;
     };
 
-    struct NumericTerm {
-
+    struct NumericTerm : x3::position_tagged,
+        x3::variant<Number, StaticFunction> {
+        using base_type::base_type;
+        using base_type::operator=;
     };
 
     /* <effect> */
@@ -855,23 +836,23 @@ namespace loki::domain::ast
         Literal literal;
     };
 
-    struct EffectProductionNumericFluent : x3::position_tagged
+    struct EffectProductionNumericFluentTotalCost : x3::position_tagged
+    {
+        NumericTerm numeric_term;
+    };
+
+    struct EffectProductionNumericFluentGeneral : x3::position_tagged
     {
         AssignOperator assign_operator;
         FunctionHead function_head;
         FunctionExpression function_expression;
     };
 
-    struct EffectProductionObjectFluent : x3::position_tagged {
-        FunctionTerm function_term;
-        boost::variant<Term, Undefined> term;
-    };
-
     struct EffectProduction : x3::position_tagged,
                               x3::variant<
                                   EffectProductionLiteral,
-                                  EffectProductionNumericFluent,
-                                  EffectProductionObjectFluent>
+                                  EffectProductionNumericFluentTotalCost,
+                                  EffectProductionNumericFluentGeneral>
     {
         using base_type::base_type;
         using base_type::operator=;

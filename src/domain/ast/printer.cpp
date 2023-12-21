@@ -65,15 +65,6 @@ namespace loki
         return parse_text(node.name, options);
     }
 
-    std::string parse_text(const domain::ast::FunctionTerm& node, const FormattingOptions& options)
-    {
-        std::stringstream ss;
-        ss << "("
-           << parse_text(node.function_symbol, options) << " "
-           << parse_text(node.terms, options) << ")";
-        return ss.str();
-    }
-
     string parse_text(const domain::ast::Term& node, const FormattingOptions& options)
     {
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
@@ -90,8 +81,6 @@ namespace loki
         ss << node.value;
         return ss.str();
     }
-
-    std::string parse_text(const domain::ast::Undefined&, const FormattingOptions&) { return "undefined"; }
 
     std::string parse_text(const domain::ast::RequirementStrips&, const FormattingOptions&) { return ":strips"; }
     std::string parse_text(const domain::ast::RequirementTyping&, const FormattingOptions&) { return ":typing"; }
@@ -536,6 +525,21 @@ namespace loki
     }
 
 
+    std::string parse_text(const domain::ast::StaticFunction& node, const FormattingOptions& options) {
+        std::stringstream ss; 
+        ss << "(" << parse_text(node.function_symbol.name, options);
+        for (const auto& term_node : node.terms) {
+            ss << " " << parse_text(term_node, options);
+        }
+        ss << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const domain::ast::NumericTerm& node, const FormattingOptions& options) {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    }
+
+
     std::string parse_text(const domain::ast::Effect& node, const FormattingOptions& options) {
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
@@ -544,18 +548,17 @@ namespace loki
         return parse_text(node.literal, options);
     }
 
-    std::string parse_text(const domain::ast::EffectProductionNumericFluent& node, const FormattingOptions& options) {
+    std::string parse_text(const domain::ast::EffectProductionNumericFluentTotalCost& node, const FormattingOptions& options) {
+        std::stringstream ss;
+        ss << "(increase (total-cost) " << parse_text(node.numeric_term, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const domain::ast::EffectProductionNumericFluentGeneral& node, const FormattingOptions& options) {
         std::stringstream ss;
         ss << "(" << parse_text(node.assign_operator, options) << " "
                   << parse_text(node.function_head, options) << " "
                   << parse_text(node.function_expression, options) << ")";
-        return ss.str();
-    }
-
-    std::string parse_text(const domain::ast::EffectProductionObjectFluent& node, const FormattingOptions& options) {
-        std::stringstream ss;
-        ss << "(assign " << parse_text(node.function_term, options) << " "
-                         << boost::apply_visitor(NodeVisitorPrinter(options), node.term) << ")";
         return ss.str();
     }
 

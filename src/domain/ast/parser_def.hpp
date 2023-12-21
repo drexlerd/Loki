@@ -59,11 +59,9 @@ namespace loki::domain::parser {
     name_type const name = "name";
     variable_type const variable = "variable";
     function_symbol_type const function_symbol = "function_symbol";
-    function_term_type const function_term = "function_term";
     term_type const term = "term";
     number_type const number = "number";
     predicate_type const predicate = "predicate";
-    undefined_type const undefined = "undefined";
 
     requirement_strips_type const requirement_strips = "requirement_strips";
     requirement_typing_type const requirement_typing = "requirement_typing";
@@ -171,10 +169,13 @@ namespace loki::domain::parser {
     assign_operator_decrease_type const assign_operator_decrease = "assign_operator_decrease";
     assign_operator_type const assign_operator = "assign_operator";
 
+    static_function_type const static_function = "static_function";
+    numeric_term_type const numeric_term = "numeric_term";
+
     effect_type const effect = "effect";
     effect_production_literal_type const effect_production_literal = "effect_production_literal";
-    effect_production_numeric_fluent_type const effect_production_numeric_fluent = "effect_production_numeric_fluent";
-    effect_production_object_fluent_type const effect_production_object_fluent = "effect_production_object_fluent";
+    effect_production_numeric_fluent_total_cost_type const effect_production_numeric_fluent_total_cost = "effect_production_numeric_fluent_total_cost";
+    effect_production_numeric_fluent_general_type const effect_production_numeric_fluent_general = "effect_production_numeric_fluent_general";
     effect_production_type const effect_production = "effect_production";
     effect_conditional_forall_type const effect_conditional_forall = "effect_conditional_forall";
     effect_conditional_when_type const effect_conditional_when = "effect_conditional_when";
@@ -202,13 +203,10 @@ namespace loki::domain::parser {
 
     const auto name_def = lexeme[alpha >> *(alnum | char_('-') | char_('_'))];
     const auto variable_def = lexeme[char_('?') > name];
-    const auto name_or_variable_def = name | variable;
     const auto function_symbol_def = name;
-    const auto function_term_def = (lit('(') > function_symbol) > *term > lit(')');
-    const auto term_def = name | variable | function_term;
+    const auto term_def = name | variable;
     const auto number_def = double_;
     const auto predicate_def = name;
-    const auto undefined_def = keyword("undefined") > x3::attr(ast::Undefined{});
 
     const auto requirement_strips_def = keyword(":strips") > x3::attr(ast::RequirementStrips{});
     const auto requirement_typing_def = keyword(":typing") > x3::attr(ast::RequirementTyping{});
@@ -327,17 +325,14 @@ namespace loki::domain::parser {
     const auto assign_operator_def = assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
 
     // For action cost effects only
-    const auto static_function_def = lit('(') > function_symbol > *(name | variable) > lit(')');
+    const auto static_function_def = lit('(') > function_symbol > *term > lit(')');
     const auto numeric_term_def = number | static_function;
 
     const auto effect_def = ((lit('(') >> keyword("and")) > *effect > lit(')')) | effect_conditional | effect_production;
     const auto effect_production_literal_def = literal;
-    // distinguishing numeric from object fluents requires some more backtracking since only function_expression and term|undefined distinguishes them
     const auto effect_production_numeric_fluent_total_cost_def = (lit('(') >> keyword("increase") >> lit('(') >> keyword("total-cost")) > lit(')') > numeric_term > lit(')');
     const auto effect_production_numeric_fluent_general_def = (lit('(') >> assign_operator >> function_head >> function_expression) > lit(')');
-    const auto effect_production_numeric_fluent_def = effect_production_numeric_fluent_total_cost | effect_production_numeric_fluent_general;
-    const auto effect_production_object_fluent_def = lit('(') >> keyword("assign") >> function_term >> (term | undefined) > lit(')');
-    const auto effect_production_def = effect_production_numeric_fluent | effect_production_object_fluent | effect_production_literal;
+    const auto effect_production_def = effect_production_numeric_fluent_total_cost | effect_production_numeric_fluent_general | effect_production_literal;
     const auto effect_conditional_forall_def = (lit('(') >> keyword("forall")) > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
     const auto effect_conditional_when_def = (lit('(') >> keyword("when")) > goal_descriptor > effect > lit(')');
     const auto effect_conditional_def = effect_conditional_forall | effect_conditional_when;
@@ -376,7 +371,7 @@ namespace loki::domain::parser {
         > lit(')');
 
 
-    BOOST_SPIRIT_DEFINE(name, variable, function_symbol, function_term, term, number, predicate, undefined)
+    BOOST_SPIRIT_DEFINE(name, variable, function_symbol, term, number, predicate)
 
     BOOST_SPIRIT_DEFINE(requirement_strips, requirement_typing, requirement_negative_preconditions,
         requirement_disjunctive_preconditions, requirement_equality, requirement_existential_preconditions,
@@ -425,8 +420,11 @@ namespace loki::domain::parser {
     BOOST_SPIRIT_DEFINE(assign_operator_assign, assign_operator_scale_up, assign_operator_scale_down,
         assign_operator_increase, assign_operator_decrease, assign_operator)
 
-    BOOST_SPIRIT_DEFINE(effect, effect_production_literal, effect_production_numeric_fluent,
-        effect_production_object_fluent, effect_production, effect_conditional_forall,
+    BOOST_SPIRIT_DEFINE(static_function, numeric_term)
+
+    BOOST_SPIRIT_DEFINE(effect, effect_production_literal, 
+        effect_production_numeric_fluent_total_cost, effect_production_numeric_fluent_general,
+        effect_production, effect_conditional_forall,
         effect_conditional_when, effect_conditional, action_symbol,
         action_body, action, derived_predicate)
 
@@ -555,10 +553,13 @@ namespace loki::domain::parser {
     struct AssignOperatorDecreaseClass : x3::annotate_on_success {};
     struct AssignOperatorClass : x3::annotate_on_success {};
 
+    struct StaticFunctionClass : x3::annotate_on_success {};
+    struct NumericTermClass : x3::annotate_on_success {};
+
     struct EffectClass : x3::annotate_on_success {};
     struct EffectProductionLiteralClass : x3::annotate_on_success {};
-    struct EffectProductionNumericFluentClass : x3::annotate_on_success {};
-    struct EffectProductionObjectFluentClass : x3::annotate_on_success {};
+    struct EffectProductionNumericFluentTotalCostClass : x3::annotate_on_success {};
+    struct EffectProductionNumericFluentGeneralClass : x3::annotate_on_success {};
     struct EffectProductionClass : x3::annotate_on_success {};
     struct EffectConditionalForallClass : x3::annotate_on_success {};
     struct EffectConditionalWhenClass : x3::annotate_on_success {};
@@ -591,9 +592,6 @@ namespace loki::domain
     parser::function_symbol_type const& function_symbol() {
         return parser::function_symbol;
     }
-    parser::function_term_type const& function_term() {
-        return parser::function_term;
-    }
     parser::term_type const& term() {
         return parser::term;
     }
@@ -602,9 +600,6 @@ namespace loki::domain
     }
     parser::predicate_type const& predicate() {
         return parser::predicate;
-    }
-    parser::undefined_type const& undefined() {
-        return parser::undefined;
     }
 
     parser::requirement_strips_type const& requirement_strips() {
@@ -901,17 +896,24 @@ namespace loki::domain
         return parser::assign_operator;
     }
 
+    parser::static_function_type const& static_function() {
+        return parser::static_function;
+    }
+    parser::numeric_term_type const& numeric_term() {
+        return parser::numeric_term;
+    }
+
     parser::effect_type const& effect() {
         return parser::effect;
     }
     parser::effect_production_literal_type const& effect_production_literal() {
         return parser::effect_production_literal;
     }
-    parser::effect_production_numeric_fluent_type const& effect_production_numeric_fluent() {
-        return parser::effect_production_numeric_fluent;
+    parser::effect_production_numeric_fluent_total_cost_type const& effect_production_numeric_fluent_total_cost() {
+        return parser::effect_production_numeric_fluent_total_cost;
     }
-    parser::effect_production_object_fluent_type const& effect_production_object_fluent() {
-        return parser::effect_production_object_fluent;
+    parser::effect_production_numeric_fluent_general_type const& effect_production_numeric_fluent_general() {
+        return parser::effect_production_numeric_fluent_general;
     }
     parser::effect_production_type const& effect_production() {
         return parser::effect_production;

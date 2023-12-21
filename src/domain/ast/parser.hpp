@@ -40,11 +40,9 @@ namespace loki::domain {
         struct NameClass;
         struct VariableClass;
         struct FunctionSymbolClass;
-        struct FunctionTermClass;
         struct TermClass;
         struct NumberClass;
         struct PredicateClass;
-        struct UndefinedClass;
 
         struct RequirementStripsClass;
         struct RequirementTypingClass;
@@ -152,10 +150,13 @@ namespace loki::domain {
         struct AssignOperatorDecreaseClass;
         struct AssignOperatorClass;
 
+        struct StaticFunctionClass;
+        struct NumericTermClass;
+
         struct EffectClass;
         struct EffectProductionLiteralClass;
-        struct EffectProductionNumericFluentClass;
-        struct EffectProductionObjectFluentClass;
+        struct EffectProductionNumericFluentTotalCostClass;
+        struct EffectProductionNumericFluentGeneralClass;
         struct EffectProductionClass;
         struct EffectConditionalForallClass;
         struct EffectConditionalWhenClass;
@@ -180,11 +181,9 @@ namespace loki::domain {
         typedef x3::rule<NameClass, ast::Name> name_type;
         typedef x3::rule<VariableClass, ast::Variable> variable_type;
         typedef x3::rule<FunctionSymbolClass, ast::FunctionSymbol> function_symbol_type;
-        typedef x3::rule<FunctionTermClass, ast::FunctionTerm> function_term_type;
         typedef x3::rule<TermClass, ast::Term> term_type;
         typedef x3::rule<NumberClass, ast::Number> number_type;
         typedef x3::rule<PredicateClass, ast::Predicate> predicate_type;
-        typedef x3::rule<UndefinedClass, ast::Undefined> undefined_type;
 
         typedef x3::rule<RequirementStripsClass, ast::RequirementStrips> requirement_strips_type;
         typedef x3::rule<RequirementTypingClass, ast::RequirementTyping> requirement_typing_type;
@@ -292,10 +291,13 @@ namespace loki::domain {
         typedef x3::rule<AssignOperatorDecreaseClass, ast::AssignOperatorDecrease> assign_operator_decrease_type;
         typedef x3::rule<AssignOperatorClass, ast::AssignOperator> assign_operator_type;
 
+        typedef x3::rule<StaticFunctionClass, ast::StaticFunction> static_function_type;
+        typedef x3::rule<NumericTermClass, ast::NumericTerm> numeric_term_type;
+
         typedef x3::rule<EffectClass, ast::Effect> effect_type;
         typedef x3::rule<EffectProductionLiteralClass, ast::EffectProductionLiteral> effect_production_literal_type;
-        typedef x3::rule<EffectProductionNumericFluentClass, ast::EffectProductionNumericFluent> effect_production_numeric_fluent_type;
-        typedef x3::rule<EffectProductionObjectFluentClass, ast::EffectProductionObjectFluent> effect_production_object_fluent_type;
+        typedef x3::rule<EffectProductionNumericFluentTotalCostClass, ast::EffectProductionNumericFluentTotalCost> effect_production_numeric_fluent_total_cost_type;
+        typedef x3::rule<EffectProductionNumericFluentGeneralClass, ast::EffectProductionNumericFluentGeneral> effect_production_numeric_fluent_general_type;
         typedef x3::rule<EffectProductionClass, ast::EffectProduction> effect_production_type;
         typedef x3::rule<EffectConditionalForallClass, ast::EffectConditionalForall> effect_conditional_forall_type;
         typedef x3::rule<EffectConditionalWhenClass, ast::EffectConditionalWhen> effect_conditional_when_type;
@@ -317,7 +319,7 @@ namespace loki::domain {
         typedef x3::rule<ConstraintsClass, ast::Constraints> constraints_type;
         typedef x3::rule<StructureClass, ast::Structure> structure_type;
 
-        BOOST_SPIRIT_DECLARE(name_type, variable_type, function_symbol_type, function_term_type, term_type, number_type, predicate_type, undefined_type)
+        BOOST_SPIRIT_DECLARE(name_type, variable_type, function_symbol_type, term_type, number_type, predicate_type)
 
         BOOST_SPIRIT_DECLARE(
             requirement_strips_type, requirement_typing_type, requirement_negative_preconditions_type, requirement_disjunctive_preconditions_type,
@@ -370,8 +372,11 @@ namespace loki::domain {
         BOOST_SPIRIT_DECLARE(assign_operator_assign_type, assign_operator_scale_up_type, assign_operator_scale_down_type,
             assign_operator_increase_type, assign_operator_decrease_type, assign_operator_type)
 
-        BOOST_SPIRIT_DECLARE(effect_type, effect_production_literal_type, effect_production_numeric_fluent_type,
-            effect_production_object_fluent_type, effect_production_type, effect_conditional_forall_type,
+        BOOST_SPIRIT_DECLARE(static_function_type, numeric_term_type)
+
+        BOOST_SPIRIT_DECLARE(effect_type, effect_production_literal_type, 
+            effect_production_numeric_fluent_total_cost_type, effect_production_numeric_fluent_general_type,
+            effect_production_type, effect_conditional_forall_type,
             effect_conditional_when_type, effect_conditional_type, action_symbol_type, action_body_type, action_type,
             derived_predicate_type)
 
@@ -394,10 +399,8 @@ namespace loki::domain {
     parser::variable_type const& variable();
     parser::number_type const& number();
     parser::function_symbol_type const& function_symbol();
-    parser::function_term_type const& function_term();
     parser::term_type const& term();
     parser::predicate_type const& predicate();
-    parser::undefined_type const& undefined();
 
     parser::requirement_strips_type const& requirement_strips();
     parser::requirement_typing_type const& requirement_typing();
@@ -505,10 +508,13 @@ namespace loki::domain {
     parser::assign_operator_decrease_type const& assign_operator_decrease();
     parser::assign_operator_type const& assign_operator();
 
+    parser::static_function_type const& static_function();
+    parser::numeric_term_type const& numeric_term();
+
     parser::effect_type const& effect();
     parser::effect_production_literal_type const& effect_production_literal();
-    parser::effect_production_numeric_fluent_type const& effect_production_numeric_fluent();
-    parser::effect_production_object_fluent_type const& effect_production_object_fluent();
+    parser::effect_production_numeric_fluent_total_cost_type const& effect_production_numeric_fluent_total_cost();
+    parser::effect_production_numeric_fluent_general_type const& effect_production_numeric_fluent_general();
     parser::effect_production_type const& effect_production();
     parser::effect_conditional_forall_type const& effect_conditional_forall();
     parser::effect_conditional_when_type const& effect_conditional_when();

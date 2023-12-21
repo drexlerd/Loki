@@ -29,10 +29,8 @@ extern std::string parse_text(const domain::ast::Name& node, const FormattingOpt
 extern std::string parse_text(const domain::ast::Variable& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::Number& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::FunctionSymbol& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::FunctionTerm& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::Term& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::Predicate& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::Undefined& node, const FormattingOptions& options={});
 
 extern std::string parse_text(const domain::ast::RequirementStrips& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::RequirementTyping& node, const FormattingOptions& options={});
@@ -140,10 +138,13 @@ extern std::string parse_text(const domain::ast::AssignOperatorIncrease& node, c
 extern std::string parse_text(const domain::ast::AssignOperatorDecrease& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::AssignOperator& node, const FormattingOptions& options={});
 
+extern std::string parse_text(const domain::ast::StaticFunction& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::NumericTerm& node, const FormattingOptions& options={});
+
 extern std::string parse_text(const domain::ast::Effect& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::EffectProductionLiteral& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::EffectProductionNumericFluent& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::EffectProductionObjectFluent& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::EffectProductionNumericFluentTotalCost& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::EffectProductionNumericFluentGeneral& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::EffectProduction& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::EffectConditionalForall& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::EffectConditionalWhen& node, const FormattingOptions& options={});

@@ -29,11 +29,9 @@ namespace loki::domain::parser
     BOOST_SPIRIT_INSTANTIATE(name_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(variable_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(function_symbol_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(function_term_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(term_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(number_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(predicate_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(undefined_type, iterator_type, context_type)
 
     BOOST_SPIRIT_INSTANTIATE(requirement_strips_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(requirement_typing_type, iterator_type, context_type)
@@ -141,10 +139,13 @@ namespace loki::domain::parser
     BOOST_SPIRIT_INSTANTIATE(assign_operator_decrease_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(assign_operator_type, iterator_type, context_type)
 
+    BOOST_SPIRIT_INSTANTIATE(static_function_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(numeric_term_type, iterator_type, context_type)
+
     BOOST_SPIRIT_INSTANTIATE(effect_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(effect_production_literal_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(effect_production_numeric_fluent_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(effect_production_object_fluent_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(effect_production_numeric_fluent_total_cost_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(effect_production_numeric_fluent_general_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(effect_production_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(effect_conditional_forall_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(effect_conditional_when_type, iterator_type, context_type)
