@@ -180,15 +180,13 @@ namespace loki::domain::ast
     /* <name> */
     struct Name : x3::position_tagged
     {
-        char alpha;
-        std::string suffix;
+        std::string characters;
     };
 
     /* <variable> */
     struct Variable : x3::position_tagged
     {
-        char question_mark;
-        Name name;
+        std::string characters;
     };
 
     struct FunctionSymbolTotalCost : x3::position_tagged { 

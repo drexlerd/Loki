@@ -27,16 +27,12 @@ namespace loki {
 
 /* Name */
 string parse(const ast::Name& node) {
-    stringstream ss;
-    ss << node.alpha << node.suffix;
-    return ss.str();
+    return node.characters;
 }
 
 /* Variable */
 pddl::Variable parse(const ast::Variable& node, Context& context) {
-    stringstream ss;
-    ss << node.question_mark << parse(node.name);
-    return context.factories.variables.get_or_create<pddl::VariableImpl>(ss.str());
+    return context.factories.variables.get_or_create<pddl::VariableImpl>(node.characters);
 }
 
 /* Term */

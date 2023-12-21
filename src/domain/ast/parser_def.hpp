@@ -41,6 +41,7 @@ namespace loki::domain::parser {
     using x3::int_;
     using x3::double_;
     using x3::no_skip;
+    using x3::raw;
 
     using ascii::alpha;
     using ascii::alnum;
@@ -201,8 +202,9 @@ namespace loki::domain::parser {
     // Grammar
     ///////////////////////////////////////////////////////////////////////////
 
-    const auto name_def = lexeme[alpha >> *(alnum | char_('-') | char_('_'))];
-    const auto variable_def = lexeme[char_('?') > name];
+    const auto name_def = raw[lexeme[alpha >> *(alnum | char_('-') | char_('_'))]];
+    const auto variable_def = raw[lexeme[char_('?') > name]];
+    // TODO: how to get rid of this rule and the additional ast node?
     const auto function_symbol_total_cost_def = lit("total-cost") > x3::attr(ast::FunctionSymbolTotalCost{});
     const auto function_symbol_def = name;
     const auto term_def = name | variable;
@@ -247,6 +249,7 @@ namespace loki::domain::parser {
     const auto function_type_number_def = number;
     const auto function_type_type__def = type;
     const auto function_type_def = function_type_number | function_type_type_;
+    // TODO: how to get rid of this additional ast node and synthesize a general version of the node?
     const auto atomic_function_skeleton_total_cost_def = lit('(') >> keyword("total-cost") > lit(')') > x3::attr(ast::AtomicFunctionSkeletonTotalCost{});
     const auto atomic_function_skeleton_general_def = lit('(') > function_symbol > typed_list_of_variables > lit(')');
     const auto atomic_function_skeleton_def = atomic_function_skeleton_total_cost | atomic_function_skeleton_general;

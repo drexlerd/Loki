@@ -48,16 +48,12 @@ namespace loki
 
     string parse_text(const domain::ast::Name& node, const FormattingOptions&)
     {
-        stringstream ss;
-        ss << node.alpha << node.suffix;
-        return ss.str();
+        return node.characters;
     }
 
     string parse_text(const domain::ast::Variable& node, const FormattingOptions& options)
     {
-        stringstream ss;
-        ss << node.question_mark << parse_text(node.name, options);
-        return ss.str();
+        return node.characters;
     }
 
     std::string parse_text(const domain::ast::FunctionSymbolTotalCost& node, const FormattingOptions& options)
