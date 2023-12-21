@@ -20,6 +20,7 @@
 
 #include "config.hpp"
 #include "../ast/error_reporting.hpp"
+#include "../filesystem.hpp"
 
 #include <unordered_map>
 
@@ -37,7 +38,7 @@ class PositionCache {
         PDDLErrorHandler m_error_handler;
 
     public:
-        PositionCache(const X3ErrorHandler& error_handler, const std::string& file, int tabs=4);
+        PositionCache(const X3ErrorHandler& error_handler, const fs::path& file, int tabs=4);
 
         template<typename T>
         void push_back(const T* object, const PositionType& position);

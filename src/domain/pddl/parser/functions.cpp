@@ -110,31 +110,77 @@ pddl::Function parse(const domain::ast::FunctionHead& node, Context& context) {
 }
 
 
+AtomicFunctionSkeletonVisitor::AtomicFunctionSkeletonVisitor(Context& context_)
+    : context(context_) { }
+
+pddl::FunctionSkeleton AtomicFunctionSkeletonVisitor::operator()(const domain::ast::AtomicFunctionSkeletonTotalCost& node) {
+    if (!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS)) {
+        throw UndefinedRequirementError(pddl::RequirementEnum::ACTION_COSTS, context.positions.get_error_handler()(node, ""));
+    } else {
+        context.referenced_values.untrack(pddl::RequirementEnum::ACTION_COSTS);
+    }
+    if ((!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS))
+        && (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS))) {
+        throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
+    } else {
+        context.referenced_values.untrack(pddl::RequirementEnum::ACTION_COSTS);
+        context.referenced_values.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
+    }
+
+    assert(context.scopes.get<pddl::TypeImpl>("number").has_value());
+    const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
+    auto function_name = "total-cost";
+    const auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
+    if (binding.has_value()) {
+        const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
+        auto message_2 = std::string("");
+        const auto& [_function_skeleton, position, error_handler] = binding.value();
+        if (position.has_value()) {
+            message_2 = error_handler(position.value(), "First defined here:");
+        }
+        throw MultiDefinitionFunctionSkeletonError(function_name, message_1 + message_2);
+    }
+    auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, pddl::ParameterList{}, type);
+    context.positions.push_back(function_skeleton, node);
+    context.scopes.insert<pddl::FunctionSkeletonImpl>(function_name, function_skeleton, node);
+    return function_skeleton;
+}
+
+pddl::FunctionSkeleton AtomicFunctionSkeletonVisitor::operator()(const domain::ast::AtomicFunctionSkeletonGeneral& node) {
+    if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS)) {
+        throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
+    } 
+    context.referenced_values.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
+    assert(context.scopes.get<pddl::TypeImpl>("number").has_value());
+    const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
+    auto function_name = parse(node.function_symbol.name);
+    const auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
+    if (binding.has_value()) {
+        const auto message_1 = context.scopes.get_error_handler()(node.function_symbol.name, "Defined here:");
+        auto message_2 = std::string("");
+        const auto& [_function_skeleton, position, error_handler] = binding.value();
+        if (position.has_value()) {
+            message_2 = error_handler(position.value(), "First defined here:");
+        }
+        throw MultiDefinitionFunctionSkeletonError(function_name, message_1 + message_2);
+    }
+    context.scopes.open_scope();
+    auto function_parameters = boost::apply_visitor(ParameterListVisitor(context), node.arguments);
+    context.scopes.close_scope();
+    auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, type);
+    context.positions.push_back(function_skeleton, node);
+    context.scopes.insert<pddl::FunctionSkeletonImpl>(function_name, function_skeleton, node.function_symbol.name);
+    return function_skeleton;
+}
+
+
 FunctionSkeletonListVisitor::FunctionSkeletonListVisitor(Context& context_)
     : context(context_) { }
 
 pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const std::vector<domain::ast::AtomicFunctionSkeleton>& formula_skeleton_nodes) {
     auto function_skeleton_list = pddl::FunctionSkeletonList();
-    assert(context.scopes.get<pddl::TypeImpl>("number").has_value());
-    const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
     for (const auto& atomic_function_skeleton : formula_skeleton_nodes) {
-        auto function_name = parse(atomic_function_skeleton.function_symbol.name);
-        const auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
-        if (binding.has_value()) {
-            const auto message_1 = context.scopes.get_error_handler()(atomic_function_skeleton.function_symbol.name, "Defined here:");
-            auto message_2 = std::string("");
-            const auto& [_function_skeleton, position, error_handler] = binding.value();
-            if (position.has_value()) {
-                message_2 = error_handler(position.value(), "First defined here:");
-            }
-            throw MultiDefinitionFunctionSkeletonError(function_name, message_1 + message_2);
-        }
-        context.scopes.open_scope();
-        auto function_parameters = boost::apply_visitor(ParameterListVisitor(context), atomic_function_skeleton.arguments);
-        context.scopes.close_scope();
-        auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, type);
-        context.positions.push_back(function_skeleton, atomic_function_skeleton);
-        context.scopes.insert<pddl::FunctionSkeletonImpl>(function_name, function_skeleton, atomic_function_skeleton.function_symbol.name);
+        auto function_skeleton = boost::apply_visitor(AtomicFunctionSkeletonVisitor(context), atomic_function_skeleton);
         function_skeleton_list.push_back(function_skeleton);
     }
     return function_skeleton_list;
@@ -142,26 +188,8 @@ pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const std::ve
 
 pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& function_skeleton_list_recursively_node) {
     auto function_skeleton_list = pddl::FunctionSkeletonList();
-    assert(context.scopes.get<pddl::TypeImpl>("number").has_value());
-    const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
     for (const auto& atomic_function_skeleton : function_skeleton_list_recursively_node.atomic_function_skeletons) {
-        auto function_name = parse(atomic_function_skeleton.function_symbol.name);
-        const auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
-        if (binding.has_value()) {
-            const auto message_1 = context.scopes.get_error_handler()(atomic_function_skeleton.function_symbol.name, "Defined here:");
-            auto message_2 = std::string("");
-            const auto& [_function_skeleton, position, error_handler] = binding.value();
-            if (position.has_value()) {
-                message_2 = error_handler(position.value(), "First defined here:");
-            }
-            throw MultiDefinitionFunctionSkeletonError(function_name, message_1 + message_2);
-        }
-        context.scopes.open_scope();
-        auto function_parameters = boost::apply_visitor(ParameterListVisitor(context), atomic_function_skeleton.arguments);
-        context.scopes.close_scope();
-        auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, type);
-        context.scopes.insert<pddl::FunctionSkeletonImpl>(function_name, function_skeleton, atomic_function_skeleton.function_symbol.name);
-        context.positions.push_back(function_skeleton, atomic_function_skeleton);
+        auto function_skeleton = boost::apply_visitor(AtomicFunctionSkeletonVisitor(context), atomic_function_skeleton);
         function_skeleton_list.push_back(function_skeleton);
     }
     if (function_skeleton_list_recursively_node.function_typed_list_of_atomic_function_skeletons.has_value()) {

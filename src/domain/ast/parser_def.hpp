@@ -98,6 +98,8 @@ namespace loki::domain::parser {
     function_type_number_type const function_type_number = "function_type_number";
     function_type_type_type const function_type_type_ = "function_type_type";
     function_type_type const function_type = "function_type";
+    atomic_function_skeleton_total_cost_type const atomic_function_skeleton_total_cost = "atomic_function_skeleton_total_cost";
+    atomic_function_skeleton_general_type const atomic_function_skeleton_general = "atomic_function_skeleton_general";
     atomic_function_skeleton_type const atomic_function_skeleton = "atomic_function_skeleton";
     function_typed_list_of_atomic_function_skeletons_recursively_type const function_typed_list_of_atomic_function_skeletons_recursively = "function_typed_list_of_atomic_function_skeletons_recursively";
     function_typed_list_of_atomic_function_skeletons_type const function_typed_list_of_atomic_function_skeletons = "function_typed_list_of_atomic_function_skeletons";
@@ -200,6 +202,7 @@ namespace loki::domain::parser {
 
     const auto name_def = lexeme[alpha >> *(alnum | char_('-') | char_('_'))];
     const auto variable_def = lexeme[char_('?') > name];
+    const auto name_or_variable_def = name | variable;
     const auto function_symbol_def = name;
     const auto function_term_def = (lit('(') > function_symbol) > *term > lit(')');
     const auto term_def = name | variable | function_term;
@@ -245,7 +248,9 @@ namespace loki::domain::parser {
     const auto function_type_number_def = number;
     const auto function_type_type__def = type;
     const auto function_type_def = function_type_number | function_type_type_;
-    const auto atomic_function_skeleton_def = lit('(') > function_symbol > typed_list_of_variables > lit(')');
+    const auto atomic_function_skeleton_total_cost_def = lit('(') >> keyword("total-cost") > lit(')') > x3::attr(ast::AtomicFunctionSkeletonTotalCost{});
+    const auto atomic_function_skeleton_general_def = lit('(') > function_symbol > typed_list_of_variables > lit(')');
+    const auto atomic_function_skeleton_def = atomic_function_skeleton_total_cost | atomic_function_skeleton_general;
     const auto function_typed_list_of_atomic_function_skeletons_recursively_def = (+atomic_function_skeleton >> lit('-')) > function_type > -function_typed_list_of_atomic_function_skeletons;
     const auto function_typed_list_of_atomic_function_skeletons_def = function_typed_list_of_atomic_function_skeletons_recursively | +atomic_function_skeleton;
 
@@ -321,10 +326,16 @@ namespace loki::domain::parser {
     const auto assign_operator_decrease_def = keyword("decrease") > x3::attr(ast::AssignOperatorDecrease{});
     const auto assign_operator_def = assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
 
+    // For action cost effects only
+    const auto static_function_def = lit('(') > function_symbol > *(name | variable) > lit(')');
+    const auto numeric_term_def = number | static_function;
+
     const auto effect_def = ((lit('(') >> keyword("and")) > *effect > lit(')')) | effect_conditional | effect_production;
     const auto effect_production_literal_def = literal;
     // distinguishing numeric from object fluents requires some more backtracking since only function_expression and term|undefined distinguishes them
-    const auto effect_production_numeric_fluent_def = (lit('(') >> assign_operator >> function_head >> function_expression) > lit(')');
+    const auto effect_production_numeric_fluent_total_cost_def = (lit('(') >> keyword("increase") >> lit('(') >> keyword("total-cost")) > lit(')') > numeric_term > lit(')');
+    const auto effect_production_numeric_fluent_general_def = (lit('(') >> assign_operator >> function_head >> function_expression) > lit(')');
+    const auto effect_production_numeric_fluent_def = effect_production_numeric_fluent_total_cost | effect_production_numeric_fluent_general;
     const auto effect_production_object_fluent_def = lit('(') >> keyword("assign") >> function_term >> (term | undefined) > lit(')');
     const auto effect_production_def = effect_production_numeric_fluent | effect_production_object_fluent | effect_production_literal;
     const auto effect_conditional_forall_def = (lit('(') >> keyword("forall")) > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
@@ -381,8 +392,8 @@ namespace loki::domain::parser {
     BOOST_SPIRIT_DEFINE(atomic_formula_skeleton)
 
     BOOST_SPIRIT_DEFINE(function_type_number, function_type_type_, function_type,
-        atomic_function_skeleton, function_typed_list_of_atomic_function_skeletons_recursively,
-        function_typed_list_of_atomic_function_skeletons)
+        atomic_function_skeleton_total_cost, atomic_function_skeleton_general, atomic_function_skeleton, 
+        function_typed_list_of_atomic_function_skeletons_recursively, function_typed_list_of_atomic_function_skeletons)
 
     BOOST_SPIRIT_DEFINE(atomic_formula_of_terms_predicate, atomic_formula_of_terms_equality,
         atomic_formula_of_terms, atom, negated_atom, literal)
@@ -471,6 +482,8 @@ namespace loki::domain::parser {
     struct FunctionTypeObjectClass : x3::annotate_on_success {};
     struct FunctionTypeTypeClass : x3::annotate_on_success {};
     struct FunctionTypeClass : x3::annotate_on_success {};
+    struct AtomicFunctionSkeletonTotalCostClass : x3::annotate_on_success {};
+    struct AtomicFunctionSkeletonGeneralClass : x3::annotate_on_success {};
     struct AtomicFunctionSkeletonClass : x3::annotate_on_success {};
     struct FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyClass : x3::annotate_on_success {};
     struct FunctionTypedListOfAtomicFunctionSkeletonsClass : x3::annotate_on_success {};
@@ -686,6 +699,12 @@ namespace loki::domain
     }
     parser::function_type_type const& function_type() {
         return parser::function_type;
+    }
+    parser::atomic_function_skeleton_total_cost_type const& atomic_function_skeleton_total_cost() {
+        return parser::atomic_function_skeleton_total_cost;
+    }
+    parser::atomic_function_skeleton_general_type const& atomic_function_skeleton_general() {
+        return parser::atomic_function_skeleton_general;
     }
     parser::atomic_function_skeleton_type const& atomic_function_skeleton() {
         return parser::atomic_function_skeleton;

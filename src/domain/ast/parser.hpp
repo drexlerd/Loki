@@ -79,6 +79,8 @@ namespace loki::domain {
         struct FunctionTypeNumberClass;
         struct FunctionTypeTypeClass;
         struct FunctionTypeClass;
+        struct AtomicFunctionSkeletonTotalCostClass;
+        struct AtomicFunctionSkeletonGeneralClass;
         struct AtomicFunctionSkeletonClass;
         struct FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyClass;
         struct FunctionTypedListOfAtomicFunctionSkeletonsClass;
@@ -217,6 +219,8 @@ namespace loki::domain {
         typedef x3::rule<FunctionTypeNumberClass, ast::FunctionTypeNumber> function_type_number_type;
         typedef x3::rule<FunctionTypeTypeClass, ast::FunctionTypeType> function_type_type_type;
         typedef x3::rule<FunctionTypeClass, ast::FunctionType> function_type_type;
+        typedef x3::rule<AtomicFunctionSkeletonTotalCostClass, ast::AtomicFunctionSkeletonTotalCost> atomic_function_skeleton_total_cost_type;
+        typedef x3::rule<AtomicFunctionSkeletonGeneralClass, ast::AtomicFunctionSkeletonGeneral> atomic_function_skeleton_general_type;
         typedef x3::rule<AtomicFunctionSkeletonClass, ast::AtomicFunctionSkeleton> atomic_function_skeleton_type;
         typedef x3::rule<FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyClass, ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively> function_typed_list_of_atomic_function_skeletons_recursively_type;
         typedef x3::rule<FunctionTypedListOfAtomicFunctionSkeletonsClass, ast::FunctionTypedListOfAtomicFunctionSkeletons> function_typed_list_of_atomic_function_skeletons_type;
@@ -329,7 +333,9 @@ namespace loki::domain {
 
         BOOST_SPIRIT_DECLARE(atomic_formula_skeleton_type)
 
-        BOOST_SPIRIT_DECLARE(function_type_number_type, function_type_type_type, function_type_type, atomic_function_skeleton_type, function_typed_list_of_atomic_function_skeletons_recursively_type, function_typed_list_of_atomic_function_skeletons_type)
+        BOOST_SPIRIT_DECLARE(function_type_number_type, function_type_type_type, function_type_type, 
+            atomic_function_skeleton_total_cost_type, atomic_function_skeleton_general_type, atomic_function_skeleton_type, 
+            function_typed_list_of_atomic_function_skeletons_recursively_type, function_typed_list_of_atomic_function_skeletons_type)
 
         BOOST_SPIRIT_DECLARE(atomic_formula_of_terms_type, atom_type, negated_atom_type, literal_type)
 
@@ -440,6 +446,8 @@ namespace loki::domain {
     parser::function_type_number_type const& function_type_number();
     parser::function_type_type_type const& function_type_type_();
     parser::function_type_type const& function_type();
+    parser::atomic_function_skeleton_total_cost_type const& atomic_function_skeleton_total_cost();
+    parser::atomic_function_skeleton_general_type const& atomic_function_skeleton_general();
     parser::atomic_function_skeleton_type const& atomic_function_skeleton();
     parser::function_typed_list_of_atomic_function_skeletons_recursively_type const& function_typed_list_of_atomic_function_skeletons_recursively();
     parser::function_typed_list_of_atomic_function_skeletons_type const& function_typed_list_of_atomic_function_skeletons();
@@ -450,7 +458,6 @@ namespace loki::domain {
     parser::atom_type const& atom();
     parser::negated_atom_type const& negated_atom();
     parser::literal_type const& literal();
-
 
     parser::function_expression_type const& function_expression();
     parser::function_head_type const& function_head();

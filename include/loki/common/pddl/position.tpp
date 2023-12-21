@@ -19,7 +19,7 @@
 namespace loki {
 
 template<typename... Ts>
-PositionCache<Ts...>::PositionCache(const X3ErrorHandler& error_handler, const std::string& file, int tabs)
+PositionCache<Ts...>::PositionCache(const X3ErrorHandler& error_handler, const fs::path& file, int tabs)
     : m_error_handler(PDDLErrorHandler(error_handler.get_error_handler().get_position_cache(), file, tabs)) { }
 
 

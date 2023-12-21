@@ -2,7 +2,7 @@
 ;;
 
 (define (domain woodworking)
-  (:requirements :typing :action-costs)
+  (:requirements :typing :action-costs :numeric-fluents)
   (:types
       acolour awood woodobj machine
       surface treatmentstatus

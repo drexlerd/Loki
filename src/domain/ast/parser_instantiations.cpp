@@ -68,6 +68,8 @@ namespace loki::domain::parser
     BOOST_SPIRIT_INSTANTIATE(function_type_number_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(function_type_type_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(function_type_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(atomic_function_skeleton_total_cost_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(atomic_function_skeleton_general_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(atomic_function_skeleton_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(function_typed_list_of_atomic_function_skeletons_recursively_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(function_typed_list_of_atomic_function_skeletons_type, iterator_type, context_type)

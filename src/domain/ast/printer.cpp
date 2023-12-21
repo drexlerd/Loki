@@ -212,13 +212,23 @@ namespace loki
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
 
-    std::string parse_text(const domain::ast::AtomicFunctionSkeleton& node, const FormattingOptions& options)
+    std::string parse_text(const domain::ast::AtomicFunctionSkeletonTotalCost& node, const FormattingOptions& options)
+    {
+        return "(total-cost)";
+    }
+
+    std::string parse_text(const domain::ast::AtomicFunctionSkeletonGeneral& node, const FormattingOptions& options)
     {
         std::stringstream ss;
         ss << "("
            << parse_text(node.function_symbol, options) << " "
            << parse_text(node.arguments, options) << ")";
         return ss.str();
+    }
+
+    std::string parse_text(const domain::ast::AtomicFunctionSkeleton& node, const FormattingOptions& options)
+    {
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
 
     std::string parse_text(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& node, const FormattingOptions& options) {

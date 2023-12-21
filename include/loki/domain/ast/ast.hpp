@@ -36,6 +36,7 @@ namespace loki::domain::ast
 
     struct Name;
     struct Variable;
+    struct NameOrVariable;
     struct FunctionSymbol;
     struct FunctionTerm;
     struct Term;
@@ -76,6 +77,8 @@ namespace loki::domain::ast
     struct FunctionTypeNumber;                                       // :numeric-fluents
     struct FunctionTypeType;                                         // :object-fluents :typing
     struct FunctionType;
+    struct AtomicFunctionSkeletonTotalCost;
+    struct AtomicFunctionSkeletonGeneral;
     struct AtomicFunctionSkeleton;
     struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively;
     struct FunctionTypedListOfAtomicFunctionSkeletons;
@@ -147,8 +150,13 @@ namespace loki::domain::ast
     struct AssignOperatorDecrease;
     struct AssignOperator;
 
+    struct StaticFunction;
+    struct NumericTerm;
+
     struct Effect;
     struct EffectProductionLiteral;
+    struct EffectProductionNumericFluentTotalCost;
+    struct EffectProductionNumericFluentGeneral;
     struct EffectProductionNumericFluent;
     struct EffectProductionObjectFluent;
     struct EffectProduction;
@@ -185,6 +193,12 @@ namespace loki::domain::ast
     {
         char question_mark;
         Name name;
+    };
+
+    struct NameOrVariable : x3::position_tagged,
+        x3::variant<Name, Variable> {
+        using base_type::base_type;
+        using base_type::operator=;
     };
 
     /* <function-symbol> */
@@ -407,10 +421,20 @@ namespace loki::domain::ast
         using base_type::operator=;
     };
 
-    struct AtomicFunctionSkeleton : x3::position_tagged
+
+    struct AtomicFunctionSkeletonTotalCost : x3::position_tagged { };
+
+    struct AtomicFunctionSkeletonGeneral : x3::position_tagged
     {
         FunctionSymbol function_symbol;
         TypedListOfVariables arguments;
+    };
+
+    struct AtomicFunctionSkeleton : x3::position_tagged,
+        x3::variant<AtomicFunctionSkeletonTotalCost
+            , AtomicFunctionSkeletonGeneral> {
+        using base_type::base_type;
+        using base_type::operator=;
     };
 
     struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively : x3::position_tagged
@@ -803,6 +827,15 @@ namespace loki::domain::ast
     {
         using base_type::base_type;
         using base_type::operator=;
+    };
+
+    struct StaticFunction : x3::position_tagged {
+        FunctionSymbol function_symbol;
+        std::vector<NameOrVariable> terms;
+    };
+
+    struct NumericTerm {
+
     };
 
     /* <effect> */

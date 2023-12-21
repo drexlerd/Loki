@@ -18,6 +18,8 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_ERROR_REPORTING_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_ERROR_REPORTING_HPP_
 
+#include "../filesystem.hpp"
+
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
 
 #include <string>
@@ -43,7 +45,7 @@ namespace loki
         typedef Iterator iterator_type;
         using position_cache = boost::spirit::x3::position_cache<std::vector<Iterator>>;
 
-        PDDLErrorHandlerImpl(position_cache pos_cache, std::string file = "", int tabs = 4)
+        PDDLErrorHandlerImpl(position_cache pos_cache, fs::path file = "", int tabs = 4)
           : pos_cache(pos_cache)
           , file(file)
           , tabs(tabs) {}

@@ -76,6 +76,19 @@ extern pddl::FunctionExpression parse(const domain::ast::FunctionExpression& nod
 extern pddl::Function parse(const domain::ast::FunctionHead& node, Context& context);
 
 
+class AtomicFunctionSkeletonVisitor : boost::static_visitor<pddl::FunctionSkeleton> {
+private:
+    Context& context;
+
+public:
+    AtomicFunctionSkeletonVisitor(Context& context_);
+
+    pddl::FunctionSkeleton operator()(const domain::ast::AtomicFunctionSkeletonTotalCost& node);
+
+    pddl::FunctionSkeleton operator()(const domain::ast::AtomicFunctionSkeletonGeneral& node);
+};
+
+
 class FunctionSkeletonListVisitor : boost::static_visitor<pddl::FunctionSkeletonList> {
 private:
     Context& context;
