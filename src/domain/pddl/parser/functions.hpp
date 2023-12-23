@@ -86,7 +86,7 @@ public:
 
     pddl::FunctionSkeleton operator()(const domain::ast::AtomicFunctionSkeletonTotalCost& node);
 
-    pddl::FunctionSkeleton operator()(const domain::ast::AtomicFunctionSkeletonGeneral& node);
+    pddl::FunctionSkeleton operator()(const domain::ast::AtomicFunctionSkeleton& node);
 };
 
 

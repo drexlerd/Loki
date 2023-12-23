@@ -37,8 +37,12 @@ namespace loki::domain {
     // parser public interface for testing
     ///////////////////////////////////////////////////////////////////////////
     namespace parser {
+        struct DefineKeywordClass;
+        struct DomainKeywordClass;
+
         struct NameClass;
         struct VariableClass;
+        struct NameTotalCostClass;
         struct FunctionSymbolTotalCostClass;
         struct FunctionSymbolClass;
         struct TermClass;
@@ -167,8 +171,6 @@ namespace loki::domain {
         struct DurativeActionClass;  // TODO
         struct DerivedPredicateClass;
 
-        struct DefineKeywordClass;
-        struct DomainKeywordClass;
         struct DomainNameClass;
         struct RequirementsClass;
         struct TypesClass;
@@ -178,9 +180,13 @@ namespace loki::domain {
         struct ConstraintsClass;
         struct StructureClass;
 
+        typedef x3::rule<DefineKeywordClass, x3::unused_type> define_keyword_type;
+        typedef x3::rule<DomainKeywordClass, x3::unused_type> domain_keyword_type;        
+
         typedef x3::rule<NameClass, ast::Name> name_type;
         typedef x3::rule<VariableClass, ast::Variable> variable_type;
-        typedef x3::rule<FunctionSymbolTotalCostClass, ast::FunctionSymbolTotalCost> function_symbol_total_cost_type;
+        typedef x3::rule<NameTotalCostClass, ast::Name> name_total_cost_type;
+        typedef x3::rule<FunctionSymbolTotalCostClass, ast::FunctionSymbol> function_symbol_total_cost_type;
         typedef x3::rule<FunctionSymbolClass, ast::FunctionSymbol> function_symbol_type;
         typedef x3::rule<TermClass, ast::Term> term_type;
         typedef x3::rule<NumberClass, ast::Number> number_type;
@@ -220,7 +226,7 @@ namespace loki::domain {
         typedef x3::rule<FunctionTypeTypeClass, ast::FunctionTypeType> function_type_type_type;
         typedef x3::rule<FunctionTypeClass, ast::FunctionType> function_type_type;
         typedef x3::rule<AtomicFunctionSkeletonTotalCostClass, ast::AtomicFunctionSkeletonTotalCost> atomic_function_skeleton_total_cost_type;
-        typedef x3::rule<AtomicFunctionSkeletonGeneralClass, ast::AtomicFunctionSkeletonGeneral> atomic_function_skeleton_general_type;
+        typedef x3::rule<AtomicFunctionSkeletonGeneralClass, ast::AtomicFunctionSkeleton> atomic_function_skeleton_general_type;
         typedef x3::rule<AtomicFunctionSkeletonClass, ast::AtomicFunctionSkeleton> atomic_function_skeleton_type;
         typedef x3::rule<FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyClass, ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively> function_typed_list_of_atomic_function_skeletons_recursively_type;
         typedef x3::rule<FunctionTypedListOfAtomicFunctionSkeletonsClass, ast::FunctionTypedListOfAtomicFunctionSkeletons> function_typed_list_of_atomic_function_skeletons_type;
@@ -292,7 +298,7 @@ namespace loki::domain {
         typedef x3::rule<AssignOperatorDecreaseClass, ast::AssignOperatorDecrease> assign_operator_decrease_type;
         typedef x3::rule<AssignOperatorClass, ast::AssignOperator> assign_operator_type;
 
-        typedef x3::rule<NumericTermClass, ast::NumericTerm> numeric_term_type;
+        typedef x3::rule<NumericTermClass, ast::FunctionExpression> numeric_term_type;
 
         typedef x3::rule<EffectClass, ast::Effect> effect_type;
         typedef x3::rule<EffectProductionLiteralClass, ast::EffectProductionLiteral> effect_production_literal_type;
@@ -308,8 +314,6 @@ namespace loki::domain {
 
         typedef x3::rule<DerivedPredicateClass, ast::DerivedPredicate> derived_predicate_type;
 
-        typedef x3::rule<DefineKeywordClass, x3::unused_type> define_keyword_type;
-        typedef x3::rule<DomainKeywordClass, x3::unused_type> domain_keyword_type;
         typedef x3::rule<DomainNameClass, ast::DomainName> domain_name_type;
         typedef x3::rule<RequirementsClass, ast::Requirements> requirements_type;
         typedef x3::rule<TypesClass, ast::Types> types_type;
@@ -319,7 +323,9 @@ namespace loki::domain {
         typedef x3::rule<ConstraintsClass, ast::Constraints> constraints_type;
         typedef x3::rule<StructureClass, ast::Structure> structure_type;
 
-        BOOST_SPIRIT_DECLARE(name_type, variable_type, function_symbol_total_cost_type, function_symbol_type, term_type, number_type, predicate_type)
+        BOOST_SPIRIT_DECLARE(total_cost_keyword_type, define_keyword_type, domain_keyword_type)
+
+        BOOST_SPIRIT_DECLARE(name_type, variable_type, function_symbol_type, term_type, number_type, predicate_type)
 
         BOOST_SPIRIT_DECLARE(
             requirement_strips_type, requirement_typing_type, requirement_negative_preconditions_type, requirement_disjunctive_preconditions_type,
@@ -381,7 +387,7 @@ namespace loki::domain {
             derived_predicate_type)
 
 
-        BOOST_SPIRIT_DECLARE(define_keyword_type, domain_keyword_type, domain_name_type, requirements_type,
+        BOOST_SPIRIT_DECLARE(domain_name_type, requirements_type,
             types_type, constants_type, predicates_type, functions_type, constraints_type, structure_type)
     }
 
@@ -395,10 +401,12 @@ namespace loki::domain {
         return lit(keyword) >> no_skip[&separator()];
     }
 
+    parser::define_keyword_type const& define_keyword();
+    parser::domain_keyword_type const& domain_keyword();
+
     parser::name_type const& name();
     parser::variable_type const& variable();
     parser::number_type const& number();
-    parser::function_symbol_total_cost_type const& function_symbol_total_cost();
     parser::function_symbol_type const& function_symbol();
     parser::term_type const& term();
     parser::predicate_type const& predicate();
@@ -524,8 +532,6 @@ namespace loki::domain {
     parser::action_type const& action();
     parser::derived_predicate_type const& derived_predicate();
 
-    parser::define_keyword_type const& define_keyword();
-    parser::domain_keyword_type const& domain_keyword();
     parser::domain_name_type const& domain_name();
     parser::requirements_type const& requirements();
     parser::types_type const& types();

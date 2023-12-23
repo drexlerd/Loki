@@ -36,7 +36,6 @@ namespace loki::domain::ast
 
     struct Name;
     struct Variable;
-    struct FunctionSymbolTotalCost;
     struct FunctionSymbol;
     struct Term;
     struct Number;
@@ -75,8 +74,6 @@ namespace loki::domain::ast
     struct FunctionTypeNumber;                                       // :numeric-fluents
     struct FunctionTypeType;                                         // :object-fluents :typing
     struct FunctionType;
-    struct AtomicFunctionSkeletonTotalCost;
-    struct AtomicFunctionSkeletonGeneral;
     struct AtomicFunctionSkeleton;
     struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively;
     struct FunctionTypedListOfAtomicFunctionSkeletons;
@@ -148,9 +145,6 @@ namespace loki::domain::ast
     struct AssignOperatorDecrease;
     struct AssignOperator;
 
-    // A restricted version of a FunctionExpression used to define action costs
-    struct NumericTerm;
-
     struct Effect;
     struct EffectProductionLiteral;
     struct EffectProductionNumericFluentTotalCost;
@@ -187,10 +181,6 @@ namespace loki::domain::ast
     struct Variable : x3::position_tagged
     {
         std::string characters;
-    };
-
-    struct FunctionSymbolTotalCost : x3::position_tagged { 
-        // total-cost
     };
 
     /* <function-symbol> */
@@ -403,20 +393,9 @@ namespace loki::domain::ast
         using base_type::operator=;
     };
 
-
-    struct AtomicFunctionSkeletonTotalCost : x3::position_tagged { };
-
-    struct AtomicFunctionSkeletonGeneral : x3::position_tagged
-    {
+    struct AtomicFunctionSkeleton : x3::position_tagged {
         FunctionSymbol function_symbol;
         TypedListOfVariables arguments;
-    };
-
-    struct AtomicFunctionSkeleton : x3::position_tagged,
-        x3::variant<AtomicFunctionSkeletonTotalCost
-            , AtomicFunctionSkeletonGeneral> {
-        using base_type::base_type;
-        using base_type::operator=;
     };
 
     struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively : x3::position_tagged
@@ -812,12 +791,6 @@ namespace loki::domain::ast
     };
 
 
-    struct NumericTerm : x3::position_tagged,
-        x3::variant<FunctionExpressionNumber, FunctionExpressionHead> {
-        using base_type::base_type;
-        using base_type::operator=;
-    };
-
     /* <effect> */
     // <p-effect>
     struct Effect : x3::position_tagged,
@@ -837,9 +810,9 @@ namespace loki::domain::ast
 
     struct EffectProductionNumericFluentTotalCost : x3::position_tagged
     {
-        AssignOperatorIncrease assign_operator_increase;
-        FunctionSymbolTotalCost function_symbol_total_cost;
-        NumericTerm numeric_term;
+        AssignOperator assign_operator_increase;
+        FunctionHead function_head_total_cost;
+        FunctionExpression numeric_term;
     };
 
     struct EffectProductionNumericFluentGeneral : x3::position_tagged

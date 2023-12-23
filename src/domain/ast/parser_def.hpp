@@ -57,9 +57,11 @@ namespace loki::domain::parser {
     // Rules
     ///////////////////////////////////////////////////////////////////////////
 
+    define_keyword_type const define_keyword = "define";
+    domain_keyword_type const domain_keyword = "domain";
+
     name_type const name = "name";
     variable_type const variable = "variable";
-    function_symbol_total_cost_type const function_symbol_total_cost = "function_symbol_total_cost";
     function_symbol_type const function_symbol = "function_symbol";
     term_type const term = "term";
     number_type const number = "number";
@@ -186,8 +188,6 @@ namespace loki::domain::parser {
     action_type const action = "action";
     derived_predicate_type const derived_predicate = "derived_predicate";
 
-    define_keyword_type const define_keyword = "define";
-    domain_keyword_type const domain_keyword = "domain";
     domain_name_type const domain_name = "domain_name";
     requirements_type const requirements = "requirements";
     types_type const types = "types";
@@ -584,14 +584,21 @@ namespace loki::domain::parser {
 
 namespace loki::domain
 {
+    parser::total_cost_keyword_type const& total_cost_keyword() {
+        return parser::total_cost_keyword;
+    }
+    parser::define_keyword_type const& define_keyword() {
+        return parser::define_keyword;
+    }
+    parser::domain_keyword_type const& domain_keyword() {
+        return parser::domain_keyword;
+    }
+
     parser::name_type const& name() {
         return parser::name;
     }
     parser::variable_type const& variable() {
         return parser::variable;
-    }
-    parser::function_symbol_total_cost_type const& function_symbol_total_cost() {
-        return parser::function_symbol_total_cost;
     }
     parser::function_symbol_type const& function_symbol() {
         return parser::function_symbol;
@@ -941,12 +948,6 @@ namespace loki::domain
         return parser::derived_predicate;
     }
 
-    parser::define_keyword_type const& define_keyword() {
-        return parser::define_keyword;
-    }
-    parser::domain_keyword_type const& domain_keyword() {
-        return parser::domain_keyword;
-    }
     parser::domain_name_type const& domain_name() {
         return parser::domain_name;
     }

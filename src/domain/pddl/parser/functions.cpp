@@ -147,7 +147,7 @@ pddl::FunctionSkeleton AtomicFunctionSkeletonVisitor::operator()(const domain::a
     return function_skeleton;
 }
 
-pddl::FunctionSkeleton AtomicFunctionSkeletonVisitor::operator()(const domain::ast::AtomicFunctionSkeletonGeneral& node) {
+pddl::FunctionSkeleton AtomicFunctionSkeletonVisitor::operator()(const domain::ast::AtomicFunctionSkeleton& node) {
     if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
     } 

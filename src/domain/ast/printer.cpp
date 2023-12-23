@@ -207,7 +207,7 @@ namespace loki
         return "(total-cost)";
     }
 
-    std::string parse_text(const domain::ast::AtomicFunctionSkeletonGeneral& node, const FormattingOptions& options)
+    std::string parse_text(const domain::ast::AtomicFunctionSkeleton& node, const FormattingOptions& options)
     {
         std::stringstream ss;
         ss << "("
