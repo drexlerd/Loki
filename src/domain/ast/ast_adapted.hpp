@@ -40,7 +40,8 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaSkeleton, predicate, t
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypeNumber, number)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypeType, type)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFunctionSkeleton, function_symbol, arguments)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFunctionSkeletonTotalCost, function_symbol)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFunctionSkeletonGeneral, function_symbol, arguments)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively, atomic_function_skeletons, function_type, function_typed_list_of_atomic_function_skeletons)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaOfTermsPredicate, predicate, terms)
@@ -84,7 +85,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorPreferenc
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::PreconditionGoalDescriptorForall, typed_list_of_variables, precondition_goal_descriptor)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionLiteral, literal)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionNumericFluentTotalCost, assign_operator_increase, function_head_total_cost, numeric_term)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionNumericFluentTotalCost, assign_operator_increase, function_symbol_total_cost, numeric_term)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectProductionNumericFluentGeneral, assign_operator, function_head, function_expression)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectConditionalForall, typed_list_of_variables, effect)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::EffectConditionalWhen, goal_descriptor, effect)

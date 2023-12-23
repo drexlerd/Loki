@@ -115,7 +115,7 @@ namespace loki::problem::parser {
     const auto atomic_formula_of_names_equality_def = (lit('(') >> lit('=')) > domain::name() > domain::name() > lit(')');
     const auto atomic_formula_of_names_def = atomic_formula_of_names_equality | atomic_formula_of_names_predicate;
     const auto atom_def = atomic_formula_of_names;
-    const auto negated_atom_def = lit('(') >> domain::keyword("not") > atomic_formula_of_names >> lit(')');
+    const auto negated_atom_def = lit('(') >> domain::keyword_lit("not") > atomic_formula_of_names >> lit(')');
     const auto literal_def = atom | negated_atom;
 
     const auto initial_element_literals_def = literal;
@@ -129,34 +129,34 @@ namespace loki::problem::parser {
     const auto metric_function_expression_binary_operator_def = (lit('(') >> domain::binary_operator() >> metric_function_expression >> metric_function_expression) > lit(')');
     const auto metric_function_expression_multi_operator_def = (lit('(') >> domain::multi_operator() >> metric_function_expression >> +metric_function_expression) > lit(')');
     const auto metric_function_expression_minus_def = (lit('(') >> lit('-')) > metric_function_expression > lit(')');
-    const auto metric_function_expression_preferences_def = (lit('(') >> domain::keyword("is-violated")) > domain::preference_name() > lit(')');
+    const auto metric_function_expression_preferences_def = (lit('(') >> domain::keyword_lit("is-violated")) > domain::preference_name() > lit(')');
     const auto metric_function_expression_basic_function_term_def = basic_function_term;
-    const auto metric_function_expression_total_time_def = domain::keyword("total-time") > x3::attr(ast::MetricFunctionExpressionTotalTime{});
+    const auto metric_function_expression_total_time_def = domain::keyword_lit("total-time") > x3::attr(ast::MetricFunctionExpressionTotalTime{});
     const auto metric_function_expression_number_def = domain::number();
     const auto metric_function_expression_def = metric_function_expression_binary_operator
         | metric_function_expression_multi_operator | metric_function_expression_minus
         | metric_function_expression_preferences | metric_function_expression_basic_function_term
         | metric_function_expression_total_time | metric_function_expression_number;
 
-    const auto optimization_minimize_def = domain::keyword("minimize") > x3::attr(ast::OptimizationMinimize{});
-    const auto optimization_maximize_def = domain::keyword("maximize") > x3::attr(ast::OptimizationMaximize{});
+    const auto optimization_minimize_def = domain::keyword_lit("minimize") > x3::attr(ast::OptimizationMinimize{});
+    const auto optimization_maximize_def = domain::keyword_lit("maximize") > x3::attr(ast::OptimizationMaximize{});
     const auto optimization_def = optimization_minimize | optimization_maximize;
 
-    const auto preference_constraint_goal_descriptor_and_def = (lit('(') >> domain::keyword("and")) > *preference_constraint_goal_descriptor > lit(')');
-    const auto preference_constraint_goal_descriptor_forall_def = (lit('(') >> domain::keyword("forall")) > domain::typed_list_of_variables() > preference_constraint_goal_descriptor > lit(')');
-    const auto preference_constraint_goal_descriptor_preference_def = (lit('(') >> domain::keyword("preference") > (-domain::preference_name())) > domain::constraint_goal_descriptor() > lit(')');
+    const auto preference_constraint_goal_descriptor_and_def = (lit('(') >> domain::keyword_lit("and")) > *preference_constraint_goal_descriptor > lit(')');
+    const auto preference_constraint_goal_descriptor_forall_def = (lit('(') >> domain::keyword_lit("forall")) > domain::typed_list_of_variables() > preference_constraint_goal_descriptor > lit(')');
+    const auto preference_constraint_goal_descriptor_preference_def = (lit('(') >> domain::keyword_lit("preference") > (-domain::preference_name())) > domain::constraint_goal_descriptor() > lit(')');
     const auto preference_constraint_goal_descriptor_simple_def = domain::constraint_goal_descriptor();
     const auto preference_constraint_goal_descriptor_def = preference_constraint_goal_descriptor_and | preference_constraint_goal_descriptor_forall
         | preference_constraint_goal_descriptor_preference | preference_constraint_goal_descriptor_simple;
 
-    const auto problem_keyword_def = domain::keyword("problem");
+    const auto problem_keyword_def = domain::keyword_lit("problem");
     const auto problem_name_def = lit('(') > problem_keyword > domain::name() > lit(')');
-    const auto domain_name_def = (lit('(') >> domain::keyword(":domain")) > domain::name() > lit(')');
-    const auto objects_def = (lit('(') >> domain::keyword(":objects")) > domain::typed_list_of_names() > lit(')');
-    const auto initial_def = (lit('(') >> domain::keyword(":init")) > *initial_element > lit(')');
-    const auto goal_def = (lit('(') >> domain::keyword(":goal")) > domain::precondition_goal_descriptor() > lit(')');
-    const auto constraints_def = (lit('(') >> domain::keyword(":constraints")) > preference_constraint_goal_descriptor > lit(')');
-    const auto metric_specification_def = (lit('(') >> domain::keyword(":metric")) > optimization > metric_function_expression > lit(')');
+    const auto domain_name_def = (lit('(') >> domain::keyword_lit(":domain")) > domain::name() > lit(')');
+    const auto objects_def = (lit('(') >> domain::keyword_lit(":objects")) > domain::typed_list_of_names() > lit(')');
+    const auto initial_def = (lit('(') >> domain::keyword_lit(":init")) > *initial_element > lit(')');
+    const auto goal_def = (lit('(') >> domain::keyword_lit(":goal")) > domain::precondition_goal_descriptor() > lit(')');
+    const auto constraints_def = (lit('(') >> domain::keyword_lit(":constraints")) > preference_constraint_goal_descriptor > lit(')');
+    const auto metric_specification_def = (lit('(') >> domain::keyword_lit(":metric")) > optimization > metric_function_expression > lit(')');
 
     const auto problem_def = lit('(') > domain::define_keyword()
             > problem_name

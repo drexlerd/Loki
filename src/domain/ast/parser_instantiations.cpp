@@ -28,6 +28,7 @@ namespace loki::domain::parser
 
     BOOST_SPIRIT_INSTANTIATE(name_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(variable_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(name_total_cost_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(function_symbol_total_cost_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(function_symbol_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(term_type, iterator_type, context_type)
