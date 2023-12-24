@@ -17,6 +17,7 @@
 
 #include "effects.hpp"
 
+#include "common.hpp"
 #include "conditions.hpp"
 #include "literal.hpp"
 #include "parameters.hpp"
@@ -67,7 +68,8 @@ pddl::Effect parse(const domain::ast::EffectProductionNumericFluentTotalCost& no
         throw UndefinedRequirementError(pddl::RequirementEnum::ACTION_COSTS, context.scopes.get_error_handler()(node, ""));
     }
     const auto assign_operator_increase = parse(node.assign_operator_increase);
-    auto function_name = "total-cost";
+    auto function_name = parse(node.function_symbol_total_cost.name);
+    assert(function_name == "total-cost");
     auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
     if (!binding.has_value()) {
         throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node.function_symbol_total_cost, ""));

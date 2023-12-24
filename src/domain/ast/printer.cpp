@@ -51,14 +51,9 @@ namespace loki
         return node.characters;
     }
 
-    string parse_text(const domain::ast::Variable& node, const FormattingOptions& options)
+    string parse_text(const domain::ast::Variable& node, const FormattingOptions&)
     {
         return node.characters;
-    }
-
-    std::string parse_text(const domain::ast::FunctionSymbolTotalCost& node, const FormattingOptions& options)
-    {
-        return "total-cost";
     }
 
     std::string parse_text(const domain::ast::FunctionSymbol& node, const FormattingOptions& options)
@@ -204,10 +199,10 @@ namespace loki
 
     std::string parse_text(const domain::ast::AtomicFunctionSkeletonTotalCost& node, const FormattingOptions& options)
     {
-        return "(total-cost)";
+        return parse_text(node.function_symbol, options);
     }
 
-    std::string parse_text(const domain::ast::AtomicFunctionSkeleton& node, const FormattingOptions& options)
+    std::string parse_text(const domain::ast::AtomicFunctionSkeletonGeneral& node, const FormattingOptions& options)
     {
         std::stringstream ss;
         ss << "("
@@ -524,11 +519,6 @@ namespace loki
     std::string parse_text(const domain::ast::AssignOperator& node, const FormattingOptions& options) {
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
-
-    std::string parse_text(const domain::ast::NumericTerm& node, const FormattingOptions& options) {
-        return boost::apply_visitor(NodeVisitorPrinter(options), node);
-    }
-
 
     std::string parse_text(const domain::ast::Effect& node, const FormattingOptions& options) {
         return boost::apply_visitor(NodeVisitorPrinter(options), node);

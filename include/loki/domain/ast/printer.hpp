@@ -28,7 +28,6 @@ namespace loki {
 extern std::string parse_text(const domain::ast::Name& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::Variable& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::Number& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::FunctionSymbolTotalCost& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::FunctionSymbol& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::Term& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::Predicate& node, const FormattingOptions& options={});
@@ -67,7 +66,7 @@ extern std::string parse_text(const domain::ast::FunctionTypeNumber& node, const
 extern std::string parse_text(const domain::ast::FunctionTypeType& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::FunctionType& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::AtomicFunctionSkeletonTotalCost& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::AtomicFunctionSkeleton& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::AtomicFunctionSkeletonGeneral& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::AtomicFunctionSkeleton& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletons& node, const FormattingOptions& options={});
@@ -138,8 +137,6 @@ extern std::string parse_text(const domain::ast::AssignOperatorScaleDown& node, 
 extern std::string parse_text(const domain::ast::AssignOperatorIncrease& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::AssignOperatorDecrease& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::AssignOperator& node, const FormattingOptions& options={});
-
-extern std::string parse_text(const domain::ast::NumericTerm& node, const FormattingOptions& options={});
 
 extern std::string parse_text(const domain::ast::Effect& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::EffectProductionLiteral& node, const FormattingOptions& options={});
