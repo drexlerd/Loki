@@ -53,6 +53,8 @@ namespace loki::problem::parser
     BOOST_SPIRIT_INSTANTIATE(optimization_minimize_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(optimization_maximize_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(optimization_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(metric_specification_total_cost_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(metric_specification_general_type, iterator_type, context_type)
 
     BOOST_SPIRIT_INSTANTIATE(preference_constraint_goal_descriptor_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(preference_constraint_goal_descriptor_and_type, iterator_type, context_type)

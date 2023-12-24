@@ -62,6 +62,8 @@ namespace loki::problem::ast
     struct OptimizationMinimize;
     struct OptimizationMaximize;
     struct Optimization;
+    struct MetricSpecificationTotalCost;
+    struct MetricSpecificationGeneral;
 
     struct PreferenceConstraintGoalDescriptor;
     struct PreferenceConstraintGoalDescriptorAnd;
@@ -217,6 +219,16 @@ namespace loki::problem::ast
         using base_type::operator=;
     };
 
+    struct MetricSpecificationTotalCost : x3::position_tagged {
+        OptimizationMinimize optimization_minimize;
+        domain::ast::FunctionSymbol function_symbol_total_cost;
+    };
+
+    struct MetricSpecificationGeneral : x3::position_tagged {
+        Optimization optimization;
+        MetricFunctionExpression metric_function_expression;
+    };
+
 
     /* <pref-con-GD> */
     struct PreferenceConstraintGoalDescriptor : x3::position_tagged,
@@ -273,9 +285,11 @@ namespace loki::problem::ast
         PreferenceConstraintGoalDescriptor preference_constraint_goal_descriptor;
     };
 
-    struct MetricSpecification : x3::position_tagged {
-        Optimization optimization;
-        MetricFunctionExpression metric_function_expression;
+    struct MetricSpecification : x3::position_tagged,
+        x3::variant<MetricSpecificationTotalCost
+            , MetricSpecificationGeneral> {
+        using base_type::base_type;
+        using base_type::operator=;
     };
 
     struct Problem : x3::position_tagged {

@@ -86,6 +86,8 @@ namespace loki::problem::parser {
     optimization_minimize_type const optimization_minimize = "optimization_minimize";
     optimization_maximize_type const optimization_maximize = "optimization_maximize";
     optimization_type const optimization = "optimization";
+    metric_specification_total_cost_type const metric_specification_total_cost = "metric_specification_total_cost";
+    metric_specification_general_type const metric_specification_general = "metric_specification_general";
 
     preference_constraint_goal_descriptor_type const preference_constraint_goal_descriptor = "preference_constraint_goal_descriptor";
     preference_constraint_goal_descriptor_and_type const preference_constraint_goal_descriptor_and = "preference_constraint_goal_descriptor_and";
@@ -141,7 +143,9 @@ namespace loki::problem::parser {
     const auto optimization_minimize_def = domain::keyword_lit("minimize") > x3::attr(ast::OptimizationMinimize{});
     const auto optimization_maximize_def = domain::keyword_lit("maximize") > x3::attr(ast::OptimizationMaximize{});
     const auto optimization_def = optimization_minimize | optimization_maximize;
-
+    const auto metric_specification_total_cost_def = optimization_minimize >> lit('(') >> domain::function_symbol_total_cost() > lit(')');
+    const auto metric_specification_general_def = optimization >> metric_function_expression;
+    
     const auto preference_constraint_goal_descriptor_and_def = (lit('(') >> domain::keyword_lit("and")) > *preference_constraint_goal_descriptor > lit(')');
     const auto preference_constraint_goal_descriptor_forall_def = (lit('(') >> domain::keyword_lit("forall")) > domain::typed_list_of_variables() > preference_constraint_goal_descriptor > lit(')');
     const auto preference_constraint_goal_descriptor_preference_def = (lit('(') >> domain::keyword_lit("preference") > (-domain::preference_name())) > domain::constraint_goal_descriptor() > lit(')');
@@ -156,7 +160,7 @@ namespace loki::problem::parser {
     const auto initial_def = (lit('(') >> domain::keyword_lit(":init")) > *initial_element > lit(')');
     const auto goal_def = (lit('(') >> domain::keyword_lit(":goal")) > domain::precondition_goal_descriptor() > lit(')');
     const auto constraints_def = (lit('(') >> domain::keyword_lit(":constraints")) > preference_constraint_goal_descriptor > lit(')');
-    const auto metric_specification_def = (lit('(') >> domain::keyword_lit(":metric")) > optimization > metric_function_expression > lit(')');
+    const auto metric_specification_def = (lit('(') >> domain::keyword_lit(":metric")) > (metric_specification_total_cost | metric_specification_general) > lit(')');
 
     const auto problem_def = lit('(') > domain::define_keyword()
             > problem_name
@@ -187,7 +191,7 @@ namespace loki::problem::parser {
         metric_function_expression_basic_function_term,
         metric_function_expression_total_time, metric_function_expression_preferences)
 
-    BOOST_SPIRIT_DEFINE(optimization_minimize, optimization_maximize, optimization)
+    BOOST_SPIRIT_DEFINE(optimization_minimize, optimization_maximize, optimization, metric_specification_total_cost, metric_specification_general)
 
     BOOST_SPIRIT_DEFINE(preference_constraint_goal_descriptor,
         preference_constraint_goal_descriptor_and,
@@ -231,6 +235,8 @@ namespace loki::problem::parser {
     struct OptimizationMinimizeClass : x3::annotate_on_success {};
     struct OptimizationMaximizeClass : x3::annotate_on_success {};
     struct OptimizationClass : x3::annotate_on_success {};
+    struct MetricSpecificationTotalCostClass : x3::annotate_on_success {};
+    struct MetricSpecificationGeneralClass : x3::annotate_on_success {};
 
     struct PreferenceConstraintGoalDescriptorClass : x3::annotate_on_success {};
     struct PreferenceConstraintGoalDescriptorAndClass : x3::annotate_on_success {};
@@ -323,6 +329,12 @@ namespace loki::problem
     }
     parser::optimization_type const& optimization() {
         return parser::optimization;
+    }
+    parser::metric_specification_total_cost_type const& metric_specification_total_cost() {
+        return parser::metric_specification_total_cost;
+    }
+    parser::metric_specification_general_type const& metric_specification_general() {
+        return parser::metric_specification_general;
     }
 
     parser::preference_constraint_goal_descriptor_type const& preference_constraint_goal_descriptor() {

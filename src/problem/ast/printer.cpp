@@ -164,6 +164,21 @@ namespace loki {
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
 
+    std::string parse_text(const problem::ast::MetricSpecificationTotalCost& node, const FormattingOptions& options) {
+        stringstream ss;
+        ss << "(:metric " << parse_text(node.optimization_minimize, options) << " "
+                          << parse_text(node.function_symbol_total_cost, options) << ")";
+        return ss.str();
+    }
+
+    std::string parse_text(const problem::ast::MetricSpecificationGeneral& node, const FormattingOptions& options) {
+        stringstream ss;
+        ss << "(:metric " << parse_text(node.optimization, options) << " "
+                          << parse_text(node.metric_function_expression, options) << ")";
+        return ss.str();
+    }
+
+
 
     string parse_text(const problem::ast::PreferenceConstraintGoalDescriptor& node, const FormattingOptions& options) {
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
@@ -234,10 +249,7 @@ namespace loki {
     }
 
     string parse_text(const problem::ast::MetricSpecification& node, const FormattingOptions& options) {
-        stringstream ss;
-        ss << "(:metric " << parse_text(node.optimization, options) << " "
-                          << parse_text(node.metric_function_expression, options) << ")";
-        return ss.str();
+        return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
 
 

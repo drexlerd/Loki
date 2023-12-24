@@ -49,13 +49,15 @@ BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::PreferenceConstraintGoalDescriptor
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::PreferenceConstraintGoalDescriptorPreference, preference_name, constraint_goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::PreferenceConstraintGoalDescriptorSimple, constraint_goal_descriptor)
 
+BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricSpecificationTotalCost, optimization_minimize, function_symbol_total_cost)
+BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricSpecificationGeneral, optimization, metric_function_expression)
+
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::ProblemName, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::DomainName, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Objects, typed_list_of_names)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Initial, initial_elements)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Goal, precondition_goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Constraints, preference_constraint_goal_descriptor)
-BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricSpecification, optimization, metric_function_expression)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Problem, problem_name, domain_name, requirements, objects, initial, goal, constraints, metric_specification)
 

@@ -52,6 +52,8 @@ extern std::string parse_text(const problem::ast::MetricFunctionExpressionPrefer
 extern std::string parse_text(const problem::ast::OptimizationMinimize& node, const FormattingOptions& options={});
 extern std::string parse_text(const problem::ast::OptimizationMaximize& node, const FormattingOptions& options={});
 extern std::string parse_text(const problem::ast::Optimization& node, const FormattingOptions& options={});
+extern std::string parse_text(const problem::ast::MetricSpecificationTotalCost& node, const FormattingOptions& options={});
+extern std::string parse_text(const problem::ast::MetricSpecificationGeneral& node, const FormattingOptions& options={});
 
 extern std::string parse_text(const problem::ast::PreferenceConstraintGoalDescriptor& node, const FormattingOptions& options={});
 extern std::string parse_text(const problem::ast::PreferenceConstraintGoalDescriptorAnd& node, const FormattingOptions& options={});

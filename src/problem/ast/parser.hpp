@@ -57,6 +57,8 @@ namespace loki::problem {
         struct OptimizationMinimizeClass;
         struct OptimizationMaximizeClass;
         struct OptimizationClass;
+        struct MetricSpecificationTotalCostClass;
+        struct MetricSpecificationGeneralClass;
 
         struct PreferenceConstraintGoalDescriptorClass;
         struct PreferenceConstraintGoalDescriptorAndClass;
@@ -101,7 +103,9 @@ namespace loki::problem {
         typedef x3::rule<OptimizationMinimizeClass, ast::OptimizationMinimize> optimization_minimize_type;
         typedef x3::rule<OptimizationMaximizeClass, ast::OptimizationMaximize> optimization_maximize_type;
         typedef x3::rule<OptimizationClass, ast::Optimization> optimization_type;
-
+        typedef x3::rule<MetricSpecificationTotalCostClass, ast::MetricSpecificationTotalCost> metric_specification_total_cost_type;
+        typedef x3::rule<MetricSpecificationGeneralClass, ast::MetricSpecificationGeneral> metric_specification_general_type;
+        
         typedef x3::rule<PreferenceConstraintGoalDescriptorClass, ast::PreferenceConstraintGoalDescriptor> preference_constraint_goal_descriptor_type;
         typedef x3::rule<PreferenceConstraintGoalDescriptorAndClass, ast::PreferenceConstraintGoalDescriptorAnd> preference_constraint_goal_descriptor_and_type;
         typedef x3::rule<PreferenceConstraintGoalDescriptorForallClass, ast::PreferenceConstraintGoalDescriptorForall> preference_constraint_goal_descriptor_forall_type;
@@ -134,7 +138,8 @@ namespace loki::problem {
             metric_function_expression_basic_function_term_type,
             metric_function_expression_total_time_type, metric_function_expression_preferences_type)
 
-        BOOST_SPIRIT_DECLARE(optimization_minimize_type, optimization_maximize_type, optimization_type)
+        BOOST_SPIRIT_DECLARE(optimization_minimize_type, optimization_maximize_type, optimization_type, 
+            metric_specification_total_cost_type, metric_specification_general_type)
 
         BOOST_SPIRIT_DECLARE(preference_constraint_goal_descriptor_type,
             preference_constraint_goal_descriptor_and_type,
@@ -174,6 +179,8 @@ namespace loki::problem {
     parser::optimization_minimize_type const& optimization_minimize();
     parser::optimization_maximize_type const& optimization_maximize();
     parser::optimization_type const& optimization();
+    parser::metric_specification_total_cost_type const& metric_specification_total_cost();
+    parser::metric_specification_general_type const& metric_specification_general();
 
     parser::preference_constraint_goal_descriptor_type const& preference_constraint_goal_descriptor();
     parser::preference_constraint_goal_descriptor_and_type const& preference_constraint_goal_descriptor_and();
