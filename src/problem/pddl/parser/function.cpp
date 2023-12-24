@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "goal.hpp"
+#include "function.hpp"
 
 #include "objects.hpp"
 
@@ -25,6 +25,46 @@
 
 
 namespace loki {
+
+MetricFunctionExpressionDeclarationVisitor::MetricFunctionExpressionDeclarationVisitor(Context& context_) : context(context_) { }
+
+pddl::FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const problem::ast::MetricFunctionExpressionNumber& node) {
+    throw NotImplementedError("parse(const problem::ast::MetricFunctionExpressionNumber& node, Context& context)");
+}
+
+pddl::FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const problem::ast::MetricFunctionExpressionBinaryOperator& node) {
+    throw NotImplementedError("parse(const problem::ast::MetricFunctionExpressionBinaryOperator& node, Context& context)");
+}
+
+pddl::FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const problem::ast::MetricFunctionExpressionMultiOperator& node) {
+    throw NotImplementedError("parse(const problem::ast::MetricFunctionExpressionMultiOperator& node, Context& context)");
+}
+
+pddl::FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const problem::ast::MetricFunctionExpressionMinus& node) {
+    throw NotImplementedError("parse(const problem::ast::MetricFunctionExpressionMinus& node, Context& context)");
+}
+
+pddl::FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const problem::ast::MetricFunctionExpressionBasicFunctionTerm& node) {
+    throw NotImplementedError("parse(const problem::ast::MetricFunctionExpressionBasicFunctionTerm& node, Context& context)");
+}
+
+pddl::FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const problem::ast::MetricFunctionExpressionTotalTime& node) {
+    throw NotImplementedError("parse(const problem::ast::MetricFunctionExpressionTotalTime& node, Context& context)");
+}
+
+pddl::FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const problem::ast::MetricFunctionExpressionPreferences& node) {
+    throw NotImplementedError("parse(const problem::ast::MetricFunctionExpression& node, Context& context)");
+}
+
+pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionPreferences& node, Context& context) {
+    throw NotImplementedError("parse(const problem::ast::MetricFunctionExpression& node, Context& context)");
+}
+
+
+pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpression& node, Context& context) {
+    return boost::apply_visitor(MetricFunctionExpressionDeclarationVisitor(context), node);
+}
+
 
 pddl::Function parse(const problem::ast::BasicFunctionTerm& node, Context& context) {
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol, context);

@@ -25,6 +25,30 @@
 
 namespace loki {
 
+class MetricFunctionExpressionDeclarationVisitor : boost::static_visitor<pddl::FunctionExpression> {
+private:
+    Context& context; 
+
+public:
+    MetricFunctionExpressionDeclarationVisitor(Context& context_);
+
+    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionNumber& node);
+
+    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionBinaryOperator& node);
+
+    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionMultiOperator& node);
+
+    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionMinus& node);
+
+    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionBasicFunctionTerm& node);
+
+    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionTotalTime& node);
+
+    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionPreferences& node);
+};
+
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpression& node, Context& context);
+
 extern pddl::Function parse(const problem::ast::BasicFunctionTerm& node, Context& context);
 
 }

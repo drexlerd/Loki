@@ -17,6 +17,8 @@
 
 #include "metric.hpp"
 
+#include "function.hpp"
+
 #include "../../../domain/pddl/parser/common.hpp"
 #include "../../../domain/pddl/parser/types.hpp"
 #include "../../../../include/loki/problem/pddl/exceptions.hpp"

@@ -19,7 +19,7 @@
 
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
-#include "../../../include/loki/domain/pddl/function.hpp"
+#include "../../../include/loki/domain/pddl/function_expressions.hpp"
 
 #include <cassert>
 
@@ -38,26 +38,26 @@ const std::string& to_string(pddl::OptimizationMetricEnum optimization_metric) {
 }
 
 
-OptimizationMetricImpl::OptimizationMetricImpl(int identifier, OptimizationMetricEnum optimization_metric, Function function)
+OptimizationMetricImpl::OptimizationMetricImpl(int identifier, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression)
     : Base(identifier)
     , m_optimization_metric(optimization_metric)
-    , m_function(std::move(function))
+    , m_function_expression(std::move(function_expression))
 {
 }
 
 bool OptimizationMetricImpl::are_equal_impl(const OptimizationMetricImpl& other) const {
     return (m_optimization_metric == other.m_optimization_metric)
-        && (m_function == other.m_function);
+        && (m_function_expression == other.m_function_expression);
 }
 
 size_t OptimizationMetricImpl::hash_impl() const {
     return hash_combine(
         m_optimization_metric,
-        m_function);
+        m_function_expression);
 }
 
 void OptimizationMetricImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
-    out << "(" << to_string(m_optimization_metric) << " " << *m_function << ")";
+    out << "(" << to_string(m_optimization_metric) << " " << *m_function_expression << ")";
 }
 
 
@@ -65,8 +65,8 @@ OptimizationMetricEnum OptimizationMetricImpl::get_optimization_metric() const {
     return m_optimization_metric;
 }
 
-const Function& OptimizationMetricImpl::get_function() const {
-    return m_function;
+const FunctionExpression& OptimizationMetricImpl::get_function_expression() const {
+    return m_function_expression;
 }
 
 }
