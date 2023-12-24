@@ -28,7 +28,10 @@
 
 
 namespace loki {
+/* References*/
+extern pddl::FunctionSkeleton parse_function_skeleton_reference(const domain::ast::FunctionSymbol& node, Context& context);
 
+/* Declarations */
 extern pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperatorMul& node);
 extern pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperatorPlus& node);
 extern pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperator& node);

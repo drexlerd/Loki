@@ -35,9 +35,9 @@ public:
 
     boost::variant<pddl::Literal, pddl::NumericFluent> operator()(const problem::ast::InitialElementTimedLiterals& node);
 
-    boost::variant<pddl::Literal, pddl::NumericFluent> operator()(const problem::ast::InitialElementNumericFluents& node);
+    boost::variant<pddl::Literal, pddl::NumericFluent> operator()(const problem::ast::InitialElementNumericFluentsTotalCost& node);
 
-    boost::variant<pddl::Literal, pddl::NumericFluent> operator()(const problem::ast::InitialElementObjectFluents& node);
+    boost::variant<pddl::Literal, pddl::NumericFluent> operator()(const problem::ast::InitialElementNumericFluentsGeneral& node);
 };
 
 

@@ -58,7 +58,11 @@ public:
         const std::string& error_handler_output);
 };
 
-
+class NegativeCostError : public SemanticParserError {
+public:
+    NegativeCostError(
+        const std::string& error_handler_output);  
+};
 
 }
 

@@ -24,6 +24,16 @@
 
 
 namespace loki {
+pddl::FunctionSkeleton parse_function_skeleton_reference(const domain::ast::FunctionSymbol& node, Context& context) {
+    auto function_name = parse(node.name);
+    auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
+    if (!binding.has_value()) {
+        throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node, ""));
+    }
+    const auto& [function_skeleton, _position, _error_handler] = binding.value();
+    return function_skeleton;
+}
+
 
 pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperatorMul&) {
     return pddl::ArithmeticOperatorEnum::MUL;
@@ -92,16 +102,11 @@ pddl::FunctionExpression parse(const domain::ast::FunctionExpression& node, Cont
 
 
 pddl::Function parse(const domain::ast::FunctionHead& node, Context& context) {
-    auto function_name = parse(node.function_symbol.name);
-    auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
-    if (!binding.has_value()) {
-        throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node.function_symbol, ""));
-    }
+    const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol, context);
     pddl::TermList term_list;
     for (const auto& term_node : node.terms) {
         term_list.push_back(boost::apply_visitor(TermReferenceTermVisitor(context), term_node));
     }
-    const auto& [function_skeleton, _position, _error_handler] = binding.value();
     if (function_skeleton->get_parameters().size() != term_list.size()) {
         throw MismatchedFunctionSkeletonTermListError(function_skeleton, term_list, context.scopes.get_error_handler()(node, ""));
     }

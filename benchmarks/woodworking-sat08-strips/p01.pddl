@@ -11,7 +11,7 @@
 
 (define (problem wood-prob)
   (:domain woodworking)
-  (:requirements :typing :action-costs)
+  (:requirements :typing :action-costs :numeric-fluents)
   (:objects
     grinder0 - grinder
     glazer0 - glazer

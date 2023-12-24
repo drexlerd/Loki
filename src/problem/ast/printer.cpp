@@ -97,16 +97,16 @@ namespace loki {
         ss << "(at " << parse_text(node.number, options) << " " << parse_text(node.literal, options) << ")";
         return ss.str();
     }
-
-    string parse_text(const problem::ast::InitialElementNumericFluents& node, const FormattingOptions& options) {
+    
+    string parse_text(const problem::ast::InitialElementNumericFluentsTotalCost& node, const FormattingOptions& options) {
         stringstream ss;
-        ss << "(= " << parse_text(node.basic_function_term, options) << " " << parse_text(node.number, options) << ")";
+        ss << "(= " << parse_text(node.function_symbol_total_cost, options) << " " << parse_text(node.number, options) << ")";
         return ss.str();
     }
 
-    string parse_text(const problem::ast::InitialElementObjectFluents& node, const FormattingOptions& options) {
+    string parse_text(const problem::ast::InitialElementNumericFluentsGeneral& node, const FormattingOptions& options) {
         stringstream ss;
-        ss << "(= " << parse_text(node.basic_function_term, options) << " " << parse_text(node.name, options) << ")";
+        ss << "(= " << parse_text(node.basic_function_term, options) << " " << parse_text(node.number, options) << ")";
         return ss.str();
     }
 

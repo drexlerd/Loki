@@ -41,8 +41,8 @@ namespace loki::problem {
 
         struct InitialElementLiteralClass;
         struct InitialElementTimedLiteralsClass;
-        struct InitialElementNumericFluentsClass;
-        struct InitialElementObjectFluentsClass;
+        struct InitialElementNumericFluentsTotalCostClass;
+        struct InitialElementNumericFluentsGeneralClass;
         struct InitialElementClass;
 
         struct MetricFunctionExpressionClass;
@@ -85,8 +85,8 @@ namespace loki::problem {
 
         typedef x3::rule<InitialElementLiteralClass, ast::InitialElementLiteral> initial_element_literals_type;
         typedef x3::rule<InitialElementTimedLiteralsClass, ast::InitialElementTimedLiterals> initial_element_timed_literals_type;
-        typedef x3::rule<InitialElementNumericFluentsClass, ast::InitialElementNumericFluents> initial_element_numeric_fluents_type;
-        typedef x3::rule<InitialElementObjectFluentsClass, ast::InitialElementObjectFluents> initial_element_object_fluents_type;
+        typedef x3::rule<InitialElementNumericFluentsTotalCostClass, ast::InitialElementNumericFluentsTotalCost> initial_element_numeric_fluents_total_cost_type;
+        typedef x3::rule<InitialElementNumericFluentsGeneralClass, ast::InitialElementNumericFluentsGeneral> initial_element_numeric_fluents_general_type;
         typedef x3::rule<InitialElementClass, ast::InitialElement> initial_element_type;
 
         typedef x3::rule<MetricFunctionExpressionClass, ast::MetricFunctionExpression> metric_function_expression_type;
@@ -124,7 +124,7 @@ namespace loki::problem {
             atomic_formula_of_names_type, atom_type, negated_atom_type, literal_type)
 
         BOOST_SPIRIT_DECLARE(initial_element_literals_type, initial_element_timed_literals_type,
-            initial_element_numeric_fluents_type, initial_element_object_fluents_type,
+            initial_element_numeric_fluents_total_cost_type, initial_element_numeric_fluents_general_type,
             initial_element_type)
 
         BOOST_SPIRIT_DECLARE(metric_function_expression_type,
@@ -158,8 +158,8 @@ namespace loki::problem {
 
     parser::initial_element_literals_type const& initial_element_literals();
     parser::initial_element_timed_literals_type const& initial_element_timed_literals();
-    parser::initial_element_numeric_fluents_type const& initial_element_numeric_fluents();
-    parser::initial_element_object_fluents_type const& initial_element_object_fluents();
+    parser::initial_element_numeric_fluents_total_cost_type const& initial_element_numeric_fluents_total_cost();
+    parser::initial_element_numeric_fluents_general_type const& initial_element_numeric_fluents_general();
     parser::initial_element_type const& initial_element();
 
     parser::metric_function_expression_type const& metric_function_expression();

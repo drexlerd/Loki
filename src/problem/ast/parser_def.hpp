@@ -70,8 +70,8 @@ namespace loki::problem::parser {
 
     initial_element_literals_type const initial_element_literals = "initial_element_literals";
     initial_element_timed_literals_type const initial_element_timed_literals = "initial_element_timed_literals";
-    initial_element_numeric_fluents_type const initial_element_numeric_fluents = "initial_element_numeric_fluents";
-    initial_element_object_fluents_type const initial_element_object_fluents = "initial_element_object_fluents";
+    initial_element_numeric_fluents_total_cost_type const initial_element_numeric_fluents_total_cost = "initial_element_numeric_fluents_total_cost";
+    initial_element_numeric_fluents_general_type const initial_element_numeric_fluents_general = "initial_element_numeric_fluents_general";
     initial_element_type const initial_element = "initial_element";
 
     metric_function_expression_type const metric_function_expression = "metric_function_expression";
@@ -120,10 +120,10 @@ namespace loki::problem::parser {
 
     const auto initial_element_literals_def = literal;
     const auto initial_element_timed_literals_def = (lit('(') >> lit("at") >> domain::number()) > literal > lit(')');
-    const auto initial_element_numeric_fluents_def = (lit('(') >> lit('=') > basic_function_term) > domain::number() > lit(')');
-    const auto initial_element_object_fluents_def = (lit('(') >> lit('=') > basic_function_term) > domain::name() > lit(')');
-    const auto initial_element_def = initial_element_timed_literals | initial_element_numeric_fluents
-        | initial_element_object_fluents | initial_element_literals;
+    const auto initial_element_numeric_fluents_total_cost_def = (lit('(') >> lit('=') >> lit('(') >> domain::function_symbol_total_cost()) > lit(')') > domain::number() > lit(')');
+    const auto initial_element_numeric_fluents_general_def = (lit('(') >> lit('=') >> basic_function_term) > domain::number() > lit(')');
+    const auto initial_element_def = initial_element_timed_literals | initial_element_numeric_fluents_total_cost
+        | initial_element_numeric_fluents_general | initial_element_literals;
 
 
     const auto metric_function_expression_binary_operator_def = (lit('(') >> domain::binary_operator() >> metric_function_expression >> metric_function_expression) > lit(')');
@@ -176,7 +176,7 @@ namespace loki::problem::parser {
         atomic_formula_of_names, atom, negated_atom, literal)
 
     BOOST_SPIRIT_DEFINE(initial_element_literals, initial_element_timed_literals,
-       initial_element_numeric_fluents, initial_element_object_fluents,
+       initial_element_numeric_fluents_total_cost, initial_element_numeric_fluents_general,
        initial_element)
 
     BOOST_SPIRIT_DEFINE(metric_function_expression,
@@ -215,8 +215,8 @@ namespace loki::problem::parser {
 
     struct InitialElementLiteralClass : x3::annotate_on_success {};
     struct InitialElementTimedLiteralsClass : x3::annotate_on_success {};
-    struct InitialElementNumericFluentsClass : x3::annotate_on_success {};
-    struct InitialElementObjectFluentsClass : x3::annotate_on_success {};
+    struct InitialElementNumericFluentsTotalCostClass : x3::annotate_on_success {};
+    struct InitialElementNumericFluentsGeneralClass : x3::annotate_on_success {};
     struct InitialElementClass : x3::annotate_on_success {};
 
     struct MetricFunctionExpressionClass : x3::annotate_on_success {};
@@ -280,11 +280,11 @@ namespace loki::problem
     parser::initial_element_timed_literals_type const& initial_element_timed_literals() {
         return parser::initial_element_timed_literals;
     }
-    parser::initial_element_numeric_fluents_type const& initial_element_numeric_fluents() {
-        return parser::initial_element_numeric_fluents;
+    parser::initial_element_numeric_fluents_total_cost_type const& initial_element_numeric_fluents_total_cost() {
+        return parser::initial_element_numeric_fluents_total_cost;
     }
-    parser::initial_element_object_fluents_type const& initial_element_object_fluents() {
-        return parser::initial_element_object_fluents;
+    parser::initial_element_numeric_fluents_general_type const& initial_element_numeric_fluents_general() {
+        return parser::initial_element_numeric_fluents_general;
     }
     parser::initial_element_type const& initial_element() {
         return parser::initial_element;

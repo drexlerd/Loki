@@ -37,8 +37,8 @@ namespace loki::problem::parser
 
     BOOST_SPIRIT_INSTANTIATE(initial_element_literals_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(initial_element_timed_literals_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(initial_element_numeric_fluents_type, iterator_type, context_type)
-    BOOST_SPIRIT_INSTANTIATE(initial_element_object_fluents_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(initial_element_numeric_fluents_total_cost_type, iterator_type, context_type)
+    BOOST_SPIRIT_INSTANTIATE(initial_element_numeric_fluents_general_type, iterator_type, context_type)
     BOOST_SPIRIT_INSTANTIATE(initial_element_type, iterator_type, context_type)
 
     BOOST_SPIRIT_INSTANTIATE(metric_function_expression_type, iterator_type, context_type)

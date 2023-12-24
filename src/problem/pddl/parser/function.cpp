@@ -20,22 +20,18 @@
 #include "objects.hpp"
 
 #include "../../../domain/pddl/parser/common.hpp"
+#include "../../../domain/pddl/parser/functions.hpp"
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 
 namespace loki {
 
 pddl::Function parse(const problem::ast::BasicFunctionTerm& node, Context& context) {
-    auto function_name = parse(node.function_symbol.name);
-    auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
-    if (!binding.has_value()) {
-        throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node.function_symbol, ""));
-    }
+    const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol, context);
     pddl::TermList term_list;
     for (const auto& name_node : node.names) {
         term_list.push_back(context.factories.terms.get_or_create<pddl::TermObjectImpl>(parse_object_reference(name_node, context)));
     }
-    const auto& [function_skeleton, _position, _error_handler] = binding.value();
     if (function_skeleton->get_parameters().size() != term_list.size()) {
         throw MismatchedFunctionSkeletonTermListError(function_skeleton, term_list, context.scopes.get_error_handler()(node, ""));
     }

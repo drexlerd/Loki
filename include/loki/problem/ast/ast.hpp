@@ -46,8 +46,8 @@ namespace loki::problem::ast
 
     struct InitialElementLiteral;
     struct InitialElementTimedLiterals;      // :timed-initial-literals
-    struct InitialElementNumericFluents;     // :numeric-fluents
-    struct InitialElementObjectFluents;      // :object-fluents
+    struct InitialElementNumericFluentsTotalCost;     // :action-costs
+    struct InitialElementNumericFluentsGeneral;     // :numeric-fluents
     struct InitialElement;
 
     struct MetricFunctionExpression;
@@ -138,22 +138,22 @@ namespace loki::problem::ast
         Literal literal;
     };
 
-    struct InitialElementNumericFluents : x3::position_tagged {
-        BasicFunctionTerm basic_function_term;
+    struct InitialElementNumericFluentsTotalCost : x3::position_tagged {
+        domain::ast::FunctionSymbol function_symbol_total_cost;
         domain::ast::Number number;
     };
 
-    struct InitialElementObjectFluents : x3::position_tagged {
+    struct InitialElementNumericFluentsGeneral : x3::position_tagged {
         BasicFunctionTerm basic_function_term;
-        domain::ast::Name name;
+        domain::ast::Number number;
     };
 
     struct InitialElement : x3::position_tagged,
         x3::variant<
             InitialElementLiteral,
             InitialElementTimedLiterals,
-            InitialElementNumericFluents,
-            InitialElementObjectFluents> {
+            InitialElementNumericFluentsTotalCost,
+            InitialElementNumericFluentsGeneral> {
         using base_type::base_type;
         using base_type::operator=;
     };

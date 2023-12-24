@@ -62,4 +62,11 @@ MismatchedPredicateObjectListError::MismatchedPredicateObjectListError(
             + ".",
         error_handler_output) { }
 
+
+NegativeCostError::NegativeCostError(
+    const std::string& error_handler_output)
+    : SemanticParserError(
+        "Negative numbers in initial numeric fluents are not allowed with :action-costs",
+        error_handler_output) { }
+
 }

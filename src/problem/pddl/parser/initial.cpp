@@ -22,8 +22,9 @@
 
 #include "../../../../include/loki/common/exceptions.hpp"
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
+#include "../../../../include/loki/problem/pddl/exceptions.hpp"
 #include "../../../domain/pddl/parser/common.hpp"
-
+#include "../../../domain/pddl/parser/functions.hpp"
 
 
 namespace loki {
@@ -39,18 +40,31 @@ boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operat
     throw NotImplementedError("InitialElementVisitor::operator()(const problem::ast::InitialElementTimedLiterals& node)");
 }
 
-boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operator()(const problem::ast::InitialElementNumericFluents& node) {
+boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operator()(const problem::ast::InitialElementNumericFluentsTotalCost& node) {
+    if (!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS)) {
+        throw UndefinedRequirementError(pddl::RequirementEnum::ACTION_COSTS, context.scopes.get_error_handler()(node, ""));
+    }
+    context.referenced_values.untrack(pddl::RequirementEnum::ACTION_COSTS);
+    const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol_total_cost, context);
+    const auto basic_function_term = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, pddl::TermList{});
+    double number = parse(node.number);
+    if (number < 0) {
+        throw NegativeCostError(context.positions.get_error_handler()(node.number, ""));
+    }
+    return context.factories.numeric_fluents.get_or_create<pddl::NumericFluentImpl>(basic_function_term, number);
+}
+
+boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operator()(const problem::ast::InitialElementNumericFluentsGeneral& node) {
     if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.scopes.get_error_handler()(node, ""));
     }
     context.referenced_values.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
     const auto basic_function_term = parse(node.basic_function_term, context);
     double number = parse(node.number);
+    if (number < 0 && context.requirements->test(pddl::RequirementEnum::ACTION_COSTS)) {
+        throw NegativeCostError(context.positions.get_error_handler()(node.number, ""));
+    }
     return context.factories.numeric_fluents.get_or_create<pddl::NumericFluentImpl>(basic_function_term, number);
-}
-
-boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operator()(const problem::ast::InitialElementObjectFluents& node) {
-    throw NotImplementedError("InitialElementVisitor::operator()(const problem::ast::InitialElementObjectFluents& node)");
 }
 
 

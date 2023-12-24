@@ -36,8 +36,8 @@ extern std::string parse_text(const problem::ast::Literal& node, const Formattin
 
 extern std::string parse_text(const problem::ast::InitialElementLiteral& node, const FormattingOptions& options={});
 extern std::string parse_text(const problem::ast::InitialElementTimedLiterals& node, const FormattingOptions& options={});
-extern std::string parse_text(const problem::ast::InitialElementNumericFluents& node, const FormattingOptions& options={});
-extern std::string parse_text(const problem::ast::InitialElementObjectFluents& node, const FormattingOptions& options={});
+extern std::string parse_text(const problem::ast::InitialElementNumericFluentsTotalCost& node, const FormattingOptions& options={});
+extern std::string parse_text(const problem::ast::InitialElementNumericFluentsGeneral& node, const FormattingOptions& options={});
 extern std::string parse_text(const problem::ast::InitialElement& node, const FormattingOptions& options={});
 
 extern std::string parse_text(const problem::ast::MetricFunctionExpression& node, const FormattingOptions& options={});
