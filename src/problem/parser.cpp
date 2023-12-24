@@ -68,6 +68,7 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
         domain_parser.m_factories.effects,
         domain_parser.m_factories.actions,
         domain_parser.m_factories.derived_predicates,
+        domain_parser.m_factories.optimization_metrics,
         domain_parser.m_factories.numeric_fluents,
         domain_parser.m_factories.domains,
         domain_parser.m_factories.problems

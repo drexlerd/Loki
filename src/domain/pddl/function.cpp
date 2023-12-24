@@ -40,7 +40,7 @@ size_t FunctionImpl::hash_impl() const {
 
 void FunctionImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     if (m_terms.empty()) {
-        out << m_function_skeleton->get_name();
+        out << "(" << m_function_skeleton->get_name() << ")";
     } else {
         out << "(" << m_function_skeleton->get_name() << "(";
         for (size_t i = 0; i < m_terms.size(); ++i) {

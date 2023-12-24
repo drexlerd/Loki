@@ -20,6 +20,7 @@
 #include "parser/objects.hpp"
 #include "parser/initial.hpp"
 #include "parser/goal.hpp"
+#include "parser/metric.hpp"
 
 #include "../../domain/pddl/parser/common.hpp"
 #include "../../domain/pddl/parser/requirements.hpp"
@@ -64,7 +65,13 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
     }
     /* Goal section */
     const auto goal_condition = parse(problem_node.goal, context);
-    const auto problem = context.factories.problems.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects, initial_literals, numeric_fluents, goal_condition);
+    /* Metric section */
+    auto optimization_metric = std::optional<pddl::OptimizationMetric>();
+    if (problem_node.metric_specification.has_value()) {
+        optimization_metric = parse(problem_node.metric_specification.value(), context);
+    }
+
+    const auto problem = context.factories.problems.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects, initial_literals, numeric_fluents, goal_condition, optimization_metric);
     context.positions.push_back(problem, problem_node);
     return problem;
 }

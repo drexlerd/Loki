@@ -39,12 +39,13 @@ private:
     LiteralList m_initial_literals;
     NumericFluentList m_numeric_fluents;
     Condition m_goal_condition;
+    std::optional<OptimizationMetric> m_optimization_metric;
 
     template<typename... Ts>
     friend class loki::PersistentFactory;
 
 public:
-    ProblemImpl(int identifier, Domain domain, std::string name, Requirements requirements, ObjectList objects, LiteralList initial_literals, NumericFluentList numeric_fluents, Condition goal_condition);
+    ProblemImpl(int identifier, Domain domain, std::string name, Requirements requirements, ObjectList objects, LiteralList initial_literals, NumericFluentList numeric_fluents, Condition goal_condition, std::optional<OptimizationMetric> optimization_metric);
 
     /// @brief Test for semantic equivalence
     bool are_equal_impl(const ProblemImpl& other) const;
@@ -58,6 +59,7 @@ public:
     const LiteralList& get_initial_literals() const;
     const NumericFluentList& numeric_fluents() const;
     const Condition& get_goal_condition() const;
+    const std::optional<OptimizationMetric>& get_optimization_metric() const;
 };
 
 }

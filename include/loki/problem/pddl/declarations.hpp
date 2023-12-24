@@ -29,13 +29,16 @@
 
 
 namespace loki::pddl {
-    class ProblemImpl;
-    using Problem = const ProblemImpl*;
-    using ProblemList = std::vector<Problem>;
-
     class NumericFluentImpl;
     using NumericFluent = const NumericFluentImpl*;
     using NumericFluentList = std::vector<NumericFluent>;
+
+    class OptimizationMetricImpl;
+    using OptimizationMetric = const OptimizationMetricImpl*; 
+
+    class ProblemImpl;
+    using Problem = const ProblemImpl*;
+    using ProblemList = std::vector<Problem>;
 }
 
 #endif

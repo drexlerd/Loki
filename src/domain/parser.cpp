@@ -69,6 +69,7 @@ DomainParser::DomainParser(const fs::path& file_path)
         m_factories.effects,
         m_factories.actions,
         m_factories.derived_predicates,
+        m_factories.optimization_metrics,
         m_factories.numeric_fluents,
         m_factories.domains,
         m_factories.problems

@@ -39,6 +39,7 @@
 #include "../../domain/pddl/type.hpp"
 #include "../../domain/pddl/variable.hpp"
 #include "../../problem/pddl/problem.hpp"
+#include "../../problem/pddl/metric.hpp"
 #include "../../problem/pddl/numeric_fluent.hpp"
 
 
@@ -71,6 +72,7 @@ using EffectFactory = PersistentFactory<pddl::EffectLiteralImpl
     , pddl::EffectConditionalWhenImpl>;
 using ActionFactory = PersistentFactory<pddl::ActionImpl>;
 using DerivedPredicateFactory = PersistentFactory<pddl::DerivedPredicateImpl>;
+using OptimizationMetricFactory = PersistentFactory<pddl::OptimizationMetricImpl>;
 using NumericFluentFactory = PersistentFactory<pddl::NumericFluentImpl>;
 using DomainFactory = PersistentFactory<pddl::DomainImpl>;
 using ProblemFactory = PersistentFactory<pddl::ProblemImpl>;
@@ -92,6 +94,7 @@ using PDDLPositionCache = PositionCache<pddl::RequirementsImpl
     , pddl::EffectImpl
     , pddl::ActionImpl
     , pddl::DerivedPredicateImpl
+    , pddl::OptimizationMetricImpl
     , pddl::NumericFluentImpl
     , pddl::DomainImpl
     , pddl::ProblemImpl>;
@@ -117,6 +120,7 @@ struct CollectionOfPDDLFactories {
     EffectFactory effects;
     ActionFactory actions;
     DerivedPredicateFactory derived_predicates;
+    OptimizationMetricFactory optimization_metrics;
     NumericFluentFactory numeric_fluents;
     DomainFactory domains;
     ProblemFactory problems;
@@ -151,6 +155,7 @@ struct CompositeOfPDDLFactories {
     EffectFactory& effects;
     ActionFactory& actions;
     DerivedPredicateFactory& derived_predicates;
+    OptimizationMetricFactory& optimization_metrics;
     NumericFluentFactory& numeric_fluents;
     DomainFactory& domains;
     ProblemFactory& problems;
