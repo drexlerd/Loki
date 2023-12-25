@@ -102,10 +102,13 @@ namespace loki::pddl {
 
     class FunctionExpressionImpl;
     using FunctionExpression = const FunctionExpressionImpl*;
+    using FunctionExpressionList = std::vector<FunctionExpression>;
     class FunctionExpressionNumberImpl;
     using FunctionExpressionNumber = const FunctionExpressionNumberImpl*;
     class FunctionExpressionBinaryOperatorImpl;
     using FunctionExpressionBinaryOperator = const FunctionExpressionBinaryOperatorImpl*;
+    class FunctionExpressionMultiOperatorImpl;
+    using FunctionExpressionMultiOperator = const FunctionExpressionMultiOperatorImpl*;
     class FunctionExpressionMinusImpl;
     using FunctionExpressionMinus = const FunctionExpressionMinusImpl*;
     class FunctionExpressionFunctionImpl;

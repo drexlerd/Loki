@@ -31,15 +31,23 @@ class PersistentFactory;
 }
 
 namespace loki::pddl {
-enum class ArithmeticOperatorEnum {
+enum class BinaryOperatorEnum {
     MUL,
     PLUS,
     MINUS,
     DIV,
 };
 
-extern std::unordered_map<ArithmeticOperatorEnum, std::string> binary_operator_enum_to_string;
-extern const std::string& to_string(pddl::ArithmeticOperatorEnum binary_operator);
+extern std::unordered_map<BinaryOperatorEnum, std::string> binary_operator_enum_to_string;
+extern const std::string& to_string(pddl::BinaryOperatorEnum binary_operator);
+
+enum class MultiOperatorEnum {
+    MUL,
+    PLUS,
+};
+
+extern std::unordered_map<MultiOperatorEnum, std::string> multi_operator_enum_to_string;
+extern const std::string& to_string(pddl::MultiOperatorEnum multi_operator);
 
 
 class FunctionExpressionVisitor {
@@ -48,6 +56,7 @@ public:
 
     virtual void visit(const FunctionExpressionNumber& function_expression) = 0;
     virtual void visit(const FunctionExpressionBinaryOperator& function_expression) = 0;
+    virtual void visit(const FunctionExpressionMultiOperator& function_expression) = 0;
     virtual void visit(const FunctionExpressionMinus& function_expression) = 0;
     virtual void visit(const FunctionExpressionFunction& function_expression) = 0;
 };
@@ -100,12 +109,12 @@ public:
 /* FunctionExpressionBinaryOperator */
 class FunctionExpressionBinaryOperatorImpl : public FunctionExpressionImpl {
 private:
-    ArithmeticOperatorEnum m_binary_operator;
+    BinaryOperatorEnum m_binary_operator;
     FunctionExpression m_left_function_expression;
     FunctionExpression m_right_function_expression;
 
     FunctionExpressionBinaryOperatorImpl(int identifier,
-        ArithmeticOperatorEnum binary_operator,
+        BinaryOperatorEnum binary_operator,
         FunctionExpression left_function_expression,
         FunctionExpression right_function_expression);
 
@@ -119,9 +128,34 @@ public:
 
     void accept(FunctionExpressionVisitor& visitor) const override;
 
-    ArithmeticOperatorEnum get_binary_operator() const;
+    BinaryOperatorEnum get_binary_operator() const;
     const FunctionExpression& get_left_function_expression() const;
     const FunctionExpression& get_right_function_expression() const;
+};
+
+
+/* FunctionExpressionMultiOperator */
+class FunctionExpressionMultiOperatorImpl : public FunctionExpressionImpl {
+private:
+    MultiOperatorEnum m_multi_operator;
+    FunctionExpressionList m_function_expressions;
+
+    FunctionExpressionMultiOperatorImpl(int identifier,
+        MultiOperatorEnum multi_operator,
+        FunctionExpressionList function_expressions);
+
+    template<typename... Ts>
+    friend class loki::PersistentFactory;
+
+public:
+    bool are_equal_impl(const FunctionExpressionImpl& other) const override;
+    size_t hash_impl() const;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
+
+    void accept(FunctionExpressionVisitor& visitor) const override;
+
+    MultiOperatorEnum get_multi_operator() const;
+    const FunctionExpressionList& get_function_expressions() const;
 };
 
 
@@ -187,6 +221,12 @@ namespace std {
     struct hash<loki::pddl::FunctionExpressionBinaryOperatorImpl>
     {
         std::size_t operator()(const loki::pddl::FunctionExpressionBinaryOperatorImpl& function_expressions) const;
+    };
+
+    template<>
+    struct hash<loki::pddl::FunctionExpressionMultiOperatorImpl>
+    {
+        std::size_t operator()(const loki::pddl::FunctionExpressionMultiOperatorImpl& function_expressions) const;
     };
 
     template<>

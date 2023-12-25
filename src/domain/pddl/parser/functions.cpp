@@ -34,30 +34,34 @@ pddl::FunctionSkeleton parse_function_skeleton_reference(const domain::ast::Func
     return function_skeleton;
 }
 
-
-pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperatorMul&) {
-    return pddl::ArithmeticOperatorEnum::MUL;
+pddl::MultiOperatorEnum MultiOperatorVisitor::operator()(const domain::ast::MultiOperatorMul&) const {
+    return pddl::MultiOperatorEnum::MUL;
 }
 
-pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperatorPlus&) {
-    return pddl::ArithmeticOperatorEnum::PLUS;
-}
-
-pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperator& node) {
-    return boost::apply_visitor(MultiOperatorVisitor(), node);
+pddl::MultiOperatorEnum MultiOperatorVisitor::operator()(const domain::ast::MultiOperatorPlus&) const {
+    return pddl::MultiOperatorEnum::PLUS;
 }
 
 
-pddl::ArithmeticOperatorEnum parse(const domain::ast::BinaryOperatorDiv&) {
-    return pddl::ArithmeticOperatorEnum::DIV;
+pddl::BinaryOperatorEnum MultiToBinaryOperatorVisitor::operator()(const domain::ast::MultiOperatorMul&) const {
+    return pddl::BinaryOperatorEnum::MUL;
 }
 
-pddl::ArithmeticOperatorEnum parse(const domain::ast::BinaryOperatorMinus&) {
-    return pddl::ArithmeticOperatorEnum::MINUS;
+pddl::BinaryOperatorEnum MultiToBinaryOperatorVisitor::operator()(const domain::ast::MultiOperatorPlus&) const {
+    return pddl::BinaryOperatorEnum::PLUS;
 }
 
-pddl::ArithmeticOperatorEnum parse(const domain::ast::BinaryOperator& node) {
-    return boost::apply_visitor(BinaryOperatorVisitor(), node);
+
+pddl::BinaryOperatorEnum BinaryOperatorVisitor::operator()(const domain::ast::BinaryOperatorDiv&) const {
+    return pddl::BinaryOperatorEnum::DIV; 
+}
+
+pddl::BinaryOperatorEnum BinaryOperatorVisitor::operator()(const domain::ast::BinaryOperatorMinus&) const {
+    return pddl::BinaryOperatorEnum::MINUS;
+}
+
+pddl::BinaryOperatorEnum BinaryOperatorVisitor::operator()(const domain::ast::MultiOperator& node) const {
+    return boost::apply_visitor(MultiToBinaryOperatorVisitor(), node);
 }
 
 
@@ -69,7 +73,7 @@ pddl::FunctionExpression parse(const domain::ast::FunctionExpressionNumber& node
 }
 
 pddl::FunctionExpression parse(const domain::ast::FunctionExpressionBinaryOp& node, Context& context) {
-    const auto binary_operator = parse(node.binary_operator);
+    const auto binary_operator = boost::apply_visitor(BinaryOperatorVisitor(), node.binary_operator);
     const auto left_function_expression = parse(node.function_expression_left, context);
     const auto right_function_expression = parse(node.function_expression_right, context);
     const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionBinaryOperatorImpl>(binary_operator, left_function_expression, right_function_expression);

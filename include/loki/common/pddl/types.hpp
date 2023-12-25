@@ -57,6 +57,7 @@ using ParameterFactory = PersistentFactory<pddl::ParameterImpl>;
 using PredicateFactory = PersistentFactory<pddl::PredicateImpl>;
 using FunctionExpressionFactory = PersistentFactory<pddl::FunctionExpressionNumberImpl
     , pddl::FunctionExpressionBinaryOperatorImpl
+    , pddl::FunctionExpressionMultiOperatorImpl
     , pddl::FunctionExpressionMinusImpl
     , pddl::FunctionExpressionFunctionImpl>;
 using FunctionFactory = PersistentFactory<pddl::FunctionImpl>;

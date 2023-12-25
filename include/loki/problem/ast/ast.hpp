@@ -186,7 +186,7 @@ namespace loki::problem::ast
     };
 
     struct MetricFunctionExpressionMultiOperator : x3::position_tagged {
-        domain::ast::BinaryOperator binary_operator;
+        domain::ast::MultiOperator multi_operator;
         MetricFunctionExpression metric_function_expression_first;
         std::vector<MetricFunctionExpression> metric_function_expression_remaining;
     };

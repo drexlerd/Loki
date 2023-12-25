@@ -93,8 +93,9 @@ void ProblemImpl::str_impl(std::ostringstream& out, const FormattingOptions& opt
     }
     out << ")\n";
     out << string(nested_options.indent, ' ') << "(:goal " << *m_goal_condition << ")\n";
-    out << string(nested_options.indent, ' ') << "(:metric " << *m_optimization_metric << ")\n";
-
+    if (m_optimization_metric.has_value()) {
+        out << string(nested_options.indent, ' ') << "(:metric " << *m_optimization_metric.value() << ")\n";
+    }
     /*
     if (node.constraints.has_value()) {
         ss << string(nested_options.indent, ' ') << parse_text(node.constraints.value(), nested_options) << "\n";

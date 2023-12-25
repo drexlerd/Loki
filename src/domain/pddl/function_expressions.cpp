@@ -18,6 +18,7 @@
 #include "../../../include/loki/domain/pddl/function_expressions.hpp"
 
 #include "../../../include/loki/common/hash.hpp"
+#include "../../../include/loki/common/collections.hpp"
 #include "../../../include/loki/domain/pddl/function.hpp"
 
 #include <cassert>
@@ -25,16 +26,27 @@
 
 namespace loki::pddl {
 
-std::unordered_map<ArithmeticOperatorEnum, std::string> binary_operator_enum_to_string = {
-    { ArithmeticOperatorEnum::MUL, "*" },
-    { ArithmeticOperatorEnum::PLUS, "+" },
-    { ArithmeticOperatorEnum::MINUS, "-" },
-    { ArithmeticOperatorEnum::DIV, "/" },
+std::unordered_map<BinaryOperatorEnum, std::string> binary_operator_enum_to_string = {
+    { BinaryOperatorEnum::MUL, "*" },
+    { BinaryOperatorEnum::PLUS, "+" },
+    { BinaryOperatorEnum::MINUS, "-" },
+    { BinaryOperatorEnum::DIV, "/" },
 };
 
-const std::string& to_string(pddl::ArithmeticOperatorEnum binary_operator) {
+const std::string& to_string(pddl::BinaryOperatorEnum binary_operator) {
     assert(binary_operator_enum_to_string.count(binary_operator));
     return binary_operator_enum_to_string.at(binary_operator);
+}
+
+
+std::unordered_map<MultiOperatorEnum, std::string> multi_operator_enum_to_string = {
+    { MultiOperatorEnum::MUL, "*" },
+    { MultiOperatorEnum::PLUS, "+" },
+};
+
+const std::string& to_string(pddl::MultiOperatorEnum multi_operator) {
+    assert(multi_operator_enum_to_string.count(multi_operator));
+    return multi_operator_enum_to_string.at(multi_operator);
 }
 
 
@@ -78,7 +90,7 @@ double FunctionExpressionNumberImpl::get_number() const {
 
 /* FunctionExpressionBinaryOperator */
 FunctionExpressionBinaryOperatorImpl::FunctionExpressionBinaryOperatorImpl(int identifier,
-    ArithmeticOperatorEnum binary_operator,
+    BinaryOperatorEnum binary_operator,
     FunctionExpression left_function_expression,
     FunctionExpression right_function_expression)
     : FunctionExpressionImpl(identifier)
@@ -109,7 +121,7 @@ void FunctionExpressionBinaryOperatorImpl::accept(FunctionExpressionVisitor& vis
     visitor.visit(this);
 }
 
-ArithmeticOperatorEnum FunctionExpressionBinaryOperatorImpl::get_binary_operator() const {
+BinaryOperatorEnum FunctionExpressionBinaryOperatorImpl::get_binary_operator() const {
     return m_binary_operator;
 }
 
@@ -119,6 +131,47 @@ const FunctionExpression& FunctionExpressionBinaryOperatorImpl::get_left_functio
 
 const FunctionExpression& FunctionExpressionBinaryOperatorImpl::get_right_function_expression() const {
     return m_right_function_expression;
+}
+
+
+/* FunctionExpressionMultiOperator */
+FunctionExpressionMultiOperatorImpl::FunctionExpressionMultiOperatorImpl(int identifier,
+    MultiOperatorEnum multi_operator,
+    FunctionExpressionList function_expressions)
+    : FunctionExpressionImpl(identifier), m_multi_operator(multi_operator), m_function_expressions(function_expressions) { }
+
+bool FunctionExpressionMultiOperatorImpl::are_equal_impl(const FunctionExpressionImpl& other) const {
+    if (typeid(*this) == typeid(other)) {
+        const auto& other_derived = static_cast<const FunctionExpressionMultiOperatorImpl&>(other);
+        return m_multi_operator == other_derived.m_multi_operator
+            && get_sorted_vector(m_function_expressions) == get_sorted_vector(other_derived.m_function_expressions);
+    }
+    return false;
+}
+
+size_t FunctionExpressionMultiOperatorImpl::hash_impl() const {
+    return hash_combine(m_multi_operator, hash_vector(get_sorted_vector(m_function_expressions)));
+}
+
+void FunctionExpressionMultiOperatorImpl::str_impl(std::ostringstream& out, const FormattingOptions&) const {
+    out << "(" << to_string(m_multi_operator);
+    assert(!m_function_expressions.empty());
+    for (const auto& function_expression : m_function_expressions) {
+        out << " " << *function_expression;
+    }
+    out << ")";
+}
+
+void FunctionExpressionMultiOperatorImpl::accept(FunctionExpressionVisitor& visitor) const {
+    visitor.visit(this);
+}
+
+MultiOperatorEnum FunctionExpressionMultiOperatorImpl::get_multi_operator() const{
+    return m_multi_operator;
+}
+
+const FunctionExpressionList& FunctionExpressionMultiOperatorImpl::get_function_expressions() const {
+    return m_function_expressions;
 }
 
 
@@ -196,6 +249,10 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::FunctionExpressionBinaryOperatorImpl>::operator()(const loki::pddl::FunctionExpressionBinaryOperatorImpl& function_expression) const {
+        return function_expression.hash_impl();
+    }
+
+    std::size_t hash<loki::pddl::FunctionExpressionMultiOperatorImpl>::operator()(const loki::pddl::FunctionExpressionMultiOperatorImpl& function_expression) const {
         return function_expression.hash_impl();
     }
 

@@ -133,7 +133,7 @@ namespace loki {
 
     string parse_text(const problem::ast::MetricFunctionExpressionMultiOperator& node, const FormattingOptions& options) {
         stringstream ss;
-        ss << "(" << parse_text(node.binary_operator, options) << " "
+        ss << "(" << parse_text(node.multi_operator, options) << " "
                   << parse_text(node.metric_function_expression_first, options) << " "
                   << parse_text(node.metric_function_expression_remaining, options)  << ")";
         return ss.str();

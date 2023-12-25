@@ -32,27 +32,20 @@ namespace loki {
 extern pddl::FunctionSkeleton parse_function_skeleton_reference(const domain::ast::FunctionSymbol& node, Context& context);
 
 /* Declarations */
-extern pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperatorMul& node);
-extern pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperatorPlus& node);
-extern pddl::ArithmeticOperatorEnum parse(const domain::ast::MultiOperator& node);
-
-struct MultiOperatorVisitor : boost::static_visitor<pddl::ArithmeticOperatorEnum> {
-    template<typename Node>
-    pddl::ArithmeticOperatorEnum operator()(const Node& node) const {
-        return parse(node);
-    }
+struct MultiOperatorVisitor : boost::static_visitor<pddl::MultiOperatorEnum> {
+    pddl::MultiOperatorEnum operator()(const domain::ast::MultiOperatorMul& node) const;
+    pddl::MultiOperatorEnum operator()(const domain::ast::MultiOperatorPlus& node) const;
 };
 
+struct MultiToBinaryOperatorVisitor : boost::static_visitor<pddl::BinaryOperatorEnum> {
+    pddl::BinaryOperatorEnum operator()(const domain::ast::MultiOperatorMul& node) const;
+    pddl::BinaryOperatorEnum operator()(const domain::ast::MultiOperatorPlus& node) const;
+};
 
-extern pddl::ArithmeticOperatorEnum parse(const domain::ast::BinaryOperatorDiv& node);
-extern pddl::ArithmeticOperatorEnum parse(const domain::ast::BinaryOperatorMinus& node);
-extern pddl::ArithmeticOperatorEnum parse(const domain::ast::BinaryOperator& node);
-
-struct BinaryOperatorVisitor : boost::static_visitor<pddl::ArithmeticOperatorEnum> {
-    template<typename Node>
-    pddl::ArithmeticOperatorEnum operator()(const Node& node) const {
-        return parse(node);
-    }
+struct BinaryOperatorVisitor : boost::static_visitor<pddl::BinaryOperatorEnum> {
+    pddl::BinaryOperatorEnum operator()(const domain::ast::BinaryOperatorDiv& node) const;
+    pddl::BinaryOperatorEnum operator()(const domain::ast::BinaryOperatorMinus& node) const;
+    pddl::BinaryOperatorEnum operator()(const domain::ast::MultiOperator& node) const;
 };
 
 

@@ -28,7 +28,7 @@ using namespace std;
 
 namespace loki::pddl {
 std::unordered_map<OptimizationMetricEnum, std::string> optimization_metric_enum_to_string = {
-    { OptimizationMetricEnum::MINIMIZE, "minimiza" },
+    { OptimizationMetricEnum::MINIMIZE, "minimize" },
     { OptimizationMetricEnum::MAXIMIZE, "maximize" },
 };
 
