@@ -24,6 +24,7 @@
 #include <unordered_set>
 #include <vector>
 #include <set>
+#include <variant>
 
 
 namespace loki::pddl {
@@ -72,18 +73,17 @@ namespace loki::pddl {
     using LiteralList = std::vector<Literal>;
     using LiteralSet = std::set<Literal>;
 
-    class ConditionImpl;
+    class ConditionLiteralImpl;
+    class ConditionAndImpl;
+    class ConditionOrImpl;
+    class ConditionNotImpl;
+    using ConditionImpl = std::variant<ConditionLiteralImpl
+        , ConditionAndImpl
+        , ConditionOrImpl
+        , ConditionNotImpl>;
     using Condition = const ConditionImpl*;
     using ConditionList = std::vector<Condition>;
     using ConditionSet = std::set<Condition>;
-    class ConditionLiteralImpl;
-    using ConditionLiteral = const ConditionLiteralImpl*;
-    class ConditionAndImpl;
-    using ConditionAnd = const ConditionAndImpl*;
-    class ConditionOrImpl;
-    using ConditionOr = const ConditionOrImpl*;
-    class ConditionNotImpl;
-    using ConditionNot = const ConditionNotImpl*;
 
     class EffectImpl;
     using Effect = const EffectImpl*;

@@ -20,6 +20,7 @@
 #include "../../../include/loki/domain/pddl/parameter.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
+#include "../../../include/loki/common/pddl/visitors.hpp"
 
 
 namespace loki::pddl {
@@ -58,7 +59,7 @@ void ActionImpl::str_impl(std::ostringstream& out, const FormattingOptions& opti
         out << ")";
         out << "\n";
         out << std::string(nested_options.indent, ' ') << ":conditions ";
-        if (m_condition.has_value()) out << *m_condition.value();
+        if (m_condition.has_value()) std::visit(StringifyVisitor(out), *m_condition.value());
         else out <<  "()" ;
 
         out << "\n";

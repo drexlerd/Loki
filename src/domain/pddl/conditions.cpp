@@ -20,28 +20,21 @@
 #include "../../../include/loki/domain/pddl/literal.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
+#include "../../../include/loki/common/pddl/visitors.hpp"
 
 
 namespace loki::pddl {
-/* BaseCondition */
-ConditionImpl::ConditionImpl(int identifier)
-    : Base<ConditionImpl>(identifier) { }
-
-ConditionImpl::~ConditionImpl() = default;
-
 
 /* Literal */
 ConditionLiteralImpl::ConditionLiteralImpl(int identifier, Literal literal)
-    : ConditionImpl(identifier)
+    : Base(identifier)
     , m_literal(std::move(literal)) { }
 
-bool ConditionLiteralImpl::are_equal_impl(const ConditionImpl& other) const {
-    // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const ConditionLiteralImpl&>(other);
-        return m_literal == other_derived.m_literal;
+bool ConditionLiteralImpl::are_equal_impl(const ConditionLiteralImpl& other) const {
+    if (this != &other) {
+        return m_literal == other.m_literal;
     }
-    return false;
+    return true;
 }
 
 size_t ConditionLiteralImpl::hash_impl() const {
@@ -52,10 +45,6 @@ void ConditionLiteralImpl::str_impl(std::ostringstream& out, const FormattingOpt
     out << *m_literal;
 }
 
-void ConditionLiteralImpl::accept(ConditionVisitor& visitor) const {
-    visitor.visit(this);
-}
-
 const Literal& ConditionLiteralImpl::get_literal() const {
     return m_literal;
 }
@@ -63,15 +52,14 @@ const Literal& ConditionLiteralImpl::get_literal() const {
 
 /* And */
 ConditionAndImpl::ConditionAndImpl(int identifier, ConditionList conditions)
-    : ConditionImpl(identifier)
+    : Base(identifier)
     , m_conditions(std::move(conditions)) { }
 
-bool ConditionAndImpl::are_equal_impl(const ConditionImpl& other) const {
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const ConditionAndImpl&>(other);
-        return get_sorted_vector(m_conditions) == get_sorted_vector(other_derived.m_conditions);
+bool ConditionAndImpl::are_equal_impl(const ConditionAndImpl& other) const {
+    if (this != &other) {
+        return get_sorted_vector(m_conditions) == get_sorted_vector(other.m_conditions);
     }
-    return false;
+    return true;
 }
 
 size_t ConditionAndImpl::hash_impl() const {
@@ -82,13 +70,9 @@ void ConditionAndImpl::str_impl(std::ostringstream& out, const FormattingOptions
     out << "(and ";
     for (size_t i = 0; i < m_conditions.size(); ++i) {
         if (i != 0) out << " ";
-        out << *m_conditions[i];
+        std::visit(StringifyVisitor(out), *m_conditions[i]);
     }
     out << ")";
-}
-
-void ConditionAndImpl::accept(ConditionVisitor& visitor) const {
-    visitor.visit(this);
 }
 
 const ConditionList& ConditionAndImpl::get_conditions() const {
@@ -98,15 +82,14 @@ const ConditionList& ConditionAndImpl::get_conditions() const {
 
 /* Or */
 ConditionOrImpl::ConditionOrImpl(int identifier, ConditionList conditions)
-    : ConditionImpl(identifier)
+    : Base(identifier)
     , m_conditions(std::move(conditions)) { }
 
-bool ConditionOrImpl::are_equal_impl(const ConditionImpl& other) const {
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const ConditionOrImpl&>(other);
-        return get_sorted_vector(m_conditions) == get_sorted_vector(other_derived.m_conditions);
+bool ConditionOrImpl::are_equal_impl(const ConditionOrImpl& other) const {
+    if (this != &other) {
+        return get_sorted_vector(m_conditions) == get_sorted_vector(other.m_conditions);
     }
-    return false;
+    return true;
 }
 
 size_t ConditionOrImpl::hash_impl() const {
@@ -117,13 +100,9 @@ void ConditionOrImpl::str_impl(std::ostringstream& out, const FormattingOptions&
     out << "(or ";
     for (size_t i = 0; i < m_conditions.size(); ++i) {
         if (i != 0) out << " ";
-        out << *m_conditions[i];
+        std::visit(StringifyVisitor(out), *m_conditions[i]);
     }
     out << ")";
-}
-
-void ConditionOrImpl::accept(ConditionVisitor& visitor) const {
-    visitor.visit(this);
 }
 
 const ConditionList& ConditionOrImpl::get_conditions() const {
@@ -133,15 +112,14 @@ const ConditionList& ConditionOrImpl::get_conditions() const {
 
 /* Not */
 ConditionNotImpl::ConditionNotImpl(int identifier, Condition condition)
-    : ConditionImpl(identifier)
+    : Base(identifier)
     , m_condition(std::move(condition)) { }
 
-bool ConditionNotImpl::are_equal_impl(const ConditionImpl& other) const {
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const ConditionNotImpl&>(other);
-        return m_condition == other_derived.m_condition;
+bool ConditionNotImpl::are_equal_impl(const ConditionNotImpl& other) const {
+    if (this != &other) {
+        return m_condition == other.m_condition;
     }
-    return false;
+    return true;
 }
 
 size_t ConditionNotImpl::hash_impl() const {
@@ -149,11 +127,9 @@ size_t ConditionNotImpl::hash_impl() const {
 }
 
 void ConditionNotImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
-    out << "(not " << *m_condition << ")";
-}
-
-void ConditionNotImpl::accept(ConditionVisitor& visitor) const {
-    visitor.visit(this);
+    out << "(not ";
+    std::visit(StringifyVisitor(out), *m_condition);
+    out << ")";
 }
 
 const Condition& ConditionNotImpl::get_condition() const {
@@ -166,7 +142,7 @@ namespace std {
     bool less<loki::pddl::Condition>::operator()(
         const loki::pddl::Condition& left_condition,
         const loki::pddl::Condition& right_condition) const {
-        return *left_condition < *right_condition;
+        return std::visit(loki::pddl::LessComparatorVisitor(), *left_condition, *right_condition);
     }
 
     std::size_t hash<loki::pddl::ConditionLiteralImpl>::operator()(const loki::pddl::ConditionLiteralImpl& condition) const {

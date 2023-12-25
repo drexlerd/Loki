@@ -62,10 +62,7 @@ using FunctionExpressionFactory = PersistentFactory<pddl::FunctionExpressionNumb
     , pddl::FunctionExpressionFunctionImpl>;
 using FunctionFactory = PersistentFactory<pddl::FunctionImpl>;
 using FunctionSkeletonFactory = PersistentFactory<pddl::FunctionSkeletonImpl>;
-using ConditionFactory = PersistentFactory<pddl::ConditionLiteralImpl
-    , pddl::ConditionAndImpl
-    , pddl::ConditionOrImpl
-    , pddl::ConditionNotImpl>;
+using ConditionFactory = PersistentFactory<pddl::ConditionImpl>;
 using EffectFactory = PersistentFactory<pddl::EffectLiteralImpl
     , pddl::EffectAndImpl
     , pddl::EffectNumericImpl

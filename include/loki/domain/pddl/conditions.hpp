@@ -24,6 +24,7 @@
 #include "../../common/pddl/base.hpp"
 
 #include <string>
+#include <variant>
 
 
 namespace loki {
@@ -33,46 +34,9 @@ class PersistentFactory;
 
 
 namespace loki::pddl {
-/// @brief Defines an interface for visiting nodes in a DAG of conditions.
-class ConditionVisitor {
-public:
-    virtual ~ConditionVisitor() = default;
-
-    virtual void visit(const ConditionLiteral& condition) = 0;
-    virtual void visit(const ConditionAnd& condition) = 0;
-    virtual void visit(const ConditionOr& condition) = 0;
-    virtual void visit(const ConditionNot& condition) = 0;
-};
-
-
-/* BaseCondition */
-/// @brief Defines the common base class for conditions.
-///        We use polymorphism instead of variant,
-///        since we wrap conditions into shared_ptr.
-class ConditionImpl : public Base<ConditionImpl> {
-protected:
-    ConditionImpl(int identifier);
-
-    // protected copy/move to prevent accidental object slicing when passed by value
-    ConditionImpl(const ConditionImpl& other) = default;
-    ConditionImpl& operator=(const ConditionImpl& other) = default;
-    ConditionImpl(ConditionImpl&& other) = default;
-    ConditionImpl& operator=(ConditionImpl&& other) = default;
-
-public:
-    virtual ~ConditionImpl();
-
-    /// @brief Test for structural equivalence
-    virtual bool are_equal_impl(const ConditionImpl& other) const = 0;
-    virtual void str_impl(std::ostringstream& out, const FormattingOptions& options) const = 0;
-
-    /// @brief Accepts the visitor by calling the visit overload.
-    virtual void accept(ConditionVisitor& visitor) const = 0;
-};
-
 
 /* Literal */
-class ConditionLiteralImpl : public ConditionImpl {
+class ConditionLiteralImpl : public Base<ConditionLiteralImpl> {
 private:
     Literal m_literal;
 
@@ -82,18 +46,16 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const ConditionImpl& other) const override;
+    bool are_equal_impl(const ConditionLiteralImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(ConditionVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     const Literal& get_literal() const;
 };
 
 
 /* And */
-class ConditionAndImpl : public ConditionImpl {
+class ConditionAndImpl : public Base<ConditionAndImpl> {
 private:
     ConditionList m_conditions;
 
@@ -103,18 +65,16 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const ConditionImpl& other) const override;
+    bool are_equal_impl(const ConditionAndImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(ConditionVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     const ConditionList& get_conditions() const;
 };
 
 
 /* Or */
-class ConditionOrImpl : public ConditionImpl {
+class ConditionOrImpl : public Base<ConditionOrImpl> {
 private:
     ConditionList m_conditions;
 
@@ -124,18 +84,16 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const ConditionImpl& other) const override;
+    bool are_equal_impl(const ConditionOrImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(ConditionVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     const ConditionList& get_conditions() const;
 };
 
 
 /* Not */
-class ConditionNotImpl : public ConditionImpl {
+class ConditionNotImpl : public Base<ConditionNotImpl> {
 private:
     Condition m_condition;
 
@@ -145,11 +103,9 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const ConditionImpl& other) const override;
+    bool are_equal_impl(const ConditionNotImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(ConditionVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     const Condition& get_condition() const;
 };
