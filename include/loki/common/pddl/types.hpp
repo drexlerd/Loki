@@ -51,7 +51,7 @@ using TypeFactory = PersistentFactory<pddl::TypeImpl>;
 using VariableFactory = PersistentFactory<pddl::VariableImpl>;
 using TermFactory = PersistentFactory<pddl::TermObjectImpl
     , pddl::TermVariableImpl>;
-using ObjectFactory = PersistentFactory<pddl::ObjectImpl>;
+using ObjectFactory = PersistentFactory2<pddl::ObjectImpl>;
 using AtomFactory = PersistentFactory<pddl::AtomImpl>;
 using LiteralFactory = PersistentFactory<pddl::LiteralImpl>;
 using ParameterFactory = PersistentFactory<pddl::ParameterImpl>;
