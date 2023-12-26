@@ -24,6 +24,7 @@
 #include "../../../include/loki/domain/pddl/function_expressions.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
+#include "../../../include/loki/common/pddl/visitors.hpp"
 
 #include <cassert>
 
@@ -212,7 +213,9 @@ size_t EffectConditionalWhenImpl::hash_impl() const {
 }
 
 void EffectConditionalWhenImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
-    out << "(when " << *m_condition << " " << *m_effect << ")";
+    out << "(when ";
+    std::visit(StringifyVisitor(out), *m_condition);
+    out << " " << *m_effect << ")";
 }
 
 void EffectConditionalWhenImpl::accept(EffectVisitor& visitor) const {

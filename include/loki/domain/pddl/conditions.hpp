@@ -32,6 +32,11 @@ template<typename... Ts>
 class PersistentFactory;
 }
 
+namespace loki {
+template<typename HolderType>
+class PersistentFactory2;
+}
+
 
 namespace loki::pddl {
 
@@ -42,8 +47,8 @@ private:
 
     ConditionLiteralImpl(int identifier, Literal literal);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
     bool are_equal_impl(const ConditionLiteralImpl& other) const;
@@ -61,8 +66,8 @@ private:
 
     ConditionAndImpl(int identifier, ConditionList conditions);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
     bool are_equal_impl(const ConditionAndImpl& other) const;
@@ -80,8 +85,8 @@ private:
 
     ConditionOrImpl(int identifier, ConditionList conditions);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
     bool are_equal_impl(const ConditionOrImpl& other) const;
@@ -99,8 +104,8 @@ private:
 
     ConditionNotImpl(int identifier, Condition condition);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
     bool are_equal_impl(const ConditionNotImpl& other) const;

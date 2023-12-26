@@ -20,6 +20,7 @@
 
 #include "position.hpp"
 #include "../persistent_factory.hpp"
+#include "../persistent_factory_2.hpp"
 
 #include "../../domain/pddl/action.hpp"
 #include "../../domain/pddl/atom.hpp"
@@ -62,7 +63,7 @@ using FunctionExpressionFactory = PersistentFactory<pddl::FunctionExpressionNumb
     , pddl::FunctionExpressionFunctionImpl>;
 using FunctionFactory = PersistentFactory<pddl::FunctionImpl>;
 using FunctionSkeletonFactory = PersistentFactory<pddl::FunctionSkeletonImpl>;
-using ConditionFactory = PersistentFactory<pddl::ConditionImpl>;
+using ConditionFactory = PersistentFactory2<pddl::ConditionImpl>;
 using EffectFactory = PersistentFactory<pddl::EffectLiteralImpl
     , pddl::EffectAndImpl
     , pddl::EffectNumericImpl

@@ -26,6 +26,7 @@
 #include "../../../include/loki/domain/pddl/domain.hpp"
 #include "../../../include/loki/domain/pddl/requirements.hpp"
 #include "../../../include/loki/domain/pddl/object.hpp"
+#include "../../../include/loki/common/pddl/visitors.hpp"
 
 using namespace std;
 
@@ -92,7 +93,9 @@ void ProblemImpl::str_impl(std::ostringstream& out, const FormattingOptions& opt
         out << *m_numeric_fluents[i];
     }
     out << ")\n";
-    out << string(nested_options.indent, ' ') << "(:goal " << *m_goal_condition << ")\n";
+    out << string(nested_options.indent, ' ') << "(:goal ";
+    std::visit(StringifyVisitor(out), *m_goal_condition);
+    out << ")\n";
     if (m_optimization_metric.has_value()) {
         out << string(nested_options.indent, ' ') << "(:metric " << *m_optimization_metric.value() << ")\n";
     }
