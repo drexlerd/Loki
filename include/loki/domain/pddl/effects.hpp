@@ -30,6 +30,11 @@ template<typename... Ts>
 class PersistentFactory;
 }
 
+namespace loki {
+template<typename HolderType>
+class PersistentFactory2;
+}
+
 
 namespace loki::pddl {
 enum class AssignOperatorEnum {
@@ -44,90 +49,46 @@ extern std::unordered_map<AssignOperatorEnum, std::string> assign_operator_enum_
 extern const std::string& to_string(pddl::AssignOperatorEnum assign_operator);
 
 
-/// @brief Defines an interface for visiting nodes in a DAG of conditions.
-class EffectVisitor {
-public:
-    virtual ~EffectVisitor() = default;
-
-    virtual void visit(const EffectLiteral& condition) = 0;
-    virtual void visit(const EffectAnd& condition) = 0;
-    virtual void visit(const EffectNumeric& condition) = 0;
-    virtual void visit(const EffectConditionalForall& condition) = 0;
-    virtual void visit(const EffectConditionalWhen& condition) = 0;
-};
-
-
-/* BaseEffect */
-/// @brief Defines the common base class for effects.
-///        We use polymorphism instead of variant,
-///        since we wrap effects into shared_ptr.
-class EffectImpl : public Base<EffectImpl> {
-protected:
-    EffectImpl(int identifier);
-
-    // protected copy/move to prevent accidental object slicing when passed by value
-    EffectImpl(const EffectImpl& other) = default;
-    EffectImpl& operator=(const EffectImpl& other) = default;
-    EffectImpl(EffectImpl&& other) = default;
-    EffectImpl& operator=(EffectImpl&& other) = default;
-
-public:
-    virtual ~EffectImpl();
-
-    /// @brief Test for structural equivalence
-    virtual bool are_equal_impl(const EffectImpl& other) const = 0;
-
-    virtual void str_impl(std::ostringstream& out, const FormattingOptions& options) const = 0;
-
-    /// @brief Accepts the visitor by calling the visit overload.
-    virtual void accept(EffectVisitor& visitor) const = 0;
-};
-
-
 /* Literal */
-class EffectLiteralImpl : public EffectImpl {
+class EffectLiteralImpl : public Base<EffectLiteralImpl> {
 private:
     Literal m_literal;
 
     EffectLiteralImpl(int identifier, Literal literal);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
-    bool are_equal_impl(const EffectImpl& other) const override;
+    bool are_equal_impl(const EffectLiteralImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(EffectVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     const Literal& get_literal() const;
 };
 
 
 /* And */
-class EffectAndImpl : public EffectImpl {
+class EffectAndImpl : public Base<EffectAndImpl> {
 private:
     EffectList m_effects;
 
     EffectAndImpl(int identifier, EffectList effects);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
-    bool are_equal_impl(const EffectImpl& other) const override;
+    bool are_equal_impl(const EffectAndImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(EffectVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     const EffectList& get_effects() const;
 };
 
 
 /* EffectNumeric */
-class EffectNumericImpl : public EffectImpl {
+class EffectNumericImpl : public Base<EffectNumericImpl> {
 private:
     AssignOperatorEnum m_assign_operator;
     Function m_function;
@@ -135,15 +96,13 @@ private:
 
     EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
-    bool are_equal_impl(const EffectImpl& other) const override;
+    bool are_equal_impl(const EffectNumericImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(EffectVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     AssignOperatorEnum get_assign_operator() const;
     const Function& get_function() const;
@@ -152,22 +111,20 @@ public:
 
 
 /* ConditionalForall */
-class EffectConditionalForallImpl : public EffectImpl {
+class EffectConditionalForallImpl : public Base<EffectConditionalForallImpl> {
 private:
     ParameterList m_parameters;
     Effect m_effect;
 
     EffectConditionalForallImpl(int identifier, ParameterList parameters, Effect effect);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
-    bool are_equal_impl(const EffectImpl& other) const override;
+    bool are_equal_impl(const EffectConditionalForallImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(EffectVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     const ParameterList& get_parameters() const;
     const Effect& get_effect() const;
@@ -175,22 +132,20 @@ public:
 
 
 /* ConditionalWhen */
-class EffectConditionalWhenImpl : public EffectImpl {
+class EffectConditionalWhenImpl : public Base<EffectConditionalWhenImpl> {
 private:
     Condition m_condition;
     Effect m_effect;
 
     EffectConditionalWhenImpl(int identifier, Condition condition, Effect effect);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
-    bool are_equal_impl(const EffectImpl& other) const override;
+    bool are_equal_impl(const EffectConditionalWhenImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(EffectVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     const Condition& get_condition() const;
     const Effect& get_effect() const;

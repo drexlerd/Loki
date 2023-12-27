@@ -20,6 +20,7 @@
 #include "../../../include/loki/domain/pddl/function_skeleton.hpp"
 #include "../../../include/loki/domain/pddl/term.hpp"
 #include "../../../include/loki/common/hash.hpp"
+#include "../../../include/loki/common/pddl/visitors.hpp"
 
 
 namespace loki::pddl {
@@ -45,7 +46,7 @@ void FunctionImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*
         out << "(" << m_function_skeleton->get_name() << "(";
         for (size_t i = 0; i < m_terms.size(); ++i) {
             if (i != 0) out << " ";
-            out << *m_terms[i];
+            std::visit(StringifyVisitor(out), *m_terms[i]);
         }
         out << "))";
     }

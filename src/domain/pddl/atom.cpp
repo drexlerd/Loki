@@ -21,6 +21,7 @@
 #include "../../../include/loki/domain/pddl/term.hpp"
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
+#include "../../../include/loki/common/pddl/visitors.hpp"
 
 
 namespace loki::pddl {
@@ -45,7 +46,7 @@ void AtomImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*opti
     out << "(" << m_predicate->get_name();
     for (size_t i = 0; i < m_terms.size(); ++i) {
         out << " ";
-        out << *m_terms[i];
+        std::visit(StringifyVisitor(out), *m_terms[i]);
     }
     out << ")";
 }

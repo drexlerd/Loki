@@ -45,24 +45,16 @@ const std::string& to_string(pddl::AssignOperatorEnum assign_operator) {
 }
 
 
-/* BaseCondition */
-EffectImpl::EffectImpl(int identifier)
-    : Base(identifier) { }
-
-EffectImpl::~EffectImpl() = default;
-
 /* Literal */
 EffectLiteralImpl::EffectLiteralImpl(int identifier, Literal literal)
-    : EffectImpl(identifier)
+    : Base(identifier)
     , m_literal(std::move(literal)) { }
 
-bool EffectLiteralImpl::are_equal_impl(const EffectImpl& other) const {
-    // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const EffectLiteralImpl&>(other);
-        return m_literal == other_derived.m_literal;
+bool EffectLiteralImpl::are_equal_impl(const EffectLiteralImpl& other) const {
+    if (this != &other) {
+        return m_literal == other.m_literal;
     }
-    return false;
+    return true;
 }
 
 size_t EffectLiteralImpl::hash_impl() const {
@@ -73,24 +65,19 @@ void EffectLiteralImpl::str_impl(std::ostringstream& out, const FormattingOption
     out << *m_literal;
 }
 
-void EffectLiteralImpl::accept(EffectVisitor& visitor) const {
-    visitor.visit(this);
-}
-
 const Literal& EffectLiteralImpl::get_literal() const {
     return m_literal;
 }
 
 
 EffectAndImpl::EffectAndImpl(int identifier, EffectList effects)
-    : EffectImpl(identifier), m_effects(std::move(effects)) { }
+    : Base(identifier), m_effects(std::move(effects)) { }
 
-bool EffectAndImpl::are_equal_impl(const EffectImpl& other) const {
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const EffectAndImpl&>(other);
-        return get_sorted_vector(m_effects) == get_sorted_vector(other_derived.m_effects);
+bool EffectAndImpl::are_equal_impl(const EffectAndImpl& other) const {
+    if (this != &other) {
+        return get_sorted_vector(m_effects) == get_sorted_vector(other.m_effects);
     }
-    return false;
+    return true;
 }
 
 size_t EffectAndImpl::hash_impl() const {
@@ -101,13 +88,9 @@ void EffectAndImpl::str_impl(std::ostringstream& out, const FormattingOptions& /
     out << "(and ";
     for (size_t i = 0; i < m_effects.size(); ++i) {
         if (i != 0) out << " ";
-        out << *m_effects[i];
+        std::visit(StringifyVisitor(out), *m_effects[i]);
     }
     out << ")";
-}
-
-void EffectAndImpl::accept(EffectVisitor& visitor) const {
-    visitor.visit(this);
 }
 
 const EffectList& EffectAndImpl::get_effects() const {
@@ -117,19 +100,18 @@ const EffectList& EffectAndImpl::get_effects() const {
 
 /* EffectNumeric */
 EffectNumericImpl::EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression)
-    : EffectImpl(identifier)
+    : Base(identifier)
     , m_assign_operator(assign_operator)
     , m_function(std::move(function))
     , m_function_expression(std::move(function_expression)) { }
 
-bool EffectNumericImpl::are_equal_impl(const EffectImpl& other) const {
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const EffectNumericImpl&>(other);
-        return m_assign_operator == other_derived.m_assign_operator
-            && m_function == other_derived.m_function
-            && m_function_expression == other_derived.m_function_expression;
+bool EffectNumericImpl::are_equal_impl(const EffectNumericImpl& other) const {
+    if (this != &other) {
+        return (m_assign_operator == other.m_assign_operator)
+            && (m_function == other.m_function)
+            && (m_function_expression == other.m_function_expression);
     }
-    return false;
+    return true;
 }
 
 size_t EffectNumericImpl::hash_impl() const {
@@ -137,11 +119,9 @@ size_t EffectNumericImpl::hash_impl() const {
 }
 
 void EffectNumericImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
-    out << "(" << to_string(m_assign_operator) << " " << *m_function << " " << *m_function_expression << ")";
-}
-
-void EffectNumericImpl::accept(EffectVisitor& visitor) const {
-    visitor.visit(this);
+    out << "(" << to_string(m_assign_operator) << " " << *m_function << " ";
+    std::visit(StringifyVisitor(out), *m_function_expression);
+    out << ")";
 }
 
 AssignOperatorEnum EffectNumericImpl::get_assign_operator() const {
@@ -159,15 +139,14 @@ const FunctionExpression& EffectNumericImpl::get_function_expression() const {
 
 /* ConditionalForall */
 EffectConditionalForallImpl::EffectConditionalForallImpl(int identifier, ParameterList parameters, Effect effect)
-    : EffectImpl(identifier), m_parameters(std::move(parameters)), m_effect(std::move(effect)) { }
+    : Base(identifier), m_parameters(std::move(parameters)), m_effect(std::move(effect)) { }
 
-bool EffectConditionalForallImpl::are_equal_impl(const EffectImpl& other) const {
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const EffectConditionalForallImpl&>(other);
-        return m_parameters == other_derived.m_parameters
-            && m_effect == other_derived.m_effect;
+bool EffectConditionalForallImpl::are_equal_impl(const EffectConditionalForallImpl& other) const {
+    if (this != &other) {
+        return (m_parameters == other.m_parameters)
+            && (m_effect == other.m_effect);
     }
-    return false;
+    return true;
 }
 
 size_t EffectConditionalForallImpl::hash_impl() const {
@@ -180,11 +159,9 @@ void EffectConditionalForallImpl::str_impl(std::ostringstream& out, const Format
         if (i != 0) out << " ";
         out << *m_parameters[i];
     }
-    out << ") " << *m_effect << ")";
-}
-
-void EffectConditionalForallImpl::accept(EffectVisitor& visitor) const {
-    visitor.visit(this);
+    out << ") ";
+    std::visit(StringifyVisitor(out), *m_effect);
+    out << ")";
 }
 
 const ParameterList& EffectConditionalForallImpl::get_parameters() const {
@@ -197,15 +174,14 @@ const Effect& EffectConditionalForallImpl::get_effect() const {
 
 
 EffectConditionalWhenImpl::EffectConditionalWhenImpl(int identifier, Condition condition, Effect effect)
-    : EffectImpl(identifier), m_condition(std::move(condition)), m_effect(std::move(effect)) { }
+    : Base(identifier), m_condition(std::move(condition)), m_effect(std::move(effect)) { }
 
-bool EffectConditionalWhenImpl::are_equal_impl(const EffectImpl& other) const {
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const EffectConditionalWhenImpl&>(other);
-        return m_condition == other_derived.m_condition
-            && m_effect == other_derived.m_effect;
+bool EffectConditionalWhenImpl::are_equal_impl(const EffectConditionalWhenImpl& other) const {
+    if (this != &other) {
+        return (m_condition == other.m_condition)
+            && (m_effect == other.m_effect);
     }
-    return false;
+    return true;
 }
 
 size_t EffectConditionalWhenImpl::hash_impl() const {
@@ -215,11 +191,9 @@ size_t EffectConditionalWhenImpl::hash_impl() const {
 void EffectConditionalWhenImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << "(when ";
     std::visit(StringifyVisitor(out), *m_condition);
-    out << " " << *m_effect << ")";
-}
-
-void EffectConditionalWhenImpl::accept(EffectVisitor& visitor) const {
-    visitor.visit(this);
+    out << " ";
+    std::visit(StringifyVisitor(out), *m_effect);
+    out << ")";
 }
 
 const Condition& EffectConditionalWhenImpl::get_condition() const {

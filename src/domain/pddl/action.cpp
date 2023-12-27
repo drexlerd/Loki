@@ -64,7 +64,7 @@ void ActionImpl::str_impl(std::ostringstream& out, const FormattingOptions& opti
 
         out << "\n";
         out << std::string(nested_options.indent, ' ') << ":effects ";
-        if (m_effect.has_value()) out << *m_effect.value();
+        if (m_effect.has_value()) std::visit(StringifyVisitor(out), *m_effect.value());
         else out <<  "()" ;
 
         out << ")\n";

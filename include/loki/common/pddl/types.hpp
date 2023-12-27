@@ -49,26 +49,17 @@ namespace loki {
 using RequirementFactory = PersistentFactory<pddl::RequirementsImpl>;
 using TypeFactory = PersistentFactory<pddl::TypeImpl>;
 using VariableFactory = PersistentFactory<pddl::VariableImpl>;
-using TermFactory = PersistentFactory<pddl::TermObjectImpl
-    , pddl::TermVariableImpl>;
+using TermFactory = PersistentFactory2<pddl::TermImpl>;
 using ObjectFactory = PersistentFactory2<pddl::ObjectImpl>;
 using AtomFactory = PersistentFactory<pddl::AtomImpl>;
 using LiteralFactory = PersistentFactory<pddl::LiteralImpl>;
 using ParameterFactory = PersistentFactory<pddl::ParameterImpl>;
 using PredicateFactory = PersistentFactory<pddl::PredicateImpl>;
-using FunctionExpressionFactory = PersistentFactory<pddl::FunctionExpressionNumberImpl
-    , pddl::FunctionExpressionBinaryOperatorImpl
-    , pddl::FunctionExpressionMultiOperatorImpl
-    , pddl::FunctionExpressionMinusImpl
-    , pddl::FunctionExpressionFunctionImpl>;
+using FunctionExpressionFactory = PersistentFactory2<pddl::FunctionExpressionImpl>;
 using FunctionFactory = PersistentFactory<pddl::FunctionImpl>;
 using FunctionSkeletonFactory = PersistentFactory<pddl::FunctionSkeletonImpl>;
 using ConditionFactory = PersistentFactory2<pddl::ConditionImpl>;
-using EffectFactory = PersistentFactory<pddl::EffectLiteralImpl
-    , pddl::EffectAndImpl
-    , pddl::EffectNumericImpl
-    , pddl::EffectConditionalForallImpl
-    , pddl::EffectConditionalWhenImpl>;
+using EffectFactory = PersistentFactory2<pddl::EffectImpl>;
 using ActionFactory = PersistentFactory<pddl::ActionImpl>;
 using DerivedPredicateFactory = PersistentFactory<pddl::DerivedPredicateImpl>;
 using OptimizationMetricFactory = PersistentFactory<pddl::OptimizationMetricImpl>;

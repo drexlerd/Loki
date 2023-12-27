@@ -20,6 +20,7 @@
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 #include "../../../include/loki/domain/pddl/function.hpp"
+#include "../../../include/loki/common/pddl/visitors.hpp"
 
 #include <cassert>
 
@@ -50,25 +51,15 @@ const std::string& to_string(pddl::MultiOperatorEnum multi_operator) {
 }
 
 
-
-/* FunctionExpression */
-FunctionExpressionImpl::FunctionExpressionImpl(int identifier)
-    : Base(identifier) { }
-
-FunctionExpressionImpl::~FunctionExpressionImpl() { }
-
-
 /* FunctionExpressionNumber */
 FunctionExpressionNumberImpl::FunctionExpressionNumberImpl(int identifier, double number)
-    : FunctionExpressionImpl(identifier), m_number(number) { }
+    : Base(identifier), m_number(number) { }
 
-bool FunctionExpressionNumberImpl::are_equal_impl(const FunctionExpressionImpl& other) const {
-    // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const FunctionExpressionNumberImpl&>(other);
-        return m_number == other_derived.m_number;
+bool FunctionExpressionNumberImpl::are_equal_impl(const FunctionExpressionNumberImpl& other) const {
+    if (this != &other) {
+        return m_number == other.m_number;
     }
-    return false;
+    return true;
 }
 
 size_t FunctionExpressionNumberImpl::hash_impl() const {
@@ -77,10 +68,6 @@ size_t FunctionExpressionNumberImpl::hash_impl() const {
 
 void FunctionExpressionNumberImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << m_number;
-}
-
-void FunctionExpressionNumberImpl::accept(FunctionExpressionVisitor& visitor) const {
-    visitor.visit(this);
 }
 
 double FunctionExpressionNumberImpl::get_number() const {
@@ -93,20 +80,18 @@ FunctionExpressionBinaryOperatorImpl::FunctionExpressionBinaryOperatorImpl(int i
     BinaryOperatorEnum binary_operator,
     FunctionExpression left_function_expression,
     FunctionExpression right_function_expression)
-    : FunctionExpressionImpl(identifier)
+    : Base(identifier)
     , m_binary_operator(binary_operator)
     , m_left_function_expression(std::move(left_function_expression))
     , m_right_function_expression(std::move(right_function_expression)) { }
 
-bool FunctionExpressionBinaryOperatorImpl::are_equal_impl(const FunctionExpressionImpl& other) const {
-    // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const FunctionExpressionBinaryOperatorImpl&>(other);
-        return m_binary_operator == other_derived.m_binary_operator
-            && m_left_function_expression == other_derived.m_left_function_expression
-            && m_right_function_expression == other_derived.m_right_function_expression;
+bool FunctionExpressionBinaryOperatorImpl::are_equal_impl(const FunctionExpressionBinaryOperatorImpl& other) const {
+    if (this != &other) {
+        return (m_binary_operator == other.m_binary_operator)
+            && (m_left_function_expression == other.m_left_function_expression)
+            && (m_right_function_expression == other.m_right_function_expression);
     }
-    return false;
+    return true;
 }
 
 size_t FunctionExpressionBinaryOperatorImpl::hash_impl() const {
@@ -114,11 +99,11 @@ size_t FunctionExpressionBinaryOperatorImpl::hash_impl() const {
 }
 
 void FunctionExpressionBinaryOperatorImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
-    out << "(" << to_string(m_binary_operator) << " " << *m_left_function_expression << " " << *m_right_function_expression << ")";
-}
-
-void FunctionExpressionBinaryOperatorImpl::accept(FunctionExpressionVisitor& visitor) const {
-    visitor.visit(this);
+    out << "(" << to_string(m_binary_operator) << " ";
+    std::visit(StringifyVisitor(out), *m_left_function_expression);
+    out << " ";
+    std::visit(StringifyVisitor(out), *m_right_function_expression);
+    out << ")";
 }
 
 BinaryOperatorEnum FunctionExpressionBinaryOperatorImpl::get_binary_operator() const {
@@ -138,15 +123,14 @@ const FunctionExpression& FunctionExpressionBinaryOperatorImpl::get_right_functi
 FunctionExpressionMultiOperatorImpl::FunctionExpressionMultiOperatorImpl(int identifier,
     MultiOperatorEnum multi_operator,
     FunctionExpressionList function_expressions)
-    : FunctionExpressionImpl(identifier), m_multi_operator(multi_operator), m_function_expressions(function_expressions) { }
+    : Base(identifier), m_multi_operator(multi_operator), m_function_expressions(function_expressions) { }
 
-bool FunctionExpressionMultiOperatorImpl::are_equal_impl(const FunctionExpressionImpl& other) const {
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const FunctionExpressionMultiOperatorImpl&>(other);
-        return m_multi_operator == other_derived.m_multi_operator
-            && get_sorted_vector(m_function_expressions) == get_sorted_vector(other_derived.m_function_expressions);
+bool FunctionExpressionMultiOperatorImpl::are_equal_impl(const FunctionExpressionMultiOperatorImpl& other) const {
+    if (this != &other) {
+        return (m_multi_operator == other.m_multi_operator)
+            && (get_sorted_vector(m_function_expressions) == get_sorted_vector(other.m_function_expressions));
     }
-    return false;
+    return true;
 }
 
 size_t FunctionExpressionMultiOperatorImpl::hash_impl() const {
@@ -157,13 +141,10 @@ void FunctionExpressionMultiOperatorImpl::str_impl(std::ostringstream& out, cons
     out << "(" << to_string(m_multi_operator);
     assert(!m_function_expressions.empty());
     for (const auto& function_expression : m_function_expressions) {
-        out << " " << *function_expression;
+        out << " ";
+        std::visit(StringifyVisitor(out), *function_expression);
     }
     out << ")";
-}
-
-void FunctionExpressionMultiOperatorImpl::accept(FunctionExpressionVisitor& visitor) const {
-    visitor.visit(this);
 }
 
 MultiOperatorEnum FunctionExpressionMultiOperatorImpl::get_multi_operator() const{
@@ -177,15 +158,13 @@ const FunctionExpressionList& FunctionExpressionMultiOperatorImpl::get_function_
 
 /* FunctionExpressionMinus */
 FunctionExpressionMinusImpl::FunctionExpressionMinusImpl(int identifier, FunctionExpression function_expression)
-    : FunctionExpressionImpl(identifier), m_function_expression(std::move(function_expression)) { }
+    : Base(identifier), m_function_expression(std::move(function_expression)) { }
 
-bool FunctionExpressionMinusImpl::are_equal_impl(const FunctionExpressionImpl& other) const {
-    // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const FunctionExpressionMinusImpl&>(other);
-        return m_function_expression == other_derived.m_function_expression;
+bool FunctionExpressionMinusImpl::are_equal_impl(const FunctionExpressionMinusImpl& other) const {
+    if (this != &other) {
+        return m_function_expression == other.m_function_expression;
     }
-    return false;
+    return true;
 }
 
 size_t FunctionExpressionMinusImpl::hash_impl() const {
@@ -196,10 +175,6 @@ void FunctionExpressionMinusImpl::str_impl(std::ostringstream& out, const Format
     out << "(- " << m_function_expression << ")";
 }
 
-void FunctionExpressionMinusImpl::accept(FunctionExpressionVisitor& visitor) const {
-    visitor.visit(this);
-}
-
 const FunctionExpression& FunctionExpressionMinusImpl::get_function_expression() const {
     return m_function_expression;
 }
@@ -207,15 +182,13 @@ const FunctionExpression& FunctionExpressionMinusImpl::get_function_expression()
 
 /* FunctionExpressionFunction */
 FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(int identifier, Function function)
-    : FunctionExpressionImpl(identifier), m_function(std::move(function)) { }
+    : Base(identifier), m_function(std::move(function)) { }
 
-bool FunctionExpressionFunctionImpl::are_equal_impl(const FunctionExpressionImpl& other) const {
-    // https://stackoverflow.com/questions/11332075/comparing-polymorphic-base-types-in-c-without-rtti
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const FunctionExpressionFunctionImpl&>(other);
-        return m_function == other_derived.m_function;
+bool FunctionExpressionFunctionImpl::are_equal_impl(const FunctionExpressionFunctionImpl& other) const {
+    if (this != &other) {
+        return m_function == other.m_function;
     }
-    return false;
+    return true;
 }
 
 size_t FunctionExpressionFunctionImpl::hash_impl() const {
@@ -224,10 +197,6 @@ size_t FunctionExpressionFunctionImpl::hash_impl() const {
 
 void FunctionExpressionFunctionImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << *m_function;
-}
-
-void FunctionExpressionFunctionImpl::accept(FunctionExpressionVisitor& visitor) const {
-    visitor.visit(this);
 }
 
 const Function& FunctionExpressionFunctionImpl::get_function() const {

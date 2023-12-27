@@ -46,13 +46,11 @@ namespace loki::pddl {
     using VariableList = std::vector<Variable>;
     using VariableAssignment = std::unordered_map<Variable, Object>;
 
-    class TermImpl;
+    class TermObjectImpl;
+    class TermVariableImpl;
+    using TermImpl = std::variant<TermObjectImpl, TermVariableImpl>;
     using Term = const TermImpl*;
     using TermList = std::vector<Term>;
-    class TermObjectImpl;
-    using TermObject = const TermObjectImpl*;
-    class TermVariableImpl;
-    using TermVariable = const TermVariableImpl*;
 
     class AtomImpl;
     using Atom = const AtomImpl*;
@@ -85,34 +83,32 @@ namespace loki::pddl {
     using ConditionList = std::vector<Condition>;
     using ConditionSet = std::set<Condition>;
 
-    class EffectImpl;
+    class EffectLiteralImpl;
+    class EffectAndImpl;
+    class EffectNumericImpl;
+    class EffectConditionalForallImpl;
+    class EffectConditionalWhenImpl;
+    using EffectImpl = std::variant<EffectLiteralImpl
+        , EffectAndImpl
+        , EffectNumericImpl
+        , EffectConditionalForallImpl
+        , EffectConditionalWhenImpl>;
     using Effect = const EffectImpl*;
     using EffectList = std::vector<Effect>;
     using EffectSet = std::set<Effect>;
-    class EffectLiteralImpl;
-    using EffectLiteral = const EffectLiteralImpl*;
-    class EffectAndImpl;
-    using EffectAnd = const EffectAndImpl*;
-    class EffectNumericImpl;
-    using EffectNumeric = const EffectNumericImpl*;
-    class EffectConditionalForallImpl;
-    using EffectConditionalForall = const EffectConditionalForallImpl*;
-    class EffectConditionalWhenImpl;
-    using EffectConditionalWhen = const EffectConditionalWhenImpl*;
 
-    class FunctionExpressionImpl;
+    class FunctionExpressionNumberImpl;
+    class FunctionExpressionBinaryOperatorImpl;
+    class FunctionExpressionMultiOperatorImpl;
+    class FunctionExpressionMinusImpl;
+    class FunctionExpressionFunctionImpl;
+    using FunctionExpressionImpl = std::variant<FunctionExpressionNumberImpl
+        , FunctionExpressionBinaryOperatorImpl
+        , FunctionExpressionMultiOperatorImpl
+        , FunctionExpressionMinusImpl
+        , FunctionExpressionFunctionImpl>;
     using FunctionExpression = const FunctionExpressionImpl*;
     using FunctionExpressionList = std::vector<FunctionExpression>;
-    class FunctionExpressionNumberImpl;
-    using FunctionExpressionNumber = const FunctionExpressionNumberImpl*;
-    class FunctionExpressionBinaryOperatorImpl;
-    using FunctionExpressionBinaryOperator = const FunctionExpressionBinaryOperatorImpl*;
-    class FunctionExpressionMultiOperatorImpl;
-    using FunctionExpressionMultiOperator = const FunctionExpressionMultiOperatorImpl*;
-    class FunctionExpressionMinusImpl;
-    using FunctionExpressionMinus = const FunctionExpressionMinusImpl*;
-    class FunctionExpressionFunctionImpl;
-    using FunctionExpressionFunction = const FunctionExpressionFunctionImpl*;
 
     class FunctionSkeletonImpl;
     using FunctionSkeleton = const FunctionSkeletonImpl*;

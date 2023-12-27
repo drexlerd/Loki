@@ -24,25 +24,17 @@
 
 
 namespace loki::pddl {
-/* TermImpl */
-TermImpl::TermImpl(int identifier)
-    : Base(identifier)
-{
-}
-
-TermImpl::~TermImpl() = default;
 
 
 /* TermObjectImpl */
 TermObjectImpl::TermObjectImpl(int identifier, Object object)
-    : TermImpl(identifier), m_object(std::move(object)) { }
+    : Base(identifier), m_object(std::move(object)) { }
 
-bool TermObjectImpl::are_equal_impl(const TermImpl& other) const {
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const TermObjectImpl&>(other);
-        return m_object == other_derived.m_object;
+bool TermObjectImpl::are_equal_impl(const TermObjectImpl& other) const {
+    if (this != &other) {
+        return m_object == other.m_object;
     }
-    return false;
+    return true;
 }
 
 size_t TermObjectImpl::hash_impl() const {
@@ -53,10 +45,6 @@ void TermObjectImpl::str_impl(std::ostringstream& out, const FormattingOptions& 
     out << *m_object;
 }
 
-void TermObjectImpl::accept(TermVisitor& visitor) const {
-    visitor.visit(this);
-}
-
 const Object& TermObjectImpl::get_object() const {
     return m_object;
 }
@@ -64,14 +52,13 @@ const Object& TermObjectImpl::get_object() const {
 
 /* TermVariableImpl */
 TermVariableImpl::TermVariableImpl(int identifier, Variable variable)
-    : TermImpl(identifier), m_variable(std::move(variable)) { }
+    : Base(identifier), m_variable(std::move(variable)) { }
 
-bool TermVariableImpl::are_equal_impl(const TermImpl& other) const {
-    if (typeid(*this) == typeid(other)) {
-        const auto& other_derived = static_cast<const TermVariableImpl&>(other);
-        return m_variable == other_derived.m_variable;
+bool TermVariableImpl::are_equal_impl(const TermVariableImpl& other) const {
+    if (this != &other) {
+        return m_variable == other.m_variable;
     }
-    return false;
+    return true;
 }
 
 size_t TermVariableImpl::hash_impl() const {
@@ -80,10 +67,6 @@ size_t TermVariableImpl::hash_impl() const {
 
 void TermVariableImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
     out << *m_variable;
-}
-
-void TermVariableImpl::accept(TermVisitor& visitor) const {
-    visitor.visit(this);
 }
 
 const Variable& TermVariableImpl::get_variable() const {

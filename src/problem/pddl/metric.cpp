@@ -20,6 +20,7 @@
 #include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/common/collections.hpp"
 #include "../../../include/loki/domain/pddl/function_expressions.hpp"
+#include "../../../include/loki/common/pddl/visitors.hpp"
 
 #include <cassert>
 
@@ -57,7 +58,9 @@ size_t OptimizationMetricImpl::hash_impl() const {
 }
 
 void OptimizationMetricImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
-    out << "(" << to_string(m_optimization_metric) << " " << *m_function_expression << ")";
+    out << "(" << to_string(m_optimization_metric) << " ";
+    std::visit(StringifyVisitor(out), *m_function_expression);
+    out << ")";
 }
 
 

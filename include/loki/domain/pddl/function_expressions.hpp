@@ -30,6 +30,11 @@ template<typename... Ts>
 class PersistentFactory;
 }
 
+namespace loki {
+template<typename HolderType>
+class PersistentFactory2;
+}
+
 namespace loki::pddl {
 enum class BinaryOperatorEnum {
     MUL,
@@ -50,64 +55,27 @@ extern std::unordered_map<MultiOperatorEnum, std::string> multi_operator_enum_to
 extern const std::string& to_string(pddl::MultiOperatorEnum multi_operator);
 
 
-class FunctionExpressionVisitor {
-public:
-    virtual ~FunctionExpressionVisitor() = default;
-
-    virtual void visit(const FunctionExpressionNumber& function_expression) = 0;
-    virtual void visit(const FunctionExpressionBinaryOperator& function_expression) = 0;
-    virtual void visit(const FunctionExpressionMultiOperator& function_expression) = 0;
-    virtual void visit(const FunctionExpressionMinus& function_expression) = 0;
-    virtual void visit(const FunctionExpressionFunction& function_expression) = 0;
-};
-
-
-/* FunctionExpression */
-class FunctionExpressionImpl : public Base<FunctionExpressionImpl> {
-protected:
-    FunctionExpressionImpl(int identifier);
-
-    // protected copy/move to prevent accidental object slicing when passed by value
-    FunctionExpressionImpl(const FunctionExpressionImpl& other) = default;
-    FunctionExpressionImpl& operator=(const FunctionExpressionImpl& other) = default;
-    FunctionExpressionImpl(FunctionExpressionImpl&& other) = default;
-    FunctionExpressionImpl& operator=(FunctionExpressionImpl&& other) = default;
-
-public:
-    virtual ~FunctionExpressionImpl();
-
-    /// @brief Test for structural equivalence
-    virtual bool are_equal_impl(const FunctionExpressionImpl& other) const = 0;
-    virtual void str_impl(std::ostringstream& out, const FormattingOptions& options) const = 0;
-
-    /// @brief Accepts the visitor by calling the visit overload.
-    virtual void accept(FunctionExpressionVisitor& visitor) const = 0;
-};
-
-
 /* FunctionExpressionNumber */
-class FunctionExpressionNumberImpl : public FunctionExpressionImpl {
+class FunctionExpressionNumberImpl : public Base<FunctionExpressionNumberImpl> {
 private:
     double m_number;
 
     FunctionExpressionNumberImpl(int identifier, double number);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
-    bool are_equal_impl(const FunctionExpressionImpl& other) const override;
+    bool are_equal_impl(const FunctionExpressionNumberImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(FunctionExpressionVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     double get_number() const;
 };
 
 
 /* FunctionExpressionBinaryOperator */
-class FunctionExpressionBinaryOperatorImpl : public FunctionExpressionImpl {
+class FunctionExpressionBinaryOperatorImpl : public Base<FunctionExpressionBinaryOperatorImpl> {
 private:
     BinaryOperatorEnum m_binary_operator;
     FunctionExpression m_left_function_expression;
@@ -118,15 +86,13 @@ private:
         FunctionExpression left_function_expression,
         FunctionExpression right_function_expression);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
-    bool are_equal_impl(const FunctionExpressionImpl& other) const override;
+    bool are_equal_impl(const FunctionExpressionBinaryOperatorImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(FunctionExpressionVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     BinaryOperatorEnum get_binary_operator() const;
     const FunctionExpression& get_left_function_expression() const;
@@ -135,7 +101,7 @@ public:
 
 
 /* FunctionExpressionMultiOperator */
-class FunctionExpressionMultiOperatorImpl : public FunctionExpressionImpl {
+class FunctionExpressionMultiOperatorImpl : public Base<FunctionExpressionMultiOperatorImpl> {
 private:
     MultiOperatorEnum m_multi_operator;
     FunctionExpressionList m_function_expressions;
@@ -144,15 +110,13 @@ private:
         MultiOperatorEnum multi_operator,
         FunctionExpressionList function_expressions);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
-    bool are_equal_impl(const FunctionExpressionImpl& other) const override;
+    bool are_equal_impl(const FunctionExpressionMultiOperatorImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(FunctionExpressionVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     MultiOperatorEnum get_multi_operator() const;
     const FunctionExpressionList& get_function_expressions() const;
@@ -160,42 +124,38 @@ public:
 
 
 /* FunctionExpressionMinus */
-class FunctionExpressionMinusImpl : public FunctionExpressionImpl {
+class FunctionExpressionMinusImpl : public Base<FunctionExpressionMinusImpl> {
 private:
     FunctionExpression m_function_expression;
 
     FunctionExpressionMinusImpl(int identifier, FunctionExpression function_expression);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
-    bool are_equal_impl(const FunctionExpressionImpl& other) const override;
+    bool are_equal_impl(const FunctionExpressionMinusImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(FunctionExpressionVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     const FunctionExpression& get_function_expression() const;
 };
 
 
 /* FunctionExpressionFunction */
-class FunctionExpressionFunctionImpl : public FunctionExpressionImpl {
+class FunctionExpressionFunctionImpl : public Base<FunctionExpressionFunctionImpl> {
 private:
     Function m_function;
 
     FunctionExpressionFunctionImpl(int identifier, Function function);
 
-    template<typename... Ts>
-    friend class loki::PersistentFactory;
+    template<typename HolderType>
+    friend class loki::PersistentFactory2;
 
 public:
-    bool are_equal_impl(const FunctionExpressionImpl& other) const override;
+    bool are_equal_impl(const FunctionExpressionFunctionImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const override;
-
-    void accept(FunctionExpressionVisitor& visitor) const override;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     const Function& get_function() const;
 };
