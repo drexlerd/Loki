@@ -19,39 +19,48 @@
 #define LOKI_INCLUDE_LOKI_COMMON_SEGMENTED_VECTOR_HPP_
 
 #include <array>
+#include <cassert>
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <iostream>
 
 
 namespace loki {
 
-template<typename T, size_t N>
+using BytesPerSegment = size_t;
+
+template<typename T, BytesPerSegment N=100000>
 class SegmentedPersistentVector {
 private:
-    std::vector<std::array<T, N>> m_data;
+    std::vector<std::vector<T>> m_data;
 
     int m_block_index;
     int m_index_in_block;
+    int m_elements_per_block;
 
     size_t m_size;
     size_t m_capacity;
 
     void increase_capacity() {
-        // Add an additional array with capacity N (1 allocation on average)
+        // Add an additional vector with capacity N (1 allocation on average)
         m_data.resize(m_data.size() + 1);
+        m_data.back().reserve(m_elements_per_block);
         // Move to the next free block
         ++m_block_index;
         // Set index to next free position in block
         m_index_in_block = 0;
         // Increase total capacity
-        m_capacity += N;
+        m_capacity += m_elements_per_block;
     }
 
 public:
-    explicit SegmentedPersistentVector() : m_block_index(-1), m_index_in_block(0), m_size(0), m_capacity(0) { }
+    explicit SegmentedPersistentVector() : m_block_index(-1), m_index_in_block(0), m_elements_per_block(N / sizeof(T)), m_size(0), m_capacity(0) { 
+        assert(m_elements_per_block > 0);
+        // std::cout << "SegmentedPersistentVector(" << "bytes_per_segment: " << N << ", " << "sizeof(T): " << sizeof(T) << ", " << "elements_per_segment: " << N / sizeof(T) << std::endl;
+    }
 
-    T* push_back(T value) {
+    const T& push_back(T value) {
         // Increase capacity if necessary
         if (m_size >= m_capacity) {
             increase_capacity();
@@ -60,15 +69,22 @@ public:
         auto& block = m_data[m_block_index];
 
         // Take ownership of memory
-        block[m_index_in_block] = std::move(value);
+        block.push_back(std::move(value));
         // Fetch return value
-        T* return_value = &block[m_index_in_block];
+        const T& return_value = block[m_index_in_block];
         // Move index to next free position in block
         ++m_index_in_block;
 
         ++m_size;
 
         return return_value;
+    }
+
+    const T& operator[](int identifier) const {
+        assert(identifier >= 0 && identifier <= static_cast<int>(size()));
+        int block_index = identifier / m_elements_per_block;
+        int index_in_block = identifier % m_elements_per_block;
+        return m_data[block_index][index_in_block];
     }
 
     size_t size() const {

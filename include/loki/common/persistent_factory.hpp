@@ -15,37 +15,46 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_COMMON_PERSISTENT_FACTORY_2_HPP_
-#define LOKI_INCLUDE_LOKI_COMMON_PERSISTENT_FACTORY_2_HPP_
+#ifndef LOKI_INCLUDE_LOKI_COMMON_PERSISTENT_FACTORY_HPP_
+#define LOKI_INCLUDE_LOKI_COMMON_PERSISTENT_FACTORY_HPP_
+
+#include "segmented_persistent_vector.hpp"
 
 #include <unordered_set>
 #include <memory>
 #include <mutex>
 #include <tuple>
+#include <type_traits>
+#include <variant>
 
 
 namespace loki {
 
+template<typename T> struct is_variant : std::false_type {};
+
+template<typename ...Args>
+struct is_variant<std::variant<Args...>> : std::true_type {};
+
+template<typename T>
+inline constexpr bool is_variant_v=is_variant<T>::value;
+
+template<typename T>
+static int getIdentifier(const T& holder) {
+    if constexpr (is_variant_v<T>) {
+        // Use std::visit for std::variant
+        return std::visit([](const auto& obj) { return obj.get_identifier(); }, holder);
+    } else {
+        // Direct call for non-variant types
+        return holder.get_identifier();
+    }
+}
+
 template<typename HolderType>
 class PersistentFactory {
 private:
-    template<typename T>
-    struct DerferencedHash {
-        std::size_t operator()(const std::unique_ptr<const T>& ptr) const {
-            return std::hash<T>()(*ptr);
-        }
-    };
-
-    /// @brief Equality comparison of the objects underlying the pointers.
-    template<typename T>
-    struct DereferencedEquality {
-        bool operator()(const std::unique_ptr<const T>& left, const std::unique_ptr<const T>& right) const {
-            return *left == *right;
-        }
-    };
-
-
-    std::unordered_set<std::unique_ptr<const HolderType>, DerferencedHash<HolderType>, DereferencedEquality<HolderType>> m_data;
+    std::unordered_set<HolderType> m_uniqueness_set;
+    SegmentedPersistentVector<HolderType> m_persistent_vector;
+    
     // Identifiers are shared across types since types can be polymorphic
     int m_count = 0;
     // Mutex is shared for thread-safe changes to count that is shared across types
@@ -57,11 +66,14 @@ public:
         std::lock_guard<std::mutex> hold(m_mutex);
         int identifier = m_count;
         /* Must explicitly call the constructor of T to give exclusive access to the factory. */
-        const auto [it, inserted] = m_data.emplace(std::make_unique<HolderType>(std::move(SubType(identifier, std::move(args)...))));
+        const auto [it, inserted] = m_uniqueness_set.emplace(SubType(identifier, args...));
         if (inserted) {
             ++m_count;
+            /* Ensure that element with identifier i will be stored at location i*/
+            assert(identifier == static_cast<int>(m_persistent_vector.size()));
+            return &m_persistent_vector.push_back(SubType(identifier, std::move(args)...));
         }
-        return it->get();
+        return &m_persistent_vector[getIdentifier(*it)];
     }
 };
 
