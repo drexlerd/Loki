@@ -26,7 +26,7 @@
 
 
 namespace loki {
-template<typename... Ts>
+template<typename HolderType>
 class PersistentFactory;
 }
 
@@ -40,7 +40,7 @@ private:
 
     FunctionSkeletonImpl(int identifier, std::string name, ParameterList parameters, Type type);
 
-    template<typename... Ts>
+    template<typename HolderType>
     friend class loki::PersistentFactory;
 
 public:

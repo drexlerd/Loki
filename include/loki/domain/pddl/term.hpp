@@ -24,13 +24,8 @@
 
 
 namespace loki {
-template<typename... Ts>
-class PersistentFactory;
-}
-
-namespace loki {
 template<typename HolderType>
-class PersistentFactory2;
+class PersistentFactory;
 }
 
 
@@ -44,7 +39,7 @@ private:
     TermObjectImpl(int identifier, Object object);
 
     template<typename HolderType>
-    friend class loki::PersistentFactory2;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const TermObjectImpl& other) const;
@@ -62,7 +57,7 @@ private:
     TermVariableImpl(int identifier, Variable variable);
 
     template<typename HolderType>
-    friend class loki::PersistentFactory2;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const TermVariableImpl& other) const;

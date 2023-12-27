@@ -30,7 +30,7 @@
 
 
 namespace loki {
-template<typename... Ts>
+template<typename HolderType>
 class PersistentFactory;
 }
 
@@ -45,7 +45,7 @@ private:
 
     ActionImpl(int identifier, std::string name, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);
 
-    template<typename... Ts>
+    template<typename HolderType>
     friend class loki::PersistentFactory;
 
 public:

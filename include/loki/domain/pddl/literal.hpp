@@ -24,7 +24,7 @@
 
 
 namespace loki {
-template<typename... Ts>
+template<typename HolderType>
 class PersistentFactory;
 }
 
@@ -37,7 +37,7 @@ private:
 
     LiteralImpl(int identifier, bool is_negated, Atom atom);
 
-    template<typename... Ts>
+    template<typename HolderType>
     friend class loki::PersistentFactory;
 
 public:

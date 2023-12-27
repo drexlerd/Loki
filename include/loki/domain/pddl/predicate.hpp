@@ -26,7 +26,7 @@
 
 
 namespace loki {
-template<typename... Ts>
+template<typename HolderType>
 class PersistentFactory;
 }
 
@@ -41,7 +41,7 @@ private:
 
     PredicateImpl(int identifier, std::string name, ParameterList parameters);
 
-    template<typename... Ts>
+    template<typename HolderType>
     friend class loki::PersistentFactory;
 
 public:

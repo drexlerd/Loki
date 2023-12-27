@@ -24,7 +24,7 @@
 
 
 namespace loki {
-template<typename... Ts>
+template<typename HolderType>
 class PersistentFactory;
 }
 
@@ -44,7 +44,7 @@ private:
     OptimizationMetricEnum m_optimization_metric;
     FunctionExpression m_function_expression;
 
-    template<typename... Ts>
+    template<typename HolderType>
     friend class loki::PersistentFactory;
 
 public:

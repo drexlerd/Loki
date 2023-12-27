@@ -26,7 +26,7 @@
 
 
 namespace loki {
-template<typename... Ts>
+template<typename HolderType>
 class PersistentFactory;
 }
 
@@ -40,7 +40,7 @@ private:
 
     ParameterImpl(int identifier, Variable variable, TypeList types);
 
-    template<typename... Ts>
+    template<typename HolderType>
     friend class loki::PersistentFactory;
 
 public:

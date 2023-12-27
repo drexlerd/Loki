@@ -26,13 +26,8 @@
 
 
 namespace loki {
-template<typename... Ts>
-class PersistentFactory;
-}
-
-namespace loki {
 template<typename HolderType>
-class PersistentFactory2;
+class PersistentFactory;
 }
 
 
@@ -57,7 +52,7 @@ private:
     EffectLiteralImpl(int identifier, Literal literal);
 
     template<typename HolderType>
-    friend class loki::PersistentFactory2;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const EffectLiteralImpl& other) const;
@@ -76,7 +71,7 @@ private:
     EffectAndImpl(int identifier, EffectList effects);
 
     template<typename HolderType>
-    friend class loki::PersistentFactory2;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const EffectAndImpl& other) const;
@@ -97,7 +92,7 @@ private:
     EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
 
     template<typename HolderType>
-    friend class loki::PersistentFactory2;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const EffectNumericImpl& other) const;
@@ -119,7 +114,7 @@ private:
     EffectConditionalForallImpl(int identifier, ParameterList parameters, Effect effect);
 
     template<typename HolderType>
-    friend class loki::PersistentFactory2;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const EffectConditionalForallImpl& other) const;
@@ -140,7 +135,7 @@ private:
     EffectConditionalWhenImpl(int identifier, Condition condition, Effect effect);
 
     template<typename HolderType>
-    friend class loki::PersistentFactory2;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const EffectConditionalWhenImpl& other) const;

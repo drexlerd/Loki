@@ -27,9 +27,10 @@
 
 
 namespace loki {
-template<typename... Ts>
+template<typename HolderType>
 class PersistentFactory;
 }
+
 
 namespace loki::pddl {
 
@@ -52,7 +53,7 @@ private:
         FunctionSkeletonList functions,
         ActionList actions);
 
-    template<typename... Ts>
+    template<typename HolderType>
     friend class loki::PersistentFactory;
 
 public:

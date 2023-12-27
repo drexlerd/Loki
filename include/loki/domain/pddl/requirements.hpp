@@ -28,7 +28,7 @@
 
 
 namespace loki {
-template<typename... Ts>
+template<typename HolderType>
 class PersistentFactory;
 }
 
@@ -69,7 +69,7 @@ private:
 
     RequirementsImpl(int identifier, RequirementEnumSet requirements);
 
-    template<typename... Ts>
+    template<typename HolderType>
     friend class loki::PersistentFactory;
 
 public:

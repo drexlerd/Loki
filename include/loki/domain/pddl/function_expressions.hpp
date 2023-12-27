@@ -26,14 +26,10 @@
 
 
 namespace loki {
-template<typename... Ts>
+template<typename HolderType>
 class PersistentFactory;
 }
 
-namespace loki {
-template<typename HolderType>
-class PersistentFactory2;
-}
 
 namespace loki::pddl {
 enum class BinaryOperatorEnum {
@@ -63,7 +59,7 @@ private:
     FunctionExpressionNumberImpl(int identifier, double number);
 
     template<typename HolderType>
-    friend class loki::PersistentFactory2;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const FunctionExpressionNumberImpl& other) const;
@@ -87,7 +83,7 @@ private:
         FunctionExpression right_function_expression);
 
     template<typename HolderType>
-    friend class loki::PersistentFactory2;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const FunctionExpressionBinaryOperatorImpl& other) const;
@@ -111,7 +107,7 @@ private:
         FunctionExpressionList function_expressions);
 
     template<typename HolderType>
-    friend class loki::PersistentFactory2;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const FunctionExpressionMultiOperatorImpl& other) const;
@@ -131,7 +127,7 @@ private:
     FunctionExpressionMinusImpl(int identifier, FunctionExpression function_expression);
 
     template<typename HolderType>
-    friend class loki::PersistentFactory2;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const FunctionExpressionMinusImpl& other) const;
@@ -150,7 +146,7 @@ private:
     FunctionExpressionFunctionImpl(int identifier, Function function);
 
     template<typename HolderType>
-    friend class loki::PersistentFactory2;
+    friend class loki::PersistentFactory;
 
 public:
     bool are_equal_impl(const FunctionExpressionFunctionImpl& other) const;

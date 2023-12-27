@@ -25,7 +25,7 @@
 
 
 namespace loki {
-template<typename... Ts>
+template<typename HolderType>
 class PersistentFactory;
 }
 
@@ -36,7 +36,7 @@ private:
     Predicate m_predicate;
     TermList m_terms;
 
-    template<typename... Ts>
+    template<typename HolderType>
     friend class loki::PersistentFactory;
 
 public:
