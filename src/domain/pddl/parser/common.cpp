@@ -32,7 +32,9 @@ string parse(const ast::Name& node) {
 
 /* Variable */
 pddl::Variable parse(const ast::Variable& node, Context& context) {
-    return context.factories.variables.get_or_create<pddl::VariableImpl>(node.characters);
+    const auto variable = context.factories.variables.get_or_create<pddl::VariableImpl>(node.characters);
+    context.positions.push_back(variable, node);
+    return variable;
 }
 
 /* Term */
@@ -52,7 +54,7 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Name& node) const {
     const auto& [constant, _position, _error_handler] = binding.value();
     const auto term = context.factories.terms.get_or_create<pddl::TermObjectImpl>(constant);
     // Add position of PDDL object
-    context.positions.push_back<pddl::TermImpl>(term, node);
+    context.positions.push_back(term, node);
     return term;
 }
 
@@ -73,7 +75,7 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) con
     // Construct Term and return it
     const auto term = context.factories.terms.get_or_create<pddl::TermVariableImpl>(variable);
     // Add position of PDDL object
-    context.positions.push_back<pddl::TermImpl>(term, node);
+    context.positions.push_back(term, node);
     return term;
 }
 
@@ -93,7 +95,7 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::Name& node) const {
     const auto& [constant, _position, _error_handler] = binding.value();
     const auto term = context.factories.terms.get_or_create<pddl::TermObjectImpl>(constant);
     // Add position of PDDL object
-    context.positions.push_back<pddl::TermImpl>(term, node);
+    context.positions.push_back(term, node);
     return term;
 }
 
@@ -109,7 +111,7 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const
     // Construct Term and return it
     const auto term = context.factories.terms.get_or_create<pddl::TermVariableImpl>(variable);
     // Add position of PDDL object
-    context.positions.push_back<pddl::TermImpl>(term, node);
+    context.positions.push_back(term, node);
     return term;
 }
 
