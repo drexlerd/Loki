@@ -67,6 +67,8 @@ include_directories(include/)
 include_directories("${PROJECT_SOURCE_DIR}")
 # include_directories(BEFORE ${PROJECT_SOURCE_DIR}/external/spirit/include)
 
+add_subdirectory(external)
+
 add_subdirectory(src)
 
 add_subdirectory(exe)
