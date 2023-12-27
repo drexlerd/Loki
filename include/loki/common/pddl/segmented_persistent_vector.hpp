@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_COMMON_SEGMENTED_VECTOR_HPP_
-#define LOKI_INCLUDE_LOKI_COMMON_SEGMENTED_VECTOR_HPP_
+#ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_SEGMENTED_VECTOR_HPP_
+#define LOKI_INCLUDE_LOKI_COMMON_PDDL_SEGMENTED_VECTOR_HPP_
 
 #include <array>
 #include <cassert>
@@ -35,9 +35,7 @@ class SegmentedPersistentVector {
 private:
     std::vector<std::vector<T>> m_data;
 
-    int m_block_index;
-    int m_index_in_block;
-    int m_elements_per_block;
+    size_t m_elements_per_block;
 
     size_t m_size;
     size_t m_capacity;
@@ -46,16 +44,20 @@ private:
         // Add an additional vector with capacity N (1 allocation on average)
         m_data.resize(m_data.size() + 1);
         m_data.back().reserve(m_elements_per_block);
-        // Move to the next free block
-        ++m_block_index;
-        // Set index to next free position in block
-        m_index_in_block = 0;
         // Increase total capacity
         m_capacity += m_elements_per_block;
     }
 
+    size_t segment_index(int identifier) const {
+        return identifier / m_elements_per_block;
+    }
+
+    size_t element_index(int identifier) const {
+        return identifier % m_elements_per_block;
+    }
+
 public:
-    explicit SegmentedPersistentVector() : m_block_index(-1), m_index_in_block(0), m_elements_per_block(N / sizeof(T)), m_size(0), m_capacity(0) { 
+    explicit SegmentedPersistentVector() : m_elements_per_block(N / sizeof(T)), m_size(0), m_capacity(0) { 
         assert(m_elements_per_block > 0);
         // std::cout << "SegmentedPersistentVector(" << "bytes_per_segment: " << N << ", " << "sizeof(T): " << sizeof(T) << ", " << "elements_per_segment: " << N / sizeof(T) << std::endl;
     }
@@ -65,26 +67,20 @@ public:
         if (m_size >= m_capacity) {
             increase_capacity();
         }
-
-        auto& block = m_data[m_block_index];
+        auto& segment = m_data[segment_index(size())];
 
         // Take ownership of memory
-        block.push_back(std::move(value));
+        segment.push_back(std::move(value));
         // Fetch return value
-        const T& return_value = block[m_index_in_block];
-        // Move index to next free position in block
-        ++m_index_in_block;
-
+        const T& return_value = segment[element_index(size())];
+        
         ++m_size;
-
         return return_value;
     }
 
     const T& operator[](int identifier) const {
         assert(identifier >= 0 && identifier <= static_cast<int>(size()));
-        int block_index = identifier / m_elements_per_block;
-        int index_in_block = identifier % m_elements_per_block;
-        return m_data[block_index][index_in_block];
+        return m_data[segment_index(identifier)][element_index(identifier)];
     }
 
     size_t size() const {

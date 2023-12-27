@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_COMMON_PERSISTENT_FACTORY_HPP_
-#define LOKI_INCLUDE_LOKI_COMMON_PERSISTENT_FACTORY_HPP_
+#ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_PERSISTENT_FACTORY_HPP_
+#define LOKI_INCLUDE_LOKI_COMMON_PDDL_PERSISTENT_FACTORY_HPP_
 
 #include "segmented_persistent_vector.hpp"
 
@@ -30,6 +30,7 @@
 
 namespace loki {
 
+/// @brief Check whether T is a variant.
 template<typename T> struct is_variant : std::false_type {};
 
 template<typename ...Args>
@@ -71,7 +72,8 @@ public:
             ++m_count;
             /* Ensure that element with identifier i will be stored at location i*/
             assert(identifier == static_cast<int>(m_persistent_vector.size()));
-            return &m_persistent_vector.push_back(SubType(identifier, std::move(args)...));
+            // Move the arguments to avoid additional copies
+            return &m_persistent_vector.push_back(std::move(SubType(identifier, std::move(args)...)));
         }
         return &m_persistent_vector[getIdentifier(*it)];
     }

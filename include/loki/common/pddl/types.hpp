@@ -19,7 +19,7 @@
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_TYPES_HPP_
 
 #include "position.hpp"
-#include "../persistent_factory.hpp"
+#include "persistent_factory.hpp"
 
 #include "../../domain/pddl/action.hpp"
 #include "../../domain/pddl/atom.hpp"
