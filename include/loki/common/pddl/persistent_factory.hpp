@@ -53,15 +53,18 @@ static int getIdentifier(const T& holder) {
 template<typename HolderType>
 class PersistentFactory {
 private:
+    // To test uniqueness only, these elements are not persistent in memory.
     std::unordered_set<HolderType> m_uniqueness_set;
+    // Use pre-allocated memory to store PDDL object persistent and continuously for improved cache locality.
     SegmentedPersistentVector<HolderType> m_persistent_vector;
     
-    // Identifiers are shared across types since types can be polymorphic
     int m_count = 0;
-    // Mutex is shared for thread-safe changes to count that is shared across types
+
     std::mutex m_mutex;
 
 public:
+    /// @brief Returns a pointer to an existing object
+    ///        or creates it before if it does not exist.v
     template<typename SubType, typename... Args>
     [[nodiscard]] HolderType const* get_or_create(Args... args) {
         std::lock_guard<std::mutex> hold(m_mutex);
