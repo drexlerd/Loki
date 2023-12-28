@@ -40,7 +40,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptor& node, Context& context)
 
 pddl::Condition parse(const domain::ast::GoalDescriptorAtom& node, Context& context) {
     const auto condition = context.factories.conditions.get_or_create<pddl::ConditionLiteralImpl>(parse(node.atom, context));
-    context.positions.push_back<pddl::ConditionImpl>(condition, node);
+    context.positions.push_back(condition, node);
     return condition;
 }
 
@@ -51,14 +51,14 @@ pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, Context& c
     }
     context.referenced_values.untrack(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS);
     const auto condition = context.factories.conditions.get_or_create<pddl::ConditionLiteralImpl>(parse(node.literal, context));
-    context.positions.push_back<pddl::ConditionImpl>(condition, node);
+    context.positions.push_back(condition, node);
     return condition;
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorAnd& node, Context& context) {
     pddl::ConditionList condition_list = parse(node.goal_descriptors, context);
     const auto condition = context.factories.conditions.get_or_create<pddl::ConditionAndImpl>(condition_list);
-    context.positions.push_back<pddl::ConditionImpl>(condition, node);
+    context.positions.push_back(condition, node);
     return condition;
 }
 
@@ -70,7 +70,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, Context& contex
     context.referenced_values.untrack(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
     pddl::ConditionList condition_list = parse(node.goal_descriptors, context);
     const auto condition = context.factories.conditions.get_or_create<pddl::ConditionOrImpl>(condition_list);
-    context.positions.push_back<pddl::ConditionImpl>(condition, node);
+    context.positions.push_back(condition, node);
     return condition;
 }
 
@@ -82,7 +82,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorNot& node, Context& conte
     context.referenced_values.untrack(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
     pddl::Condition child_condition = parse(node.goal_descriptor, context);
     const auto condition = context.factories.conditions.get_or_create<pddl::ConditionNotImpl>(child_condition);
-    context.positions.push_back<pddl::ConditionImpl>(condition, node);
+    context.positions.push_back(condition, node);
     return condition;
 }
 
@@ -171,7 +171,7 @@ pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAnd& node, Cont
         condition_list.push_back(parse(child_node, context));
     }
     const auto condition = context.factories.conditions.get_or_create<pddl::ConditionAndImpl>(condition_list);
-    context.positions.push_back<pddl::ConditionImpl>(condition, node);
+    context.positions.push_back(condition, node);
     return condition;
 }
 
@@ -238,7 +238,7 @@ pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorAnd& node, Co
         condition_list.push_back(parse(child_node, context));
     }
     const auto condition = context.factories.conditions.get_or_create<pddl::ConditionAndImpl>(condition_list);
-    context.positions.push_back<pddl::ConditionImpl>(condition, node);
+    context.positions.push_back(condition, node);
     return condition;
 }
 

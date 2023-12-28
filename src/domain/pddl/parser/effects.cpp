@@ -67,7 +67,7 @@ pddl::Effect parse(const domain::ast::Effect& node, Context& context) {
 pddl::Effect parse(const domain::ast::EffectProductionLiteral& node, Context& context) {
     auto literal = parse(node.literal, context);
     const auto effect = context.factories.effects.get_or_create<pddl::EffectLiteralImpl>(literal);
-    context.positions.push_back<pddl::EffectImpl>(effect, node);
+    context.positions.push_back(effect, node);
     return effect;
 }
 
@@ -87,7 +87,7 @@ pddl::Effect parse(const domain::ast::EffectProductionNumericFluentTotalCost& no
     context.referenced_pointers.untrack(function->get_function_skeleton());
     const auto function_expression = boost::apply_visitor(FunctionExpressionVisitor(context), node.numeric_term);
     const auto effect = context.factories.effects.get_or_create<pddl::EffectNumericImpl>(assign_operator_increase, function, function_expression);
-    context.positions.push_back<pddl::EffectImpl>(effect, node);
+    context.positions.push_back(effect, node);
     return effect;
 }
 
@@ -100,7 +100,7 @@ pddl::Effect parse(const domain::ast::EffectProductionNumericFluentGeneral& node
     context.referenced_pointers.untrack(function->get_function_skeleton());
     const auto function_expression = parse(node.function_expression, context);
     const auto effect = context.factories.effects.get_or_create<pddl::EffectNumericImpl>(assign_operator, function, function_expression);
-    context.positions.push_back<pddl::EffectImpl>(effect, node);
+    context.positions.push_back(effect, node);
     return effect;
 }
 
@@ -125,7 +125,7 @@ pddl::Effect parse(const domain::ast::EffectConditionalForall& node, Context& co
     
     context.scopes.close_scope();
     const auto effect = context.factories.effects.get_or_create<pddl::EffectConditionalForallImpl>(parameters, child_effect);
-    context.positions.push_back<pddl::EffectImpl>(effect, node);
+    context.positions.push_back(effect, node);
     return effect;
 }
 
@@ -135,7 +135,7 @@ pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, Context& cont
     const auto child_effect = parse(node.effect, context);
     context.scopes.close_scope();
     const auto effect = context.factories.effects.get_or_create<pddl::EffectConditionalWhenImpl>(condition, child_effect);
-    context.positions.push_back<pddl::EffectImpl>(effect, node);
+    context.positions.push_back(effect, node);
     return effect;
 }
 
@@ -145,7 +145,7 @@ pddl::Effect parse(const domain::ast::EffectConditional& node, Context& context)
         throw UndefinedRequirementError(pddl::RequirementEnum::CONDITIONAL_EFFECTS, context.scopes.get_error_handler()(node, ""));
     }
     const auto effect = boost::apply_visitor(EffectVisitor(context), node);
-    context.positions.push_back<pddl::EffectImpl>(effect, node);
+    context.positions.push_back(effect, node);
     return effect;
 }
 

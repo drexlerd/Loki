@@ -66,7 +66,7 @@ pddl::FunctionExpression parse(const domain::ast::FunctionExpression& node, Cont
 pddl::FunctionExpression parse(const domain::ast::FunctionExpressionNumber& node, Context& context) {
     const auto number = parse(node.number);
     const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionNumberImpl>(number);
-    context.positions.push_back<pddl::FunctionExpressionImpl>(function_expression, node);
+    context.positions.push_back(function_expression, node);
     return function_expression;
 }
 
@@ -75,21 +75,21 @@ pddl::FunctionExpression parse(const domain::ast::FunctionExpressionBinaryOp& no
     const auto left_function_expression = parse(node.function_expression_left, context);
     const auto right_function_expression = parse(node.function_expression_right, context);
     const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionBinaryOperatorImpl>(binary_operator, left_function_expression, right_function_expression);
-    context.positions.push_back<pddl::FunctionExpressionImpl>(function_expression, node);
+    context.positions.push_back(function_expression, node);
     return function_expression;
 }
 
 pddl::FunctionExpression parse(const domain::ast::FunctionExpressionMinus& node, Context& context) {
     const auto child_function_expression = parse(node.function_expression, context);
     const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionMinusImpl>(child_function_expression);
-    context.positions.push_back<pddl::FunctionExpressionImpl>(function_expression, node);
+    context.positions.push_back(function_expression, node);
     return function_expression;
 }
 
 pddl::FunctionExpression parse(const domain::ast::FunctionExpressionHead node, Context& context) {
     const auto function = parse(node.function_head, context);
     const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionFunctionImpl>(function);
-    context.positions.push_back<pddl::FunctionExpressionImpl>(function_expression, node);
+    context.positions.push_back(function_expression, node);
     return function_expression;
 }
 
