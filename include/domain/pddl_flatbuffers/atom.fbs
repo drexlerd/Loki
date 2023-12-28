@@ -1,0 +1,14 @@
+include "predicate.fbs";
+include "term.fbs";
+
+
+namespace loki::pddl_flat;
+
+
+table Atom {
+  identifier:int;
+  predicate:Predicate
+  terms:[Term]
+}
+ 
+root_type Atom;

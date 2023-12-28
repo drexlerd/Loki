@@ -1,0 +1,10 @@
+namespace loki::pddl_flat;
+
+
+table Predicate {
+  identifier:int;
+  name:string;
+  arity:int;
+}
+ 
+root_type Predicate;

@@ -1,0 +1,9 @@
+include "object.fbs";
+include "variable.fbs";
+
+namespace loki::pddl_flat;
+ 
+ 
+union Term { Object, Variable }
+
+root_type Term;
