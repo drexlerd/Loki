@@ -42,6 +42,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorAtom& node, Context& cont
     context.positions.push_back<pddl::ConditionImpl>(condition, node);
     return condition;
 }
+
 pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, Context& context) {
     // requires :negative-preconditions
     if (!context.requirements->test(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS)) {
@@ -88,7 +89,12 @@ pddl::Condition parse(const domain::ast::GoalDescriptorImply& node, Context& con
     if (!context.requirements->test(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS)) {
         throw UnsupportedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
-    throw NotImplementedError("parse(const domain::ast::GoalDescriptorImply& node, Context& context)");
+    context.referenced_values.untrack(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
+    auto condition_left = parse(node.goal_descriptor_left, context); 
+    auto condition_right = parse(node.goal_descriptor_right, context); 
+    const auto condition = context.factories.conditions.get_or_create<pddl::ConditionImplyImpl>(condition_left, condition_right);
+    context.positions.push_back(condition, node);
+    return condition;
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorExists& node, Context& context) {

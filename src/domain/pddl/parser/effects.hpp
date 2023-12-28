@@ -42,6 +42,8 @@ struct AssignOperatorVisitor : boost::static_visitor<pddl::AssignOperatorEnum> {
     }
 };
 
+
+extern pddl::Effect parse(const std::vector<domain::ast::Effect>& effect_nodes, Context& context);
 extern pddl::Effect parse(const domain::ast::Effect& node, Context& context);
 extern pddl::Effect parse(const domain::ast::EffectProductionLiteral& node, Context& context);
 extern pddl::Effect parse(const domain::ast::EffectProductionNumericFluentTotalCost& node, Context& context);
@@ -51,38 +53,16 @@ extern pddl::Effect parse(const domain::ast::EffectConditionalForall& node, Cont
 extern pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, Context& context);
 extern pddl::Effect parse(const domain::ast::EffectConditional& node, Context& context);
 
-struct EffectProductionVisitor : boost::static_visitor<pddl::Effect> {
-    Context& context;
-
-    EffectProductionVisitor(Context& context_);
-
-    template<typename Node>
-    pddl::Effect operator()(const Node& node) const {
-        return parse(node, context);
-    }
-};
-
-struct EffectConditionalVisitor : boost::static_visitor<pddl::Effect> {
-    Context& context;
-
-    EffectConditionalVisitor(Context& context_);
-
-    template<typename Node>
-    pddl::Effect operator()(const Node& node) const {
-        return parse(node, context);
-    }
-};
 
 struct EffectVisitor : boost::static_visitor<pddl::Effect> {
     Context& context;
 
     EffectVisitor(Context& context_);
 
-    pddl::Effect operator()(const std::vector<domain::ast::Effect>& effect_nodes) const;
-
-    pddl::Effect operator()(const domain::ast::EffectConditional& effect_node) const;
-
-    pddl::Effect operator()(const domain::ast::EffectProduction& effect_node) const;
+    template<typename Node>
+    pddl::Effect operator()(const Node& node) const {
+        return parse(node, context);
+    }
 
 };
 

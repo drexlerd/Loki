@@ -75,10 +75,12 @@ namespace loki::pddl {
     class ConditionAndImpl;
     class ConditionOrImpl;
     class ConditionNotImpl;
+    class ConditionImplyImpl;
     using ConditionImpl = std::variant<ConditionLiteralImpl
         , ConditionAndImpl
         , ConditionOrImpl
-        , ConditionNotImpl>;
+        , ConditionNotImpl
+        , ConditionImplyImpl>;
     using Condition = const ConditionImpl*;
     using ConditionList = std::vector<Condition>;
     using ConditionSet = std::set<Condition>;

@@ -28,15 +28,14 @@
 
 
 namespace loki {
-/* References*/
-extern pddl::FunctionSkeleton parse_function_skeleton_reference(const domain::ast::FunctionSymbol& node, Context& context);
-
-/* Declarations */
+/* MultiOperator */
 struct MultiOperatorVisitor : boost::static_visitor<pddl::MultiOperatorEnum> {
     pddl::MultiOperatorEnum operator()(const domain::ast::MultiOperatorMul& node) const;
     pddl::MultiOperatorEnum operator()(const domain::ast::MultiOperatorPlus& node) const;
 };
 
+
+/* BinaryOperator */
 struct MultiToBinaryOperatorVisitor : boost::static_visitor<pddl::BinaryOperatorEnum> {
     pddl::BinaryOperatorEnum operator()(const domain::ast::MultiOperatorMul& node) const;
     pddl::BinaryOperatorEnum operator()(const domain::ast::MultiOperatorPlus& node) const;
@@ -49,10 +48,12 @@ struct BinaryOperatorVisitor : boost::static_visitor<pddl::BinaryOperatorEnum> {
 };
 
 
+/* FunctionExpression */
 extern pddl::FunctionExpression parse(const domain::ast::FunctionExpressionNumber& node, Context& context);
 extern pddl::FunctionExpression parse(const domain::ast::FunctionExpressionBinaryOp& node, Context& context);
 extern pddl::FunctionExpression parse(const domain::ast::FunctionExpressionMinus& node, Context& context);
 extern pddl::FunctionExpression parse(const domain::ast::FunctionExpressionHead node, Context& context);
+extern pddl::FunctionExpression parse(const domain::ast::FunctionExpression& node, Context& context);
 
 class FunctionExpressionVisitor : boost::static_visitor<pddl::FunctionExpression> {
 private:
@@ -67,10 +68,15 @@ public:
     }
 };
 
-extern pddl::FunctionExpression parse(const domain::ast::FunctionExpression& node, Context& context);
 
-
+/* Function */
 extern pddl::Function parse(const domain::ast::FunctionHead& node, Context& context);
+
+
+/* FunctionSkeleton */
+extern pddl::FunctionSkeleton parse_function_skeleton_reference(const domain::ast::FunctionSymbol& node, Context& context);
+extern pddl::FunctionSkeleton parse(const domain::ast::AtomicFunctionSkeletonTotalCost& node);
+extern pddl::FunctionSkeleton parse(const domain::ast::AtomicFunctionSkeletonGeneral& node);
 
 
 class AtomicFunctionSkeletonVisitor : boost::static_visitor<pddl::FunctionSkeleton> {
@@ -80,11 +86,17 @@ private:
 public:
     AtomicFunctionSkeletonVisitor(Context& context_);
 
-    pddl::FunctionSkeleton operator()(const domain::ast::AtomicFunctionSkeletonTotalCost& node);
-
-    pddl::FunctionSkeleton operator()(const domain::ast::AtomicFunctionSkeletonGeneral& node);
+    template<typename Node>
+    pddl::FunctionSkeleton operator()(const Node& node) {
+        return parse(node, context);
+    }
 };
 
+
+/* FunctionSkeletonList */
+extern pddl::FunctionSkeletonList parse(const std::vector<domain::ast::AtomicFunctionSkeleton>& formula_skeleton_nodes);
+extern pddl::FunctionSkeletonList parse(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& function_skeleton_list_recursively_node);
+extern pddl::FunctionSkeletonList parse(const domain::ast::Functions& functions_node, Context& context);
 
 class FunctionSkeletonListVisitor : boost::static_visitor<pddl::FunctionSkeletonList> {
 private:
@@ -93,12 +105,11 @@ private:
 public:
     FunctionSkeletonListVisitor(Context& context_);
 
-    pddl::FunctionSkeletonList operator()(const std::vector<domain::ast::AtomicFunctionSkeleton>& formula_skeleton_nodes);
-
-    pddl::FunctionSkeletonList operator()(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& function_skeleton_list_recursively_node);
+    template<typename Node>
+    pddl::FunctionSkeletonList operator()(const Node& node) {
+        return parse(node, context);
+    }
 };
-
-extern pddl::FunctionSkeletonList parse(const domain::ast::Functions& functions_node, Context& context);
 
 }
 

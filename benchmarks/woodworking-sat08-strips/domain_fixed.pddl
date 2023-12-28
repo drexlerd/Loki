@@ -32,7 +32,6 @@
             (in-highspeed-saw ?b - board ?m - highspeed-saw)
             (empty ?m - highspeed-saw)
             (has-colour ?machine - machine ?colour - acolour)
-            (contains-part ?b - board ?p - part)
             (grind-treatment-change ?old ?new - treatmentstatus)
             (is-smooth ?surface - surface))
 

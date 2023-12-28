@@ -24,16 +24,8 @@
 
 
 namespace loki {
-pddl::FunctionSkeleton parse_function_skeleton_reference(const domain::ast::FunctionSymbol& node, Context& context) {
-    auto function_name = parse(node.name);
-    auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
-    if (!binding.has_value()) {
-        throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node, ""));
-    }
-    const auto& [function_skeleton, _position, _error_handler] = binding.value();
-    return function_skeleton;
-}
 
+/* MultiOperator */
 pddl::MultiOperatorEnum MultiOperatorVisitor::operator()(const domain::ast::MultiOperatorMul&) const {
     return pddl::MultiOperatorEnum::MUL;
 }
@@ -43,6 +35,7 @@ pddl::MultiOperatorEnum MultiOperatorVisitor::operator()(const domain::ast::Mult
 }
 
 
+/* BinaryOperator */
 pddl::BinaryOperatorEnum MultiToBinaryOperatorVisitor::operator()(const domain::ast::MultiOperatorMul&) const {
     return pddl::BinaryOperatorEnum::MUL;
 }
@@ -64,6 +57,11 @@ pddl::BinaryOperatorEnum BinaryOperatorVisitor::operator()(const domain::ast::Mu
     return boost::apply_visitor(MultiToBinaryOperatorVisitor(), node);
 }
 
+
+/* FunctionExpression */
+pddl::FunctionExpression parse(const domain::ast::FunctionExpression& node, Context& context) {
+    return boost::apply_visitor(FunctionExpressionVisitor(context), node);
+}
 
 pddl::FunctionExpression parse(const domain::ast::FunctionExpressionNumber& node, Context& context) {
     const auto number = parse(node.number);
@@ -95,16 +93,11 @@ pddl::FunctionExpression parse(const domain::ast::FunctionExpressionHead node, C
     return function_expression;
 }
 
-
 FunctionExpressionVisitor::FunctionExpressionVisitor(Context& context_)
     : context(context_) { }
 
 
-pddl::FunctionExpression parse(const domain::ast::FunctionExpression& node, Context& context) {
-    return boost::apply_visitor(FunctionExpressionVisitor(context), node);
-}
-
-
+/* Function */
 pddl::Function parse(const domain::ast::FunctionHead& node, Context& context) {
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol, context);
     pddl::TermList term_list;
@@ -116,14 +109,24 @@ pddl::Function parse(const domain::ast::FunctionHead& node, Context& context) {
     }
     const auto function = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, term_list);
     context.positions.push_back(function, node);
+    context.referenced_pointers.untrack(function->get_function_skeleton());
     return function;
 }
 
 
-AtomicFunctionSkeletonVisitor::AtomicFunctionSkeletonVisitor(Context& context_)
-    : context(context_) { }
+/* FunctionSkeleton */
+pddl::FunctionSkeleton parse_function_skeleton_reference(const domain::ast::FunctionSymbol& node, Context& context) {
+    auto function_name = parse(node.name);
+    auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
+    if (!binding.has_value()) {
+        throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node, ""));
+    }
+    const auto& [function_skeleton, _position, _error_handler] = binding.value();
+    context.referenced_pointers.untrack(function_skeleton);
+    return function_skeleton;
+}
 
-pddl::FunctionSkeleton AtomicFunctionSkeletonVisitor::operator()(const domain::ast::AtomicFunctionSkeletonTotalCost& node) {
+pddl::FunctionSkeleton parse(const domain::ast::AtomicFunctionSkeletonTotalCost& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::ACTION_COSTS, context.positions.get_error_handler()(node, ""));
     } else {
@@ -153,10 +156,11 @@ pddl::FunctionSkeleton AtomicFunctionSkeletonVisitor::operator()(const domain::a
     auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, pddl::ParameterList{}, type);
     context.positions.push_back(function_skeleton, node);
     context.scopes.insert<pddl::FunctionSkeletonImpl>(function_name, function_skeleton, node);
+    context.referenced_pointers.track(function_skeleton);
     return function_skeleton;
 }
 
-pddl::FunctionSkeleton AtomicFunctionSkeletonVisitor::operator()(const domain::ast::AtomicFunctionSkeletonGeneral& node) {
+pddl::FunctionSkeleton parse(const domain::ast::AtomicFunctionSkeletonGeneral& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
     } 
@@ -180,14 +184,16 @@ pddl::FunctionSkeleton AtomicFunctionSkeletonVisitor::operator()(const domain::a
     auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, type);
     context.positions.push_back(function_skeleton, node);
     context.scopes.insert<pddl::FunctionSkeletonImpl>(function_name, function_skeleton, node.function_symbol.name);
+    context.referenced_pointers.track(function_skeleton);
     return function_skeleton;
 }
 
-
-FunctionSkeletonListVisitor::FunctionSkeletonListVisitor(Context& context_)
+AtomicFunctionSkeletonVisitor::AtomicFunctionSkeletonVisitor(Context& context_)
     : context(context_) { }
 
-pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const std::vector<domain::ast::AtomicFunctionSkeleton>& formula_skeleton_nodes) {
+
+/* FunctionSkeletonList */
+pddl::FunctionSkeletonList parse(const std::vector<domain::ast::AtomicFunctionSkeleton>& formula_skeleton_nodes, Context& context) {
     auto function_skeleton_list = pddl::FunctionSkeletonList();
     for (const auto& atomic_function_skeleton : formula_skeleton_nodes) {
         auto function_skeleton = boost::apply_visitor(AtomicFunctionSkeletonVisitor(context), atomic_function_skeleton);
@@ -196,7 +202,7 @@ pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const std::ve
     return function_skeleton_list;
 }
 
-pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& function_skeleton_list_recursively_node) {
+pddl::FunctionSkeletonList parse(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& function_skeleton_list_recursively_node, Context& context) {
     auto function_skeleton_list = pddl::FunctionSkeletonList();
     for (const auto& atomic_function_skeleton : function_skeleton_list_recursively_node.atomic_function_skeletons) {
         auto function_skeleton = boost::apply_visitor(AtomicFunctionSkeletonVisitor(context), atomic_function_skeleton);
@@ -212,5 +218,8 @@ pddl::FunctionSkeletonList FunctionSkeletonListVisitor::operator()(const domain:
 pddl::FunctionSkeletonList parse(const domain::ast::Functions& functions_node, Context& context) {
     return boost::apply_visitor(FunctionSkeletonListVisitor(context), functions_node.function_types_list_of_atomic_function_skeletons);
 }
+
+FunctionSkeletonListVisitor::FunctionSkeletonListVisitor(Context& context_)
+    : context(context_) { }
 
 }

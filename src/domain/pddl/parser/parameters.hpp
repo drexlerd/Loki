@@ -26,6 +26,7 @@
 
 namespace loki {
 
+/* ParameterList */
 class ParameterListVisitor : boost::static_visitor<pddl::ParameterList> {
 private:
     Context& context;

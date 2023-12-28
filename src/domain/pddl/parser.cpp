@@ -85,15 +85,19 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context) {
         boost::apply_visitor(UnpackingVisitor(action_list, derived_predicate_list), variant);
     }
     // Check referenced_pointers
-    // cannot do that with constants
-    /*
-    for (const auto& constant : constants) {
-        if (!context.referenced_pointers.exists(constant)) {
-            const auto& [_constant, position, error_handler] = context.scopes.get<pddl::ObjectImpl>(constant->get_name()).value();
-            throw UnusedConstantError(constant->get_name(), error_handler(position.value(), ""));
+    for (const auto& predicate : predicates) {
+        if (context.referenced_pointers.exists(predicate)) {
+            const auto& [_predicate, position, error_handler] = context.scopes.get<pddl::PredicateImpl>(predicate->get_name()).value();
+            throw UnusedPredicateError(predicate->get_name(), error_handler(position.value(), ""));
         }
     }
-    */
+    for (const auto& function_skeleton : function_skeletons) {
+        if (context.referenced_pointers.exists(function_skeleton)) {
+            const auto& [_function_skeleton, position, error_handler] = context.scopes.get<pddl::FunctionSkeletonImpl>(function_skeleton->get_name()).value();
+            throw UnusedFunctionSkeletonError(function_skeleton->get_name(), error_handler(position.value(), ""));
+        }
+    }
+    
     const auto domain = context.factories.domains.get_or_create<pddl::DomainImpl>(domain_name, context.requirements, types, constants, predicates, function_skeletons, action_list);
     context.positions.push_back(domain, domain_node);
     return domain;

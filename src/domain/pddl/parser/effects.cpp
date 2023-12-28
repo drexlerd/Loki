@@ -52,6 +52,14 @@ pddl::AssignOperatorEnum parse(const domain::ast::AssignOperator& node) {
 }
 
 
+pddl::Effect parse(const std::vector<domain::ast::Effect>& effect_nodes, Context& context) {
+    pddl::EffectList effect_list;
+    for (const auto& effect_node : effect_nodes) {
+        effect_list.push_back(parse(effect_node, context));
+    }
+    return context.factories.effects.get_or_create<pddl::EffectAndImpl>(effect_list);
+}
+
 pddl::Effect parse(const domain::ast::Effect& node, Context& context) {
     return boost::apply_visitor(EffectVisitor(context), node);
 }
@@ -76,6 +84,7 @@ pddl::Effect parse(const domain::ast::EffectProductionNumericFluentTotalCost& no
     }
     const auto& [function_skeleton, _position, _error_handler] = binding.value();
     const auto function = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, pddl::TermList{});
+    context.referenced_pointers.untrack(function->get_function_skeleton());
     const auto function_expression = boost::apply_visitor(FunctionExpressionVisitor(context), node.numeric_term);
     const auto effect = context.factories.effects.get_or_create<pddl::EffectNumericImpl>(assign_operator_increase, function, function_expression);
     context.positions.push_back<pddl::EffectImpl>(effect, node);
@@ -88,6 +97,7 @@ pddl::Effect parse(const domain::ast::EffectProductionNumericFluentGeneral& node
     }
     const auto assign_operator = parse(node.assign_operator);
     const auto function = parse(node.function_head, context);
+    context.referenced_pointers.untrack(function->get_function_skeleton());
     const auto function_expression = parse(node.function_expression, context);
     const auto effect = context.factories.effects.get_or_create<pddl::EffectNumericImpl>(assign_operator, function, function_expression);
     context.positions.push_back<pddl::EffectImpl>(effect, node);
@@ -95,7 +105,7 @@ pddl::Effect parse(const domain::ast::EffectProductionNumericFluentGeneral& node
 }
 
 pddl::Effect parse(const domain::ast::EffectProduction& node, Context& context) {
-    return boost::apply_visitor(EffectProductionVisitor(context), node);
+    return boost::apply_visitor(EffectVisitor(context), node);
 }
 
 pddl::Effect parse(const domain::ast::EffectConditionalForall& node, Context& context) {
@@ -123,41 +133,12 @@ pddl::Effect parse(const domain::ast::EffectConditional& node, Context& context)
     if (!context.requirements->test(pddl::RequirementEnum::CONDITIONAL_EFFECTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::CONDITIONAL_EFFECTS, context.scopes.get_error_handler()(node, ""));
     }
-    const auto effect = boost::apply_visitor(EffectConditionalVisitor(context), node);
+    const auto effect = boost::apply_visitor(EffectVisitor(context), node);
     context.positions.push_back<pddl::EffectImpl>(effect, node);
     return effect;
 }
 
-
-EffectProductionVisitor::EffectProductionVisitor(Context& context_)
-    : context(context_) { }
-
-
-EffectConditionalVisitor::EffectConditionalVisitor(Context& context_)
-    : context(context_) { }
-
-
 EffectVisitor::EffectVisitor(Context& context_)
     : context(context_) { }
-
-pddl::Effect EffectVisitor::operator()(const std::vector<domain::ast::Effect>& effect_nodes) const {
-    pddl::EffectList effect_list;
-    for (const auto& effect_node : effect_nodes) {
-        effect_list.push_back(parse(effect_node, context));
-    }
-    return context.factories.effects.get_or_create<pddl::EffectAndImpl>(effect_list);
-}
-
-pddl::Effect EffectVisitor::operator()(const domain::ast::EffectConditional& node) const {
-    const auto effect = boost::apply_visitor(EffectConditionalVisitor(context), node);
-    context.positions.push_back(effect, node);
-    return effect;
-}
-
-pddl::Effect EffectVisitor::operator()(const domain::ast::EffectProduction& node) const {
-    const auto effect = boost::apply_visitor(EffectProductionVisitor(context), node);
-    context.positions.push_back(effect, node);
-    return effect;
-}
 
 }

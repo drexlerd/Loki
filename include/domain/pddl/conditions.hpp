@@ -110,6 +110,27 @@ public:
     const Condition& get_condition() const;
 };
 
+
+/* Imply */
+class ConditionImplyImpl : public Base<ConditionNotImpl> {
+private:
+    Condition m_condition_left;
+    Condition m_condition_right;
+
+    ConditionImplyImpl(int identifier, Condition condition_left, Condition condition_right);
+
+    template<typename HolderType>
+    friend class loki::PersistentFactory;
+
+public:
+    bool are_equal_impl(const ConditionImplyImpl& other) const;
+    size_t hash_impl() const;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
+
+    const Condition& get_condition_left() const;
+    const Condition& get_condition_right() const;
+};
+
 }
 
 
@@ -143,6 +164,12 @@ namespace std {
     struct hash<loki::pddl::ConditionNotImpl>
     {
         std::size_t operator()(const loki::pddl::ConditionNotImpl& condition) const;
+    };
+
+    template<>
+    struct hash<loki::pddl::ConditionImplyImpl>
+    {
+        std::size_t operator()(const loki::pddl::ConditionImplyImpl& condition) const;
     };
 }
 

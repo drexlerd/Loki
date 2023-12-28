@@ -37,6 +37,7 @@ pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formul
     if (predicate->get_parameters().size() != term_list.size()) {
         throw MismatchedPredicateTermListError(predicate, term_list, context.scopes.get_error_handler()(atomic_formula_of_terms_node, ""));
     }
+    context.referenced_pointers.untrack(predicate);
     const auto atom = context.factories.atoms.get_or_create<pddl::AtomImpl>(predicate, term_list);
     context.positions.push_back(atom, atomic_formula_of_terms_node);
     return atom;

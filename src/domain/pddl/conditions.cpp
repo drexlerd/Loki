@@ -136,7 +136,41 @@ const Condition& ConditionNotImpl::get_condition() const {
     return m_condition;
 }
 
+
+/* Imply */
+ConditionImplyImpl::ConditionImplyImpl(int identifier, Condition condition_left, Condition condition_right)
+    : Base(identifier), m_condition_left(condition_left), m_condition_right(condition_right) { }
+
+bool ConditionImplyImpl::are_equal_impl(const ConditionImplyImpl& other) const {
+    if (this != &other) {
+        return (m_condition_left == other.m_condition_left)
+            && (m_condition_right == other.m_condition_right);
+    }
+    return true;
 }
+
+size_t ConditionImplyImpl::hash_impl() const {
+    return hash_combine(m_condition_left, m_condition_right);
+}
+
+void ConditionImplyImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+    out << "(imply ";
+    std::visit(StringifyVisitor(out), *m_condition_left);
+    out << " ";
+    std::visit(StringifyVisitor(out), *m_condition_right);
+    out << ")";
+}
+
+const Condition& ConditionImplyImpl::get_condition_left() const {
+    return m_condition_left;
+}
+
+const Condition& ConditionImplyImpl::get_condition_right() const {
+    return m_condition_right;
+}
+
+}
+
 
 namespace std {
     bool less<loki::pddl::Condition>::operator()(
@@ -158,6 +192,10 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::ConditionNotImpl>::operator()(const loki::pddl::ConditionNotImpl& condition) const {
+        return condition.hash_impl();
+    }
+
+    std::size_t hash<loki::pddl::ConditionImplyImpl>::operator()(const loki::pddl::ConditionImplyImpl& condition) const {
         return condition.hash_impl();
     }
 }
