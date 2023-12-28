@@ -15,12 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/domain/pddl/parameter.hpp"
+#include "../../../include/domain/pddl/parameter.hpp"
 
-#include "../../../include/loki/domain/pddl/type.hpp"
-#include "../../../include/loki/domain/pddl/variable.hpp"
-#include "../../../include/loki/common/hash.hpp"
-#include "../../../include/loki/common/collections.hpp"
+#include "../../../include/domain/pddl/type.hpp"
+#include "../../../include/domain/pddl/variable.hpp"
+#include "../../../include/common/hash.hpp"
+#include "../../../include/common/collections.hpp"
 
 #include <cassert>
 

@@ -18,9 +18,9 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_TYPES_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_TYPES_HPP_
 
-#include "../../../../include/loki/domain/ast/ast.hpp"
-#include "../../../../include/loki/domain/pddl/parser.hpp"
-#include "../../../../include/loki/domain/pddl/type.hpp"
+#include "../../../../include/domain/ast/ast.hpp"
+#include "../../../../include/domain/pddl/parser.hpp"
+#include "../../../../include/domain/pddl/type.hpp"
 
 
 namespace loki {

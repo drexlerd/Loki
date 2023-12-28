@@ -50,10 +50,6 @@ include("configure_ccache")
 # CCache
 configure_ccache()
 
-# Python
-#find_package(Python REQUIRED)
-#find_package(PythonLibs REQUIRED)
-
 # Boost
 configure_boost()
 find_package(Boost ${BOOST_MIN_VERSION})
@@ -62,10 +58,6 @@ include_directories(${Boost_INCLUDE_DIRS})
 ##############################################################
 # Add library and executable targets
 ##############################################################
-
-include_directories(include/)
-include_directories("${PROJECT_SOURCE_DIR}")
-# include_directories(BEFORE ${PROJECT_SOURCE_DIR}/external/spirit/include)
 
 add_subdirectory(external)
 
@@ -83,9 +75,3 @@ endif()
 ###########
 # Install #
 ###########
-
-# Install cmake scripts
-install(
-    DIRECTORY "${PROJECT_SOURCE_DIR}/cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/sketches"
-)

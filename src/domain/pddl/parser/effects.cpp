@@ -22,7 +22,7 @@
 #include "literal.hpp"
 #include "parameters.hpp"
 #include "functions.hpp"
-#include "../../../../include/loki/domain/pddl/exceptions.hpp"
+#include "../../../../include/domain/pddl/exceptions.hpp"
 
 
 namespace loki {

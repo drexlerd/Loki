@@ -17,7 +17,7 @@
 
 #include "common.hpp"
 
-#include "../../../../include/loki/domain/pddl/exceptions.hpp"
+#include "../../../../include/domain/pddl/exceptions.hpp"
 
 using namespace loki::domain;
 using namespace std;

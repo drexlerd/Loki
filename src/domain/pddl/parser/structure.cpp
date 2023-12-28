@@ -22,9 +22,9 @@
 #include "parameters.hpp"
 #include "common.hpp"
 
-#include "../../../../include/loki/domain/pddl/exceptions.hpp"
-#include "../../../../include/loki/domain/pddl/action.hpp"
-#include "../../../../include/loki/domain/pddl/derived_predicate.hpp"
+#include "../../../../include/domain/pddl/exceptions.hpp"
+#include "../../../../include/domain/pddl/action.hpp"
+#include "../../../../include/domain/pddl/derived_predicate.hpp"
 
 
 namespace loki {

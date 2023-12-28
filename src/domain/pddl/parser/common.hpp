@@ -18,9 +18,9 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_COMMON_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_COMMON_HPP_
 
-#include "../../../../include/loki/domain/ast/ast.hpp"
+#include "../../../../include/domain/ast/ast.hpp"
 
-#include "../../../../include/loki/common/pddl/context.hpp"
+#include "../../../../include/common/pddl/context.hpp"
 
 
 namespace loki {

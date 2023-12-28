@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/problem/pddl/parser.hpp"
+#include "../../../include/problem/pddl/parser.hpp"
 
 #include "parser/objects.hpp"
 #include "parser/initial.hpp"
@@ -26,9 +26,9 @@
 #include "../../domain/pddl/parser/requirements.hpp"
 #include "../../domain/pddl/unpacking_visitor.hpp"
 
-#include "../../../include/loki/problem/pddl/exceptions.hpp"
-#include "../../../include/loki/domain/pddl/domain.hpp"
-#include "../../../include/loki/domain/pddl/requirements.hpp"
+#include "../../../include/problem/pddl/exceptions.hpp"
+#include "../../../include/domain/pddl/domain.hpp"
+#include "../../../include/domain/pddl/requirements.hpp"
 
 
 namespace loki {
