@@ -22,6 +22,8 @@
 
 #include "../../common/pddl/base.hpp"
 
+#include <optional>
+
 
 namespace loki {
 template<typename HolderType>
