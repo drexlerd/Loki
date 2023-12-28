@@ -18,6 +18,7 @@
 #include "../../../include/domain/pddl/conditions.hpp"
 
 #include "../../../include/domain/pddl/literal.hpp"
+#include "../../../include/domain/pddl/parameter.hpp"
 #include "../../../include/common/hash.hpp"
 #include "../../../include/common/collections.hpp"
 #include "../../../include/common/pddl/visitors.hpp"
@@ -139,7 +140,7 @@ const Condition& ConditionNotImpl::get_condition() const {
 
 /* Imply */
 ConditionImplyImpl::ConditionImplyImpl(int identifier, Condition condition_left, Condition condition_right)
-    : Base(identifier), m_condition_left(condition_left), m_condition_right(condition_right) { }
+    : Base(identifier), m_condition_left(std::move(condition_left)), m_condition_right(std::move(condition_right)) { }
 
 bool ConditionImplyImpl::are_equal_impl(const ConditionImplyImpl& other) const {
     if (this != &other) {
@@ -169,6 +170,76 @@ const Condition& ConditionImplyImpl::get_condition_right() const {
     return m_condition_right;
 }
 
+
+/* Exists */
+ConditionExistsImpl::ConditionExistsImpl(int identifier, ParameterList parameters, Condition condition)
+    : Base(identifier), m_parameters(std::move(parameters)), m_condition(std::move(condition)) { }
+
+bool ConditionExistsImpl::are_equal_impl(const ConditionExistsImpl& other) const {
+    if (this != &other) {
+        return (m_parameters == other.m_parameters)
+            && (m_condition == other.m_condition);
+    }
+}
+
+size_t ConditionExistsImpl::hash_impl() const {
+    return hash_combine(hash_vector(m_parameters), m_condition);
+}
+
+void ConditionExistsImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+    out << "(exists (";
+    for (size_t i = 0; i < m_parameters.size(); ++i) {
+        if (i != 0) out << " ";
+        out << *m_parameters[i];
+    }
+    out << ") ";
+    std::visit(StringifyVisitor(out), *m_condition);
+    out << ")";
+}
+
+const ParameterList& ConditionExistsImpl::get_parameters() const {
+    return m_parameters;
+}
+
+const Condition& ConditionExistsImpl::get_condition() const {
+    return m_condition;
+}
+
+
+/* Forall */
+ConditionForallImpl::ConditionForallImpl(int identifier, ParameterList parameters, Condition condition)
+    : Base(identifier), m_parameters(std::move(parameters)), m_condition(std::move(condition)) { }
+
+bool ConditionForallImpl::are_equal_impl(const ConditionForallImpl& other) const {
+    if (this != &other) {
+        return (m_parameters == other.m_parameters)
+            && (m_condition == other.m_condition);
+    }
+}
+
+size_t ConditionForallImpl::hash_impl() const {
+    return hash_combine(hash_vector(m_parameters), m_condition);
+}
+
+void ConditionForallImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+    out << "(forall (";
+    for (size_t i = 0; i < m_parameters.size(); ++i) {
+        if (i != 0) out << " ";
+        out << *m_parameters[i];
+    }
+    out << ") ";
+    std::visit(StringifyVisitor(out), *m_condition);
+    out << ")";
+}
+
+const ParameterList& ConditionForallImpl::get_parameters() const {
+    return m_parameters;
+}
+
+const Condition& ConditionForallImpl::get_condition() const {
+    return m_condition;
+}
+
 }
 
 
@@ -196,6 +267,14 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::ConditionImplyImpl>::operator()(const loki::pddl::ConditionImplyImpl& condition) const {
+        return condition.hash_impl();
+    }
+
+    std::size_t hash<loki::pddl::ConditionExistsImpl>::operator()(const loki::pddl::ConditionExistsImpl& condition) const {
+        return condition.hash_impl();
+    }
+
+    std::size_t hash<loki::pddl::ConditionForallImpl>::operator()(const loki::pddl::ConditionForallImpl& condition) const {
         return condition.hash_impl();
     }
 }

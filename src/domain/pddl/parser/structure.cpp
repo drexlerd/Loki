@@ -49,12 +49,14 @@ pddl::Action parse(const domain::ast::Action& node, Context& context) {
         context.referenced_pointers.track(parameter->get_variable());
     }
     auto [condition, effect] = parse(node.action_body, context);
+    // Check referenced_pointers
     for (const auto& parameter : parameters) {
         if (context.referenced_pointers.exists(parameter->get_variable())) {
             const auto& [variable, position, error_handler] = context.scopes.get<pddl::VariableImpl>(parameter->get_variable()->get_name()).value();
             throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
         }
     }
+    
     context.scopes.close_scope();
     const auto action = context.factories.actions.get_or_create<pddl::ActionImpl>(name, parameters, condition, effect);
     context.positions.push_back(action, node);

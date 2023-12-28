@@ -110,10 +110,21 @@ pddl::Effect parse(const domain::ast::EffectProduction& node, Context& context) 
 
 pddl::Effect parse(const domain::ast::EffectConditionalForall& node, Context& context) {
     context.scopes.open_scope();
-    const auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
+    const auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
+    for (const auto& parameter : parameters) {
+        context.referenced_pointers.track(parameter->get_variable());
+    }
     const auto child_effect = parse(node.effect, context);
+    // Check referenced_pointers
+    for (const auto& parameter : parameters) {
+        if (context.referenced_pointers.exists(parameter->get_variable())) {
+            const auto& [variable, position, error_handler] = context.scopes.get<pddl::VariableImpl>(parameter->get_variable()->get_name()).value();
+            throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
+        }
+    }
+    
     context.scopes.close_scope();
-    const auto effect = context.factories.effects.get_or_create<pddl::EffectConditionalForallImpl>(parameter_list, child_effect);
+    const auto effect = context.factories.effects.get_or_create<pddl::EffectConditionalForallImpl>(parameters, child_effect);
     context.positions.push_back<pddl::EffectImpl>(effect, node);
     return effect;
 }

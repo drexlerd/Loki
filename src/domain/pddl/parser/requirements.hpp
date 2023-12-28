@@ -26,44 +26,27 @@ using namespace loki::domain;
 
 namespace loki {
 
+/* Requirements */
+extern pddl::RequirementEnumSet parse(const domain::ast::Requirements& requirements_node, Context& context);
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementStrips& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementTyping& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementNegativePreconditions& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementDisjunctivePreconditions& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementEquality& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementExistentialPreconditions& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementUniversalPreconditions& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementQuantifiedPreconditions& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementConditionalEffects& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementFluents& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementObjectFluents& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementNumericFluents& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementAdl& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementDurativeActions& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementDerivedPredicates& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementTimedInitialLiterals& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementPreferences& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementConstraints& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::RequirementActionCosts& node, Context& context);
-
 extern pddl::RequirementEnumSet parse(const domain::ast::Requirement& node, Context& context);
 
 struct RequirementVisitor : boost::static_visitor<pddl::RequirementEnumSet> {
@@ -76,8 +59,6 @@ struct RequirementVisitor : boost::static_visitor<pddl::RequirementEnumSet> {
         return parse(node, context);
     }
 };
-
-extern pddl::RequirementEnumSet parse(const domain::ast::Requirements& requirements_node, Context& context);
 
 }
 

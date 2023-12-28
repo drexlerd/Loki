@@ -131,6 +131,48 @@ public:
     const Condition& get_condition_right() const;
 };
 
+
+/* Exists */
+class ConditionExistsImpl : public Base<ConditionExistsImpl> {
+private:
+    ParameterList m_parameters;
+    Condition m_condition;
+
+    ConditionExistsImpl(int identifier, ParameterList parameters, Condition condition);
+
+    template<typename HolderType>
+    friend class loki::PersistentFactory;
+
+public:
+    bool are_equal_impl(const ConditionExistsImpl& other) const;
+    size_t hash_impl() const;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
+
+    const ParameterList& get_parameters() const;
+    const Condition& get_condition() const;
+};
+
+
+/* Forall */
+class ConditionForallImpl : public Base<ConditionForallImpl> {
+private:
+    ParameterList m_parameters;
+    Condition m_condition;
+
+    ConditionForallImpl(int identifier, ParameterList parameters, Condition condition);
+
+    template<typename HolderType>
+    friend class loki::PersistentFactory;
+
+public:
+    bool are_equal_impl(const ConditionForallImpl& other) const;
+    size_t hash_impl() const;
+    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
+
+    const ParameterList& get_parameters() const;
+    const Condition& get_condition() const;
+};
+
 }
 
 
@@ -170,6 +212,18 @@ namespace std {
     struct hash<loki::pddl::ConditionImplyImpl>
     {
         std::size_t operator()(const loki::pddl::ConditionImplyImpl& condition) const;
+    };
+
+    template<>
+    struct hash<loki::pddl::ConditionExistsImpl>
+    {
+        std::size_t operator()(const loki::pddl::ConditionExistsImpl& condition) const;
+    };
+
+    template<>
+    struct hash<loki::pddl::ConditionForallImpl>
+    {
+        std::size_t operator()(const loki::pddl::ConditionForallImpl& condition) const;
     };
 }
 

@@ -28,6 +28,7 @@
 
 namespace loki {
 
+/* AssignOperator */
 extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorAssign& node);
 extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleUp& node);
 extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorScaleDown& node);
@@ -43,6 +44,7 @@ struct AssignOperatorVisitor : boost::static_visitor<pddl::AssignOperatorEnum> {
 };
 
 
+/* Effects */
 extern pddl::Effect parse(const std::vector<domain::ast::Effect>& effect_nodes, Context& context);
 extern pddl::Effect parse(const domain::ast::Effect& node, Context& context);
 extern pddl::Effect parse(const domain::ast::EffectProductionLiteral& node, Context& context);
@@ -52,7 +54,6 @@ extern pddl::Effect parse(const domain::ast::EffectProduction& node, Context& co
 extern pddl::Effect parse(const domain::ast::EffectConditionalForall& node, Context& context);
 extern pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, Context& context);
 extern pddl::Effect parse(const domain::ast::EffectConditional& node, Context& context);
-
 
 struct EffectVisitor : boost::static_visitor<pddl::Effect> {
     Context& context;
