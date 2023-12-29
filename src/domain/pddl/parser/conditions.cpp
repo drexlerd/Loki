@@ -76,10 +76,10 @@ pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, Context& contex
 
 pddl::Condition parse(const domain::ast::GoalDescriptorNot& node, Context& context) {
     // requires :disjunctive-preconditions
-    if (!context.requirements->test(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS)) {
-        throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
+    if (!context.requirements->test(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS)) {
+        throw UndefinedRequirementError(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
-    context.referenced_values.untrack(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
+    context.referenced_values.untrack(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS);
     pddl::Condition child_condition = parse(node.goal_descriptor, context);
     const auto condition = context.factories.conditions.get_or_create<pddl::ConditionNotImpl>(child_condition);
     context.positions.push_back(condition, node);

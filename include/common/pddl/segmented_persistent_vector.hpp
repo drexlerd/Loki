@@ -57,8 +57,7 @@ private:
     }
 
 public:
-    explicit SegmentedPersistentVector() : m_size(0), m_capacity(0) { 
-    }
+    explicit SegmentedPersistentVector() : m_size(0), m_capacity(0) { }
 
     const T& push_back(T value) {
         // Increase capacity if necessary
