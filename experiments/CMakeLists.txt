@@ -1,0 +1,2 @@
+add_executable(persistent_factory "persistent_factory.cpp")
+target_link_libraries(persistent_factory parsers)

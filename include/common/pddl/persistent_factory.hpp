@@ -31,26 +31,6 @@
 
 namespace loki {
 
-/// @brief Check whether T is a variant.
-template<typename T> struct is_variant : std::false_type {};
-
-template<typename ...Args>
-struct is_variant<std::variant<Args...>> : std::true_type {};
-
-template<typename T>
-inline constexpr bool is_variant_v=is_variant<T>::value;
-
-template<typename T>
-static int getIdentifier(const T& holder) {
-    if constexpr (is_variant_v<T>) {
-        // Use std::visit for std::variant
-        return std::visit([](const auto& obj) { return obj.get_identifier(); }, holder);
-    } else {
-        // Direct call for non-variant types
-        return holder.get_identifier();
-    }
-}
-
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory {
 private:
@@ -103,7 +83,8 @@ public:
         /* Test for uniqueness */
         const auto [it, inserted] = m_uniqueness_set.emplace(element_ptr);
         if (inserted) {
-            // validate the element by increasing the identifier to the next free position
+            // Element is unique! 
+            // Validate the element by increasing the identifier to the next free position
             ++m_count;
         }
         return element_ptr;
