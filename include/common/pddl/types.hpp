@@ -44,15 +44,14 @@
 
 
 namespace loki {
-
 using RequirementFactory = PersistentFactory<pddl::RequirementsImpl, 100>;
-using TypeFactory = PersistentFactory<pddl::TypeImpl, 100>;
-using VariableFactory = PersistentFactory<pddl::VariableImpl, 100>;
-using TermFactory = PersistentFactory<pddl::TermImpl, 100>;
-using ObjectFactory = PersistentFactory<pddl::ObjectImpl, 100>;
-using AtomFactory = PersistentFactory<pddl::AtomImpl, 100>;
-using LiteralFactory = PersistentFactory<pddl::LiteralImpl, 100>;
-using ParameterFactory = PersistentFactory<pddl::ParameterImpl, 100>;
+using TypeFactory = PersistentFactory<pddl::TypeImpl, 1000>;
+using VariableFactory = PersistentFactory<pddl::VariableImpl, 1000>;
+using TermFactory = PersistentFactory<pddl::TermImpl, 1000>;
+using ObjectFactory = PersistentFactory<pddl::ObjectImpl, 1000>;
+using AtomFactory = PersistentFactory<pddl::AtomImpl, 1000>;
+using LiteralFactory = PersistentFactory<pddl::LiteralImpl, 1000>;
+using ParameterFactory = PersistentFactory<pddl::ParameterImpl, 1000>;
 using PredicateFactory = PersistentFactory<pddl::PredicateImpl, 100>;
 using FunctionExpressionFactory = PersistentFactory<pddl::FunctionExpressionImpl, 100>;
 using FunctionFactory = PersistentFactory<pddl::FunctionImpl, 100>;

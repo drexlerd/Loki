@@ -17,6 +17,7 @@
 
 #include "../../include/problem/parser.hpp"
 
+#include "../../include/common/memory.hpp"
 #include "../../include/common/ast/error_reporting.hpp"
 #include "../../include/common/pddl/error_reporting.hpp"
 #include "../../include/common/pddl/context.hpp"
@@ -86,9 +87,12 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
     // Only the global scope remains
     assert(context.scopes.get_stack().size() == 1);
 
+    const auto [vm_usage, resident_set] = process_mem_usage();
     const auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     std::cout << "Finished parsing after " << duration.count() << " milliseconds." << std::endl;
+    std::cout << "Peak virtual memory: " << vm_usage << " KB." << std::endl;
+    std::cout << "Peak resident set size: " << resident_set << " KB." << std::endl;
 }
 
 const PDDLPositionCache& ProblemParser::get_position_cache() const {

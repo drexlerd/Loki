@@ -75,6 +75,18 @@ public:
         return return_value;
     }
 
+    T& operator[](int index) {
+        assert(index < static_cast<int>(size()));
+        return m_data[segment_index(index)][element_index(index)];
+    }
+
+    void pop_back() {
+        assert(size() > 0);
+        auto& segment = m_data[segment_index(size() - 1)];
+        segment.pop_back();
+        --m_size;
+    }
+
     const T& operator[](int identifier) const {
         assert(identifier >= 0 && identifier <= static_cast<int>(size()));
         return m_data[segment_index(identifier)][element_index(identifier)];

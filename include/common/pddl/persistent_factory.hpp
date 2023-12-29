@@ -54,8 +54,24 @@ static int getIdentifier(const T& holder) {
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory {
 private:
-    // To test uniqueness only, these elements are not persistent in memory.
-    std::unordered_set<HolderType> m_uniqueness_set;
+    template<typename T>
+    struct DerferencedHash {
+        std::size_t operator()(const T* ptr) const {
+            return std::hash<T>()(*ptr);
+        }
+    };
+
+    /// @brief Equality comparison of the objects underlying the pointers.
+    template<typename T>
+    struct DereferencedEquality {
+        bool operator()(const T* left, const T* right) const {
+            return *left == *right;
+        }
+    };
+
+    // We use an unordered_set to test for uniqueness.
+    // We use pointers to the persistent memory to reduce allocations.
+    std::unordered_set<const HolderType*, DerferencedHash<HolderType>, DereferencedEquality<HolderType>> m_uniqueness_set;
     // Use pre-allocated memory to store PDDL object persistent and continuously for improved cache locality.
     SegmentedPersistentVector<HolderType, N> m_persistent_vector;
     
@@ -69,17 +85,28 @@ public:
     template<typename SubType, typename... Args>
     [[nodiscard]] HolderType const* get_or_create(Args... args) {
         std::lock_guard<std::mutex> hold(m_mutex);
+        /* Construct and insert the element in persistent memory. */
         int identifier = m_count;
-        /* Must explicitly call the constructor of T to give exclusive access to the factory. */
-        const auto [it, inserted] = m_uniqueness_set.emplace(SubType(identifier, args...));
-        if (inserted) {
-            ++m_count;
-            /* Ensure that element with identifier i will be stored at location i*/
-            assert(identifier == static_cast<int>(m_persistent_vector.size()));
-            // Move the arguments to avoid additional copies
-            return &m_persistent_vector.push_back(std::move(SubType(identifier, std::move(args)...)));
+        // Ensure that element with identifier i is stored at position i.
+        assert((identifier == (static_cast<int>(m_persistent_vector.size())-1))
+            || (identifier == static_cast<int>(m_persistent_vector.size())));
+        // The pointer to the location in persistent memory.
+        const auto* element_ptr = static_cast<HolderType*>(nullptr);
+        // Explicitly call the constructor of T to give exclusive access to the factory.
+        auto element = HolderType(std::move(SubType(identifier, std::move(args)...)));
+        bool overwrite_last_element = (identifier == static_cast<int>(m_persistent_vector.size()) - 1);
+        if (overwrite_last_element) {
+            element_ptr = &(m_persistent_vector[identifier] = std::move(element));
+        } else {
+            element_ptr = &(m_persistent_vector.push_back(std::move(element)));
         }
-        return &m_persistent_vector[getIdentifier(*it)];
+        /* Test for uniqueness */
+        const auto [it, inserted] = m_uniqueness_set.emplace(element_ptr);
+        if (inserted) {
+            // validate the element by increasing the identifier to the next free position
+            ++m_count;
+        }
+        return element_ptr;
     }
 };
 
