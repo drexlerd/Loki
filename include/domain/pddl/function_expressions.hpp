@@ -26,7 +26,7 @@
 
 
 namespace loki {
-template<typename HolderType>
+template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
@@ -58,7 +58,7 @@ private:
 
     FunctionExpressionNumberImpl(int identifier, double number);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -82,7 +82,7 @@ private:
         FunctionExpression left_function_expression,
         FunctionExpression right_function_expression);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -106,7 +106,7 @@ private:
         MultiOperatorEnum multi_operator,
         FunctionExpressionList function_expressions);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -126,7 +126,7 @@ private:
 
     FunctionExpressionMinusImpl(int identifier, FunctionExpression function_expression);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -145,7 +145,7 @@ private:
 
     FunctionExpressionFunctionImpl(int identifier, Function function);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:

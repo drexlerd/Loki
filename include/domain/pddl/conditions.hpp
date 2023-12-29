@@ -28,7 +28,7 @@
 
 
 namespace loki {
-template<typename HolderType>
+template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
@@ -42,7 +42,7 @@ private:
 
     ConditionLiteralImpl(int identifier, Literal literal);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -61,7 +61,7 @@ private:
 
     ConditionAndImpl(int identifier, ConditionList conditions);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -80,7 +80,7 @@ private:
 
     ConditionOrImpl(int identifier, ConditionList conditions);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -99,7 +99,7 @@ private:
 
     ConditionNotImpl(int identifier, Condition condition);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -119,7 +119,7 @@ private:
 
     ConditionImplyImpl(int identifier, Condition condition_left, Condition condition_right);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -140,7 +140,7 @@ private:
 
     ConditionExistsImpl(int identifier, ParameterList parameters, Condition condition);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -161,7 +161,7 @@ private:
 
     ConditionForallImpl(int identifier, ParameterList parameters, Condition condition);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:

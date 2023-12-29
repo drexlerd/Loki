@@ -18,6 +18,8 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_SEGMENTED_VECTOR_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_SEGMENTED_VECTOR_HPP_
 
+#include "declarations.hpp"
+
 #include <array>
 #include <cassert>
 #include <memory>
@@ -28,38 +30,34 @@
 
 namespace loki {
 
-using BytesPerSegment = size_t;
-
-template<typename T, BytesPerSegment N=100000>
+template<typename T, ElementsPerSegment N>
 class SegmentedPersistentVector {
+    static_assert(N > 0, "Segment size N must be greater than 0");
+
 private:
     std::vector<std::vector<T>> m_data;
-
-    size_t m_elements_per_block;
 
     size_t m_size;
     size_t m_capacity;
 
     void increase_capacity() {
-        // Add an additional vector with capacity N (1 allocation on average)
+        // Add an additional vector with capacity N
         m_data.resize(m_data.size() + 1);
-        m_data.back().reserve(m_elements_per_block);
+        m_data.back().reserve(N);
         // Increase total capacity
-        m_capacity += m_elements_per_block;
+        m_capacity += N;
     }
 
     size_t segment_index(int identifier) const {
-        return identifier / m_elements_per_block;
+        return identifier / N;
     }
 
     size_t element_index(int identifier) const {
-        return identifier % m_elements_per_block;
+        return identifier % N;
     }
 
 public:
-    explicit SegmentedPersistentVector() : m_elements_per_block(N / sizeof(T)), m_size(0), m_capacity(0) { 
-        assert(m_elements_per_block > 0);
-        // std::cout << "SegmentedPersistentVector(" << "bytes_per_segment: " << N << ", " << "sizeof(T): " << sizeof(T) << ", " << "elements_per_segment: " << N / sizeof(T) << std::endl;
+    explicit SegmentedPersistentVector() : m_size(0), m_capacity(0) { 
     }
 
     const T& push_back(T value) {

@@ -26,7 +26,7 @@
 
 
 namespace loki {
-template<typename HolderType>
+template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
@@ -43,7 +43,7 @@ private:
     Condition m_goal_condition;
     std::optional<OptimizationMetric> m_optimization_metric;
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:

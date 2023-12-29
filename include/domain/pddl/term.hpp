@@ -24,7 +24,7 @@
 
 
 namespace loki {
-template<typename HolderType>
+template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
@@ -38,7 +38,7 @@ private:
 
     TermObjectImpl(int identifier, Object object);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -56,7 +56,7 @@ private:
 
     TermVariableImpl(int identifier, Variable variable);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:

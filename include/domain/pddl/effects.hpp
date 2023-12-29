@@ -26,7 +26,7 @@
 
 
 namespace loki {
-template<typename HolderType>
+template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
@@ -51,7 +51,7 @@ private:
 
     EffectLiteralImpl(int identifier, Literal literal);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -70,7 +70,7 @@ private:
 
     EffectAndImpl(int identifier, EffectList effects);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -91,7 +91,7 @@ private:
 
     EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -113,7 +113,7 @@ private:
 
     EffectConditionalForallImpl(int identifier, ParameterList parameters, Effect effect);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
@@ -134,7 +134,7 @@ private:
 
     EffectConditionalWhenImpl(int identifier, Condition condition, Effect effect);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:

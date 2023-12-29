@@ -45,26 +45,26 @@
 
 namespace loki {
 
-using RequirementFactory = PersistentFactory<pddl::RequirementsImpl>;
-using TypeFactory = PersistentFactory<pddl::TypeImpl>;
-using VariableFactory = PersistentFactory<pddl::VariableImpl>;
-using TermFactory = PersistentFactory<pddl::TermImpl>;
-using ObjectFactory = PersistentFactory<pddl::ObjectImpl>;
-using AtomFactory = PersistentFactory<pddl::AtomImpl>;
-using LiteralFactory = PersistentFactory<pddl::LiteralImpl>;
-using ParameterFactory = PersistentFactory<pddl::ParameterImpl>;
-using PredicateFactory = PersistentFactory<pddl::PredicateImpl>;
-using FunctionExpressionFactory = PersistentFactory<pddl::FunctionExpressionImpl>;
-using FunctionFactory = PersistentFactory<pddl::FunctionImpl>;
-using FunctionSkeletonFactory = PersistentFactory<pddl::FunctionSkeletonImpl>;
-using ConditionFactory = PersistentFactory<pddl::ConditionImpl>;
-using EffectFactory = PersistentFactory<pddl::EffectImpl>;
-using ActionFactory = PersistentFactory<pddl::ActionImpl>;
-using DerivedPredicateFactory = PersistentFactory<pddl::DerivedPredicateImpl>;
-using OptimizationMetricFactory = PersistentFactory<pddl::OptimizationMetricImpl>;
-using NumericFluentFactory = PersistentFactory<pddl::NumericFluentImpl>;
-using DomainFactory = PersistentFactory<pddl::DomainImpl>;
-using ProblemFactory = PersistentFactory<pddl::ProblemImpl>;
+using RequirementFactory = PersistentFactory<pddl::RequirementsImpl, 100>;
+using TypeFactory = PersistentFactory<pddl::TypeImpl, 100>;
+using VariableFactory = PersistentFactory<pddl::VariableImpl, 100>;
+using TermFactory = PersistentFactory<pddl::TermImpl, 100>;
+using ObjectFactory = PersistentFactory<pddl::ObjectImpl, 100>;
+using AtomFactory = PersistentFactory<pddl::AtomImpl, 100>;
+using LiteralFactory = PersistentFactory<pddl::LiteralImpl, 100>;
+using ParameterFactory = PersistentFactory<pddl::ParameterImpl, 100>;
+using PredicateFactory = PersistentFactory<pddl::PredicateImpl, 100>;
+using FunctionExpressionFactory = PersistentFactory<pddl::FunctionExpressionImpl, 100>;
+using FunctionFactory = PersistentFactory<pddl::FunctionImpl, 100>;
+using FunctionSkeletonFactory = PersistentFactory<pddl::FunctionSkeletonImpl, 100>;
+using ConditionFactory = PersistentFactory<pddl::ConditionImpl, 100>;
+using EffectFactory = PersistentFactory<pddl::EffectImpl, 100>;
+using ActionFactory = PersistentFactory<pddl::ActionImpl, 100>;
+using DerivedPredicateFactory = PersistentFactory<pddl::DerivedPredicateImpl, 100>;
+using OptimizationMetricFactory = PersistentFactory<pddl::OptimizationMetricImpl, 100>;
+using NumericFluentFactory = PersistentFactory<pddl::NumericFluentImpl, 100>;
+using DomainFactory = PersistentFactory<pddl::DomainImpl, 1>;
+using ProblemFactory = PersistentFactory<pddl::ProblemImpl, 100>;
 
 
 using PDDLPositionCache = PositionCache<pddl::RequirementsImpl

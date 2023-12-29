@@ -18,6 +18,7 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_PERSISTENT_FACTORY_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_PERSISTENT_FACTORY_HPP_
 
+#include "declarations.hpp"
 #include "segmented_persistent_vector.hpp"
 
 #include <unordered_set>
@@ -50,13 +51,13 @@ static int getIdentifier(const T& holder) {
     }
 }
 
-template<typename HolderType>
+template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory {
 private:
     // To test uniqueness only, these elements are not persistent in memory.
     std::unordered_set<HolderType> m_uniqueness_set;
     // Use pre-allocated memory to store PDDL object persistent and continuously for improved cache locality.
-    SegmentedPersistentVector<HolderType> m_persistent_vector;
+    SegmentedPersistentVector<HolderType, N> m_persistent_vector;
     
     int m_count = 0;
 

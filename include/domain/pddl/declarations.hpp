@@ -18,6 +18,8 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_DECLARATIONS_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_DECLARATIONS_HPP_
 
+#include "../../common/pddl/declarations.hpp"
+
 #include <memory>
 #include <string>
 #include <unordered_map>

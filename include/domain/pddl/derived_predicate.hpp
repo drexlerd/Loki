@@ -29,7 +29,7 @@
 
 
 namespace loki {
-template<typename HolderType>
+template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
@@ -42,7 +42,7 @@ private:
 
     DerivedPredicateImpl(int identifier, ParameterList parameters, Condition condition);
 
-    template<typename HolderType>
+    template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
 public:
