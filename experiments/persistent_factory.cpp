@@ -45,8 +45,12 @@ int main() {
     auto parameter_factory = loki::ParameterFactory();
     auto variable_factory = loki::VariableFactory();
     auto parameters = loki::pddl::ParameterList{
-        parameter_factory.get_or_create<loki::pddl::ParameterImpl>(variable_factory.get_or_create<loki::pddl::VariableImpl>("?variable_left"), loki::pddl::TypeList{}),
-        parameter_factory.get_or_create<loki::pddl::ParameterImpl>(variable_factory.get_or_create<loki::pddl::VariableImpl>("?variable_right"), loki::pddl::TypeList{})
+        parameter_factory.get_or_create<loki::pddl::ParameterImpl>(
+            variable_factory.get_or_create<loki::pddl::VariableImpl>("?variable_left"), 
+            loki::pddl::TypeList{}),
+        parameter_factory.get_or_create<loki::pddl::ParameterImpl>(
+            variable_factory.get_or_create<loki::pddl::VariableImpl>("?variable_right"), 
+            loki::pddl::TypeList{})
     };
 
     auto predicates = loki::pddl::PredicateList();
