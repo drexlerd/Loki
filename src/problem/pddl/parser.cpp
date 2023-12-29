@@ -56,6 +56,9 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
     if (problem_node.objects.has_value()) {
         objects = parse(problem_node.objects.value(), context);
     }
+    for (const auto& object : objects) {
+        context.referenced_pointers.track(object);
+    }
     /* Initial section */
     auto initial_literals = pddl::LiteralList();
     auto numeric_fluents = pddl::NumericFluentList();
@@ -69,6 +72,14 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
     auto optimization_metric = std::optional<pddl::OptimizationMetric>();
     if (problem_node.metric_specification.has_value()) {
         optimization_metric = parse(problem_node.metric_specification.value(), context);
+    }
+
+    // Check referenced_pointers
+    for (const auto& object : objects) {
+        if (context.referenced_pointers.exists(object)) {
+            const auto& [_object, position, error_handler] = context.scopes.get<pddl::ObjectImpl>(object->get_name()).value();
+            throw UnusedObjectError(object->get_name(), error_handler(position.value(), ""));
+        }
     }
 
     const auto problem = context.factories.problems.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects, initial_literals, numeric_fluents, goal_condition, optimization_metric);

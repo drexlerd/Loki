@@ -41,6 +41,7 @@ pddl::Object parse_object_reference(const domain::ast::Name& name_node, Context&
     }
     const auto& [object, _position, _error_handler] = binding.value();
     context.positions.push_back(object, name_node);
+    context.referenced_pointers.untrack(object);
     return object;
 }
 
