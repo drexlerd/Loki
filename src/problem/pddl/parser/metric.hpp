@@ -24,6 +24,12 @@
 
 
 namespace loki {
+
+/* OptimizationMetricEnum */
+extern pddl::OptimizationMetricEnum parse(const problem::ast::Optimization& node, Context& context);
+extern pddl::OptimizationMetricEnum parse(const problem::ast::OptimizationMinimize& node, Context& context);   
+extern pddl::OptimizationMetricEnum parse(const problem::ast::OptimizationMaximize& node, Context& context);
+
 class OptimizationDeclarationVisitor : boost::static_visitor<pddl::OptimizationMetric> {
 private:
     Context& context;
@@ -31,14 +37,17 @@ private:
 public:
     OptimizationDeclarationVisitor(Context& context_);
 
-    pddl::OptimizationMetricEnum operator()(const problem::ast::OptimizationMinimize& node);
-    
-    pddl::OptimizationMetricEnum operator()(const problem::ast::OptimizationMaximize& node);
+    template<typename Node> 
+    pddl::OptimizationMetricEnum operator()(const Node& node) const {
+        return parse(node, context);
+    }
 };
 
-extern pddl::OptimizationMetricEnum parse(const problem::ast::Optimization& node, Context& context);
 
-
+/* OptimizationMetric */
+extern pddl::OptimizationMetric parse(const problem::ast::MetricSpecification& node, Context& context);
+extern pddl::OptimizationMetric parse(const problem::ast::MetricSpecificationTotalCost& node, Context& context);
+extern pddl::OptimizationMetric parse(const problem::ast::MetricSpecificationGeneral& node, Context& context);
 
 class MetricSpecificationDeclarationVisitor : boost::static_visitor<pddl::OptimizationMetric> {
 private:
@@ -47,12 +56,11 @@ private:
 public:
     MetricSpecificationDeclarationVisitor(Context& context_);
 
-    pddl::OptimizationMetric operator()(const problem::ast::MetricSpecificationTotalCost& node);
-    
-    pddl::OptimizationMetric operator()(const problem::ast::MetricSpecificationGeneral& node);
+    template<typename Node> 
+    pddl::OptimizationMetric operator()(const Node& node) const {
+        return parse(node, context);
+    }
 };
-
-extern pddl::OptimizationMetric parse(const problem::ast::MetricSpecification& node, Context& context);
 
 }
 

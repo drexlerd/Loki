@@ -24,6 +24,7 @@
 
 namespace loki {
 
+/* Atom */
 extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, Context& context);
 extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, Context& context);
 extern pddl::Atom parse(const problem::ast::AtomicFormulaOfNames& node, Context& context);
@@ -42,6 +43,7 @@ public:
 };
 
 
+/* Literal */
 extern pddl::Literal parse(const problem::ast::Atom& node, Context& context);
 extern pddl::Literal parse(const problem::ast::NegatedAtom& node, Context& context);
 extern pddl::Literal parse(const problem::ast::Literal& node, Context& context);

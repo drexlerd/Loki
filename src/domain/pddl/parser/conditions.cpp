@@ -183,43 +183,43 @@ pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorForall& node, C
     return parse_condition_forall(node.typed_list_of_variables, node.constraint_goal_descriptor, context);
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAtEnd& node, Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAtEnd& /*node*/, Context& /*context*/) {
     throw NotImplementedError("parse(const domain::ast::ConstraintGoalDescriptorAtEnd& node, Context& context)");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAlways& node, Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAlways& /*node*/, Context& /*context*/) {
     throw NotImplementedError("parse(const domain::ast::ConstraintGoalDescriptorAlways& node, Context& context)");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometime& node, Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometime& /*node*/, Context& /*context*/) {
     throw NotImplementedError("parse(const domain::ast::ConstraintGoalDescriptorSometime& node, Context& context)");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorWithin& node, Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorWithin& /*node*/, Context& /*context*/) {
     throw NotImplementedError("parse(const domain::ast::ConstraintGoalDescriptorWithin& node, Context& context)");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAtMostOnce& node, Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAtMostOnce& /*node*/, Context& /*context*/) {
     throw NotImplementedError("parse(const domain::ast::ConstraintGoalDescriptorAtMostOnce& node, Context& context)");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometimeAfter& node, Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometimeAfter& /*node*/, Context& /*context*/) {
     throw NotImplementedError("parse(const domain::ast::ConstraintGoalDescriptorSometimeAfter& node, Context& context)");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometimeBefore& node, Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorSometimeBefore& /*node*/, Context& /*context*/) {
     throw NotImplementedError("parse(const domain::ast::ConstraintGoalDescriptorSometimeBefore& node, Context& context)");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAlwaysWithin& node, Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAlwaysWithin& /*node*/, Context& /*context*/) {
     throw NotImplementedError("parse(const domain::ast::ConstraintGoalDescriptorAlwaysWithin& node, Context& context)");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorHoldDuring& node, Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorHoldDuring& /*node*/, Context& /*context*/) {
     throw NotImplementedError("parse(const domain::ast::ConstraintGoalDescriptorHoldDuring& node, Context& context)");
 }
 
-pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorHoldAfter& node, Context& context) {
+pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorHoldAfter& /*node*/, Context& /*context*/) {
     throw NotImplementedError("parse(const domain::ast::ConstraintGoalDescriptorHoldAfter& node, Context& context)");
 }
 

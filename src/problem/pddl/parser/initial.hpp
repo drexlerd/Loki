@@ -21,28 +21,36 @@
 #include "../../../../include/problem/ast/ast.hpp"
 #include "../../../../include/problem/pddl/parser.hpp"
 
+#include <variant>
+
 
 namespace loki {
 
-class InitialElementVisitor : boost::static_visitor<boost::variant<pddl::Literal, pddl::NumericFluent>> {
+/* Init */
+extern std::vector<std::variant<pddl::Literal, pddl::NumericFluent>> parse(
+    const problem::ast::Initial& initial_node, Context& context);
+
+extern std::variant<pddl::Literal, pddl::NumericFluent> parse(
+    const problem::ast::InitialElementLiteral& node);
+extern std::variant<pddl::Literal, pddl::NumericFluent> parse(
+    const problem::ast::InitialElementTimedLiterals& node);
+extern std::variant<pddl::Literal, pddl::NumericFluent> parse(
+    const problem::ast::InitialElementNumericFluentsTotalCost& node);
+extern std::variant<pddl::Literal, pddl::NumericFluent> parse(
+    const problem::ast::InitialElementNumericFluentsGeneral& node);
+
+class InitialElementVisitor : boost::static_visitor<std::variant<pddl::Literal, pddl::NumericFluent>> {
 private:
     Context& context;
 
 public:
     InitialElementVisitor(Context& context_);
 
-    boost::variant<pddl::Literal, pddl::NumericFluent> operator()(const problem::ast::InitialElementLiteral& node);
-
-    boost::variant<pddl::Literal, pddl::NumericFluent> operator()(const problem::ast::InitialElementTimedLiterals& node);
-
-    boost::variant<pddl::Literal, pddl::NumericFluent> operator()(const problem::ast::InitialElementNumericFluentsTotalCost& node);
-
-    boost::variant<pddl::Literal, pddl::NumericFluent> operator()(const problem::ast::InitialElementNumericFluentsGeneral& node);
+    template<typename Node>
+    std::variant<pddl::Literal, pddl::NumericFluent> operator()(const Node& node) const {
+        return parse(node, context);
+    }
 };
-
-
-extern std::vector<boost::variant<pddl::Literal, pddl::NumericFluent>> parse(
-    const problem::ast::Initial& initial_node, Context& context);
 
 }
 

@@ -24,7 +24,7 @@ using namespace loki::domain;
 
 namespace loki {
 
-pddl::RequirementEnumSet parse(const ast::RequirementStrips&, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementStrips&, Context& /*context*/) {
     // Strips as the minimal requirement must not be tracked.
     return { pddl::RequirementEnum::STRIPS };
 }

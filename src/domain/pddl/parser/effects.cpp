@@ -75,6 +75,7 @@ pddl::Effect parse(const domain::ast::EffectProductionNumericFluentTotalCost& no
     if (!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::ACTION_COSTS, context.scopes.get_error_handler()(node, ""));
     }
+    context.referenced_values.untrack(pddl::RequirementEnum::ACTION_COSTS);
     const auto assign_operator_increase = parse(node.assign_operator_increase);
     auto function_name = parse(node.function_symbol_total_cost.name);
     assert(function_name == "total-cost");
@@ -95,6 +96,7 @@ pddl::Effect parse(const domain::ast::EffectProductionNumericFluentGeneral& node
     if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.scopes.get_error_handler()(node, ""));
     }
+    context.referenced_values.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
     const auto assign_operator = parse(node.assign_operator);
     const auto function = parse(node.function_head, context);
     context.referenced_pointers.untrack(function->get_function_skeleton());
@@ -144,6 +146,7 @@ pddl::Effect parse(const domain::ast::EffectConditional& node, Context& context)
     if (!context.requirements->test(pddl::RequirementEnum::CONDITIONAL_EFFECTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::CONDITIONAL_EFFECTS, context.scopes.get_error_handler()(node, ""));
     }
+    context.referenced_values.untrack(pddl::RequirementEnum::CONDITIONAL_EFFECTS);
     const auto effect = boost::apply_visitor(EffectVisitor(context), node);
     context.positions.push_back(effect, node);
     return effect;

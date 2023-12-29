@@ -29,18 +29,24 @@
 
 namespace loki {
 
-InitialElementVisitor::InitialElementVisitor(Context& context_)
-    : context(context_) { }
+std::vector<std::variant<pddl::Literal, pddl::NumericFluent>> parse(
+    const problem::ast::Initial& initial_node, Context& context) {
+    std::vector<std::variant<pddl::Literal, pddl::NumericFluent>> initial_element_list;
+    for (const auto& initial_element : initial_node.initial_elements) {
+        initial_element_list.push_back(boost::apply_visitor(InitialElementVisitor(context), initial_element));
+    }
+    return initial_element_list;
+}
 
-boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operator()(const problem::ast::InitialElementLiteral& node) {
+std::variant<pddl::Literal, pddl::NumericFluent> parse(const problem::ast::InitialElementLiteral& node, Context& context) {
     return parse(node.literal, context);
 }
 
-boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operator()(const problem::ast::InitialElementTimedLiterals& node) {
+std::variant<pddl::Literal, pddl::NumericFluent> parse(const problem::ast::InitialElementTimedLiterals& /*node*/, Context& /*context*/) {
     throw NotImplementedError("InitialElementVisitor::operator()(const problem::ast::InitialElementTimedLiterals& node)");
 }
 
-boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operator()(const problem::ast::InitialElementNumericFluentsTotalCost& node) {
+std::variant<pddl::Literal, pddl::NumericFluent> parse(const problem::ast::InitialElementNumericFluentsTotalCost& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::ACTION_COSTS, context.scopes.get_error_handler()(node, ""));
     }
@@ -54,7 +60,7 @@ boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operat
     return context.factories.numeric_fluents.get_or_create<pddl::NumericFluentImpl>(basic_function_term, number);
 }
 
-boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operator()(const problem::ast::InitialElementNumericFluentsGeneral& node) {
+std::variant<pddl::Literal, pddl::NumericFluent> parse(const problem::ast::InitialElementNumericFluentsGeneral& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.scopes.get_error_handler()(node, ""));
     }
@@ -67,14 +73,7 @@ boost::variant<pddl::Literal, pddl::NumericFluent> InitialElementVisitor::operat
     return context.factories.numeric_fluents.get_or_create<pddl::NumericFluentImpl>(basic_function_term, number);
 }
 
-
-std::vector<boost::variant<pddl::Literal, pddl::NumericFluent>> parse(
-    const problem::ast::Initial& initial_node, Context& context) {
-    std::vector<boost::variant<pddl::Literal, pddl::NumericFluent>> initial_element_list;
-    for (const auto& initial_element : initial_node.initial_elements) {
-        initial_element_list.push_back(boost::apply_visitor(InitialElementVisitor(context), initial_element));
-    }
-    return initial_element_list;
-}
+InitialElementVisitor::InitialElementVisitor(Context& context_)
+    : context(context_) { }
 
 }

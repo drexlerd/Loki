@@ -25,6 +25,16 @@
 
 namespace loki {
 
+/* FunctionExpression */
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpression& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionNumber& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionBinaryOperator& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionMultiOperator& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionMinus& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionBasicFunctionTerm& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionTotalTime& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionPreferences& node, Context& context);
+
 class MetricFunctionExpressionDeclarationVisitor : boost::static_visitor<pddl::FunctionExpression> {
 private:
     Context& context; 
@@ -32,23 +42,14 @@ private:
 public:
     MetricFunctionExpressionDeclarationVisitor(Context& context_);
 
-    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionNumber& node);
-
-    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionBinaryOperator& node);
-
-    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionMultiOperator& node);
-
-    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionMinus& node);
-
-    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionBasicFunctionTerm& node);
-
-    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionTotalTime& node);
-
-    pddl::FunctionExpression operator()(const problem::ast::MetricFunctionExpressionPreferences& node);
+    template<typename Node>
+    pddl::FunctionExpression operator()(const Node& node) const {
+        return parse(node, context);
+    }
 };
 
-extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpression& node, Context& context);
 
+/* Function */
 extern pddl::Function parse(const problem::ast::BasicFunctionTerm& node, Context& context);
 
 }
