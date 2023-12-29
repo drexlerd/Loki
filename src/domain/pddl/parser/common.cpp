@@ -87,16 +87,16 @@ TermReferenceTermVisitor::TermReferenceTermVisitor(Context& context_)
     : context(context_) { }
 
 pddl::Term TermReferenceTermVisitor::operator()(const ast::Name& node) const {
-    const auto constant_name = parse(node);
+    const auto object_name = parse(node);
     // Test for undefined constant.
-    const auto binding = context.scopes.get<pddl::ObjectImpl>(constant_name);
+    const auto binding = context.scopes.get<pddl::ObjectImpl>(object_name);
     if (!binding.has_value()) {
-        throw UndefinedConstantError(constant_name, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedConstantError(object_name, context.scopes.get_error_handler()(node, ""));
     }
-    // Constant are not tracked and hence must not be untracked.
     // Construct Term and return it
-    const auto& [constant, _position, _error_handler] = binding.value();
-    const auto term = context.factories.terms.get_or_create<pddl::TermObjectImpl>(constant);
+    const auto& [object, _position, _error_handler] = binding.value();
+    context.referenced_pointers.untrack(object);
+    const auto term = context.factories.terms.get_or_create<pddl::TermObjectImpl>(object);
     // Add position of PDDL object
     context.positions.push_back(term, node);
     return term;
