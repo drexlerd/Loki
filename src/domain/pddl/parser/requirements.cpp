@@ -112,16 +112,22 @@ pddl::RequirementEnumSet parse(const ast::RequirementAdl&, Context& context) {
     // Strips as the minimal requirement must not be tracked.
     // ADL as a composite must not be tracked
     context.referenced_values.track(pddl::RequirementEnum::TYPING);
+    context.referenced_values.track(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS);
     context.referenced_values.track(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
     context.referenced_values.track(pddl::RequirementEnum::EQUALITY);
     context.referenced_values.track(pddl::RequirementEnum::QUANTIFIED_PRECONDITIONS);
+    context.referenced_values.track(pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS);
+    context.referenced_values.track(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS);
     context.referenced_values.track(pddl::RequirementEnum::CONDITIONAL_EFFECTS);
     return { pddl::RequirementEnum::ADL,
              pddl::RequirementEnum::STRIPS,
              pddl::RequirementEnum::TYPING,
+             pddl::RequirementEnum::NEGATIVE_PRECONDITIONS,
              pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS,
              pddl::RequirementEnum::EQUALITY,
              pddl::RequirementEnum::QUANTIFIED_PRECONDITIONS,
+             pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS,
+             pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS,
              pddl::RequirementEnum::CONDITIONAL_EFFECTS };
 }
 
