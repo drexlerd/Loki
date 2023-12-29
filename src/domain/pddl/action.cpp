@@ -59,12 +59,12 @@ void ActionImpl::str_impl(std::ostringstream& out, const FormattingOptions& opti
         out << ")";
         out << "\n";
         out << std::string(nested_options.indent, ' ') << ":conditions ";
-        if (m_condition.has_value()) std::visit(StringifyVisitor(out), *m_condition.value());
+        if (m_condition.has_value()) std::visit(StringifyVisitor(out, options), *m_condition.value());
         else out <<  "()" ;
 
         out << "\n";
         out << std::string(nested_options.indent, ' ') << ":effects ";
-        if (m_effect.has_value()) std::visit(StringifyVisitor(out), *m_effect.value());
+        if (m_effect.has_value()) std::visit(StringifyVisitor(out, options), *m_effect.value());
         else out <<  "()" ;
 
         out << ")\n";

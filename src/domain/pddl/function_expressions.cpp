@@ -98,11 +98,11 @@ size_t FunctionExpressionBinaryOperatorImpl::hash_impl() const {
     return hash_combine(m_binary_operator, m_left_function_expression, m_right_function_expression);
 }
 
-void FunctionExpressionBinaryOperatorImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
+void FunctionExpressionBinaryOperatorImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
     out << "(" << to_string(m_binary_operator) << " ";
-    std::visit(StringifyVisitor(out), *m_left_function_expression);
+    std::visit(StringifyVisitor(out, options), *m_left_function_expression);
     out << " ";
-    std::visit(StringifyVisitor(out), *m_right_function_expression);
+    std::visit(StringifyVisitor(out, options), *m_right_function_expression);
     out << ")";
 }
 
@@ -137,12 +137,12 @@ size_t FunctionExpressionMultiOperatorImpl::hash_impl() const {
     return hash_combine(m_multi_operator, hash_vector(get_sorted_vector(m_function_expressions)));
 }
 
-void FunctionExpressionMultiOperatorImpl::str_impl(std::ostringstream& out, const FormattingOptions&) const {
+void FunctionExpressionMultiOperatorImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
     out << "(" << to_string(m_multi_operator);
     assert(!m_function_expressions.empty());
     for (const auto& function_expression : m_function_expressions) {
         out << " ";
-        std::visit(StringifyVisitor(out), *function_expression);
+        std::visit(StringifyVisitor(out, options), *function_expression);
     }
     out << ")";
 }

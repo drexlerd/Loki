@@ -67,11 +67,11 @@ size_t ConditionAndImpl::hash_impl() const {
     return hash_vector(get_sorted_vector(m_conditions));
 }
 
-void ConditionAndImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
+void ConditionAndImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
     out << "(and ";
     for (size_t i = 0; i < m_conditions.size(); ++i) {
         if (i != 0) out << " ";
-        std::visit(StringifyVisitor(out), *m_conditions[i]);
+        std::visit(StringifyVisitor(out, options), *m_conditions[i]);
     }
     out << ")";
 }
@@ -97,11 +97,11 @@ size_t ConditionOrImpl::hash_impl() const {
     return hash_vector(get_sorted_vector(m_conditions));
 }
 
-void ConditionOrImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
+void ConditionOrImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
     out << "(or ";
     for (size_t i = 0; i < m_conditions.size(); ++i) {
         if (i != 0) out << " ";
-        std::visit(StringifyVisitor(out), *m_conditions[i]);
+        std::visit(StringifyVisitor(out, options), *m_conditions[i]);
     }
     out << ")";
 }
@@ -127,9 +127,9 @@ size_t ConditionNotImpl::hash_impl() const {
     return hash_combine(m_condition);
 }
 
-void ConditionNotImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
+void ConditionNotImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
     out << "(not ";
-    std::visit(StringifyVisitor(out), *m_condition);
+    std::visit(StringifyVisitor(out, options), *m_condition);
     out << ")";
 }
 
@@ -156,9 +156,9 @@ size_t ConditionImplyImpl::hash_impl() const {
 
 void ConditionImplyImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
     out << "(imply ";
-    std::visit(StringifyVisitor(out), *m_condition_left);
+    std::visit(StringifyVisitor(out, options), *m_condition_left);
     out << " ";
-    std::visit(StringifyVisitor(out), *m_condition_right);
+    std::visit(StringifyVisitor(out, options), *m_condition_right);
     out << ")";
 }
 
@@ -180,6 +180,7 @@ bool ConditionExistsImpl::are_equal_impl(const ConditionExistsImpl& other) const
         return (m_parameters == other.m_parameters)
             && (m_condition == other.m_condition);
     }
+    return true;
 }
 
 size_t ConditionExistsImpl::hash_impl() const {
@@ -193,7 +194,7 @@ void ConditionExistsImpl::str_impl(std::ostringstream& out, const FormattingOpti
         out << *m_parameters[i];
     }
     out << ") ";
-    std::visit(StringifyVisitor(out), *m_condition);
+    std::visit(StringifyVisitor(out, options), *m_condition);
     out << ")";
 }
 
@@ -215,6 +216,7 @@ bool ConditionForallImpl::are_equal_impl(const ConditionForallImpl& other) const
         return (m_parameters == other.m_parameters)
             && (m_condition == other.m_condition);
     }
+    return true;
 }
 
 size_t ConditionForallImpl::hash_impl() const {
@@ -228,7 +230,7 @@ void ConditionForallImpl::str_impl(std::ostringstream& out, const FormattingOpti
         out << *m_parameters[i];
     }
     out << ") ";
-    std::visit(StringifyVisitor(out), *m_condition);
+    std::visit(StringifyVisitor(out, options), *m_condition);
     out << ")";
 }
 

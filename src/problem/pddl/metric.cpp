@@ -59,7 +59,7 @@ size_t OptimizationMetricImpl::hash_impl() const {
 
 void OptimizationMetricImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
     out << "(" << to_string(m_optimization_metric) << " ";
-    std::visit(StringifyVisitor(out), *m_function_expression);
+    std::visit(StringifyVisitor(out, options), *m_function_expression);
     out << ")";
 }
 

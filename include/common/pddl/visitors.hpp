@@ -18,7 +18,9 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_VISITORS_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_VISITORS_HPP_
 
-#include <ostream>
+#include "../printer.hpp"
+
+#include <sstream>
 
 
 namespace loki::pddl {
@@ -30,13 +32,15 @@ struct LessComparatorVisitor {
 };
 
 struct StringifyVisitor {
-    std::ostream& out;
+    std::ostringstream& out;
+    const FormattingOptions& options;
 
-    StringifyVisitor(std::ostream& out_) : out(out_) { }
+    StringifyVisitor(std::ostringstream& out_, const FormattingOptions& options_) 
+        : out(out_), options(options_) { }
 
     template<typename T>
     void operator()(const T& object) {
-        out << object;
+        object.str(out, options);
     }   
 };
 

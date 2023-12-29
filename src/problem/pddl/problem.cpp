@@ -94,7 +94,7 @@ void ProblemImpl::str_impl(std::ostringstream& out, const FormattingOptions& opt
     }
     out << ")\n";
     out << string(nested_options.indent, ' ') << "(:goal ";
-    std::visit(StringifyVisitor(out), *m_goal_condition);
+    std::visit(StringifyVisitor(out, options), *m_goal_condition);
     out << ")\n";
     if (m_optimization_metric.has_value()) {
         out << string(nested_options.indent, ' ') << "(:metric " << *m_optimization_metric.value() << ")\n";
