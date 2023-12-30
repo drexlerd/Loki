@@ -62,8 +62,10 @@ public:
     Base(Base&& other) = default;
     Base& operator=(Base&& other) = default;
 
+    constexpr const auto& self() const { return static_cast<Derived const&>(*this); }
+
     bool operator==(const Base& other) const {
-        return static_cast<Derived const*>(this)->are_equal_impl(static_cast<const Derived&>(other));
+        return self().are_equal_impl(other.self());
     }
 
     bool operator!=(const Base& other) const {
@@ -79,7 +81,7 @@ public:
     }
 
     size_t hash() const {
-        return static_cast<Derived const*>(this)->hash_impl();
+        return self().hash_impl();
     }
 
     /// @brief Overload of the output stream insertion operator (operator<<).
@@ -90,7 +92,7 @@ public:
 
     /// @brief Compute a string representation of this object.
     void str(std::ostringstream& out, const FormattingOptions& options) const {
-        static_cast<Derived const*>(this)->str_impl(out, options);
+        self().str_impl(out, options);
     }
 
     /// @brief Compute a string representation of this object.
