@@ -75,6 +75,7 @@ int main() {
             }
         }
     }
+    std::cout << "Term factory: " << term_factory.size() << std::endl;
     std::cout << "Num atoms: " << atoms.size() << std::endl;
 
     const auto [vm_usage, resident_set] = loki::process_mem_usage();

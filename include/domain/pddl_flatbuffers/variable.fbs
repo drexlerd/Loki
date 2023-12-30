@@ -1,9 +1,0 @@
-namespace loki::pddl_flat;
-
-
-table Variable {
-  identifier:int;
-  name:string;
-}
- 
-root_type Variable;

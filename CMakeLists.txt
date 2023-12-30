@@ -57,18 +57,16 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories("${PROJECT_SOURCE_DIR}/external/flatbuffers/include")
 
 
-
-
 ##############################################################
 # Add library and executable targets
 ##############################################################
 
 # Add FlatBuffers directly to our build. This defines the `flatbuffers` target.
-set(FLATBUFFERS_MAX_PARSING_DEPTH 16)
-set(FLATBUFFERS_SRC_DIR "${PROJECT_SOURCE_DIR}/external/flatbuffers/")
-add_subdirectory(${FLATBUFFERS_SRC_DIR}
-                 ${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-build
-                 EXCLUDE_FROM_ALL)
+#set(FLATBUFFERS_MAX_PARSING_DEPTH 16)
+#set(FLATBUFFERS_SRC_DIR "${PROJECT_SOURCE_DIR}/external/flatbuffers/")
+#add_subdirectory(${FLATBUFFERS_SRC_DIR}
+#                 ${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-build
+#                 EXCLUDE_FROM_ALL)
 
 add_subdirectory(src)
 

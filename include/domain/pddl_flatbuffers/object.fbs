@@ -1,9 +1,0 @@
-namespace loki;
-namespace pddl_flat;
-
-table Object {
-  identifier:int;
-  name:string;
-}
- 
-root_type Object;

@@ -81,13 +81,18 @@ public:
             element_ptr = &(m_persistent_vector.push_back(std::move(element)));
         }
         /* Test for uniqueness */
-        const auto [it, inserted] = m_uniqueness_set.emplace(element_ptr);
-        if (inserted) {
+        auto it = m_uniqueness_set.find(element_ptr);
+        if (it == m_uniqueness_set.end()) {
             // Element is unique! 
+            m_uniqueness_set.emplace(element_ptr);
             // Validate the element by increasing the identifier to the next free position
             ++m_count;
         }
         return element_ptr;
+    }
+
+    size_t size() const {
+        return m_persistent_vector.size();
     }
 };
 
