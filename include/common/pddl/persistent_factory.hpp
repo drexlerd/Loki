@@ -30,7 +30,12 @@
 
 
 namespace loki {
-
+/// @brief The PersistentFactory class manages unique objects in a persistent 
+///        and efficient manner, utilizing a combination of unordered_set for 
+///        uniqueness checks and SegmentedPersistentVector for continuous and 
+///        cache-efficient storage.
+/// @tparam HolderType is the nested type which can be an std::variant.
+/// @tparam N is the number of elements per segment
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory {
 private:
@@ -87,6 +92,8 @@ public:
             m_uniqueness_set.emplace(element_ptr);
             // Validate the element by increasing the identifier to the next free position
             ++m_count;
+        } else {
+            element_ptr = *it;
         }
         return element_ptr;
     }
