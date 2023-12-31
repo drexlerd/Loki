@@ -2,7 +2,7 @@
 
 ATTENTION: Loki's testing framework must be stronger, and Loki itself must still be tested in production. Therefore, we strongly advise against using it already. However, we are thankful for all kinds of feedback, suggestions, and feature requests.
 
-Loki is a C++17 library for efficient syntactic and semantic parsing of PDDL files. Loki implements exhaustive error handling to provide meaningful clang-style error messages for syntactic, semantic, and modeling errors. The resulting PDDL objects are uniquely constructed immutable pointer objects with persistent continuous memory, allowing for constant time hashing, constant time equality comparison, and efficient dereferencing.
+Loki is a C++17 library for efficient syntactic and semantic parsing of PDDL files. Loki implements exhaustive error handling to provide meaningful clang-style messages for syntactic, semantic, and modeling errors. The resulting PDDL objects are uniquely constructed immutable pointer objects stored in persistent and continuous memory, to enable hashing in constant time, equality comparison in constant time, and efficient dereferencing.
 
 ## Supported PDDL Requirements
 
