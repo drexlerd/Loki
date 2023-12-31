@@ -29,7 +29,7 @@ pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formul
     if (!binding.has_value()) {
         throw UndefinedPredicateError(predicate_name, context.scopes.get_error_handler()(atomic_formula_of_terms_node.predicate, ""));
     }
-    pddl::TermList term_list;
+    auto term_list = pddl::TermList();
     for (const auto& term_node : atomic_formula_of_terms_node.terms) {
         term_list.push_back(boost::apply_visitor(TermReferenceTermVisitor(context), term_node));
     }
@@ -53,7 +53,6 @@ pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& atomic_formula
     const auto& [equal_predicate, _position, _error_handler] = context.scopes.get<pddl::PredicateImpl>("=").value();
     auto left_term = boost::apply_visitor(TermReferenceTermVisitor(context), atomic_formula_of_terms_node.term_left);
     auto right_term = boost::apply_visitor(TermReferenceTermVisitor(context), atomic_formula_of_terms_node.term_right);
-    assert(context.scopes.get<pddl::PredicateImpl>("=").has_value());
     const auto atom = context.factories.atoms.get_or_create<pddl::AtomImpl>(
         equal_predicate,
         pddl::TermList{left_term, right_term});
