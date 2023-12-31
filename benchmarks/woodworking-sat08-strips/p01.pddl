@@ -13,14 +13,11 @@
   (:domain woodworking)
   (:requirements :typing :action-costs :numeric-fluents)
   (:objects
-    grinder0 - grinder
     glazer0 - glazer
     immersion-varnisher0 - immersion-varnisher
-    planer0 - planer
     highspeed-saw0 - highspeed-saw
     spray-varnisher0 - spray-varnisher
-    saw0 - saw
-    red black - acolour
+    red - acolour
     pine teak - awood
     p0 p1 p2 - part
     b0 - board
