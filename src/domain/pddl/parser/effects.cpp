@@ -53,7 +53,7 @@ pddl::AssignOperatorEnum parse(const domain::ast::AssignOperator& node) {
 
 
 pddl::Effect parse(const std::vector<domain::ast::Effect>& effect_nodes, Context& context) {
-    pddl::EffectList effect_list;
+    auto effect_list = pddl::EffectList();
     for (const auto& effect_node : effect_nodes) {
         effect_list.push_back(parse(effect_node, context));
     }

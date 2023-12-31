@@ -100,7 +100,7 @@ FunctionExpressionVisitor::FunctionExpressionVisitor(Context& context_)
 /* Function */
 pddl::Function parse(const domain::ast::FunctionHead& node, Context& context) {
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol, context);
-    pddl::TermList term_list;
+    auto term_list = pddl::TermList();
     for (const auto& term_node : node.terms) {
         term_list.push_back(boost::apply_visitor(TermReferenceTermVisitor(context), term_node));
     }

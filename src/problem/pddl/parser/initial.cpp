@@ -31,7 +31,7 @@ namespace loki {
 
 std::vector<std::variant<pddl::Literal, pddl::NumericFluent>> parse(
     const problem::ast::Initial& initial_node, Context& context) {
-    std::vector<std::variant<pddl::Literal, pddl::NumericFluent>> initial_element_list;
+    auto initial_element_list = std::vector<std::variant<pddl::Literal, pddl::NumericFluent>>();
     for (const auto& initial_element : initial_node.initial_elements) {
         initial_element_list.push_back(boost::apply_visitor(InitialElementVisitor(context), initial_element));
     }

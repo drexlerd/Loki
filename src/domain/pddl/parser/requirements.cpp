@@ -197,7 +197,7 @@ pddl::RequirementEnumSet parse(const ast::Requirement& node, Context& context) {
 RequirementVisitor::RequirementVisitor(Context& context_) : context(context_) { }
 
 pddl::RequirementEnumSet parse(const ast::Requirements& requirements_node, Context& context) {
-    pddl::RequirementEnumSet requirements;
+    auto requirements = pddl::RequirementEnumSet();
     for (const auto& requirement : requirements_node.requirements) {
         auto additional_requirements = parse(requirement, context);
         requirements.insert(additional_requirements.begin(), additional_requirements.end());

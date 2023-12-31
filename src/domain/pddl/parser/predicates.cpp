@@ -27,7 +27,7 @@ using namespace std;
 
 namespace loki {
 pddl::PredicateList parse(const ast::Predicates& predicates_node, Context& context) {
-    pddl::PredicateList predicate_list;
+    auto predicate_list = pddl::PredicateList();
     for (const auto& atomic_formula_skeleton : predicates_node.atomic_formula_skeletons) {
         const auto name = parse(atomic_formula_skeleton.predicate.name);
         const auto binding = context.scopes.get<pddl::ObjectImpl>(name);

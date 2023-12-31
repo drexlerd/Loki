@@ -41,44 +41,47 @@ static void test_multiple_definition_variable(const pddl::Variable& variable, co
     }
 }
 
-ParameterListVisitor::ParameterListVisitor(Context& context_)
-    : context(context_) { }
 
-pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>& variable_nodes) {
-    // A visited vector of variable has single base type "object"
+static pddl::Parameter parse_parameter_definition(const domain::ast::Variable& variable_node, const pddl::TypeList& type_list, Context& context) {
+    const auto variable = parse(variable_node, context);
+    test_multiple_definition_variable(variable, variable_node, context);
+    context.scopes.insert(variable->get_name(), variable, variable_node);
+    const auto parameter = context.factories.parameters.get_or_create<pddl::ParameterImpl>(variable, type_list);
+    context.positions.push_back(parameter, variable_node);
+    return parameter;
+}
+
+
+static pddl::ParameterList parse_parameter_definitions(const std::vector<domain::ast::Variable>& variable_nodes, const pddl::TypeList& type_list, Context& context) {
     auto parameter_list = pddl::ParameterList();
-    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("object");
     for (const auto& variable_node : variable_nodes) {
-        const auto variable = parse(variable_node, context);
-        test_multiple_definition_variable(variable, variable_node, context);
-        context.scopes.insert(variable->get_name(), variable, variable_node);
-        const auto parameter = context.factories.parameters.get_or_create<pddl::ParameterImpl>(variable, pddl::TypeList{type});
-        context.positions.push_back(parameter, variable_node);
-        parameter_list.emplace_back(parameter);
+        parameter_list.emplace_back(parse_parameter_definition(variable_node, type_list, context));
     }
     return parameter_list;
 }
 
-pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVariablesRecursively& typed_variables_node) {
+
+ParameterListVisitor::ParameterListVisitor(Context& context_)
+    : context(context_) { }
+
+pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>& nodes) {
+    // A visited vector of variable has single base type "object"
+    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("object");
+    auto parameter_list = parse_parameter_definitions(nodes, pddl::TypeList{type}, context);
+    return parameter_list;
+}
+
+pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVariablesRecursively& node) {
     // requires :typing
     if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
-        throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_variables_node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(node, ""));
     }
     context.referenced_values.untrack(pddl::RequirementEnum::TYPING);
-    auto parameter_list = pddl::ParameterList();
-    const auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context),
-                                            typed_variables_node.type);
+    const auto type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context), node.type);
     // A non-visited vector of variables has user defined types
-    for (const auto& variable_node : typed_variables_node.variables) {
-        const auto variable = parse(variable_node, context);
-        test_multiple_definition_variable(variable, variable_node, context);
-        context.scopes.insert(variable->get_name(), variable, variable_node);
-        const auto parameter = context.factories.parameters.get_or_create<pddl::ParameterImpl>(variable, types);
-        context.positions.push_back(parameter, variable_node);
-        parameter_list.emplace_back(parameter);
-    }
+    auto parameter_list = parse_parameter_definitions(node.variables, type_list, context);
     // Recursively add parameters.
-    auto additional_parameters = boost::apply_visitor(ParameterListVisitor(context), typed_variables_node.typed_list_of_variables.get());
+    auto additional_parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables.get());
     parameter_list.insert(parameter_list.end(), additional_parameters.begin(), additional_parameters.end());
     return parameter_list;
 }

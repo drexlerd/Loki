@@ -27,7 +27,7 @@ namespace loki {
 // parse a vector of goal descriptors
 template<typename T>
 static pddl::ConditionList parse(const std::vector<T>& nodes, Context& context) {
-    pddl::ConditionList condition_list;
+    auto condition_list = pddl::ConditionList();
     for (const auto& node : nodes) {
         condition_list.push_back(parse(node, context));
     }
@@ -56,7 +56,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorLiteral& node, Context& c
 }
 
 pddl::Condition parse(const domain::ast::GoalDescriptorAnd& node, Context& context) {
-    pddl::ConditionList condition_list = parse(node.goal_descriptors, context);
+    auto condition_list = parse(node.goal_descriptors, context);
     const auto condition = context.factories.conditions.get_or_create<pddl::ConditionAndImpl>(condition_list);
     context.positions.push_back(condition, node);
     return condition;
@@ -68,7 +68,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorOr& node, Context& contex
         throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
     context.referenced_values.untrack(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
-    pddl::ConditionList condition_list = parse(node.goal_descriptors, context);
+    auto condition_list = parse(node.goal_descriptors, context);
     const auto condition = context.factories.conditions.get_or_create<pddl::ConditionOrImpl>(condition_list);
     context.positions.push_back(condition, node);
     return condition;
@@ -80,7 +80,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorNot& node, Context& conte
         throw UndefinedRequirementError(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
     context.referenced_values.untrack(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS);
-    pddl::Condition child_condition = parse(node.goal_descriptor, context);
+    auto child_condition = parse(node.goal_descriptor, context);
     const auto condition = context.factories.conditions.get_or_create<pddl::ConditionNotImpl>(child_condition);
     context.positions.push_back(condition, node);
     return condition;
@@ -166,7 +166,7 @@ pddl::Condition parse(const domain::ast::ConstraintGoalDescriptor& node, Context
 }
 
 pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAnd& node, Context& context) {
-    pddl::ConditionList condition_list;
+    auto condition_list = pddl::ConditionList();
     for (const auto& child_node : node.constraint_goal_descriptors) {
         condition_list.push_back(parse(child_node, context));
     }
@@ -233,7 +233,7 @@ pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorSimple& node,
 }
 
 pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorAnd& node, Context& context) {
-    pddl::ConditionList condition_list;
+    auto condition_list = pddl::ConditionList();
     for (const auto& child_node : node.precondition_goal_descriptors) {
         condition_list.push_back(parse(child_node, context));
     }

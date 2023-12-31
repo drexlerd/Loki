@@ -44,13 +44,13 @@ std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(co
 pddl::Action parse(const domain::ast::Action& node, Context& context) {
     context.scopes.open_scope();
     auto name = parse(node.action_symbol.name);
-    auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
-    for (const auto& parameter : parameters) {
+    auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
+    for (const auto& parameter : parameter_list) {
         context.referenced_pointers.track(parameter->get_variable());
     }
     auto [condition, effect] = parse(node.action_body, context);
     // Check referenced_pointers
-    for (const auto& parameter : parameters) {
+    for (const auto& parameter : parameter_list) {
         if (context.referenced_pointers.exists(parameter->get_variable())) {
             const auto& [variable, position, error_handler] = context.scopes.get<pddl::VariableImpl>(parameter->get_variable()->get_name()).value();
             throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
@@ -58,7 +58,7 @@ pddl::Action parse(const domain::ast::Action& node, Context& context) {
     }
     
     context.scopes.close_scope();
-    const auto action = context.factories.actions.get_or_create<pddl::ActionImpl>(name, parameters, condition, effect);
+    const auto action = context.factories.actions.get_or_create<pddl::ActionImpl>(name, parameter_list, condition, effect);
     context.positions.push_back(action, node);
     return action;
 }
@@ -68,10 +68,22 @@ pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, Context&
         throw UndefinedRequirementError(pddl::RequirementEnum::DERIVED_PREDICATES, context.scopes.get_error_handler()(node, ""));
     }
     context.referenced_values.untrack(pddl::RequirementEnum::DERIVED_PREDICATES);
-    auto parameters = boost::apply_visitor(ParameterListVisitor(context),
-        node.typed_list_of_variables);
+    context.scopes.open_scope();
+    auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
+    for (const auto& parameter : parameter_list) {
+        context.referenced_pointers.track(parameter->get_variable());
+    }
     auto condition = parse(node.goal_descriptor, context);
-    const auto derived_predicate = context.factories.derived_predicates.get_or_create<pddl::DerivedPredicateImpl>(parameters, condition);
+    const auto derived_predicate = context.factories.derived_predicates.get_or_create<pddl::DerivedPredicateImpl>(parameter_list, condition);
+    // Check referenced_pointers
+    for (const auto& parameter : parameter_list) {
+        if (context.referenced_pointers.exists(parameter->get_variable())) {
+            const auto& [variable, position, error_handler] = context.scopes.get<pddl::VariableImpl>(parameter->get_variable()->get_name()).value();
+            throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
+        }
+    }
+    
+    context.scopes.close_scope();
     context.positions.push_back(derived_predicate, node);
     return derived_predicate;
 }
@@ -81,8 +93,7 @@ StructureVisitor::StructureVisitor(Context& context_)
     : context(context_) { }
 
 
-boost::variant<pddl::DerivedPredicate, pddl::Action> parse(
-    const domain::ast::Structure& node, Context& context) {
+boost::variant<pddl::DerivedPredicate, pddl::Action> parse(const domain::ast::Structure& node, Context& context) {
     return boost::apply_visitor(StructureVisitor(context), node);
 }
 

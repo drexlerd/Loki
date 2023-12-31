@@ -34,7 +34,7 @@ pddl::Atom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, Contex
     if (!binding.has_value()) {
         throw UndefinedPredicateError(name, context.scopes.get_error_handler()(node, ""));
     }
-    pddl::TermList term_list;
+    auto term_list = pddl::TermList();
     for (const auto& name_node : node.names) {
         term_list.push_back(context.factories.terms.get_or_create<pddl::TermObjectImpl>(parse_object_reference(name_node, context)));
     }
