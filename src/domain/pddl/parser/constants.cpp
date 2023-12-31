@@ -58,11 +58,11 @@ static pddl::Object parse_constant_definition(const domain::ast::Name& node, con
 
 
 static pddl::ObjectList parse_constant_definitions(const std::vector<domain::ast::Name> nodes, const pddl::TypeList& type_list, Context& context) {
-    auto object_list = pddl::ObjectList();
+    auto constant_list = pddl::ObjectList();
     for (const auto& node : nodes) {
-        object_list.emplace_back(parse_constant_definition(node, type_list, context));
+        constant_list.emplace_back(parse_constant_definition(node, type_list, context));
     }
-    return object_list;
+    return constant_list;
 }
 
 
@@ -77,8 +77,8 @@ pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& n
     // A visited vector of name has single base type "object"
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
     const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
-    const auto object_list = parse_constant_definitions(name_nodes, pddl::TypeList{type}, context);
-    return object_list;
+    const auto constant_list = parse_constant_definitions(name_nodes, pddl::TypeList{type}, context);
+    return constant_list;
 }
 
 pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
@@ -89,11 +89,11 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
     const auto type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context),
                                             typed_list_of_names_recursively_node.type);
     // A non-visited vector of names has user defined base types
-    auto object_list = parse_constant_definitions(typed_list_of_names_recursively_node.names, type_list, context);
+    auto constant_list = parse_constant_definitions(typed_list_of_names_recursively_node.names, type_list, context);
     // Recursively add objects.
     auto additional_objects = boost::apply_visitor(ConstantListVisitor(context), typed_list_of_names_recursively_node.typed_list_of_names.get());
-    object_list.insert(object_list.end(), additional_objects.begin(), additional_objects.end());
-    return object_list;
+    constant_list.insert(constant_list.end(), additional_objects.begin(), additional_objects.end());
+    return constant_list;
 }
 
 }

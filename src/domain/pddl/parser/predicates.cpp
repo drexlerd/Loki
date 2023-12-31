@@ -48,19 +48,29 @@ static void insert_context_information(const pddl::Predicate& predicate, const d
 }
 
 
-pddl::PredicateList parse(const domain::ast::Predicates& predicates_node, Context& context) {
+static pddl::Predicate parse_predicate_definition(const domain::ast::AtomicFormulaSkeleton& node, Context& context) {
+    context.scopes.open_scope();
+    const auto parameters = boost::apply_visitor(ParameterListVisitor(context),node.typed_list_of_variables);
+    context.scopes.close_scope();
+    const auto predicate_name = parse(node.predicate.name);
+    const auto predicate = context.factories.predicates.get_or_create<pddl::PredicateImpl>(predicate_name, parameters);
+    test_multiple_definition(predicate, node.predicate, context);
+    insert_context_information(predicate, node.predicate, context);
+    return predicate;
+}
+
+
+static pddl::PredicateList parse_predicate_definitions(const std::vector<domain::ast::AtomicFormulaSkeleton>& nodes, Context& context) {
     auto predicate_list = pddl::PredicateList();
-    for (const auto& atomic_formula_skeleton : predicates_node.atomic_formula_skeletons) {
-        context.scopes.open_scope();
-        const auto parameters = boost::apply_visitor(ParameterListVisitor(context),
-                                                     atomic_formula_skeleton.typed_list_of_variables);
-        context.scopes.close_scope();
-        const auto name = parse(atomic_formula_skeleton.predicate.name);
-        const auto predicate = context.factories.predicates.get_or_create<pddl::PredicateImpl>(name, parameters);
-        test_multiple_definition(predicate, atomic_formula_skeleton.predicate, context);
-        insert_context_information(predicate, atomic_formula_skeleton.predicate, context);
-        predicate_list.emplace_back(predicate);
+    for (const auto& node : nodes) {
+        predicate_list.emplace_back(parse_predicate_definition(node, context));
     }
+    return predicate_list;
+}
+
+
+pddl::PredicateList parse(const domain::ast::Predicates& predicates_node, Context& context) {
+    const auto predicate_list = parse_predicate_definitions(predicates_node.atomic_formula_skeletons, context);
     return predicate_list;
 }
 
