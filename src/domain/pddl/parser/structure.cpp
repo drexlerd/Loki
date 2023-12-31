@@ -46,12 +46,12 @@ pddl::Action parse(const domain::ast::Action& node, Context& context) {
     auto name = parse(node.action_symbol.name);
     auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
     for (const auto& parameter : parameter_list) {
-        context.referenced_pointers.track(parameter->get_variable());
+        context.references.track(parameter->get_variable());
     }
     auto [condition, effect] = parse(node.action_body, context);
-    // Check referenced_pointers
+    // Check references
     for (const auto& parameter : parameter_list) {
-        if (context.referenced_pointers.exists(parameter->get_variable())) {
+        if (context.references.exists(parameter->get_variable())) {
             const auto& [variable, position, error_handler] = context.scopes.get<pddl::VariableImpl>(parameter->get_variable()->get_name()).value();
             throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
         }
@@ -67,17 +67,17 @@ pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, Context&
     if (!context.requirements->test(pddl::RequirementEnum::DERIVED_PREDICATES)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::DERIVED_PREDICATES, context.scopes.get_error_handler()(node, ""));
     }
-    context.referenced_values.untrack(pddl::RequirementEnum::DERIVED_PREDICATES);
+    context.references.untrack(pddl::RequirementEnum::DERIVED_PREDICATES);
     context.scopes.open_scope();
     auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
     for (const auto& parameter : parameter_list) {
-        context.referenced_pointers.track(parameter->get_variable());
+        context.references.track(parameter->get_variable());
     }
     auto condition = parse(node.goal_descriptor, context);
     const auto derived_predicate = context.factories.derived_predicates.get_or_create<pddl::DerivedPredicateImpl>(parameter_list, condition);
-    // Check referenced_pointers
+    // Check references
     for (const auto& parameter : parameter_list) {
-        if (context.referenced_pointers.exists(parameter->get_variable())) {
+        if (context.references.exists(parameter->get_variable())) {
             const auto& [variable, position, error_handler] = context.scopes.get<pddl::VariableImpl>(parameter->get_variable()->get_name()).value();
             throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
         }

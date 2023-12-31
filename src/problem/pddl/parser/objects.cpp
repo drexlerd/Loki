@@ -41,7 +41,7 @@ pddl::Object parse_object_reference(const domain::ast::Name& name_node, Context&
     }
     const auto& [object, _position, _error_handler] = binding.value();
     context.positions.push_back(object, name_node);
-    context.referenced_pointers.untrack(object);
+    context.references.untrack(object);
     return object;
 }
 
@@ -91,7 +91,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
     if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
         throw UnsupportedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(node, ""));
     }
-    context.referenced_values.untrack(pddl::RequirementEnum::TYPING);
+    context.references.untrack(pddl::RequirementEnum::TYPING);
     const auto type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context), node.type);
     // A non-visited vector of names has user defined base types
     auto object_list = parse_object_definitions(node.names, type_list, context);

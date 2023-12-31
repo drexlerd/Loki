@@ -21,30 +21,7 @@ namespace loki {
 
 template<typename... Ts>
 template<typename T>
-bool PointerReferences<Ts...>::exists(const T* reference) const {
-    const auto& t_references = std::get<std::unordered_set<const T*>>(references);
-    return t_references.count(reference);
-}
-
-
-template<typename... Ts>
-template<typename T>
-void PointerReferences<Ts...>::track(const T* reference) {
-    auto& t_references = std::get<std::unordered_set<const T*>>(references);
-    t_references.insert(reference);
-}
-
-
-template<typename... Ts>
-template<typename T>
-void PointerReferences<Ts...>::untrack(const T* reference) {
-    auto& t_references = std::get<std::unordered_set<const T*>>(references);
-    t_references.erase(reference);
-}
-
-template<typename... Ts>
-template<typename T>
-bool ValueReferences<Ts...>::exists(T reference) const {
+bool References<Ts...>::exists(T reference) const {
     const auto& t_references = std::get<std::unordered_set<T>>(references);
     return t_references.count(reference);
 }
@@ -52,7 +29,7 @@ bool ValueReferences<Ts...>::exists(T reference) const {
 
 template<typename... Ts>
 template<typename T>
-void ValueReferences<Ts...>::track(T reference) {
+void References<Ts...>::track(T reference) {
     auto& t_references = std::get<std::unordered_set<T>>(references);
     t_references.insert(reference);
 }
@@ -60,7 +37,7 @@ void ValueReferences<Ts...>::track(T reference) {
 
 template<typename... Ts>
 template<typename T>
-void ValueReferences<Ts...>::untrack(T reference) {
+void References<Ts...>::untrack(T reference) {
     auto& t_references = std::get<std::unordered_set<T>>(references);
     t_references.erase(reference);
 }

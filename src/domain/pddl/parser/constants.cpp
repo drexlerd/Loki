@@ -85,7 +85,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
     if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
         throw UnsupportedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_list_of_names_recursively_node, ""));
     }
-    context.referenced_values.untrack(pddl::RequirementEnum::TYPING);
+    context.references.untrack(pddl::RequirementEnum::TYPING);
     const auto type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context),
                                             typed_list_of_names_recursively_node.type);
     // A non-visited vector of names has user defined base types

@@ -84,15 +84,15 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context) {
         auto variant = boost::apply_visitor(StructureVisitor(context), structure_node);
         boost::apply_visitor(UnpackingVisitor(action_list, derived_predicate_list), variant);
     }
-    // Check referenced_pointers
+    // Check references
     for (const auto& predicate : predicates) {
-        if (context.referenced_pointers.exists(predicate)) {
+        if (context.references.exists(predicate)) {
             const auto& [_predicate, position, error_handler] = context.scopes.get<pddl::PredicateImpl>(predicate->get_name()).value();
             throw UnusedPredicateError(predicate->get_name(), error_handler(position.value(), ""));
         }
     }
     for (const auto& function_skeleton : function_skeletons) {
-        if (context.referenced_pointers.exists(function_skeleton)) {
+        if (context.references.exists(function_skeleton)) {
             const auto& [_function_skeleton, position, error_handler] = context.scopes.get<pddl::FunctionSkeletonImpl>(function_skeleton->get_name()).value();
             throw UnusedFunctionSkeletonError(function_skeleton->get_name(), error_handler(position.value(), ""));
         }

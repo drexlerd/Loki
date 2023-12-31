@@ -109,7 +109,7 @@ pddl::Function parse(const domain::ast::FunctionHead& node, Context& context) {
     }
     const auto function = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, term_list);
     context.positions.push_back(function, node);
-    context.referenced_pointers.untrack(function->get_function_skeleton());
+    context.references.untrack(function->get_function_skeleton());
     return function;
 }
 
@@ -122,7 +122,7 @@ pddl::FunctionSkeleton parse_function_skeleton_reference(const domain::ast::Func
         throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node, ""));
     }
     const auto& [function_skeleton, _position, _error_handler] = binding.value();
-    context.referenced_pointers.untrack(function_skeleton);
+    context.references.untrack(function_skeleton);
     return function_skeleton;
 }
 
@@ -145,7 +145,7 @@ static void test_multiple_definition(const pddl::FunctionSkeleton& function_skel
 static void insert_context_information(const pddl::FunctionSkeleton& function_skeleton, const domain::ast::Name& node, Context& context) {
     context.positions.push_back(function_skeleton, node);
     context.scopes.insert<pddl::FunctionSkeletonImpl>(function_skeleton->get_name(), function_skeleton, node);
-    context.referenced_pointers.track(function_skeleton);
+    context.references.track(function_skeleton);
 }
 
 
@@ -153,14 +153,14 @@ pddl::FunctionSkeleton parse(const domain::ast::AtomicFunctionSkeletonTotalCost&
     if (!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::ACTION_COSTS, context.positions.get_error_handler()(node, ""));
     } else {
-        context.referenced_values.untrack(pddl::RequirementEnum::ACTION_COSTS);
+        context.references.untrack(pddl::RequirementEnum::ACTION_COSTS);
     }
     if ((!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS))
         && (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS))) {
         throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
     } else {
-        context.referenced_values.untrack(pddl::RequirementEnum::ACTION_COSTS);
-        context.referenced_values.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
+        context.references.untrack(pddl::RequirementEnum::ACTION_COSTS);
+        context.references.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
     }
 
     assert(context.scopes.get<pddl::TypeImpl>("number").has_value());
@@ -178,7 +178,7 @@ pddl::FunctionSkeleton parse(const domain::ast::AtomicFunctionSkeletonGeneral& n
     if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
     } 
-    context.referenced_values.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
+    context.references.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
 
     context.scopes.open_scope();
     auto function_parameters = boost::apply_visitor(ParameterListVisitor(context), node.arguments);

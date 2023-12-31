@@ -38,9 +38,7 @@
 
 
 namespace loki {
-/// @brief Encapsulates referenced pointers of bindings.
-///        We require that each binding must be referenced at least one in a child scope
-///        and if it was not referenced then we report an error message.
+/// @brief Encapsulates references.
 ///
 ///        Example usage:
 ///        1. Track all variables of the parameters of an action.
@@ -49,52 +47,30 @@ namespace loki {
 ///        3. Verify that all variables are untracked, meaning
 ///           that they were referenced at least once.
 template<typename... Ts>
-class PointerReferences {
-    private:
-        std::tuple<std::unordered_set<const Ts*>...> references;
-
-    public:
-        /// @brief Returns a pointer if it exists.
-        template<typename T>
-        bool exists(const T* reference) const;
-
-        /// @brief Inserts a pointer of type T
-        template<typename T>
-        void track(const T* reference);
-
-        /// @brief Erases a pointer of Type T
-        template<typename T>
-        void untrack(const T* reference);
-};
-
-/// @brief Encapsulates referenced values of enums.
-///        Usage is similar to PointerReferences.
-template<typename... Ts>
-class ValueReferences {
+class References {
     private:
         std::tuple<std::unordered_set<Ts>...> references;
 
     public:
-        /// @brief Returns a value if it exists.
+        /// @brief Returns a pointer if it exists.
         template<typename T>
-        bool exists(T value) const;
+        bool exists(T reference) const;
 
-        /// @brief Inserts a value of type T
+        /// @brief Inserts a pointer of type T
         template<typename T>
-        void track(T value);
+        void track(T reference);
 
-        /// @brief Erases a value of Type T
+        /// @brief Erases a pointer of Type T
         template<typename T>
-        void untrack(T value);
+        void untrack(T reference);
 };
 
-using ReferencedPointers = PointerReferences<pddl::TypeImpl
-    , pddl::ObjectImpl
-    , pddl::PredicateImpl
-    , pddl::FunctionSkeletonImpl
-    , pddl::VariableImpl>;
-
-using ReferencedValues = ValueReferences<pddl::RequirementEnum>;
+using ReferencedPDDLObjects = References<pddl::Type
+    , pddl::Object
+    , pddl::Predicate
+    , pddl::FunctionSkeleton
+    , pddl::Variable
+    , pddl::RequirementEnum>;
 
 }
 

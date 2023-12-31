@@ -34,7 +34,7 @@ string parse(const ast::Name& node) {
 pddl::Variable parse(const ast::Variable& node, Context& context) {
     const auto variable = context.factories.variables.get_or_create<pddl::VariableImpl>(node.characters);
     // Declare variable as being referenced.
-    context.referenced_pointers.untrack(variable);
+    context.references.untrack(variable);
     // Add position of PDDL object
     context.positions.push_back(variable, node);
     return variable;
@@ -95,7 +95,7 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::Name& node) const {
     }
     // Construct Term and return it
     const auto& [object, _position, _error_handler] = binding.value();
-    context.referenced_pointers.untrack(object);
+    context.references.untrack(object);
     const auto term = context.factories.terms.get_or_create<pddl::TermObjectImpl>(object);
     // Add position of PDDL object
     context.positions.push_back(term, node);

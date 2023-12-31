@@ -89,7 +89,7 @@ MetricFunctionExpressionDeclarationVisitor::MetricFunctionExpressionDeclarationV
 /* Function */
 pddl::Function parse(const problem::ast::BasicFunctionTerm& node, Context& context) {
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol, context);
-    pddl::TermList term_list;
+    auto term_list = pddl::TermList();
     for (const auto& name_node : node.names) {
         term_list.push_back(context.factories.terms.get_or_create<pddl::TermObjectImpl>(parse_object_reference(name_node, context)));
     }

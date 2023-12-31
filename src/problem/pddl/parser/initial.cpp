@@ -50,7 +50,7 @@ std::variant<pddl::Literal, pddl::NumericFluent> parse(const problem::ast::Initi
     if (!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::ACTION_COSTS, context.scopes.get_error_handler()(node, ""));
     }
-    context.referenced_values.untrack(pddl::RequirementEnum::ACTION_COSTS);
+    context.references.untrack(pddl::RequirementEnum::ACTION_COSTS);
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol_total_cost, context);
     const auto basic_function_term = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, pddl::TermList{});
     double number = parse(node.number);
@@ -64,7 +64,7 @@ std::variant<pddl::Literal, pddl::NumericFluent> parse(const problem::ast::Initi
     if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.scopes.get_error_handler()(node, ""));
     }
-    context.referenced_values.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
+    context.references.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
     const auto basic_function_term = parse(node.basic_function_term, context);
     double number = parse(node.number);
     if (number < 0 && context.requirements->test(pddl::RequirementEnum::ACTION_COSTS)) {

@@ -57,7 +57,7 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
         objects = parse(problem_node.objects.value(), context);
     }
     for (const auto& object : objects) {
-        context.referenced_pointers.track(object);
+        context.references.track(object);
     }
     /* Initial section */
     auto initial_literals = pddl::LiteralList();
@@ -74,9 +74,9 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
         optimization_metric = parse(problem_node.metric_specification.value(), context);
     }
 
-    // Check referenced_pointers
+    // Check references
     for (const auto& object : objects) {
-        if (context.referenced_pointers.exists(object)) {
+        if (context.references.exists(object)) {
             const auto& [_object, position, error_handler] = context.scopes.get<pddl::ObjectImpl>(object->get_name()).value();
             throw UnusedObjectError(object->get_name(), error_handler(position.value(), ""));
         }

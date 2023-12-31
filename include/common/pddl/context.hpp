@@ -35,14 +35,12 @@ namespace loki
         // For referencing to existing bindings
         ScopeStack& scopes;
         // For checking that binding pointers were referenced at least once
-        ReferencedPointers referenced_pointers;
-        // For checking that enum values were referenced at least once
-        ReferencedValues referenced_values;
+        ReferencedPDDLObjects references;
         // For convenience, to avoid an additional parameter during semantic parsing
         pddl::Requirements requirements;
 
         Context(CompositeOfPDDLFactories &factories_, PDDLPositionCache& positions_, ScopeStack &scopes_)
-            : factories(factories_), positions(positions_), scopes(scopes_), referenced_pointers(ReferencedPointers()), referenced_values(ReferencedValues()), requirements(nullptr) {}
+            : factories(factories_), positions(positions_), scopes(scopes_), references(ReferencedPDDLObjects()), requirements(nullptr) {}
     };
 
 }
