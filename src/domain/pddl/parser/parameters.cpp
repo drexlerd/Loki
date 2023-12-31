@@ -28,7 +28,7 @@ using namespace std;
 
 namespace loki {
 
-static void test_multiple_definition_variable(const pddl::Variable& variable, const ast::Variable& node, const Context& context) {
+static void test_multiple_definition(const pddl::Variable& variable, const ast::Variable& node, const Context& context) {
     const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
     if (binding.has_value()) {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
@@ -42,10 +42,16 @@ static void test_multiple_definition_variable(const pddl::Variable& variable, co
 }
 
 
+static void insert_context_information(const pddl::Variable& variable, const ast::Variable& node, Context& context) {
+    context.scopes.insert(variable->get_name(), variable, node);
+}
+
+
 static pddl::Parameter parse_parameter_definition(const domain::ast::Variable& variable_node, const pddl::TypeList& type_list, Context& context) {
     const auto variable = parse(variable_node, context);
-    test_multiple_definition_variable(variable, variable_node, context);
-    context.scopes.insert(variable->get_name(), variable, variable_node);
+    test_multiple_definition(variable, variable_node, context);
+    insert_context_information(variable, variable_node, context);
+
     const auto parameter = context.factories.parameters.get_or_create<pddl::ParameterImpl>(variable, type_list);
     context.positions.push_back(parameter, variable_node);
     return parameter;
@@ -81,7 +87,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
     // A non-visited vector of variables has user defined types
     auto parameter_list = parse_parameter_definitions(node.variables, type_list, context);
     // Recursively add parameters.
-    auto additional_parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables.get());
+    auto additional_parameters = boost::apply_visitor(*this, node.typed_list_of_variables.get());
     parameter_list.insert(parameter_list.end(), additional_parameters.begin(), additional_parameters.end());
     return parameter_list;
 }
