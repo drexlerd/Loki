@@ -93,6 +93,8 @@ public:
             // Validate the element by increasing the identifier to the next free position
             ++m_count;
         } else {
+            // Element is not unique!
+            // Return the existing one.
             element_ptr = *it;
         }
         return element_ptr;
