@@ -64,7 +64,7 @@ bool ConditionAndImpl::are_equal_impl(const ConditionAndImpl& other) const {
 }
 
 size_t ConditionAndImpl::hash_impl() const {
-    return hash_vector(get_sorted_vector(m_conditions));
+    return hash_container(get_sorted_vector(m_conditions));
 }
 
 void ConditionAndImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
@@ -94,7 +94,7 @@ bool ConditionOrImpl::are_equal_impl(const ConditionOrImpl& other) const {
 }
 
 size_t ConditionOrImpl::hash_impl() const {
-    return hash_vector(get_sorted_vector(m_conditions));
+    return hash_container(get_sorted_vector(m_conditions));
 }
 
 void ConditionOrImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
@@ -184,7 +184,7 @@ bool ConditionExistsImpl::are_equal_impl(const ConditionExistsImpl& other) const
 }
 
 size_t ConditionExistsImpl::hash_impl() const {
-    return hash_combine(hash_vector(m_parameters), m_condition);
+    return hash_combine(hash_container(m_parameters), m_condition);
 }
 
 void ConditionExistsImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
@@ -220,7 +220,7 @@ bool ConditionForallImpl::are_equal_impl(const ConditionForallImpl& other) const
 }
 
 size_t ConditionForallImpl::hash_impl() const {
-    return hash_combine(hash_vector(m_parameters), m_condition);
+    return hash_combine(hash_container(m_parameters), m_condition);
 }
 
 void ConditionForallImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {

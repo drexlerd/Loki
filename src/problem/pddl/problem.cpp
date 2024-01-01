@@ -61,8 +61,8 @@ size_t ProblemImpl::hash_impl() const {
         m_domain,
         m_name,
         m_requirements,
-        hash_vector(get_sorted_vector(m_objects)),
-        hash_vector(get_sorted_vector(m_initial_literals)),
+        hash_container(get_sorted_vector(m_objects)),
+        hash_container(get_sorted_vector(m_initial_literals)),
         m_goal_condition,
         optimization_hash);
 }

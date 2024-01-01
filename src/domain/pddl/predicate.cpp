@@ -37,7 +37,7 @@ bool PredicateImpl::are_equal_impl(const PredicateImpl& other) const {
 }
 
 size_t PredicateImpl::hash_impl() const {
-    return hash_combine(m_name, hash_vector(m_parameters));
+    return hash_combine(m_name, hash_container(m_parameters));
 }
 
 void PredicateImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {

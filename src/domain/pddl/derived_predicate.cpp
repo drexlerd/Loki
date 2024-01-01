@@ -34,7 +34,7 @@ bool DerivedPredicateImpl::are_equal_impl(const DerivedPredicateImpl& other) con
 }
 
 size_t DerivedPredicateImpl::hash_impl() const {
-    return hash_combine(hash_vector(get_sorted_vector(m_parameters)), m_condition);
+    return hash_combine(hash_container(get_sorted_vector(m_parameters)), m_condition);
 }
 
 void DerivedPredicateImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {

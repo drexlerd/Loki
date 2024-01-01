@@ -36,7 +36,7 @@ bool FunctionImpl::are_equal_impl(const FunctionImpl& other) const {
 }
 
 size_t FunctionImpl::hash_impl() const {
-    return hash_combine(m_function_skeleton, hash_vector(m_terms));
+    return hash_combine(m_function_skeleton, hash_container(m_terms));
 }
 
 void FunctionImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {

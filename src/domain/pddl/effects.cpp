@@ -81,7 +81,7 @@ bool EffectAndImpl::are_equal_impl(const EffectAndImpl& other) const {
 }
 
 size_t EffectAndImpl::hash_impl() const {
-    return hash_vector(get_sorted_vector(m_effects));
+    return hash_container(get_sorted_vector(m_effects));
 }
 
 void EffectAndImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
@@ -150,7 +150,7 @@ bool EffectConditionalForallImpl::are_equal_impl(const EffectConditionalForallIm
 }
 
 size_t EffectConditionalForallImpl::hash_impl() const {
-    return hash_combine(hash_vector(m_parameters), m_effect);
+    return hash_combine(hash_container(m_parameters), m_effect);
 }
 
 void EffectConditionalForallImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {

@@ -33,7 +33,7 @@ bool ObjectImpl::are_equal_impl(const ObjectImpl& other) const {
 }
 
 size_t ObjectImpl::hash_impl() const {
-    return hash_combine(m_name, hash_vector(get_sorted_vector(m_types)));
+    return hash_combine(m_name, hash_container(get_sorted_vector(m_types)));
 }
 
 void ObjectImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {

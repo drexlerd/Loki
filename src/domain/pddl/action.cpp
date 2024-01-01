@@ -43,7 +43,7 @@ bool ActionImpl::are_equal_impl(const ActionImpl& other) const {
 size_t ActionImpl::hash_impl() const {
     return hash_combine(
         m_name,
-        hash_vector(m_parameters),
+        hash_container(m_parameters),
         *m_condition,
         *m_effect);
 }

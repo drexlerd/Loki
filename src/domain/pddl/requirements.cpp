@@ -62,7 +62,7 @@ bool RequirementsImpl::are_equal_impl(const RequirementsImpl& other) const {
 }
 
 size_t RequirementsImpl::hash_impl() const {
-    return hash_set(m_requirements);
+    return hash_container(m_requirements);
 }
 
 void RequirementsImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {

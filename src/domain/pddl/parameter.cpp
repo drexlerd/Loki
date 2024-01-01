@@ -38,7 +38,7 @@ bool ParameterImpl::are_equal_impl(const ParameterImpl& other) const {
 }
 
 size_t ParameterImpl::hash_impl() const {
-    return hash_combine(m_variable, hash_vector(get_sorted_vector(m_types)));
+    return hash_combine(m_variable, hash_container(get_sorted_vector(m_types)));
 }
 
 void ParameterImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {

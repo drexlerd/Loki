@@ -38,7 +38,7 @@ bool AtomImpl::are_equal_impl(const AtomImpl& other) const {
 }
 
 size_t AtomImpl::hash_impl() const {
-    return hash_combine(m_predicate, hash_vector(m_terms));
+    return hash_combine(m_predicate, hash_container(m_terms));
 }
 
 

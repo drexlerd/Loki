@@ -134,7 +134,7 @@ bool FunctionExpressionMultiOperatorImpl::are_equal_impl(const FunctionExpressio
 }
 
 size_t FunctionExpressionMultiOperatorImpl::hash_impl() const {
-    return hash_combine(m_multi_operator, hash_vector(get_sorted_vector(m_function_expressions)));
+    return hash_combine(m_multi_operator, hash_container(get_sorted_vector(m_function_expressions)));
 }
 
 void FunctionExpressionMultiOperatorImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {

@@ -35,7 +35,7 @@ bool FunctionSkeletonImpl::are_equal_impl(const FunctionSkeletonImpl& other) con
 }
 
 size_t FunctionSkeletonImpl::hash_impl() const {
-    return hash_combine(m_name, hash_vector(m_parameters), m_type);
+    return hash_combine(m_name, hash_container(m_parameters), m_type);
 }
 
 void FunctionSkeletonImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {

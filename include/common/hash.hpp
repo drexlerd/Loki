@@ -50,12 +50,13 @@ inline size_t hash_combine(const Types&... args)
     return seed;
 }
 
-template<class T>
-inline std::size_t hash_vector(const std::vector<T>& vector)
+template<class Container>
+inline std::size_t hash_container(const Container& container)
 {
+    using T = typename Container::value_type;
     const auto hash_function = std::hash<T>();
     std::size_t aggregated_hash = 0;
-    for (const auto& item : vector)
+    for (const auto& item : container)
     {
         const auto item_hash = hash_function(item);
         hash_combine(aggregated_hash, item_hash);
@@ -63,25 +64,12 @@ inline std::size_t hash_vector(const std::vector<T>& vector)
     return aggregated_hash;
 }
 
-template<typename T>
-struct hash_vector_type {
-    size_t operator()(const std::vector<T>& vector) const {
-        return hash_vector(vector);
+template<typename Container>
+struct hash_container_type {
+    size_t operator()(const Container& container) const {
+        return hash_container(container);
     }
 };
-
-template<class T>
-inline std::size_t hash_set(const std::set<T>& vector)
-{
-    const auto hash_function = std::hash<T>();
-    std::size_t aggregated_hash = 0;
-    for (const auto& item : vector)
-    {
-        const auto item_hash = hash_function(item);
-        hash_combine(aggregated_hash, item_hash);
-    }
-    return aggregated_hash;
-}
 
 }
 
