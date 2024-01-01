@@ -38,7 +38,7 @@
 
 
 namespace loki {
-/// @brief Encapsulates references.
+/// @brief Encapsulates tracking of references of PDDL objects.
 ///
 ///        Example usage:
 ///        1. Track all variables of the parameters of an action.

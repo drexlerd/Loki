@@ -32,11 +32,11 @@ std::optional<BindingValueType<T>> Bindings<Ts...>::get(const std::string& key) 
 
 template<typename... Ts>
 template<typename T>
-void Bindings<Ts...>::insert(const std::string& key, const BindingPtrType<T>& binding, const std::optional<PositionType>& position) {
-    assert(binding);
+void Bindings<Ts...>::insert(const std::string& key, const PDDLElement<T>& element, const std::optional<PositionType>& position) {
+    assert(element);
     auto& t_bindings = std::get<BindingMapType<T>>(bindings);
     assert(!t_bindings.count(key));
-    t_bindings.emplace(key, std::make_tuple(binding, position));
+    t_bindings.emplace(key, std::make_tuple(element, position));
 }
 
 
@@ -52,10 +52,10 @@ std::optional<BindingValueType<T>> Scope::get(const std::string& name) const {
 
 
 template<typename T>
-void Scope::insert(const std::string& name, const BindingPtrType<T>& binding, const std::optional<PositionType>& position) {
-    assert(binding);
+void Scope::insert(const std::string& name, const PDDLElement<T>& element, const std::optional<PositionType>& position) {
+    assert(element);
     assert(!this->get<T>(name));
-    bindings.insert<T>(name, binding, position);
+    bindings.insert<T>(name, element, position);
 }
 
 
@@ -75,9 +75,9 @@ std::optional<ScopeStackSearchResult<T>> ScopeStack::get(const std::string& name
 
 /// @brief Insert a binding of type T.
 template<typename T>
-void ScopeStack::insert(const std::string& name, const BindingPtrType<T>& binding, const std::optional<PositionType>& position) {
+void ScopeStack::insert(const std::string& name, const PDDLElement<T>& element, const std::optional<PositionType>& position) {
     assert(!m_stack.empty());
-    m_stack.back()->insert(name, binding, position);
+    m_stack.back()->insert(name, element, position);
 }
 
 

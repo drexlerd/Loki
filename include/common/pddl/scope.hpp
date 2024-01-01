@@ -19,6 +19,7 @@
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_SCOPE_HPP_
 
 #include "config.hpp"
+#include "declarations.hpp"
 
 #include "../../common/ast/config.hpp"
 #include "../../domain/pddl/type.hpp"
@@ -41,16 +42,12 @@
 
 namespace loki {
 
-/// @brief Pointer type of the binding
-template<typename T>
-using BindingPtrType = const T*;
-
 /// @brief Encapsulates binding related information of a type T.
 ///        The object is the entity bound to the name.
 ///        The position points to the matched location
 ///        in the input stream and is used for error reporting.
 template<typename T>
-using BindingValueType = std::tuple<BindingPtrType<T>, std::optional<PositionType>>;
+using BindingValueType = std::tuple<PDDLElement<T>, std::optional<PositionType>>;
 
 /// @brief Datastructure to store bindings of a type T.
 template<typename T>
@@ -72,7 +69,7 @@ class Bindings {
         template<typename T>
         void insert(
             const std::string& key,
-            const BindingPtrType<T>& binding,
+            const PDDLElement<T>& binding,
             const std::optional<PositionType>& position);
 };
 
@@ -103,13 +100,13 @@ class Scope {
 
         /// @brief Insert a binding of type T.
         template<typename T>
-        void insert(const std::string& name, const BindingPtrType<T>& binding, const std::optional<PositionType>& position);
+        void insert(const std::string& name, const PDDLElement<T>& element, const std::optional<PositionType>& position);
 };
 
 
 /// @brief Encapsulates the result of search for a binding with the corresponding ErrorHandler.
 template<typename T>
-using ScopeStackSearchResult = std::tuple<const BindingPtrType<T>, const std::optional<PositionType>, const PDDLErrorHandler&>;
+using ScopeStackSearchResult = std::tuple<const PDDLElement<T>, const std::optional<PositionType>, const PDDLErrorHandler&>;
 
 
 /// @brief Implements a scoping mechanism to store bindings which are mappings from name to a pointer to a PDDL object
@@ -156,7 +153,7 @@ class ScopeStack {
 
         /// @brief Insert a binding of type T.
         template<typename T>
-        void insert(const std::string& name, const BindingPtrType<T>& binding, const std::optional<PositionType>& position);
+        void insert(const std::string& name, const PDDLElement<T>& element, const std::optional<PositionType>& position);
 
         /// @brief Get the error handler to print an error message.
         const PDDLErrorHandler& get_error_handler() const;
