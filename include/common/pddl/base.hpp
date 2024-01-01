@@ -38,7 +38,9 @@ namespace loki {
 ///            * Type
 ///            * Object
 ///            * Variable
+///            * Term
 ///            * Atom
+///            * NumericFluent
 ///            * Literal
 ///            * Parameter
 ///            * Function
