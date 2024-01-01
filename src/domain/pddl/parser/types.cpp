@@ -83,34 +83,67 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& eithe
 }
 
 /* TypeDeclarationTypedListOfNamesVisitor */
+static void test_multiple_definition(const pddl::Type& type, const domain::ast::Name& node, const Context& context) {
+    const auto type_name = type->get_name();
+    const auto binding = context.scopes.get<pddl::TypeImpl>(type_name);
+    if (binding.has_value()) {
+        const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
+        auto message_2 = std::string("");
+        const auto& [_type, position, error_handler] = binding.value();
+        if (position.has_value()) {
+            message_2 = error_handler(position.value(), "First defined here:");
+        }
+        throw MultiDefinitionTypeError(type_name, message_1 + message_2);
+    }
+}
+
+
+static void test_reserved_type(const pddl::Type& type, const domain::ast::Name& node, const Context& context) {
+    if (type->get_name() == "object") {
+        throw ReservedTypeError("object", context.scopes.get_error_handler()(node, ""));
+    }
+    // We also reserve type name number although PDDL specification allows it.
+    // However, this allows using regular types as function types for simplicity.
+    if (type->get_name() == "number") {
+        throw ReservedTypeError("number", context.scopes.get_error_handler()(node, ""));
+    }
+}
+
+
+static void insert_context_information(const pddl::Type& type, const domain::ast::Name& node, Context& context) {
+    context.positions.push_back(type, node);
+    context.scopes.insert(type->get_name(), type, node);
+    context.references.track(type);
+}
+
+
+static pddl::Type parse_type_definition(const domain::ast::Name& node, const pddl::TypeList& type_list, Context& context) {
+    const auto name = parse(node);
+    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>(name, type_list);
+    test_reserved_type(type, node, context);
+    test_multiple_definition(type, node, context);
+    insert_context_information(type, node, context);
+    return type;
+}
+
+
+static pddl::TypeList parse_type_definitions(const std::vector<domain::ast::Name>& nodes, const pddl::TypeList& parent_type_list, Context& context) {
+    auto type_list = pddl::TypeList();
+    for (const auto& node : nodes) {
+        type_list.push_back(parse_type_definition(node, parent_type_list, context));
+    }
+    return type_list;
+}
+
 
 TypeDeclarationTypedListOfNamesVisitor::TypeDeclarationTypedListOfNamesVisitor(Context& context_)
     : context(context_) { }
 
 pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vector<domain::ast::Name>& name_nodes) {
     // A visited vector of name has single base type "object"
-    auto type_list = pddl::TypeList();
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
     const auto& [type_object, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
-    for (const auto& name_node : name_nodes) {
-        const auto name = parse(name_node);
-        const auto binding = context.scopes.get<pddl::TypeImpl>(name);
-        if (binding.has_value()) {
-            const auto message_1 = context.scopes.get_error_handler()(name_node, "Defined here:");
-            auto message_2 = std::string("");
-            const auto& [_type, position, error_handler] = binding.value();
-            if (position.has_value()) {
-                message_2 = error_handler(position.value(), "First defined here:");
-            } else {
-                // Reserved type?
-            }
-            throw MultiDefinitionTypeError(name, message_1 + message_2);
-        }
-        const auto type = context.factories.types.get_or_create<pddl::TypeImpl>(name, pddl::TypeList{type_object});
-        type_list.push_back(type);
-        context.positions.push_back(type, name_node);
-        context.scopes.insert<pddl::TypeImpl>(name, type, name_node);
-    }
+    const auto type_list = parse_type_definitions(name_nodes, pddl::TypeList{type_object}, context);
     return type_list;
 }
 
@@ -120,39 +153,12 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::Typ
         throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_list_of_names_recursively_node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::TYPING);
-    auto type_list = pddl::TypeList();
-    const auto types = boost::apply_visitor(TypeDeclarationTypeVisitor(context),
-                                            typed_list_of_names_recursively_node.type);
     // A non-visited vector of names has user defined base types.
-    for (const auto& name_node : typed_list_of_names_recursively_node.names) {
-        const auto name = parse(name_node);
-        if (name == "object") {
-            throw SemanticParserError("Unexpected type name \"object\". It is a reserved type name.", context.scopes.get_error_handler()(name_node, ""));
-        }
-        // We also reserve type name number although PDDL specification allows it.
-        // However, this allows using regular types as function types for simplicity.
-        if (name == "number") {
-            throw SemanticParserError("Unexpected type name \"number\". It is a reserved type name.", context.scopes.get_error_handler()(name_node, ""));
-        }
-        const auto binding = context.scopes.get<pddl::TypeImpl>(name);
-        if (binding.has_value()) {
-            const auto message_1 = context.scopes.get_error_handler()(name_node, "Defined here:");
-            auto message_2 = std::string("");
-            const auto& [_type, position, error_handler] = binding.value();
-            if (position.has_value()) {
-                message_2 = error_handler(position.value(), "First defined here:");
-            } else {
-                // Reserved type?
-            }
-            throw MultiDefinitionTypeError(name, message_1 + message_2);
-        }
-        const auto type = context.factories.types.get_or_create<pddl::TypeImpl>(name, types);
-        context.positions.push_back(type, name_node);
-        type_list.push_back(type);
-        context.scopes.insert<pddl::TypeImpl>(name, type, name_node);
-    }
+    const auto parent_type_list = boost::apply_visitor(TypeDeclarationTypeVisitor(context),
+                                            typed_list_of_names_recursively_node.type);
+    auto type_list = parse_type_definitions(typed_list_of_names_recursively_node.names, parent_type_list, context);
     // Recursively add types.
-    auto additional_types = boost::apply_visitor(TypeDeclarationTypedListOfNamesVisitor(context), typed_list_of_names_recursively_node.typed_list_of_names.get());
+    const auto additional_types = boost::apply_visitor(*this, typed_list_of_names_recursively_node.typed_list_of_names.get());
     type_list.insert(type_list.end(), additional_types.begin(), additional_types.end());
     return type_list;
 }

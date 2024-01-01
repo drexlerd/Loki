@@ -24,6 +24,10 @@
 
 namespace loki {
 /* Type */
+ReservedTypeError::ReservedTypeError(const std::string& name, const std::string& error_handler_output)
+    : SemanticParserError(
+        "Unexpected type name \"" + name + "\". It is a reserved type name", error_handler_output) { }
+
 UnusedTypeError::UnusedTypeError(const std::string& name, const std::string& error_handler_output)
     : SemanticParserError(
         "The type with name \"" + name + "\" was never referred to.", error_handler_output) { }

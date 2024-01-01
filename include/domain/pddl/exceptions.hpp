@@ -29,6 +29,11 @@
 namespace loki {
 
 /* Type */
+class ReservedTypeError : public SemanticParserError {
+public:
+    ReservedTypeError(const std::string& name, const std::string& error_handler_output);
+};
+
 class UnusedTypeError : public SemanticParserError {
 public:
     UnusedTypeError(const std::string& name, const std::string& error_handler_output);

@@ -96,7 +96,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
     // A non-visited vector of names has user defined base types
     auto object_list = parse_object_definitions(node.names, type_list, context);
     // Recursively add objects.
-    auto additional_objects = boost::apply_visitor(ObjectListVisitor(context), node.typed_list_of_names.get());
+    auto additional_objects = boost::apply_visitor(*this, node.typed_list_of_names.get());
     object_list.insert(object_list.end(), additional_objects.begin(), additional_objects.end());
     return object_list;
 }

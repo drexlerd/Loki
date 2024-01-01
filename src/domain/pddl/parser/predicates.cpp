@@ -33,8 +33,6 @@ static void test_multiple_definition(const pddl::Predicate& predicate, const dom
         const auto& [_predicate, position, error_handler] = binding.value();
         if (position.has_value()) {
             message_2 = error_handler(position.value(), "First defined here:");
-        } else {
-            // Reserved type error?
         }
         throw MultiDefinitionPredicateError(predicate_name, message_1 + message_2);
     }
@@ -43,7 +41,7 @@ static void test_multiple_definition(const pddl::Predicate& predicate, const dom
 
 static void insert_context_information(const pddl::Predicate& predicate, const domain::ast::Predicate& node, Context& context) {
     context.positions.push_back(predicate, node);
-    context.scopes.insert<pddl::PredicateImpl>(predicate->get_name(), predicate, node);
+    context.scopes.insert(predicate->get_name(), predicate, node);
     context.references.track(predicate);
 }
 
