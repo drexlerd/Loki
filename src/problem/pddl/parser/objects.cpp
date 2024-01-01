@@ -80,7 +80,7 @@ static pddl::ObjectList parse_object_definitions(const std::vector<domain::ast::
 
 
 pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Name>& name_nodes) {
-    // A visited vector of name has single base type "object"
+    // std::vector<domain::ast::Name> has single base type "object"
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
     const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
     auto object_list = parse_object_definitions(name_nodes, pddl::TypeList{type}, context);
@@ -92,8 +92,8 @@ pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNam
         throw UnsupportedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::TYPING);
+    // TypedListOfNamesRecursively has user defined base types
     const auto type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context), node.type);
-    // A non-visited vector of names has user defined base types
     auto object_list = parse_object_definitions(node.names, type_list, context);
     // Recursively add objects.
     auto additional_objects = boost::apply_visitor(*this, node.typed_list_of_names.get());

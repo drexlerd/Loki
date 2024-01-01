@@ -140,7 +140,7 @@ TypeDeclarationTypedListOfNamesVisitor::TypeDeclarationTypedListOfNamesVisitor(C
     : context(context_) { }
 
 pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vector<domain::ast::Name>& name_nodes) {
-    // A visited vector of name has single base type "object"
+    // std::vector<domain::ast::Name> has single base type "object"
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
     const auto& [type_object, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
     const auto type_list = parse_type_definitions(name_nodes, pddl::TypeList{type_object}, context);
@@ -153,7 +153,7 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::Typ
         throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_list_of_names_recursively_node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::TYPING);
-    // A non-visited vector of names has user defined base types.
+    // TypedListOfNamesRecursively has user defined base types.
     const auto parent_type_list = boost::apply_visitor(TypeDeclarationTypeVisitor(context),
                                             typed_list_of_names_recursively_node.type);
     auto type_list = parse_type_definitions(typed_list_of_names_recursively_node.names, parent_type_list, context);

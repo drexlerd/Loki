@@ -71,7 +71,7 @@ ParameterListVisitor::ParameterListVisitor(Context& context_)
     : context(context_) { }
 
 pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>& nodes) {
-    // A visited vector of variable has single base type "object"
+    // std::vector<ast::Variable> has single base type "object"
     const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("object");
     auto parameter_list = parse_parameter_definitions(nodes, pddl::TypeList{type}, context);
     return parameter_list;
@@ -84,7 +84,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
     }
     context.references.untrack(pddl::RequirementEnum::TYPING);
     const auto type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context), node.type);
-    // A non-visited vector of variables has user defined types
+    // TypedListOfVariablesRecursively has user defined types
     auto parameter_list = parse_parameter_definitions(node.variables, type_list, context);
     // Recursively add parameters.
     auto additional_parameters = boost::apply_visitor(*this, node.typed_list_of_variables.get());

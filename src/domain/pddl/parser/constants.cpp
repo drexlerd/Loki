@@ -74,7 +74,7 @@ ConstantListVisitor::ConstantListVisitor(Context& context_)
     : context(context_) { }
 
 pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
-    // A visited vector of name has single base type "object"
+    // std::vector<ast::Name> has single base type "object"
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
     const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
     const auto constant_list = parse_constant_definitions(name_nodes, pddl::TypeList{type}, context);
@@ -88,7 +88,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
     context.references.untrack(pddl::RequirementEnum::TYPING);
     const auto type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context),
                                             typed_list_of_names_recursively_node.type);
-    // A non-visited vector of names has user defined base types
+    // TypedListOfNamesRecursively has user defined base types
     auto constant_list = parse_constant_definitions(typed_list_of_names_recursively_node.names, type_list, context);
     // Recursively add objects.
     auto additional_objects = boost::apply_visitor(*this, typed_list_of_names_recursively_node.typed_list_of_names.get());
