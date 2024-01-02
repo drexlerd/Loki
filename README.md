@@ -33,6 +33,7 @@ Loki depends on a fraction of Boost's (boost.org) header-only libraries.
 
 - Fusion
 - Spirit x3
+- Container
 
 
 ## Installation
