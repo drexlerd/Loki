@@ -32,7 +32,7 @@ AtomImpl::AtomImpl(int identifier, Predicate predicate, TermList terms)
 {
 }
 
-bool AtomImpl::are_equal_impl(const AtomImpl& other) const {
+bool AtomImpl::is_structurally_equivalent_to_impl(const AtomImpl& other) const {
     return (m_predicate == other.m_predicate)
         && (m_terms == other.m_terms);
 }

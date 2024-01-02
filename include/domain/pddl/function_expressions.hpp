@@ -62,7 +62,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const FunctionExpressionNumberImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const FunctionExpressionNumberImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -86,7 +86,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const FunctionExpressionBinaryOperatorImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const FunctionExpressionBinaryOperatorImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -110,7 +110,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const FunctionExpressionMultiOperatorImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const FunctionExpressionMultiOperatorImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -130,7 +130,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const FunctionExpressionMinusImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const FunctionExpressionMinusImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -149,7 +149,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const FunctionExpressionFunctionImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const FunctionExpressionFunctionImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 

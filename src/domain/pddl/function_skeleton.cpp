@@ -30,7 +30,7 @@ FunctionSkeletonImpl::FunctionSkeletonImpl(int identifier, std::string name, Par
 {
 }
 
-bool FunctionSkeletonImpl::are_equal_impl(const FunctionSkeletonImpl& other) const {
+bool FunctionSkeletonImpl::is_structurally_equivalent_to_impl(const FunctionSkeletonImpl& other) const {
     return (m_name == other.m_name) && (m_parameters == other.m_parameters) && (m_type == other.m_type);
 }
 

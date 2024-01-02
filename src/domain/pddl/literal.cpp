@@ -30,7 +30,7 @@ LiteralImpl::LiteralImpl(int identifier, bool is_negated, Atom atom)
 {
 }
 
-bool LiteralImpl::are_equal_impl(const LiteralImpl& other) const {
+bool LiteralImpl::is_structurally_equivalent_to_impl(const LiteralImpl& other) const {
     return (m_is_negated == other.m_is_negated) && (m_atom == other.m_atom);
 }
 

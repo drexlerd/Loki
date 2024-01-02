@@ -28,7 +28,7 @@ TypeImpl::TypeImpl(int identifier, std::string name, TypeList bases)
 {
 }
 
-bool TypeImpl::are_equal_impl(const TypeImpl& other) const {
+bool TypeImpl::is_structurally_equivalent_to_impl(const TypeImpl& other) const {
     return (m_name == other.m_name) && (get_sorted_vector(m_bases) == get_sorted_vector(other.m_bases));
 }
 

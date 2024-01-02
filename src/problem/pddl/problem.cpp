@@ -45,7 +45,7 @@ ProblemImpl::ProblemImpl(int identifier, Domain domain, std::string name, Requir
 {
 }
 
-bool ProblemImpl::are_equal_impl(const ProblemImpl& other) const {
+bool ProblemImpl::is_structurally_equivalent_to_impl(const ProblemImpl& other) const {
     return (m_domain == other.m_domain)
         && (m_name == other.m_name)
         && (m_requirements == other.m_requirements)

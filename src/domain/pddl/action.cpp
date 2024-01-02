@@ -33,7 +33,7 @@ ActionImpl::ActionImpl(int identifier, std::string name, ParameterList parameter
 {
 }
 
-bool ActionImpl::are_equal_impl(const ActionImpl& other) const {
+bool ActionImpl::is_structurally_equivalent_to_impl(const ActionImpl& other) const {
     return (m_name == other.m_name)
         && (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters))
         && (*m_condition == *other.m_condition)

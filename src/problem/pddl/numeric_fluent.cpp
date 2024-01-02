@@ -25,7 +25,7 @@ namespace loki::pddl {
 NumericFluentImpl::NumericFluentImpl(int identifier, Function function, double number)
     : Base(identifier), m_function(std::move(function)), m_number(number) { }
 
-bool NumericFluentImpl::are_equal_impl(const NumericFluentImpl& other) const {
+bool NumericFluentImpl::is_structurally_equivalent_to_impl(const NumericFluentImpl& other) const {
     return (m_function == other.m_function)
         && (m_number == other.m_number);
 }

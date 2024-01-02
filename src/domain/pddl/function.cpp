@@ -31,7 +31,7 @@ FunctionImpl::FunctionImpl(int identifier, FunctionSkeleton function_skeleton, T
 {
 }
 
-bool FunctionImpl::are_equal_impl(const FunctionImpl& other) const {
+bool FunctionImpl::is_structurally_equivalent_to_impl(const FunctionImpl& other) const {
     return (m_function_skeleton == other.m_function_skeleton) && (m_terms == other.m_terms);
 }
 

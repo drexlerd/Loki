@@ -28,7 +28,7 @@ DerivedPredicateImpl::DerivedPredicateImpl(int identifier, ParameterList paramet
 {
 }
 
-bool DerivedPredicateImpl::are_equal_impl(const DerivedPredicateImpl& other) const {
+bool DerivedPredicateImpl::is_structurally_equivalent_to_impl(const DerivedPredicateImpl& other) const {
     return (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters))
         && (m_condition == other.m_condition);
 }

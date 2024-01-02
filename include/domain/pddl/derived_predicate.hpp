@@ -47,7 +47,7 @@ private:
 
 public:
     /// @brief Test for structural equivalence
-    bool are_equal_impl(const DerivedPredicateImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const DerivedPredicateImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 

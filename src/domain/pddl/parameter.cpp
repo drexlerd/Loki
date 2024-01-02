@@ -33,7 +33,7 @@ ParameterImpl::ParameterImpl(int identifier, pddl::Variable variable, TypeList t
 {
 }
 
-bool ParameterImpl::are_equal_impl(const ParameterImpl& other) const {
+bool ParameterImpl::is_structurally_equivalent_to_impl(const ParameterImpl& other) const {
     return (m_variable == other.m_variable) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types));
 }
 

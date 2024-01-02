@@ -45,7 +45,7 @@ private:
 
 public:
     /// @brief Test for semantic equivalence
-    bool are_equal_impl(const ObjectImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const ObjectImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 

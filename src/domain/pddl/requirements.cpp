@@ -57,7 +57,7 @@ RequirementsImpl::RequirementsImpl(int identifier, RequirementEnumSet requiremen
 {
 }
 
-bool RequirementsImpl::are_equal_impl(const RequirementsImpl& other) const {
+bool RequirementsImpl::is_structurally_equivalent_to_impl(const RequirementsImpl& other) const {
     return (m_requirements == other.m_requirements);
 }
 

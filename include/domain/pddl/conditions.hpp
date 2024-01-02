@@ -46,7 +46,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const ConditionLiteralImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const ConditionLiteralImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -65,7 +65,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const ConditionAndImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const ConditionAndImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -84,7 +84,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const ConditionOrImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const ConditionOrImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -103,7 +103,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const ConditionNotImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const ConditionNotImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -123,7 +123,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const ConditionImplyImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const ConditionImplyImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -144,7 +144,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const ConditionExistsImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const ConditionExistsImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -165,7 +165,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const ConditionForallImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const ConditionForallImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 

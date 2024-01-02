@@ -27,7 +27,7 @@ VariableImpl::VariableImpl(int identifier, std::string name)
 {
 }
 
-bool VariableImpl::are_equal_impl(const VariableImpl& other) const {
+bool VariableImpl::is_structurally_equivalent_to_impl(const VariableImpl& other) const {
     return (m_name == other.m_name);
 }
 

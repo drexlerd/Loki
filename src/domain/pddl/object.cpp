@@ -28,7 +28,7 @@ ObjectImpl::ObjectImpl(int identifier, std::string name, TypeList types)
 {
 }
 
-bool ObjectImpl::are_equal_impl(const ObjectImpl& other) const {
+bool ObjectImpl::is_structurally_equivalent_to_impl(const ObjectImpl& other) const {
     return (m_name == other.m_name) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types));
 }
 

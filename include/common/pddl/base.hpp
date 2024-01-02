@@ -67,7 +67,7 @@ public:
     constexpr const auto& self() const { return static_cast<Derived const&>(*this); }
 
     bool operator==(const Base& other) const {
-        return self().are_equal_impl(other.self());
+        return self().is_structurally_equivalent_to_impl(other.self());
     }
 
     bool operator!=(const Base& other) const {

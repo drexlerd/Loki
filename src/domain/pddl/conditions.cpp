@@ -31,7 +31,7 @@ ConditionLiteralImpl::ConditionLiteralImpl(int identifier, Literal literal)
     : Base(identifier)
     , m_literal(std::move(literal)) { }
 
-bool ConditionLiteralImpl::are_equal_impl(const ConditionLiteralImpl& other) const {
+bool ConditionLiteralImpl::is_structurally_equivalent_to_impl(const ConditionLiteralImpl& other) const {
     if (this != &other) {
         return m_literal == other.m_literal;
     }
@@ -56,7 +56,7 @@ ConditionAndImpl::ConditionAndImpl(int identifier, ConditionList conditions)
     : Base(identifier)
     , m_conditions(std::move(conditions)) { }
 
-bool ConditionAndImpl::are_equal_impl(const ConditionAndImpl& other) const {
+bool ConditionAndImpl::is_structurally_equivalent_to_impl(const ConditionAndImpl& other) const {
     if (this != &other) {
         return get_sorted_vector(m_conditions) == get_sorted_vector(other.m_conditions);
     }
@@ -86,7 +86,7 @@ ConditionOrImpl::ConditionOrImpl(int identifier, ConditionList conditions)
     : Base(identifier)
     , m_conditions(std::move(conditions)) { }
 
-bool ConditionOrImpl::are_equal_impl(const ConditionOrImpl& other) const {
+bool ConditionOrImpl::is_structurally_equivalent_to_impl(const ConditionOrImpl& other) const {
     if (this != &other) {
         return get_sorted_vector(m_conditions) == get_sorted_vector(other.m_conditions);
     }
@@ -116,7 +116,7 @@ ConditionNotImpl::ConditionNotImpl(int identifier, Condition condition)
     : Base(identifier)
     , m_condition(std::move(condition)) { }
 
-bool ConditionNotImpl::are_equal_impl(const ConditionNotImpl& other) const {
+bool ConditionNotImpl::is_structurally_equivalent_to_impl(const ConditionNotImpl& other) const {
     if (this != &other) {
         return m_condition == other.m_condition;
     }
@@ -142,7 +142,7 @@ const Condition& ConditionNotImpl::get_condition() const {
 ConditionImplyImpl::ConditionImplyImpl(int identifier, Condition condition_left, Condition condition_right)
     : Base(identifier), m_condition_left(std::move(condition_left)), m_condition_right(std::move(condition_right)) { }
 
-bool ConditionImplyImpl::are_equal_impl(const ConditionImplyImpl& other) const {
+bool ConditionImplyImpl::is_structurally_equivalent_to_impl(const ConditionImplyImpl& other) const {
     if (this != &other) {
         return (m_condition_left == other.m_condition_left)
             && (m_condition_right == other.m_condition_right);
@@ -175,7 +175,7 @@ const Condition& ConditionImplyImpl::get_condition_right() const {
 ConditionExistsImpl::ConditionExistsImpl(int identifier, ParameterList parameters, Condition condition)
     : Base(identifier), m_parameters(std::move(parameters)), m_condition(std::move(condition)) { }
 
-bool ConditionExistsImpl::are_equal_impl(const ConditionExistsImpl& other) const {
+bool ConditionExistsImpl::is_structurally_equivalent_to_impl(const ConditionExistsImpl& other) const {
     if (this != &other) {
         return (m_parameters == other.m_parameters)
             && (m_condition == other.m_condition);
@@ -211,7 +211,7 @@ const Condition& ConditionExistsImpl::get_condition() const {
 ConditionForallImpl::ConditionForallImpl(int identifier, ParameterList parameters, Condition condition)
     : Base(identifier), m_parameters(std::move(parameters)), m_condition(std::move(condition)) { }
 
-bool ConditionForallImpl::are_equal_impl(const ConditionForallImpl& other) const {
+bool ConditionForallImpl::is_structurally_equivalent_to_impl(const ConditionForallImpl& other) const {
     if (this != &other) {
         return (m_parameters == other.m_parameters)
             && (m_condition == other.m_condition);

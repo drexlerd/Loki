@@ -55,7 +55,7 @@ const std::string& to_string(pddl::MultiOperatorEnum multi_operator) {
 FunctionExpressionNumberImpl::FunctionExpressionNumberImpl(int identifier, double number)
     : Base(identifier), m_number(number) { }
 
-bool FunctionExpressionNumberImpl::are_equal_impl(const FunctionExpressionNumberImpl& other) const {
+bool FunctionExpressionNumberImpl::is_structurally_equivalent_to_impl(const FunctionExpressionNumberImpl& other) const {
     if (this != &other) {
         return m_number == other.m_number;
     }
@@ -85,7 +85,7 @@ FunctionExpressionBinaryOperatorImpl::FunctionExpressionBinaryOperatorImpl(int i
     , m_left_function_expression(std::move(left_function_expression))
     , m_right_function_expression(std::move(right_function_expression)) { }
 
-bool FunctionExpressionBinaryOperatorImpl::are_equal_impl(const FunctionExpressionBinaryOperatorImpl& other) const {
+bool FunctionExpressionBinaryOperatorImpl::is_structurally_equivalent_to_impl(const FunctionExpressionBinaryOperatorImpl& other) const {
     if (this != &other) {
         return (m_binary_operator == other.m_binary_operator)
             && (m_left_function_expression == other.m_left_function_expression)
@@ -125,7 +125,7 @@ FunctionExpressionMultiOperatorImpl::FunctionExpressionMultiOperatorImpl(int ide
     FunctionExpressionList function_expressions)
     : Base(identifier), m_multi_operator(multi_operator), m_function_expressions(function_expressions) { }
 
-bool FunctionExpressionMultiOperatorImpl::are_equal_impl(const FunctionExpressionMultiOperatorImpl& other) const {
+bool FunctionExpressionMultiOperatorImpl::is_structurally_equivalent_to_impl(const FunctionExpressionMultiOperatorImpl& other) const {
     if (this != &other) {
         return (m_multi_operator == other.m_multi_operator)
             && (get_sorted_vector(m_function_expressions) == get_sorted_vector(other.m_function_expressions));
@@ -160,7 +160,7 @@ const FunctionExpressionList& FunctionExpressionMultiOperatorImpl::get_function_
 FunctionExpressionMinusImpl::FunctionExpressionMinusImpl(int identifier, FunctionExpression function_expression)
     : Base(identifier), m_function_expression(std::move(function_expression)) { }
 
-bool FunctionExpressionMinusImpl::are_equal_impl(const FunctionExpressionMinusImpl& other) const {
+bool FunctionExpressionMinusImpl::is_structurally_equivalent_to_impl(const FunctionExpressionMinusImpl& other) const {
     if (this != &other) {
         return m_function_expression == other.m_function_expression;
     }
@@ -184,7 +184,7 @@ const FunctionExpression& FunctionExpressionMinusImpl::get_function_expression()
 FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(int identifier, Function function)
     : Base(identifier), m_function(std::move(function)) { }
 
-bool FunctionExpressionFunctionImpl::are_equal_impl(const FunctionExpressionFunctionImpl& other) const {
+bool FunctionExpressionFunctionImpl::is_structurally_equivalent_to_impl(const FunctionExpressionFunctionImpl& other) const {
     if (this != &other) {
         return m_function == other.m_function;
     }

@@ -32,7 +32,7 @@ PredicateImpl::PredicateImpl(int identifier, std::string name, ParameterList par
 {
 }
 
-bool PredicateImpl::are_equal_impl(const PredicateImpl& other) const {
+bool PredicateImpl::is_structurally_equivalent_to_impl(const PredicateImpl& other) const {
     return (m_name == other.m_name) && (m_parameters == other.m_parameters);
 }
 

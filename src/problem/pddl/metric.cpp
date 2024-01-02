@@ -46,7 +46,7 @@ OptimizationMetricImpl::OptimizationMetricImpl(int identifier, OptimizationMetri
 {
 }
 
-bool OptimizationMetricImpl::are_equal_impl(const OptimizationMetricImpl& other) const {
+bool OptimizationMetricImpl::is_structurally_equivalent_to_impl(const OptimizationMetricImpl& other) const {
     return (m_optimization_metric == other.m_optimization_metric)
         && (m_function_expression == other.m_function_expression);
 }

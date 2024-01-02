@@ -42,7 +42,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const TermObjectImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const TermObjectImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -60,7 +60,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const TermVariableImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const TermVariableImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 

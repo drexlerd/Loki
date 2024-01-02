@@ -30,7 +30,7 @@ namespace loki::pddl {
 TermObjectImpl::TermObjectImpl(int identifier, Object object)
     : Base(identifier), m_object(std::move(object)) { }
 
-bool TermObjectImpl::are_equal_impl(const TermObjectImpl& other) const {
+bool TermObjectImpl::is_structurally_equivalent_to_impl(const TermObjectImpl& other) const {
     if (this != &other) {
         return m_object == other.m_object;
     }
@@ -54,7 +54,7 @@ const Object& TermObjectImpl::get_object() const {
 TermVariableImpl::TermVariableImpl(int identifier, Variable variable)
     : Base(identifier), m_variable(std::move(variable)) { }
 
-bool TermVariableImpl::are_equal_impl(const TermVariableImpl& other) const {
+bool TermVariableImpl::is_structurally_equivalent_to_impl(const TermVariableImpl& other) const {
     if (this != &other) {
         return m_variable == other.m_variable;
     }

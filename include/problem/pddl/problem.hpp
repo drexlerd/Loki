@@ -50,7 +50,7 @@ public:
     ProblemImpl(int identifier, Domain domain, std::string name, Requirements requirements, ObjectList objects, LiteralList initial_literals, NumericFluentList numeric_fluents, Condition goal_condition, std::optional<OptimizationMetric> optimization_metric);
 
     /// @brief Test for semantic equivalence
-    bool are_equal_impl(const ProblemImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const ProblemImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 

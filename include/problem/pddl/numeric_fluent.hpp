@@ -43,7 +43,7 @@ public:
     NumericFluentImpl(int identifier, Function function, double number);
 
     /// @brief Test for semantic equivalence
-    bool are_equal_impl(const NumericFluentImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const NumericFluentImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 

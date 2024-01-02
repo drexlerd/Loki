@@ -50,7 +50,7 @@ DomainImpl::DomainImpl(int identifier,
 {
 }
 
-bool DomainImpl::are_equal_impl(const DomainImpl& other) const {
+bool DomainImpl::is_structurally_equivalent_to_impl(const DomainImpl& other) const {
     return (m_name == other.m_name)
         && (m_requirements == other.m_requirements)
         && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types))

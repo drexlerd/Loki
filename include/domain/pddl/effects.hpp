@@ -55,7 +55,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const EffectLiteralImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const EffectLiteralImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -74,7 +74,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const EffectAndImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const EffectAndImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -95,7 +95,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const EffectNumericImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const EffectNumericImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -117,7 +117,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const EffectConditionalForallImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const EffectConditionalForallImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
@@ -138,7 +138,7 @@ private:
     friend class loki::PersistentFactory;
 
 public:
-    bool are_equal_impl(const EffectConditionalWhenImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const EffectConditionalWhenImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 

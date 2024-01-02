@@ -50,7 +50,7 @@ EffectLiteralImpl::EffectLiteralImpl(int identifier, Literal literal)
     : Base(identifier)
     , m_literal(std::move(literal)) { }
 
-bool EffectLiteralImpl::are_equal_impl(const EffectLiteralImpl& other) const {
+bool EffectLiteralImpl::is_structurally_equivalent_to_impl(const EffectLiteralImpl& other) const {
     if (this != &other) {
         return m_literal == other.m_literal;
     }
@@ -73,7 +73,7 @@ const Literal& EffectLiteralImpl::get_literal() const {
 EffectAndImpl::EffectAndImpl(int identifier, EffectList effects)
     : Base(identifier), m_effects(std::move(effects)) { }
 
-bool EffectAndImpl::are_equal_impl(const EffectAndImpl& other) const {
+bool EffectAndImpl::is_structurally_equivalent_to_impl(const EffectAndImpl& other) const {
     if (this != &other) {
         return get_sorted_vector(m_effects) == get_sorted_vector(other.m_effects);
     }
@@ -105,7 +105,7 @@ EffectNumericImpl::EffectNumericImpl(int identifier, AssignOperatorEnum assign_o
     , m_function(std::move(function))
     , m_function_expression(std::move(function_expression)) { }
 
-bool EffectNumericImpl::are_equal_impl(const EffectNumericImpl& other) const {
+bool EffectNumericImpl::is_structurally_equivalent_to_impl(const EffectNumericImpl& other) const {
     if (this != &other) {
         return (m_assign_operator == other.m_assign_operator)
             && (m_function == other.m_function)
@@ -141,7 +141,7 @@ const FunctionExpression& EffectNumericImpl::get_function_expression() const {
 EffectConditionalForallImpl::EffectConditionalForallImpl(int identifier, ParameterList parameters, Effect effect)
     : Base(identifier), m_parameters(std::move(parameters)), m_effect(std::move(effect)) { }
 
-bool EffectConditionalForallImpl::are_equal_impl(const EffectConditionalForallImpl& other) const {
+bool EffectConditionalForallImpl::is_structurally_equivalent_to_impl(const EffectConditionalForallImpl& other) const {
     if (this != &other) {
         return (m_parameters == other.m_parameters)
             && (m_effect == other.m_effect);
@@ -176,7 +176,7 @@ const Effect& EffectConditionalForallImpl::get_effect() const {
 EffectConditionalWhenImpl::EffectConditionalWhenImpl(int identifier, Condition condition, Effect effect)
     : Base(identifier), m_condition(std::move(condition)), m_effect(std::move(effect)) { }
 
-bool EffectConditionalWhenImpl::are_equal_impl(const EffectConditionalWhenImpl& other) const {
+bool EffectConditionalWhenImpl::is_structurally_equivalent_to_impl(const EffectConditionalWhenImpl& other) const {
     if (this != &other) {
         return (m_condition == other.m_condition)
             && (m_effect == other.m_effect);
