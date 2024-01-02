@@ -33,7 +33,6 @@ namespace loki {
 ///        Detecting semantic equivalence is important for
 ///            - reducing the required memory by detecting duplicates
 ///            - reducing comparison and hashing to pointer level instead of traversing the whole structure
-///            - caching evaluation results
 ///        For the following type of PDDL objects, loki detects semantic equivalence:
 ///            * Type
 ///            * Object
