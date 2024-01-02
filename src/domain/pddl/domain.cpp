@@ -179,6 +179,10 @@ const PredicateList& DomainImpl::get_predicates() const {
     return m_predicates;
 }
 
+const ActionList& DomainImpl::get_actions() const {
+    return m_actions;
+}
+
 }
 
 namespace std {

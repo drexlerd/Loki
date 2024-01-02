@@ -45,7 +45,7 @@ namespace loki {
 ///        The position points to the matched location
 ///        in the input stream and is used for error reporting.
 template<typename T>
-using BindingValueType = std::tuple<PDDLElement<T>, std::optional<PositionType>>;
+using BindingValueType = std::tuple<PDDLElement<T>, std::optional<Position>>;
 
 /// @brief Datastructure to store bindings of a type T.
 template<typename T>
@@ -68,7 +68,7 @@ class Bindings {
         void insert(
             const std::string& key,
             const PDDLElement<T>& binding,
-            const std::optional<PositionType>& position);
+            const std::optional<Position>& position);
 };
 
 
@@ -98,13 +98,13 @@ class Scope {
 
         /// @brief Insert a binding of type T.
         template<typename T>
-        void insert(const std::string& name, const PDDLElement<T>& element, const std::optional<PositionType>& position);
+        void insert(const std::string& name, const PDDLElement<T>& element, const std::optional<Position>& position);
 };
 
 
 /// @brief Encapsulates the result of search for a binding with the corresponding ErrorHandler.
 template<typename T>
-using ScopeStackSearchResult = std::tuple<const PDDLElement<T>, const std::optional<PositionType>, const PDDLErrorHandler&>;
+using ScopeStackSearchResult = std::tuple<const PDDLElement<T>, const std::optional<Position>, const PDDLErrorHandler&>;
 
 
 /// @brief Implements a scoping mechanism to store bindings which are mappings from name to a pointer to a PDDL object
@@ -151,7 +151,7 @@ class ScopeStack {
 
         /// @brief Insert a binding of type T.
         template<typename T>
-        void insert(const std::string& name, const PDDLElement<T>& element, const std::optional<PositionType>& position);
+        void insert(const std::string& name, const PDDLElement<T>& element, const std::optional<Position>& position);
 
         /// @brief Get the error handler to print an error message.
         const PDDLErrorHandler& get_error_handler() const;

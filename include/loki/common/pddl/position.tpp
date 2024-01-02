@@ -25,14 +25,14 @@ PositionCache<Ts...>::PositionCache(const X3ErrorHandler& error_handler, const f
 
 template<typename... Ts>
 template<typename T>
-void PositionCache<Ts...>::push_back(const PDDLElement<T>& element, const PositionType& position) {
+void PositionCache<Ts...>::push_back(const PDDLElement<T>& element, const Position& position) {
     auto& t_positions = std::get<PositionMapType<T>>(m_positions);
     t_positions[element].push_back(position);
 }
 
 template<typename... Ts>
 template<typename T>
-std::vector<PositionType> PositionCache<Ts...>::get(const PDDLElement<T>& element) const {
+PositionList PositionCache<Ts...>::get(const PDDLElement<T>& element) const {
     auto& t_positions = std::get<PositionMapType<T>>(m_positions);
     auto it = t_positions.find(element);
     if (it != t_positions.end()) {

@@ -29,7 +29,7 @@
 
 namespace loki {
 template<typename T>
-using PositionMapType = std::unordered_map<PDDLElement<T>, std::vector<PositionType>>;
+using PositionMapType = std::unordered_map<PDDLElement<T>, PositionList>;
 
 /// @brief Stores all occurrences of a PDDL object in the input file for each PDDL type T.
 template<typename... Ts>
@@ -43,10 +43,10 @@ class PositionCache {
         PositionCache(const X3ErrorHandler& error_handler, const fs::path& file, int tabs=4);
 
         template<typename T>
-        void push_back(const PDDLElement<T>& element, const PositionType& position);
+        void push_back(const PDDLElement<T>& element, const Position& position);
 
         template<typename T>
-        std::vector<PositionType> get(const PDDLElement<T>& element) const;
+        PositionList get(const PDDLElement<T>& element) const;
 
         const PDDLErrorHandler& get_error_handler() const;
 };

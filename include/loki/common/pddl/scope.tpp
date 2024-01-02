@@ -32,7 +32,7 @@ std::optional<BindingValueType<T>> Bindings<Ts...>::get(const std::string& key) 
 
 template<typename... Ts>
 template<typename T>
-void Bindings<Ts...>::insert(const std::string& key, const PDDLElement<T>& element, const std::optional<PositionType>& position) {
+void Bindings<Ts...>::insert(const std::string& key, const PDDLElement<T>& element, const std::optional<Position>& position) {
     assert(element);
     auto& t_bindings = std::get<BindingMapType<T>>(bindings);
     assert(!t_bindings.count(key));
@@ -52,7 +52,7 @@ std::optional<BindingValueType<T>> Scope::get(const std::string& name) const {
 
 
 template<typename T>
-void Scope::insert(const std::string& name, const PDDLElement<T>& element, const std::optional<PositionType>& position) {
+void Scope::insert(const std::string& name, const PDDLElement<T>& element, const std::optional<Position>& position) {
     assert(element);
     assert(!this->get<T>(name));
     bindings.insert<T>(name, element, position);
@@ -75,7 +75,7 @@ std::optional<ScopeStackSearchResult<T>> ScopeStack::get(const std::string& name
 
 /// @brief Insert a binding of type T.
 template<typename T>
-void ScopeStack::insert(const std::string& name, const PDDLElement<T>& element, const std::optional<PositionType>& position) {
+void ScopeStack::insert(const std::string& name, const PDDLElement<T>& element, const std::optional<Position>& position) {
     assert(!m_stack.empty());
     m_stack.back()->insert(name, element, position);
 }

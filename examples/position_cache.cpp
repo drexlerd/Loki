@@ -18,31 +18,67 @@
 #include "../include/loki/domain/parser.hpp"
 #include "../include/loki/problem/parser.hpp"
 
+#include <cassert>
 #include <iostream>
 
 
+/// @brief Prints an error message when encourtering an And-Condition.
+struct TestUnsupportedAndConditionVisitor {
+    const loki::Position position;
+    const loki::PDDLPositionCache& position_cache;
+    const loki::PDDLErrorHandler& error_handler; 
+
+    TestUnsupportedAndConditionVisitor(
+        const loki::Position position_,
+        const loki::PDDLPositionCache& position_cache_,
+        const loki::PDDLErrorHandler& error_handler_)
+        : position(position_)
+        , position_cache(position_cache_)
+        , error_handler(error_handler_) { }
+
+    /// @brief For leaf nodes we do not need to do anything 
+    template<typename Node>
+    void operator()(const Node&) { }
+
+    /// @brief For inner nodes we need to recursively call the visitor
+    void operator()(const loki::pddl::ConditionOrImpl& node) {
+        for (const auto& child_node : node.get_conditions()) {
+            // We call front() to obtain the first occurence.
+            const auto child_position = position_cache.get<loki::pddl::ConditionImpl>(child_node).front();
+            std::visit(TestUnsupportedAndConditionVisitor(child_position, position_cache, error_handler), *child_node);
+        }
+    }
+
+    /// @brief For the unsupported And-Condition, 
+    ///        we print an clang-style error message and throw an exception.
+    void operator()(const loki::pddl::ConditionAndImpl& node) {
+        std::cout << error_handler(position, "Your awesome error message.") << std::endl;
+        throw std::runtime_error("Unexpected And-Condition.");
+    }
+};
+
+
+/// @brief In this example, we show how to print custom error message for unsupported PDDL types.
 int main() {
     // Parse the domain
     auto domain_parser = loki::DomainParser("benchmarks/gripper/domain.pddl");
     const auto domain = domain_parser.get_domain();
     std::cout << *domain << std::endl << std::endl;
 
-    // Print occurences of domain constants.
     const loki::PDDLPositionCache& position_cache = domain_parser.get_position_cache();
     const loki::PDDLErrorHandler& error_handler = position_cache.get_error_handler();
-    for (const auto constant : domain->get_constants()) {
-        std::cout << "Constant name: " << constant->get_name() << std::endl;
-        const auto& positions = position_cache.get<loki::pddl::ObjectImpl>(constant);
-        std::cout << "Number of occurences: " << positions.size() << std::endl;
-        for (auto position : positions) {
-            const auto iterator = error_handler.position_of(position);
-            std::cout << "String represenation from iterator: " << std::string(iterator.begin(), iterator.end()) << std::endl;
-            std::cout << "Print a custom clang-style error message:" << std::endl;
-            std::cout << error_handler(position, "Your awesome error message.") << std::endl;
-        }
-    }
 
-    // Note: iterators can be compared to find positions of elements that are within other elements.
+    for (const auto& action : domain->get_actions()) {
+        const auto condition = action->get_condition();
+        if (!condition.has_value()) {
+            continue;
+        }
+        // We call front() to obtain the first occurence.
+        auto condition_position = position_cache.get<loki::pddl::ConditionImpl>(condition.value()).front();
+        std::visit(
+            TestUnsupportedAndConditionVisitor(condition_position, position_cache, error_handler), 
+            *condition.value());
+    }
 
     return 0;
 }

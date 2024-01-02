@@ -68,6 +68,7 @@ public:
     const ObjectList& get_constants() const;
     const PredicateList& get_predicates() const;
     const FunctionSkeletonList& get_functions() const;
+    const ActionList& get_actions() const;
 };
 
 }
