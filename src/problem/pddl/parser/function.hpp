@@ -18,8 +18,8 @@
 #ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_FUNCTION_HPP_
 #define LOKI_SRC_PROBLEM_PDDL_PARSER_FUNCTION_HPP_
 
-#include "../../../../include/problem/ast/ast.hpp"
-#include "../../../../include/problem/pddl/parser.hpp"
+#include "../../../../include/loki/problem/ast/ast.hpp"
+#include "../../../../include/loki/problem/pddl/parser.hpp"
 
 
 

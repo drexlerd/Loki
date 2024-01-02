@@ -19,8 +19,8 @@
 
 #include "objects.hpp"
 
-#include "../../../../include/domain/pddl/exceptions.hpp"
-#include "../../../../include/problem/pddl/exceptions.hpp"
+#include "../../../../include/loki/domain/pddl/exceptions.hpp"
+#include "../../../../include/loki/problem/pddl/exceptions.hpp"
 #include "../../../domain/pddl/parser/common.hpp"
 
 

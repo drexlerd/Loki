@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../include/common/pddl/types.hpp"
-#include "../include/common/memory.hpp"
+#include "../include/loki/common/pddl/types.hpp"
+#include "../include/loki/common/memory.hpp"
 
 #include <chrono>
 #include <iostream>

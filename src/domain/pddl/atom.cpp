@@ -15,13 +15,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/domain/pddl/atom.hpp"
+#include "../../../include/loki/domain/pddl/atom.hpp"
 
-#include "../../../include/domain/pddl/predicate.hpp"
-#include "../../../include/domain/pddl/term.hpp"
-#include "../../../include/common/hash.hpp"
-#include "../../../include/common/collections.hpp"
-#include "../../../include/common/pddl/visitors.hpp"
+#include "../../../include/loki/domain/pddl/predicate.hpp"
+#include "../../../include/loki/domain/pddl/term.hpp"
+#include "../../../include/loki/common/hash.hpp"
+#include "../../../include/loki/common/collections.hpp"
+#include "../../../include/loki/common/pddl/visitors.hpp"
 
 
 namespace loki::pddl {

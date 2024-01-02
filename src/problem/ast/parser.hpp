@@ -18,7 +18,7 @@
 #ifndef LOKI_SRC_PROBLEM_AST_PARSER_HPP_
 #define LOKI_SRC_PROBLEM_AST_PARSER_HPP_
 
-#include "../../../include/problem/ast/ast.hpp"
+#include "../../../include/loki/problem/ast/ast.hpp"
 
 #include <boost/spirit/home/x3.hpp>
 

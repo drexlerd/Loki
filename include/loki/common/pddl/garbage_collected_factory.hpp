@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_FACTORY_HPP_
-#define LOKI_INCLUDE_LOKI_COMMON_PDDL_FACTORY_HPP_
+#ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_GARBAGE_COLLECTED_FACTORY_HPP_
+#define LOKI_INCLUDE_LOKI_COMMON_PDDL_GARBAGE_COLLECTED_FACTORY_HPP_
 
 #include <unordered_map>
 #include <unordered_set>

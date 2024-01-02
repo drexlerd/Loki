@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../include/common/exceptions.hpp"
+#include "../../include/loki/common/exceptions.hpp"
 
 
 namespace loki {

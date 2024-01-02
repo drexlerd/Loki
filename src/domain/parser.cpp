@@ -15,18 +15,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../include/domain/parser.hpp"
+#include "../../include/loki/domain/parser.hpp"
 
-#include "../../include/common/memory.hpp"
-#include "../../include/common/ast/error_reporting.hpp"
-#include "../../include/common/pddl/error_reporting.hpp"
-#include "../../include/common/pddl/context.hpp"
-#include "../../include/common/filesystem.hpp"
-#include "../../include/common/ast/parser_wrapper.hpp"
-#include "../../include/common/exceptions.hpp"
-#include "../../include/domain/ast/parser.hpp"
-#include "../../include/domain/ast/ast.hpp"
-#include "../../include/domain/pddl/parser.hpp"
+#include "../../include/loki/common/memory.hpp"
+#include "../../include/loki/common/ast/error_reporting.hpp"
+#include "../../include/loki/common/pddl/error_reporting.hpp"
+#include "../../include/loki/common/pddl/context.hpp"
+#include "../../include/loki/common/filesystem.hpp"
+#include "../../include/loki/common/ast/parser_wrapper.hpp"
+#include "../../include/loki/common/exceptions.hpp"
+#include "../../include/loki/domain/ast/parser.hpp"
+#include "../../include/loki/domain/ast/ast.hpp"
+#include "../../include/loki/domain/pddl/parser.hpp"
 
 #include <tuple>
 #include <chrono>

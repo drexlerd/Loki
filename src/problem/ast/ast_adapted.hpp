@@ -18,7 +18,7 @@
 #ifndef LOKI_SRC_PROBLEM_AST_AST_ADAPTED_HPP_
 #define LOKI_SRC_PROBLEM_AST_AST_ADAPTED_HPP_
 
-#include "../../../include/problem/ast/ast.hpp"
+#include "../../../include/loki/problem/ast/ast.hpp"
 
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>

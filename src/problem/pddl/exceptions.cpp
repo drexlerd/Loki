@@ -15,10 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/problem/pddl/exceptions.hpp"
+#include "../../../include/loki/problem/pddl/exceptions.hpp"
 
-#include "../../../include/domain/pddl/domain.hpp"
-#include "../../../include/domain/pddl/predicate.hpp"
+#include "../../../include/loki/domain/pddl/domain.hpp"
+#include "../../../include/loki/domain/pddl/predicate.hpp"
 
 
 namespace loki {

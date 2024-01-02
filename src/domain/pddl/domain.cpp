@@ -15,15 +15,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/domain/pddl/domain.hpp"
+#include "../../../include/loki/domain/pddl/domain.hpp"
 
-#include "../../../include/domain/pddl/action.hpp"
-#include "../../../include/domain/pddl/function_skeleton.hpp"
-#include "../../../include/domain/pddl/object.hpp"
-#include "../../../include/domain/pddl/predicate.hpp"
-#include "../../../include/domain/pddl/type.hpp"
-#include "../../../include/common/hash.hpp"
-#include "../../../include/common/collections.hpp"
+#include "../../../include/loki/domain/pddl/action.hpp"
+#include "../../../include/loki/domain/pddl/function_skeleton.hpp"
+#include "../../../include/loki/domain/pddl/object.hpp"
+#include "../../../include/loki/domain/pddl/predicate.hpp"
+#include "../../../include/loki/domain/pddl/type.hpp"
+#include "../../../include/loki/common/hash.hpp"
+#include "../../../include/loki/common/collections.hpp"
 
 #include <iostream>
 

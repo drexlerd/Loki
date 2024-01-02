@@ -18,10 +18,10 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_EFFECTS_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_EFFECTS_HPP_
 
-#include "../../../../include/domain/ast/ast.hpp"
-#include "../../../../include/domain/pddl/parser.hpp"
-#include "../../../../include/domain/pddl/declarations.hpp"
-#include "../../../../include/domain/pddl/effects.hpp"
+#include "../../../../include/loki/domain/ast/ast.hpp"
+#include "../../../../include/loki/domain/pddl/parser.hpp"
+#include "../../../../include/loki/domain/pddl/declarations.hpp"
+#include "../../../../include/loki/domain/pddl/effects.hpp"
 
 #include <variant>
 

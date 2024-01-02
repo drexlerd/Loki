@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/common/pddl/scope.hpp"
+#include "../../../include/loki/common/pddl/scope.hpp"
 
 
 namespace loki {

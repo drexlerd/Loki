@@ -19,13 +19,11 @@
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_REFERENCE_HPP_
 
 #include "../../common/ast/config.hpp"
-#include "../../domain/pddl/type.hpp"
 #include "../../domain/pddl/object.hpp"
 #include "../../domain/pddl/predicate.hpp"
 #include "../../domain/pddl/requirements.hpp"
 #include "../../domain/pddl/function_skeleton.hpp"
 #include "../../domain/pddl/variable.hpp"
-#include "../../domain/pddl/requirements.hpp"
 
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 

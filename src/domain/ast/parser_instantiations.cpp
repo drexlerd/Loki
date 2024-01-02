@@ -17,7 +17,7 @@
 
 #include "parser_def.hpp"
 
-#include "../../../include/common/ast/config.hpp"
+#include "../../../include/loki/common/ast/config.hpp"
 
 
 namespace loki::domain::parser
