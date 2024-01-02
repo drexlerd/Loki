@@ -20,11 +20,6 @@
 
 #include "../../domain/pddl/declarations.hpp"
 
-#include <memory>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <set>
 #include <vector>
 
 

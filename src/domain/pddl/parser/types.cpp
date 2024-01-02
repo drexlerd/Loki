@@ -113,7 +113,6 @@ static void test_reserved_type(const pddl::Type& type, const domain::ast::Name& 
 static void insert_context_information(const pddl::Type& type, const domain::ast::Name& node, Context& context) {
     context.positions.push_back(type, node);
     context.scopes.insert(type->get_name(), type, node);
-    context.references.track(type);
 }
 
 

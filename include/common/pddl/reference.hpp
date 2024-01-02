@@ -65,8 +65,7 @@ class References {
         void untrack(T reference);
 };
 
-using ReferencedPDDLObjects = References<pddl::Type
-    , pddl::Object
+using ReferencedPDDLObjects = References<pddl::Object
     , pddl::Predicate
     , pddl::FunctionSkeleton
     , pddl::Variable

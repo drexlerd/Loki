@@ -22,12 +22,8 @@
 
 #include <boost/container/small_vector.hpp>
 
-#include <memory>
-#include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
-#include <set>
 #include <variant>
 
 
@@ -38,12 +34,10 @@ namespace loki::pddl {
     class TypeImpl;
     using Type = const TypeImpl*;
     using TypeList = boost::container::small_vector<Type,1>;  // often single type
-    using TypeSet = std::set<Type>;
 
     class ObjectImpl;
     using Object = const ObjectImpl*;
     using ObjectList = std::vector<Object>;
-    using ObjectSet = std::set<Object>;
 
     class VariableImpl;
     using Variable = const VariableImpl*;
@@ -68,12 +62,10 @@ namespace loki::pddl {
     class PredicateImpl;
     using Predicate = const PredicateImpl*;
     using PredicateList = std::vector<Predicate>;
-    using PredicateSet = std::set<Predicate>;
 
     class LiteralImpl;
     using Literal = const LiteralImpl*;
     using LiteralList = std::vector<Literal>;
-    using LiteralSet = std::set<Literal>;
 
     class ConditionLiteralImpl;
     class ConditionAndImpl;
@@ -91,7 +83,6 @@ namespace loki::pddl {
         , ConditionForallImpl>;
     using Condition = const ConditionImpl*;
     using ConditionList = std::vector<Condition>;
-    using ConditionSet = std::set<Condition>;
 
     class EffectLiteralImpl;
     class EffectAndImpl;
@@ -105,7 +96,6 @@ namespace loki::pddl {
         , EffectConditionalWhenImpl>;
     using Effect = const EffectImpl*;
     using EffectList = std::vector<Effect>;
-    using EffectSet = std::set<Effect>;
 
     class FunctionExpressionNumberImpl;
     class FunctionExpressionBinaryOperatorImpl;
@@ -123,32 +113,26 @@ namespace loki::pddl {
     class FunctionSkeletonImpl;
     using FunctionSkeleton = const FunctionSkeletonImpl*;
     using FunctionSkeletonList = std::vector<FunctionSkeleton>;
-    using FunctionSkeletonSet = std::set<FunctionSkeleton>;
 
     class FunctionImpl;
     using Function = const FunctionImpl*;
     using FunctionList = std::vector<Function>;
-    using FunctionSet = std::set<Function>;
 
     class ConstraintImpl;
     using Constraint = const ConstraintImpl*;
     using ConstraintList = std::vector<Constraint>;
-    using ConstraintSet = std::set<Constraint>;
 
     class ActionImpl;
     using Action = const ActionImpl*;
     using ActionList = std::vector<Action>;
-    using ActionSet = std::set<Action>;
 
     class DerivedPredicateImpl;
     using DerivedPredicate = const DerivedPredicateImpl*;
     using DerivedPredicateList = std::vector<DerivedPredicate>;
-    using DerivedPredicateSet = std::set<DerivedPredicate>;
 
     class DomainImpl;
     using Domain = const DomainImpl*;
     using DomainList = std::vector<Domain>;
-    using DomainSet = std::set<Domain>;
 }
 
 #endif

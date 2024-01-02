@@ -19,6 +19,8 @@
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_POSITION_HPP_
 
 #include "config.hpp"
+#include "declarations.hpp"
+
 #include "../ast/error_reporting.hpp"
 #include "../filesystem.hpp"
 
@@ -27,7 +29,7 @@
 
 namespace loki {
 template<typename T>
-using PositionMapType = std::unordered_map<const T*, std::vector<PositionType>>;
+using PositionMapType = std::unordered_map<PDDLElement<T>, std::vector<PositionType>>;
 
 /// @brief Stores all occurrences of a PDDL object in the input file for each PDDL type T.
 template<typename... Ts>
@@ -41,10 +43,10 @@ class PositionCache {
         PositionCache(const X3ErrorHandler& error_handler, const fs::path& file, int tabs=4);
 
         template<typename T>
-        void push_back(const T* object, const PositionType& position);
+        void push_back(const PDDLElement<T>& element, const PositionType& position);
 
         template<typename T>
-        std::vector<PositionType> get(const T* object) const;
+        std::vector<PositionType> get(const PDDLElement<T>& element) const;
 
         const PDDLErrorHandler& get_error_handler() const;
 };

@@ -34,7 +34,7 @@ namespace loki
         PDDLPositionCache& positions;
         // For referencing to existing bindings
         ScopeStack& scopes;
-        // For checking that binding pointers were referenced at least once
+        // For checking that certain PDDL objects were referenced at least once
         ReferencedPDDLObjects references;
         // For convenience, to avoid an additional parameter during semantic parsing
         pddl::Requirements requirements;
