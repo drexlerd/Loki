@@ -2,7 +2,7 @@
 
 ATTENTION: Loki's testing framework must be stronger, and Loki itself must still be tested in production. Therefore, we strongly advise against using it already. However, we are thankful for all kinds of feedback, suggestions, and feature requests.
 
-Loki is a C++17 library for efficient syntactic and semantic parsing of PDDL files. Loki implements exhaustive error handling to provide meaningful clang-style messages for syntactic, semantic, and modeling errors. The resulting PDDL objects are structurally uniquely constructed immutable pointer objects stored in persistent and continuous memory to enable hashing in constant time, equality comparison in constant time, and cache efficient data access.
+Loki is a C++17 library for efficient syntactic and semantic parsing of PDDL files. Loki implements exhaustive error handling to provide meaningful clang-style messages for syntactic, semantic, and modeling errors. The resulting PDDL objects are structurally uniquely constructed immutable pointer objects stored in persistent and continuous memory to enable hashing in constant time, equality comparison in constant time, and cache-efficient data access.
 
 ## Supported PDDL Requirements
 
@@ -65,7 +65,7 @@ The third example shows how to detect structurally equivalent problems over a co
 ./build/examples/multiple_problems
 ```
 
-The fourth example shows how to find matches positions of each PDDL object in the input stream and report customized clang-style error reports.
+The fourth example shows how to find the matched positions of each PDDL object in the input stream and how to report customized clang-style error reports.
 
 ```console
 ./build/examples/position_cache
@@ -74,13 +74,13 @@ The fourth example shows how to find matches positions of each PDDL object in th
 
 ## Running the Executables
 
-Parsing a domain file into an abstract syntax tree and printing it.
+Parsing a domain file and printing it.
 
 ```console
 ./build/exe/domain benchmarks/gripper/domain.pddl
 ```
 
-Parsing a domain and problem file into an abstract syntax tree and printing it.
+Parsing a domain and a problem file and printing both.
 
 ```console
 ./build/exe/problem benchmarks/gripper/domain.pddl benchmarks/gripper/p-2-0.pddl
