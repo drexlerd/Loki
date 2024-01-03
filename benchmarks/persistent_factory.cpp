@@ -25,9 +25,7 @@
 #include <random>
 
 
-/// @brief In this experiment, we evaluate the performance of constructing atoms.
-
-// Define another benchmark
+/// @brief In this benchmark, we evaluate the performance of constructing atoms.
 static void BM_ConstructAtoms(benchmark::State& state) {
     const size_t num_objects = 100;
     const size_t num_predicates = 100;
