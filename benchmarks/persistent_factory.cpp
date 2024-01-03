@@ -25,7 +25,7 @@
 #include <random>
 
 
-/// @brief In this experiment, we evaluate the performance of constructing and accessing atoms.
+/// @brief In this experiment, we evaluate the performance of constructing atoms.
 
 // Define another benchmark
 static void BM_ConstructAtoms(benchmark::State& state) {
@@ -65,6 +65,7 @@ static void BM_ConstructAtoms(benchmark::State& state) {
         auto atom_factory = loki::AtomFactory();
         auto term_factory = loki::TermFactory();
         auto atoms = loki::pddl::AtomList();
+        // Construct num_objects^2 * num_predicates many atoms
         for (const auto& predicate : predicates) {
             for (const auto& object_left : objects) {
                 for (const auto& object_right : objects) {
