@@ -26,7 +26,7 @@
 struct TestUnsupportedAndConditionVisitor {
     const loki::Position position;
     const loki::PDDLPositionCache& position_cache;
-    const loki::PDDLErrorHandler& error_handler; 
+    const loki::PDDLErrorHandler& error_handler;
 
     TestUnsupportedAndConditionVisitor(
         const loki::Position position_,
@@ -36,7 +36,7 @@ struct TestUnsupportedAndConditionVisitor {
         , position_cache(position_cache_)
         , error_handler(error_handler_) { }
 
-    /// @brief For leaf nodes we do not need to do anything 
+    /// @brief For leaf nodes we do not need to do anything
     template<typename Node>
     void operator()(const Node&) { }
 
@@ -49,9 +49,9 @@ struct TestUnsupportedAndConditionVisitor {
         }
     }
 
-    /// @brief For the unsupported And-Condition, 
+    /// @brief For the unsupported And-Condition,
     ///        we print an clang-style error message and throw an exception.
-    void operator()(const loki::pddl::ConditionAndImpl& node) {
+    void operator()(const loki::pddl::ConditionAndImpl&) {
         std::cout << error_handler(position, "Your awesome error message.") << std::endl;
         throw std::runtime_error("Unexpected And-Condition.");
     }
@@ -61,7 +61,7 @@ struct TestUnsupportedAndConditionVisitor {
 /// @brief In this example, we show how to print custom error message for unsupported PDDL types.
 int main() {
     // Parse the domain
-    auto domain_parser = loki::DomainParser("benchmarks/gripper/domain.pddl");
+    auto domain_parser = loki::DomainParser("data/gripper/domain.pddl");
     const auto domain = domain_parser.get_domain();
     std::cout << *domain << std::endl << std::endl;
 
@@ -76,7 +76,7 @@ int main() {
         // We call front() to obtain the first occurence.
         auto condition_position = position_cache.get<loki::pddl::ConditionImpl>(condition.value()).front();
         std::visit(
-            TestUnsupportedAndConditionVisitor(condition_position, position_cache, error_handler), 
+            TestUnsupportedAndConditionVisitor(condition_position, position_cache, error_handler),
             *condition.value());
     }
 

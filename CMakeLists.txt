@@ -74,11 +74,14 @@ add_subdirectory(exe)
 
 add_subdirectory(examples)
 
-add_subdirectory(experiments)
-
 set(ENABLE_TESTING True)
 if (ENABLE_TESTING)
     add_subdirectory(tests)
+endif()
+
+set(ENABLE_BENCHMARKING True)
+if (ENABLE_BENCHMARKING)
+    add_subdirectory(benchmarks)
 endif()
 
 ###########

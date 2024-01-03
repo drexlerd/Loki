@@ -19,14 +19,8 @@
 (boarded ?person - passenger)
 ;; true if ?person has boarded the lift
 
-(not-boarded ?person - passenger)
-;; true if ?person has not boarded the lift
-
 (served ?person - passenger)
 ;; true if ?person has alighted as her destination
-
-(not-served ?person - passenger)
-;; true if ?person is not at their destination
 
 (lift-at ?floor - floor)
 ;; current position of the lift is at ?floor
