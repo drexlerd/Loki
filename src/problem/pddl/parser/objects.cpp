@@ -89,7 +89,7 @@ pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Na
 
 pddl::ObjectList ObjectListVisitor::operator()(const domain::ast::TypedListOfNamesRecursively& node) {
     if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
-        throw UnsupportedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::TYPING);
     // TypedListOfNamesRecursively has user defined base types

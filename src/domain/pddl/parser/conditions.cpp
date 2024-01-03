@@ -88,11 +88,11 @@ pddl::Condition parse(const domain::ast::GoalDescriptorNot& node, Context& conte
 
 pddl::Condition parse(const domain::ast::GoalDescriptorImply& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS)) {
-        throw UnsupportedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
-    auto condition_left = parse(node.goal_descriptor_left, context); 
-    auto condition_right = parse(node.goal_descriptor_right, context); 
+    auto condition_left = parse(node.goal_descriptor_left, context);
+    auto condition_right = parse(node.goal_descriptor_right, context);
     const auto condition = context.factories.conditions.get_or_create<pddl::ConditionImplyImpl>(condition_left, condition_right);
     context.positions.push_back(condition, node);
     return condition;
@@ -100,7 +100,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorImply& node, Context& con
 
 pddl::Condition parse(const domain::ast::GoalDescriptorExists& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS)) {
-        throw UnsupportedRequirementError(pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS);
     context.scopes.open_scope();
@@ -147,7 +147,7 @@ pddl::Condition parse_condition_forall(const domain::ast::TypedListOfVariables& 
 
 pddl::Condition parse(const domain::ast::GoalDescriptorForall& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS)) {
-        throw UnsupportedRequirementError(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS);
     return parse_condition_forall(node.typed_list_of_variables, node.goal_descriptor, context);
@@ -155,7 +155,7 @@ pddl::Condition parse(const domain::ast::GoalDescriptorForall& node, Context& co
 
 pddl::Condition parse(const domain::ast::GoalDescriptorFunctionComparison& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS)) {
-        throw UnsupportedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.scopes.get_error_handler()(node, ""));
     }
     throw NotImplementedError("parse(const domain::ast::GoalDescriptorFunctionComparison& node, Context& context)");
 }
@@ -177,7 +177,7 @@ pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorAnd& node, Cont
 
 pddl::Condition parse(const domain::ast::ConstraintGoalDescriptorForall& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS)) {
-        throw UnsupportedRequirementError(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS);
     return parse_condition_forall(node.typed_list_of_variables, node.constraint_goal_descriptor, context);
@@ -244,14 +244,14 @@ pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorAnd& node, Co
 
 pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorPreference& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::PREFERENCES)) {
-        throw UnsupportedRequirementError(pddl::RequirementEnum::PREFERENCES, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::PREFERENCES, context.scopes.get_error_handler()(node, ""));
     }
     throw NotImplementedError("parse(const domain::ast::PreconditionGoalDescriptorPreference& node, Context& context)");
 }
 
 pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorForall& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS)) {
-        throw UnsupportedRequirementError(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS, context.scopes.get_error_handler()(node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS);
     return parse_condition_forall(node.typed_list_of_variables, node.precondition_goal_descriptor, context);
