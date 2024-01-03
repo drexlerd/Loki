@@ -27,10 +27,17 @@ namespace loki::domain::tests {
 TEST(LokiTests, FunctionTypedListOfAtomicFunctionSkeletonsTest) {
     ast::FunctionTypedListOfAtomicFunctionSkeletons ast;
 
-    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - function-type1", function_typed_list_of_atomic_function_skeletons(), ast));
-    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2) - function-type1");
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - number ", function_typed_list_of_atomic_function_skeletons(), ast));
+    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2) - number");
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - number)", function_typed_list_of_atomic_function_skeletons(), ast));
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - number\n", function_typed_list_of_atomic_function_skeletons(), ast));
 
-
+    // trailing "(" indicates another atomic function skeleton that fails to be parsed.
+    EXPECT_ANY_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - number(", function_typed_list_of_atomic_function_skeletons(), ast));
+    // no trailing separator after "number" keyword
+    EXPECT_ANY_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - number", function_typed_list_of_atomic_function_skeletons(), ast));
+    // function type does not match "number"
+    EXPECT_ANY_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - wrong ", function_typed_list_of_atomic_function_skeletons(), ast));
 }
 
 }

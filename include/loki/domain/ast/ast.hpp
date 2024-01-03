@@ -63,6 +63,8 @@ namespace loki::domain::ast
     struct Requirement;
 
     struct Type;
+    struct TypeObject;
+    struct TypeNumber;
     struct TypeEither;
     struct TypedListOfNamesRecursively;  // :typing
     struct TypedListOfNames;
@@ -71,9 +73,6 @@ namespace loki::domain::ast
 
     struct AtomicFormulaSkeleton;
 
-    struct FunctionTypeNumber;                                       // :numeric-fluents
-    struct FunctionTypeType;                                         // :object-fluents :typing
-    struct FunctionType;
     struct AtomicFunctionSkeletonTotalCost;
     struct AtomicFunctionSkeletonGeneral;
     struct AtomicFunctionSkeleton;
@@ -325,11 +324,17 @@ namespace loki::domain::ast
     struct Type : x3::position_tagged,
                   x3::variant<
                       Name,
+                      x3::forward_ast<TypeObject>,
+                      x3::forward_ast<TypeNumber>,
                       x3::forward_ast<TypeEither>>
     {
         using base_type::base_type;
         using base_type::operator=;
     };
+
+    struct TypeObject : x3::position_tagged { };
+
+    struct TypeNumber : x3::position_tagged { };
 
     struct TypeEither : x3::position_tagged
     {
@@ -377,24 +382,6 @@ namespace loki::domain::ast
     };
 
     /* <function typed list (atomic function skeleton)> */
-    struct FunctionTypeNumber : x3::position_tagged
-    {
-        Number number;
-    };
-
-    struct FunctionTypeType  : x3::position_tagged
-    {
-        Type type;
-    };
-
-    struct FunctionType : x3::position_tagged,
-        x3::variant<
-            FunctionTypeNumber,
-            FunctionTypeType> {
-        using base_type::base_type;
-        using base_type::operator=;
-    };
-
     struct AtomicFunctionSkeletonTotalCost : x3::position_tagged {
         FunctionSymbol function_symbol;
     };
@@ -415,7 +402,7 @@ namespace loki::domain::ast
     struct FunctionTypedListOfAtomicFunctionSkeletonsRecursively : x3::position_tagged
     {
         std::vector<AtomicFunctionSkeleton> atomic_function_skeletons;
-        FunctionType function_type;
+        TypeNumber function_type;
         boost::optional<x3::forward_ast<FunctionTypedListOfAtomicFunctionSkeletons>> function_typed_list_of_atomic_function_skeletons;
     };
 

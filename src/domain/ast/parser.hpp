@@ -72,6 +72,8 @@ namespace loki::domain {
         struct RequirementClass;
 
         struct TypeClass;
+        struct TypeObjectClass;
+        struct TypeNumberClass;
         struct TypeEitherClass;
         struct TypedListOfNamesRecursivelyClass;
         struct TypedListOfNamesClass;
@@ -80,9 +82,6 @@ namespace loki::domain {
 
         struct AtomicFormulaSkeletonClass;
 
-        struct FunctionTypeNumberClass;
-        struct FunctionTypeTypeClass;
-        struct FunctionTypeClass;
         struct AtomicFunctionSkeletonTotalCostClass;
         struct AtomicFunctionSkeletonGeneralClass;
         struct AtomicFunctionSkeletonClass;
@@ -215,6 +214,8 @@ namespace loki::domain {
         typedef x3::rule<RequirementClass, ast::Requirement> requirement_type;
 
         typedef x3::rule<TypeClass, ast::Type> type_type;
+        typedef x3::rule<TypeObjectClass, ast::TypeObject> type_object_type;
+        typedef x3::rule<TypeNumberClass, ast::TypeNumber> type_number_type;
         typedef x3::rule<TypeEitherClass, ast::TypeEither> type_either_type;
         typedef x3::rule<TypedListOfNamesRecursivelyClass, ast::TypedListOfNamesRecursively> typed_list_of_names_recursively_type;
         typedef x3::rule<TypedListOfNamesClass, ast::TypedListOfNames> typed_list_of_names_type;
@@ -223,9 +224,6 @@ namespace loki::domain {
 
         typedef x3::rule<AtomicFormulaSkeletonClass, ast::AtomicFormulaSkeleton> atomic_formula_skeleton_type;
 
-        typedef x3::rule<FunctionTypeNumberClass, ast::FunctionTypeNumber> function_type_number_type;
-        typedef x3::rule<FunctionTypeTypeClass, ast::FunctionTypeType> function_type_type_type;
-        typedef x3::rule<FunctionTypeClass, ast::FunctionType> function_type_type;
         typedef x3::rule<AtomicFunctionSkeletonTotalCostClass, ast::AtomicFunctionSkeletonTotalCost> atomic_function_skeleton_total_cost_type;
         typedef x3::rule<AtomicFunctionSkeletonGeneralClass, ast::AtomicFunctionSkeletonGeneral> atomic_function_skeleton_general_type;
         typedef x3::rule<AtomicFunctionSkeletonClass, ast::AtomicFunctionSkeleton> atomic_function_skeleton_type;
@@ -337,13 +335,13 @@ namespace loki::domain {
             requirement_constraints_type, requirement_action_costs_type, requirement_type)
 
         BOOST_SPIRIT_DECLARE(
-            type_type, type_either_type, typed_list_of_names_recursively_type, typed_list_of_names_type,
+            type_type, type_object_type, type_number_type, type_either_type, 
+            typed_list_of_names_recursively_type, typed_list_of_names_type,
             typed_list_of_variables_recursively_type, typed_list_of_variables_type)
 
         BOOST_SPIRIT_DECLARE(atomic_formula_skeleton_type)
 
-        BOOST_SPIRIT_DECLARE(function_type_number_type, function_type_type_type, function_type_type, 
-            atomic_function_skeleton_total_cost_type, atomic_function_skeleton_general_type, atomic_function_skeleton_type, 
+        BOOST_SPIRIT_DECLARE(atomic_function_skeleton_total_cost_type, atomic_function_skeleton_general_type, atomic_function_skeleton_type, 
             function_typed_list_of_atomic_function_skeletons_recursively_type, function_typed_list_of_atomic_function_skeletons_type)
 
         BOOST_SPIRIT_DECLARE(atomic_formula_of_terms_type, atom_type, negated_atom_type, literal_type)
@@ -440,6 +438,8 @@ namespace loki::domain {
     parser::requirement_type const& requirement();
 
     parser::type_type const& type();
+    parser::type_object_type const& type_object();
+    parser::type_number_type const& type_number();
     parser::type_either_type const& type_either();
     parser::typed_list_of_names_recursively_type const& typed_list_of_names_recursively();
     parser::typed_list_of_names_type const& typed_list_of_names();
@@ -462,9 +462,6 @@ namespace loki::domain {
     parser::binary_comparator_less_equal_type const& binary_comparator_less_equal();
     parser::binary_comparator_type const& binary_comparator();
 
-    parser::function_type_number_type const& function_type_number();
-    parser::function_type_type_type const& function_type_type_();
-    parser::function_type_type const& function_type();
     parser::atomic_function_skeleton_total_cost_type const& atomic_function_skeleton_total_cost();
     parser::atomic_function_skeleton_general_type const& atomic_function_skeleton_general();
     parser::atomic_function_skeleton_type const& atomic_function_skeleton();

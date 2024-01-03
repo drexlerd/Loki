@@ -31,22 +31,30 @@ namespace loki {
 TypeDeclarationTypeVisitor::TypeDeclarationTypeVisitor(Context& context_)
     : context(context_) { }
 
-pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::Type& type_node) {
-    return boost::apply_visitor(*this, type_node);
-}
-
-pddl::TypeList TypeDeclarationTypeVisitor::operator()(const domain::ast::Name& name_node) {
-    auto name = parse(name_node);
-    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>(name);
-    context.positions.push_back(type, name_node);
+pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeObject& node) {
+    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("object");
+    context.positions.push_back(type, node);
     return { type };
 }
 
-pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeEither& either_type_node) {
+pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeNumber& node) {
+    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("number");
+    context.positions.push_back(type, node);
+    return { type };
+}
+
+pddl::TypeList TypeDeclarationTypeVisitor::operator()(const domain::ast::Name& node) {
+    auto name = parse(node);
+    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>(name);
+    context.positions.push_back(type, node);
+    return { type };
+}
+
+pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeEither& node) {
     // we flatten nested either types
     pddl::TypeList type_list;
-    for (auto& type_node : either_type_node.types) {
-        auto types = this->operator()(type_node);
+    for (auto& child_node : node.types) {
+        auto types = boost::apply_visitor(*this, child_node);
         type_list.insert(type_list.end(), types.begin(), types.end());
     }
     return type_list;
@@ -57,26 +65,36 @@ pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeEither& eit
 TypeReferenceTypeVisitor::TypeReferenceTypeVisitor(const Context& context_)
     : context(context_) { }
 
-pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Type& type_node) {
-    return boost::apply_visitor(*this, type_node);
+pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeObject&) {
+    const auto binding = context.scopes.get<pddl::TypeImpl>("object");
+    assert(binding.has_value());
+    const auto& [type, _position, _error_handler] = binding.value();
+    return {type};
 }
 
-pddl::TypeList TypeReferenceTypeVisitor::operator()(const domain::ast::Name& name_node) {
-    auto name = parse(name_node);
+pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeNumber&) {
+    const auto binding = context.scopes.get<pddl::TypeImpl>("number");
+    assert(binding.has_value());
+    const auto& [type, _position, _error_handler] = binding.value();
+    return {type};
+}
+
+pddl::TypeList TypeReferenceTypeVisitor::operator()(const domain::ast::Name& node) {
+    auto name = parse(node);
     auto binding = context.scopes.get<pddl::TypeImpl>(name);
     if (!binding.has_value()) {
-        throw UndefinedTypeError(name, context.scopes.get_error_handler()(name_node, ""));
+        throw UndefinedTypeError(name, context.scopes.get_error_handler()(node, ""));
     }
     const auto& [type, _position, _error_handler] = binding.value();
-    context.positions.push_back(type, name_node);
+    context.positions.push_back(type, node);
     return { type };
 }
 
-pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& either_type_node) {
+pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& node) {
     // we flatten nested either types
     auto type_list = pddl::TypeList();
-    for (auto& type_node : either_type_node.types) {
-        auto types = this->operator()(type_node);
+    for (auto& child_node : node.types) {
+        auto types = boost::apply_visitor(*this, child_node);
         type_list.insert(type_list.end(), types.begin(), types.end());
     }
     return type_list;

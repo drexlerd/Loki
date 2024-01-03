@@ -108,6 +108,16 @@ namespace loki
         return boost::apply_visitor(NodeVisitorPrinter(options), node);
     }
 
+    string parse_text(const domain::ast::TypeObject& /*node*/, const FormattingOptions& /*options*/)
+    {
+        return "object";
+    }
+
+    string parse_text(const domain::ast::TypeNumber& /*node*/, const FormattingOptions& /*options*/)
+    {
+        return "number";
+    }
+
     string parse_text(const domain::ast::TypeEither& node, const FormattingOptions& options)
     {
         stringstream ss;
@@ -183,19 +193,6 @@ namespace loki
         return ss.str();
     }
 
-    std::string parse_text(const domain::ast::FunctionTypeNumber& node, const FormattingOptions& options)
-    {
-        return parse_text(node.number, options);
-    }
-
-    std::string parse_text(const domain::ast::FunctionTypeType& node, const FormattingOptions& options)
-    {
-        return parse_text(node.type, options);
-    }
-
-    std::string parse_text(const domain::ast::FunctionType& node, const FormattingOptions& options) {
-        return boost::apply_visitor(NodeVisitorPrinter(options), node);
-    }
 
     std::string parse_text(const domain::ast::AtomicFunctionSkeletonTotalCost& node, const FormattingOptions& options)
     {

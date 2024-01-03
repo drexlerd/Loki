@@ -91,6 +91,8 @@ namespace loki::domain::parser {
     requirement_type const requirement = "requirement";
 
     type_type const type = "type";
+    type_object_type const type_object = "type_object";
+    type_number_type const type_number = "type_number";
     type_either_type const type_either = "type_either";
     typed_list_of_names_recursively_type const typed_list_of_names_recursively = "typed_list_of_names_recursively";
     typed_list_of_names_type const typed_list_of_names = "typed_list_of_names";
@@ -99,9 +101,6 @@ namespace loki::domain::parser {
 
     atomic_formula_skeleton_type const atomic_formula_skeleton = "atomic_formula_skeleton";
 
-    function_type_number_type const function_type_number = "function_type_number";
-    function_type_type_type const function_type_type_ = "function_type_type";
-    function_type_type const function_type = "function_type";
     atomic_function_skeleton_total_cost_type const atomic_function_skeleton_total_cost = "atomic_function_skeleton_total_cost";
     atomic_function_skeleton_general_type const atomic_function_skeleton_general = "atomic_function_skeleton_general";
     atomic_function_skeleton_type const atomic_function_skeleton = "atomic_function_skeleton";
@@ -239,8 +238,10 @@ namespace loki::domain::parser {
         | requirement_durative_actions | requirement_derived_predicates | requirement_timed_initial_literals
         | requirement_preferences | requirement_constraints | requirement_action_costs;
 
-    const auto type_def = type_either | name;
-    const auto type_either_def = (lit('(') >> keyword_lit("either") >> +type) > lit(')');
+    const auto type_def = type_object | type_number | type_either | name;
+    const auto type_object_def = keyword_lit("object") > x3::attr(ast::TypeObject{});
+    const auto type_number_def = keyword_lit("number") > x3::attr(ast::TypeNumber{});
+    const auto type_either_def = (lit('(') >> keyword_lit("either") > +type) > lit(')');
     const auto typed_list_of_names_recursively_def = (+name >> lit('-')) > type > typed_list_of_names;
     const auto typed_list_of_names_def = typed_list_of_names_recursively | *name;
     const auto typed_list_of_variables_recursively_def = (+variable >> lit('-')) > type > typed_list_of_variables;
@@ -248,13 +249,10 @@ namespace loki::domain::parser {
 
     const auto atomic_formula_skeleton_def = lit('(') > predicate > typed_list_of_variables > lit(')');
 
-    const auto function_type_number_def = number;
-    const auto function_type_type__def = type;
-    const auto function_type_def = function_type_number | function_type_type_;
     const auto atomic_function_skeleton_total_cost_def = lit('(') >> function_symbol_total_cost > lit(')');
     const auto atomic_function_skeleton_general_def = lit('(') > function_symbol > typed_list_of_variables > lit(')');
     const auto atomic_function_skeleton_def = atomic_function_skeleton_total_cost | atomic_function_skeleton_general;
-    const auto function_typed_list_of_atomic_function_skeletons_recursively_def = (+atomic_function_skeleton >> lit('-')) > function_type > -function_typed_list_of_atomic_function_skeletons;
+    const auto function_typed_list_of_atomic_function_skeletons_recursively_def = (+atomic_function_skeleton >> lit('-')) > type_number > -function_typed_list_of_atomic_function_skeletons;
     const auto function_typed_list_of_atomic_function_skeletons_def = function_typed_list_of_atomic_function_skeletons_recursively | +atomic_function_skeleton;
 
     const auto atomic_formula_of_terms_predicate_def = (lit('(') >> predicate) > *term > lit(')');
@@ -385,13 +383,12 @@ namespace loki::domain::parser {
         requirement_derived_predicates, requirement_timed_initial_literals, requirement_preferences,
         requirement_constraints, requirement_action_costs, requirement)
 
-    BOOST_SPIRIT_DEFINE(type, type_either, typed_list_of_names_recursively,
+    BOOST_SPIRIT_DEFINE(type, type_object, type_number, type_either, typed_list_of_names_recursively,
         typed_list_of_names, typed_list_of_variables_recursively, typed_list_of_variables)
 
     BOOST_SPIRIT_DEFINE(atomic_formula_skeleton)
 
-    BOOST_SPIRIT_DEFINE(function_type_number, function_type_type_, function_type,
-        atomic_function_skeleton_total_cost, atomic_function_skeleton_general, atomic_function_skeleton, 
+    BOOST_SPIRIT_DEFINE(atomic_function_skeleton_total_cost, atomic_function_skeleton_general, atomic_function_skeleton, 
         function_typed_list_of_atomic_function_skeletons_recursively, function_typed_list_of_atomic_function_skeletons)
 
     BOOST_SPIRIT_DEFINE(atomic_formula_of_terms_predicate, atomic_formula_of_terms_equality,
@@ -472,6 +469,7 @@ namespace loki::domain::parser {
 
     struct TypeClass : x3::annotate_on_success {};
     struct TypeObjectClass : x3::annotate_on_success {};
+    struct TypeNumberClass : x3::annotate_on_success {};
     struct TypeEitherClass : x3::annotate_on_success {};
     struct TypedListOfNamesRecursivelyClass : x3::annotate_on_success {};
     struct TypedListOfNamesClass : x3::annotate_on_success {};
@@ -480,10 +478,6 @@ namespace loki::domain::parser {
 
     struct AtomicFormulaSkeletonClass : x3::annotate_on_success {};
 
-    struct FunctionTypeNumberClass : x3::annotate_on_success {};
-    struct FunctionTypeObjectClass : x3::annotate_on_success {};
-    struct FunctionTypeTypeClass : x3::annotate_on_success {};
-    struct FunctionTypeClass : x3::annotate_on_success {};
     struct AtomicFunctionSkeletonTotalCostClass : x3::annotate_on_success {};
     struct AtomicFunctionSkeletonGeneralClass : x3::annotate_on_success {};
     struct AtomicFunctionSkeletonClass : x3::annotate_on_success {};
@@ -682,6 +676,12 @@ namespace loki::domain
     parser::type_type const& type() {
         return parser::type;
     }
+    parser::type_object_type const& type_object() {
+        return parser::type_object;
+    }
+    parser::type_number_type const& type_number() {
+        return parser::type_number;
+    }
     parser::type_either_type const& type_either() {
         return parser::type_either;
     }
@@ -702,15 +702,6 @@ namespace loki::domain
         return parser::atomic_formula_skeleton;
     }
 
-    parser::function_type_number_type const& function_type_number() {
-        return parser::function_type_number;
-    }
-    parser::function_type_type_type const& function_type_type_() {
-        return parser::function_type_type_;
-    }
-    parser::function_type_type const& function_type() {
-        return parser::function_type;
-    }
     parser::atomic_function_skeleton_total_cost_type const& atomic_function_skeleton_total_cost() {
         return parser::atomic_function_skeleton_total_cost;
     }

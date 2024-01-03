@@ -32,11 +32,13 @@ private:
 public:
     TypeDeclarationTypeVisitor(Context& context_);
 
-    pddl::TypeList operator()(const domain::ast::Type& type_node);
+    pddl::TypeList operator()(const domain::ast::TypeObject& node);
 
-    pddl::TypeList operator()(const domain::ast::Name& name_node);
+    pddl::TypeList operator()(const domain::ast::TypeNumber& node);
 
-    pddl::TypeList operator()(const domain::ast::TypeEither& either_type_node);
+    pddl::TypeList operator()(const domain::ast::Name& node);
+
+    pddl::TypeList operator()(const domain::ast::TypeEither& node);
 };
 
 class TypeReferenceTypeVisitor : boost::static_visitor<pddl::TypeList> {
@@ -46,11 +48,13 @@ private:
 public:
     TypeReferenceTypeVisitor(const Context& context_);
 
-    pddl::TypeList operator()(const domain::ast::Type& type_node);
+    pddl::TypeList operator()(const domain::ast::TypeObject& node);
 
-    pddl::TypeList operator()(const domain::ast::Name& name_node);
+    pddl::TypeList operator()(const domain::ast::TypeNumber& node);
 
-    pddl::TypeList operator()(const domain::ast::TypeEither& either_type_node);
+    pddl::TypeList operator()(const domain::ast::Name& node);
+
+    pddl::TypeList operator()(const domain::ast::TypeEither& node);
 };
 
 class TypeDeclarationTypedListOfNamesVisitor : boost::static_visitor<pddl::TypeList> {
@@ -60,13 +64,13 @@ private:
 public:
     TypeDeclarationTypedListOfNamesVisitor(Context& context_);
 
-    pddl::TypeList operator()(const std::vector<domain::ast::Name>& name_nodes);
+    pddl::TypeList operator()(const std::vector<domain::ast::Name>& nodes);
 
-    pddl::TypeList operator()(const domain::ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node);
+    pddl::TypeList operator()(const domain::ast::TypedListOfNamesRecursively& node);
 };
 
 
-extern pddl::TypeList parse(const domain::ast::Types& types_node, Context& context);
+extern pddl::TypeList parse(const domain::ast::Types& node, Context& context);
 
 }
 

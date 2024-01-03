@@ -54,6 +54,8 @@ extern std::string parse_text(const domain::ast::RequirementActionCosts& node, c
 extern std::string parse_text(const domain::ast::Requirement& node, const FormattingOptions& options={});
 
 extern std::string parse_text(const domain::ast::Type& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::TypeObject& node, const FormattingOptions& options={});
+extern std::string parse_text(const domain::ast::TypeNumber& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::TypeEither& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::TypedListOfNamesRecursively& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::TypedListOfNames& node, const FormattingOptions& options={});
@@ -62,9 +64,6 @@ extern std::string parse_text(const domain::ast::TypedListOfVariables& node, con
 
 extern std::string parse_text(const domain::ast::AtomicFormulaSkeleton& node, const FormattingOptions& options={});
 
-extern std::string parse_text(const domain::ast::FunctionTypeNumber& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::FunctionTypeType& node, const FormattingOptions& options={});
-extern std::string parse_text(const domain::ast::FunctionType& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::AtomicFunctionSkeletonTotalCost& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::AtomicFunctionSkeletonGeneral& node, const FormattingOptions& options={});
 extern std::string parse_text(const domain::ast::AtomicFunctionSkeleton& node, const FormattingOptions& options={});
