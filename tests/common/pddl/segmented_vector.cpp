@@ -17,21 +17,30 @@
 
 #include <gtest/gtest.h>
 
-#include "../../src/domain/ast/parser.hpp"
-#include "../../include/loki/common/ast/parser_wrapper.hpp"
-#include "../../include/loki/domain/ast/printer.hpp"
+#include "../../../include/loki/common/pddl/segmented_vector.hpp"
 
 
 namespace loki::domain::tests {
 
-TEST(LokiTests, TypedListOfVariablesRecursivelyTest) {
-    ast::TypedListOfVariablesRecursively ast;
+TEST(LokiTests, SegmentedVectorTest) {
+    SegmentedVector<int, 2> vec;
+    EXPECT_EQ(vec.size(), 0);
+    EXPECT_EQ(vec.capacity(), 0);
 
-    EXPECT_NO_THROW(parse_ast("?var1 ?var2 - type1", typed_list_of_variables_recursively(), ast));
-    EXPECT_EQ(parse_text(ast), "?var1 ?var2 - type1");
+    vec.push_back(2);
+    EXPECT_EQ(vec.size(), 1);
+    EXPECT_EQ(vec.capacity(), 2);
+    EXPECT_EQ(vec[0], 2);
 
-    EXPECT_ANY_THROW(parse_ast("name1 name2", typed_list_of_variables_recursively(), ast));
-    EXPECT_ANY_THROW(parse_ast("?var1 ?var2", typed_list_of_variables_recursively(), ast));
+    vec.push_back(1);
+    EXPECT_EQ(vec.size(), 2);
+    EXPECT_EQ(vec[1], 1);
+    EXPECT_EQ(vec.capacity(), 2);
+    
+    vec.push_back(0);
+    EXPECT_EQ(vec.size(), 3);
+    EXPECT_EQ(vec[2], 0);
+    EXPECT_EQ(vec.capacity(), 4);
 }
 
 }

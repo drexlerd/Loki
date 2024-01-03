@@ -15,4 +15,15 @@ FetchContent_MakeAvailable(googletest)
 add_library(GTest::GTest INTERFACE IMPORTED)
 target_link_libraries(GTest::GTest INTERFACE gtest_main)
 
-add_subdirectory(domain)
+file(GLOB SRC_FILES
+    "common/pddl/*.cpp"
+    "domain/ast/*.cpp")
+
+add_executable(domain_tests ${SRC_FILES})
+
+target_link_libraries(domain_tests
+    PRIVATE
+        loki::parsers
+        GTest::GTest)
+
+add_test(domain_gtests domain_tests)

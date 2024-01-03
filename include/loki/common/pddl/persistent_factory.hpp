@@ -19,7 +19,7 @@
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_PERSISTENT_FACTORY_HPP_
 
 #include "declarations.hpp"
-#include "segmented_persistent_vector.hpp"
+#include "segmented_vector.hpp"
 
 #include <unordered_set>
 #include <memory>
@@ -32,7 +32,7 @@
 namespace loki {
 /// @brief The PersistentFactory class manages unique objects in a persistent 
 ///        and efficient manner, utilizing a combination of unordered_set for 
-///        uniqueness checks and SegmentedPersistentVector for continuous and 
+///        uniqueness checks and SegmentedVector for continuous and 
 ///        cache-efficient storage.
 /// @tparam HolderType is the nested type which can be an std::variant.
 /// @tparam N is the number of elements per segment
@@ -58,7 +58,7 @@ private:
     // We use pointers to the persistent memory to reduce allocations.
     std::unordered_set<const HolderType*, DerferencedHash<HolderType>, DereferencedEquality<HolderType>> m_uniqueness_set;
     // Use pre-allocated memory to store PDDL object persistent and continuously for improved cache locality.
-    SegmentedPersistentVector<HolderType, N> m_persistent_vector;
+    SegmentedVector<HolderType, N> m_persistent_vector;
     
     int m_count = 0;
 
@@ -101,7 +101,7 @@ public:
     }
 
     size_t size() const {
-        return m_persistent_vector.size();
+        return m_count;
     }
 };
 

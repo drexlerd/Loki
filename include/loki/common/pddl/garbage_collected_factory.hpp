@@ -34,7 +34,7 @@ namespace loki {
 ///        Custom deleter idea: https://stackoverflow.com/questions/49782011/herb-sutters-10-liner-with-cleanup
 ///        TODO: improve the quality of the answer on stackoverflow
 template<typename... Ts>
-class ReferenceCountedObjectFactory {
+class GarbageCollectedFactory {
 private:
 
     /// @brief Encapsulates the data of a single type.
@@ -56,7 +56,7 @@ private:
     std::shared_ptr<Cache> m_cache;
 
 public:
-    ReferenceCountedObjectFactory()
+    GarbageCollectedFactory()
         : m_cache(std::make_shared<Cache>()) { }
 
     /// @brief Gets a shared reference to the object of type T with the given arguments.
@@ -100,6 +100,13 @@ public:
         );
         t_cache.identifier_to_object.emplace(identifier, sp);
         return sp;
+    }
+
+    template<typename T>
+    size_t size() const {
+        std::lock_guard<std::mutex> hold(m_cache->mutex);
+        auto& t_cache = std::get<PerTypeCache<T>>(m_cache->data);
+        return t_cache.uniqueness.size();
     }
 };
 

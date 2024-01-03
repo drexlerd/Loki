@@ -1,5 +1,5 @@
 file(GLOB SRC_FILES
-    "*.cpp")
+    "ast/*.cpp")
 
 add_executable(domain_tests ${SRC_FILES})
 

@@ -11,9 +11,9 @@ add_executable(undefined_behavior "undefined_behavior.cpp")
 target_link_libraries(undefined_behavior parsers)
 
 
-add_custom_target(state_space_delivery_example_domain ALL
+add_custom_target(example_domain ALL
     COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/benchmarks/gripper/domain.pddl" "${CMAKE_BINARY_DIR}/benchmarks/gripper/domain.pddl")
-add_custom_target(state_space_delivery_example_instance_1 ALL
+add_custom_target(example_problem_0 ALL
     COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/benchmarks/gripper/p-2-0.pddl" "${CMAKE_BINARY_DIR}/benchmarks/gripper/p-2-0.pddl")
-add_custom_target(state_space_delivery_example_instance_2 ALL
+add_custom_target(example_problem_1 ALL
     COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/benchmarks/gripper/p-2-1.pddl" "${CMAKE_BINARY_DIR}/benchmarks/gripper/p-2-1.pddl")

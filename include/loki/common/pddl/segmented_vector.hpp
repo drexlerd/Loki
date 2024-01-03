@@ -29,13 +29,13 @@
 
 
 namespace loki {
-/// @brief The SegmentedPersistentVector persistently stores elements of type T 
+/// @brief The SegmentedVector persistently stores elements of type T 
 ///        in segments of size N, ensuring that references to elements do not 
 ///        become invalidated upon reallocation.
 /// @tparam T is the nested type
 /// @tparam N is the number of elements per segment
 template<typename T, ElementsPerSegment N>
-class SegmentedPersistentVector {
+class SegmentedVector {
 private:
     std::vector<std::vector<T>> m_data;
 
@@ -59,7 +59,7 @@ private:
     }
 
 public:
-    explicit SegmentedPersistentVector() : m_size(0), m_capacity(0) { }
+    explicit SegmentedVector() : m_size(0), m_capacity(0) { }
 
     const T& push_back(T value) {
         // Increase capacity if necessary
@@ -80,13 +80,6 @@ public:
     T& operator[](int index) {
         assert(index < static_cast<int>(size()));
         return m_data[segment_index(index)][element_index(index)];
-    }
-
-    void pop_back() {
-        assert(size() > 0);
-        auto& segment = m_data[segment_index(size() - 1)];
-        segment.pop_back();
-        --m_size;
     }
 
     const T& operator[](int identifier) const {

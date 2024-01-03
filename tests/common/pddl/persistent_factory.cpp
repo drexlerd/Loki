@@ -17,28 +17,25 @@
 
 #include <gtest/gtest.h>
 
-#include "../../src/domain/ast/parser.hpp"
-#include "../../include/loki/common/ast/parser_wrapper.hpp"
-#include "../../include/loki/domain/ast/printer.hpp"
+#include "../../../include/loki/common/pddl/persistent_factory.hpp"
+#include "../../../include/loki/domain/pddl/object.hpp"
 
 
 namespace loki::domain::tests {
 
-TEST(LokiTests, NumberTest) {
-    ast::Number ast;
+TEST(LokiTests, PersistentFactoryTest) {
+    PersistentFactory<pddl::ObjectImpl, 2> factory;
+    EXPECT_EQ(factory.size(), 0);
 
-    EXPECT_NO_THROW(parse_ast("5", number(), ast));
-    EXPECT_EQ(parse_text(ast), "5");
-    EXPECT_NO_THROW(parse_ast("4.2", number(), ast));
-    EXPECT_EQ(parse_text(ast), "4.2");
-    EXPECT_NO_THROW(parse_ast("6 7", number(), ast));
-    EXPECT_EQ(parse_text(ast), "6");
-    // TODO: Is this really what we want?
-    EXPECT_NO_THROW(parse_ast("1loki", number(), ast));
-    EXPECT_EQ(parse_text(ast), "1");
+    // Test uniqueness: insert the same element twice
+    const auto object_0_0 = factory.get_or_create<pddl::ObjectImpl>("object_0");
+    EXPECT_EQ(factory.size(), 1);
+    EXPECT_EQ(object_0_0->get_identifier(), 0);
+    EXPECT_EQ(object_0_0->get_name(), "object_0");
+    const auto object_0_1 = factory.get_or_create<pddl::ObjectImpl>("object_0");
+    EXPECT_EQ(factory.size(), 1);
+    EXPECT_EQ(object_0_0, object_0_1);
 
-    EXPECT_ANY_THROW(parse_ast("loki", number(), ast));
-    EXPECT_ANY_THROW(parse_ast("(5)", number(), ast));
 }
 
 }
