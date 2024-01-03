@@ -16,6 +16,7 @@
  */
 
 #include "../../../include/loki/common/pddl/garbage_collected_factory.hpp"
+#include "../../../include/loki/common/hash.hpp"
 #include "../../../include/loki/domain/pddl/object.hpp"
 
 #include <gtest/gtest.h>
@@ -24,33 +25,67 @@
 
 
 namespace loki::domain::tests {
-/*
-class Object {
+
+/// @brief A type to avoid friending in the pddl::Object since this class is not used.
+class ObjectImpl {
 private:
     int m_identifier;
     std::string m_name;
 
-    Object(int identifier, std::string name) : m_identifier(identifier), m_name(std::move(name)) { }
+    ObjectImpl(int identifier, std::string name) : m_identifier(identifier), m_name(std::move(name)) { }
 
     template<typename... Ts>
-    friend class GarbageCollectedFactory;
+    friend class loki::GarbageCollectedFactory;
 
 public:
+    bool operator==(const ObjectImpl& other) const {
+        return m_name == other.m_name;
+    }
+
+    size_t hash() const {
+        return hash_combine(m_name);
+    }
+
     int get_identifier() const { return m_identifier; }
     const std::string& get_name() const { return m_name; }
 };
 
+using Object = std::shared_ptr<ObjectImpl>;
+
+}
+
+
+namespace std {
+    template<>
+    struct hash<loki::domain::tests::ObjectImpl> {
+        size_t operator()(const loki::domain::tests::ObjectImpl& object) const {
+            return object.hash();
+        }
+    };
+}
+
+
+namespace loki::domain::tests {
+
 TEST(LokiTests, GarbageCollectedFactoryTest) {
-    GarbageCollectedFactory<Object> factory;
-    EXPECT_EQ(factory.size<Object>(), 0);
+    GarbageCollectedFactory<ObjectImpl> factory;
+    EXPECT_EQ(factory.size<ObjectImpl>(), 0);
 
     {
-        const auto object_0 = factory.get_or_create<Object>("object_0");
-        EXPECT_EQ(factory.size<Object>(), 1);
-        EXPECT_EQ(object_0->get_name(), "object_0");
-        // destructor is called
+        const auto object_0_0 = factory.get_or_create<ObjectImpl>("object_0");
+        EXPECT_EQ(factory.size<ObjectImpl>(), 1);
+        EXPECT_EQ(object_0_0->get_name(), "object_0");
+
+        const auto object_0_1 = factory.get_or_create<ObjectImpl>("object_0");
+        EXPECT_EQ(factory.size<ObjectImpl>(), 1);
+        EXPECT_EQ(object_0_0, object_0_1);
+
+        const auto object_1 = factory.get_or_create<ObjectImpl>("object_1");
+        EXPECT_EQ(factory.size<ObjectImpl>(), 2);
+
+        // destructors are called
     }
-    EXPECT_EQ(factory.size<Object>(), 0);
+    EXPECT_EQ(factory.size<ObjectImpl>(), 0);
 }
-*/
+
 }

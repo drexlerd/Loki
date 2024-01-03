@@ -18,6 +18,7 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_GARBAGE_COLLECTED_FACTORY_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_GARBAGE_COLLECTED_FACTORY_HPP_
 
+#include <cassert>
 #include <unordered_map>
 #include <unordered_set>
 #include <memory>
