@@ -14,12 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.9"
-
-      - name: Install boost
+      - name: Download boost
         id: install-boost
         run: |
           bash .github/workflows/scripts/install_boost.sh
