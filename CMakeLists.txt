@@ -94,3 +94,47 @@ endif()
 ###########
 # Install #
 ###########
+
+# Install header files
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/loki"
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# Install cmake scripts
+install(
+    DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/loki/cmake"
+)
+
+
+
+###########
+# Exports #
+###########
+
+# https://cmake.org/cmake/help/latest/guide/importing-exporting/index.html
+
+include(CMakePackageConfigHelpers)
+
+# Generate the version file for the config file
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/lokiConfigVersion.cmake"
+  VERSION "${loki_VERSION_MAJOR}.${loki_VERSION_MINOR}"
+  COMPATIBILITY ExactVersion
+)
+
+# Create config file
+# https://cmake.org/cmake/help/book/mastering-cmake/cmake/Help/guide/importing-exporting/index.html
+# https://cmake.org/cmake/help/latest/module/CMakePackageConfigHelpers.html#generating-a-package-configuration-file
+configure_package_config_file("${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/lokiConfig.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/loki"
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO
+)
+
+# Install config files
+install(
+  FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/lokiConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/lokiConfigVersion.cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/loki"
+)
