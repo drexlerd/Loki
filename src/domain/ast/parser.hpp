@@ -181,7 +181,7 @@ namespace loki::domain {
         struct StructureClass;
 
         typedef x3::rule<DefineKeywordClass, x3::unused_type> define_keyword_type;
-        typedef x3::rule<DomainKeywordClass, x3::unused_type> domain_keyword_type;        
+        typedef x3::rule<DomainKeywordClass, x3::unused_type> domain_keyword_type;
 
         typedef x3::rule<NameClass, ast::Name> name_type;
         typedef x3::rule<VariableClass, ast::Variable> variable_type;
@@ -335,13 +335,13 @@ namespace loki::domain {
             requirement_constraints_type, requirement_action_costs_type, requirement_type)
 
         BOOST_SPIRIT_DECLARE(
-            type_type, type_object_type, type_number_type, type_either_type, 
+            type_type, type_object_type, type_number_type, type_either_type,
             typed_list_of_names_recursively_type, typed_list_of_names_type,
             typed_list_of_variables_recursively_type, typed_list_of_variables_type)
 
         BOOST_SPIRIT_DECLARE(atomic_formula_skeleton_type)
 
-        BOOST_SPIRIT_DECLARE(atomic_function_skeleton_total_cost_type, atomic_function_skeleton_general_type, atomic_function_skeleton_type, 
+        BOOST_SPIRIT_DECLARE(atomic_function_skeleton_total_cost_type, atomic_function_skeleton_general_type, atomic_function_skeleton_type,
             function_typed_list_of_atomic_function_skeletons_recursively_type, function_typed_list_of_atomic_function_skeletons_type)
 
         BOOST_SPIRIT_DECLARE(atomic_formula_of_terms_type, atom_type, negated_atom_type, literal_type)
@@ -379,7 +379,7 @@ namespace loki::domain {
 
         BOOST_SPIRIT_DECLARE(numeric_term_type)
 
-        BOOST_SPIRIT_DECLARE(effect_type, effect_production_literal_type, 
+        BOOST_SPIRIT_DECLARE(effect_type, effect_production_literal_type,
             effect_production_numeric_fluent_total_cost_type, effect_production_numeric_fluent_general_type,
             effect_production_type, effect_conditional_forall_type,
             effect_conditional_when_type, effect_conditional_type, action_symbol_type, action_body_type, action_type,

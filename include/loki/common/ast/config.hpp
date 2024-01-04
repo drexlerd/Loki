@@ -29,7 +29,7 @@ namespace loki
 {
     namespace x3 = boost::spirit::x3;
 
-    using Position = boost::spirit::x3::position_tagged;
+    using Position = x3::position_tagged;
     using PositionList = std::vector<Position>;
 
     // Our iterator type
