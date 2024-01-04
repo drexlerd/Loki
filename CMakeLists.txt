@@ -29,9 +29,14 @@ endif()
 
 option(ENABLE_TESTING "Enables compilation of tests." OFF)
 if (ENABLE_TESTING)
-    message("Building tests enabled.")
+    message("Testing enabled.")
 else()
-    message("Building tests disabled.")
+    message("Testing disabled.")
+endif()
+if (ENABLE_BENCHMARKING)
+    message("Benchmarking enabled.")
+else()
+    message("Benchmarking disabled.")
 endif()
 
 ##############################################################
