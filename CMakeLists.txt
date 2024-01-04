@@ -61,6 +61,8 @@ configure_ccache()
 configure_boost()
 find_package(Boost ${BOOST_MIN_VERSION})
 include_directories(${Boost_INCLUDE_DIRS})
+message(${Boost_INCLUDE_DIRS})
+
 #include_directories("${PROJECT_SOURCE_DIR}/external/flatbuffers/include")
 
 
