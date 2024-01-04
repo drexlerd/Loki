@@ -1,8 +1,9 @@
 name: Minimal setup
-on:
-  push:
-    branches:
-      - master
+on: [push, pull_request]
+#on:
+#  push:
+#    branches:
+#      - main
 
 jobs:
   benchmark:
