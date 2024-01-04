@@ -1,9 +1,8 @@
 name: Googlebenchmark
-on: [push, pull_request]
-#on:
-#  push:
-#    branches:
-#      - main
+on:
+  push:
+    branches:
+      - main
 
 
 permissions:
@@ -27,7 +26,7 @@ jobs:
           echo "BOOST_ROOT=${{runner.workspace}}/Loki/boost_1_84_0" >> "$GITHUB_OUTPUT"
 
       - name: Configure CMake
-        run: cmake -DENABLE_BENCHMARKING:BOOL=TRUE -S $GITHUB_WORKSPACE -B ${{runner.workspace}}/build
+        run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -S $GITHUB_WORKSPACE -B ${{runner.workspace}}/build
         env:
           BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
@@ -38,12 +37,6 @@ jobs:
       # Run benchmark and store the output to a file
       - name: Run benchmark
         run: ${{runner.workspace}}/build/benchmarks/persistent_factory --benchmark_format=json | tee benchmark_result.json
-      # Download previous benchmark result from cache (if exists)
-      #- name: Download previous benchmark data
-      #  uses: actions/cache@v1
-      #  with:
-      #    path: ./cache
-      #    key: ${{ runner.os }}-benchmark
       # Run `github-action-benchmark` action
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1

@@ -44,9 +44,9 @@
 
 
 namespace loki {
-// The segmented sizes are chosen sufficiently large to avoid 
+// The segmented sizes are chosen sufficiently large to avoid
 // to avoid allocations and for continuous storage.
-// The values are just educated guesses based on the knowledge 
+// The values are just educated guesses based on the knowledge
 // that cache line size is 64 Bytes.
 using RequirementFactory = PersistentFactory<pddl::RequirementsImpl, 100>;
 using TypeFactory = PersistentFactory<pddl::TypeImpl, 1000>;
