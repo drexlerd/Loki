@@ -7,6 +7,7 @@ FetchContent_Declare(
 )
 
 # Make Google Benchmark available
+set(BENCHMARK_DOWNLOAD_DEPENDENCIES ON)
 FetchContent_MakeAvailable(googlebenchmark)
 
 # Now declare your executable

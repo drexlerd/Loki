@@ -12,7 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Establish project
 ##############################################################
 
-project(sketches VERSION 0.1 LANGUAGES C CXX)
+project(Loki VERSION 0.1 LANGUAGES C CXX)
 
 # Compilation flags, some configuration-specific
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -pedantic -fPIC")
@@ -33,6 +33,8 @@ if (ENABLE_TESTING)
 else()
     message("Testing disabled.")
 endif()
+
+option(ENABLE_BENCHMARKING "Enables compilation of tests." OFF)
 if (ENABLE_BENCHMARKING)
     message("Benchmarking enabled.")
 else()
