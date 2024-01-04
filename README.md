@@ -87,9 +87,9 @@ Parsing a domain and a problem file and printing both.
 ```
 
 
-## Performance Tests
+## Performance Benchmarks
 
-The automated performance tests are available [here](https://drexlerd.github.io/Loki/dev/bench/)
+The automated performance benchmarks are available [here](https://drexlerd.github.io/Loki/dev/bench/)
 
 
 ## Acknowledgements
