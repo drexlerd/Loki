@@ -87,6 +87,11 @@ Parsing a domain and a problem file and printing both.
 ```
 
 
+## Performance Tests
+
+The automated performance tests are available [here](https://drexlerd.github.io/Loki/dev/bench/)
+
+
 ## Acknowledgements
 
 This work was partially supported by the Wallenberg AI, Autonomous Systems and Software Program (WASP) funded by the Knut and Alice Wallenberg Foundation.
