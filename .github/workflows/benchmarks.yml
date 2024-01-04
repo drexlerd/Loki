@@ -1,0 +1,50 @@
+name: Minimal setup
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  benchmark:
+    name: Performance regression check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install boost
+        id: install-boost
+        run: |
+          bash .github/workflows/scripts/install_boost.sh
+          echo "BOOST_ROOT=${{runner.workspace}}/Loki/boost_1_84_0" >> "$GITHUB_OUTPUT"
+
+      - name: Configure CMake
+        run: cmake -DENABLE_BENCHMARKING:BOOL=TRUE -S $GITHUB_WORKSPACE -B ${{runner.workspace}}/build
+        env:
+          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+
+      - name: Build
+        working-directory: ${{runner.workspace}}/build
+        run: export CXXFLAGS="-Werror" && cmake --build .
+
+      # Run benchmark and store the output to a file
+      - name: Run benchmark
+        run: ${{runner.workspace}}/build/benchmarks/persistent_factory --benchmark_format=json | tee benchmark_result.json
+      # Download previous benchmark result from cache (if exists)
+      - name: Download previous benchmark data
+        uses: actions/cache@v1
+        with:
+          path: ./cache
+          key: ${{ runner.os }}-benchmark
+      # Run `github-action-benchmark` action
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          # What benchmark tool the output.txt came from
+          tool: 'googlecpp'
+          # Where the output from the benchmark tool is stored
+          output-file-path: benchmark_result.json
+          # Where the previous data file is stored
+          external-data-json-path: ./cache/benchmark-data.json
+          # Workflow will fail when an alert happens
+          fail-on-alert: true
+      # Upload the updated cache file for the next job by actions/cache
