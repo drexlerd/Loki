@@ -33,7 +33,8 @@ namespace loki::pddl {
 
     class TypeImpl;
     using Type = const TypeImpl*;
-    using TypeList = boost::container::small_vector<Type,1>;  // often single type
+    //using TypeList = boost::container::small_vector<Type,1>;  // often single type
+    using TypeList = std::vector<Type>;
 
     class ObjectImpl;
     using Object = const ObjectImpl*;
@@ -48,7 +49,8 @@ namespace loki::pddl {
     class TermVariableImpl;
     using TermImpl = std::variant<TermObjectImpl, TermVariableImpl>;
     using Term = const TermImpl*;
-    using TermList = boost::container::small_vector<Term, 2>;  // often unary and binary predicates
+    //using TermList = boost::container::small_vector<Term, 2>;  // often unary and binary predicates
+    using TermList = std::vector<Term>;
 
     class AtomImpl;
     using Atom = const AtomImpl*;
@@ -56,7 +58,8 @@ namespace loki::pddl {
 
     class ParameterImpl;
     using Parameter = const ParameterImpl*;
-    using ParameterList = boost::container::small_vector<Parameter, 10>;  // often actions, quantifiers with few parameters
+    //using ParameterList = boost::container::small_vector<Parameter, 10>;  // often actions, quantifiers with few parameters
+    using ParameterList = std::vector<Parameter>;
     using ParameterAssignment = std::unordered_map<Parameter, Object>;
 
     class PredicateImpl;
