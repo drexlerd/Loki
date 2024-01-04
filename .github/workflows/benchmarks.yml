@@ -5,6 +5,14 @@ on: [push, pull_request]
 #    branches:
 #      - main
 
+
+permissions:
+  # deployments permission to deploy GitHub pages website
+  deployments: write
+  # contents permission to update benchmark contents in gh-pages branch
+  contents: write
+
+
 jobs:
   benchmark:
     name: Performance regression check
@@ -31,11 +39,11 @@ jobs:
       - name: Run benchmark
         run: ${{runner.workspace}}/build/benchmarks/persistent_factory --benchmark_format=json | tee benchmark_result.json
       # Download previous benchmark result from cache (if exists)
-      - name: Download previous benchmark data
-        uses: actions/cache@v1
-        with:
-          path: ./cache/benchmarks/
-          key: ${{ runner.os }}-benchmark
+      #- name: Download previous benchmark data
+      #  uses: actions/cache@v1
+      #  with:
+      #    path: ./cache
+      #    key: ${{ runner.os }}-benchmark
       # Run `github-action-benchmark` action
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
@@ -44,12 +52,7 @@ jobs:
           tool: 'googlecpp'
           # Where the output from the benchmark tool is stored
           output-file-path: benchmark_result.json
-          # Where the previous data file is stored
-          external-data-json-path: ./benchmarks/cache/benchmark-data.json
-          # Workflow will fail when an alert happens
-          fail-on-alert: true
-          # GitHub API token to make a commit comment
+          # Access token to deploy GitHub Pages branch
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          # Enable alert commit comment
-          comment-on-alert: true
-      # Upload the updated cache file for the next job by actions/cache
+          # Push and deploy GitHub pages branch automatically
+          auto-push: true
