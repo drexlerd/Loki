@@ -34,7 +34,7 @@ jobs:
       - name: Download previous benchmark data
         uses: actions/cache@v1
         with:
-          path: ./cache
+          path: ./cache/benchmarks/
           key: ${{ runner.os }}-benchmark
       # Run `github-action-benchmark` action
       - name: Store benchmark result
@@ -45,7 +45,7 @@ jobs:
           # Where the output from the benchmark tool is stored
           output-file-path: benchmark_result.json
           # Where the previous data file is stored
-          external-data-json-path: ./cache/benchmark-data.json
+          external-data-json-path: ./benchmarks/cache/benchmark-data.json
           # Workflow will fail when an alert happens
           fail-on-alert: true
           # GitHub API token to make a commit comment
