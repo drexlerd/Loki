@@ -53,8 +53,3 @@ jobs:
           # Enable alert commit comment
           comment-on-alert: true
       # Upload the updated cache file for the next job by actions/cache
-      - name: Upload Benchmark Data
-        uses: actions/upload-artifact@v2
-        with:
-          name: Benchmark Data
-          path: ./benchmarks/cache/benchmark-data.json
