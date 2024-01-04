@@ -59,9 +59,7 @@ configure_ccache()
 
 # Boost
 configure_boost()
-find_package(Boost ${BOOST_MIN_VERSION})
-include_directories(${Boost_INCLUDE_DIRS})
-message(${Boost_INCLUDE_DIRS})
+find_package(Boost ${BOOST_MIN_VERSION} REQUIRED)
 
 #include_directories("${PROJECT_SOURCE_DIR}/external/flatbuffers/include")
 
@@ -88,7 +86,7 @@ if (ENABLE_TESTING)
     add_subdirectory(tests)
 endif()
 
-#set(ENABLE_BENCHMARKING True)
+# TODO (Dominik): As soon as -DENABLE_BENCHMARKING is enabled, the IDE might throw errors related to class of boost not available in the namespace boost::spirit::x3
 if (ENABLE_BENCHMARKING)
     add_subdirectory(benchmarks)
 endif()
