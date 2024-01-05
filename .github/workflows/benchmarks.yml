@@ -16,17 +16,33 @@ jobs:
   benchmark:
     name: Performance regression check
     runs-on: ubuntu-latest
+    env:
+      BENCHMARK_INSTALL_DIR: ${{ github.workspace }}/benchmark-install
     steps:
       - uses: actions/checkout@v2
+
+      - name: Checkout Google Benchmark
+        uses: actions/checkout@v2
+        with:
+          repository: google/benchmark
+          path: 'benchmark'
+
+      - name: Build and Install Google Benchmark
+        run: |
+          cd benchmark
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DCMAKE_INSTALL_PREFIX=${BENCHMARK_INSTALL_DIR}
+          cmake --build build
+          cmake --install build
 
       - name: Install boost
         id: install-boost
         run: |
-          bash .github/workflows/scripts/install_boost.sh
+          wget --no-check-certificate 'https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz'
+          tar xf boost_1_84_0.tar.gz
           echo "BOOST_ROOT=${{runner.workspace}}/Loki/boost_1_84_0" >> "$GITHUB_OUTPUT"
 
       - name: Configure CMake
-        run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -S $GITHUB_WORKSPACE -B ${{runner.workspace}}/build
+        run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="${BENCHMARK_INSTALL_DIR}; -S $GITHUB_WORKSPACE -B ${{runner.workspace}}/build
         env:
           BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
