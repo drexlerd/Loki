@@ -61,8 +61,7 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="$BENCHMARK_INSTALL_DIR;$GITHUB_WORKSPACE/boost_1_84_0" -S $GITHUB_WORKSPACE -B $GITHUB_WORKSPACE/build
 
       - name: Build Loki
-        working-directory: $GITHUB_WORKSPACE/build
-        run: export CXXFLAGS="-Werror" && cmake --build .
+        run: export CXXFLAGS="-Werror" && cmake --build build
 
       # Run benchmark and store the output to a file
       - name: Run benchmark
