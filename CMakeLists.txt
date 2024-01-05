@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
+
 ##############################################################
 # Language setup
 ##############################################################
@@ -7,6 +8,7 @@ cmake_minimum_required(VERSION 3.13)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
 
 ##############################################################
 # Establish project
@@ -41,6 +43,7 @@ else()
     message("Benchmarking disabled.")
 endif()
 
+
 ##############################################################
 # CMake modules and macro files
 ##############################################################
@@ -58,11 +61,13 @@ include("configure_ccache")
 configure_ccache()
 
 # Boost
+# Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
 configure_boost()
 find_package(Boost ${BOOST_MIN_VERSION} REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
+
 #include_directories("${PROJECT_SOURCE_DIR}/external/flatbuffers/include")
 
 
@@ -83,15 +88,14 @@ add_subdirectory(exe)
 
 add_subdirectory(examples)
 
-#set(ENABLE_TESTING True)
 if (ENABLE_TESTING)
     add_subdirectory(tests)
 endif()
 
-# TODO (Dominik): As soon as -DENABLE_BENCHMARKING is enabled, the IDE might throw errors related to class of boost not available in the namespace boost::spirit::x3
 if (ENABLE_BENCHMARKING)
     add_subdirectory(benchmarks)
 endif()
+
 
 ###########
 # Install #

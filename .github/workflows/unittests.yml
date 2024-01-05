@@ -38,5 +38,5 @@ jobs:
       run: export CXXFLAGS="-Werror" && cmake --build build
 
     - name: Test
-      working-directory: $GITHUB_WORKSPACE/build/tests
+      working-directory: build/tests
       run: GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V
