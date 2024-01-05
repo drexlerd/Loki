@@ -2,7 +2,8 @@ name: Googlebenchmark
 on:
   push:
     branches:
-      - main cmake
+      - main
+      - cmake
 
 
 permissions:
