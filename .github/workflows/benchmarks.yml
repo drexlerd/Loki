@@ -48,9 +48,9 @@ jobs:
         run: echo ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
       - name: Configure CMake
-        run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="${BENCHMARK_INSTALL_DIR}" -S $GITHUB_WORKSPACE -B ${{runner.workspace}}/build
-        env:
-          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+        run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="${BENCHMARK_INSTALL_DIR};${{runner.workspace}}/boost_1_84_0" -S $GITHUB_WORKSPACE -B ${{runner.workspace}}/build
+        #env:
+        #  BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
       - name: Build Loki
         working-directory: ${{runner.workspace}}/build
