@@ -40,7 +40,7 @@ jobs:
         run: |
           wget --no-check-certificate 'https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz'
           tar xf boost_1_84_0.tar.gz
-          echo "BOOST_ROOT=${{runner.workspace}}/boost_1_84_0" >> "$GITHUB_OUTPUT"
+          echo "BOOST_ROOT=${{runner.workspace}}/boost_1_84_0" >> "$GITHUB_ENV"
           echo "${{runner.workspace}}/boost_1_84_0"
 
       - name: Check boost
