@@ -20,7 +20,8 @@ jobs:
     env:
       BENCHMARK_INSTALL_DIR: ${{ github.workspace }}/benchmark-install
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Loki
+        uses: actions/checkout@v2
 
       - name: Checkout Google Benchmark
         uses: actions/checkout@v2
@@ -45,12 +46,13 @@ jobs:
         id: check-boost
         run: |
           echo "${{runner.workspace}}"
+          echo {$GITHUB_WORKSPACE}
           ls -l
           cd boost_1_84_0
           ls -l
 
       - name: Configure CMake
-        run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="${BENCHMARK_INSTALL_DIR};${{runner.workspace}}/boost_1_84_0" -S $GITHUB_WORKSPACE -B ${{runner.workspace}}/build
+        run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="${BENCHMARK_INSTALL_DIR};{$GITHUB_WORKSPACE}/boost_1_84_0" -S $GITHUB_WORKSPACE -B {$GITHUB_WORKSPACE}/build
 
       - name: Build Loki
         working-directory: ${{runner.workspace}}/build
