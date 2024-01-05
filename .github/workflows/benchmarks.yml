@@ -18,7 +18,7 @@ jobs:
     name: Performance regression check
     runs-on: ubuntu-latest
     env:
-      BENCHMARK_INSTALL_DIR: $GITHUB_WORKSPACE/benchmark-install
+      BENCHMARK_INSTALL_DIR: ${{ github.workspace }}/benchmark-install
     steps:
       - name: Checkout Loki
         uses: actions/checkout@v2
@@ -38,14 +38,12 @@ jobs:
           cmake --install build
 
       - name: Download and extract boost
-        id: install-boost
         run: |
           wget --no-check-certificate 'https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz'
           tar xf boost_1_84_0.tar.gz
 
       - name: Configure CMake
-        run: |
-          cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="$BENCHMARK_INSTALL_DIR;$GITHUB_WORKSPACE/boost_1_84_0" -S $GITHUB_WORKSPACE -B $GITHUB_WORKSPACE/build
+        run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="$BENCHMARK_INSTALL_DIR;$GITHUB_WORKSPACE/boost_1_84_0" -S $GITHUB_WORKSPACE -B $GITHUB_WORKSPACE/build
 
       - name: Build Loki
         run: export CXXFLAGS="-Werror" && cmake --build build
