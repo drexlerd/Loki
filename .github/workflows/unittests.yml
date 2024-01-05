@@ -21,7 +21,7 @@ jobs:
 
     - name: Build and Install Google Test
       run: |
-        cd benchmark
+        cd googletest
         cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DCMAKE_INSTALL_PREFIX=$GTEST_INSTALL_DIR
         cmake --build build
         cmake --install build
