@@ -48,9 +48,9 @@ jobs:
         run: |
           pwd
           echo "${{runner.workspace}}"
-          echo {$GITHUB_WORKSPACE}
-          echo ${BENCHMARK_INSTALL_DIR}
-          echo {$GITHUB_WORKSPACE}/boost_1_84_0
+          echo $GITHUB_WORKSPACE
+          echo $BENCHMARK_INSTALL_DIR
+          echo $GITHUB_WORKSPACE/boost_1_84_0
           ls -l
           cd boost_1_84_0
           ls -l
@@ -58,7 +58,7 @@ jobs:
       - name: Configure CMake
         run: |
           pwd
-          cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="${BENCHMARK_INSTALL_DIR};{$GITHUB_WORKSPACE}/boost_1_84_0" -S $GITHUB_WORKSPACE -B {$GITHUB_WORKSPACE}/build
+          cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="$BENCHMARK_INSTALL_DIR;$GITHUB_WORKSPACE/boost_1_84_0" -S $GITHUB_WORKSPACE -B $GITHUB_WORKSPACE/build
 
       - name: Build Loki
         working-directory: ${{runner.workspace}}/build
