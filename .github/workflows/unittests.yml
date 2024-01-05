@@ -5,30 +5,40 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        shell: bash
+    env:
+      GTEST_INSTALL_DIR: $GITHUB_WORKSPACE/googletest-install
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout Loki
+      uses: actions/checkout@v2
 
-      - name: Download boost
-        id: install-boost
-        run: |
-          bash .github/workflows/scripts/install_boost.sh
-          echo "BOOST_ROOT=${{runner.workspace}}/Loki/boost_1_84_0" >> "$GITHUB_OUTPUT"
+    - name: Checkout Google Test
+      uses: actions/checkout@v2
+      with:
+        repository: google/googletest
+        path: 'googletest'
+        ref: 'dddb219c3eb96d7f9200f09b0a381f016e6b4562'  # stick to a commit to avoid added future dependencies
 
-      - name: Configure CMake
-        run: cmake -DENABLE_TESTING:BOOL=TRUE -S $GITHUB_WORKSPACE -B ${{runner.workspace}}/build
-        env:
-          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+    - name: Build and Install Google Test
+      run: |
+        cd benchmark
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DCMAKE_INSTALL_PREFIX=${BENCHMARK_INSTALL_DIR}
+        cmake --build build
+        cmake --install build
 
-      - name: Build
-        working-directory: ${{runner.workspace}}/build
-        run: export CXXFLAGS="-Werror" && cmake --build .
+    - name: Download and extract boost
+      id: install-boost
+      run: |
+        wget --no-check-certificate 'https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz'
+        tar xf boost_1_84_0.tar.gz
 
-      - name: Test
-        working-directory: ${{runner.workspace}}/build/tests
-        run: GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V
+    - name: Configure CMake
+      run: |
+        cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING:BOOL=TRUE -DCMAKE_PREFIX_PATH="$GTEST_INSTALL_DIR;$GITHUB_WORKSPACE/boost_1_84_0" -S $GITHUB_WORKSPACE -B $GITHUB_WORKSPACE/build
+
+    - name: Build Loki
+      run: export CXXFLAGS="-Werror" && cmake --build build
+
+    - name: Test
+      working-directory: $GITHUB_WORKSPACE/build/tests
+      run: GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V

@@ -18,7 +18,7 @@ jobs:
     name: Performance regression check
     runs-on: ubuntu-latest
     env:
-      BENCHMARK_INSTALL_DIR: ${{ github.workspace }}/benchmark-install
+      BENCHMARK_INSTALL_DIR: $GITHUB_WORKSPACE/benchmark-install
     steps:
       - name: Checkout Loki
         uses: actions/checkout@v2
@@ -28,6 +28,7 @@ jobs:
         with:
           repository: google/benchmark
           path: 'benchmark'
+          ref: '4575fc415f17c45911f7df7aacbf83a378c5565a'  # they plan to add a dependency to abseil soon that we want to avoid
 
       - name: Build and Install Google Benchmark
         run: |
@@ -41,23 +42,9 @@ jobs:
         run: |
           wget --no-check-certificate 'https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz'
           tar xf boost_1_84_0.tar.gz
-          pwd
-
-      - name: Check boost
-        id: check-boost
-        run: |
-          pwd
-          echo "${{runner.workspace}}"
-          echo $GITHUB_WORKSPACE
-          echo $BENCHMARK_INSTALL_DIR
-          echo $GITHUB_WORKSPACE/boost_1_84_0
-          ls -l
-          cd boost_1_84_0
-          ls -l
 
       - name: Configure CMake
         run: |
-          pwd
           cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="$BENCHMARK_INSTALL_DIR;$GITHUB_WORKSPACE/boost_1_84_0" -S $GITHUB_WORKSPACE -B $GITHUB_WORKSPACE/build
 
       - name: Build Loki
