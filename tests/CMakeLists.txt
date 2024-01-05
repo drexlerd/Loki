@@ -16,8 +16,6 @@ set(TEST_NAME ${CMAKE_PROJECT_NAME}_tests)
 
 find_package(GTest "1.11.0" REQUIRED)
 
-target_link_libraries(GTest::GTest INTERFACE gtest_main)
-
 file(GLOB SRC_FILES
     "common/pddl/*.cpp"
     "domain/ast/*.cpp")
@@ -27,6 +25,7 @@ add_executable(domain_tests ${SRC_FILES})
 target_link_libraries(domain_tests
     PRIVATE
         loki::parsers
-        GTest::GTest)
+        GTest::GTest
+        GTest::Main)
 
 add_test(domain_gtests domain_tests)

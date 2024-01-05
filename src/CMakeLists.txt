@@ -12,9 +12,9 @@ file(GLOB SRC_FILES
     "problem/pddl/*.cpp"
     "problem/pddl/parser/*.cpp")
 add_library(parsers STATIC ${SRC_FILES})
-#target_include_directories(parsers
-#    PUBLIC
-#        ${Boost_INCLUDE_DIRS})
+target_include_directories(parsers
+    PUBLIC
+        ${Boost_INCLUDE_DIRS})
 # target_link_libraries(parsers PRIVATE flatbuffers)
 
 # Create an alias for simpler reference

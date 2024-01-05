@@ -37,7 +37,7 @@ jobs:
           cmake --build build
           cmake --install build
 
-      - name: Download and extract boost
+      - name: Download and extract boost, no building required
         run: |
           wget --no-check-certificate 'https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz'
           tar xf boost_1_84_0.tar.gz
