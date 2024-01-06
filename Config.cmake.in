@@ -10,6 +10,9 @@ include(CMakeFindDependencyMacro)
 
 configure_boost()
 find_dependency(Boost ${BOOST_MIN_VERSION} REQUIRED)
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
 
 
 ############
