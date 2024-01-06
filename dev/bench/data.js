@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1704464078152,
+  "lastUpdate": 1704535521041,
   "repoUrl": "https://github.com/drexlerd/Loki",
   "entries": {
     "Benchmark": [
@@ -546,6 +546,48 @@ window.BENCHMARK_DATA = {
             "value": 2821829.274900522,
             "unit": "ns/iter",
             "extra": "iterations: 251\ncpu: 2821674.9003984053 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "committer": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "distinct": true,
+          "id": "46f0706e2b0e8eca7f7dfb550f6993b9b4d804b5",
+          "message": "changed \\n to eol in parser, added eoi to keyword parsers, fixed test name",
+          "timestamp": "2024-01-06T10:59:00+01:00",
+          "tree_id": "dc814f6adc9447b71ec969fb067a9e78c6faf5f3",
+          "url": "https://github.com/drexlerd/Loki/commit/46f0706e2b0e8eca7f7dfb550f6993b9b4d804b5"
+        },
+        "date": 1704535520633,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_ConstructAtoms",
+            "value": 25065956.96296346,
+            "unit": "ns/iter",
+            "extra": "iterations: 27\ncpu: 25065388.888888888 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IterateAtoms",
+            "value": 1275645.7850638006,
+            "unit": "ns/iter",
+            "extra": "iterations: 549\ncpu: 1275622.9508196723 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomlyIterateAtoms",
+            "value": 2834366.459016432,
+            "unit": "ns/iter",
+            "extra": "iterations: 244\ncpu: 2834327.868852459 ns\nthreads: 1"
           }
         ]
       }
