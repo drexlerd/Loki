@@ -12,6 +12,7 @@ file(GLOB SRC_FILES
     "problem/pddl/*.cpp"
     "problem/pddl/parser/*.cpp")
 add_library(parsers STATIC ${SRC_FILES})
+set_target_properties(parsers PROPERTIES OUTPUT_NAME loki_parsers)
 
 # target_link_libraries(parsers PRIVATE flatbuffers)
 
@@ -28,7 +29,7 @@ target_include_directories(parsers
 # Install the target and create export-set
 install(
     TARGETS parsers
-    EXPORT parsersTargets
+    EXPORT lokiparsersTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -36,15 +37,15 @@ install(
 )
 
 # Generate and install export file
-install(EXPORT parsersTargets
+install(EXPORT lokiparsersTargets
     NAMESPACE loki::
     COMPONENT parsers
-    FILE parsersTargets.cmake
+    FILE lokiparsersTargets.cmake
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/loki"
 )
 
 # Generate build tree export file
-export(EXPORT parsersTargets
-       FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/parsersTargets.cmake"
-       NAMESPACE dlplan::
+export(EXPORT lokiparsersTargets
+       FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/lokiparsersTargets.cmake"
+       NAMESPACE loki::
 )

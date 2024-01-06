@@ -25,3 +25,6 @@ foreach(_comp ${loki_FIND_COMPONENTS})
   endif()
   include("${CMAKE_CURRENT_LIST_DIR}/loki${_comp}Targets.cmake")
 endforeach()
+
+get_filename_component(LOKI_CONFIG_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+message(STATUS "Found loki: ${LOKI_CONFIG_DIR} (found version \"${loki_VERSION_MAJOR}.${loki_VERSION_MINOR}\")")

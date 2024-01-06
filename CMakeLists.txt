@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
 
-
 ##############################################################
 # Language setup
 ##############################################################
@@ -14,7 +13,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Establish project
 ##############################################################
 
-project(Loki VERSION 0.1 LANGUAGES C CXX)
+project(loki VERSION "0.1" LANGUAGES C CXX)
 
 # Compilation flags, some configuration-specific
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -pedantic -fPIC")
