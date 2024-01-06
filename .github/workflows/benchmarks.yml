@@ -42,14 +42,14 @@ jobs:
           tar xf boost_1_84_0.tar.gz
 
       - name: Configure CMake
-        run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="$BENCHMARK_INSTALL_DIR;$GITHUB_WORKSPACE/boost_1_84_0" -S $GITHUB_WORKSPACE -B $GITHUB_WORKSPACE/build
+        run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="$BENCHMARK_INSTALL_DIR;$GITHUB_WORKSPACE/boost_1_84_0" -S . -B build
 
       - name: Build Loki
         run: export CXXFLAGS="-Werror" && cmake --build build
 
       # Run benchmark and store the output to a file
       - name: Run benchmark
-        run: $GITHUB_WORKSPACE/build/benchmarks/persistent_factory --benchmark_format=json | tee benchmark_result.json
+        run: build/benchmarks/persistent_factory --benchmark_format=json | tee benchmark_result.json
       # Run `github-action-benchmark` action
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
