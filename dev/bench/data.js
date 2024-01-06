@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1704578252815,
+  "lastUpdate": 1704578437633,
   "repoUrl": "https://github.com/drexlerd/Loki",
   "entries": {
     "Benchmark": [
@@ -1344,6 +1344,48 @@ window.BENCHMARK_DATA = {
             "value": 2040715.0639534967,
             "unit": "ns/iter",
             "extra": "iterations: 344\ncpu: 2040609.5930232564 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "committer": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "distinct": true,
+          "id": "aafa5f45b4745b94845fcdb504baeb694e87418a",
+          "message": "added flag to use all available cores for building",
+          "timestamp": "2024-01-06T22:57:57+01:00",
+          "tree_id": "f0e618c6d8056bb6cf3eeb40fd2d72499f07c2cc",
+          "url": "https://github.com/drexlerd/Loki/commit/aafa5f45b4745b94845fcdb504baeb694e87418a"
+        },
+        "date": 1704578436739,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_ConstructAtoms",
+            "value": 25545201.14285757,
+            "unit": "ns/iter",
+            "extra": "iterations: 28\ncpu: 25543435.714285713 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IterateAtoms",
+            "value": 901100.9184993628,
+            "unit": "ns/iter",
+            "extra": "iterations: 773\ncpu: 901093.6610608024 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomlyIterateAtoms",
+            "value": 2008732.7463976594,
+            "unit": "ns/iter",
+            "extra": "iterations: 347\ncpu: 2008655.619596542 ns\nthreads: 1"
           }
         ]
       }
