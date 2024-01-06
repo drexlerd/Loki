@@ -37,8 +37,12 @@ Loki depends on a fraction of Boost's (boost.org) header-only libraries.
 ## Installation
 
 ```console
+// Configure
 cmake -S . -B build
+// Build
 cmake --build build -j16
+// Install (optional)
+cmake --install build --prefix=<path/to/directory>
 ```
 
 
