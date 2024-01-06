@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1704562107232,
+  "lastUpdate": 1704569555341,
   "repoUrl": "https://github.com/drexlerd/Loki",
   "entries": {
     "Benchmark": [
@@ -1218,6 +1218,48 @@ window.BENCHMARK_DATA = {
             "value": 2019331.5977011502,
             "unit": "ns/iter",
             "extra": "iterations: 348\ncpu: 2019292.24137931 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e07fb993eb0624690afac3de87a297cb12d08eff",
+          "message": "Update CMakeLists.txt",
+          "timestamp": "2024-01-06T20:27:35+01:00",
+          "tree_id": "d9e9cabb05146acf2c6f1c788b4633a52ff43b9f",
+          "url": "https://github.com/drexlerd/Loki/commit/e07fb993eb0624690afac3de87a297cb12d08eff"
+        },
+        "date": 1704569554335,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_ConstructAtoms",
+            "value": 25018407.428571466,
+            "unit": "ns/iter",
+            "extra": "iterations: 28\ncpu: 25016250 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IterateAtoms",
+            "value": 899866.4612403231,
+            "unit": "ns/iter",
+            "extra": "iterations: 774\ncpu: 899851.6795865635 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomlyIterateAtoms",
+            "value": 2015859.6293102205,
+            "unit": "ns/iter",
+            "extra": "iterations: 348\ncpu: 2015753.160919541 ns\nthreads: 1"
           }
         ]
       }
