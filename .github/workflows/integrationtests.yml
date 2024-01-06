@@ -1,0 +1,33 @@
+name: Googletest Unit Tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      LOKI_INSTALL_DIR: ${{ github.workspace }}/loki-install
+
+    steps:
+    - name: Checkout Loki
+      uses: actions/checkout@v2
+
+    - name: Download and extract boost, no building required
+      run: |
+        wget --no-check-certificate 'https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz'
+        tar xf boost_1_84_0.tar.gz
+
+    - name: Configure CMake
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING:BOOL=TRUE -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/boost_1_84_0" -S . -B build
+
+    - name: Build Loki
+      run: export CXXFLAGS="-Werror" && cmake --build build
+
+    - name: Install Loki
+      run: cmake --install build --prefix=$LOKI_INSTALL_DIR
+
+    - name: Build and Test Project
+      run: |
+        cd tests/integration
+        cmake -S . -B build -DCMAKE_PREFIX_PATH=$LOKI_INSTALL_DIR
+        cmake --build build
