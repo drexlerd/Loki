@@ -88,9 +88,6 @@ BENCHMARK(BM_ConstructAtoms);
 auto identifier_visitor = [](const auto& arg) -> int {
     return arg.get_identifier();
 };
-auto name_visitor = [](const auto& arg) -> std::string {
-    return arg.get_name();
-};
 
 static void access_atom_data(const loki::pddl::Atom& atom) {
     const auto& atom_identifier = atom->get_identifier();
@@ -103,7 +100,6 @@ static void access_atom_data(const loki::pddl::Atom& atom) {
 
     for (const auto& term : atom_terms) {
         int term_identifier = std::visit(identifier_visitor, *term);
-        const auto& term_name = std::visit(name_visitor, *term);
     }
 }
 
