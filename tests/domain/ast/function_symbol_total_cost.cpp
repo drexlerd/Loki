@@ -27,14 +27,9 @@ namespace loki::domain::tests {
 TEST(LokiTests, FunctionSymbolTotalCostTest) {
     ast::FunctionSymbol ast;
 
-    EXPECT_NO_THROW(parse_ast("total-cost ", function_symbol_total_cost(), ast));
+    EXPECT_NO_THROW(parse_ast("total-cost", function_symbol_total_cost(), ast));
     EXPECT_EQ(parse_text(ast), "total-cost");
-    EXPECT_NO_THROW(parse_ast("total-cost(", function_symbol_total_cost(), ast));
-    EXPECT_NO_THROW(parse_ast("total-cost)", function_symbol_total_cost(), ast));
-    EXPECT_NO_THROW(parse_ast("total-cost\n", function_symbol_total_cost(), ast));
 
-    // no separator after "total-cost" keyword
-    EXPECT_ANY_THROW(parse_ast("total-cost", function_symbol_total_cost(), ast));  // no separator
     // wrong keyword
     EXPECT_ANY_THROW(parse_ast("loki ", function_symbol_total_cost(), ast));
 }

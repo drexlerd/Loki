@@ -30,6 +30,8 @@ namespace loki::domain {
     using x3::lit;
     using x3::string;
     using x3::no_skip;
+    using x3::eol;
+    using x3::eoi;
 
     using ascii::char_;
     using ascii::space;
@@ -391,7 +393,7 @@ namespace loki::domain {
     }
 
     inline auto separator() {
-        return (ascii::space | lit('\n') | lit('(') | lit(')'));  // TODO: is ) correct?
+        return (ascii::space | x3::eol | x3::eoi | lit('(') | lit(')'));  // TODO: is ) correct?
     }
 
     /// @brief Matches a keyword
