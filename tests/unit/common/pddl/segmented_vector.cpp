@@ -15,9 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
+#include "../../../../include/loki/common/pddl/segmented_vector.hpp"
 
-#include "../../../include/loki/common/pddl/segmented_vector.hpp"
+#include <gtest/gtest.h>
 
 
 namespace loki::domain::tests {
@@ -36,7 +36,7 @@ TEST(LokiTests, SegmentedVectorTest) {
     EXPECT_EQ(vec.size(), 2);
     EXPECT_EQ(vec[1], 1);
     EXPECT_EQ(vec.capacity(), 2);
-    
+
     vec.push_back(0);
     EXPECT_EQ(vec.size(), 3);
     EXPECT_EQ(vec[2], 0);

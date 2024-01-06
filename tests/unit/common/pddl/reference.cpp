@@ -15,11 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
+#include "../../../../include/loki/common/pddl/persistent_factory.hpp"
+#include "../../../../include/loki/common/pddl/reference.hpp"
+#include "../../../../include/loki/domain/pddl/object.hpp"
 
-#include "../../../include/loki/common/pddl/persistent_factory.hpp"
-#include "../../../include/loki/common/pddl/reference.hpp"
-#include "../../../include/loki/domain/pddl/object.hpp"
+#include <gtest/gtest.h>
 
 
 namespace loki::domain::tests {
@@ -28,7 +28,7 @@ TEST(LokiTests, ReferenceTest) {
     PersistentFactory<pddl::ObjectImpl, 2> factory;
     const auto object_0 = factory.get_or_create<pddl::ObjectImpl>("object_0");
     const auto object_1 = factory.get_or_create<pddl::ObjectImpl>("object_1");
-    
+
     ReferencedPDDLObjects references;
     EXPECT_TRUE(!references.exists(object_0));
     EXPECT_TRUE(!references.exists(object_1));

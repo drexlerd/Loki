@@ -15,11 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
+#include "../../../../src/domain/ast/parser.hpp"
+#include "../../../../include/loki/common/ast/parser_wrapper.hpp"
+#include "../../../../include/loki/domain/ast/ast.hpp"
+#include "../../../../include/loki/domain/ast/printer.hpp"
 
-#include "../../../src/domain/ast/parser.hpp"
-#include "../../../include/loki/common/ast/parser_wrapper.hpp"
-#include "../../../include/loki/domain/ast/printer.hpp"
+#include <gtest/gtest.h>
 
 
 namespace loki::domain::tests {

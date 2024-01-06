@@ -15,9 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/common/pddl/garbage_collected_factory.hpp"
-#include "../../../include/loki/common/hash.hpp"
-#include "../../../include/loki/domain/pddl/object.hpp"
+#include "../../../../include/loki/common/pddl/garbage_collected_factory.hpp"
+#include "../../../../include/loki/common/hash.hpp"
+#include "../../../../include/loki/domain/pddl/object.hpp"
 
 #include <gtest/gtest.h>
 
