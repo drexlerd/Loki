@@ -32,7 +32,7 @@ jobs:
         tar xf boost_1_84_0.tar.gz
 
     - name: Configure CMake
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING:BOOL=TRUE -DCMAKE_PREFIX_PATH="$GTEST_INSTALL_DIR;$GITHUB_WORKSPACE/boost_1_84_0" -S $GITHUB_WORKSPACE -B $GITHUB_WORKSPACE/build
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING:BOOL=TRUE -DCMAKE_PREFIX_PATH="$GTEST_INSTALL_DIR;$GITHUB_WORKSPACE/boost_1_84_0" -S . -B build
 
     - name: Build Loki
       run: export CXXFLAGS="-Werror" && cmake --build build
