@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1704535920905,
+  "lastUpdate": 1704538000632,
   "repoUrl": "https://github.com/drexlerd/Loki",
   "entries": {
     "Benchmark": [
@@ -630,6 +630,48 @@ window.BENCHMARK_DATA = {
             "value": 2005581.8104956667,
             "unit": "ns/iter",
             "extra": "iterations: 343\ncpu: 2005505.5393586003 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "committer": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "distinct": true,
+          "id": "2f30b736e395880a52a9c1434c661e4fc6fbf43e",
+          "message": "factored out tracking and untracking of lists of pddl objects",
+          "timestamp": "2024-01-06T11:41:18+01:00",
+          "tree_id": "4254d7a16636178fd231d2a653ff5e85491c7dca",
+          "url": "https://github.com/drexlerd/Loki/commit/2f30b736e395880a52a9c1434c661e4fc6fbf43e"
+        },
+        "date": 1704538000286,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_ConstructAtoms",
+            "value": 23654373.133333214,
+            "unit": "ns/iter",
+            "extra": "iterations: 30\ncpu: 23653110.000000004 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IterateAtoms",
+            "value": 909641.0670967851,
+            "unit": "ns/iter",
+            "extra": "iterations: 775\ncpu: 909597.9354838708 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomlyIterateAtoms",
+            "value": 2007175.787356189,
+            "unit": "ns/iter",
+            "extra": "iterations: 348\ncpu: 2007111.781609195 ns\nthreads: 1"
           }
         ]
       }
