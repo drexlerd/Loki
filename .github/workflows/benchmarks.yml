@@ -30,7 +30,7 @@ jobs:
       - name: Build and Install Google Benchmark
         run: |
           cd benchmark
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DCMAKE_INSTALL_PREFIX=benchmark-install
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/benchmark-install"
           cmake --build build
           cmake --install build
 

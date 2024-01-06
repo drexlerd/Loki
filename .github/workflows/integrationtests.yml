@@ -1,4 +1,4 @@
-name: Googletest Unit Tests
+name: Integration Tests
 
 on: [push, pull_request]
 
@@ -18,16 +18,16 @@ jobs:
         tar xf boost_1_84_0.tar.gz
 
     - name: Configure CMake
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/boost_1_84_0" -S . -B build
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/boost_1_84_0" -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/loki-install" -S . -B build
 
     - name: Build Loki
       run: export CXXFLAGS="-Werror" && cmake --build build
 
     - name: Install Loki
-      run: cmake --install build --prefix=$LOKI_INSTALL_DIR
+      run: cmake --install build
 
     - name: Build and Test Project
       run: |
         cd tests/integration
-        cmake -S . -B build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/boost_1_84_0;LOKI_INSTALL_DIR"
+        cmake -S . -B build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/boost_1_84_0;$GITHUB_WORKSPACE/loki-install"
         cmake --build build
