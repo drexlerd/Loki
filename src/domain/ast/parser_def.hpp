@@ -253,7 +253,7 @@ namespace loki::domain::parser {
     const auto atomic_function_skeleton_general_def = lit('(') > function_symbol > typed_list_of_variables > lit(')');
     const auto atomic_function_skeleton_def = atomic_function_skeleton_total_cost | atomic_function_skeleton_general;
     const auto function_typed_list_of_atomic_function_skeletons_recursively_def = (+atomic_function_skeleton >> lit('-')) > type_number > -function_typed_list_of_atomic_function_skeletons;
-    const auto function_typed_list_of_atomic_function_skeletons_def = function_typed_list_of_atomic_function_skeletons_recursively | +atomic_function_skeleton;
+    const auto function_typed_list_of_atomic_function_skeletons_def = function_typed_list_of_atomic_function_skeletons_recursively | *atomic_function_skeleton;
 
     const auto atomic_formula_of_terms_predicate_def = (lit('(') >> predicate) > *term > lit(')');
     const auto atomic_formula_of_terms_equality_def = (lit('(') >> lit('=')) >> term > term > lit(')');
@@ -388,7 +388,7 @@ namespace loki::domain::parser {
 
     BOOST_SPIRIT_DEFINE(atomic_formula_skeleton)
 
-    BOOST_SPIRIT_DEFINE(atomic_function_skeleton_total_cost, atomic_function_skeleton_general, atomic_function_skeleton, 
+    BOOST_SPIRIT_DEFINE(atomic_function_skeleton_total_cost, atomic_function_skeleton_general, atomic_function_skeleton,
         function_typed_list_of_atomic_function_skeletons_recursively, function_typed_list_of_atomic_function_skeletons)
 
     BOOST_SPIRIT_DEFINE(atomic_formula_of_terms_predicate, atomic_formula_of_terms_equality,
@@ -423,7 +423,7 @@ namespace loki::domain::parser {
 
     BOOST_SPIRIT_DEFINE(numeric_term)
 
-    BOOST_SPIRIT_DEFINE(effect, effect_production_literal, 
+    BOOST_SPIRIT_DEFINE(effect, effect_production_literal,
         effect_production_numeric_fluent_total_cost, effect_production_numeric_fluent_general,
         effect_production, effect_conditional_forall,
         effect_conditional_when, effect_conditional, action_symbol,

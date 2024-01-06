@@ -24,19 +24,13 @@
 
 namespace loki::domain::tests {
 
-TEST(LokiTests, AtomicFunctionSkeletonTest) {
-    ast::AtomicFunctionSkeleton ast;
+TEST(LokiTests, AtomicFunctionSkeletonTotalCostTest) {
+    ast::AtomicFunctionSkeletonTotalCost ast;
 
-    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2)", atomic_function_skeleton(), ast));
-    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2)");
+    EXPECT_NO_THROW(parse_ast("(total-cost)", atomic_function_skeleton_total_cost(), ast));
+    EXPECT_EQ(parse_text(ast), "(total-cost)");
 
-    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 - type1 ?var2 - type2)", atomic_function_skeleton(), ast));
-    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 - type1\n?var2 - type2)");
-
-    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2 - type1)", atomic_function_skeleton(), ast));
-    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2 - type1)");
-
-    EXPECT_ANY_THROW(parse_ast("(?var1 ?var2 - type1)", atomic_function_skeleton(), ast));
+    EXPECT_ANY_THROW(parse_ast("(loki)", atomic_function_skeleton_total_cost(), ast));
 }
 
 }

@@ -24,16 +24,19 @@
 
 namespace loki::domain::tests {
 
-TEST(LokiTests, TypedListOfVariablesRecursivelyTest) {
-    ast::TypedListOfVariablesRecursively ast;
+TEST(LokiTests, AtomicFunctionSkeletonGeneralTest) {
+    ast::AtomicFunctionSkeletonGeneral ast;
 
-    // recursive
-    EXPECT_NO_THROW(parse_ast("?var1 ?var2 - type1", typed_list_of_variables_recursively(), ast));
-    EXPECT_EQ(parse_text(ast), "?var1 ?var2 - type1");
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2)", atomic_function_skeleton_general(), ast));
+    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2)");
 
-    // implicit "object" type
-    EXPECT_ANY_THROW(parse_ast("name1 name2", typed_list_of_variables_recursively(), ast));
-    EXPECT_ANY_THROW(parse_ast("?var1 ?var2", typed_list_of_variables_recursively(), ast));
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 - type1 ?var2 - type2)", atomic_function_skeleton_general(), ast));
+    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 - type1\n?var2 - type2)");
+
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2 - type1)", atomic_function_skeleton_general(), ast));
+    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2 - type1)");
+
+    EXPECT_ANY_THROW(parse_ast("(?var1 ?var2 - type1)", atomic_function_skeleton_general(), ast));
 }
 
 }

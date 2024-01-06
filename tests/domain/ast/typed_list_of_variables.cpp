@@ -27,9 +27,11 @@ namespace loki::domain::tests {
 TEST(LokiTests, TypedListOfVariablesTest) {
     ast::TypedListOfVariables ast;
 
+    // recursive alternative
     EXPECT_NO_THROW(parse_ast("?var1 ?var2 - type1 ?var3 ?var4 - type2", typed_list_of_variables(), ast));
     EXPECT_EQ(parse_text(ast), "?var1 ?var2 - type1\n?var3 ?var4 - type2");
 
+    // implicit "object" type alternative
     EXPECT_NO_THROW(parse_ast("?var1 ?var2", typed_list_of_variables(), ast));
     EXPECT_EQ(parse_text(ast), "?var1 ?var2");
 

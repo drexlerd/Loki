@@ -40,6 +40,8 @@ TEST(LokiTests, PersistentFactoryTest) {
     const auto object_1 = factory.get_or_create<pddl::ObjectImpl>("object_1");
     EXPECT_EQ(factory.size(), 2);
     EXPECT_NE(object_0_0, object_1);
+    EXPECT_EQ(object_1->get_identifier(), 1);
+    EXPECT_EQ(object_1->get_name(), "object_1");
 
 }
 

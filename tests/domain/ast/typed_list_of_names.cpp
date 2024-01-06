@@ -27,9 +27,11 @@ namespace loki::domain::tests {
 TEST(LokiTests, TypedListOfNamesTest) {
     ast::TypedListOfNames ast;
 
+    // recursive alternative
     EXPECT_NO_THROW(parse_ast("name1 name2 - type1 name3 name4 - type2", typed_list_of_names(), ast));
     EXPECT_EQ(parse_text(ast), "name1 name2 - type1\nname3 name4 - type2");
 
+    // implicit "object" type alternative
     EXPECT_NO_THROW(parse_ast("name1 name2", typed_list_of_names(), ast));
     EXPECT_EQ(parse_text(ast), "name1 name2");
 
