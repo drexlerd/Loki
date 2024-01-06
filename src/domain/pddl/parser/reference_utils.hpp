@@ -1,0 +1,46 @@
+/*
+ * Copyright (C) 2023 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_REFERENCE_UTILS_HPP_
+#define LOKI_SRC_PROBLEM_PDDL_PARSER_REFERENCE_UTILS_HPP_
+
+#include "../../../../include/loki/common/pddl/context.hpp"
+#include "../../../../include/loki/domain/pddl/declarations.hpp"
+#include "../../../../include/loki/domain/pddl/parameter.hpp"
+
+
+namespace loki {
+
+// For tracking an untracking of lists of pddl objects
+
+extern void track_variable_references(const pddl::ParameterList& parameter_list, Context& context);
+
+extern void test_variable_references(const pddl::ParameterList& parameter_list, const Context& context);
+
+
+extern void track_predicate_references(const pddl::PredicateList& predicate_list, Context& context);
+
+extern void test_predicate_references(const pddl::PredicateList& predicate_list, const Context& context);
+
+
+extern void track_function_skeleton_references(const pddl::FunctionSkeletonList& function_skeleton_list, Context& context);
+
+extern void test_function_skeleton_references(const pddl::FunctionSkeletonList& function_skeleton_list, const Context& context);
+
+}
+
+#endif

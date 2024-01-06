@@ -21,6 +21,7 @@
 #include "effects.hpp"
 #include "parameters.hpp"
 #include "common.hpp"
+#include "reference_utils.hpp"
 
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 #include "../../../../include/loki/domain/pddl/action.hpp"
@@ -45,18 +46,9 @@ pddl::Action parse(const domain::ast::Action& node, Context& context) {
     context.scopes.open_scope();
     auto name = parse(node.action_symbol.name);
     auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
-    for (const auto& parameter : parameter_list) {
-        context.references.track(parameter->get_variable());
-    }
+    track_variable_references(parameter_list, context);
     auto [condition, effect] = parse(node.action_body, context);
-    // Check references
-    for (const auto& parameter : parameter_list) {
-        if (context.references.exists(parameter->get_variable())) {
-            const auto& [variable, position, error_handler] = context.scopes.get<pddl::VariableImpl>(parameter->get_variable()->get_name()).value();
-            throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
-        }
-    }
-    
+    test_variable_references(parameter_list, context);
     context.scopes.close_scope();
     const auto action = context.factories.actions.get_or_create<pddl::ActionImpl>(name, parameter_list, condition, effect);
     context.positions.push_back(action, node);
@@ -70,19 +62,11 @@ pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, Context&
     context.references.untrack(pddl::RequirementEnum::DERIVED_PREDICATES);
     context.scopes.open_scope();
     auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
-    for (const auto& parameter : parameter_list) {
-        context.references.track(parameter->get_variable());
-    }
+    track_variable_references(parameter_list, context);
     auto condition = parse(node.goal_descriptor, context);
     const auto derived_predicate = context.factories.derived_predicates.get_or_create<pddl::DerivedPredicateImpl>(parameter_list, condition);
-    // Check references
-    for (const auto& parameter : parameter_list) {
-        if (context.references.exists(parameter->get_variable())) {
-            const auto& [variable, position, error_handler] = context.scopes.get<pddl::VariableImpl>(parameter->get_variable()->get_name()).value();
-            throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
-        }
-    }
-    
+    test_variable_references(parameter_list, context);
+
     context.scopes.close_scope();
     context.positions.push_back(derived_predicate, node);
     return derived_predicate;

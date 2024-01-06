@@ -46,7 +46,7 @@ pddl::BinaryOperatorEnum MultiToBinaryOperatorVisitor::operator()(const domain::
 
 
 pddl::BinaryOperatorEnum BinaryOperatorVisitor::operator()(const domain::ast::BinaryOperatorDiv&) const {
-    return pddl::BinaryOperatorEnum::DIV; 
+    return pddl::BinaryOperatorEnum::DIV;
 }
 
 pddl::BinaryOperatorEnum BinaryOperatorVisitor::operator()(const domain::ast::BinaryOperatorMinus&) const {
@@ -145,7 +145,6 @@ static void test_multiple_definition(const pddl::FunctionSkeleton& function_skel
 static void insert_context_information(const pddl::FunctionSkeleton& function_skeleton, const domain::ast::Name& node, Context& context) {
     context.positions.push_back(function_skeleton, node);
     context.scopes.insert<pddl::FunctionSkeletonImpl>(function_skeleton->get_name(), function_skeleton, node);
-    context.references.track(function_skeleton);
 }
 
 
@@ -167,7 +166,7 @@ pddl::FunctionSkeleton parse(const domain::ast::AtomicFunctionSkeletonTotalCost&
     const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
     auto function_name = parse(node.function_symbol.name);
     auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, pddl::ParameterList{}, type);
-    
+
     test_multiple_definition(function_skeleton, node.function_symbol.name, context);
     insert_context_information(function_skeleton, node.function_symbol.name, context);
 
@@ -177,18 +176,18 @@ pddl::FunctionSkeleton parse(const domain::ast::AtomicFunctionSkeletonTotalCost&
 pddl::FunctionSkeleton parse(const domain::ast::AtomicFunctionSkeletonGeneral& node, Context& context) {
     if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS)) {
         throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
-    } 
+    }
     context.references.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
 
     context.scopes.open_scope();
     auto function_parameters = boost::apply_visitor(ParameterListVisitor(context), node.arguments);
     context.scopes.close_scope();
-    
+
     assert(context.scopes.get<pddl::TypeImpl>("number").has_value());
     const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
     auto function_name = parse(node.function_symbol.name);
     auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, type);
-    
+
     test_multiple_definition(function_skeleton, node.function_symbol.name, context);
     insert_context_information(function_skeleton, node.function_symbol.name, context);
 
@@ -216,7 +215,7 @@ pddl::FunctionSkeletonList parse(const std::vector<domain::ast::AtomicFunctionSk
 
 pddl::FunctionSkeletonList parse(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& function_skeleton_list_recursively_node, Context& context) {
     auto function_skeleton_list = parse_function_skeleton_definitions(function_skeleton_list_recursively_node.atomic_function_skeletons, context);
-    
+
     if (function_skeleton_list_recursively_node.function_typed_list_of_atomic_function_skeletons.has_value()) {
         auto add_function_skeleton_list = boost::apply_visitor(FunctionSkeletonListVisitor(context), function_skeleton_list_recursively_node.function_typed_list_of_atomic_function_skeletons.value().get());
         function_skeleton_list.insert(function_skeleton_list.end(), add_function_skeleton_list.begin(), add_function_skeleton_list.end());

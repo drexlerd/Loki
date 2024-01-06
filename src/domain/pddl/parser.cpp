@@ -35,6 +35,7 @@
 #include "parser/types.hpp"
 #include "parser/structure.hpp"
 #include "parser/common.hpp"
+#include "parser/reference_utils.hpp"
 
 using namespace loki::domain;
 using namespace std;
@@ -72,11 +73,13 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context) {
     if (domain_node.predicates.has_value()) {
         predicates = parse(domain_node.predicates.value(), context);
     }
+    track_predicate_references(predicates, context);
     /* Functions section */
     auto function_skeletons = pddl::FunctionSkeletonList();
     if (domain_node.functions.has_value()) {
         function_skeletons = parse(domain_node.functions.value(), context);
     }
+    track_function_skeleton_references(function_skeletons, context);
     /* Action Schema section */
     auto derived_predicate_list = pddl::DerivedPredicateList();
     auto action_list = pddl::ActionList();
@@ -85,19 +88,9 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context) {
         boost::apply_visitor(UnpackingVisitor(action_list, derived_predicate_list), variant);
     }
     // Check references
-    for (const auto& predicate : predicates) {
-        if (context.references.exists(predicate)) {
-            const auto& [_predicate, position, error_handler] = context.scopes.get<pddl::PredicateImpl>(predicate->get_name()).value();
-            throw UnusedPredicateError(predicate->get_name(), error_handler(position.value(), ""));
-        }
-    }
-    for (const auto& function_skeleton : function_skeletons) {
-        if (context.references.exists(function_skeleton)) {
-            const auto& [_function_skeleton, position, error_handler] = context.scopes.get<pddl::FunctionSkeletonImpl>(function_skeleton->get_name()).value();
-            throw UnusedFunctionSkeletonError(function_skeleton->get_name(), error_handler(position.value(), ""));
-        }
-    }
-    
+    test_predicate_references(predicates, context);
+    test_function_skeleton_references(function_skeletons, context);
+
     const auto domain = context.factories.domains.get_or_create<pddl::DomainImpl>(domain_name, context.requirements, types, constants, predicates, function_skeletons, action_list);
     context.positions.push_back(domain, domain_node);
     return domain;

@@ -21,6 +21,7 @@
 #include "parser/initial.hpp"
 #include "parser/goal.hpp"
 #include "parser/metric.hpp"
+#include "parser/reference_utils.hpp"
 
 #include "../../domain/pddl/parser/common.hpp"
 #include "../../domain/pddl/parser/requirements.hpp"
@@ -56,9 +57,7 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
     if (problem_node.objects.has_value()) {
         objects = parse(problem_node.objects.value(), context);
     }
-    for (const auto& object : objects) {
-        context.references.track(object);
-    }
+    track_object_references(objects, context);
     /* Initial section */
     auto initial_literals = pddl::LiteralList();
     auto numeric_fluents = pddl::NumericFluentList();
@@ -75,12 +74,7 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
     }
 
     // Check references
-    for (const auto& object : objects) {
-        if (context.references.exists(object)) {
-            const auto& [_object, position, error_handler] = context.scopes.get<pddl::ObjectImpl>(object->get_name()).value();
-            throw UnusedObjectError(object->get_name(), error_handler(position.value(), ""));
-        }
-    }
+    test_object_references(objects, context);
 
     const auto problem = context.factories.problems.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects, initial_literals, numeric_fluents, goal_condition, optimization_metric);
     context.positions.push_back(problem, problem_node);

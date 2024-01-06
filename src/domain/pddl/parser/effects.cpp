@@ -22,6 +22,8 @@
 #include "literal.hpp"
 #include "parameters.hpp"
 #include "functions.hpp"
+#include "reference_utils.hpp"
+
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
 
@@ -112,21 +114,12 @@ pddl::Effect parse(const domain::ast::EffectProduction& node, Context& context) 
 
 pddl::Effect parse(const domain::ast::EffectConditionalForall& node, Context& context) {
     context.scopes.open_scope();
-    const auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
-    for (const auto& parameter : parameters) {
-        context.references.track(parameter->get_variable());
-    }
+    const auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
+    track_variable_references(parameter_list, context);
     const auto child_effect = parse(node.effect, context);
-    // Check referenced_pointers
-    for (const auto& parameter : parameters) {
-        if (context.references.exists(parameter->get_variable())) {
-            const auto& [variable, position, error_handler] = context.scopes.get<pddl::VariableImpl>(parameter->get_variable()->get_name()).value();
-            throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
-        }
-    }
-    
+    test_variable_references(parameter_list, context);
     context.scopes.close_scope();
-    const auto effect = context.factories.effects.get_or_create<pddl::EffectConditionalForallImpl>(parameters, child_effect);
+    const auto effect = context.factories.effects.get_or_create<pddl::EffectConditionalForallImpl>(parameter_list, child_effect);
     context.positions.push_back(effect, node);
     return effect;
 }

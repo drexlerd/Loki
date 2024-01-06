@@ -19,6 +19,7 @@
 
 #include "literal.hpp"
 #include "parameters.hpp"
+#include "reference_utils.hpp"
 
 #include "../../../../include/loki/domain/pddl/exceptions.hpp"
 
@@ -104,21 +105,12 @@ pddl::Condition parse(const domain::ast::GoalDescriptorExists& node, Context& co
     }
     context.references.untrack(pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS);
     context.scopes.open_scope();
-    auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
-    for (const auto& parameter : parameters) {
-        context.references.track(parameter->get_variable());
-    }
+    auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
+    track_variable_references(parameter_list, context);
     auto child_condition = parse(node.goal_descriptor, context);
-    // Check referenced_pointers
-    for (const auto& parameter : parameters) {
-        if (context.references.exists(parameter->get_variable())) {
-            const auto& [variable, position, error_handler] = context.scopes.get<pddl::VariableImpl>(parameter->get_variable()->get_name()).value();
-            throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
-        }
-    }
-
+    test_variable_references(parameter_list, context);
     context.scopes.close_scope();
-    auto condition = context.factories.conditions.get_or_create<pddl::ConditionExistsImpl>(parameters, child_condition);
+    auto condition = context.factories.conditions.get_or_create<pddl::ConditionExistsImpl>(parameter_list, child_condition);
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -126,21 +118,12 @@ pddl::Condition parse(const domain::ast::GoalDescriptorExists& node, Context& co
 template<typename ConditionNode>
 pddl::Condition parse_condition_forall(const domain::ast::TypedListOfVariables& parameters_node, const ConditionNode& condition_node, Context& context) {
     context.scopes.open_scope();
-    auto parameters = boost::apply_visitor(ParameterListVisitor(context), parameters_node);
-    for (const auto& parameter : parameters) {
-        context.references.track(parameter->get_variable());
-    }
+    auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), parameters_node);
+    track_variable_references(parameter_list, context);
     auto child_condition = parse(condition_node, context);
-    // Check referenced_pointers
-    for (const auto& parameter : parameters) {
-        if (context.references.exists(parameter->get_variable())) {
-            const auto& [variable, position, error_handler] = context.scopes.get<pddl::VariableImpl>(parameter->get_variable()->get_name()).value();
-            throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
-        }
-    }
-
+    test_variable_references(parameter_list, context);
     context.scopes.close_scope();
-    auto condition = context.factories.conditions.get_or_create<pddl::ConditionForallImpl>(parameters, child_condition);
+    auto condition = context.factories.conditions.get_or_create<pddl::ConditionForallImpl>(parameter_list, child_condition);
     context.positions.push_back(condition, condition_node);
     return condition;
 }

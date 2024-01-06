@@ -42,7 +42,6 @@ static void test_multiple_definition(const pddl::Predicate& predicate, const dom
 static void insert_context_information(const pddl::Predicate& predicate, const domain::ast::Predicate& node, Context& context) {
     context.positions.push_back(predicate, node);
     context.scopes.insert(predicate->get_name(), predicate, node);
-    context.references.track(predicate);
 }
 
 
