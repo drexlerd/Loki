@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1704569555341,
+  "lastUpdate": 1704578042521,
   "repoUrl": "https://github.com/drexlerd/Loki",
   "entries": {
     "Benchmark": [
@@ -1260,6 +1260,48 @@ window.BENCHMARK_DATA = {
             "value": 2015859.6293102205,
             "unit": "ns/iter",
             "extra": "iterations: 348\ncpu: 2015753.160919541 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "committer": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "distinct": true,
+          "id": "530672c24abcd22c4209e9908dd2a9f3f9a8f92f",
+          "message": "added caching of gtest installation",
+          "timestamp": "2024-01-06T22:48:58+01:00",
+          "tree_id": "9daac14d031053cc5743f52a25db5aa0cb6c0a34",
+          "url": "https://github.com/drexlerd/Loki/commit/530672c24abcd22c4209e9908dd2a9f3f9a8f92f"
+        },
+        "date": 1704578042141,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_ConstructAtoms",
+            "value": 24594348.413794205,
+            "unit": "ns/iter",
+            "extra": "iterations: 29\ncpu: 24592782.758620694 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IterateAtoms",
+            "value": 901624.0038659552,
+            "unit": "ns/iter",
+            "extra": "iterations: 776\ncpu: 901580.025773196 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomlyIterateAtoms",
+            "value": 2028107.7093022694,
+            "unit": "ns/iter",
+            "extra": "iterations: 344\ncpu: 2028005.5232558139 ns\nthreads: 1"
           }
         ]
       }
