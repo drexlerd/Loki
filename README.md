@@ -85,13 +85,15 @@ Parsing a domain and a problem file and printing both.
 ./build/exe/problem benchmarks/gripper/domain.pddl benchmarks/gripper/p-2-0.pddl
 ```
 
+
 ## Running the Tests
 
-The testing framework depends on [GoogleTest](https://github.com/google/googletest).
+The testing framework depends on [GoogleTest](https://github.com/google/googletest) and requires the `-DENABLE_TESTING=ON` flag to be passed to the cmake configure step.
+
 
 ## Performance Benchmarks
 
-The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark). The results can be viewed [here](https://drexlerd.github.io/Loki/dev/bench/).
+The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark) and requires the `-DENABLE_BENCHMARKING=ON` flag to be passed to the cmake configure step. The results can be viewed [here](https://drexlerd.github.io/Loki/dev/bench/).
 
 
 ## Acknowledgements
