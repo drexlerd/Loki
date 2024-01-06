@@ -29,5 +29,5 @@ jobs:
     - name: Build and Test Project
       run: |
         cd tests/integration
-        cmake -S . -B build -DCMAKE_PREFIX_PATH=$LOKI_INSTALL_DIR
+        cmake -S . -B build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/boost_1_84_0;LOKI_INSTALL_DIR"
         cmake --build build
