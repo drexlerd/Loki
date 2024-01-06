@@ -21,7 +21,7 @@ jobs:
       run: cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/boost_1_84_0" -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/loki-install" -S . -B build
 
     - name: Build Loki
-      run: export CXXFLAGS="-Werror" && cmake --build build
+      run: export CXXFLAGS="-Werror" && cmake --build build -j$(nproc)
 
     - name: Install Loki
       run: cmake --install build
