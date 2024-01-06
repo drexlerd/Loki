@@ -42,7 +42,7 @@ cmake -S . -B build
 # Build
 cmake --build build -j16
 # Install (optional)
-cmake --install build --prefix=<path/to/directory>
+cmake --install build --prefix=<path/to/installation-directory>
 ```
 
 The recommended way to integrate Loki in your CMake projects is by adding the installation directory to `CMAKE_PREFIX_PATH` and a combination of `find_package` and `target_link_libraries`:
