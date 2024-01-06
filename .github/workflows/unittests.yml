@@ -9,7 +9,16 @@ jobs:
     - name: Checkout Loki
       uses: actions/checkout@v2
 
+    - name: Cache Google Test
+      id: cache-googletest
+      uses: actions/cache@v2
+      with:
+        path: |
+          googletest-install
+        key: ${{ runner.os }}-googletest-${{ hashFiles('**/googletest/CMakeLists.txt') }}  # Unique key based on OS and CMake file
+
     - name: Checkout Google Test
+      if: steps.cache-googletest.outputs.cache-hit != 'true'
       uses: actions/checkout@v2
       with:
         repository: google/googletest
@@ -17,6 +26,7 @@ jobs:
         ref: 'dddb219c3eb96d7f9200f09b0a381f016e6b4562'  # stick to a commit to avoid added future dependencies
 
     - name: Build and Install Google Test
+      if: steps.cache-googletest.outputs.cache-hit != 'true'
       run: |
         cd googletest
         cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/googletest-install"
