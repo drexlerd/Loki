@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1704549342181,
+  "lastUpdate": 1704552576502,
   "repoUrl": "https://github.com/drexlerd/Loki",
   "entries": {
     "Benchmark": [
@@ -840,6 +840,48 @@ window.BENCHMARK_DATA = {
             "value": 2049686.3779762008,
             "unit": "ns/iter",
             "extra": "iterations: 336\ncpu: 2049640.4761904764 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "committer": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "distinct": true,
+          "id": "fa595213d8f506b5b2cc00002df065f08bee1bb1",
+          "message": "added explanation on how to integrate loki in cmake projects",
+          "timestamp": "2024-01-06T15:44:21+01:00",
+          "tree_id": "d1459aa8c6400f290a4f6fa1167f70fb867ac65a",
+          "url": "https://github.com/drexlerd/Loki/commit/fa595213d8f506b5b2cc00002df065f08bee1bb1"
+        },
+        "date": 1704552576115,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_ConstructAtoms",
+            "value": 24167955.689655438,
+            "unit": "ns/iter",
+            "extra": "iterations: 29\ncpu: 24167510.34482759 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_IterateAtoms",
+            "value": 921338.9035989334,
+            "unit": "ns/iter",
+            "extra": "iterations: 778\ncpu: 921332.9048843189 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomlyIterateAtoms",
+            "value": 2032131.5100864798,
+            "unit": "ns/iter",
+            "extra": "iterations: 347\ncpu: 2032122.7665706063 ns\nthreads: 1"
           }
         ]
       }
