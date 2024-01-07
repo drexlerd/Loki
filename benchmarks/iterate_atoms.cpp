@@ -104,14 +104,15 @@ static void BM_RandomlyIterateAtoms(benchmark::State& state) {
 // Tetralith has Intel Xeon Gold 6130 with L1=512KB, L2=8192KB, L3=22528KB
 // sizeof(loki::pddl::AtomImpl)=56 => 9142 fit into L1, 146285 fit into L2, 402285 fit into L3
 
-BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(1000);
-BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(10000);
-BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(100000);
-BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(1000000);
+// we just choose some reasonable numbers that can be observed in planning tasks
+BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(100);  // small tasks
+BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(1000);  // medium tasks
+BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(10000);  // large tasks
+BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(100000);  // huge tasks
 
+BENCHMARK(loki::benchmarks::BM_RandomlyIterateAtoms)->Arg(100);
 BENCHMARK(loki::benchmarks::BM_RandomlyIterateAtoms)->Arg(1000);
 BENCHMARK(loki::benchmarks::BM_RandomlyIterateAtoms)->Arg(10000);
 BENCHMARK(loki::benchmarks::BM_RandomlyIterateAtoms)->Arg(100000);
-BENCHMARK(loki::benchmarks::BM_RandomlyIterateAtoms)->Arg(1000000);
 
 BENCHMARK_MAIN();

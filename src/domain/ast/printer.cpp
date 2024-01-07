@@ -194,7 +194,7 @@ namespace loki
     }
 
 
-    std::string parse_text(const domain::ast::AtomicFunctionSkeletonTotalCost& node, const FormattingOptions& options)
+    std::string parse_text(const domain::ast::AtomicFunctionSkeletonTotalCost& node, const FormattingOptions& /*options*/)
     {
         std::stringstream ss;
         ss << "(" << parse_text(node.function_symbol) << ")";

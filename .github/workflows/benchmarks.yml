@@ -67,7 +67,7 @@ jobs:
           # Access token to deploy GitHub Pages branch
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # Push and deploy GitHub pages branch automatically
-          auto-push: true
+          auto-push: false
 
       # Run benchmark and store the output to a file
       - name: Run benchmark iterate_atoms
@@ -80,9 +80,6 @@ jobs:
           tool: 'googlecpp'
           # Where the output from the benchmark tool is stored
           output-file-path: benchmark_result.json
-          # Report Processed data
-          benchmark-data-extractor-regexp: 'BM_.+/(\d+\.\d+)Gi/s'
-          unit: 'Gi/s'
           # Access token to deploy GitHub Pages branch
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # Push and deploy GitHub pages branch automatically
