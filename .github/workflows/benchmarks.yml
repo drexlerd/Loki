@@ -54,8 +54,8 @@ jobs:
         run: export CXXFLAGS="-Werror" && cmake --build build -j$(nproc)
 
       # Run benchmark and store the output to a file
-      - name: Run benchmark
-        run: build/benchmarks/persistent_factory --benchmark_format=json | tee benchmark_result.json
+      - name: Run benchmark construct_atoms
+        run: build/benchmarks/construct_atoms --benchmark_format=json | tee benchmark_result.json
       # Run `github-action-benchmark` action
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
@@ -64,6 +64,25 @@ jobs:
           tool: 'googlecpp'
           # Where the output from the benchmark tool is stored
           output-file-path: benchmark_result.json
+          # Access token to deploy GitHub Pages branch
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # Push and deploy GitHub pages branch automatically
+          auto-push: true
+
+      # Run benchmark and store the output to a file
+      - name: Run benchmark iterate_atoms
+        run: build/benchmarks/iterate_atoms --benchmark_format=json | tee benchmark_result.json
+      # Run `github-action-benchmark` action
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          # What benchmark tool the output.txt came from
+          tool: 'googlecpp'
+          # Where the output from the benchmark tool is stored
+          output-file-path: benchmark_result.json
+          # Report Processed data
+          benchmark-data-extractor-regexp: 'BM_.+/(\d+\.\d+)Gi/s'
+          unit: 'Gi/s'
           # Access token to deploy GitHub Pages branch
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # Push and deploy GitHub pages branch automatically
