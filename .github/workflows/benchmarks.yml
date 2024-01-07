@@ -67,7 +67,7 @@ jobs:
           # Access token to deploy GitHub Pages branch
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # Push and deploy GitHub pages branch automatically
-          auto-push: false
+          auto-push: true
 
       # Run benchmark and store the output to a file
       - name: Run benchmark iterate_atoms
