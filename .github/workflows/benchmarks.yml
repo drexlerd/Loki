@@ -61,7 +61,7 @@ jobs:
 
       # Combine outputs to a single file
       - name: Combine JSON files
-        run: python3 benchmarks/combine_results benchmark_result_construct_atoms.json benchmark_result_iterate_atoms.json > benchmark_result.json
+        run: python3 benchmarks/combine_results.py benchmark_result_construct_atoms.json benchmark_result_iterate_atoms.json > benchmark_result.json
 
       # Run `github-action-benchmark` action
       - name: Store benchmark result
