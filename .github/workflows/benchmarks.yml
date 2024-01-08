@@ -17,6 +17,9 @@ jobs:
     name: Performance regression check
     runs-on: ubuntu-latest
     steps:
+      - name: Install jq
+        run: sudo apt-get install jq
+
       - name: Checkout Loki
         uses: actions/checkout@v2
 
@@ -53,25 +56,16 @@ jobs:
       - name: Build Loki
         run: export CXXFLAGS="-Werror" && cmake --build build -j$(nproc)
 
-      # Run benchmark and store the output to a file
+      # Run benchmarks and store the output to a file
       - name: Run benchmark construct_atoms
-        run: build/benchmarks/construct_atoms --benchmark_format=json | tee benchmark_result.json
-      # Run `github-action-benchmark` action
-      - name: Store benchmark result
-        uses: benchmark-action/github-action-benchmark@v1
-        with:
-          # What benchmark tool the output.txt came from
-          tool: 'googlecpp'
-          # Where the output from the benchmark tool is stored
-          output-file-path: benchmark_result.json
-          # Access token to deploy GitHub Pages branch
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          # Push and deploy GitHub pages branch automatically
-          auto-push: true
-
-      # Run benchmark and store the output to a file
+        run: build/benchmarks/construct_atoms --benchmark_format=json | tee benchmark_result_construct_atoms.json
       - name: Run benchmark iterate_atoms
-        run: build/benchmarks/iterate_atoms --benchmark_format=json | tee benchmark_result.json
+        run: build/benchmarks/iterate_atoms --benchmark_format=json | tee benchmark_result_iterate_atoms.json
+
+      # Combine outputs to a single file
+      - name: Combine JSON files
+        run: jq -s '.[0] + .[1]' benchmark_result_construct_atoms.json benchmark_result_iterate_atoms.json > benchmark_result.json
+
       # Run `github-action-benchmark` action
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
