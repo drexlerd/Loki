@@ -33,22 +33,26 @@ Loki depends on a fraction of Boost's (boost.org) header-only libraries.
 - Spirit x3
 - Container
 
-
-## Installation
-
-We provide a cmake project that takes care of downloading, building, and installing [Boost](https://boost.org), [GoogleBenchmark](https://github.com/google/benchmark), and [GoogleTest](https://github.com/google/googletest).
+We provide a cmake project that takes care of downloading, building, and installing all dependencies.
 
 ```console
 # Configure dependencies
 cmake -S dependencies -B dependencies/build
 # Build and install dependencies
 cmake --build dependencies/build -j16
+```
 
-# Configure Loki with installation prefixes of all dependencies
+We also install the additional dependencies [GoogleBenchmark](https://github.com/google/benchmark), and [GoogleTest](https://github.com/google/googletest) which are used in the continuous integration framework.
+
+
+## Installation
+
+```console
+# Configure with installation prefixes of all dependencies
 cmake -S . -B build -DCMAKE_PREFIX_PATH="dependencies/build/boost/boost-prefix/src/boost"
-# Build Loki
+# Build 
 cmake --build build -j16
-# Install Loki (optional)
+# Install (optional)
 cmake --install build --prefix=<path/to/installation-directory>
 ```
 
