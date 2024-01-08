@@ -112,12 +112,26 @@ Parsing a domain and a problem file and printing both.
 
 ## Running the Tests
 
-The testing framework depends on [GoogleTest](https://github.com/google/googletest) and requires the additional install prefix `dependencies/build/benchmark/benchmark-prefix/src/benchmark` to be added to `CMAKE_PREFIX_PATH` and the `-DENABLE_TESTING=ON` flag to be passed to the cmake configure step.
+The testing framework depends on [GoogleTest](https://github.com/google/googletest). Use the following altered cmake configure step.
+
+```console 
+cmake -S . -B build \
+    -DENABLE_TESTING=ON \
+    -DCMAKE_PREFIX_PATH="dependencies/build/boost/boost-prefix/src/boost;\
+        dependencies/build/googletest/googletest-prefix/src/googletest"
+```
 
 
 ## Performance Benchmarks
 
-The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark) and requires the additional install prefix `dependencies/build/googletest/googletest-prefix/src/googletest` to be added to `CMAKE_PREFIX_PATH` and the `-DENABLE_BENCHMARKING=ON` flag to be passed to the cmake configure step. The results can be viewed [here](https://drexlerd.github.io/Loki/dev/bench/).
+The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark). Use the following altered cmake configure step.
+
+```console 
+cmake -S . -B build \
+    -DENABLE_TESTING=ON \
+    -DCMAKE_PREFIX_PATH="dependencies/build/boost/boost-prefix/src/boost;\
+        dependencies/build/benchmark/benchmark-prefix/src/benchmark"
+```
 
 
 ## Acknowledgements
