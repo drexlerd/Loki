@@ -36,12 +36,19 @@ Loki depends on a fraction of Boost's (boost.org) header-only libraries.
 
 ## Installation
 
+We provide a cmake project that takes care of downloading, building, and installing [Boost](https://boost.org), [GoogleBenchmark](https://github.com/google/benchmark), and [GoogleTest](https://github.com/google/googletest).
+
 ```console
-# Configure
-cmake -S . -B build
-# Build
+# Configure dependencies
+cmake -S dependencies -B dependencies/build
+# Build and install dependencies
+cmake --build dependencies/build -j16
+
+# Configure Loki with installation prefixes of all dependencies
+cmake -S . -B build -DCMAKE_PREFIX_PATH="dependencies/build/benchmark/benchmark-prefix/src/benchmark;dependencies/build/benchmark;dependencies/build/boost/boost-prefix/src/boost;dependencies/build/googletest/googletest-prefix/src/googletest"
+# Build Loki
 cmake --build build -j16
-# Install (optional)
+# Install Loki (optional)
 cmake --install build --prefix=<path/to/installation-directory>
 ```
 
