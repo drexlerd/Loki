@@ -61,25 +61,17 @@ configure_ccache()
 
 # Boost
 # Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/dependencies/build/boost/boost-prefix/src/boost")
 configure_boost()
 find_package(Boost ${BOOST_MIN_VERSION} REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
-#include_directories("${PROJECT_SOURCE_DIR}/external/flatbuffers/include")
-
 
 ##############################################################
 # Add library and executable targets
 ##############################################################
-
-# Add FlatBuffers directly to our build. This defines the `flatbuffers` target.
-#set(FLATBUFFERS_MAX_PARSING_DEPTH 16)
-#set(FLATBUFFERS_SRC_DIR "${PROJECT_SOURCE_DIR}/external/flatbuffers/")
-#add_subdirectory(${FLATBUFFERS_SRC_DIR}
-#                 ${CMAKE_CURRENT_BINARY_DIR}/flatbuffers-build
-#                 EXCLUDE_FROM_ALL)
 
 add_subdirectory(src)
 
@@ -88,11 +80,11 @@ add_subdirectory(exe)
 add_subdirectory(examples)
 
 if (ENABLE_TESTING)
-    add_subdirectory(tests)
+  add_subdirectory(tests)
 endif()
 
 if (ENABLE_BENCHMARKING)
-    add_subdirectory(benchmarks)
+  add_subdirectory(benchmarks)
 endif()
 
 

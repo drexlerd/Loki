@@ -33,7 +33,9 @@ Loki depends on a fraction of Boost's (boost.org) header-only libraries.
 - Spirit x3
 - Container
 
-We provide a cmake project that takes care of downloading, building, and installing all dependencies.
+Loki also uses additional dependencies [GoogleBenchmark](https://github.com/google/benchmark), and [GoogleTest](https://github.com/google/googletest) which are used in the continuous integration framework.
+
+We provide a CMake project that takes care of downloading, building, and installing all dependencies.
 
 ```console
 # Configure dependencies
@@ -42,15 +44,13 @@ cmake -S dependencies -B dependencies/build
 cmake --build dependencies/build -j16
 ```
 
-We also install the additional dependencies [GoogleBenchmark](https://github.com/google/benchmark), and [GoogleTest](https://github.com/google/googletest) which are used in the continuous integration framework.
-
 
 ## Installation
 
 ```console
 # Configure with installation prefixes of all dependencies
-cmake -S . -B build -DCMAKE_PREFIX_PATH="dependencies/build/boost/boost-prefix/src/boost"
-# Build 
+cmake -S . -B build
+# Build
 cmake --build build -j16
 # Install (optional)
 cmake --install build --prefix=<path/to/installation-directory>
@@ -59,8 +59,8 @@ cmake --install build --prefix=<path/to/installation-directory>
 The recommended way to integrate Loki in your CMake projects is by adding the installation directory to `CMAKE_PREFIX_PATH` and a combination of `find_package` and `target_link_libraries`:
 
 ```cmake
+list(APPEND CMAKE_PREFIX_PATH "<path/to/installation-directory>")
 find_package(loki 0.1 COMPONENTS parsers REQUIRED)
-
 target_link_libraries(your_target loki::parsers)
 ```
 
@@ -116,28 +116,11 @@ Parsing a domain and a problem file and printing both.
 
 ## Running the Tests
 
-The testing framework depends on [GoogleTest](https://github.com/google/googletest). Use the following altered cmake configure step
-
-```console 
-cmake -S . -B build \
-    -DENABLE_TESTING=ON \
-    -DCMAKE_PREFIX_PATH="dependencies/build/boost/boost-prefix/src/boost;\
-        dependencies/build/googletest/googletest-prefix/src/googletest"
-```
-
+The testing framework depends on [GoogleTest](https://github.com/google/googletest) and requires the additional compile flag `-DENABLE_TESTING=ON` to be set in the cmake configure step.
 
 ## Performance Benchmarks
 
-The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark). Use the following altered cmake configure step.
-
-```console 
-cmake -S . -B build \
-    -DENABLE_TESTING=ON \
-    -DCMAKE_PREFIX_PATH="dependencies/build/boost/boost-prefix/src/boost;\
-        dependencies/build/benchmark/benchmark-prefix/src/benchmark"
-```
-
-The results from the GitHub action can be viewed [here](https://drexlerd.github.io/Loki/dev/bench/).
+The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark) and requires the additional compile flag `-DENABLE_BENCHMARKING=ON` to be set in the cmake configure step. The results from the GitHub action can be viewed [here](https://drexlerd.github.io/Loki/dev/bench/).
 
 
 ## Acknowledgements
