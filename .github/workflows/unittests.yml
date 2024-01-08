@@ -9,38 +9,26 @@ jobs:
     - name: Checkout Loki
       uses: actions/checkout@v2
 
-    - name: Checkout Google Test
-      uses: actions/checkout@v2
-      with:
-        repository: google/googletest
-        path: 'googletest'
-        ref: 'dddb219c3eb96d7f9200f09b0a381f016e6b4562'  # stick to a commit to avoid added future dependencies
-
-    - name: Cache Google Test
-      id: cache-googletest
+    - name: Cache Dependencies
+      id: cache-dependencies
       uses: actions/cache@v2
       with:
-        path: googletest-install
-        key: ${{ runner.os }}-googletest-${{ hashFiles('**/googletest/CMakeLists.txt') }}  # Unique key based on OS and CMake file
+        path: |
+            dependencies/benchmark-install
+            dependencies/boost
+            dependencies/googletest-install
+        key: ${{ runner.os }}-benchmark-${{ hashFiles('**/dependencies/benchmark/CMakeLists.txt', '**/dependencies/boost/CMakeLists.txt', '**/dependencies/googletest/CMakeLists.txt') }}  # Unique key based on OS and CMake files
 
-    - name: Build and Install Google Test
-      if: steps.cache-googletest.outputs.cache-hit != 'true'
+    - name: Configure, Build, and Install Dependencies
+      if: steps.cache-dependencies.outputs.cache-hit != 'true'
       run: |
-        cd googletest
-        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/googletest-install"
+        cmake -S dependencies -B dependencies/build
+        cmake --build dependencies/build -j$(nproc)
+
+    - name: Configure, and Build Loki
+      run: |
+        cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=ON -S . -B build
         cmake --build build -j$(nproc)
-        cmake --install build
-
-    - name: Download and extract boost, no building required
-      run: |
-        wget --no-check-certificate 'https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz'
-        tar xf boost_1_84_0.tar.gz
-
-    - name: Configure CMake
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING:BOOL=TRUE -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/googletest-install;$GITHUB_WORKSPACE/boost_1_84_0" -S . -B build
-
-    - name: Build Loki
-      run: export CXXFLAGS="-Werror" && cmake --build build -j$(nproc)
 
     - name: Test
       working-directory: build/tests/unit
