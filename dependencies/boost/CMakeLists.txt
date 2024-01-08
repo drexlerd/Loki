@@ -15,5 +15,5 @@ ExternalProject_Add(
     UPDATE_DISCONNECTED true
 )
 
-ExternalProject_Get_Property(Boost source_dir)
+ExternalProject_Get_Property(boost source_dir)
 set(BOOST_INCLUDE_DIRS ${source_dir})
