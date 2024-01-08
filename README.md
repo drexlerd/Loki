@@ -112,7 +112,7 @@ Parsing a domain and a problem file and printing both.
 
 ## Running the Tests
 
-The testing framework depends on [GoogleTest](https://github.com/google/googletest). Use the following altered cmake configure step.
+The testing framework depends on [GoogleTest](https://github.com/google/googletest). Use the following altered cmake configure step
 
 ```console 
 cmake -S . -B build \
@@ -132,6 +132,8 @@ cmake -S . -B build \
     -DCMAKE_PREFIX_PATH="dependencies/build/boost/boost-prefix/src/boost;\
         dependencies/build/benchmark/benchmark-prefix/src/benchmark"
 ```
+
+The results from the GitHub action can be viewed [here](https://drexlerd.github.io/Loki/dev/bench/).
 
 
 ## Acknowledgements
