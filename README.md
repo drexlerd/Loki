@@ -45,7 +45,7 @@ cmake -S dependencies -B dependencies/build
 cmake --build dependencies/build -j16
 
 # Configure Loki with installation prefixes of all dependencies
-cmake -S . -B build -DCMAKE_PREFIX_PATH="dependencies/build/benchmark/benchmark-prefix/src/benchmark;dependencies/build/benchmark;dependencies/build/boost/boost-prefix/src/boost;dependencies/build/googletest/googletest-prefix/src/googletest"
+cmake -S . -B build -DCMAKE_PREFIX_PATH="dependencies/build/boost/boost-prefix/src/boost"
 # Build Loki
 cmake --build build -j16
 # Install Loki (optional)
@@ -112,12 +112,12 @@ Parsing a domain and a problem file and printing both.
 
 ## Running the Tests
 
-The testing framework depends on [GoogleTest](https://github.com/google/googletest) and requires the `-DENABLE_TESTING=ON` flag to be passed to the cmake configure step.
+The testing framework depends on [GoogleTest](https://github.com/google/googletest) and requires the additional install prefix `dependencies/build/benchmark/benchmark-prefix/src/benchmark` to be added to `CMAKE_PREFIX_PATH` and the `-DENABLE_TESTING=ON` flag to be passed to the cmake configure step.
 
 
 ## Performance Benchmarks
 
-The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark) and requires the `-DENABLE_BENCHMARKING=ON` flag to be passed to the cmake configure step. The results can be viewed [here](https://drexlerd.github.io/Loki/dev/bench/).
+The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark) and requires the additional install prefix `dependencies/build/googletest/googletest-prefix/src/googletest` to be added to `CMAKE_PREFIX_PATH` and the `-DENABLE_BENCHMARKING=ON` flag to be passed to the cmake configure step. The results can be viewed [here](https://drexlerd.github.io/Loki/dev/bench/).
 
 
 ## Acknowledgements
