@@ -20,38 +20,26 @@ jobs:
       - name: Checkout Loki
         uses: actions/checkout@v2
 
-      - name: Checkout Google Benchmark
-        uses: actions/checkout@v2
-        with:
-          repository: google/benchmark
-          path: 'benchmark'
-          ref: '4575fc415f17c45911f7df7aacbf83a378c5565a'  # they plan to add a dependency to abseil soon that we want to avoid
-
-      - name: Cache Google Benchmark
-        id: cache-benchmark
+      - name: Cache Dependencies
+        id: cache-dependencies
         uses: actions/cache@v2
         with:
-          path: benchmark-install
-          key: ${{ runner.os }}-benchmark-${{ hashFiles('**/benchmark/CMakeLists.txt') }}  # Unique key based on OS and CMake file
+          path: |
+              dependencies/benchmark-install
+              dependencies/boost
+              dependencies/googletest-install
+          key: ${{ runner.os }}-benchmark-${{ hashFiles('**/dependencies/benchmark/CMakeLists.txt', '**/dependencies/googletest/CMakeLists.txt') }}  # Unique key based on OS and CMake file
 
-      - name: Build and Install Google Benchmark
-        if: steps.cache-benchmark.outputs.cache-hit != 'true'
+      - name: Configure, Build, and Install Dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
-          cd benchmark
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/benchmark-install"
-          cmake --build build -j$(nproc)
-          cmake --install build
+          cmake -S dependencies -B dependencies/build
+          cmake --build dependencies/build -j$(nproc)
 
-      - name: Download and extract boost, no building required
+      - name: Configure, and Build Loki
         run: |
-          wget --no-check-certificate 'https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz'
-          tar xf boost_1_84_0.tar.gz
-
-      - name: Configure CMake
-        run: cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/benchmark-install;$GITHUB_WORKSPACE/boost_1_84_0" -S . -B build
-
-      - name: Build Loki
-        run: export CXXFLAGS="-Werror" && cmake --build build -j$(nproc)
+          cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING:BOOL=TRUE -S . -B build
+          export CXXFLAGS="-Werror" && cmake --build build -j$(nproc)
 
       # Run benchmarks and store the output to a file
       - name: Run benchmark construct_atoms
