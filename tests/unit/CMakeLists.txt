@@ -10,7 +10,6 @@ file(GLOB SRC_FILES
 set(TEST_NAME ${CMAKE_PROJECT_NAME}_tests)
 
 add_executable(${TEST_NAME} ${SRC_FILES})
-add_dependencies(${TEST_NAME} my_library)
 
 target_link_libraries(${TEST_NAME}
     PRIVATE
