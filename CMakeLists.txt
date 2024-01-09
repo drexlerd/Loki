@@ -62,7 +62,7 @@ configure_ccache()
 # Boost
 # Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
 configure_boost()
-# set(CMAKE_FIND_DEBUG_MODE ON)
+set(CMAKE_FIND_DEBUG_MODE ON)
 find_package(Boost ${BOOST_MIN_VERSION} REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
