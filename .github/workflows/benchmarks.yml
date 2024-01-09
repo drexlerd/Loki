@@ -31,7 +31,7 @@ jobs:
           key: ${{ runner.os }}-benchmark-${{ hashFiles('**/dependencies/benchmark/CMakeLists.txt', '**/dependencies/boost/CMakeLists.txt', '**/dependencies/googletest/CMakeLists.txt') }}  # Unique key based on OS and CMake files
 
       - name: Configure, Build, and Install Dependencies
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        # if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
           cmake -S dependencies -B dependencies/build
           cmake --build dependencies/build -j$(nproc)
