@@ -34,7 +34,7 @@ jobs:
         # if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
           pwd
-          cmake -S dependencies -B dependencies/build -DCMAKE_INSTALL_PREFIX=dependencies/installs
+          cmake -S dependencies -B dependencies/build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/dependencies/installs
           cmake --build dependencies/build -j$(nproc)
 
       - name: Configure, and Build Loki
