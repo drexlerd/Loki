@@ -33,12 +33,12 @@ jobs:
       - name: Configure, Build, and Install Dependencies
         # if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
-          cmake -S dependencies -B dependencies/build
+          cmake -S dependencies -B dependencies/build -DCMAKE_INSTALL_PREFIX=dependencies/installs
           cmake --build dependencies/build -j$(nproc)
 
       - name: Configure, and Build Loki
         run: |
-          cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING=ON -S . -B build
+          cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKING=ON -S . -B build -DCMAKE_PREFIX_PATH=dependencies/installs
           cmake --build build -j$(nproc)
 
       # Run benchmarks and store the output to a file

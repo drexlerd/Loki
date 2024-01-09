@@ -1,7 +1,6 @@
 
 enable_testing()
 
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/dependencies/build/googletest-install")
 find_package(GTest "1.11.0" REQUIRED)
 
 file(GLOB SRC_FILES
@@ -11,6 +10,7 @@ file(GLOB SRC_FILES
 set(TEST_NAME ${CMAKE_PROJECT_NAME}_tests)
 
 add_executable(${TEST_NAME} ${SRC_FILES})
+add_dependencies(${TEST_NAME} my_library)
 
 target_link_libraries(${TEST_NAME}
     PRIVATE

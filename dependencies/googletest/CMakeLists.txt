@@ -4,7 +4,7 @@ project(InstallGoogletest)
 include(ExternalProject)
 
 list(APPEND CMAKE_ARGS
-    "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/googletest-install"
+    "-DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}"
     )
 
 message(STATUS "Preparing external project \"googletest\" with args:")

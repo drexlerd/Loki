@@ -39,7 +39,7 @@ We provide a CMake project that takes care of downloading, building, and install
 
 ```console
 # Configure dependencies
-cmake -S dependencies -B dependencies/build
+cmake -S dependencies -B dependencies/build -DCMAKE_INSTALL_PREFIX=dependencies/installs
 # Build and install dependencies
 cmake --build dependencies/build -j16
 ```
@@ -51,7 +51,7 @@ cmake --build dependencies/build -j16
 # Configure with installation prefixes of all dependencies
 cmake -S . -B build
 # Build
-cmake --build build -j16
+cmake --build build -j16 -DCMAKE_PREFIX_PATH=dependencies/installs
 # Install (optional)
 cmake --install build --prefix=<path/to/installation-directory>
 ```

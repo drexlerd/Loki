@@ -1,4 +1,3 @@
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/dependencies/build/benchmark-install")
 find_package(benchmark "1.8.3" REQUIRED)
 
 add_executable(construct_atoms "construct_atoms.cpp" "utils.cpp")

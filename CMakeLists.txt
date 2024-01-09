@@ -61,7 +61,6 @@ configure_ccache()
 
 # Boost
 # Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/dependencies/build/boost/boost-prefix/src/boost")
 configure_boost()
 # set(CMAKE_FIND_DEBUG_MODE ON)
 find_package(Boost ${BOOST_MIN_VERSION} REQUIRED)
