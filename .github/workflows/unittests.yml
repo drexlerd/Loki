@@ -22,9 +22,9 @@ jobs:
     - name: Configure, Build, and Install Dependencies
       # if: steps.cache-dependencies.outputs.cache-hit != 'true'
       run: |
-        echo $GITHUB_WORKSPACE
-        cmake -S dependencies -B dependencies/build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/dependencies/installs
-        cmake --build dependencies/build -j$(nproc)
+        cd dependencies
+        cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/dependencies/installs
+        cmake --build build -j$(nproc)
 
     - name: Configure, and Build Loki
       run: |
