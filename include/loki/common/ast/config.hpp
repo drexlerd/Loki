@@ -22,6 +22,8 @@
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
 
+#include <string>
+
 
 /// @brief Defines types of our parsers.
 ///        The configuration is relevant when reusing the parsers instantiated by the library.
