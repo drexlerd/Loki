@@ -49,9 +49,9 @@ cmake --build dependencies/build -j16
 
 ```console
 # Configure with installation prefixes of all dependencies
-cmake -S . -B build
+cmake -S . -B build -DCMAKE_PREFIX_PATH=${PWD}/dependencies/installs
 # Build
-cmake --build build -j16 -DCMAKE_PREFIX_PATH=dependencies/installs
+cmake --build build -j16
 # Install (optional)
 cmake --install build --prefix=<path/to/installation-directory>
 ```
