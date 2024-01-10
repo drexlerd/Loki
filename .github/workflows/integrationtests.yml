@@ -32,5 +32,5 @@ jobs:
     - name: Build and Test Project
       run: |
         cd tests/integration
-        cmake -S . -B build -j$(nproc) -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/dependencies/installs"
-        cmake --build build
+        cmake -S . -B build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/dependencies/installs"
+        cmake --build build -j$(nproc)
