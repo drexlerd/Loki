@@ -12,22 +12,25 @@ jobs:
     - name: Checkout Loki
       uses: actions/checkout@v2
 
-    - name: Download and extract boost, no building required
+    - name: Cache Dependencies
+      id: cache-dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+            dependencies/benchmark-install
+            dependencies/boost
+            dependencies/googletest-install
+        key: ${{ runner.os }}-benchmark-${{ hashFiles('**/dependencies/benchmark/CMakeLists.txt', '**/dependencies/boost/CMakeLists.txt', '**/dependencies/googletest/CMakeLists.txt') }}  # Unique key based on OS and CMake files
+
+    - name: Configure, Build, and Install Dependencies
+      # if: steps.cache-dependencies.outputs.cache-hit != 'true'
       run: |
-        wget --no-check-certificate 'https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz'
-        tar xf boost_1_84_0.tar.gz
-
-    - name: Configure CMake
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/boost_1_84_0" -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/loki-install" -S . -B build
-
-    - name: Build Loki
-      run: export CXXFLAGS="-Werror" && cmake --build build -j$(nproc)
-
-    - name: Install Loki
-      run: cmake --install build
+        cd dependencies
+        cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/dependencies/installs
+        cmake --build build -j$(nproc)
 
     - name: Build and Test Project
       run: |
         cd tests/integration
-        cmake -S . -B build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/boost_1_84_0;$GITHUB_WORKSPACE/loki-install"
+        cmake -S . -B build -j$(nproc) -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/dependencies/installs"
         cmake --build build
