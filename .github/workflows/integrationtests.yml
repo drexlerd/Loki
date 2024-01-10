@@ -26,11 +26,11 @@ jobs:
       # if: steps.cache-dependencies.outputs.cache-hit != 'true'
       run: |
         cd dependencies
-        cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/dependencies/installs
+        cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/tests/integration/dependencies/installs
         cmake --build build -j$(nproc)
 
     - name: Build and Test Project
       run: |
         cd tests/integration
-        cmake -S . -B build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/dependencies/installs"
+        cmake -S . -B build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/tests/integration/dependencies/installs"
         cmake --build build -j$(nproc)
