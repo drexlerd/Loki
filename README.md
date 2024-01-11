@@ -27,7 +27,7 @@ Loki is a C++17 library for efficient syntactic and semantic parsing of PDDL fil
 
 ## Dependencies
 
-Loki depends on a fraction of Boost's (boost.org) header-only libraries (Fusion, Spirit x3, Container), its performance benchmarking framework depends on [GoogleBenchmark](https://github.com/google/benchmark), and its testing framework depends on [GoogleTest](https://github.com/google/googletest).
+Loki depends on a fraction of [Boost's](boost.org) header-only libraries (Fusion, Spirit x3, Container), its performance benchmarking framework depends on [GoogleBenchmark](https://github.com/google/benchmark), and its testing framework depends on [GoogleTest](https://github.com/google/googletest).
 
 We provide a CMake Superbuild project that takes care of downloading, building, and installing all dependencies.
 
