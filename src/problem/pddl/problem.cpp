@@ -15,18 +15,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/problem/pddl/problem.hpp"
+#include <loki/problem/pddl/problem.hpp>
 
-#include "../../../include/loki/problem/pddl/metric.hpp"
-#include "../../../include/loki/problem/pddl/numeric_fluent.hpp"
-#include "../../../include/loki/common/hash.hpp"
-#include "../../../include/loki/common/collections.hpp"
-#include "../../../include/loki/domain/pddl/conditions.hpp"
-#include "../../../include/loki/domain/pddl/literal.hpp"
-#include "../../../include/loki/domain/pddl/domain.hpp"
-#include "../../../include/loki/domain/pddl/requirements.hpp"
-#include "../../../include/loki/domain/pddl/object.hpp"
-#include "../../../include/loki/common/pddl/visitors.hpp"
+#include <loki/problem/pddl/metric.hpp>
+#include <loki/problem/pddl/numeric_fluent.hpp>
+#include <loki/common/hash.hpp>
+#include <loki/common/collections.hpp>
+#include <loki/domain/pddl/conditions.hpp>
+#include <loki/domain/pddl/literal.hpp>
+#include <loki/domain/pddl/domain.hpp>
+#include <loki/domain/pddl/requirements.hpp>
+#include <loki/domain/pddl/object.hpp>
+#include <loki/common/pddl/visitors.hpp>
 
 using namespace std;
 

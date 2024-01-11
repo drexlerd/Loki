@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../../include/loki/common/pddl/segmented_vector.hpp"
+#include <loki/common/pddl/segmented_vector.hpp>
 
 #include <gtest/gtest.h>
 

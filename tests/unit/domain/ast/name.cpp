@@ -16,9 +16,10 @@
  */
 
 #include "../../../../src/domain/ast/parser.hpp"
-#include "../../../../include/loki/common/ast/parser_wrapper.hpp"
-#include "../../../../include/loki/domain/ast/ast.hpp"
-#include "../../../../include/loki/domain/ast/printer.hpp"
+
+#include <loki/common/ast/parser_wrapper.hpp>
+#include <loki/domain/ast/ast.hpp>
+#include <loki/domain/ast/printer.hpp>
 
 #include <gtest/gtest.h>
 

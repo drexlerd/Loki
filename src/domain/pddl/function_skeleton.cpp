@@ -15,10 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/domain/pddl/function_skeleton.hpp"
+#include <loki/domain/pddl/function_skeleton.hpp>
 
-#include "../../../include/loki/domain/pddl/parameter.hpp"
-#include "../../../include/loki/common/hash.hpp"
+#include <loki/domain/pddl/parameter.hpp>
+#include <loki/common/hash.hpp>
 
 
 namespace loki::pddl {

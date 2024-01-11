@@ -15,16 +15,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/domain/pddl/effects.hpp"
+#include <loki/domain/pddl/effects.hpp>
 
-#include "../../../include/loki/domain/pddl/conditions.hpp"
-#include "../../../include/loki/domain/pddl/literal.hpp"
-#include "../../../include/loki/domain/pddl/parameter.hpp"
-#include "../../../include/loki/domain/pddl/function.hpp"
-#include "../../../include/loki/domain/pddl/function_expressions.hpp"
-#include "../../../include/loki/common/hash.hpp"
-#include "../../../include/loki/common/collections.hpp"
-#include "../../../include/loki/common/pddl/visitors.hpp"
+#include <loki/domain/pddl/conditions.hpp>
+#include <loki/domain/pddl/literal.hpp>
+#include <loki/domain/pddl/parameter.hpp>
+#include <loki/domain/pddl/function.hpp>
+#include <loki/domain/pddl/function_expressions.hpp>
+#include <loki/common/hash.hpp>
+#include <loki/common/collections.hpp>
+#include <loki/common/pddl/visitors.hpp>
 
 #include <cassert>
 

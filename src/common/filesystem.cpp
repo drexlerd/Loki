@@ -15,9 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../include/loki/common/filesystem.hpp"
-
-#include "../../include/loki/common/exceptions.hpp"
+#include <loki/common/filesystem.hpp>
+#include <loki/common/exceptions.hpp>
 
 #include <string>
 #include <fstream>

@@ -17,8 +17,8 @@
 
 #include "utils.hpp"
 
-#include "../include/loki/common/pddl/types.hpp"
-#include "../include/loki/common/memory.hpp"
+#include <loki/common/pddl/types.hpp>
+#include <loki/common/memory.hpp>
 
 #include <benchmark/benchmark.h>
 

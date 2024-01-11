@@ -21,8 +21,9 @@
 
 #include "../../../domain/pddl/parser/common.hpp"
 #include "../../../domain/pddl/parser/functions.hpp"
-#include "../../../../include/loki/problem/pddl/exceptions.hpp"
-#include "../../../../include/loki/domain/pddl/exceptions.hpp"
+
+#include <loki/problem/pddl/exceptions.hpp>
+#include <loki/domain/pddl/exceptions.hpp>
 
 
 using namespace loki::problem;

@@ -17,7 +17,7 @@
 
 #include "parser_def.hpp"
 
-#include "../../../include/loki/common/ast/config.hpp"
+#include <loki/common/ast/config.hpp>
 
 
 namespace loki::problem::parser

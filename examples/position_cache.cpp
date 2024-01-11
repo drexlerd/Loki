@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../include/loki/domain/parser.hpp"
-#include "../include/loki/problem/parser.hpp"
+#include <loki/domain/parser.hpp>
+#include <loki/problem/parser.hpp>
 
 #include <cassert>
 #include <iostream>

@@ -21,10 +21,10 @@
 #include "ast_adapted.hpp"
 #include "parser.hpp"
 
-#include "../../../include/loki/common/ast/parser_wrapper.hpp"
-#include "../../../include/loki/domain/ast/ast.hpp"
-#include "../../../include/loki/domain/ast/error_handler.hpp"
-#include "../../../include/loki/domain/ast/parser.hpp"
+#include <loki/common/ast/parser_wrapper.hpp>
+#include <loki/domain/ast/ast.hpp>
+#include <loki/domain/ast/error_handler.hpp>
+#include <loki/domain/ast/parser.hpp>
 
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>

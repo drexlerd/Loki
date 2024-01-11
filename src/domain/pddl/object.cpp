@@ -15,9 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/domain/pddl/object.hpp"
-#include "../../../include/loki/common/hash.hpp"
-#include "../../../include/loki/common/collections.hpp"
+#include <loki/domain/pddl/object.hpp>
+
+#include <loki/common/hash.hpp>
+#include <loki/common/collections.hpp>
 
 
 namespace loki::pddl {

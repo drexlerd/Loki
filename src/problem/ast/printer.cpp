@@ -15,9 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/problem/ast/printer.hpp"
+#include <loki/problem/ast/printer.hpp>
 
-#include "../../../include/loki/domain/ast/printer.hpp"
+#include <loki/domain/ast/printer.hpp>
 
 #include <sstream>
 

@@ -15,18 +15,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../include/loki/problem/parser.hpp"
+#include <loki/problem/parser.hpp>
 
-#include "../../include/loki/common/memory.hpp"
-#include "../../include/loki/common/ast/error_reporting.hpp"
-#include "../../include/loki/common/pddl/error_reporting.hpp"
-#include "../../include/loki/common/pddl/context.hpp"
-#include "../../include/loki/common/filesystem.hpp"
-#include "../../include/loki/common/ast/parser_wrapper.hpp"
-#include "../../include/loki/common/exceptions.hpp"
-#include "../../include/loki/problem/ast/parser.hpp"
-#include "../../include/loki/problem/ast/ast.hpp"
-#include "../../include/loki/problem/pddl/parser.hpp"
+#include <loki/common/memory.hpp>
+#include <loki/common/ast/error_reporting.hpp>
+#include <loki/common/pddl/error_reporting.hpp>
+#include <loki/common/pddl/context.hpp>
+#include <loki/common/filesystem.hpp>
+#include <loki/common/ast/parser_wrapper.hpp>
+#include <loki/common/exceptions.hpp>
+#include <loki/problem/ast/parser.hpp>
+#include <loki/problem/ast/ast.hpp>
+#include <loki/problem/pddl/parser.hpp>
 
 #include <cassert>
 #include <chrono>

@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../../include/loki/common/pddl/persistent_factory.hpp"
-#include "../../../../include/loki/domain/pddl/object.hpp"
+#include <loki/common/pddl/persistent_factory.hpp>
+#include <loki/domain/pddl/object.hpp>
 
 #include <gtest/gtest.h>
 

@@ -18,14 +18,14 @@
 #include "parser.hpp"
 #include "unpacking_visitor.hpp"
 
-#include "../../../include/loki/domain/pddl/exceptions.hpp"
-#include "../../../include/loki/domain/pddl/parser.hpp"
-#include "../../../include/loki/domain/pddl/object.hpp"
-#include "../../../include/loki/domain/pddl/parameter.hpp"
-#include "../../../include/loki/domain/pddl/predicate.hpp"
-#include "../../../include/loki/domain/pddl/type.hpp"
-#include "../../../include/loki/domain/pddl/domain.hpp"
-#include "../../../include/loki/domain/pddl/object.hpp"
+#include <loki/domain/pddl/exceptions.hpp>
+#include <loki/domain/pddl/parser.hpp>
+#include <loki/domain/pddl/object.hpp>
+#include <loki/domain/pddl/parameter.hpp>
+#include <loki/domain/pddl/predicate.hpp>
+#include <loki/domain/pddl/type.hpp>
+#include <loki/domain/pddl/domain.hpp>
+#include <loki/domain/pddl/object.hpp>
 
 #include "parser/constants.hpp"
 #include "parser/functions.hpp"

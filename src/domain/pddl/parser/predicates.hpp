@@ -18,9 +18,9 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_PREDICATES_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_PREDICATES_HPP_
 
-#include "../../../../include/loki/domain/ast/ast.hpp"
-#include "../../../../include/loki/domain/pddl/parser.hpp"
-#include "../../../../include/loki/domain/pddl/predicate.hpp"
+#include <loki/domain/ast/ast.hpp>
+#include <loki/domain/pddl/parser.hpp>
+#include <loki/domain/pddl/predicate.hpp>
 
 
 namespace loki {

@@ -18,7 +18,7 @@
 #include "literal.hpp"
 #include "common.hpp"
 
-#include "../../../../include/loki/domain/pddl/exceptions.hpp"
+#include <loki/domain/pddl/exceptions.hpp>
 
 
 namespace loki {
