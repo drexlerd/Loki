@@ -13,7 +13,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Establish project
 ##############################################################
 
-project(integration_example VERSION "0.1" LANGUAGES C CXX)
+project(integration_example VERSION "0.0.1" LANGUAGES C CXX)
 
 
 ##############################################################

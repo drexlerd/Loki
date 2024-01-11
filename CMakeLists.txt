@@ -13,7 +13,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Establish project
 ##############################################################
 
-project(loki VERSION "0.1" LANGUAGES C CXX)
+project(loki VERSION "0.0.1" LANGUAGES C CXX)
 
 # Compilation flags, some configuration-specific
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -pedantic -fPIC")
@@ -118,7 +118,7 @@ include(CMakePackageConfigHelpers)
 # Generate the version file for the config file
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/lokiConfigVersion.cmake"
-  VERSION "${loki_VERSION_MAJOR}.${loki_VERSION_MINOR}"
+  VERSION "${loki_VERSION}.${loki_VERSION_MAJOR}.${loki_VERSION_MINOR}"
   COMPATIBILITY ExactVersion
 )
 
