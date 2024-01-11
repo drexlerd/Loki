@@ -39,7 +39,7 @@ cmake --build dependencies/build -j16
 ```
 
 
-## Installation
+## Build instructions
 
 ```console
 # Configure with installation prefixes of all dependencies
@@ -50,12 +50,12 @@ cmake --build build -j16
 cmake --install build --prefix=<path/to/installation-directory>
 ```
 
-We also provide a CMake Superbuild project [here](https://github.com/drexlerd/Loki/tree/main/tests/integration/dependencies) that takes care of downloading, building, and installing Loki together and its dependencies. You can simply copy it to your project and run it similarly to the Superbuild project from above.
 
+## Integration instructions
 
-## Best Practices for Integration into Planning Systems
+We provide a CMake Superbuild project [here](https://github.com/drexlerd/Loki/tree/main/tests/integration/dependencies) that takes care of downloading, building, and installing Loki together and its dependencies. You can simply copy it to your project or integrate it in your own Superbuild and run it similarly to the Superbuild project from above.
 
-Soon :)
+TODO
 
 
 ## Running the Examples
