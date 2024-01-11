@@ -35,7 +35,7 @@ Loki depends on a fraction of Boost's (boost.org) header-only libraries.
 
 Loki also uses additional dependencies [GoogleBenchmark](https://github.com/google/benchmark), and [GoogleTest](https://github.com/google/googletest) which are used in the continuous integration framework.
 
-We provide a CMake project that takes care of downloading, building, and installing all dependencies.
+We provide a CMake Superbuild project that takes care of downloading, building, and installing all dependencies.
 
 ```console
 # Configure dependencies
@@ -63,6 +63,8 @@ list(APPEND CMAKE_PREFIX_PATH "<path/to/installation-directory>")
 find_package(loki 0.1 COMPONENTS parsers REQUIRED)
 target_link_libraries(your_target loki::parsers)
 ```
+
+We also provide a CMake Superbuild project [here](https://github.com/drexlerd/Loki/tree/main/tests/integration/dependencies) that takes care of downloading, buildings, and installing loki together with its dependencies. You can simply copy it to your project and run it similar as the Superbuild project from above.
 
 
 ## Best Practices for Integration into Planning Systems

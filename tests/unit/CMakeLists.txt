@@ -1,4 +1,3 @@
-
 enable_testing()
 
 find_package(GTest "1.11.0" REQUIRED)
