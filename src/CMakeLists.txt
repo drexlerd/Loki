@@ -5,14 +5,21 @@ file(GLOB_RECURSE SRC_FILES
     "domain/**/*.cpp"
     "problem/*.cpp"
     "problem/**/*.cpp")
-file(GLOB_RECURSE HEADER_FILES
+file(GLOB_RECURSE PRIVATE_HEADER_FILES
+    "common/*.hpp"
+    "common/**/*.hpp"
+    "domain/*.hpp"
+    "domain/**/*.hpp"
+    "problem/*.hpp"
+    "problem/**/*.hpp")
+file(GLOB_RECURSE PUBLIC_HEADER_FILES
     "../include/loki/common/*.hpp"
     "../include/loki/common/**/*.hpp"
     "../include/loki/domain/*.hpp"
     "../include/loki/domain/**/*.hpp"
     "../include/loki/problem/*.hpp"
     "../include/loki/problem/**/*.hpp")
-add_library(parsers STATIC ${SRC_FILES} ${HEADER_FILES})
+add_library(parsers STATIC ${SRC_FILES} ${PRIVATE_HEADER_FILES} ${PUBLIC_HEADER_FILES})
 set_target_properties(parsers PROPERTIES OUTPUT_NAME loki_parsers)
 
 # target_link_libraries(parsers PRIVATE flatbuffers)
