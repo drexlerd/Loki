@@ -113,7 +113,6 @@ Parsing a domain and a problem file and printing both.
 ./build/exe/problem benchmarks/gripper/domain.pddl benchmarks/gripper/p-2-0.pddl
 ```
 
-
 ## Running the Tests
 
 The testing framework depends on [GoogleTest](https://github.com/google/googletest) and requires the additional compile flag `-DENABLE_TESTING=ON` to be set in the cmake configure step.
@@ -122,6 +121,15 @@ The testing framework depends on [GoogleTest](https://github.com/google/googlete
 
 The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark) and requires the additional compile flag `-DENABLE_BENCHMARKING=ON` to be set in the cmake configure step. The results from the GitHub action can be viewed [here](https://drexlerd.github.io/Loki/dev/bench/).
 
+## IDE Support
+
+We developed Loki in Visual Studio Code. We recommend the C/C++ and CMake Tools extensions by Microsoft. To get maximum IDE support, you should set the following cmake configure args in the CMake Tools extension settings under workspace:
+
+- `-DCMAKE_PREFIX_PATH=<absolute/path/to/dependencies/install-dir`
+- `-DENABLE_TESTING=ON`
+- `-DENABLE_BENCHMARKING=ON`
+
+After running `CMake: Configure` in Visual Studio Code (ctrl + shift + p), you should see all include paths being correctly resolved.
 
 ## Acknowledgements
 
