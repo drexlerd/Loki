@@ -118,7 +118,7 @@ include(CMakePackageConfigHelpers)
 # Generate the version file for the config file
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/lokiConfigVersion.cmake"
-  VERSION "${loki_VERSION}.${loki_VERSION_MAJOR}.${loki_VERSION_MINOR}"
+  VERSION "${loki_VERSION}"
   COMPATIBILITY ExactVersion
 )
 
