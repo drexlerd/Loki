@@ -1,5 +1,7 @@
 @PACKAGE_INIT@
 
+include(CMakeFindDependencyMacro)
+
 ##############################################################
 # CMake modules and macro files
 ##############################################################
