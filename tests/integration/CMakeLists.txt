@@ -19,12 +19,15 @@ project(integration_example VERSION "0.0.1" LANGUAGES C CXX)
 # We installed the dependencies into the subdirectory loki-dependencies
 # and hence must append it to the cmake_prefix_path.
 message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
-list(LENGTH CMAKE_PREFIX_PATH PREFIX_PATH_COUNT)
 if(PREFIX_PATH_COUNT GREATER 1)
     message(FATAL_ERROR "Only one prefix path is allowed. Found multiple paths in CMAKE_PREFIX_PATH. Please add dependencies to the CMake Superbuild.")
 endif()
+set(ORIGINAL_CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH})
+list(LENGTH ORIGINAL_CMAKE_PREFIX_PATH PREFIX_PATH_COUNT)
 list(APPEND CMAKE_PREFIX_PATH
-    "${CMAKE_PREFIX_PATH}/loki-dependencies")
+    "${ORIGINAL_CMAKE_PREFIX_PATH}/loki-dependencies")
+message(STATUS "MODIFIED_CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+# set(CMAKE_FIND_DEBUG_MODE ON)
 
 
 ##############################################################
