@@ -1,6 +1,7 @@
 macro(configure_dependencies)
   # We installed the dependencies into the subdirectories under the install prefix.
   # Hence must append them to the single cmake_prefix_path.
+  message("Configure dependencies of Loki:")
   message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
   list(LENGTH CMAKE_PREFIX_PATH PREFIX_PATH_COUNT)
   if(PREFIX_PATH_COUNT GREATER 1)
