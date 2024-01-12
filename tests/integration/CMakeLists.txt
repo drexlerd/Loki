@@ -24,15 +24,17 @@ project(integration_example VERSION "0.0.1" LANGUAGES C CXX)
 list(APPEND CMAKE_MODULE_PATH
   "${PROJECT_SOURCE_DIR}/cmake"
 )
-# include("configure_dependencies")
+include("configure_dependencies")
 
 
 ##############################################################
 # Dependency Handling
 ##############################################################
 
-# Add lokis dependencies
-# configure_dependencies()
+# set(CMAKE_FIND_DEBUG_MODE ON)
+
+set(DEPENDENCY_NAMES_LIST loki)
+configure_dependencies("${DEPENDENCY_NAMES_LIST}")
 
 
 ##############################################################

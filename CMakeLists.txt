@@ -68,6 +68,8 @@ configure_ccache()
 # Dependency Handling
 ##############################################################
 
+# set(CMAKE_FIND_DEBUG_MODE ON)
+
 set(DEPENDENCY_NAMES_LIST benchmark boost googletest)
 configure_dependencies("${DEPENDENCY_NAMES_LIST}")
 
