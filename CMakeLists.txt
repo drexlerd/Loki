@@ -42,6 +42,8 @@ else()
     message("Benchmarking disabled.")
 endif()
 
+# set(CMAKE_FIND_DEBUG_MODE ON)
+message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 
 ##############################################################
 # CMake modules and macro files
@@ -62,10 +64,6 @@ configure_ccache()
 # Boost
 # Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
 configure_boost()
-# set(CMAKE_FIND_DEBUG_MODE ON)
-# set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}")
-message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
-message("${CMAKE_PREFIX_PATH}/include")
 find_package(Boost ${BOOST_MIN_VERSION} REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})

@@ -39,7 +39,7 @@ cmake --build dependencies/build -j16
 ```
 
 
-## Build instructions
+## Build Instructions
 
 ```console
 # Configure with installation prefixes of all dependencies
@@ -51,7 +51,7 @@ cmake --install build --prefix=<path/to/installation-directory>
 ```
 
 
-## Integration instructions
+## Integration Instructions
 
 We provide a CMake Superbuild project [here](https://github.com/drexlerd/Loki/tree/main/tests/integration/dependencies) that takes care of downloading, building, and installing Loki together and its dependencies. You can simply copy it to your project or integrate it in your own Superbuild and run it similarly to the Superbuild project from above.
 

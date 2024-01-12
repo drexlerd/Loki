@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
+
 ##############################################################
 # Language setup
 ##############################################################
@@ -15,13 +16,17 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(integration_example VERSION "0.0.1" LANGUAGES C CXX)
 
+# We installed the dependencies into the subdirectory loki-dependencies
+# and hence must append it to the cmake_prefix_path.
+list(APPEND CMAKE_PREFIX_PATH
+    "${CMAKE_PREFIX_PATH}/loki-dependencies")
+
 
 ##############################################################
 # CMake modules and macro files
 ##############################################################
 
 find_package(loki 0.0.1 COMPONENTS parsers REQUIRED)
-
 
 
 ##############################################################

@@ -4,20 +4,20 @@ project(InstallBenchmark)
 include(ExternalProject)
 
 list(APPEND CMAKE_ARGS
-    "-DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}"
+    "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
     "-DCMAKE_BUILD_TYPE=Release"
     "-DBENCHMARK_ENABLE_GTEST_TESTS=OFF"
     )
 
 message(${CMAKE_BINARY_DIR}/benchmark-install)
 
-message(STATUS "Preparing external project \"benchmark\" with args:")
+message(STATUS "Preparing external project \"loki_benchmark\" with args:")
 foreach(CMAKE_ARG ${CMAKE_ARGS})
     message(STATUS "-- ${CMAKE_ARG}")
 endforeach()
 
 ExternalProject_Add(
-    benchmark
+    loki_benchmark
     GIT_REPOSITORY https://github.com/google/benchmark.git
     GIT_TAG v1.8.3
     PREFIX ${CMAKE_BINARY_DIR}/benchmark
