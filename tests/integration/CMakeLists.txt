@@ -18,27 +18,21 @@ project(integration_example VERSION "0.0.1" LANGUAGES C CXX)
 
 
 ##############################################################
-# Dependency handling
+# CMake modules and macro files
 ##############################################################
 
-# We installed the dependencies into the subdirectories under the install prefix.
-# Hence must append them to the single cmake_prefix_path.
-message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
-list(LENGTH CMAKE_PREFIX_PATH PREFIX_PATH_COUNT)
-if(PREFIX_PATH_COUNT GREATER 1)
-    message(FATAL_ERROR "Only one prefix path is allowed. Found multiple paths in CMAKE_PREFIX_PATH. Please add dependencies to the CMake Superbuild.")
-endif()
+list(APPEND CMAKE_MODULE_PATH
+  "${PROJECT_SOURCE_DIR}/cmake"
+)
+include("configure_dependencies")
 
-list(APPEND MODIFIED_CMAKE_PREFIX_PATH
-    "${CMAKE_PREFIX_PATH}/loki")
-message(${MODIFIED_CMAKE_PREFIX_PATH})
-set(CMAKE_PREFIX_PATH ${MODIFIED_CMAKE_PREFIX_PATH})
-message(STATUS "MODIFIED_CMAKE_PREFIX_PATH:")
-foreach(CMAKE_PREFIX_PATH_ARG ${CMAKE_PREFIX_PATH})
-    message(STATUS "-- ${CMAKE_PREFIX_PATH_ARG}")
-endforeach()
-# set(CMAKE_FIND_DEBUG_MODE ON)
 
+##############################################################
+# Dependency Handling
+##############################################################
+
+# Add lokis dependencies
+configure_dependencies()
 
 
 ##############################################################
