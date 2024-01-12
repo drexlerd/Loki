@@ -42,8 +42,8 @@ else()
     message("Benchmarking disabled.")
 endif()
 
-# set(CMAKE_FIND_DEBUG_MODE ON)
 message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+# set(CMAKE_FIND_DEBUG_MODE ON)
 
 ##############################################################
 # CMake modules and macro files
