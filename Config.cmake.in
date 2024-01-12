@@ -27,11 +27,12 @@ list(LENGTH CMAKE_PREFIX_PATH PREFIX_PATH_COUNT)
 if(PREFIX_PATH_COUNT GREATER 1)
     message(FATAL_ERROR "Only one prefix path is allowed. Found multiple paths in CMAKE_PREFIX_PATH. Please add dependencies to the CMake Superbuild.")
 endif()
+list(GET CMAKE_PREFIX_PATH 0 SINGLE_CMAKE_PREFIX_PATH)
 
 list(APPEND MODIFIED_CMAKE_PREFIX_PATH
-    "${CMAKE_PREFIX_PATH}/benchmark"
-    "${CMAKE_PREFIX_PATH}/boost"
-    "${CMAKE_PREFIX_PATH}/googletest")
+    "${SINGLE_CMAKE_PREFIX_PATH}/benchmark"
+    "${SINGLE_CMAKE_PREFIX_PATH}/boost"
+    "${SINGLE_CMAKE_PREFIX_PATH}/googletest")
 message(${MODIFIED_CMAKE_PREFIX_PATH})
 set(CMAKE_PREFIX_PATH ${MODIFIED_CMAKE_PREFIX_PATH})
 message(STATUS "MODIFIED_CMAKE_PREFIX_PATH:")
