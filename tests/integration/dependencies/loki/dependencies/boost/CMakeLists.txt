@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.13)
-project(InstallBoost)
+cmake_minimum_required(VERSION 3.21)
+project(InstallLokiBoost)
 
 include(ExternalProject)
 
