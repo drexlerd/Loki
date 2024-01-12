@@ -15,5 +15,3 @@ ExternalProject_Add(
             COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/tools/cmake ${CMAKE_INSTALL_PREFIX}/lib/cmake
     UPDATE_DISCONNECTED 1
 )
-
-set(BOOST_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX})
