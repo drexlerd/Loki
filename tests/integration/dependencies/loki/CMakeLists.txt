@@ -3,12 +3,14 @@ project(InstallLoki)
 
 include(ExternalProject)
 
+set(LOKI_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/loki")
+
 
 #####################
 # Loki-dependencies #
 #####################
 list(APPEND LOKI_DEPENDENCIES_CMAKE_ARGS
-    "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}/loki"
+    "-DCMAKE_INSTALL_PREFIX=${LOKI_INSTALL_PREFIX}"
     "-DCMAKE_BUILD_TYPE=Release"
     )
 
@@ -33,8 +35,8 @@ ExternalProject_Add(
 ########
 
 list(APPEND LOKI_CMAKE_ARGS
-    "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}/loki"
-    "-DCMAKE_PREFIX_PATH=${CMAKE_INSTALL_PREFIX}/loki"
+    "-DCMAKE_INSTALL_PREFIX=${LOKI_INSTALL_PREFIX}"
+    "-DCMAKE_PREFIX_PATH=${LOKI_INSTALL_PREFIX}"
     "-DCMAKE_BUILD_TYPE=Release"
     )
 

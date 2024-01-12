@@ -4,7 +4,7 @@ project(InstallGoogletest)
 include(ExternalProject)
 
 list(APPEND CMAKE_ARGS
-    "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
+    "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}/googletest"
     )
 
 message(STATUS "Preparing external project \"loki_googletest\" with args:")
