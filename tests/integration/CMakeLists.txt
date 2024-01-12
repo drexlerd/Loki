@@ -24,7 +24,7 @@ project(integration_example VERSION "0.0.1" LANGUAGES C CXX)
 list(APPEND CMAKE_MODULE_PATH
   "${PROJECT_SOURCE_DIR}/cmake"
 )
-include("configure_dependencies")
+# include("configure_dependencies")
 
 
 ##############################################################
@@ -32,7 +32,7 @@ include("configure_dependencies")
 ##############################################################
 
 # Add lokis dependencies
-configure_dependencies()
+# configure_dependencies()
 
 
 ##############################################################
