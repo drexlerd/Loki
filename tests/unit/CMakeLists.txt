@@ -1,6 +1,7 @@
 enable_testing()
 
-find_package(GTest "1.11.0" REQUIRED PATHS ${CMAKE_PREFIX_PATH}/googletest NO_DEFAULT_PATH)
+find_package(GTest "1.11.0" REQUIRED COMPONENTS GTest Main PATHS "${CMAKE_PREFIX_PATH}/googletest" NO_DEFAULT_PATH)
+find_package(GTest)
 
 file(GLOB_RECURSE SRC_FILES
     "common/*.cpp" "common/**/*.cpp"
