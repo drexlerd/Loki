@@ -51,10 +51,10 @@ endif()
 ##############################################################
 
 list(APPEND CMAKE_MODULE_PATH
-  "${PROJECT_SOURCE_DIR}/cmake"
+  ${PROJECT_SOURCE_DIR}/cmake
 )
-include("configure_boost")
-include("configure_ccache")
+include(configure_boost)
+include(configure_ccache)
 
 
 ##############################################################
@@ -76,7 +76,7 @@ configure_boost()
 find_package(Boost ${BOOST_MIN_VERSION} REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
-  message(STATUS "Found Boost: ${Boost_INCLUDE_DIRS} (found version \"${Boost_VERSION}\")")
+  message(STATUS "Found Boost: ${Boost_DIR} (found version ${Boost_VERSION})")
 endif()
 
 
@@ -104,13 +104,13 @@ endif()
 ###########
 
 # Install header files
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/loki"
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/loki
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # Install cmake scripts
 install(
-    DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/loki/cmake"
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake/
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/loki/cmake
 )
 
 
@@ -124,24 +124,24 @@ include(CMakePackageConfigHelpers)
 
 # Generate the version file for the config file
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/lokiConfigVersion.cmake"
-  VERSION "${loki_VERSION}"
+  ${CMAKE_CURRENT_BINARY_DIR}/lokiConfigVersion.cmake
+  VERSION ${loki_VERSION}
   COMPATIBILITY ExactVersion
 )
 
 # Create config file
 # https://cmake.org/cmake/help/book/mastering-cmake/cmake/Help/guide/importing-exporting/index.html
 # https://cmake.org/cmake/help/latest/module/CMakePackageConfigHelpers.html#generating-a-package-configuration-file
-configure_package_config_file("${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/lokiConfig.cmake"
-  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/loki"
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/lokiConfig.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/loki
   NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )
 
 # Install config files
 install(
   FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/lokiConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/lokiConfigVersion.cmake"
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/loki"
+    ${CMAKE_CURRENT_BINARY_DIR}/lokiConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/lokiConfigVersion.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/loki
 )
