@@ -21,7 +21,7 @@ project(integration_example VERSION "0.0.1" LANGUAGES C CXX)
 # CMake modules and macro files
 ##############################################################
 
-find_package(loki 0.0.1 COMPONENTS parsers REQUIRED PATHS "${CMAKE_INSTALL_PREFIX}/loki" NO_SYSTEM_ENVIRONMENT_PATH)
+find_package(loki 0.0.1 COMPONENTS parsers REQUIRED PATHS "${CMAKE_INSTALL_PREFIX}/loki" NO_DEFAULT_PATH)
 
 
 ##############################################################
