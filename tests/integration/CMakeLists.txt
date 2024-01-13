@@ -28,5 +28,5 @@ find_package(loki COMPONENTS parsers REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFA
 # Add library and executable targets
 ##############################################################
 
-add_executable(integration_standalone main.cpp)
+add_executable(integration_standalone "main.cpp")
 target_link_libraries(integration_standalone loki::parsers)
