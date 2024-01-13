@@ -25,17 +25,17 @@ target_include_directories(parsers
 install(
     TARGETS parsers
     EXPORT lokiparsersTargets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 
 # Generate and install export file
 install(EXPORT lokiparsersTargets
     NAMESPACE loki::
     COMPONENT parsers
-    FILE lokiparsersTargets.cmake
+    FILE "lokiparsersTargets.cmake"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/loki"
 )
 
