@@ -4,7 +4,7 @@ project(InstallBenchmark)
 include(ExternalProject)
 
 list(APPEND CMAKE_ARGS
-    "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}/benchmark"
+    "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
     "-DCMAKE_BUILD_TYPE=Release"
     "-DBENCHMARK_ENABLE_GTEST_TESTS=OFF"
     )
