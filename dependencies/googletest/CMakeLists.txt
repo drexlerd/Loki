@@ -7,13 +7,13 @@ list(APPEND CMAKE_ARGS
     "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
 )
 
-message(STATUS "Preparing external project \"loki_googletest\" with args:")
+message(STATUS "Preparing external project \"googletest\" with args:")
 foreach(CMAKE_ARG ${CMAKE_ARGS})
     message(STATUS "-- ${CMAKE_ARG}")
 endforeach()
 
 ExternalProject_Add(
-    loki_googletest
+    googletest
     GIT_REPOSITORY https://github.com/google/googletest.git
     GIT_TAG release-1.12.1
     PREFIX ${CMAKE_BINARY_DIR}/googletest
