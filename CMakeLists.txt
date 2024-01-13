@@ -55,7 +55,7 @@ list(APPEND CMAKE_MODULE_PATH
 )
 include("configure_boost")
 include("configure_ccache")
-include("configure_dependencies")
+
 
 ##############################################################
 # CCache

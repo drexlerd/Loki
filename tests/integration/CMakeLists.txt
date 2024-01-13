@@ -21,27 +21,7 @@ project(integration_example VERSION "0.0.1" LANGUAGES C CXX)
 # CMake modules and macro files
 ##############################################################
 
-list(APPEND CMAKE_MODULE_PATH
-  "${PROJECT_SOURCE_DIR}/cmake"
-)
-include("configure_dependencies")
-
-
-##############################################################
-# Dependency Handling
-##############################################################
-
-# set(CMAKE_FIND_DEBUG_MODE ON)
-
-set(DEPENDENCY_NAMES_LIST loki)
-configure_dependencies("${DEPENDENCY_NAMES_LIST}")
-
-
-##############################################################
-# CMake modules and macro files
-##############################################################
-
-find_package(loki 0.0.1 COMPONENTS parsers REQUIRED)
+find_package(loki 0.0.1 COMPONENTS parsers REQUIRED PATHS "${CMAKE_INSTALL_PREFIX}/loki" NO_SYSTEM_ENVIRONMENT_PATH)
 
 
 ##############################################################
