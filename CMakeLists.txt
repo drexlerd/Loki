@@ -70,15 +70,13 @@ configure_ccache()
 
 # set(CMAKE_FIND_DEBUG_MODE ON)
 
-set(DEPENDENCY_NAMES_LIST benchmark boost googletest)
-configure_dependencies("${DEPENDENCY_NAMES_LIST}")
-
 # Boost
 # Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
 configure_boost()
-find_package(Boost ${BOOST_MIN_VERSION} REQUIRED)
+find_package(Boost ${BOOST_MIN_VERSION} REQUIRED PATHS ${CMAKE_PREFIX_PATH}/boost NO_SYSTEM_ENVIRONMENT_PATH)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
+  message(STATUS "Found Boost: ${Boost_INCLUDE_DIRS} (found version \"${Boost_VERSION}\")")
 endif()
 
 

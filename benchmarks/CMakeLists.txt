@@ -1,4 +1,4 @@
-find_package(benchmark "1.8.3" REQUIRED)
+find_package(benchmark "1.8.3" REQUIRED PATHS ${CMAKE_PREFIX_PATH}/benchmark NO_SYSTEM_ENVIRONMENT_PATH)
 
 add_executable(construct_atoms "construct_atoms.cpp" "utils.cpp" "utils.hpp")
 target_link_libraries(construct_atoms loki::parsers)
