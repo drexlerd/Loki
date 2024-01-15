@@ -36,17 +36,21 @@ private:
     Predicate m_predicate;
     TermList m_terms;
 
+    AtomImpl(int identifier, Predicate predicate, TermList terms);
+
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
-
-public:
-    AtomImpl(int identifier, Predicate predicate, TermList terms);
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const AtomImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<AtomImpl>;
+
+public:
     const Predicate& get_predicate() const;
     const TermList& get_terms() const;
 };

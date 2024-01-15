@@ -44,17 +44,21 @@ private:
     OptimizationMetricEnum m_optimization_metric;
     FunctionExpression m_function_expression;
 
+    OptimizationMetricImpl(int identifier, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
+
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
-
-public:
-    OptimizationMetricImpl(int identifier, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const OptimizationMetricImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<OptimizationMetricImpl>;
+
+public:
     OptimizationMetricEnum get_optimization_metric() const;
     const FunctionExpression& get_function_expression() const;
 };

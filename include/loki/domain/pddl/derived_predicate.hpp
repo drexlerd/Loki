@@ -42,15 +42,19 @@ private:
 
     DerivedPredicateImpl(int identifier, ParameterList parameters, Condition condition);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     /// @brief Test for structural equivalence
     bool is_structurally_equivalent_to_impl(const DerivedPredicateImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<DerivedPredicateImpl>;
+
+public:
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
 };

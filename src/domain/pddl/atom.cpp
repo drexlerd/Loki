@@ -70,6 +70,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::AtomImpl>::operator()(const loki::pddl::AtomImpl& atom) const {
-        return atom.hash_impl();
+        return atom.hash();
     }
 }

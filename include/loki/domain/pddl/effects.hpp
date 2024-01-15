@@ -51,8 +51,12 @@ private:
 
     EffectLiteralImpl(int identifier, Literal literal);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
+
+    // Give access to the private interface implementations.
+    friend class Base<EffectLiteralImpl>;
 
 public:
     bool is_structurally_equivalent_to_impl(const EffectLiteralImpl& other) const;
@@ -70,8 +74,12 @@ private:
 
     EffectAndImpl(int identifier, EffectList effects);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
+
+    // Give access to the private interface implementations.
+    friend class Base<EffectAndImpl>;
 
 public:
     bool is_structurally_equivalent_to_impl(const EffectAndImpl& other) const;
@@ -91,8 +99,12 @@ private:
 
     EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
+
+    // Give access to the private interface implementations.
+    friend class Base<EffectNumericImpl>;
 
 public:
     bool is_structurally_equivalent_to_impl(const EffectNumericImpl& other) const;
@@ -113,8 +125,12 @@ private:
 
     EffectConditionalForallImpl(int identifier, ParameterList parameters, Effect effect);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
+
+    // Give access to the private interface implementations.
+    friend class Base<EffectConditionalForallImpl>;
 
 public:
     bool is_structurally_equivalent_to_impl(const EffectConditionalForallImpl& other) const;
@@ -134,14 +150,18 @@ private:
 
     EffectConditionalWhenImpl(int identifier, Condition condition, Effect effect);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const EffectConditionalWhenImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<EffectConditionalWhenImpl>;
+
+public:
     const Condition& get_condition() const;
     const Effect& get_effect() const;
 };

@@ -43,17 +43,21 @@ private:
     Condition m_goal_condition;
     std::optional<OptimizationMetric> m_optimization_metric;
 
+    ProblemImpl(int identifier, Domain domain, std::string name, Requirements requirements, ObjectList objects, LiteralList initial_literals, NumericFluentList numeric_fluents, Condition goal_condition, std::optional<OptimizationMetric> optimization_metric);
+
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
-
-public:
-    ProblemImpl(int identifier, Domain domain, std::string name, Requirements requirements, ObjectList objects, LiteralList initial_literals, NumericFluentList numeric_fluents, Condition goal_condition, std::optional<OptimizationMetric> optimization_metric);
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const ProblemImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<ProblemImpl>;
+
+public:
     const Domain& get_domain() const;
     const std::string& get_name() const;
     const Requirements& get_requirements() const;

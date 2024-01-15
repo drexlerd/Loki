@@ -81,6 +81,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::ParameterImpl>::operator()(const loki::pddl::ParameterImpl& parameter) const {
-        return parameter.hash_impl();
+        return parameter.hash();
     }
 }

@@ -38,14 +38,18 @@ private:
 
     TermObjectImpl(int identifier, Object object);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const TermObjectImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<TermObjectImpl>;
+
+public:
     const Object& get_object() const;
 };
 
@@ -56,14 +60,18 @@ private:
 
     TermVariableImpl(int identifier, Variable variable);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const TermVariableImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<TermVariableImpl>;
+
+public:
     const Variable& get_variable() const;
 };
 

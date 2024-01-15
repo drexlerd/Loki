@@ -253,30 +253,30 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::ConditionLiteralImpl>::operator()(const loki::pddl::ConditionLiteralImpl& condition) const {
-        return condition.hash_impl();
+        return condition.hash();
     }
 
     std::size_t hash<loki::pddl::ConditionAndImpl>::operator()(const loki::pddl::ConditionAndImpl& condition) const {
-        return condition.hash_impl();
+        return condition.hash();
     }
 
     std::size_t hash<loki::pddl::ConditionOrImpl>::operator()(const loki::pddl::ConditionOrImpl& condition) const {
-        return condition.hash_impl();
+        return condition.hash();
     }
 
     std::size_t hash<loki::pddl::ConditionNotImpl>::operator()(const loki::pddl::ConditionNotImpl& condition) const {
-        return condition.hash_impl();
+        return condition.hash();
     }
 
     std::size_t hash<loki::pddl::ConditionImplyImpl>::operator()(const loki::pddl::ConditionImplyImpl& condition) const {
-        return condition.hash_impl();
+        return condition.hash();
     }
 
     std::size_t hash<loki::pddl::ConditionExistsImpl>::operator()(const loki::pddl::ConditionExistsImpl& condition) const {
-        return condition.hash_impl();
+        return condition.hash();
     }
 
     std::size_t hash<loki::pddl::ConditionForallImpl>::operator()(const loki::pddl::ConditionForallImpl& condition) const {
-        return condition.hash_impl();
+        return condition.hash();
     }
 }

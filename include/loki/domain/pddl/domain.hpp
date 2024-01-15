@@ -53,15 +53,19 @@ private:
         FunctionSkeletonList functions,
         ActionList actions);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     /// @brief Test for structural equivalence
     bool is_structurally_equivalent_to_impl(const DomainImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<DomainImpl>;
+
+public:
     const std::string& get_name() const;
     const Requirements& get_requirements() const;
     const TypeList& get_types() const;

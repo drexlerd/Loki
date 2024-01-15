@@ -54,6 +54,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::VariableImpl>::operator()(const loki::pddl::VariableImpl& variable) const {
-        return variable.hash_impl();
+        return variable.hash();
     }
 }

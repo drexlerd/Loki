@@ -58,6 +58,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::NumericFluentImpl>::operator()(const loki::pddl::NumericFluentImpl& numeric_fluent) const {
-        return numeric_fluent.hash_impl();
+        return numeric_fluent.hash();
     }
 }

@@ -83,6 +83,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::OptimizationMetricImpl>::operator()(const loki::pddl::OptimizationMetricImpl& metric) const {
-        return metric.hash_impl();
+        return metric.hash();
     }
 }

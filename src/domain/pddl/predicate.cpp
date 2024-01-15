@@ -71,6 +71,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::PredicateImpl>::operator()(const loki::pddl::PredicateImpl& predicate) const {
-        return predicate.hash_impl();
+        return predicate.hash();
     }
 }

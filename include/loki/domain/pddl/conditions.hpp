@@ -42,14 +42,18 @@ private:
 
     ConditionLiteralImpl(int identifier, Literal literal);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const ConditionLiteralImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<ConditionLiteralImpl>;
+
+public:
     const Literal& get_literal() const;
 };
 
@@ -61,14 +65,18 @@ private:
 
     ConditionAndImpl(int identifier, ConditionList conditions);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const ConditionAndImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<ConditionAndImpl>;
+
+public:
     const ConditionList& get_conditions() const;
 };
 
@@ -80,14 +88,18 @@ private:
 
     ConditionOrImpl(int identifier, ConditionList conditions);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const ConditionOrImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<ConditionOrImpl>;
+
+public:
     const ConditionList& get_conditions() const;
 };
 
@@ -99,14 +111,18 @@ private:
 
     ConditionNotImpl(int identifier, Condition condition);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const ConditionNotImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<ConditionNotImpl>;
+
+public:
     const Condition& get_condition() const;
 };
 
@@ -119,14 +135,18 @@ private:
 
     ConditionImplyImpl(int identifier, Condition condition_left, Condition condition_right);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const ConditionImplyImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<ConditionImplyImpl>;
+
+public:
     const Condition& get_condition_left() const;
     const Condition& get_condition_right() const;
 };
@@ -140,14 +160,18 @@ private:
 
     ConditionExistsImpl(int identifier, ParameterList parameters, Condition condition);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const ConditionExistsImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<ConditionExistsImpl>;
+
+public:
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
 };
@@ -161,14 +185,18 @@ private:
 
     ConditionForallImpl(int identifier, ParameterList parameters, Condition condition);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const ConditionForallImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<ConditionForallImpl>;
+
+public:
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
 };

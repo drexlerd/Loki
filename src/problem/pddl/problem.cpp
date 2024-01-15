@@ -152,6 +152,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::ProblemImpl>::operator()(const loki::pddl::ProblemImpl& problem) const {
-        return problem.hash_impl();
+        return problem.hash();
     }
 }

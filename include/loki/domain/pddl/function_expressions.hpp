@@ -58,14 +58,18 @@ private:
 
     FunctionExpressionNumberImpl(int identifier, double number);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const FunctionExpressionNumberImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<FunctionExpressionNumberImpl>;
+
+public:
     double get_number() const;
 };
 
@@ -82,14 +86,18 @@ private:
         FunctionExpression left_function_expression,
         FunctionExpression right_function_expression);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const FunctionExpressionBinaryOperatorImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<FunctionExpressionBinaryOperatorImpl>;
+
+public:
     BinaryOperatorEnum get_binary_operator() const;
     const FunctionExpression& get_left_function_expression() const;
     const FunctionExpression& get_right_function_expression() const;
@@ -106,14 +114,18 @@ private:
         MultiOperatorEnum multi_operator,
         FunctionExpressionList function_expressions);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const FunctionExpressionMultiOperatorImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<FunctionExpressionMultiOperatorImpl>;
+
+public:
     MultiOperatorEnum get_multi_operator() const;
     const FunctionExpressionList& get_function_expressions() const;
 };
@@ -126,14 +138,18 @@ private:
 
     FunctionExpressionMinusImpl(int identifier, FunctionExpression function_expression);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const FunctionExpressionMinusImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<FunctionExpressionMinusImpl>;
+
+public:
     const FunctionExpression& get_function_expression() const;
 };
 
@@ -145,14 +161,18 @@ private:
 
     FunctionExpressionFunctionImpl(int identifier, Function function);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     bool is_structurally_equivalent_to_impl(const FunctionExpressionFunctionImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<FunctionExpressionFunctionImpl>;
+
+public:
     const Function& get_function() const;
 };
 

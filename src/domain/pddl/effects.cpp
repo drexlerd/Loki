@@ -215,22 +215,22 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::EffectLiteralImpl>::operator()(const loki::pddl::EffectLiteralImpl& effect) const {
-        return effect.hash_impl();
+        return effect.hash();
     }
 
     std::size_t hash<loki::pddl::EffectAndImpl>::operator()(const loki::pddl::EffectAndImpl& effect) const {
-        return effect.hash_impl();
+        return effect.hash();
     }
 
     std::size_t hash<loki::pddl::EffectNumericImpl>::operator()(const loki::pddl::EffectNumericImpl& effect) const {
-        return effect.hash_impl();
+        return effect.hash();
     }
 
     std::size_t hash<loki::pddl::EffectConditionalForallImpl>::operator()(const loki::pddl::EffectConditionalForallImpl& effect) const {
-        return effect.hash_impl();
+        return effect.hash();
     }
 
     std::size_t hash<loki::pddl::EffectConditionalWhenImpl>::operator()(const loki::pddl::EffectConditionalWhenImpl& effect) const {
-        return effect.hash_impl();
+        return effect.hash();
     }
 }

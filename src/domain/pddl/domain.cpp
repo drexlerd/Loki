@@ -193,6 +193,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::DomainImpl>::operator()(const loki::pddl::DomainImpl& domain) const {
-        return domain.hash_impl();
+        return domain.hash();
     }
 }

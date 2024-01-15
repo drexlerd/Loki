@@ -40,15 +40,19 @@ private:
 
     FunctionSkeletonImpl(int identifier, std::string name, ParameterList parameters, Type type);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const FunctionSkeletonImpl& other) const;
     size_t hash_impl() const;
-    /// @brief Returns a string representation where typing is assumed to be true.
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
+
+    // Give access to the private interface implementations.
+    friend class Base<FunctionSkeletonImpl>;
+
+public:
     /// @brief Returns a parseable string representation in the context of a domain.
     void str(std::ostringstream& out, const FormattingOptions& options, bool typing_enabled) const;
 

@@ -95,6 +95,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::RequirementsImpl>::operator()(const loki::pddl::RequirementsImpl& requirements) const {
-        return requirements.hash_impl();
+        return requirements.hash();
     }
 }

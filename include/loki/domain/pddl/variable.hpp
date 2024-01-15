@@ -36,15 +36,19 @@ private:
 
     VariableImpl(int identifier, std::string name);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const VariableImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<VariableImpl>;
+
+public:
     const std::string& get_name() const;
 };
 

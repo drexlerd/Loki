@@ -83,10 +83,10 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::TermObjectImpl>::operator()(const loki::pddl::TermObjectImpl& term) const {
-        return term.hash_impl();
+        return term.hash();
     }
 
     std::size_t hash<loki::pddl::TermVariableImpl>::operator()(const loki::pddl::TermVariableImpl& term) const {
-        return term.hash_impl();
+        return term.hash();
     }
 }

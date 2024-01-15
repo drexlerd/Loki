@@ -45,15 +45,19 @@ private:
 
     ActionImpl(int identifier, std::string name, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     /// @brief Test for structural equivalence
     bool is_structurally_equivalent_to_impl(const ActionImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<ActionImpl>;
+
+public:
     const std::string& get_name() const;
     const ParameterList& get_parameters() const;
     const std::optional<Condition>& get_condition() const;

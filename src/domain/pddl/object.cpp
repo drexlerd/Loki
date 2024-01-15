@@ -59,6 +59,6 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::ObjectImpl>::operator()(const loki::pddl::ObjectImpl& object) const {
-        return object.hash_impl();
+        return object.hash();
     }
 }

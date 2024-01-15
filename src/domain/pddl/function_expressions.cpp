@@ -214,22 +214,22 @@ namespace std {
     }
 
     std::size_t hash<loki::pddl::FunctionExpressionNumberImpl>::operator()(const loki::pddl::FunctionExpressionNumberImpl& function_expression) const {
-        return function_expression.hash_impl();
+        return function_expression.hash();
     }
 
     std::size_t hash<loki::pddl::FunctionExpressionBinaryOperatorImpl>::operator()(const loki::pddl::FunctionExpressionBinaryOperatorImpl& function_expression) const {
-        return function_expression.hash_impl();
+        return function_expression.hash();
     }
 
     std::size_t hash<loki::pddl::FunctionExpressionMultiOperatorImpl>::operator()(const loki::pddl::FunctionExpressionMultiOperatorImpl& function_expression) const {
-        return function_expression.hash_impl();
+        return function_expression.hash();
     }
 
     std::size_t hash<loki::pddl::FunctionExpressionMinusImpl>::operator()(const loki::pddl::FunctionExpressionMinusImpl& function_expression) const {
-        return function_expression.hash_impl();
+        return function_expression.hash();
     }
 
     std::size_t hash<loki::pddl::FunctionExpressionFunctionImpl>::operator()(const loki::pddl::FunctionExpressionFunctionImpl& function_expression) const {
-        return function_expression.hash_impl();
+        return function_expression.hash();
     }
 }

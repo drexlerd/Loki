@@ -36,10 +36,10 @@ private:
     Function m_function;
     double m_number;
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     NumericFluentImpl(int identifier, Function function, double number);
 
     /// @brief Test for semantic equivalence
@@ -47,6 +47,10 @@ public:
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<NumericFluentImpl>;
+
+public:
     const Function& get_function() const;
     double get_number() const;
 };

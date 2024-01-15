@@ -39,15 +39,19 @@ private:
 
     FunctionImpl(int identifier, FunctionSkeleton function_skeleton, TermList terms);
 
+    // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-public:
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const FunctionImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
+    // Give access to the private interface implementations.
+    friend class Base<FunctionImpl>;
+
+public:
     const FunctionSkeleton& get_function_skeleton() const;
     const TermList& get_terms() const;
 };
