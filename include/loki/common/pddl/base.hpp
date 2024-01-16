@@ -54,9 +54,10 @@ class Base {
 protected:
     int m_identifier;
 
-public:
     explicit Base(int identifier) : m_identifier(identifier) { }
+    friend Derived;
 
+public:
     // moveable but not copyable
     Base(const Base& other) = delete;
     Base& operator=(const Base& other) = delete;
