@@ -23,6 +23,8 @@
 
 #include "../../common/pddl/base.hpp"
 
+#include <string>
+
 
 namespace loki {
 template<typename HolderType, ElementsPerSegment N>

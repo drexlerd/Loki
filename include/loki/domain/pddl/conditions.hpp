@@ -24,7 +24,6 @@
 #include "../../common/pddl/base.hpp"
 
 #include <string>
-#include <variant>
 
 
 namespace loki {

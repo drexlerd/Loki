@@ -23,7 +23,6 @@
 #include "../../common/pddl/base.hpp"
 
 #include <string>
-#include <functional>
 
 
 namespace loki {
