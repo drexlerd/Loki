@@ -143,6 +143,14 @@ public:
         const std::string& error_handler_output);
 };
 
+class MismatchedFunctionSkeletonObjectListError : public SemanticParserError {
+public:
+    MismatchedFunctionSkeletonObjectListError(
+        const pddl::FunctionSkeleton& function_skeleton,
+        const pddl::ObjectList& object_list,
+        const std::string& error_handler_output);
+};
+
 }
 
 #endif

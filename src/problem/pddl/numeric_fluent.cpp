@@ -18,11 +18,11 @@
 #include <loki/problem/pddl/numeric_fluent.hpp>
 
 #include <loki/common/hash.hpp>
-#include <loki/domain/pddl/function.hpp>
+#include <loki/problem/pddl/ground_function.hpp>
 
 
 namespace loki::pddl {
-NumericFluentImpl::NumericFluentImpl(int identifier, Function function, double number)
+NumericFluentImpl::NumericFluentImpl(int identifier, GroundFunction function, double number)
     : Base(identifier), m_function(std::move(function)), m_number(number) { }
 
 bool NumericFluentImpl::is_structurally_equivalent_to_impl(const NumericFluentImpl& other) const {
@@ -38,7 +38,7 @@ void NumericFluentImpl::str_impl(std::ostringstream& out, const FormattingOption
     out << "(= " << *m_function << " " << m_number << ")";
 }
 
-const Function& NumericFluentImpl::get_function() const {
+const GroundFunction& NumericFluentImpl::get_function() const {
     return m_function;
 }
 

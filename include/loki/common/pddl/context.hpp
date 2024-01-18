@@ -29,7 +29,7 @@ namespace loki
     struct Context
     {
         // For the unique construction of PDDL objects
-        CompositeOfPDDLFactories& factories;
+        PDDLFactories& factories;
         // For storing the positions in the input PDDL file
         PDDLPositionCache& positions;
         // For referencing to existing bindings
@@ -39,7 +39,7 @@ namespace loki
         // For convenience, to avoid an additional parameter during semantic parsing
         pddl::Requirements requirements;
 
-        Context(CompositeOfPDDLFactories &factories_, PDDLPositionCache& positions_, ScopeStack &scopes_)
+        Context(PDDLFactories &factories_, PDDLPositionCache& positions_, ScopeStack &scopes_)
             : factories(factories_), positions(positions_), scopes(scopes_), references(ReferencedPDDLObjects()), requirements(nullptr) {}
     };
 

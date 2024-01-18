@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_LITERAL_HPP_
-#define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_LITERAL_HPP_
+#ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_LITERAL_HPP_
+#define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_LITERAL_HPP_
 
 #include "declarations.hpp"
 

@@ -34,14 +34,14 @@ class PersistentFactory;
 namespace loki::pddl {
 class NumericFluentImpl : public Base<NumericFluentImpl> {
 private:
-    Function m_function;
+    GroundFunction m_function;
     double m_number;
 
     // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
-    NumericFluentImpl(int identifier, Function function, double number);
+    NumericFluentImpl(int identifier, GroundFunction function, double number);
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const NumericFluentImpl& other) const;
@@ -52,7 +52,7 @@ private:
     friend class Base<NumericFluentImpl>;
 
 public:
-    const Function& get_function() const;
+    const GroundFunction& get_function() const;
     double get_number() const;
 };
 

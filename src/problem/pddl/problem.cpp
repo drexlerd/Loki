@@ -19,20 +19,30 @@
 
 #include <loki/problem/pddl/metric.hpp>
 #include <loki/problem/pddl/numeric_fluent.hpp>
+#include <loki/problem/pddl/ground_conditions.hpp>
+#include <loki/problem/pddl/ground_literal.hpp>
 #include <loki/common/hash.hpp>
 #include <loki/common/collections.hpp>
-#include <loki/domain/pddl/conditions.hpp>
-#include <loki/domain/pddl/literal.hpp>
 #include <loki/domain/pddl/domain.hpp>
 #include <loki/domain/pddl/requirements.hpp>
 #include <loki/domain/pddl/object.hpp>
 #include <loki/common/pddl/visitors.hpp>
 
+#include <iostream>
+
 using namespace std;
 
 
 namespace loki::pddl {
-ProblemImpl::ProblemImpl(int identifier, Domain domain, std::string name, Requirements requirements, ObjectList objects, LiteralList initial_literals, NumericFluentList numeric_fluents, Condition goal_condition, std::optional<OptimizationMetric> optimization_metric)
+ProblemImpl::ProblemImpl(int identifier,
+    Domain domain,
+    std::string name,
+    Requirements requirements,
+    ObjectList objects,
+    GroundLiteralList initial_literals,
+    NumericFluentList numeric_fluents,
+    GroundCondition goal_condition,
+    std::optional<OptimizationMetric> optimization_metric)
     : Base(identifier)
     , m_domain(std::move(domain))
     , m_name(std::move(name))
@@ -74,6 +84,7 @@ void ProblemImpl::str_impl(std::ostringstream& out, const FormattingOptions& opt
     if (!m_requirements->get_requirements().empty()) {
         out << string(nested_options.indent, ' ') << *m_requirements << "\n";
     }
+
     if (!m_objects.empty()) {
         out << string(nested_options.indent, ' ') << "(:objects ";
         for (size_t i = 0; i < m_objects.size(); ++i) {
@@ -82,19 +93,23 @@ void ProblemImpl::str_impl(std::ostringstream& out, const FormattingOptions& opt
         }
         out << ")\n";
     }
+
     out << string(nested_options.indent, ' ') << "(:init ";
     for (size_t i = 0; i < m_initial_literals.size(); ++i) {
         if (i != 0) out << " ";
         out << *m_initial_literals[i];
     }
+
     out << " ";
     for (size_t i = 0; i < m_numeric_fluents.size(); ++i) {
         if (i != 0) out << " ";
         out << *m_numeric_fluents[i];
     }
+
     out << ")\n";
     out << string(nested_options.indent, ' ') << "(:goal ";
-    std::visit(StringifyVisitor(out, options), *m_goal_condition);
+    // std::visit(StringifyVisitor(out, options), *m_goal_condition);
+
     out << ")\n";
     if (m_optimization_metric.has_value()) {
         out << string(nested_options.indent, ' ') << "(:metric " << *m_optimization_metric.value() << ")\n";
@@ -125,7 +140,7 @@ const ObjectList& ProblemImpl::get_objects() const {
     return m_objects;
 }
 
-const LiteralList& ProblemImpl::get_initial_literals() const {
+const GroundLiteralList& ProblemImpl::get_initial_literals() const {
     return m_initial_literals;
 }
 
@@ -133,7 +148,7 @@ const NumericFluentList& ProblemImpl::numeric_fluents() const {
     return m_numeric_fluents;
 }
 
-const Condition& ProblemImpl::get_goal_condition() const {
+const GroundCondition& ProblemImpl::get_goal_condition() const {
     return m_goal_condition;
 }
 

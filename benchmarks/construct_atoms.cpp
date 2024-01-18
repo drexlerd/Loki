@@ -33,7 +33,7 @@ static void BM_ConstructAtoms(benchmark::State& state) {
     const size_t num_predicates = 10;
 
     for (auto _ : state) {
-        auto factories = loki::CollectionOfPDDLFactories();
+        auto factories = loki::PDDLFactories();
 
         auto atoms = create_atoms(num_objects, num_predicates, factories);
         benchmark::DoNotOptimize(atoms);

@@ -50,7 +50,6 @@ struct TermReferenceTermVisitor : boost::static_visitor<pddl::Term> {
     pddl::Term operator()(const domain::ast::Variable& node) const;
 };
 
-
 /* Number */
 extern double parse(const domain::ast::Number& node);
 

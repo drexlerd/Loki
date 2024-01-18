@@ -35,6 +35,11 @@ MultiDefinitionObjectError::MultiDefinitionObjectError(const std::string& name, 
     : SemanticParserError(
         "The object with name \"" + name + "\" has already been defined.", error_handler_output) { }
 
+/* Grounding */
+VariableGroundingError::VariableGroundingError(const std::string& name, const std::string& error_handler_output)
+    : SemanticParserError(
+        "The variable with name \"" + name + "\" is not ground.", error_handler_output) {}
+
 /* Compatibility errors */
 MismatchedDomainError::MismatchedDomainError(
     const pddl::Domain& domain,

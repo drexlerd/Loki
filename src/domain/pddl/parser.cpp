@@ -36,6 +36,7 @@
 #include "parser/structure.hpp"
 #include "parser/common.hpp"
 #include "parser/reference_utils.hpp"
+#include "parser/function_skeleton.hpp"
 
 using namespace loki::domain;
 using namespace std;

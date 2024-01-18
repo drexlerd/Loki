@@ -59,7 +59,7 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
     }
     track_object_references(objects, context);
     /* Initial section */
-    auto initial_literals = pddl::LiteralList();
+    auto initial_literals = pddl::GroundLiteralList();
     auto numeric_fluents = pddl::NumericFluentList();
     const auto initial_elements = parse(problem_node.initial, context);
     for (const auto& initial_element : initial_elements) {

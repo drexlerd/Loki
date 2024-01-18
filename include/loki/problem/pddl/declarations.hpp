@@ -24,12 +24,54 @@
 
 
 namespace loki::pddl {
+    class GroundAtomImpl;
+    using GroundAtom = const GroundAtomImpl*;
+    using GroundAtomList = std::vector<GroundAtom>;
+
+    class GroundLiteralImpl;
+    using GroundLiteral = const GroundLiteralImpl*;
+    using GroundLiteralList = std::vector<GroundLiteral>;
+
+    class GroundConditionLiteralImpl;
+    class GroundConditionAndImpl;
+    class GroundConditionOrImpl;
+    class GroundConditionNotImpl;
+    class GroundConditionImplyImpl;
+    class GroundConditionExistsImpl;
+    class GroundConditionForallImpl;
+    using GroundConditionImpl = std::variant<GroundConditionLiteralImpl
+        , GroundConditionAndImpl
+        , GroundConditionOrImpl
+        , GroundConditionNotImpl
+        , GroundConditionImplyImpl
+        , GroundConditionExistsImpl
+        , GroundConditionForallImpl>;
+    using GroundCondition = const GroundConditionImpl*;
+    using GroundConditionList = std::vector<GroundCondition>;
+
+    class GroundFunctionExpressionNumberImpl;
+    class GroundFunctionExpressionBinaryOperatorImpl;
+    class GroundFunctionExpressionMultiOperatorImpl;
+    class GroundFunctionExpressionMinusImpl;
+    class GroundFunctionExpressionFunctionImpl;
+    using GroundFunctionExpressionImpl = std::variant<GroundFunctionExpressionNumberImpl
+        , GroundFunctionExpressionBinaryOperatorImpl
+        , GroundFunctionExpressionMultiOperatorImpl
+        , GroundFunctionExpressionMinusImpl
+        , GroundFunctionExpressionFunctionImpl>;
+    using GroundFunctionExpression = const GroundFunctionExpressionImpl*;
+    using GroundFunctionExpressionList = std::vector<GroundFunctionExpression>;;
+
+    class GroundFunctionImpl;
+    using GroundFunction = const GroundFunctionImpl*;
+    using GroundFunctionList = std::vector<GroundFunction>;
+
     class NumericFluentImpl;
     using NumericFluent = const NumericFluentImpl*;
     using NumericFluentList = std::vector<NumericFluent>;
 
     class OptimizationMetricImpl;
-    using OptimizationMetric = const OptimizationMetricImpl*; 
+    using OptimizationMetric = const OptimizationMetricImpl*;
 
     class ProblemImpl;
     using Problem = const ProblemImpl*;

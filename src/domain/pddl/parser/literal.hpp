@@ -25,9 +25,9 @@
 namespace loki {
 
 /* Atom */
-extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& atomic_formula_of_terms_node, Context& context);
-extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& atomic_formula_of_terms_node, Context& context);
-extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTerms& atomic_formula_of_terms_node, Context& context);
+extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& node, Context& context);
+extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& node, Context& context);
+extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTerms& node, Context& context);
 
 struct AtomicFormulaOfTermsVisitor : boost::static_visitor<pddl::Atom> {
     Context& context;
@@ -42,9 +42,9 @@ struct AtomicFormulaOfTermsVisitor : boost::static_visitor<pddl::Atom> {
 
 
 /* Literal */
-extern pddl::Literal parse(const domain::ast::Atom& atom_node, Context& context);
-extern pddl::Literal parse(const domain::ast::NegatedAtom& negated_atom_node, Context& context);
-extern pddl::Literal parse(const domain::ast::Literal& literal_node, Context& context);
+extern pddl::Literal parse(const domain::ast::Atom& node, Context& context);
+extern pddl::Literal parse(const domain::ast::NegatedAtom& node, Context& context);
+extern pddl::Literal parse(const domain::ast::Literal& node, Context& context);
 
 struct LiteralVisitor : boost::static_visitor<pddl::Literal> {
     Context& context;

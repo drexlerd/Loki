@@ -5,7 +5,7 @@ namespace loki::benchmarks {
 loki::pddl::AtomList create_atoms(
     size_t num_objects,
     size_t num_predicates,
-    loki::CollectionOfPDDLFactories& factories) {
+    loki::PDDLFactories& factories) {
     // Create num_objects-many objects with name object_1,...,object_<num_objects>
     auto objects = loki::pddl::ObjectList();
     for (size_t i = 1; i <= num_objects; ++i) {
@@ -36,7 +36,7 @@ loki::pddl::AtomList create_atoms(
     for (const auto& predicate : predicates) {
         for (const auto& object_left : objects) {
             for (const auto& object_right : objects) {
-                atoms.push_back(factories.problem_atoms.get_or_create<loki::pddl::AtomImpl>(
+                atoms.push_back(factories.atoms.get_or_create<loki::pddl::AtomImpl>(
                     predicate,
                     loki::pddl::TermList{
                         factories.terms.get_or_create<loki::pddl::TermObjectImpl>(object_left),

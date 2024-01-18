@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_METRIC_HPP_
-#define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_METRIC_HPP_
+#ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_GROUND_LITERAL_HPP_
+#define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_GROUND_LITERAL_HPP_
 
 #include "declarations.hpp"
 
@@ -32,37 +32,28 @@ class PersistentFactory;
 
 
 namespace loki::pddl {
-enum class OptimizationMetricEnum {
-    MINIMIZE,
-    MAXIMIZE
-};
-
-extern std::unordered_map<OptimizationMetricEnum, std::string> optimization_metric_enum_to_string;
-extern const std::string& to_string(pddl::OptimizationMetricEnum optimization_metric);
-
-
-class OptimizationMetricImpl : public Base<OptimizationMetricImpl> {
+class GroundLiteralImpl : public Base<GroundLiteralImpl> {
 private:
-    OptimizationMetricEnum m_optimization_metric;
-    GroundFunctionExpression m_function_expression;
+    bool m_is_negated;
+    GroundAtom m_atom;
 
-    OptimizationMetricImpl(int identifier, OptimizationMetricEnum optimization_metric, GroundFunctionExpression function_expression);
+    GroundLiteralImpl(int identifier, bool is_negated, GroundAtom atom);
 
     // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
     friend class loki::PersistentFactory;
 
     /// @brief Test for semantic equivalence
-    bool is_structurally_equivalent_to_impl(const OptimizationMetricImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const GroundLiteralImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
-    friend class Base<OptimizationMetricImpl>;
+    friend class Base<GroundLiteralImpl>;
 
 public:
-    OptimizationMetricEnum get_optimization_metric() const;
-    const GroundFunctionExpression& get_function_expression() const;
+    bool is_negated() const;
+    const GroundAtom& get_atom() const;
 };
 
 }
@@ -71,16 +62,17 @@ public:
 namespace std {
     // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
     template<>
-    struct less<loki::pddl::OptimizationMetric>
+    struct less<loki::pddl::GroundLiteral>
     {
-        bool operator()(const loki::pddl::OptimizationMetric& left_metric, const loki::pddl::OptimizationMetric& right_metric) const;
+        bool operator()(const loki::pddl::GroundLiteral& left_literal, const loki::pddl::GroundLiteral& right_literal) const;
     };
 
     template<>
-    struct hash<loki::pddl::OptimizationMetricImpl>
+    struct hash<loki::pddl::GroundLiteralImpl>
     {
-        std::size_t operator()(const loki::pddl::OptimizationMetricImpl& metric) const;
+        std::size_t operator()(const loki::pddl::GroundLiteralImpl& literal) const;
     };
 }
+
 
 #endif

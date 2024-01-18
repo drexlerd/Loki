@@ -51,35 +51,10 @@ DomainParser::DomainParser(const fs::path& file_path)
         throw SyntaxParserError("", x3_error_handler.get_error_stream().str());
     }
 
-    /* Parse the domain to PDDL */
-    // Initialize the context
-    auto composite_factories = CompositeOfPDDLFactories{
-        m_factories.requirements,
-        m_factories.types,
-        m_factories.variables,
-        m_factories.terms,
-        m_factories.objects,  // use factory shared between domain and problem to include constants in indexing 0,1,...
-        m_factories.domain_atoms,  // use domain specific factory
-        m_factories.domain_literals,  // use domain specific factory
-        m_factories.parameters,
-        m_factories.predicates,
-        m_factories.function_expressions,
-        m_factories.functions,
-        m_factories.function_skeletons,
-        m_factories.conditions,
-        m_factories.effects,
-        m_factories.actions,
-        m_factories.derived_predicates,
-        m_factories.optimization_metrics,
-        m_factories.numeric_fluents,
-        m_factories.domains,
-        m_factories.problems
-    };
-
     m_position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, file_path);
     m_scopes = std::make_unique<ScopeStack>(m_position_cache->get_error_handler());
 
-    auto context = Context(composite_factories, *m_position_cache, *m_scopes);
+    auto context = Context(m_factories, *m_position_cache, *m_scopes);
     // Initialize global scope
     context.scopes.open_scope();
 
@@ -115,7 +90,7 @@ DomainParser::DomainParser(const fs::path& file_path)
     std::cout << "Peak resident set size: " << resident_set << " KB." << std::endl;
 }
 
-CollectionOfPDDLFactories& DomainParser::get_factories() {
+PDDLFactories& DomainParser::get_factories() {
     return m_factories;
 }
 

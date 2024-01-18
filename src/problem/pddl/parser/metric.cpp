@@ -17,10 +17,10 @@
 
 #include "metric.hpp"
 
-#include "function.hpp"
+#include "functions.hpp"
 
 #include "../../../domain/pddl/parser/common.hpp"
-#include "../../../domain/pddl/parser/functions.hpp"
+#include "../../../domain/pddl/parser/function_skeleton.hpp"
 
 #include <loki/problem/pddl/exceptions.hpp>
 #include <loki/domain/pddl/exceptions.hpp>
@@ -31,7 +31,7 @@ using namespace std;
 
 
 namespace loki {
-    
+
 /* OptimizationMetricEnum */
 pddl::OptimizationMetricEnum parse(const problem::ast::Optimization& node, Context& context) {
     return boost::apply_visitor(OptimizationDeclarationVisitor(context), node);
@@ -56,8 +56,8 @@ pddl::OptimizationMetric parse(const problem::ast::MetricSpecification& node, Co
 pddl::OptimizationMetric parse(const problem::ast::MetricSpecificationTotalCost& node, Context& context) {
     const auto optimization = pddl::OptimizationMetricEnum::MINIMIZE;
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol_total_cost, context);
-    const auto function = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, pddl::TermList{});
-    const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionFunctionImpl>(function);
+    const auto function = context.factories.ground_functions.get_or_create<pddl::GroundFunctionImpl>(function_skeleton, pddl::ObjectList{});
+    const auto function_expression = context.factories.ground_function_expressions.get_or_create<pddl::GroundFunctionExpressionFunctionImpl>(function);
     return context.factories.optimization_metrics.get_or_create<pddl::OptimizationMetricImpl>(optimization, function_expression);
 }
 

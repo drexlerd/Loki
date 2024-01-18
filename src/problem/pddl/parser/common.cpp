@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Dominik Drexler
+ * Copyright (C) 2023 Dominik Drexler and Simon Stahlberg
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,18 +15,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_GOAL_HPP_
-#define LOKI_SRC_PROBLEM_PDDL_PARSER_GOAL_HPP_
+#include "common.hpp"
 
-#include <loki/problem/ast/ast.hpp>
-#include <loki/problem/pddl/parser.hpp>
+#include "objects.hpp"
 
+#include <loki/problem/pddl/exceptions.hpp>
 
 
 namespace loki {
 
-extern pddl::GroundCondition parse(const problem::ast::Goal& node, Context& context);
+/* Term */
+ObjectReferenceTermVisitor::ObjectReferenceTermVisitor(Context& context_)
+    : context(context_) { }
 
+pddl::Object ObjectReferenceTermVisitor::operator()(const domain::ast::Name& node) const {
+    return parse_object_reference(node, context);
 }
 
-#endif
+pddl::Object ObjectReferenceTermVisitor::operator()(const domain::ast::Variable& node) const {
+    throw VariableGroundingError(node.characters, context.scopes.get_error_handler()(node, ""));
+}
+
+}

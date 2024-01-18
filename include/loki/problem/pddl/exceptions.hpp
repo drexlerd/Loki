@@ -41,6 +41,12 @@ public:
     MultiDefinitionObjectError(const std::string& name, const std::string& error_handler_output);
 };
 
+/* Grounding */
+class VariableGroundingError : public SemanticParserError {
+public:
+    VariableGroundingError(const std::string& name, const std::string& error_handler_output);
+};
+
 /* Compatibility errors */
 class MismatchedDomainError : public SemanticParserError {
 public:
@@ -61,7 +67,7 @@ public:
 class NegativeCostError : public SemanticParserError {
 public:
     NegativeCostError(
-        const std::string& error_handler_output);  
+        const std::string& error_handler_output);
 };
 
 }

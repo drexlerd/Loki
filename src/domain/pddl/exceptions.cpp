@@ -129,4 +129,18 @@ MismatchedFunctionSkeletonTermListError::MismatchedFunctionSkeletonTermListError
         error_handler_output) { }
 
 
+MismatchedFunctionSkeletonObjectListError::MismatchedFunctionSkeletonObjectListError(
+    const pddl::FunctionSkeleton& function_skeleton,
+    const pddl::ObjectList& object_list,
+    const std::string& error_handler_output)
+    : SemanticParserError(
+        "Mismatched number of objects for function skeleton \""
+            + function_skeleton->get_name()
+            + "\" with sizes "
+            + std::to_string(function_skeleton->get_parameters().size())
+            + "!="
+            + std::to_string(object_list.size())
+            + ".",
+        error_handler_output) { }
+
 }
