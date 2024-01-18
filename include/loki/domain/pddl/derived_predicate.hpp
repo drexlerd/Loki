@@ -19,8 +19,6 @@
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_DERIVED_PREDICATE_HPP_
 
 #include "declarations.hpp"
-#include "conditions.hpp"
-#include "effects.hpp"
 
 #include "../../common/pddl/base.hpp"
 

@@ -17,10 +17,12 @@
 
 #include <loki/domain/pddl/action.hpp>
 
-#include <loki/domain/pddl/parameter.hpp>
 #include <loki/common/hash.hpp>
 #include <loki/common/collections.hpp>
 #include <loki/common/pddl/visitors.hpp>
+#include <loki/domain/pddl/parameter.hpp>
+#include <loki/domain/pddl/conditions.hpp>
+#include <loki/domain/pddl/effects.hpp>
 
 
 namespace loki::pddl {

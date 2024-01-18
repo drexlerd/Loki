@@ -15,9 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/domain/pddl/derived_predicate.hpp>
 #include <loki/common/hash.hpp>
 #include <loki/common/collections.hpp>
+#include <loki/domain/pddl/conditions.hpp>
+#include <loki/domain/pddl/effects.hpp>
+#include <loki/domain/pddl/derived_predicate.hpp>
 
 
 namespace loki::pddl {

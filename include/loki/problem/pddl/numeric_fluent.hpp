@@ -21,7 +21,6 @@
 #include "declarations.hpp"
 
 #include "../../common/pddl/base.hpp"
-#include "../../domain/pddl/function.hpp"
 
 
 namespace loki {
