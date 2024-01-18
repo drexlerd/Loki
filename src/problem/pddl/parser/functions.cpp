@@ -20,8 +20,7 @@
 #include "objects.hpp"
 
 #include "../../../domain/pddl/parser/common.hpp"
-#include "../../../domain/pddl/parser/function_skeleton.hpp"
-#include "../../../domain/pddl/parser/function_operators.hpp"
+#include "../../../domain/pddl/parser/functions.hpp"
 
 #include <loki/domain/pddl/exceptions.hpp>
 
@@ -29,59 +28,59 @@
 namespace loki {
 
 /* FunctionExpression */
-pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionNumber& node, Context& context) {
+pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionNumber& node, Context& context) {
     const auto number = parse(node.number);
-    const auto function_expression = context.factories.ground_function_expressions.get_or_create<pddl::GroundFunctionExpressionNumberImpl>(number);
+    const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionNumberImpl>(number);
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
 
-pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionBinaryOperator& node, Context& context) {
+pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionBinaryOperator& node, Context& context) {
     const auto binary_operator = boost::apply_visitor(BinaryOperatorVisitor(), node.binary_operator);
     const auto left_function_expression = parse(node.metric_function_expression_left, context);
     const auto right_function_expression = parse(node.metric_function_expression_right, context);
-    const auto function_expression = context.factories.ground_function_expressions.get_or_create<pddl::GroundFunctionExpressionBinaryOperatorImpl>(binary_operator, left_function_expression, right_function_expression);
+    const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionBinaryOperatorImpl>(binary_operator, left_function_expression, right_function_expression);
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
 
-pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionMultiOperator& node, Context& context) {
+pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionMultiOperator& node, Context& context) {
     const auto multi_operator = boost::apply_visitor(MultiOperatorVisitor(), node.multi_operator);
-    auto function_expressions = pddl::GroundFunctionExpressionList();
+    auto function_expressions = pddl::FunctionExpressionList();
     const auto first_function_expression = parse(node.metric_function_expression_first, context);
     function_expressions.push_back(first_function_expression);
     for (const auto& child_node : node.metric_function_expression_remaining) {
         const auto next_function_expression = parse(child_node, context);
         function_expressions.push_back(next_function_expression);
     }
-    const auto function_expression = context.factories.ground_function_expressions.get_or_create<pddl::GroundFunctionExpressionMultiOperatorImpl>(multi_operator, function_expressions);
+    const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionMultiOperatorImpl>(multi_operator, function_expressions);
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
 
-pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionMinus& node, Context& context) {
+pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionMinus& node, Context& context) {
     const auto child_function_expression = parse(node.metric_function_expression, context);
-    const auto function_expression = context.factories.ground_function_expressions.get_or_create<pddl::GroundFunctionExpressionMinusImpl>(child_function_expression);
+    const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionMinusImpl>(child_function_expression);
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
 
-pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionBasicFunctionTerm& node, Context& context) {
+pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionBasicFunctionTerm& node, Context& context) {
     const auto function = parse(node.basic_function_term, context);
-    const auto function_expression = context.factories.ground_function_expressions.get_or_create<pddl::GroundFunctionExpressionFunctionImpl>(function);
+    const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionFunctionImpl>(function);
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
 
-pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionTotalTime& /*node*/, Context& /*context*/) {
+pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionTotalTime& /*node*/, Context& /*context*/) {
     throw NotImplementedError("parse(const problem::ast::MetricFunctionExpressionTotalTime& node, Context& context)");
 }
 
-pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionPreferences& /*node*/, Context& /*context*/) {
+pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionPreferences& /*node*/, Context& /*context*/) {
     throw NotImplementedError("parse(const problem::ast::MetricFunctionExpressionPreferences& node, Context& context)");
 }
 
-pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpression& node, Context& context) {
+pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpression& node, Context& context) {
     return boost::apply_visitor(MetricFunctionExpressionDeclarationVisitor(context), node);
 }
 
@@ -89,16 +88,16 @@ MetricFunctionExpressionDeclarationVisitor::MetricFunctionExpressionDeclarationV
 
 
 /* Function */
-pddl::GroundFunction parse(const problem::ast::BasicFunctionTerm& node, Context& context) {
+pddl::Function parse(const problem::ast::BasicFunctionTerm& node, Context& context) {
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol, context);
-    auto object_list = pddl::ObjectList();
+    auto term_list = pddl::TermList();
     for (const auto& name_node : node.names) {
-        object_list.push_back(parse_object_reference(name_node, context));
+        term_list.push_back(context.factories.terms.get_or_create<pddl::TermObjectImpl>(parse_object_reference(name_node, context)));
     }
-    if (function_skeleton->get_parameters().size() != object_list.size()) {
-        throw MismatchedFunctionSkeletonObjectListError(function_skeleton, object_list, context.scopes.get_error_handler()(node, ""));
+    if (function_skeleton->get_parameters().size() != term_list.size()) {
+        throw MismatchedFunctionSkeletonTermListError(function_skeleton, term_list, context.scopes.get_error_handler()(node, ""));
     }
-    const auto function = context.factories.ground_functions.get_or_create<pddl::GroundFunctionImpl>(function_skeleton, object_list);
+    const auto function = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, term_list);
     context.positions.push_back(function, node);
     return function;
 }

@@ -17,15 +17,15 @@
 
 #include "goal.hpp"
 
-#include "conditions.hpp"
+#include "../../../domain/pddl/parser/conditions.hpp"
 
-#include <loki/problem/pddl/ground_conditions.hpp>
+#include <loki/domain/pddl/conditions.hpp>
 
 #include <iostream>
 
 namespace loki {
 
-pddl::GroundCondition parse(const problem::ast::Goal& node, Context& context) {
+pddl::Condition parse(const problem::ast::Goal& node, Context& context) {
     const auto condition = parse(node.precondition_goal_descriptor, context);
     return condition;
 }

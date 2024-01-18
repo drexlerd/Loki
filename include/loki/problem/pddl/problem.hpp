@@ -41,10 +41,10 @@ private:
     ObjectList m_objects;
     GroundLiteralList m_initial_literals;
     NumericFluentList m_numeric_fluents;
-    GroundCondition m_goal_condition;
+    Condition m_goal_condition;
     std::optional<OptimizationMetric> m_optimization_metric;
 
-    ProblemImpl(int identifier, Domain domain, std::string name, Requirements requirements, ObjectList objects, GroundLiteralList initial_literals, NumericFluentList numeric_fluents, GroundCondition goal_condition, std::optional<OptimizationMetric> optimization_metric);
+    ProblemImpl(int identifier, Domain domain, std::string name, Requirements requirements, ObjectList objects, GroundLiteralList initial_literals, NumericFluentList numeric_fluents, Condition goal_condition, std::optional<OptimizationMetric> optimization_metric);
 
     // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
@@ -65,7 +65,7 @@ public:
     const ObjectList& get_objects() const;
     const GroundLiteralList& get_initial_literals() const;
     const NumericFluentList& numeric_fluents() const;
-    const GroundCondition& get_goal_condition() const;
+    const Condition& get_goal_condition() const;
     const std::optional<OptimizationMetric>& get_optimization_metric() const;
 };
 

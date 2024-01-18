@@ -44,9 +44,9 @@ extern const std::string& to_string(pddl::OptimizationMetricEnum optimization_me
 class OptimizationMetricImpl : public Base<OptimizationMetricImpl> {
 private:
     OptimizationMetricEnum m_optimization_metric;
-    GroundFunctionExpression m_function_expression;
+    FunctionExpression m_function_expression;
 
-    OptimizationMetricImpl(int identifier, OptimizationMetricEnum optimization_metric, GroundFunctionExpression function_expression);
+    OptimizationMetricImpl(int identifier, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
 
     // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
@@ -62,7 +62,7 @@ private:
 
 public:
     OptimizationMetricEnum get_optimization_metric() const;
-    const GroundFunctionExpression& get_function_expression() const;
+    const FunctionExpression& get_function_expression() const;
 };
 
 }

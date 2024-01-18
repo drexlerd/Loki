@@ -42,30 +42,7 @@ public:
     }
 };
 
-
-extern pddl::GroundAtom parse(const domain::ast::AtomicFormulaOfTermsPredicate& node, Context& context);
-extern pddl::GroundAtom parse(const domain::ast::AtomicFormulaOfTermsEquality& node, Context& context);
-extern pddl::GroundAtom parse(const domain::ast::AtomicFormulaOfTerms& node, Context& context);
-
-class GroundAtomicFormulaOfTermsVisitor : boost::static_visitor<pddl::GroundAtom> {
-private:
-    Context& context;
-
-public:
-    GroundAtomicFormulaOfTermsVisitor(Context& context_);
-
-    template<typename Node>
-    pddl::GroundAtom operator()(const Node& node) const {
-        return parse(node, context);
-    }
-};
-
-
 /* Literal */
-extern pddl::GroundLiteral parse(const domain::ast::Atom& node, Context& context);
-extern pddl::GroundLiteral parse(const domain::ast::NegatedAtom& node, Context& context);
-extern pddl::GroundLiteral parse(const domain::ast::Literal& node, Context& context);
-
 extern pddl::GroundLiteral parse(const problem::ast::Atom& node, Context& context);
 extern pddl::GroundLiteral parse(const problem::ast::NegatedAtom& node, Context& context);
 extern pddl::GroundLiteral parse(const problem::ast::Literal& node, Context& context);

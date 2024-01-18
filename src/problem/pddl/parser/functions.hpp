@@ -26,31 +26,31 @@
 namespace loki {
 
 /* FunctionExpression */
-extern pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpression& node, Context& context);
-extern pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionNumber& node, Context& context);
-extern pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionBinaryOperator& node, Context& context);
-extern pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionMultiOperator& node, Context& context);
-extern pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionMinus& node, Context& context);
-extern pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionBasicFunctionTerm& node, Context& context);
-extern pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionTotalTime& node, Context& context);
-extern pddl::GroundFunctionExpression parse(const problem::ast::MetricFunctionExpressionPreferences& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpression& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionNumber& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionBinaryOperator& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionMultiOperator& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionMinus& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionBasicFunctionTerm& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionTotalTime& node, Context& context);
+extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionPreferences& node, Context& context);
 
-class MetricFunctionExpressionDeclarationVisitor : boost::static_visitor<pddl::GroundFunctionExpression> {
+class MetricFunctionExpressionDeclarationVisitor : boost::static_visitor<pddl::FunctionExpression> {
 private:
-    Context& context;
+    Context& context; 
 
 public:
     MetricFunctionExpressionDeclarationVisitor(Context& context_);
 
     template<typename Node>
-    pddl::GroundFunctionExpression operator()(const Node& node) const {
+    pddl::FunctionExpression operator()(const Node& node) const {
         return parse(node, context);
     }
 };
 
 
 /* Function */
-extern pddl::GroundFunction parse(const problem::ast::BasicFunctionTerm& node, Context& context);
+extern pddl::Function parse(const problem::ast::BasicFunctionTerm& node, Context& context);
 
 }
 

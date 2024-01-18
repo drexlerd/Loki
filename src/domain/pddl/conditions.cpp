@@ -71,7 +71,7 @@ void ConditionAndImpl::str_impl(std::ostringstream& out, const FormattingOptions
     out << "(and ";
     for (size_t i = 0; i < m_conditions.size(); ++i) {
         if (i != 0) out << " ";
-        // std::visit(StringifyVisitor(out, options), *m_conditions[i]);
+        std::visit(StringifyVisitor(out, options), *m_conditions[i]);
     }
     out << ")";
 }

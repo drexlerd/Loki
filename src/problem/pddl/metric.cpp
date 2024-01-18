@@ -21,7 +21,7 @@
 #include <loki/common/collections.hpp>
 #include <loki/common/pddl/visitors.hpp>
 
-#include <loki/problem/pddl/ground_function_expressions.hpp>
+#include <loki/domain/pddl/function_expressions.hpp>
 
 #include <cassert>
 
@@ -40,7 +40,7 @@ const std::string& to_string(pddl::OptimizationMetricEnum optimization_metric) {
 }
 
 
-OptimizationMetricImpl::OptimizationMetricImpl(int identifier, OptimizationMetricEnum optimization_metric, GroundFunctionExpression function_expression)
+OptimizationMetricImpl::OptimizationMetricImpl(int identifier, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression)
     : Base(identifier)
     , m_optimization_metric(optimization_metric)
     , m_function_expression(std::move(function_expression))
@@ -69,7 +69,7 @@ OptimizationMetricEnum OptimizationMetricImpl::get_optimization_metric() const {
     return m_optimization_metric;
 }
 
-const GroundFunctionExpression& OptimizationMetricImpl::get_function_expression() const {
+const FunctionExpression& OptimizationMetricImpl::get_function_expression() const {
     return m_function_expression;
 }
 

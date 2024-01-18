@@ -17,8 +17,6 @@
 
 #include "functions.hpp"
 
-#include "function_skeleton.hpp"
-#include "function_operators.hpp"
 #include "parameters.hpp"
 #include "common.hpp"
 
@@ -26,6 +24,38 @@
 
 
 namespace loki {
+
+/* MultiOperator */
+pddl::MultiOperatorEnum MultiOperatorVisitor::operator()(const domain::ast::MultiOperatorMul&) const {
+    return pddl::MultiOperatorEnum::MUL;
+}
+
+pddl::MultiOperatorEnum MultiOperatorVisitor::operator()(const domain::ast::MultiOperatorPlus&) const {
+    return pddl::MultiOperatorEnum::PLUS;
+}
+
+
+/* BinaryOperator */
+pddl::BinaryOperatorEnum MultiToBinaryOperatorVisitor::operator()(const domain::ast::MultiOperatorMul&) const {
+    return pddl::BinaryOperatorEnum::MUL;
+}
+
+pddl::BinaryOperatorEnum MultiToBinaryOperatorVisitor::operator()(const domain::ast::MultiOperatorPlus&) const {
+    return pddl::BinaryOperatorEnum::PLUS;
+}
+
+
+pddl::BinaryOperatorEnum BinaryOperatorVisitor::operator()(const domain::ast::BinaryOperatorDiv&) const {
+    return pddl::BinaryOperatorEnum::DIV;
+}
+
+pddl::BinaryOperatorEnum BinaryOperatorVisitor::operator()(const domain::ast::BinaryOperatorMinus&) const {
+    return pddl::BinaryOperatorEnum::MINUS;
+}
+
+pddl::BinaryOperatorEnum BinaryOperatorVisitor::operator()(const domain::ast::MultiOperator& node) const {
+    return boost::apply_visitor(MultiToBinaryOperatorVisitor(), node);
+}
 
 
 /* FunctionExpression */
@@ -82,5 +112,122 @@ pddl::Function parse(const domain::ast::FunctionHead& node, Context& context) {
     context.references.untrack(function->get_function_skeleton());
     return function;
 }
+
+
+/* FunctionSkeleton */
+pddl::FunctionSkeleton parse_function_skeleton_reference(const domain::ast::FunctionSymbol& node, Context& context) {
+    auto function_name = parse(node.name);
+    auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
+    if (!binding.has_value()) {
+        throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node, ""));
+    }
+    const auto& [function_skeleton, _position, _error_handler] = binding.value();
+    context.references.untrack(function_skeleton);
+    return function_skeleton;
+}
+
+
+static void test_multiple_definition(const pddl::FunctionSkeleton& function_skeleton, const domain::ast::Name& node, const Context& context) {
+    const auto function_name = function_skeleton->get_name();
+    const auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
+    if (binding.has_value()) {
+        const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
+        auto message_2 = std::string("");
+        const auto& [_function_skeleton, position, error_handler] = binding.value();
+        if (position.has_value()) {
+            message_2 = error_handler(position.value(), "First defined here:");
+        }
+        throw MultiDefinitionFunctionSkeletonError(function_name, message_1 + message_2);
+    }
+}
+
+
+static void insert_context_information(const pddl::FunctionSkeleton& function_skeleton, const domain::ast::Name& node, Context& context) {
+    context.positions.push_back(function_skeleton, node);
+    context.scopes.insert<pddl::FunctionSkeletonImpl>(function_skeleton->get_name(), function_skeleton, node);
+}
+
+
+pddl::FunctionSkeleton parse(const domain::ast::AtomicFunctionSkeletonTotalCost& node, Context& context) {
+    if (!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS)) {
+        throw UndefinedRequirementError(pddl::RequirementEnum::ACTION_COSTS, context.positions.get_error_handler()(node, ""));
+    } else {
+        context.references.untrack(pddl::RequirementEnum::ACTION_COSTS);
+    }
+    if ((!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS))
+        && (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS))) {
+        throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
+    } else {
+        context.references.untrack(pddl::RequirementEnum::ACTION_COSTS);
+        context.references.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
+    }
+
+    assert(context.scopes.get<pddl::TypeImpl>("number").has_value());
+    const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
+    auto function_name = parse(node.function_symbol.name);
+    auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, pddl::ParameterList{}, type);
+
+    test_multiple_definition(function_skeleton, node.function_symbol.name, context);
+    insert_context_information(function_skeleton, node.function_symbol.name, context);
+
+    return function_skeleton;
+}
+
+pddl::FunctionSkeleton parse(const domain::ast::AtomicFunctionSkeletonGeneral& node, Context& context) {
+    if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS)) {
+        throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
+    }
+    context.references.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
+
+    context.scopes.open_scope();
+    auto function_parameters = boost::apply_visitor(ParameterListVisitor(context), node.arguments);
+    context.scopes.close_scope();
+
+    assert(context.scopes.get<pddl::TypeImpl>("number").has_value());
+    const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
+    auto function_name = parse(node.function_symbol.name);
+    auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, type);
+
+    test_multiple_definition(function_skeleton, node.function_symbol.name, context);
+    insert_context_information(function_skeleton, node.function_symbol.name, context);
+
+    return function_skeleton;
+}
+
+AtomicFunctionSkeletonVisitor::AtomicFunctionSkeletonVisitor(Context& context_)
+    : context(context_) { }
+
+
+/* FunctionSkeletonList */
+static pddl::FunctionSkeletonList parse_function_skeleton_definitions(const std::vector<domain::ast::AtomicFunctionSkeleton>& nodes, Context& context) {
+    auto function_skeleton_list = pddl::FunctionSkeletonList();
+    for (const auto& node : nodes) {
+        auto function_skeleton = boost::apply_visitor(AtomicFunctionSkeletonVisitor(context), node);
+        function_skeleton_list.push_back(function_skeleton);
+    }
+    return function_skeleton_list;
+}
+
+pddl::FunctionSkeletonList parse(const std::vector<domain::ast::AtomicFunctionSkeleton>& formula_skeleton_nodes, Context& context) {
+    auto function_skeleton_list = parse_function_skeleton_definitions(formula_skeleton_nodes, context);
+    return function_skeleton_list;
+}
+
+pddl::FunctionSkeletonList parse(const domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& function_skeleton_list_recursively_node, Context& context) {
+    auto function_skeleton_list = parse_function_skeleton_definitions(function_skeleton_list_recursively_node.atomic_function_skeletons, context);
+
+    if (function_skeleton_list_recursively_node.function_typed_list_of_atomic_function_skeletons.has_value()) {
+        auto add_function_skeleton_list = boost::apply_visitor(FunctionSkeletonListVisitor(context), function_skeleton_list_recursively_node.function_typed_list_of_atomic_function_skeletons.value().get());
+        function_skeleton_list.insert(function_skeleton_list.end(), add_function_skeleton_list.begin(), add_function_skeleton_list.end());
+    }
+    return function_skeleton_list;
+}
+
+pddl::FunctionSkeletonList parse(const domain::ast::Functions& functions_node, Context& context) {
+    return boost::apply_visitor(FunctionSkeletonListVisitor(context), functions_node.function_types_list_of_atomic_function_skeletons);
+}
+
+FunctionSkeletonListVisitor::FunctionSkeletonListVisitor(Context& context_)
+    : context(context_) { }
 
 }

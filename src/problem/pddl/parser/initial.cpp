@@ -21,7 +21,7 @@
 #include "functions.hpp"
 
 #include "../../../domain/pddl/parser/common.hpp"
-#include "../../../domain/pddl/parser/function_skeleton.hpp"
+#include "../../../domain/pddl/parser/functions.hpp"
 
 #include <loki/common/exceptions.hpp>
 #include <loki/domain/pddl/exceptions.hpp>
@@ -53,7 +53,7 @@ std::variant<pddl::GroundLiteral, pddl::NumericFluent> parse(const problem::ast:
     }
     context.references.untrack(pddl::RequirementEnum::ACTION_COSTS);
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol_total_cost, context);
-    const auto basic_function_term = context.factories.ground_functions.get_or_create<pddl::GroundFunctionImpl>(function_skeleton, pddl::ObjectList{});
+    const auto basic_function_term = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, pddl::TermList{});
     double number = parse(node.number);
     if (number < 0) {
         throw NegativeCostError(context.positions.get_error_handler()(node.number, ""));

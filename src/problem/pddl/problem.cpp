@@ -17,16 +17,16 @@
 
 #include <loki/problem/pddl/problem.hpp>
 
-#include <loki/problem/pddl/metric.hpp>
-#include <loki/problem/pddl/numeric_fluent.hpp>
-#include <loki/problem/pddl/ground_conditions.hpp>
-#include <loki/problem/pddl/ground_literal.hpp>
 #include <loki/common/hash.hpp>
 #include <loki/common/collections.hpp>
+#include <loki/common/pddl/visitors.hpp>
 #include <loki/domain/pddl/domain.hpp>
 #include <loki/domain/pddl/requirements.hpp>
 #include <loki/domain/pddl/object.hpp>
-#include <loki/common/pddl/visitors.hpp>
+#include <loki/domain/pddl/conditions.hpp>
+#include <loki/problem/pddl/metric.hpp>
+#include <loki/problem/pddl/numeric_fluent.hpp>
+#include <loki/problem/pddl/ground_literal.hpp>
 
 #include <iostream>
 
@@ -41,7 +41,7 @@ ProblemImpl::ProblemImpl(int identifier,
     ObjectList objects,
     GroundLiteralList initial_literals,
     NumericFluentList numeric_fluents,
-    GroundCondition goal_condition,
+    Condition goal_condition,
     std::optional<OptimizationMetric> optimization_metric)
     : Base(identifier)
     , m_domain(std::move(domain))
@@ -99,16 +99,14 @@ void ProblemImpl::str_impl(std::ostringstream& out, const FormattingOptions& opt
         if (i != 0) out << " ";
         out << *m_initial_literals[i];
     }
-
-    out << " ";
     for (size_t i = 0; i < m_numeric_fluents.size(); ++i) {
-        if (i != 0) out << " ";
+        out << " ";
         out << *m_numeric_fluents[i];
     }
 
     out << ")\n";
     out << string(nested_options.indent, ' ') << "(:goal ";
-    // std::visit(StringifyVisitor(out, options), *m_goal_condition);
+    std::visit(StringifyVisitor(out, options), *m_goal_condition);
 
     out << ")\n";
     if (m_optimization_metric.has_value()) {
@@ -148,7 +146,7 @@ const NumericFluentList& ProblemImpl::numeric_fluents() const {
     return m_numeric_fluents;
 }
 
-const GroundCondition& ProblemImpl::get_goal_condition() const {
+const Condition& ProblemImpl::get_goal_condition() const {
     return m_goal_condition;
 }
 

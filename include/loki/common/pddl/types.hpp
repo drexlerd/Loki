@@ -39,9 +39,6 @@
 #include "../../domain/pddl/type.hpp"
 #include "../../domain/pddl/variable.hpp"
 #include "../../problem/pddl/ground_atom.hpp"
-#include "../../problem/pddl/ground_conditions.hpp"
-#include "../../problem/pddl/ground_function.hpp"
-#include "../../problem/pddl/ground_function_expressions.hpp"
 #include "../../problem/pddl/ground_literal.hpp"
 #include "../../problem/pddl/problem.hpp"
 #include "../../problem/pddl/metric.hpp"
@@ -65,12 +62,9 @@ using GroundLiteralFactory = PersistentFactory<pddl::GroundLiteralImpl, 1000>;
 using ParameterFactory = PersistentFactory<pddl::ParameterImpl, 1000>;
 using PredicateFactory = PersistentFactory<pddl::PredicateImpl, 1000>;
 using FunctionExpressionFactory = PersistentFactory<pddl::FunctionExpressionImpl, 1000>;
-using GroundFunctionExpressionFactory = PersistentFactory<pddl::GroundFunctionExpressionImpl, 1000>;
 using FunctionFactory = PersistentFactory<pddl::FunctionImpl, 1000>;
-using GroundFunctionFactory = PersistentFactory<pddl::GroundFunctionImpl, 1000>;
 using FunctionSkeletonFactory = PersistentFactory<pddl::FunctionSkeletonImpl, 1000>;
 using ConditionFactory = PersistentFactory<pddl::ConditionImpl, 1000>;
-using GroundConditionFactory = PersistentFactory<pddl::GroundConditionImpl, 1000>;
 using EffectFactory = PersistentFactory<pddl::EffectImpl, 1000>;
 using ActionFactory = PersistentFactory<pddl::ActionImpl, 100>;
 using DerivedPredicateFactory = PersistentFactory<pddl::DerivedPredicateImpl, 100>;
@@ -92,12 +86,9 @@ using PDDLPositionCache = PositionCache<pddl::RequirementsImpl
     , pddl::ParameterImpl
     , pddl::PredicateImpl
     , pddl::FunctionExpressionImpl
-    , pddl::GroundFunctionExpressionImpl
     , pddl::FunctionImpl
-    , pddl::GroundFunctionImpl
     , pddl::FunctionSkeletonImpl
     , pddl::ConditionImpl
-    , pddl::GroundConditionImpl
     , pddl::EffectImpl
     , pddl::ActionImpl
     , pddl::DerivedPredicateImpl
@@ -121,12 +112,9 @@ struct PDDLFactories {
     ParameterFactory parameters;
     PredicateFactory predicates;
     FunctionExpressionFactory function_expressions;
-    GroundFunctionExpressionFactory ground_function_expressions;
     FunctionFactory functions;
-    GroundFunctionFactory ground_functions;
     FunctionSkeletonFactory function_skeletons;
     ConditionFactory conditions;
-    GroundConditionFactory ground_conditions;
     EffectFactory effects;
     ActionFactory actions;
     DerivedPredicateFactory derived_predicates;
