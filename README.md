@@ -113,7 +113,7 @@ The benchmark framework depends on [GoogleBenchmark](https://github.com/google/b
 
 We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Tools` extensions by Microsoft. To get maximum IDE support, you should set the following `Cmake: Configure Args` in the `CMake Tools` extension settings under `Workspace`:
 
-- `-DCMAKE_PREFIX_PATH=<absolute/path/to/dependencies/install-dir`
+- `-DCMAKE_PREFIX_PATH=${workspaceFolder}/dependencies/installs`
 - `-DENABLE_TESTING=ON`
 - `-DENABLE_BENCHMARKING=ON`
 
