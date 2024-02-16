@@ -175,6 +175,10 @@ const ObjectList& DomainImpl::get_constants() const {
     return m_constants;
 }
 
+const FunctionSkeletonList& DomainImpl::get_functions() const {
+    return m_functions;
+}
+
 const PredicateList& DomainImpl::get_predicates() const {
     return m_predicates;
 }
