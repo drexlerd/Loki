@@ -75,16 +75,13 @@ public:
         // Ensure that element with identifier i is stored at position i.
         assert((identifier == (m_persistent_vector.size()-1))
             || (identifier == m_persistent_vector.size()));
-        // The pointer to the location in persistent memory.
-        const auto* element_ptr = static_cast<HolderType*>(nullptr);
         // Explicitly call the constructor of T to give exclusive access to the factory.
         auto element = HolderType(std::move(SubType(identifier, std::forward<Args>(args)...)));
         bool overwrite_last_element = (identifier == m_persistent_vector.size() - 1);
-        if (overwrite_last_element) {
-            element_ptr = &(m_persistent_vector[identifier] = std::move(element));
-        } else {
-            element_ptr = &(m_persistent_vector.push_back(std::move(element)));
-        }
+        // The pointer to the location in persistent memory.
+        const auto* element_ptr = overwrite_last_element 
+            ? &(m_persistent_vector[identifier] = std::move(element))
+            : &(m_persistent_vector.push_back(std::move(element)));
         assert(element_ptr);
         /* Test for uniqueness */
         auto it = m_uniqueness_set.find(element_ptr);

@@ -94,7 +94,7 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& node)
     // we flatten nested either types
     auto type_list = pddl::TypeList();
     for (auto& child_node : node.types) {
-        auto types = boost::apply_visitor(*this, child_node);
+        auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context), child_node);
         type_list.insert(type_list.end(), types.begin(), types.end());
     }
     return type_list;
@@ -160,7 +160,8 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vec
     // std::vector<domain::ast::Name> has single base type "object"
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
     const auto& [type_object, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
-    const auto type_list = parse_type_definitions(name_nodes, pddl::TypeList{type_object}, context);
+    const auto base_types = pddl::TypeList{type_object};
+    const auto type_list = parse_type_definitions(name_nodes, base_types, context);
     return type_list;
 }
 
