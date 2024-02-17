@@ -72,7 +72,7 @@ ParameterListVisitor::ParameterListVisitor(Context& context_)
 
 pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>& nodes) {
     // std::vector<ast::Variable> has single base type "object"
-    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("object");
+    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("object", pddl::TypeList());
     auto parameter_list = parse_parameter_definitions(nodes, pddl::TypeList{type}, context);
     return parameter_list;
 }

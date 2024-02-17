@@ -32,20 +32,20 @@ TypeDeclarationTypeVisitor::TypeDeclarationTypeVisitor(Context& context_)
     : context(context_) { }
 
 pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeObject& node) {
-    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("object");
+    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("object", pddl::TypeList());
     context.positions.push_back(type, node);
     return { type };
 }
 
 pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeNumber& node) {
-    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("number");
+    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("number", pddl::TypeList());
     context.positions.push_back(type, node);
     return { type };
 }
 
 pddl::TypeList TypeDeclarationTypeVisitor::operator()(const domain::ast::Name& node) {
     auto name = parse(node);
-    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>(name);
+    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>(name, pddl::TypeList());
     context.positions.push_back(type, node);
     return { type };
 }

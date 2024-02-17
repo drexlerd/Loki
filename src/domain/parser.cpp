@@ -59,8 +59,8 @@ DomainParser::DomainParser(const fs::path& file_path)
     context.scopes.open_scope();
 
     // Create base types.
-    const auto base_type_object = context.factories.types.get_or_create<pddl::TypeImpl>("object");
-    const auto base_type_number = context.factories.types.get_or_create<pddl::TypeImpl>("number");
+    const auto base_type_object = context.factories.types.get_or_create<pddl::TypeImpl>("object", pddl::TypeList());
+    const auto base_type_number = context.factories.types.get_or_create<pddl::TypeImpl>("number", pddl::TypeList());
     context.scopes.insert("object", base_type_object, {});
     context.scopes.insert("number", base_type_number, {});
 
