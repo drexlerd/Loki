@@ -40,11 +40,7 @@ namespace loki
         pddl::Requirements requirements;
 
         Context(PDDLFactories &factories_, PDDLPositionCache& positions_, ScopeStack &scopes_)
-            : factories(factories_), positions(positions_), scopes(scopes_), references(ReferencedPDDLObjects()), requirements(nullptr) {
-            // Initialize root types.
-            scopes.insert<pddl::TypeImpl>("object", factories.types.get_or_create<pddl::TypeImpl>("object"), std::nullopt);
-            scopes.insert<pddl::TypeImpl>("number", factories.types.get_or_create<pddl::TypeImpl>("number"), std::nullopt);
-        }
+            : factories(factories_), positions(positions_), scopes(scopes_), references(ReferencedPDDLObjects()), requirements(nullptr) {}
     };
 
 }
