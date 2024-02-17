@@ -61,7 +61,7 @@ static pddl::Parameter parse_parameter_definition(const domain::ast::Variable& v
 static pddl::ParameterList parse_parameter_definitions(const std::vector<domain::ast::Variable>& variable_nodes, const pddl::TypeList& type_list, Context& context) {
     auto parameter_list = pddl::ParameterList();
     for (const auto& variable_node : variable_nodes) {
-        parameter_list.emplace_back(parse_parameter_definition(variable_node, type_list, context));
+        parameter_list.push_back(parse_parameter_definition(variable_node, type_list, context));
     }
     return parameter_list;
 }

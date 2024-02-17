@@ -60,7 +60,7 @@ static pddl::Predicate parse_predicate_definition(const domain::ast::AtomicFormu
 static pddl::PredicateList parse_predicate_definitions(const std::vector<domain::ast::AtomicFormulaSkeleton>& nodes, Context& context) {
     auto predicate_list = pddl::PredicateList();
     for (const auto& node : nodes) {
-        predicate_list.emplace_back(parse_predicate_definition(node, context));
+        predicate_list.push_back(parse_predicate_definition(node, context));
     }
     return predicate_list;
 }

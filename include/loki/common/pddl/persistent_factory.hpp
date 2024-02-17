@@ -87,7 +87,7 @@ public:
         auto it = m_uniqueness_set.find(element_ptr);
         if (it == m_uniqueness_set.end()) {
             // Element is unique! 
-            m_uniqueness_set.emplace(element_ptr);
+            m_uniqueness_set.insert(element_ptr);
             // Validate the element by increasing the identifier to the next free position
             ++m_count;
             assert(m_uniqueness_set.size() == m_count);
