@@ -28,6 +28,10 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
         STRING "Choose the type of build." FORCE)
 endif()
 
+set(CMAKE_BUILD_TYPE "Release")
+
+message(STATUS "Build configuration: ${CMAKE_BUILD_TYPE}")
+
 # make cache variables for install destinations
 include(GNUInstallDirs)
 
@@ -44,6 +48,12 @@ if (ENABLE_BENCHMARKING)
 else()
     message("Benchmarking disabled.")
 endif()
+
+
+set(DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/")
+add_definitions(-DDATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/")
+message("DATA_DIR: ${DATA_DIR}")
+
 
 
 ##############################################################
