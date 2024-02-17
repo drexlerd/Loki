@@ -49,8 +49,9 @@ static void insert_context_information(const pddl::Object& constant, const domai
 
 
 static pddl::Object parse_constant_definition(const domain::ast::Name& node, const pddl::TypeList& type_list, Context& context) {
-    const auto name = parse(node);
-    const auto constant = context.factories.objects.get_or_create<pddl::ObjectImpl>(name, type_list);
+    const auto constant = context.factories.objects.get_or_create<pddl::ObjectImpl>(
+        parse(node), 
+        pddl::TypeList{type_list});
     test_multiple_definition(constant, node, context);
     insert_context_information(constant, node, context);
     return constant;
