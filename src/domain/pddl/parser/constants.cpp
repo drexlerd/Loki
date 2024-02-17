@@ -77,7 +77,7 @@ ConstantListVisitor::ConstantListVisitor(Context& context_)
 pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
     // std::vector<ast::Name> has single base type "object"
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
-    const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
+    const auto [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
     const auto type_list = pddl::TypeList{type};
     return parse_constant_definitions(name_nodes, type_list, context);
 }
