@@ -85,7 +85,7 @@ public:
         } else {
             element_ptr = &(m_persistent_vector.push_back(std::move(element)));
         }
-        std::cout << "element_ptr: " << element_ptr << std::endl;
+        assert(element_ptr);
         /* Test for uniqueness */
         auto it = m_uniqueness_set.find(element_ptr);
         if (it == m_uniqueness_set.end()) {
