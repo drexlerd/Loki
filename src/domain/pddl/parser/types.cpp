@@ -54,7 +54,7 @@ pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeEither& nod
     // we flatten nested either types
     pddl::TypeList type_list;
     for (auto& child_node : node.types) {
-        auto types = boost::apply_visitor(*this, child_node);
+        auto types = boost::apply_visitor(TypeDeclarationTypeVisitor(context), child_node);
         type_list.insert(type_list.end(), types.begin(), types.end());
     }
     return type_list;
@@ -175,8 +175,8 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::Typ
                                             typed_list_of_names_recursively_node.type);
     auto type_list = parse_type_definitions(typed_list_of_names_recursively_node.names, parent_type_list, context);
     // Recursively add types.
-    //const auto additional_types = boost::apply_visitor(*this, typed_list_of_names_recursively_node.typed_list_of_names.get());
-    //type_list.insert(type_list.end(), additional_types.begin(), additional_types.end());
+    const auto additional_types = boost::apply_visitor(TypeDeclarationTypedListOfNamesVisitor(context), typed_list_of_names_recursively_node.typed_list_of_names.get());
+    type_list.insert(type_list.end(), additional_types.begin(), additional_types.end());
     return type_list;
 }
 

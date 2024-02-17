@@ -81,13 +81,10 @@ public:
         auto element = HolderType(std::move(SubType(identifier, std::forward<Args>(args)...)));
         bool overwrite_last_element = (identifier == m_persistent_vector.size() - 1);
         if (overwrite_last_element) {
-            std::cout << "overwrite" << std::endl;
             element_ptr = &(m_persistent_vector[identifier] = std::move(element));
         } else {
-            std::cout << "push_back" << std::endl;
             element_ptr = &(m_persistent_vector.push_back(std::move(element)));
         }
-        std::cout << "element_ptr: " << element_ptr << std::endl;
         assert(element_ptr);
         /* Test for uniqueness */
         auto it = m_uniqueness_set.find(element_ptr);

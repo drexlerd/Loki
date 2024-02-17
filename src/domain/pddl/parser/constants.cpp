@@ -91,7 +91,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecu
     // TypedListOfNamesRecursively has user defined base types
     auto constant_list = parse_constant_definitions(typed_list_of_names_recursively_node.names, type_list, context);
     // Recursively add objects.
-    auto additional_objects = boost::apply_visitor(*this, typed_list_of_names_recursively_node.typed_list_of_names.get());
+    auto additional_objects = boost::apply_visitor(ConstantListVisitor(context), typed_list_of_names_recursively_node.typed_list_of_names.get());
     constant_list.insert(constant_list.end(), additional_objects.begin(), additional_objects.end());
     return constant_list;
 }

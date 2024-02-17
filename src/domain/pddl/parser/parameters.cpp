@@ -87,7 +87,7 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
     // TypedListOfVariablesRecursively has user defined types
     auto parameter_list = parse_parameter_definitions(node.variables, type_list, context);
     // Recursively add parameters.
-    auto additional_parameters = boost::apply_visitor(*this, node.typed_list_of_variables.get());
+    auto additional_parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables.get());
     parameter_list.insert(parameter_list.end(), additional_parameters.begin(), additional_parameters.end());
     return parameter_list;
 }
