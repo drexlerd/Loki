@@ -60,7 +60,7 @@ static pddl::Object parse_constant_definition(const domain::ast::Name& node, con
 static pddl::ObjectList parse_constant_definitions(const std::vector<domain::ast::Name>& nodes, const pddl::TypeList& type_list, Context& context) {
     auto constant_list = pddl::ObjectList();
     for (const auto& node : nodes) {
-        constant_list.emplace_back(parse_constant_definition(node, type_list, context));
+        constant_list.push_back(parse_constant_definition(node, type_list, context));
     }
     return constant_list;
 }
