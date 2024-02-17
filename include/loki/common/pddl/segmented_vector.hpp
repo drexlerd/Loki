@@ -70,11 +70,10 @@ public:
 
         // Take ownership of memory
         segment.push_back(std::move(value));
-        // Fetch return value
-        const T& return_value = segment[element_index(size())];
-        
         ++m_size;
-        return return_value;
+        
+        // Fetch return value
+        return segment.back();
     }
 
     T& operator[](size_t pos) {
