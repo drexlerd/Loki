@@ -85,7 +85,7 @@ pddl::Effect parse(const domain::ast::EffectProductionNumericFluentTotalCost& no
     if (!binding.has_value()) {
         throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node.function_symbol_total_cost, ""));
     }
-    const auto& [function_skeleton, _position, _error_handler] = binding.value();
+    const auto [function_skeleton, _position, _error_handler] = binding.value();
     const auto function = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, pddl::TermList{});
     context.references.untrack(function->get_function_skeleton());
     const auto function_expression = boost::apply_visitor(FunctionExpressionVisitor(context), node.numeric_term);

@@ -40,7 +40,7 @@ pddl::Object parse_object_reference(const domain::ast::Name& name_node, Context&
     if (!binding.has_value()) {
         throw UndefinedObjectError(name, context.scopes.get_error_handler()(name_node, ""));
     }
-    const auto& [object, _position, _error_handler] = binding.value();
+    const auto [object, _position, _error_handler] = binding.value();
     context.positions.push_back(object, name_node);
     context.references.untrack(object);
     return object;
@@ -52,7 +52,7 @@ static void test_multiple_definition_object(const std::string& object_name, cons
     if (binding.has_value()) {
         const auto message_1 = context.scopes.get_error_handler()(name_node, "Defined here:");
         auto message_2 = std::string("");
-        const auto& [_object, position, error_handler] = binding.value();
+        const auto [_object, position, error_handler] = binding.value();
         if (position.has_value()) {
             message_2 = error_handler(position.value(), "First defined here:");
         }
@@ -83,7 +83,7 @@ static pddl::ObjectList parse_object_definitions(const std::vector<domain::ast::
 pddl::ObjectList ObjectListVisitor::operator()(const std::vector<domain::ast::Name>& name_nodes) {
     // std::vector<domain::ast::Name> has single base type "object"
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
-    const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
+    const auto [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
     auto object_list = parse_object_definitions(name_nodes, pddl::TypeList{type}, context);
     return object_list;
 }

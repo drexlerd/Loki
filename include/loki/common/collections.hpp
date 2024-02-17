@@ -31,8 +31,8 @@ namespace loki {
 /// @param vec
 /// @return
 template<typename Collection>
-std::vector<typename Collection::value_type> get_sorted_vector(const Collection& collection) {
-    std::vector<typename Collection::value_type> result(collection.begin(), collection.end());
+boost::container::small_vector<typename Collection::value_type, 100> get_sorted_vector(const Collection& collection) {
+    boost::container::small_vector<typename Collection::value_type, 100> result(collection.begin(), collection.end());
     std::sort(result.begin(), result.end());
     return result;
 }

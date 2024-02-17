@@ -37,7 +37,7 @@ private:
     std::string m_name;
     TypeList m_bases;
 
-    TypeImpl(int identifier, std::string name, TypeList bases);
+    TypeImpl(int identifier, std::string name, TypeList bases = {});
 
     // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>

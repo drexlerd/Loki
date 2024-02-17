@@ -68,7 +68,7 @@ public:
     /// @brief Returns a pointer to an existing object
     ///        or creates it before if it does not exist.v
     template<typename SubType, typename... Args>
-    [[nodiscard]] HolderType const* get_or_create(Args... args) {
+    [[nodiscard]] HolderType const* get_or_create(Args&&... args) {
         std::lock_guard<std::mutex> hold(m_mutex);
         /* Construct and insert the element in persistent memory. */
         size_t identifier = m_count;
@@ -76,26 +76,18 @@ public:
         assert((identifier == (m_persistent_vector.size()-1))
             || (identifier == m_persistent_vector.size()));
         // Explicitly call the constructor of T to give exclusive access to the factory.
-        auto element = HolderType(std::move(SubType(identifier, args...)));
+        auto element = HolderType(std::move(SubType(identifier, std::forward<Args>(args)...)));
         bool overwrite_last_element = (identifier == m_persistent_vector.size() - 1);
         // The pointer to the location in persistent memory.
-        const auto* element_ptr = static_cast<const HolderType*>(nullptr);
-        if (overwrite_last_element) {
-            const auto& persistent_element = m_persistent_vector[identifier] = std::move(element);
-            element_ptr = &persistent_element;
-        } else {
-            const auto& persistent_element = m_persistent_vector.push_back(std::move(element));
-            element_ptr = &persistent_element;
-        }
-        if (!element_ptr) {
-            throw std::runtime_error("element_ptr is nullptr");
-        }
+        const auto* element_ptr = overwrite_last_element 
+            ? &(m_persistent_vector[identifier] = std::move(element))
+            : &(m_persistent_vector.push_back(std::move(element)));
         assert(element_ptr);
         /* Test for uniqueness */
         auto it = m_uniqueness_set.find(element_ptr);
         if (it == m_uniqueness_set.end()) {
             // Element is unique! 
-            m_uniqueness_set.insert(element_ptr);
+            m_uniqueness_set.emplace(element_ptr);
             // Validate the element by increasing the identifier to the next free position
             ++m_count;
             assert(m_uniqueness_set.size() == m_count);

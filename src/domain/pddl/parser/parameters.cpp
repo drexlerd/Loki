@@ -33,7 +33,7 @@ static void test_multiple_definition(const pddl::Variable& variable, const ast::
     if (binding.has_value()) {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
         auto message_2 = std::string("");
-        const auto& [_variable, position, error_handler] = binding.value();
+        const auto [_variable, position, error_handler] = binding.value();
         if (position.has_value()) {
             message_2 = error_handler(position.value(), "First defined here:");
         }

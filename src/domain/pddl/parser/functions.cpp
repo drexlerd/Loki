@@ -121,7 +121,7 @@ pddl::FunctionSkeleton parse_function_skeleton_reference(const domain::ast::Func
     if (!binding.has_value()) {
         throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node, ""));
     }
-    const auto& [function_skeleton, _position, _error_handler] = binding.value();
+    const auto [function_skeleton, _position, _error_handler] = binding.value();
     context.references.untrack(function_skeleton);
     return function_skeleton;
 }
@@ -133,7 +133,7 @@ static void test_multiple_definition(const pddl::FunctionSkeleton& function_skel
     if (binding.has_value()) {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
         auto message_2 = std::string("");
-        const auto& [_function_skeleton, position, error_handler] = binding.value();
+        const auto [_function_skeleton, position, error_handler] = binding.value();
         if (position.has_value()) {
             message_2 = error_handler(position.value(), "First defined here:");
         }
@@ -163,7 +163,7 @@ pddl::FunctionSkeleton parse(const domain::ast::AtomicFunctionSkeletonTotalCost&
     }
 
     assert(context.scopes.get<pddl::TypeImpl>("number").has_value());
-    const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
+    const auto [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
     auto function_name = parse(node.function_symbol.name);
     auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, pddl::ParameterList{}, type);
 
@@ -184,7 +184,7 @@ pddl::FunctionSkeleton parse(const domain::ast::AtomicFunctionSkeletonGeneral& n
     context.scopes.close_scope();
 
     assert(context.scopes.get<pddl::TypeImpl>("number").has_value());
-    const auto& [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
+    const auto [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("number").value();
     auto function_name = parse(node.function_symbol.name);
     auto function_skeleton = context.factories.function_skeletons.get_or_create<pddl::FunctionSkeletonImpl>(function_name, function_parameters, type);
 

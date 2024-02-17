@@ -31,7 +31,7 @@ void track_object_references(const pddl::ObjectList& object_list, Context& conte
 void test_object_references(const pddl::ObjectList& object_list, const Context& context) {
     for (const auto& object : object_list) {
         if (context.references.exists(object)) {
-            const auto& [_object, position, error_handler] = context.scopes.get<pddl::ObjectImpl>(object->get_name()).value();
+            const auto [_object, position, error_handler] = context.scopes.get<pddl::ObjectImpl>(object->get_name()).value();
             throw UnusedObjectError(object->get_name(), error_handler(position.value(), ""));
         }
     }

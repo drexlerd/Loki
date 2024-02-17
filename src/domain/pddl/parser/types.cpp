@@ -68,14 +68,14 @@ TypeReferenceTypeVisitor::TypeReferenceTypeVisitor(const Context& context_)
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeObject&) {
     const auto binding = context.scopes.get<pddl::TypeImpl>("object");
     assert(binding.has_value());
-    const auto& [type, _position, _error_handler] = binding.value();
+    const auto [type, _position, _error_handler] = binding.value();
     return {type};
 }
 
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeNumber&) {
     const auto binding = context.scopes.get<pddl::TypeImpl>("number");
     assert(binding.has_value());
-    const auto& [type, _position, _error_handler] = binding.value();
+    const auto [type, _position, _error_handler] = binding.value();
     return {type};
 }
 
@@ -85,7 +85,7 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const domain::ast::Name& nod
     if (!binding.has_value()) {
         throw UndefinedTypeError(name, context.scopes.get_error_handler()(node, ""));
     }
-    const auto& [type, _position, _error_handler] = binding.value();
+    const auto [type, _position, _error_handler] = binding.value();
     context.positions.push_back(type, node);
     return { type };
 }
@@ -107,7 +107,7 @@ static void test_multiple_definition(const pddl::Type& type, const domain::ast::
     if (binding.has_value()) {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
         auto message_2 = std::string("");
-        const auto& [_type, position, error_handler] = binding.value();
+        const auto [_type, position, error_handler] = binding.value();
         if (position.has_value()) {
             message_2 = error_handler(position.value(), "First defined here:");
         }
@@ -159,9 +159,8 @@ TypeDeclarationTypedListOfNamesVisitor::TypeDeclarationTypedListOfNamesVisitor(C
 pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vector<domain::ast::Name>& name_nodes) {
     // std::vector<domain::ast::Name> has single base type "object"
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
-    const auto& [type_object, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
-    const auto base_types = pddl::TypeList{type_object};
-    const auto type_list = parse_type_definitions(name_nodes, base_types, context);
+    const auto [type_object, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
+    const auto type_list = parse_type_definitions(name_nodes, pddl::TypeList{type_object}, context);
     return type_list;
 }
 

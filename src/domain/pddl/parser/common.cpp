@@ -54,7 +54,7 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Name& node) const {
     }
     // Constant are not tracked and hence must not be untracked.
     // Construct Term and return it
-    const auto& [constant, _position, _error_handler] = binding.value();
+    const auto [constant, _position, _error_handler] = binding.value();
     const auto term = context.factories.terms.get_or_create<pddl::TermObjectImpl>(constant);
     // Add position of PDDL object
     context.positions.push_back(term, node);
@@ -68,7 +68,7 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) con
     const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
     if (binding.has_value()) {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
-        const auto& [_constant, position, error_handler] = binding.value();
+        const auto [_constant, position, error_handler] = binding.value();
         assert(position.has_value());
         const auto message_2 = error_handler(position.value(), "First defined here:");
         throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
@@ -94,7 +94,7 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::Name& node) const {
         throw UndefinedConstantError(object_name, context.scopes.get_error_handler()(node, ""));
     }
     // Construct Term and return it
-    const auto& [object, _position, _error_handler] = binding.value();
+    const auto [object, _position, _error_handler] = binding.value();
     context.references.untrack(object);
     const auto term = context.factories.terms.get_or_create<pddl::TermObjectImpl>(object);
     // Add position of PDDL object

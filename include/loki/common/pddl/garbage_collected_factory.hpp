@@ -75,7 +75,7 @@ public:
         auto& t_cache = std::get<PerTypeCache<T>>(m_cache->data);
         int identifier = m_cache->count;
         auto key = T(identifier, args...);
-        const auto& [it, inserted] = t_cache.uniqueness.insert(key);
+        const auto [it, inserted] = t_cache.uniqueness.insert(key);
         if (!inserted) {
             assert(t_cache.identifier_to_object.count(it->get_identifier()));
             return t_cache.identifier_to_object.at(it->get_identifier()).lock();

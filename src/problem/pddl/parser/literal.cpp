@@ -38,7 +38,7 @@ pddl::GroundAtom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, 
     for (const auto& name_node : node.names) {
         object_list.push_back(parse_object_reference(name_node, context));
     }
-    const auto& [predicate, _position, _error_handler] = binding.value();
+    const auto [predicate, _position, _error_handler] = binding.value();
     if (predicate->get_parameters().size() != object_list.size()) {
         throw MismatchedPredicateObjectListError(predicate, object_list, context.scopes.get_error_handler()(node, ""));
     }
@@ -52,7 +52,7 @@ pddl::GroundAtom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, C
         throw UndefinedRequirementError(pddl::RequirementEnum::EQUALITY, context.scopes.get_error_handler()(node, ""));
     }
     assert(context.scopes.get<pddl::PredicateImpl>("=").has_value());
-    const auto& [equal_predicate, _position, _error_handler] = context.scopes.get<pddl::PredicateImpl>("=").value();
+    const auto [equal_predicate, _position, _error_handler] = context.scopes.get<pddl::PredicateImpl>("=").value();
     const auto object_left = parse_object_reference(node.name_left, context);
     const auto object_right = parse_object_reference(node.name_right, context);
     const auto atom = context.factories.ground_atoms.get_or_create<pddl::GroundAtomImpl>(equal_predicate, pddl::ObjectList{object_left, object_right});

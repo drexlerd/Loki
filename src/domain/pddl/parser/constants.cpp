@@ -33,7 +33,7 @@ static void test_multiple_definition(const pddl::Object& constant, const domain:
     if (binding.has_value()) {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
         auto message_2 = std::string("");
-        const auto& [_object, position, error_handler] = binding.value();
+        const auto [_object, position, error_handler] = binding.value();
         if (position.has_value()) {
             message_2 = error_handler(position.value(), "First defined here:");
         }
@@ -78,8 +78,7 @@ pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& n
     // std::vector<ast::Name> has single base type "object"
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
     const auto [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
-    const auto type_list = pddl::TypeList{type};
-    return parse_constant_definitions(name_nodes, type_list, context);
+    return parse_constant_definitions(name_nodes, pddl::TypeList{type}, context);
 }
 
 pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
