@@ -60,7 +60,7 @@ private:
     // Use pre-allocated memory to store PDDL object persistent and continuously for improved cache locality.
     SegmentedVector<HolderType, N> m_persistent_vector;
     
-    int m_count = 0;
+    size_t m_count = 0;
 
     std::mutex m_mutex;
 
@@ -71,20 +71,21 @@ public:
     [[nodiscard]] HolderType const* get_or_create(Args... args) {
         std::lock_guard<std::mutex> hold(m_mutex);
         /* Construct and insert the element in persistent memory. */
-        int identifier = m_count;
+        size_t identifier = m_count;
         // Ensure that element with identifier i is stored at position i.
-        assert((identifier == (static_cast<int>(m_persistent_vector.size())-1))
-            || (identifier == static_cast<int>(m_persistent_vector.size())));
+        assert((identifier == (m_persistent_vector.size()-1))
+            || (identifier == m_persistent_vector.size()));
         // The pointer to the location in persistent memory.
         const auto* element_ptr = static_cast<HolderType*>(nullptr);
         // Explicitly call the constructor of T to give exclusive access to the factory.
         auto element = HolderType(std::move(SubType(identifier, std::move(args)...)));
-        bool overwrite_last_element = (identifier == static_cast<int>(m_persistent_vector.size()) - 1);
+        bool overwrite_last_element = (identifier == m_persistent_vector.size() - 1);
         if (overwrite_last_element) {
             element_ptr = &(m_persistent_vector[identifier] = std::move(element));
         } else {
             element_ptr = &(m_persistent_vector.push_back(std::move(element)));
         }
+        std::cout << "element_ptr: " << element_ptr << std::endl;
         /* Test for uniqueness */
         auto it = m_uniqueness_set.find(element_ptr);
         if (it == m_uniqueness_set.end()) {
@@ -92,6 +93,7 @@ public:
             m_uniqueness_set.emplace(element_ptr);
             // Validate the element by increasing the identifier to the next free position
             ++m_count;
+            assert(m_uniqueness_set.size() == m_count);
         } else {
             // Element is not unique!
             // Return the existing one.

@@ -50,12 +50,12 @@ private:
         m_capacity += N;
     }
 
-    size_t segment_index(int identifier) const {
-        return identifier / N;
+    size_t segment_index(size_t pos) const {
+        return pos / N;
     }
 
-    size_t element_index(int identifier) const {
-        return identifier % N;
+    size_t element_index(size_t pos) const {
+        return pos % N;
     }
 
 public:
@@ -77,14 +77,14 @@ public:
         return return_value;
     }
 
-    T& operator[](int index) {
-        assert(index < static_cast<int>(size()));
-        return m_data[segment_index(index)][element_index(index)];
+    T& operator[](size_t pos) {
+        assert(pos < size());
+        return m_data[segment_index(pos)][element_index(pos)];
     }
 
-    const T& operator[](int identifier) const {
-        assert(identifier >= 0 && identifier <= static_cast<int>(size()));
-        return m_data[segment_index(identifier)][element_index(identifier)];
+    const T& operator[](size_t pos) const {
+        assert(pos < size());
+        return m_data[segment_index(pos)][element_index(pos)];
     }
 
     size_t size() const {
