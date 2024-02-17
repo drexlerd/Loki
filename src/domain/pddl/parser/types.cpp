@@ -175,8 +175,8 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::Typ
                                             typed_list_of_names_recursively_node.type);
     auto type_list = parse_type_definitions(typed_list_of_names_recursively_node.names, parent_type_list, context);
     // Recursively add types.
-    const auto additional_types = boost::apply_visitor(*this, typed_list_of_names_recursively_node.typed_list_of_names.get());
-    type_list.insert(type_list.end(), additional_types.begin(), additional_types.end());
+    //const auto additional_types = boost::apply_visitor(*this, typed_list_of_names_recursively_node.typed_list_of_names.get());
+    //type_list.insert(type_list.end(), additional_types.begin(), additional_types.end());
     return type_list;
 }
 
