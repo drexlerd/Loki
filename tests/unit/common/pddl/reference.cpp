@@ -26,8 +26,8 @@ namespace loki::domain::tests {
 
 TEST(LokiTests, ReferenceTest) {
     PersistentFactory<pddl::ObjectImpl, 2> factory;
-    const auto object_0 = factory.get_or_create<pddl::ObjectImpl>("object_0");
-    const auto object_1 = factory.get_or_create<pddl::ObjectImpl>("object_1");
+    const auto object_0 = factory.get_or_create<pddl::ObjectImpl>("object_0", pddl::TypeList());
+    const auto object_1 = factory.get_or_create<pddl::ObjectImpl>("object_1", pddl::TypeList());
 
     ReferencedPDDLObjects references;
     EXPECT_TRUE(!references.exists(object_0));

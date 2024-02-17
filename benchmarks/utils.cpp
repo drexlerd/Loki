@@ -10,7 +10,7 @@ loki::pddl::AtomList create_atoms(
     auto objects = loki::pddl::ObjectList();
     for (size_t i = 1; i <= num_objects; ++i) {
         objects.push_back(factories.objects.get_or_create<loki::pddl::ObjectImpl>(
-            ("object_" + std::to_string(i)))
+            ("object_" + std::to_string(i)), pddl::TypeList())
         );
     }
 
