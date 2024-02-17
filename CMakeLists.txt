@@ -16,7 +16,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project(loki VERSION "0.0.1" LANGUAGES C CXX)
 
 # Compilation flags, some configuration-specific
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -pedantic -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -Wuninitialized -pedantic -fPIC")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -fomit-frame-pointer")
 set(CMAKE_CXX_FLAGS_DEBUG "-O3 -DDEBUG")
 
