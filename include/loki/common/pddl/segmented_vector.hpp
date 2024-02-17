@@ -71,7 +71,7 @@ public:
         // Take ownership of memory
         segment.push_back(std::move(value));
         ++m_size;
-        
+
         // Fetch return value
         return segment.back();
     }

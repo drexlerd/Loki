@@ -68,7 +68,7 @@ public:
     /// @brief Returns a pointer to an existing object
     ///        or creates it before if it does not exist.v
     template<typename SubType, typename... Args>
-    [[nodiscard]] HolderType const* get_or_create(Args... args) {
+    [[nodiscard]] HolderType const* get_or_create(Args&&... args) {
         std::lock_guard<std::mutex> hold(m_mutex);
         /* Construct and insert the element in persistent memory. */
         size_t identifier = m_count;
@@ -78,7 +78,7 @@ public:
         // The pointer to the location in persistent memory.
         const auto* element_ptr = static_cast<HolderType*>(nullptr);
         // Explicitly call the constructor of T to give exclusive access to the factory.
-        auto element = HolderType(std::move(SubType(identifier, args...)));
+        auto element = HolderType(std::move(SubType(identifier, std::forward<Args>(args)...)));
         bool overwrite_last_element = (identifier == m_persistent_vector.size() - 1);
         if (overwrite_last_element) {
             std::cout << "overwrite" << std::endl;
