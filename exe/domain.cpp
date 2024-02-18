@@ -34,5 +34,3 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-
-// cmake -S . -B build -DENABLE_TESTING:bool=TRUE && cmake --build build -j16 && ./build/exe/domain benchmarks/gripper/domain.pddl && ./build/tests/domain/domain_tests

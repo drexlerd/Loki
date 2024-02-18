@@ -33,18 +33,18 @@ message(STATUS "Build configuration: ${CMAKE_BUILD_TYPE}")
 # make cache variables for install destinations
 include(GNUInstallDirs)
 
-option(ENABLE_TESTING "Enables compilation of tests." OFF)
-if (ENABLE_TESTING)
-    message("Testing enabled.")
+option(BUILD_TESTS "Enables compilation of tests." OFF)
+if (BUILD_TESTS)
+    message("Build tests enabled.")
 else()
-    message("Testing disabled.")
+    message("Build tests disabled.")
 endif()
 
-option(ENABLE_BENCHMARKING "Enables compilation of tests." OFF)
-if (ENABLE_BENCHMARKING)
-    message("Benchmarking enabled.")
+option(BUILD_BENCHMARKS "Enables compilation of tests." OFF)
+if (BUILD_BENCHMARKS)
+    message("Build benchmarks enabled.")
 else()
-    message("Benchmarking disabled.")
+    message("Build benchmarks disabled.")
 endif()
 
 
@@ -98,11 +98,11 @@ add_subdirectory(exe)
 
 add_subdirectory(examples)
 
-if (ENABLE_TESTING)
+if (BUILD_TESTS)
   add_subdirectory(tests)
 endif()
 
-if (ENABLE_BENCHMARKING)
+if (BUILD_BENCHMARKS)
   add_subdirectory(benchmarks)
 endif()
 
