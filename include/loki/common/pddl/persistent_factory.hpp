@@ -100,12 +100,12 @@ public:
     }
 
     /// @brief Returns a pointer to an existing object with the given identifier.
-    [[nodiscard]] HolderType const* get(size_t identifier) {
+    [[nodiscard]] HolderType const* get(size_t identifier) const {
         if (identifier < m_persistent_vector.size()) {
             return &(m_persistent_vector[identifier]);
         }
 
-        throw std::runtime_error("invalid identifier");
+        throw std::invalid_argument("invalid identifier");
     }
 
     size_t size() const {
