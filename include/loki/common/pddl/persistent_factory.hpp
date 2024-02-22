@@ -30,9 +30,9 @@
 
 
 namespace loki {
-/// @brief The PersistentFactory class manages unique objects in a persistent 
-///        and efficient manner, utilizing a combination of unordered_set for 
-///        uniqueness checks and SegmentedVector for continuous and 
+/// @brief The PersistentFactory class manages unique objects in a persistent
+///        and efficient manner, utilizing a combination of unordered_set for
+///        uniqueness checks and SegmentedVector for continuous and
 ///        cache-efficient storage.
 /// @tparam HolderType is the nested type which can be an std::variant.
 /// @tparam N is the number of elements per segment
@@ -59,14 +59,14 @@ private:
     std::unordered_set<const HolderType*, DerferencedHash<HolderType>, DereferencedEquality<HolderType>> m_uniqueness_set;
     // Use pre-allocated memory to store PDDL object persistent and continuously for improved cache locality.
     SegmentedVector<HolderType, N> m_persistent_vector;
-    
+
     size_t m_count = 0;
 
     std::mutex m_mutex;
 
 public:
     /// @brief Returns a pointer to an existing object
-    ///        or creates it before if it does not exist.v
+    ///        or creates it before if it does not exist.
     template<typename SubType, typename... Args>
     [[nodiscard]] HolderType const* get_or_create(Args&&... args) {
         std::lock_guard<std::mutex> hold(m_mutex);
@@ -79,14 +79,14 @@ public:
         auto element = HolderType(std::move(SubType(identifier, std::forward<Args>(args)...)));
         bool overwrite_last_element = (identifier == m_persistent_vector.size() - 1);
         // The pointer to the location in persistent memory.
-        const auto* element_ptr = overwrite_last_element 
+        const auto* element_ptr = overwrite_last_element
             ? &(m_persistent_vector[identifier] = std::move(element))
             : &(m_persistent_vector.push_back(std::move(element)));
         assert(element_ptr);
         /* Test for uniqueness */
         auto it = m_uniqueness_set.find(element_ptr);
         if (it == m_uniqueness_set.end()) {
-            // Element is unique! 
+            // Element is unique!
             m_uniqueness_set.emplace(element_ptr);
             // Validate the element by increasing the identifier to the next free position
             ++m_count;
@@ -97,6 +97,15 @@ public:
             element_ptr = *it;
         }
         return element_ptr;
+    }
+
+    /// @brief Returns a pointer to an existing object with the given identifier.
+    [[nodiscard]] HolderType const* get(size_t identifier) {
+        if (identifier < m_persistent_vector.size()) {
+            return &(m_persistent_vector[identifier]);
+        }
+
+        throw std::runtime_error("invalid identifier");
     }
 
     size_t size() const {
