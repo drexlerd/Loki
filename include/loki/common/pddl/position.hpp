@@ -18,37 +18,37 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_POSITION_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_POSITION_HPP_
 
-#include "config.hpp"
-#include "declarations.hpp"
-
-#include "../ast/error_reporting.hpp"
-#include "../filesystem.hpp"
+#include "loki/common/ast/error_reporting.hpp"
+#include "loki/common/filesystem.hpp"
+#include "loki/common/pddl/config.hpp"
+#include "loki/common/pddl/declarations.hpp"
 
 #include <unordered_map>
 
-
-namespace loki {
+namespace loki
+{
 template<typename T>
 using PositionMapType = std::unordered_map<PDDLElement<T>, PositionList>;
 
 /// @brief Stores all occurrences of a PDDL object in the input file for each PDDL type T.
 template<typename... Ts>
-class PositionCache {
-    private:
-        std::tuple<PositionMapType<Ts>...> m_positions;
+class PositionCache
+{
+private:
+    std::tuple<PositionMapType<Ts>...> m_positions;
 
-        PDDLErrorHandler m_error_handler;
+    PDDLErrorHandler m_error_handler;
 
-    public:
-        PositionCache(const X3ErrorHandler& error_handler, const fs::path& file, int tabs=4);
+public:
+    PositionCache(const X3ErrorHandler& error_handler, const fs::path& file, int tabs = 4);
 
-        template<typename T>
-        void push_back(const PDDLElement<T>& element, const Position& position);
+    template<typename T>
+    void push_back(const PDDLElement<T>& element, const Position& position);
 
-        template<typename T>
-        PositionList get(const PDDLElement<T>& element) const;
+    template<typename T>
+    PositionList get(const PDDLElement<T>& element) const;
 
-        const PDDLErrorHandler& get_error_handler() const;
+    const PDDLErrorHandler& get_error_handler() const;
 };
 
 }

@@ -18,34 +18,33 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_TYPES_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_TYPES_HPP_
 
-#include "position.hpp"
-#include "persistent_factory.hpp"
+#include "loki/common/pddl/persistent_factory.hpp"
+#include "loki/common/pddl/position.hpp"
+#include "loki/domain/pddl/action.hpp"
+#include "loki/domain/pddl/atom.hpp"
+#include "loki/domain/pddl/conditions.hpp"
+#include "loki/domain/pddl/derived_predicate.hpp"
+#include "loki/domain/pddl/domain.hpp"
+#include "loki/domain/pddl/effects.hpp"
+#include "loki/domain/pddl/function.hpp"
+#include "loki/domain/pddl/function_expressions.hpp"
+#include "loki/domain/pddl/function_skeleton.hpp"
+#include "loki/domain/pddl/literal.hpp"
+#include "loki/domain/pddl/object.hpp"
+#include "loki/domain/pddl/parameter.hpp"
+#include "loki/domain/pddl/predicate.hpp"
+#include "loki/domain/pddl/requirements.hpp"
+#include "loki/domain/pddl/term.hpp"
+#include "loki/domain/pddl/type.hpp"
+#include "loki/domain/pddl/variable.hpp"
+#include "loki/problem/pddl/ground_atom.hpp"
+#include "loki/problem/pddl/ground_literal.hpp"
+#include "loki/problem/pddl/metric.hpp"
+#include "loki/problem/pddl/numeric_fluent.hpp"
+#include "loki/problem/pddl/problem.hpp"
 
-#include "../../domain/pddl/action.hpp"
-#include "../../domain/pddl/atom.hpp"
-#include "../../domain/pddl/conditions.hpp"
-#include "../../domain/pddl/derived_predicate.hpp"
-#include "../../domain/pddl/domain.hpp"
-#include "../../domain/pddl/effects.hpp"
-#include "../../domain/pddl/function_expressions.hpp"
-#include "../../domain/pddl/function_skeleton.hpp"
-#include "../../domain/pddl/function.hpp"
-#include "../../domain/pddl/literal.hpp"
-#include "../../domain/pddl/object.hpp"
-#include "../../domain/pddl/parameter.hpp"
-#include "../../domain/pddl/predicate.hpp"
-#include "../../domain/pddl/requirements.hpp"
-#include "../../domain/pddl/term.hpp"
-#include "../../domain/pddl/type.hpp"
-#include "../../domain/pddl/variable.hpp"
-#include "../../problem/pddl/ground_atom.hpp"
-#include "../../problem/pddl/ground_literal.hpp"
-#include "../../problem/pddl/problem.hpp"
-#include "../../problem/pddl/metric.hpp"
-#include "../../problem/pddl/numeric_fluent.hpp"
-
-
-namespace loki {
+namespace loki
+{
 // The segmented sizes are chosen sufficiently large to avoid
 // to avoid allocations and for continuous storage.
 // The values are just educated guesses based on the knowledge
@@ -73,33 +72,32 @@ using NumericFluentFactory = PersistentFactory<pddl::NumericFluentImpl, 1000>;
 using DomainFactory = PersistentFactory<pddl::DomainImpl, 1>;
 using ProblemFactory = PersistentFactory<pddl::ProblemImpl, 100>;
 
-
-using PDDLPositionCache = PositionCache<pddl::RequirementsImpl
-    , pddl::TypeImpl
-    , pddl::VariableImpl
-    , pddl::TermImpl
-    , pddl::ObjectImpl
-    , pddl::AtomImpl
-    , pddl::GroundAtomImpl
-    , pddl::LiteralImpl
-    , pddl::GroundLiteralImpl
-    , pddl::ParameterImpl
-    , pddl::PredicateImpl
-    , pddl::FunctionExpressionImpl
-    , pddl::FunctionImpl
-    , pddl::FunctionSkeletonImpl
-    , pddl::ConditionImpl
-    , pddl::EffectImpl
-    , pddl::ActionImpl
-    , pddl::DerivedPredicateImpl
-    , pddl::OptimizationMetricImpl
-    , pddl::NumericFluentImpl
-    , pddl::DomainImpl
-    , pddl::ProblemImpl>;
-
+using PDDLPositionCache = PositionCache<pddl::RequirementsImpl,
+                                        pddl::TypeImpl,
+                                        pddl::VariableImpl,
+                                        pddl::TermImpl,
+                                        pddl::ObjectImpl,
+                                        pddl::AtomImpl,
+                                        pddl::GroundAtomImpl,
+                                        pddl::LiteralImpl,
+                                        pddl::GroundLiteralImpl,
+                                        pddl::ParameterImpl,
+                                        pddl::PredicateImpl,
+                                        pddl::FunctionExpressionImpl,
+                                        pddl::FunctionImpl,
+                                        pddl::FunctionSkeletonImpl,
+                                        pddl::ConditionImpl,
+                                        pddl::EffectImpl,
+                                        pddl::ActionImpl,
+                                        pddl::DerivedPredicateImpl,
+                                        pddl::OptimizationMetricImpl,
+                                        pddl::NumericFluentImpl,
+                                        pddl::DomainImpl,
+                                        pddl::ProblemImpl>;
 
 /// @brief Collection of factories for the unique creation of PDDL objects.
-struct PDDLFactories {
+struct PDDLFactories
+{
     RequirementFactory requirements;
     TypeFactory types;
     VariableFactory variables;

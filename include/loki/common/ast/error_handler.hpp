@@ -18,45 +18,48 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_AST_ERROR_HANDLER_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_AST_ERROR_HANDLER_HPP_
 
-#include "config.hpp"
+#include "loki/common/ast/config.hpp"
 
-#include <unordered_map>
 #include <string>
-
+#include <unordered_map>
 
 namespace loki
 {
-    namespace x3 = boost::spirit::x3;
+namespace x3 = boost::spirit::x3;
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Our error handler
-    ////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+// Our error handler
+////////////////////////////////////////////////////////////////////////////
 
-    struct error_handler_base
+struct error_handler_base
+{
+    std::unordered_map<std::string, std::string> id_map;
+
+    error_handler_base() {}
+
+    template<typename Iterator, typename Exception, typename Context>
+    x3::error_handler_result on_error(Iterator& /*first*/,
+                                      Iterator const& /*last*/
+                                      ,
+                                      Exception const& x,
+                                      Context const& context)
     {
-        std::unordered_map<std::string, std::string> id_map;
-
-        error_handler_base() { }
-
-        template <typename Iterator, typename Exception, typename Context>
-        x3::error_handler_result on_error(
-            Iterator& /*first*/, Iterator const& /*last*/
-          , Exception const& x, Context const& context) {
+        {
+            std::string which = x.which();
+            auto iter = id_map.find(which);
+            if (iter != id_map.end())
             {
-                std::string which = x.which();
-                auto iter = id_map.find(which);
-                if (iter != id_map.end()) {
-                    which = iter->second;
-                }
-
-                std::string message = "Error! Expecting: " + which + " here:";
-                auto& error_handler = x3::get<error_handler_tag>(context).get();
-                error_handler(x.where(), message);
-
-                return x3::error_handler_result::fail;
+                which = iter->second;
             }
+
+            std::string message = "Error! Expecting: " + which + " here:";
+            auto& error_handler = x3::get<error_handler_tag>(context).get();
+            error_handler(x.where(), message);
+
+            return x3::error_handler_result::fail;
         }
-    };
+    }
+};
 }
 
 #endif

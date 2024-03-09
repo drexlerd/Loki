@@ -18,30 +18,30 @@
 #ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_DECLARATIONS_HPP_
 #define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_DECLARATIONS_HPP_
 
-#include "../../domain/pddl/declarations.hpp"
+#include "loki/domain/pddl/declarations.hpp"
 
 #include <vector>
 
+namespace loki::pddl
+{
+class GroundAtomImpl;
+using GroundAtom = const GroundAtomImpl*;
+using GroundAtomList = std::vector<GroundAtom>;
 
-namespace loki::pddl {
-    class GroundAtomImpl;
-    using GroundAtom = const GroundAtomImpl*;
-    using GroundAtomList = std::vector<GroundAtom>;
+class GroundLiteralImpl;
+using GroundLiteral = const GroundLiteralImpl*;
+using GroundLiteralList = std::vector<GroundLiteral>;
 
-    class GroundLiteralImpl;
-    using GroundLiteral = const GroundLiteralImpl*;
-    using GroundLiteralList = std::vector<GroundLiteral>;
+class NumericFluentImpl;
+using NumericFluent = const NumericFluentImpl*;
+using NumericFluentList = std::vector<NumericFluent>;
 
-    class NumericFluentImpl;
-    using NumericFluent = const NumericFluentImpl*;
-    using NumericFluentList = std::vector<NumericFluent>;
+class OptimizationMetricImpl;
+using OptimizationMetric = const OptimizationMetricImpl*;
 
-    class OptimizationMetricImpl;
-    using OptimizationMetric = const OptimizationMetricImpl*;
-
-    class ProblemImpl;
-    using Problem = const ProblemImpl*;
-    using ProblemList = std::vector<Problem>;
+class ProblemImpl;
+using Problem = const ProblemImpl*;
+using ProblemList = std::vector<Problem>;
 }
 
 #endif

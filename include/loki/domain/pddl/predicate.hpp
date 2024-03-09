@@ -18,23 +18,23 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_PREDICATE_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_PREDICATE_HPP_
 
-#include "declarations.hpp"
-
-#include "../../common/pddl/base.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/domain/pddl/declarations.hpp"
 
 #include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
-
-namespace loki::pddl {
+namespace loki::pddl
+{
 
 // An alternative name is AtomSkeleton
-class PredicateImpl : public Base<PredicateImpl> {
+class PredicateImpl : public Base<PredicateImpl>
+{
 private:
     std::string m_name;
     ParameterList m_parameters;
@@ -63,20 +63,20 @@ public:
 
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::Predicate>
+{
+    bool operator()(const loki::pddl::Predicate& left_predicate, const loki::pddl::Predicate& right_predicate) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::Predicate>
-    {
-        bool operator()(const loki::pddl::Predicate& left_predicate, const loki::pddl::Predicate& right_predicate) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::PredicateImpl>
-    {
-        std::size_t operator()(const loki::pddl::PredicateImpl& predicate) const;
-    };
+template<>
+struct hash<loki::pddl::PredicateImpl>
+{
+    std::size_t operator()(const loki::pddl::PredicateImpl& predicate) const;
+};
 }
 
 #endif

@@ -18,12 +18,11 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_COMMON_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_COMMON_HPP_
 
+#include <loki/common/pddl/context.hpp>
 #include <loki/domain/ast/ast.hpp>
 
-#include <loki/common/pddl/context.hpp>
-
-
-namespace loki {
+namespace loki
+{
 
 /* Name */
 extern std::string parse(const domain::ast::Name& node);
@@ -32,7 +31,8 @@ extern std::string parse(const domain::ast::Name& node);
 extern pddl::Variable parse(const domain::ast::Variable& node, Context& context);
 
 /* Term */
-struct TermDeclarationTermVisitor : boost::static_visitor<pddl::Term> {
+struct TermDeclarationTermVisitor : boost::static_visitor<pddl::Term>
+{
     Context& context;
 
     TermDeclarationTermVisitor(Context& context_);
@@ -41,7 +41,8 @@ struct TermDeclarationTermVisitor : boost::static_visitor<pddl::Term> {
     pddl::Term operator()(const domain::ast::Variable& node) const;
 };
 
-struct TermReferenceTermVisitor : boost::static_visitor<pddl::Term> {
+struct TermReferenceTermVisitor : boost::static_visitor<pddl::Term>
+{
     Context& context;
 
     TermReferenceTermVisitor(Context& context_);
@@ -55,4 +56,4 @@ extern double parse(const domain::ast::Number& node);
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_COMMON_HPP_
+#endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_COMMON_HPP_

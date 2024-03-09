@@ -18,124 +18,114 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_DECLARATIONS_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_DECLARATIONS_HPP_
 
-#include "../../common/pddl/declarations.hpp"
+#include "loki/common/pddl/declarations.hpp"
 
 #include <boost/container/small_vector.hpp>
-
 #include <unordered_map>
-#include <vector>
 #include <variant>
+#include <vector>
 
+namespace loki::pddl
+{
+class RequirementsImpl;
+using Requirements = const RequirementsImpl*;
 
-namespace loki::pddl {
-    class RequirementsImpl;
-    using Requirements = const RequirementsImpl*;
+class TypeImpl;
+using Type = const TypeImpl*;
+using TypeList = boost::container::small_vector<Type, 1>;  // often single type
+// using TypeList = std::vector<Type>;
 
-    class TypeImpl;
-    using Type = const TypeImpl*;
-    using TypeList = boost::container::small_vector<Type,1>;  // often single type
-    //using TypeList = std::vector<Type>;
+class ObjectImpl;
+using Object = const ObjectImpl*;
+using ObjectList = std::vector<Object>;
 
-    class ObjectImpl;
-    using Object = const ObjectImpl*;
-    using ObjectList = std::vector<Object>;
+class VariableImpl;
+using Variable = const VariableImpl*;
+using VariableList = std::vector<Variable>;  // not used
+using VariableAssignment = std::unordered_map<Variable, Object>;
 
-    class VariableImpl;
-    using Variable = const VariableImpl*;
-    using VariableList = std::vector<Variable>;  // not used
-    using VariableAssignment = std::unordered_map<Variable, Object>;
+class TermObjectImpl;
+class TermVariableImpl;
+using TermImpl = std::variant<TermObjectImpl, TermVariableImpl>;
+using Term = const TermImpl*;
+using TermList = boost::container::small_vector<Term, 2>;  // often unary and binary predicates
+// using TermList = std::vector<Term>;
 
-    class TermObjectImpl;
-    class TermVariableImpl;
-    using TermImpl = std::variant<TermObjectImpl, TermVariableImpl>;
-    using Term = const TermImpl*;
-    using TermList = boost::container::small_vector<Term, 2>;  // often unary and binary predicates
-    //using TermList = std::vector<Term>;
+class AtomImpl;
+using Atom = const AtomImpl*;
+using AtomList = std::vector<Atom>;
 
-    class AtomImpl;
-    using Atom = const AtomImpl*;
-    using AtomList = std::vector<Atom>;
+class ParameterImpl;
+using Parameter = const ParameterImpl*;
+using ParameterList = boost::container::small_vector<Parameter, 10>;  // often actions, quantifiers with few parameters
+// using ParameterList = std::vector<Parameter>;
+using ParameterAssignment = std::unordered_map<Parameter, Object>;
 
-    class ParameterImpl;
-    using Parameter = const ParameterImpl*;
-    using ParameterList = boost::container::small_vector<Parameter, 10>;  // often actions, quantifiers with few parameters
-    //using ParameterList = std::vector<Parameter>;
-    using ParameterAssignment = std::unordered_map<Parameter, Object>;
+class PredicateImpl;
+using Predicate = const PredicateImpl*;
+using PredicateList = std::vector<Predicate>;
 
-    class PredicateImpl;
-    using Predicate = const PredicateImpl*;
-    using PredicateList = std::vector<Predicate>;
+class LiteralImpl;
+using Literal = const LiteralImpl*;
+using LiteralList = std::vector<Literal>;
 
-    class LiteralImpl;
-    using Literal = const LiteralImpl*;
-    using LiteralList = std::vector<Literal>;
+class ConditionLiteralImpl;
+class ConditionAndImpl;
+class ConditionOrImpl;
+class ConditionNotImpl;
+class ConditionImplyImpl;
+class ConditionExistsImpl;
+class ConditionForallImpl;
+using ConditionImpl =
+    std::variant<ConditionLiteralImpl, ConditionAndImpl, ConditionOrImpl, ConditionNotImpl, ConditionImplyImpl, ConditionExistsImpl, ConditionForallImpl>;
+using Condition = const ConditionImpl*;
+using ConditionList = std::vector<Condition>;
 
-    class ConditionLiteralImpl;
-    class ConditionAndImpl;
-    class ConditionOrImpl;
-    class ConditionNotImpl;
-    class ConditionImplyImpl;
-    class ConditionExistsImpl;
-    class ConditionForallImpl;
-    using ConditionImpl = std::variant<ConditionLiteralImpl
-        , ConditionAndImpl
-        , ConditionOrImpl
-        , ConditionNotImpl
-        , ConditionImplyImpl
-        , ConditionExistsImpl
-        , ConditionForallImpl>;
-    using Condition = const ConditionImpl*;
-    using ConditionList = std::vector<Condition>;
+class EffectLiteralImpl;
+class EffectAndImpl;
+class EffectNumericImpl;
+class EffectConditionalForallImpl;
+class EffectConditionalWhenImpl;
+using EffectImpl = std::variant<EffectLiteralImpl, EffectAndImpl, EffectNumericImpl, EffectConditionalForallImpl, EffectConditionalWhenImpl>;
+using Effect = const EffectImpl*;
+using EffectList = std::vector<Effect>;
 
-    class EffectLiteralImpl;
-    class EffectAndImpl;
-    class EffectNumericImpl;
-    class EffectConditionalForallImpl;
-    class EffectConditionalWhenImpl;
-    using EffectImpl = std::variant<EffectLiteralImpl
-        , EffectAndImpl
-        , EffectNumericImpl
-        , EffectConditionalForallImpl
-        , EffectConditionalWhenImpl>;
-    using Effect = const EffectImpl*;
-    using EffectList = std::vector<Effect>;
+class FunctionExpressionNumberImpl;
+class FunctionExpressionBinaryOperatorImpl;
+class FunctionExpressionMultiOperatorImpl;
+class FunctionExpressionMinusImpl;
+class FunctionExpressionFunctionImpl;
+using FunctionExpressionImpl = std::variant<FunctionExpressionNumberImpl,
+                                            FunctionExpressionBinaryOperatorImpl,
+                                            FunctionExpressionMultiOperatorImpl,
+                                            FunctionExpressionMinusImpl,
+                                            FunctionExpressionFunctionImpl>;
+using FunctionExpression = const FunctionExpressionImpl*;
+using FunctionExpressionList = std::vector<FunctionExpression>;
 
-    class FunctionExpressionNumberImpl;
-    class FunctionExpressionBinaryOperatorImpl;
-    class FunctionExpressionMultiOperatorImpl;
-    class FunctionExpressionMinusImpl;
-    class FunctionExpressionFunctionImpl;
-    using FunctionExpressionImpl = std::variant<FunctionExpressionNumberImpl
-        , FunctionExpressionBinaryOperatorImpl
-        , FunctionExpressionMultiOperatorImpl
-        , FunctionExpressionMinusImpl
-        , FunctionExpressionFunctionImpl>;
-    using FunctionExpression = const FunctionExpressionImpl*;
-    using FunctionExpressionList = std::vector<FunctionExpression>;
+class FunctionSkeletonImpl;
+using FunctionSkeleton = const FunctionSkeletonImpl*;
+using FunctionSkeletonList = std::vector<FunctionSkeleton>;
 
-    class FunctionSkeletonImpl;
-    using FunctionSkeleton = const FunctionSkeletonImpl*;
-    using FunctionSkeletonList = std::vector<FunctionSkeleton>;
+class FunctionImpl;
+using Function = const FunctionImpl*;
+using FunctionList = std::vector<Function>;
 
-    class FunctionImpl;
-    using Function = const FunctionImpl*;
-    using FunctionList = std::vector<Function>;
+class ConstraintImpl;
+using Constraint = const ConstraintImpl*;
+using ConstraintList = std::vector<Constraint>;
 
-    class ConstraintImpl;
-    using Constraint = const ConstraintImpl*;
-    using ConstraintList = std::vector<Constraint>;
+class ActionImpl;
+using Action = const ActionImpl*;
+using ActionList = std::vector<Action>;
 
-    class ActionImpl;
-    using Action = const ActionImpl*;
-    using ActionList = std::vector<Action>;
+class DerivedPredicateImpl;
+using DerivedPredicate = const DerivedPredicateImpl*;
+using DerivedPredicateList = std::vector<DerivedPredicate>;
 
-    class DerivedPredicateImpl;
-    using DerivedPredicate = const DerivedPredicateImpl*;
-    using DerivedPredicateList = std::vector<DerivedPredicate>;
-
-    class DomainImpl;
-    using Domain = const DomainImpl*;
-    using DomainList = std::vector<Domain>;
+class DomainImpl;
+using Domain = const DomainImpl*;
+using DomainList = std::vector<Domain>;
 }
 
 #endif

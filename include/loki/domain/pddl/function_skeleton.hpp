@@ -18,21 +18,21 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_FUNCTION_SKELETON_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_FUNCTION_SKELETON_HPP_
 
-#include "declarations.hpp"
-
-#include "../../common/pddl/base.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/domain/pddl/declarations.hpp"
 
 #include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
-
-namespace loki::pddl {
-class FunctionSkeletonImpl : public Base<FunctionSkeletonImpl> {
+namespace loki::pddl
+{
+class FunctionSkeletonImpl : public Base<FunctionSkeletonImpl>
+{
 private:
     std::string m_name;
     ParameterList m_parameters;
@@ -63,20 +63,20 @@ public:
 
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::FunctionSkeleton>
+{
+    bool operator()(const loki::pddl::FunctionSkeleton& left_function, const loki::pddl::FunctionSkeleton& right_function) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::FunctionSkeleton>
-    {
-        bool operator()(const loki::pddl::FunctionSkeleton& left_function, const loki::pddl::FunctionSkeleton& right_function) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::FunctionSkeletonImpl>
-    {
-        std::size_t operator()(const loki::pddl::FunctionSkeletonImpl& function) const;
-    };
+template<>
+struct hash<loki::pddl::FunctionSkeletonImpl>
+{
+    std::size_t operator()(const loki::pddl::FunctionSkeletonImpl& function) const;
+};
 }
 
 #endif

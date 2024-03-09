@@ -17,12 +17,12 @@
 
 // Taken from: https://stackoverflow.com/questions/669438/how-to-get-memory-usage-at-runtime-using-c
 
-#include <unistd.h>
+#include <fstream>
 #include <ios>
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <tuple>
+#include <unistd.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -30,7 +30,8 @@
 // size and resident set size, and return the results in KB.
 //
 // On failure, returns 0.0, 0.0
-namespace loki {
+namespace loki
+{
 
 extern std::tuple<double, double> process_mem_usage();
 

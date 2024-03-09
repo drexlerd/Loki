@@ -18,22 +18,22 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_TERM_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_TERM_HPP_
 
-#include "declarations.hpp"
-
-#include "../../common/pddl/base.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/domain/pddl/declarations.hpp"
 
 #include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
+namespace loki::pddl
+{
 
-namespace loki::pddl {
-
-class TermObjectImpl : public Base<TermObjectImpl> {
+class TermObjectImpl : public Base<TermObjectImpl>
+{
 private:
     Object m_object;
 
@@ -54,8 +54,8 @@ public:
     const Object& get_object() const;
 };
 
-
-class TermVariableImpl : public Base<TermVariableImpl> {
+class TermVariableImpl : public Base<TermVariableImpl>
+{
 private:
     Variable m_variable;
 
@@ -78,27 +78,26 @@ public:
 
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::Term>
+{
+    bool operator()(const loki::pddl::Term& left_term, const loki::pddl::Term& right_term) const;
+};
 
+template<>
+struct hash<loki::pddl::TermObjectImpl>
+{
+    std::size_t operator()(const loki::pddl::TermObjectImpl& term) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::Term>
-    {
-        bool operator()(const loki::pddl::Term& left_term, const loki::pddl::Term& right_term) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::TermObjectImpl>
-    {
-        std::size_t operator()(const loki::pddl::TermObjectImpl& term) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::TermVariableImpl>
-    {
-        std::size_t operator()(const loki::pddl::TermVariableImpl& term) const;
-    };
+template<>
+struct hash<loki::pddl::TermVariableImpl>
+{
+    std::size_t operator()(const loki::pddl::TermVariableImpl& term) const;
+};
 }
 
 #endif

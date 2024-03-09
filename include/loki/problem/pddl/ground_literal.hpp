@@ -18,21 +18,21 @@
 #ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_GROUND_LITERAL_HPP_
 #define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_GROUND_LITERAL_HPP_
 
-#include "declarations.hpp"
-
-#include "../../common/pddl/base.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/problem/pddl/declarations.hpp"
 
 #include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
-
-namespace loki::pddl {
-class GroundLiteralImpl : public Base<GroundLiteralImpl> {
+namespace loki::pddl
+{
+class GroundLiteralImpl : public Base<GroundLiteralImpl>
+{
 private:
     bool m_is_negated;
     GroundAtom m_atom;
@@ -58,21 +58,20 @@ public:
 
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::GroundLiteral>
+{
+    bool operator()(const loki::pddl::GroundLiteral& left_literal, const loki::pddl::GroundLiteral& right_literal) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::GroundLiteral>
-    {
-        bool operator()(const loki::pddl::GroundLiteral& left_literal, const loki::pddl::GroundLiteral& right_literal) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::GroundLiteralImpl>
-    {
-        std::size_t operator()(const loki::pddl::GroundLiteralImpl& literal) const;
-    };
+template<>
+struct hash<loki::pddl::GroundLiteralImpl>
+{
+    std::size_t operator()(const loki::pddl::GroundLiteralImpl& literal) const;
+};
 }
-
 
 #endif

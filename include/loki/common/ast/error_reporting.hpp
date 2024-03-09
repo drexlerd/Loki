@@ -18,48 +18,39 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_AST_ERROR_REPORTING_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_AST_ERROR_REPORTING_HPP_
 
-#include "config.hpp"
+#include "loki/common/ast/config.hpp"
 
 #include <sstream>
-
 
 // Clang-style error handling utilities
 
 namespace loki
 {
-    /* Combined error handler and output stream. */
-    class X3ErrorHandler {
-        private:
-            // Order of initialization matters
-            std::ostringstream m_error_stream;
-            error_handler_type m_error_handler;
+/* Combined error handler and output stream. */
+class X3ErrorHandler
+{
+private:
+    // Order of initialization matters
+    std::ostringstream m_error_stream;
+    error_handler_type m_error_handler;
 
-        public:
-            X3ErrorHandler(iterator_type first, iterator_type last, const std::string& file)
-                : m_error_handler(error_handler_type(first, last, m_error_stream, file)) { }
+public:
+    X3ErrorHandler(iterator_type first, iterator_type last, const std::string& file) : m_error_handler(error_handler_type(first, last, m_error_stream, file)) {}
 
-            // delete copy and move to avoid dangling references.
-            X3ErrorHandler(const X3ErrorHandler& other) = delete;
-            X3ErrorHandler& operator=(const X3ErrorHandler& other) = delete;
-            X3ErrorHandler(X3ErrorHandler&& other) = delete;
-            X3ErrorHandler& operator=(X3ErrorHandler&& other) = delete;
+    // delete copy and move to avoid dangling references.
+    X3ErrorHandler(const X3ErrorHandler& other) = delete;
+    X3ErrorHandler& operator=(const X3ErrorHandler& other) = delete;
+    X3ErrorHandler(X3ErrorHandler&& other) = delete;
+    X3ErrorHandler& operator=(X3ErrorHandler&& other) = delete;
 
-            const error_handler_type& get_error_handler() const {
-                return m_error_handler;
-            }
+    const error_handler_type& get_error_handler() const { return m_error_handler; }
 
-            error_handler_type& get_error_handler() {
-                return m_error_handler;
-            }
+    error_handler_type& get_error_handler() { return m_error_handler; }
 
-            const std::ostringstream& get_error_stream() const {
-                return m_error_stream;
-            }
+    const std::ostringstream& get_error_stream() const { return m_error_stream; }
 
-            std::ostringstream& get_error_stream() {
-                return m_error_stream;
-            }
-    };
+    std::ostringstream& get_error_stream() { return m_error_stream; }
+};
 }
 
 #endif

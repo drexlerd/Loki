@@ -18,131 +18,144 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_EXCEPTIONS_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_EXCEPTIONS_HPP_
 
-#include "declarations.hpp"
-#include "requirements.hpp"
-
-#include "../../common/exceptions.hpp"
+#include "loki/common/exceptions.hpp"
+#include "loki/domain/pddl/declarations.hpp"
+#include "loki/domain/pddl/requirements.hpp"
 
 #include <stdexcept>
 
-
-namespace loki {
+namespace loki
+{
 
 /* Type */
-class ReservedTypeError : public SemanticParserError {
+class ReservedTypeError : public SemanticParserError
+{
 public:
     ReservedTypeError(const std::string& name, const std::string& error_handler_output);
 };
 
-class UnusedTypeError : public SemanticParserError {
+class UnusedTypeError : public SemanticParserError
+{
 public:
     UnusedTypeError(const std::string& name, const std::string& error_handler_output);
 };
 
-class UndefinedTypeError : public SemanticParserError {
+class UndefinedTypeError : public SemanticParserError
+{
 public:
     UndefinedTypeError(const std::string& name, const std::string& error_handler_output);
 };
 
-class MultiDefinitionTypeError : public SemanticParserError {
+class MultiDefinitionTypeError : public SemanticParserError
+{
 public:
     MultiDefinitionTypeError(const std::string& name, const std::string& error_handler_output);
 };
 
 /* Predicate */
-class UnusedPredicateError : public SemanticParserError {
+class UnusedPredicateError : public SemanticParserError
+{
 public:
     UnusedPredicateError(const std::string& name, const std::string& error_handler_output);
 };
 
-class UndefinedPredicateError : public SemanticParserError {
+class UndefinedPredicateError : public SemanticParserError
+{
 public:
     UndefinedPredicateError(const std::string& name, const std::string& error_handler_output);
 };
 
-class MultiDefinitionPredicateError : public SemanticParserError {
+class MultiDefinitionPredicateError : public SemanticParserError
+{
 public:
     MultiDefinitionPredicateError(const std::string& name, const std::string& error_handler_output);
 };
 
 /* Constant */
 // UnusedConstantError is not a valid exception because constants are not required to be used in all problems
-class UndefinedConstantError : public SemanticParserError {
+class UndefinedConstantError : public SemanticParserError
+{
 public:
     UndefinedConstantError(const std::string& name, const std::string& error_handler_output);
 };
 
-class MultiDefinitionConstantError : public SemanticParserError {
+class MultiDefinitionConstantError : public SemanticParserError
+{
 public:
     MultiDefinitionConstantError(const std::string& name, const std::string& error_handler_output);
 };
 
 /* Variable */
-class UnusedVariableError : public SemanticParserError {
+class UnusedVariableError : public SemanticParserError
+{
 public:
     UnusedVariableError(const std::string& name, const std::string& error_handler_output);
 };
 
-class UndefinedVariableError : public SemanticParserError {
+class UndefinedVariableError : public SemanticParserError
+{
 public:
     UndefinedVariableError(const std::string& name, const std::string& error_handler_output);
 };
 
-class MultiDefinitionVariableError : public SemanticParserError {
+class MultiDefinitionVariableError : public SemanticParserError
+{
 public:
     MultiDefinitionVariableError(const std::string& name, const std::string& error_handler_output);
 };
 
 /* FunctionSkeleton */
-class UnusedFunctionSkeletonError : public SemanticParserError {
+class UnusedFunctionSkeletonError : public SemanticParserError
+{
 public:
     UnusedFunctionSkeletonError(const std::string& name, const std::string& error_handler_output);
 };
 
-class UndefinedFunctionSkeletonError : public SemanticParserError {
+class UndefinedFunctionSkeletonError : public SemanticParserError
+{
 public:
     UndefinedFunctionSkeletonError(const std::string& name, const std::string& error_handler_output);
 };
 
-class MultiDefinitionFunctionSkeletonError : public SemanticParserError {
+class MultiDefinitionFunctionSkeletonError : public SemanticParserError
+{
 public:
     MultiDefinitionFunctionSkeletonError(const std::string& name, const std::string& error_handler_output);
 };
 
 /* Requirement */
-class UnusedRequirementError : public SemanticParserError {
+class UnusedRequirementError : public SemanticParserError
+{
 public:
     UnusedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output);
 };
 
-class UndefinedRequirementError : public SemanticParserError {
+class UndefinedRequirementError : public SemanticParserError
+{
 public:
     UndefinedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output);
 };
 
-class UnsupportedRequirementError : public std::runtime_error {
+class UnsupportedRequirementError : public std::runtime_error
+{
 public:
     explicit UnsupportedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output);
 };
 
-
 /* Compatibility errors */
-class MismatchedPredicateTermListError : public SemanticParserError {
+class MismatchedPredicateTermListError : public SemanticParserError
+{
 public:
-    MismatchedPredicateTermListError(
-        const pddl::Predicate& predicate,
-        const pddl::TermList& term_list,
-        const std::string& error_handler_output);
+    MismatchedPredicateTermListError(const pddl::Predicate& predicate, const pddl::TermList& term_list, const std::string& error_handler_output);
 };
 
-class MismatchedFunctionSkeletonTermListError : public SemanticParserError {
+class MismatchedFunctionSkeletonTermListError : public SemanticParserError
+{
 public:
-    MismatchedFunctionSkeletonTermListError(
-        const pddl::FunctionSkeleton& function_skeleton,
-        const pddl::TermList& term_list,
-        const std::string& error_handler_output);
+    MismatchedFunctionSkeletonTermListError(const pddl::FunctionSkeleton& function_skeleton,
+                                            const pddl::TermList& term_list,
+                                            const std::string& error_handler_output);
 };
-
 
 }
 

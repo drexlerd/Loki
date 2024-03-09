@@ -18,14 +18,14 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_BASE_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_BASE_HPP_
 
-#include "../printer.hpp"
+#include "loki/common/printer.hpp"
 
 #include <algorithm>
 #include <sstream>
 #include <vector>
 
-
-namespace loki {
+namespace loki
+{
 /// @brief Implements a common base class for PDDL objects.
 ///
 ///        Each PDDL object has an identifier.
@@ -50,11 +50,12 @@ namespace loki {
 ///        For example, loki detects semantic equivalence of a conjunction of atoms
 ///        but loki does not detect semantic equivalence of an arbitrary formula of atoms.
 template<typename Derived>
-class Base {
+class Base
+{
 protected:
     int m_identifier;
 
-    explicit Base(int identifier) : m_identifier(identifier) { }
+    explicit Base(int identifier) : m_identifier(identifier) {}
     friend Derived;
 
 public:
@@ -66,49 +67,37 @@ public:
 
     constexpr const auto& self() const { return static_cast<Derived const&>(*this); }
 
-    bool operator==(const Base& other) const {
-        return self().is_structurally_equivalent_to_impl(other.self());
-    }
+    bool operator==(const Base& other) const { return self().is_structurally_equivalent_to_impl(other.self()); }
 
-    bool operator!=(const Base& other) const {
-        return !(*this == other);
-    }
+    bool operator!=(const Base& other) const { return !(*this == other); }
 
-    bool operator<(const Base& other) const {
-        return m_identifier < other.m_identifier;
-    }
+    bool operator<(const Base& other) const { return m_identifier < other.m_identifier; }
 
-    bool operator>(const Base& other) const {
-        return m_identifier > other.m_identifier;
-    }
+    bool operator>(const Base& other) const { return m_identifier > other.m_identifier; }
 
-    size_t hash() const {
-        return self().hash_impl();
-    }
+    size_t hash() const { return self().hash_impl(); }
 
     /// @brief Overload of the output stream insertion operator (operator<<).
-    friend std::ostream& operator<<(std::ostream& os, const Base& element) {
+    friend std::ostream& operator<<(std::ostream& os, const Base& element)
+    {
         os << element.str();
         return os;
     }
 
     /// @brief Compute a string representation of this object.
-    void str(std::ostringstream& out, const FormattingOptions& options) const {
-        self().str_impl(out, options);
-    }
+    void str(std::ostringstream& out, const FormattingOptions& options) const { self().str_impl(out, options); }
 
     /// @brief Compute a string representation of this object.
-    std::string str() const {
+    std::string str() const
+    {
         std::ostringstream out;
-        FormattingOptions options{0, 4};
+        FormattingOptions options { 0, 4 };
         str(out, options);
         return out.str();
     }
 
     /// @brief Returns the identifier
-    int get_identifier() const {
-        return m_identifier;
-    }
+    int get_identifier() const { return m_identifier; }
 };
 
 }

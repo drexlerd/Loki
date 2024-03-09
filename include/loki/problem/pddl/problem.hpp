@@ -18,22 +18,22 @@
 #ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_PROBLEM_HPP_
 #define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_PROBLEM_HPP_
 
-#include "declarations.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/problem/pddl/declarations.hpp"
 
-#include "../../common/pddl/base.hpp"
-
-#include <string>
 #include <optional>
+#include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
-
-namespace loki::pddl {
-class ProblemImpl : public Base<ProblemImpl> {
+namespace loki::pddl
+{
+class ProblemImpl : public Base<ProblemImpl>
+{
 private:
     Domain m_domain;
     std::string m_name;
@@ -44,7 +44,15 @@ private:
     Condition m_goal_condition;
     std::optional<OptimizationMetric> m_optimization_metric;
 
-    ProblemImpl(int identifier, Domain domain, std::string name, Requirements requirements, ObjectList objects, GroundLiteralList initial_literals, NumericFluentList numeric_fluents, Condition goal_condition, std::optional<OptimizationMetric> optimization_metric);
+    ProblemImpl(int identifier,
+                Domain domain,
+                std::string name,
+                Requirements requirements,
+                ObjectList objects,
+                GroundLiteralList initial_literals,
+                NumericFluentList numeric_fluents,
+                Condition goal_condition,
+                std::optional<OptimizationMetric> optimization_metric);
 
     // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
@@ -71,20 +79,20 @@ public:
 
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::Problem>
+{
+    bool operator()(const loki::pddl::Problem& left_problem, const loki::pddl::Problem& right_problem) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::Problem>
-    {
-        bool operator()(const loki::pddl::Problem& left_problem, const loki::pddl::Problem& right_problem) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::ProblemImpl>
-    {
-        std::size_t operator()(const loki::pddl::ProblemImpl& problem) const;
-    };
+template<>
+struct hash<loki::pddl::ProblemImpl>
+{
+    std::size_t operator()(const loki::pddl::ProblemImpl& problem) const;
+};
 }
 
 #endif

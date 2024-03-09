@@ -18,13 +18,11 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_ERROR_REPORTING_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_ERROR_REPORTING_HPP_
 
-#include "../filesystem.hpp"
+#include "loki/common/filesystem.hpp"
 
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
-
-#include <string>
 #include <sstream>
-
+#include <string>
 
 // Clang-style error handling utilities
 
@@ -35,173 +33,166 @@
 
 namespace loki
 {
-    using position_tagged = boost::spirit::x3::position_tagged;
+using position_tagged = boost::spirit::x3::position_tagged;
 
-    template <typename Iterator>
-    class PDDLErrorHandlerImpl
+template<typename Iterator>
+class PDDLErrorHandlerImpl
+{
+public:
+    typedef Iterator iterator_type;
+    using position_cache = boost::spirit::x3::position_cache<std::vector<Iterator>>;
+
+    PDDLErrorHandlerImpl(position_cache pos_cache, fs::path file = "", int tabs = 4) : pos_cache(pos_cache), file(file), tabs(tabs) {}
+
+    std::string operator()(Iterator err_pos, std::string const& error_message) const;
+    std::string operator()(Iterator err_first, Iterator err_last, std::string const& error_message) const;
+    std::string operator()(position_tagged pos, std::string const& message) const
     {
-    public:
+        auto where = pos_cache.position_of(pos);
+        return (*this)(where.begin(), where.end(), message);
+    }
 
-        typedef Iterator iterator_type;
-        using position_cache = boost::spirit::x3::position_cache<std::vector<Iterator>>;
+    boost::iterator_range<Iterator> position_of(position_tagged pos) const { return pos_cache.position_of(pos); }
 
-        PDDLErrorHandlerImpl(position_cache pos_cache, fs::path file = "", int tabs = 4)
-          : pos_cache(pos_cache)
-          , file(file)
-          , tabs(tabs) {}
+private:
+    std::string print_file_line(std::size_t line) const;
+    std::string print_line(Iterator line_start, Iterator last) const;
+    std::string print_indicator(Iterator& line_start, Iterator last, char ind) const;
+    Iterator get_line_start(Iterator first, Iterator pos) const;
+    std::size_t position(Iterator i) const;
 
-        std::string operator()(Iterator err_pos, std::string const& error_message) const;
-        std::string operator()(Iterator err_first, Iterator err_last, std::string const& error_message) const;
-        std::string operator()(position_tagged pos, std::string const& message) const
-        {
-            auto where = pos_cache.position_of(pos);
-            return (*this)(where.begin(), where.end(), message);
-        }
+    position_cache pos_cache;
+    std::string file;
+    int tabs;
+};
 
-        boost::iterator_range<Iterator> position_of(position_tagged pos) const
-        {
-            return pos_cache.position_of(pos);
-        }
-
-    private:
-
-        std::string print_file_line(std::size_t line) const;
-        std::string print_line(Iterator line_start, Iterator last) const;
-        std::string print_indicator(Iterator& line_start, Iterator last, char ind) const;
-        Iterator get_line_start(Iterator first, Iterator pos) const;
-        std::size_t position(Iterator i) const;
-
-        position_cache pos_cache;
-        std::string file;
-        int tabs;
-    };
-
-    template <typename Iterator>
-    std::string PDDLErrorHandlerImpl<Iterator>::print_file_line(std::size_t line) const
+template<typename Iterator>
+std::string PDDLErrorHandlerImpl<Iterator>::print_file_line(std::size_t line) const
+{
+    std::ostringstream err_out;
+    if (file != "")
     {
-        std::ostringstream err_out;
-        if (file != "")
-        {
-            err_out << "In file " << file << ", ";
-        }
+        err_out << "In file " << file << ", ";
+    }
+    else
+    {
+        err_out << "In ";
+    }
+
+    err_out << "line " << line << ':' << std::endl;
+    return err_out.str();
+}
+
+template<typename Iterator>
+std::string PDDLErrorHandlerImpl<Iterator>::print_line(Iterator start, Iterator last) const
+{
+    std::ostringstream err_out;
+    auto end = start;
+    while (end != last)
+    {
+        auto c = *end;
+        if (c == '\r' || c == '\n')
+            break;
         else
-        {
-            err_out << "In ";
-        }
-
-        err_out << "line " << line << ':' << std::endl;
-        return err_out.str();
+            ++end;
     }
+    typedef typename std::iterator_traits<Iterator>::value_type char_type;
+    std::basic_string<char_type> line { start, end };
+    err_out << boost::spirit::x3::to_utf8(line) << std::endl;
+    return err_out.str();
+}
 
-    template <typename Iterator>
-    std::string PDDLErrorHandlerImpl<Iterator>::print_line(Iterator start, Iterator last) const
+template<typename Iterator>
+std::string PDDLErrorHandlerImpl<Iterator>::print_indicator(Iterator& start, Iterator last, char ind) const
+{
+    std::ostringstream err_out;
+    for (; start != last; ++start)
     {
-        std::ostringstream err_out;
-        auto end = start;
-        while (end != last)
-        {
-            auto c = *end;
-            if (c == '\r' || c == '\n')
-                break;
-            else
-                ++end;
-        }
-        typedef typename std::iterator_traits<Iterator>::value_type char_type;
-        std::basic_string<char_type> line{start, end};
-        err_out << boost::spirit::x3::to_utf8(line) << std::endl;
-        return err_out.str();
-    }
-
-    template <typename Iterator>
-    std::string PDDLErrorHandlerImpl<Iterator>::print_indicator(Iterator& start, Iterator last, char ind) const
-    {
-        std::ostringstream err_out;
-        for (; start != last; ++start)
-        {
-            auto c = *start;
-            if (c == '\r' || c == '\n')
-                break;
-            else if (c == '\t')
-                for (int i = 0; i < tabs; ++i)
-                    err_out << ind;
-            else
+        auto c = *start;
+        if (c == '\r' || c == '\n')
+            break;
+        else if (c == '\t')
+            for (int i = 0; i < tabs; ++i)
                 err_out << ind;
-        }
-        return err_out.str();
+        else
+            err_out << ind;
     }
+    return err_out.str();
+}
 
-    template <class Iterator>
-    inline Iterator PDDLErrorHandlerImpl<Iterator>::get_line_start(Iterator first, Iterator pos) const
+template<class Iterator>
+inline Iterator PDDLErrorHandlerImpl<Iterator>::get_line_start(Iterator first, Iterator pos) const
+{
+    Iterator latest = first;
+    for (Iterator i = first; i != pos;)
+        if (*i == '\r' || *i == '\n')
+            latest = ++i;
+        else
+            ++i;
+    return latest;
+}
+
+template<typename Iterator>
+std::size_t PDDLErrorHandlerImpl<Iterator>::position(Iterator i) const
+{
+    std::size_t line { 1 };
+    typename std::iterator_traits<Iterator>::value_type prev { 0 };
+
+    for (Iterator pos = pos_cache.first(); pos != i; ++pos)
     {
-        Iterator latest = first;
-        for (Iterator i = first; i != pos;)
-            if (*i == '\r' || *i == '\n')
-                latest = ++i;
-            else
-                ++i;
-        return latest;
-    }
-
-    template <typename Iterator>
-    std::size_t PDDLErrorHandlerImpl<Iterator>::position(Iterator i) const
-    {
-        std::size_t line { 1 };
-        typename std::iterator_traits<Iterator>::value_type prev { 0 };
-
-        for (Iterator pos = pos_cache.first(); pos != i; ++pos) {
-            auto c = *pos;
-            switch (c) {
+        auto c = *pos;
+        switch (c)
+        {
             case '\n':
-                if (prev != '\r') ++line;
+                if (prev != '\r')
+                    ++line;
                 break;
             case '\r':
                 ++line;
                 break;
             default:
                 break;
-            }
-            prev = c;
         }
-
-        return line;
+        prev = c;
     }
 
-    template <typename Iterator>
-    std::string PDDLErrorHandlerImpl<Iterator>::operator()(
-        Iterator err_pos, std::string const& error_message) const
-    {
-        Iterator first = pos_cache.first();
-        Iterator last = pos_cache.last();
+    return line;
+}
 
-        std::ostringstream err_out;
-        err_out << print_file_line(position(err_pos));
-        err_out << error_message << std::endl;
+template<typename Iterator>
+std::string PDDLErrorHandlerImpl<Iterator>::operator()(Iterator err_pos, std::string const& error_message) const
+{
+    Iterator first = pos_cache.first();
+    Iterator last = pos_cache.last();
 
-        Iterator start = get_line_start(first, err_pos);
-        err_out << print_line(start, last);
-        err_out << print_indicator(start, err_pos, '_');
-        err_out << "^_" << std::endl;
-        return err_out.str();
-    }
+    std::ostringstream err_out;
+    err_out << print_file_line(position(err_pos));
+    err_out << error_message << std::endl;
 
-    template <typename Iterator>
-    std::string PDDLErrorHandlerImpl<Iterator>::operator()(
-        Iterator err_first, Iterator err_last, std::string const& error_message) const
-    {
-        Iterator first = pos_cache.first();
-        Iterator last = pos_cache.last();
+    Iterator start = get_line_start(first, err_pos);
+    err_out << print_line(start, last);
+    err_out << print_indicator(start, err_pos, '_');
+    err_out << "^_" << std::endl;
+    return err_out.str();
+}
 
-        std::ostringstream err_out;
-        err_out << print_file_line(position(err_first));
-        err_out << error_message << std::endl;
+template<typename Iterator>
+std::string PDDLErrorHandlerImpl<Iterator>::operator()(Iterator err_first, Iterator err_last, std::string const& error_message) const
+{
+    Iterator first = pos_cache.first();
+    Iterator last = pos_cache.last();
 
-        Iterator start = get_line_start(first, err_first);
-        err_out << print_line(start, last);
-        err_out << print_indicator(start, err_first, ' ');
-        err_out << print_indicator(start, err_last, '~');
-        err_out << " <<-- Here" << std::endl;
-        return err_out.str();
-    }
+    std::ostringstream err_out;
+    err_out << print_file_line(position(err_first));
+    err_out << error_message << std::endl;
+
+    Iterator start = get_line_start(first, err_first);
+    err_out << print_line(start, last);
+    err_out << print_indicator(start, err_first, ' ');
+    err_out << print_indicator(start, err_last, '~');
+    err_out << " <<-- Here" << std::endl;
+    return err_out.str();
+}
 
 }
 

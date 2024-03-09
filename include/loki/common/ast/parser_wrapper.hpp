@@ -18,49 +18,47 @@
 #ifndef LOKI_INCLUDE_COMMON_AST_PARSER_WRAPPER_HPP_
 #define LOKI_INCLUDE_COMMON_AST_PARSER_WRAPPER_HPP_
 
-#include "config.hpp"
+#include "loki/common/ast/config.hpp"
 
 #include <iostream>
 
-
-namespace loki {
+namespace loki
+{
 
 template<typename Iterator, typename Parser, typename Node>
-bool parse_ast(Iterator& iter, Iterator end, const Parser& parser, Node& out, error_handler_type& error_handler) {
-    out = Node(); // reinitialize
+bool parse_ast(Iterator& iter, Iterator end, const Parser& parser, Node& out, error_handler_type& error_handler)
+{
+    out = Node();  // reinitialize
 
-    //assert(error_handler.get_position_cache().first() <= iter &&
-    //       end < error_handler.get_position_cache().last());
+    // assert(error_handler.get_position_cache().first() <= iter &&
+    //        end < error_handler.get_position_cache().last());
 
     using boost::spirit::x3::with;
-    auto const wrapped_parser =
-        with<error_handler_tag>(std::ref(error_handler))
-        [
-            parser
-        ];
+    auto const wrapped_parser = with<error_handler_tag>(std::ref(error_handler))[parser];
     using boost::spirit::x3::ascii::space;
     bool success = phrase_parse(iter, end, wrapped_parser, space, out);
     return success;
 }
 
 template<typename Parser, typename Node>
-bool parse_ast(const std::string& source, const Parser& parser, Node& out, error_handler_type& error_handler) {
+bool parse_ast(const std::string& source, const Parser& parser, Node& out, error_handler_type& error_handler)
+{
     auto iter = source.begin();
     return parse_ast(iter, source.end(), parser, out, error_handler);
 }
 
 template<typename Parser, typename Node>
-void parse_ast(const std::string& source, const Parser& parser, Node& out) {
+void parse_ast(const std::string& source, const Parser& parser, Node& out)
+{
     loki::iterator_type iter(source.begin());
     const loki::iterator_type end(source.end());
     error_handler_type error_handler(iter, end, std::cerr);
     bool success = parse_ast(source, parser, out, error_handler);
-    if (!success) {
+    if (!success)
+    {
         throw std::runtime_error("Failed parse.");
     }
 }
-
-
 
 }
 

@@ -20,25 +20,23 @@
 
 #include "config.hpp"
 #include "declarations.hpp"
-
-#include "../../common/ast/config.hpp"
-#include "../../domain/pddl/type.hpp"
-#include "../../domain/pddl/object.hpp"
-#include "../../domain/pddl/predicate.hpp"
-#include "../../domain/pddl/function_skeleton.hpp"
-#include "../../domain/pddl/variable.hpp"
+#include "loki/common/ast/config.hpp"
+#include "loki/domain/pddl/function_skeleton.hpp"
+#include "loki/domain/pddl/object.hpp"
+#include "loki/domain/pddl/predicate.hpp"
+#include "loki/domain/pddl/type.hpp"
+#include "loki/domain/pddl/variable.hpp"
 
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
-
 #include <cassert>
-#include <unordered_map>
-#include <memory>
-#include <tuple>
-#include <optional>
 #include <deque>
+#include <memory>
+#include <optional>
+#include <tuple>
+#include <unordered_map>
 
-
-namespace loki {
+namespace loki
+{
 
 /// @brief Encapsulates binding related information of a type T.
 ///        The object is the entity bound to the name.
@@ -51,61 +49,52 @@ using BindingValueType = std::tuple<PDDLElement<T>, std::optional<Position>>;
 template<typename T>
 using BindingMapType = std::unordered_map<std::string, BindingValueType<T>>;
 
-
 /// @brief Encapsulates bindings for different types.
 template<typename... Ts>
-class Bindings {
-    private:
-        std::tuple<BindingMapType<Ts>...> bindings;
+class Bindings
+{
+private:
+    std::tuple<BindingMapType<Ts>...> bindings;
 
-    public:
-        /// @brief Returns a binding if it exists.
-        template<typename T>
-        std::optional<BindingValueType<T>> get(const std::string& key) const;
+public:
+    /// @brief Returns a binding if it exists.
+    template<typename T>
+    std::optional<BindingValueType<T>> get(const std::string& key) const;
 
-        /// @brief Inserts a binding of type T
-        template<typename T>
-        void insert(
-            const std::string& key,
-            const PDDLElement<T>& binding,
-            const std::optional<Position>& position);
+    /// @brief Inserts a binding of type T
+    template<typename T>
+    void insert(const std::string& key, const PDDLElement<T>& binding, const std::optional<Position>& position);
 };
-
 
 /// @brief Wraps bindings in a scope with reference to a parent scope.
-class Scope {
-    private:
-        const Scope* m_parent_scope;
+class Scope
+{
+private:
+    const Scope* m_parent_scope;
 
-        Bindings<pddl::TypeImpl
-            , pddl::ObjectImpl
-            , pddl::PredicateImpl
-            , pddl::FunctionSkeletonImpl
-            , pddl::VariableImpl> bindings;
+    Bindings<pddl::TypeImpl, pddl::ObjectImpl, pddl::PredicateImpl, pddl::FunctionSkeletonImpl, pddl::VariableImpl> bindings;
 
-    public:
-        explicit Scope(const Scope* parent_scope = nullptr);
+public:
+    explicit Scope(const Scope* parent_scope = nullptr);
 
-        // delete copy and move to avoid dangling references.
-        Scope(const Scope& other) = delete;
-        Scope& operator=(const Scope& other) = delete;
-        Scope(Scope&& other) = delete;
-        Scope& operator=(Scope&& other) = delete;
+    // delete copy and move to avoid dangling references.
+    Scope(const Scope& other) = delete;
+    Scope& operator=(const Scope& other) = delete;
+    Scope(Scope&& other) = delete;
+    Scope& operator=(Scope&& other) = delete;
 
-        /// @brief Returns a binding if it exists.
-        template<typename T>
-        std::optional<BindingValueType<T>> get(const std::string& name) const;
+    /// @brief Returns a binding if it exists.
+    template<typename T>
+    std::optional<BindingValueType<T>> get(const std::string& name) const;
 
-        /// @brief Insert a binding of type T.
-        template<typename T>
-        void insert(const std::string& name, const PDDLElement<T>& element, const std::optional<Position>& position);
+    /// @brief Insert a binding of type T.
+    template<typename T>
+    void insert(const std::string& name, const PDDLElement<T>& element, const std::optional<Position>& position);
 };
-
 
 /// @brief Encapsulates the result of search for a binding with the corresponding ErrorHandler.
 template<typename T>
 using ScopeStackSearchResult = std::tuple<const PDDLElement<T>, const std::optional<Position>, const PDDLErrorHandler&>;
-
 
 /// @brief Implements a scoping mechanism to store bindings which are mappings from name to a pointer to a PDDL object
 ///        type and a position in the input stream that can be used to construct error messages with the given ErrorHandler.
@@ -121,45 +110,44 @@ using ScopeStackSearchResult = std::tuple<const PDDLElement<T>, const std::optio
 ///
 ///        During problem file parsing, we get access to bindings from the domain through additional composition as follows:
 ///        [ (Domain Scope Global) ], [ (Problem Scope Global), (Problem Scope Child 1), (Problem Scope Child 2), ... ]
-class ScopeStack {
-    private:
-        std::deque<std::unique_ptr<Scope>> m_stack;
+class ScopeStack
+{
+private:
+    std::deque<std::unique_ptr<Scope>> m_stack;
 
-        const PDDLErrorHandler& m_error_handler;
+    const PDDLErrorHandler& m_error_handler;
 
-        const ScopeStack* m_parent;
+    const ScopeStack* m_parent;
 
-    public:
-        ScopeStack(const PDDLErrorHandler& error_handler,
-            const ScopeStack* parent=nullptr);
+public:
+    ScopeStack(const PDDLErrorHandler& error_handler, const ScopeStack* parent = nullptr);
 
-        // delete copy and move to avoid dangling references.
-        ScopeStack(const ScopeStack& other) = delete;
-        ScopeStack& operator=(const ScopeStack& other) = delete;
-        ScopeStack(ScopeStack&& other) = delete;
-        ScopeStack& operator=(ScopeStack&& other) = delete;
+    // delete copy and move to avoid dangling references.
+    ScopeStack(const ScopeStack& other) = delete;
+    ScopeStack& operator=(const ScopeStack& other) = delete;
+    ScopeStack(ScopeStack&& other) = delete;
+    ScopeStack& operator=(ScopeStack&& other) = delete;
 
-        /// @brief Inserts a new scope on the top of the stack.
-        void open_scope();
+    /// @brief Inserts a new scope on the top of the stack.
+    void open_scope();
 
-        /// @brief Deletes the topmost scope from the stack.
-        void close_scope();
+    /// @brief Deletes the topmost scope from the stack.
+    void close_scope();
 
-        /// @brief Returns a binding if it exists.
-        template<typename T>
-        std::optional<ScopeStackSearchResult<T>> get(const std::string& name) const;
+    /// @brief Returns a binding if it exists.
+    template<typename T>
+    std::optional<ScopeStackSearchResult<T>> get(const std::string& name) const;
 
-        /// @brief Insert a binding of type T.
-        template<typename T>
-        void insert(const std::string& name, const PDDLElement<T>& element, const std::optional<Position>& position);
+    /// @brief Insert a binding of type T.
+    template<typename T>
+    void insert(const std::string& name, const PDDLElement<T>& element, const std::optional<Position>& position);
 
-        /// @brief Get the error handler to print an error message.
-        const PDDLErrorHandler& get_error_handler() const;
+    /// @brief Get the error handler to print an error message.
+    const PDDLErrorHandler& get_error_handler() const;
 
-        // For testing purposes only.
-        const std::deque<std::unique_ptr<Scope>>& get_stack() const;
+    // For testing purposes only.
+    const std::deque<std::unique_ptr<Scope>>& get_stack() const;
 };
-
 
 }
 

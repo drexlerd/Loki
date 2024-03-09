@@ -18,24 +18,23 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_REFERENCE_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_REFERENCE_HPP_
 
-#include "../../common/ast/config.hpp"
-#include "../../domain/pddl/object.hpp"
-#include "../../domain/pddl/predicate.hpp"
-#include "../../domain/pddl/requirements.hpp"
-#include "../../domain/pddl/function_skeleton.hpp"
-#include "../../domain/pddl/variable.hpp"
+#include "loki/common/ast/config.hpp"
+#include "loki/domain/pddl/function_skeleton.hpp"
+#include "loki/domain/pddl/object.hpp"
+#include "loki/domain/pddl/predicate.hpp"
+#include "loki/domain/pddl/requirements.hpp"
+#include "loki/domain/pddl/variable.hpp"
 
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
-
 #include <cassert>
-#include <unordered_set>
-#include <memory>
-#include <tuple>
-#include <optional>
 #include <deque>
+#include <memory>
+#include <optional>
+#include <tuple>
+#include <unordered_set>
 
-
-namespace loki {
+namespace loki
+{
 /// @brief Encapsulates tracking of references of PDDL objects.
 ///
 ///        Example usage:
@@ -45,29 +44,26 @@ namespace loki {
 ///        3. Verify that all variables are untracked, meaning
 ///           that they were referenced at least once.
 template<typename... Ts>
-class References {
-    private:
-        std::tuple<std::unordered_set<Ts>...> references;
+class References
+{
+private:
+    std::tuple<std::unordered_set<Ts>...> references;
 
-    public:
-        /// @brief Returns a pointer if it exists.
-        template<typename T>
-        bool exists(T reference) const;
+public:
+    /// @brief Returns a pointer if it exists.
+    template<typename T>
+    bool exists(T reference) const;
 
-        /// @brief Inserts a pointer of type T
-        template<typename T>
-        void track(T reference);
+    /// @brief Inserts a pointer of type T
+    template<typename T>
+    void track(T reference);
 
-        /// @brief Erases a pointer of Type T
-        template<typename T>
-        void untrack(T reference);
+    /// @brief Erases a pointer of Type T
+    template<typename T>
+    void untrack(T reference);
 };
 
-using ReferencedPDDLObjects = References<pddl::Object
-    , pddl::Predicate
-    , pddl::FunctionSkeleton
-    , pddl::Variable
-    , pddl::RequirementEnum>;
+using ReferencedPDDLObjects = References<pddl::Object, pddl::Predicate, pddl::FunctionSkeleton, pddl::Variable, pddl::RequirementEnum>;
 
 }
 

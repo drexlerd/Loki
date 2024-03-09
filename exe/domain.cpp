@@ -15,17 +15,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include <loki/domain/parser.hpp>
 
-#include <iostream>
-
-
-int main(int argc, char** argv) {
-    if (argc < 2) {
+int main(int argc, char** argv)
+{
+    if (argc < 2)
+    {
         std::cout << "Usage: interpreter <domain:str>" << std::endl;
         return 1;
     }
-    const auto domain_file = std::string{argv[1]};
+    const auto domain_file = std::string { argv[1] };
 
     // 1. Parse the domain
     const auto domain_parser = loki::DomainParser(domain_file);

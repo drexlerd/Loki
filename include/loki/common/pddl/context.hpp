@@ -18,30 +18,36 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_CONTEXT_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_CONTEXT_HPP_
 
-#include "position.hpp"
-#include "reference.hpp"
-#include "scope.hpp"
-#include "types.hpp"
+#include "loki/common/pddl/position.hpp"
+#include "loki/common/pddl/reference.hpp"
+#include "loki/common/pddl/scope.hpp"
+#include "loki/common/pddl/types.hpp"
 
 namespace loki
 {
 
-    struct Context
-    {
-        // For the unique construction of PDDL objects
-        PDDLFactories& factories;
-        // For storing the positions in the input PDDL file
-        PDDLPositionCache& positions;
-        // For referencing to existing bindings
-        ScopeStack& scopes;
-        // For checking that certain PDDL objects were referenced at least once
-        ReferencedPDDLObjects references;
-        // For convenience, to avoid an additional parameter during semantic parsing
-        pddl::Requirements requirements;
+struct Context
+{
+    // For the unique construction of PDDL objects
+    PDDLFactories& factories;
+    // For storing the positions in the input PDDL file
+    PDDLPositionCache& positions;
+    // For referencing to existing bindings
+    ScopeStack& scopes;
+    // For checking that certain PDDL objects were referenced at least once
+    ReferencedPDDLObjects references;
+    // For convenience, to avoid an additional parameter during semantic parsing
+    pddl::Requirements requirements;
 
-        Context(PDDLFactories &factories_, PDDLPositionCache& positions_, ScopeStack &scopes_)
-            : factories(factories_), positions(positions_), scopes(scopes_), references(ReferencedPDDLObjects()), requirements(nullptr) {}
-    };
+    Context(PDDLFactories& factories_, PDDLPositionCache& positions_, ScopeStack& scopes_) :
+        factories(factories_),
+        positions(positions_),
+        scopes(scopes_),
+        references(ReferencedPDDLObjects()),
+        requirements(nullptr)
+    {
+    }
+};
 
 }
 

@@ -15,29 +15,29 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
-namespace loki {
+namespace loki
+{
 
 template<typename... Ts>
 template<typename T>
-bool References<Ts...>::exists(T reference) const {
+bool References<Ts...>::exists(T reference) const
+{
     const auto& t_references = std::get<std::unordered_set<T>>(references);
     return t_references.count(reference);
 }
 
-
 template<typename... Ts>
 template<typename T>
-void References<Ts...>::track(T reference) {
+void References<Ts...>::track(T reference)
+{
     auto& t_references = std::get<std::unordered_set<T>>(references);
     t_references.insert(reference);
 }
 
-
 template<typename... Ts>
 template<typename T>
-void References<Ts...>::untrack(T reference) {
+void References<Ts...>::untrack(T reference)
+{
     auto& t_references = std::get<std::unordered_set<T>>(references);
     t_references.erase(reference);
 }

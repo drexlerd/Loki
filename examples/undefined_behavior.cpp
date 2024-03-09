@@ -15,15 +15,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include <loki/domain/parser.hpp>
 #include <loki/problem/parser.hpp>
 
-#include <iostream>
-
-
 /// @brief This example illustrates incorrect ownership handling
-int main() {
-    auto domain = loki::pddl::Domain{nullptr};
+int main()
+{
+    auto domain = loki::pddl::Domain { nullptr };
     {
         // Parse the domain
         auto domain_parser = loki::DomainParser("data/gripper/domain.pddl");

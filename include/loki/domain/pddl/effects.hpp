@@ -18,21 +18,21 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_EFFECTS_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_EFFECTS_HPP_
 
-#include "declarations.hpp"
-
-#include "../../common/pddl/base.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/domain/pddl/declarations.hpp"
 
 #include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
-
-namespace loki::pddl {
-enum class AssignOperatorEnum {
+namespace loki::pddl
+{
+enum class AssignOperatorEnum
+{
     ASSIGN,
     SCALE_UP,
     SCALE_DOWN,
@@ -43,9 +43,9 @@ enum class AssignOperatorEnum {
 extern std::unordered_map<AssignOperatorEnum, std::string> assign_operator_enum_to_string;
 extern const std::string& to_string(pddl::AssignOperatorEnum assign_operator);
 
-
 /* Literal */
-class EffectLiteralImpl : public Base<EffectLiteralImpl> {
+class EffectLiteralImpl : public Base<EffectLiteralImpl>
+{
 private:
     Literal m_literal;
 
@@ -66,9 +66,9 @@ public:
     const Literal& get_literal() const;
 };
 
-
 /* And */
-class EffectAndImpl : public Base<EffectAndImpl> {
+class EffectAndImpl : public Base<EffectAndImpl>
+{
 private:
     EffectList m_effects;
 
@@ -89,9 +89,9 @@ public:
     const EffectList& get_effects() const;
 };
 
-
 /* EffectNumeric */
-class EffectNumericImpl : public Base<EffectNumericImpl> {
+class EffectNumericImpl : public Base<EffectNumericImpl>
+{
 private:
     AssignOperatorEnum m_assign_operator;
     Function m_function;
@@ -116,9 +116,9 @@ public:
     const FunctionExpression& get_function_expression() const;
 };
 
-
 /* ConditionalForall */
-class EffectConditionalForallImpl : public Base<EffectConditionalForallImpl> {
+class EffectConditionalForallImpl : public Base<EffectConditionalForallImpl>
+{
 private:
     ParameterList m_parameters;
     Effect m_effect;
@@ -141,9 +141,9 @@ public:
     const Effect& get_effect() const;
 };
 
-
 /* ConditionalWhen */
-class EffectConditionalWhenImpl : public Base<EffectConditionalWhenImpl> {
+class EffectConditionalWhenImpl : public Base<EffectConditionalWhenImpl>
+{
 private:
     Condition m_condition;
     Effect m_effect;
@@ -166,48 +166,46 @@ public:
     const Effect& get_effect() const;
 };
 
-
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::Effect>
+{
+    bool operator()(const loki::pddl::Effect& left_effect, const loki::pddl::Effect& right_effect) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::Effect>
-    {
-        bool operator()(const loki::pddl::Effect& left_effect, const loki::pddl::Effect& right_effect) const;
-    };
+template<>
+struct hash<loki::pddl::EffectLiteralImpl>
+{
+    std::size_t operator()(const loki::pddl::EffectLiteralImpl& effect) const;
+};
 
-    template<>
-    struct hash<loki::pddl::EffectLiteralImpl>
-    {
-        std::size_t operator()(const loki::pddl::EffectLiteralImpl& effect) const;
-    };
+template<>
+struct hash<loki::pddl::EffectAndImpl>
+{
+    std::size_t operator()(const loki::pddl::EffectAndImpl& effect) const;
+};
 
-    template<>
-    struct hash<loki::pddl::EffectAndImpl>
-    {
-        std::size_t operator()(const loki::pddl::EffectAndImpl& effect) const;
-    };
+template<>
+struct hash<loki::pddl::EffectNumericImpl>
+{
+    std::size_t operator()(const loki::pddl::EffectNumericImpl& effect) const;
+};
 
-    template<>
-    struct hash<loki::pddl::EffectNumericImpl>
-    {
-        std::size_t operator()(const loki::pddl::EffectNumericImpl& effect) const;
-    };
+template<>
+struct hash<loki::pddl::EffectConditionalForallImpl>
+{
+    std::size_t operator()(const loki::pddl::EffectConditionalForallImpl& effect) const;
+};
 
-    template<>
-    struct hash<loki::pddl::EffectConditionalForallImpl>
-    {
-        std::size_t operator()(const loki::pddl::EffectConditionalForallImpl& effect) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::EffectConditionalWhenImpl>
-    {
-        std::size_t operator()(const loki::pddl::EffectConditionalWhenImpl& effect) const;
-    };
+template<>
+struct hash<loki::pddl::EffectConditionalWhenImpl>
+{
+    std::size_t operator()(const loki::pddl::EffectConditionalWhenImpl& effect) const;
+};
 }
-
 
 #endif

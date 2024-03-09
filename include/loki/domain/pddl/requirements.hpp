@@ -18,23 +18,23 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_REQUIREMENTS_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_REQUIREMENTS_HPP_
 
-#include "declarations.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/domain/pddl/declarations.hpp"
 
-#include "../../common/pddl/base.hpp"
-
-#include <string>
 #include <set>
+#include <string>
 #include <unordered_map>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
-
-namespace loki::pddl {
-enum class RequirementEnum {
+namespace loki::pddl
+{
+enum class RequirementEnum
+{
     STRIPS,
     TYPING,
     NEGATIVE_PRECONDITIONS,
@@ -62,8 +62,8 @@ using RequirementEnumList = std::vector<RequirementEnum>;
 extern std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string;
 extern const std::string& to_string(pddl::RequirementEnum requirement);
 
-
-class RequirementsImpl : public Base<RequirementsImpl> {
+class RequirementsImpl : public Base<RequirementsImpl>
+{
 private:
     RequirementEnumSet m_requirements;
 
@@ -89,20 +89,20 @@ public:
 
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::Requirements>
+{
+    bool operator()(const loki::pddl::Requirements& left_requirements, const loki::pddl::Requirements& right_requirements) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::Requirements>
-    {
-        bool operator()(const loki::pddl::Requirements& left_requirements, const loki::pddl::Requirements& right_requirements) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::RequirementsImpl>
-    {
-        std::size_t operator()(const loki::pddl::RequirementsImpl& requirements) const;
-    };
+template<>
+struct hash<loki::pddl::RequirementsImpl>
+{
+    std::size_t operator()(const loki::pddl::RequirementsImpl& requirements) const;
+};
 }
 
 #endif

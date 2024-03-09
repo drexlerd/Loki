@@ -18,15 +18,15 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PARSER_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PARSER_HPP_
 
-#include "pddl/declarations.hpp"
+#include "loki/common/filesystem.hpp"
+#include "loki/common/pddl/context.hpp"
+#include "loki/domain/pddl/declarations.hpp"
 
-#include "../common/pddl/context.hpp"
-#include "../common/filesystem.hpp"
+namespace loki
+{
 
-
-namespace loki {
-
-class DomainParser {
+class DomainParser
+{
 private:
     fs::path m_file_path;
     // We need to keep the source in memory for error reporting.

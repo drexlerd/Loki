@@ -18,20 +18,20 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_COLLECTIONS_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_COLLECTIONS_HPP_
 
-#include <boost/container/small_vector.hpp>
-
 #include <algorithm>
+#include <boost/container/small_vector.hpp>
 #include <vector>
 
-
-namespace loki {
+namespace loki
+{
 
 /// @brief Returns the sorted vector
 /// @tparam T
 /// @param vec
 /// @return
 template<typename Collection>
-boost::container::small_vector<typename Collection::value_type, 100> get_sorted_vector(const Collection& collection) {
+boost::container::small_vector<typename Collection::value_type, 100> get_sorted_vector(const Collection& collection)
+{
     boost::container::small_vector<typename Collection::value_type, 100> result(collection.begin(), collection.end());
     std::sort(result.begin(), result.end());
     return result;

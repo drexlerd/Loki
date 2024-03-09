@@ -18,21 +18,21 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_TYPE_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_TYPE_HPP_
 
-#include "declarations.hpp"
-
-#include "../../common/pddl/base.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/domain/pddl/declarations.hpp"
 
 #include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
-
-namespace loki::pddl {
-class TypeImpl : public Base<TypeImpl> {
+namespace loki::pddl
+{
+class TypeImpl : public Base<TypeImpl>
+{
 private:
     std::string m_name;
     TypeList m_bases;
@@ -57,20 +57,20 @@ public:
 };
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::Type>
+{
+    bool operator()(const loki::pddl::Type& left_type, const loki::pddl::Type& right_type) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::Type>
-    {
-        bool operator()(const loki::pddl::Type& left_type, const loki::pddl::Type& right_type) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::TypeImpl>
-    {
-        std::size_t operator()(const loki::pddl::TypeImpl& type) const;
-    };
+template<>
+struct hash<loki::pddl::TypeImpl>
+{
+    std::size_t operator()(const loki::pddl::TypeImpl& type) const;
+};
 }
 
 #endif

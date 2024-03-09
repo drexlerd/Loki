@@ -18,34 +18,35 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_VISITORS_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_VISITORS_HPP_
 
-#include "../printer.hpp"
+#include "loki/common/printer.hpp"
 
 #include <sstream>
 
-
-namespace loki::pddl {
-struct LessComparatorVisitor {
+namespace loki::pddl
+{
+struct LessComparatorVisitor
+{
     template<typename T1, typename T2>
-    bool operator()(const T1& object_left, const T2& object_right) const {
+    bool operator()(const T1& object_left, const T2& object_right) const
+    {
         return object_left.get_identifier() < object_right.get_identifier();
     }
 };
 
-struct StringifyVisitor {
+struct StringifyVisitor
+{
     std::ostringstream& out;
     const FormattingOptions& options;
 
-    StringifyVisitor(std::ostringstream& out_, const FormattingOptions& options_) 
-        : out(out_), options(options_) { }
+    StringifyVisitor(std::ostringstream& out_, const FormattingOptions& options_) : out(out_), options(options_) {}
 
     template<typename T>
-    void operator()(const T& object) {
+    void operator()(const T& object)
+    {
         object.str(out, options);
-    }   
+    }
 };
 
 }
-
-
 
 #endif

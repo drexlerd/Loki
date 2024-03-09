@@ -20,31 +20,31 @@
 
 #include <stdexcept>
 
-
-namespace loki {
-class FileNotExistsError : public std::runtime_error {
+namespace loki
+{
+class FileNotExistsError : public std::runtime_error
+{
 public:
     explicit FileNotExistsError(const std::string& path_to_file);
 };
 
-
-class SyntaxParserError : public std::runtime_error {
+class SyntaxParserError : public std::runtime_error
+{
 public:
     explicit SyntaxParserError(const std::string& message, const std::string& error_handler_output);
 };
 
-
-class SemanticParserError : public std::runtime_error {
+class SemanticParserError : public std::runtime_error
+{
 public:
     explicit SemanticParserError(const std::string& message, const std::string& error_handler_output);
 };
 
-
-class NotImplementedError : public std::runtime_error {
+class NotImplementedError : public std::runtime_error
+{
 public:
     explicit NotImplementedError(const std::string& message);
 };
-
 
 }
 

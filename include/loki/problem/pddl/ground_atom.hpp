@@ -15,25 +15,24 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_GROUND_ATOM_HPP_
 #define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_GROUND_ATOM_HPP_
 
-#include "declarations.hpp"
-
-#include "../../common/pddl/base.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/problem/pddl/declarations.hpp"
 
 #include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
-
-namespace loki::pddl {
-class GroundAtomImpl : public Base<GroundAtomImpl> {
+namespace loki::pddl
+{
+class GroundAtomImpl : public Base<GroundAtomImpl>
+{
 private:
     Predicate m_predicate;
     ObjectList m_objects;
@@ -59,20 +58,20 @@ public:
 
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::GroundAtom>
+{
+    bool operator()(const loki::pddl::GroundAtom& left_atom, const loki::pddl::GroundAtom& right_atom) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::GroundAtom>
-    {
-        bool operator()(const loki::pddl::GroundAtom& left_atom, const loki::pddl::GroundAtom& right_atom) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::GroundAtomImpl>
-    {
-        std::size_t operator()(const loki::pddl::GroundAtomImpl& atom) const;
-    };
+template<>
+struct hash<loki::pddl::GroundAtomImpl>
+{
+    std::size_t operator()(const loki::pddl::GroundAtomImpl& atom) const;
+};
 }
 
 #endif

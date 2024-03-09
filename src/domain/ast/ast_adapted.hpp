@@ -18,10 +18,9 @@
 #ifndef LOKI_SRC_DOMAIN_AST_AST_ADAPTED_HPP_
 #define LOKI_SRC_DOMAIN_AST_AST_ADAPTED_HPP_
 
-#include <loki/domain/ast/ast.hpp>
-
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
+#include <loki/domain/ast/ast.hpp>
 
 // We need to tell fusion about our rexpr and rexpr_key_value
 // to make them a first-class fusion citizens
@@ -40,7 +39,10 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaSkeleton, predicate, t
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFunctionSkeletonTotalCost, function_symbol)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFunctionSkeletonGeneral, function_symbol, arguments)
-BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively, atomic_function_skeletons, function_type, function_typed_list_of_atomic_function_skeletons)
+BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively,
+                          atomic_function_skeletons,
+                          function_type,
+                          function_typed_list_of_atomic_function_skeletons)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaOfTermsPredicate, predicate, terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::AtomicFormulaOfTermsEquality, term_left, term_right)
@@ -102,6 +104,5 @@ BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Predicates, atomic_formula_skeleton
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Functions, function_types_list_of_atomic_function_skeletons)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Constraints, constraint_goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::domain::ast::Domain, domain_name, requirements, types, constants, predicates, functions, constraints, structures)
-
 
 #endif

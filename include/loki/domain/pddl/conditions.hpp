@@ -15,27 +15,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_CONDITIONS_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_CONDITIONS_HPP_
 
-#include "declarations.hpp"
-
-#include "../../common/pddl/base.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/domain/pddl/declarations.hpp"
 
 #include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
-
-namespace loki::pddl {
+namespace loki::pddl
+{
 
 /* Literal */
-class ConditionLiteralImpl : public Base<ConditionLiteralImpl> {
+class ConditionLiteralImpl : public Base<ConditionLiteralImpl>
+{
 private:
     Literal m_literal;
 
@@ -56,9 +55,9 @@ public:
     const Literal& get_literal() const;
 };
 
-
 /* And */
-class ConditionAndImpl : public Base<ConditionAndImpl> {
+class ConditionAndImpl : public Base<ConditionAndImpl>
+{
 private:
     ConditionList m_conditions;
 
@@ -79,9 +78,9 @@ public:
     const ConditionList& get_conditions() const;
 };
 
-
 /* Or */
-class ConditionOrImpl : public Base<ConditionOrImpl> {
+class ConditionOrImpl : public Base<ConditionOrImpl>
+{
 private:
     ConditionList m_conditions;
 
@@ -102,9 +101,9 @@ public:
     const ConditionList& get_conditions() const;
 };
 
-
 /* Not */
-class ConditionNotImpl : public Base<ConditionNotImpl> {
+class ConditionNotImpl : public Base<ConditionNotImpl>
+{
 private:
     Condition m_condition;
 
@@ -125,9 +124,9 @@ public:
     const Condition& get_condition() const;
 };
 
-
 /* Imply */
-class ConditionImplyImpl : public Base<ConditionNotImpl> {
+class ConditionImplyImpl : public Base<ConditionNotImpl>
+{
 private:
     Condition m_condition_left;
     Condition m_condition_right;
@@ -150,9 +149,9 @@ public:
     const Condition& get_condition_right() const;
 };
 
-
 /* Exists */
-class ConditionExistsImpl : public Base<ConditionExistsImpl> {
+class ConditionExistsImpl : public Base<ConditionExistsImpl>
+{
 private:
     ParameterList m_parameters;
     Condition m_condition;
@@ -175,9 +174,9 @@ public:
     const Condition& get_condition() const;
 };
 
-
 /* Forall */
-class ConditionForallImpl : public Base<ConditionForallImpl> {
+class ConditionForallImpl : public Base<ConditionForallImpl>
+{
 private:
     ParameterList m_parameters;
     Condition m_condition;
@@ -202,57 +201,56 @@ public:
 
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::Condition>
+{
+    bool operator()(const loki::pddl::Condition& left_condition, const loki::pddl::Condition& right_condition) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::Condition>
-    {
-        bool operator()(const loki::pddl::Condition& left_condition, const loki::pddl::Condition& right_condition) const;
-    };
+template<>
+struct hash<loki::pddl::ConditionLiteralImpl>
+{
+    std::size_t operator()(const loki::pddl::ConditionLiteralImpl& condition) const;
+};
 
-    template<>
-    struct hash<loki::pddl::ConditionLiteralImpl>
-    {
-        std::size_t operator()(const loki::pddl::ConditionLiteralImpl& condition) const;
-    };
+template<>
+struct hash<loki::pddl::ConditionAndImpl>
+{
+    std::size_t operator()(const loki::pddl::ConditionAndImpl& condition) const;
+};
 
-    template<>
-    struct hash<loki::pddl::ConditionAndImpl>
-    {
-        std::size_t operator()(const loki::pddl::ConditionAndImpl& condition) const;
-    };
+template<>
+struct hash<loki::pddl::ConditionOrImpl>
+{
+    std::size_t operator()(const loki::pddl::ConditionOrImpl& condition) const;
+};
 
-    template<>
-    struct hash<loki::pddl::ConditionOrImpl>
-    {
-        std::size_t operator()(const loki::pddl::ConditionOrImpl& condition) const;
-    };
+template<>
+struct hash<loki::pddl::ConditionNotImpl>
+{
+    std::size_t operator()(const loki::pddl::ConditionNotImpl& condition) const;
+};
 
-    template<>
-    struct hash<loki::pddl::ConditionNotImpl>
-    {
-        std::size_t operator()(const loki::pddl::ConditionNotImpl& condition) const;
-    };
+template<>
+struct hash<loki::pddl::ConditionImplyImpl>
+{
+    std::size_t operator()(const loki::pddl::ConditionImplyImpl& condition) const;
+};
 
-    template<>
-    struct hash<loki::pddl::ConditionImplyImpl>
-    {
-        std::size_t operator()(const loki::pddl::ConditionImplyImpl& condition) const;
-    };
+template<>
+struct hash<loki::pddl::ConditionExistsImpl>
+{
+    std::size_t operator()(const loki::pddl::ConditionExistsImpl& condition) const;
+};
 
-    template<>
-    struct hash<loki::pddl::ConditionExistsImpl>
-    {
-        std::size_t operator()(const loki::pddl::ConditionExistsImpl& condition) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::ConditionForallImpl>
-    {
-        std::size_t operator()(const loki::pddl::ConditionForallImpl& condition) const;
-    };
+template<>
+struct hash<loki::pddl::ConditionForallImpl>
+{
+    std::size_t operator()(const loki::pddl::ConditionForallImpl& condition) const;
+};
 }
-
 
 #endif

@@ -17,77 +17,80 @@
 
 #include "constants.hpp"
 
-#include "types.hpp"
 #include "common.hpp"
+#include "types.hpp"
 
 #include <loki/domain/pddl/exceptions.hpp>
 
 using namespace loki::domain;
 using namespace std;
 
-
-namespace loki {
-static void test_multiple_definition(const pddl::Object& constant, const domain::ast::Name& node, const Context& context) {
+namespace loki
+{
+static void test_multiple_definition(const pddl::Object& constant, const domain::ast::Name& node, const Context& context)
+{
     const auto constant_name = constant->get_name();
     const auto binding = context.scopes.get<pddl::ObjectImpl>(constant_name);
-    if (binding.has_value()) {
+    if (binding.has_value())
+    {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
         auto message_2 = std::string("");
         const auto [_object, position, error_handler] = binding.value();
-        if (position.has_value()) {
+        if (position.has_value())
+        {
             message_2 = error_handler(position.value(), "First defined here:");
         }
         throw MultiDefinitionConstantError(constant_name, message_1 + message_2);
     }
 }
 
-
-static void insert_context_information(const pddl::Object& constant, const domain::ast::Name& node, Context& context) {
+static void insert_context_information(const pddl::Object& constant, const domain::ast::Name& node, Context& context)
+{
     context.positions.push_back(constant, node);
     context.scopes.insert<pddl::ObjectImpl>(constant->get_name(), constant, node);
 }
 
-
-static pddl::Object parse_constant_definition(const domain::ast::Name& node, const pddl::TypeList& type_list, Context& context) {
-    const auto constant = context.factories.objects.get_or_create<pddl::ObjectImpl>(
-        parse(node), 
-        type_list);
+static pddl::Object parse_constant_definition(const domain::ast::Name& node, const pddl::TypeList& type_list, Context& context)
+{
+    const auto constant = context.factories.objects.get_or_create<pddl::ObjectImpl>(parse(node), type_list);
     test_multiple_definition(constant, node, context);
     insert_context_information(constant, node, context);
     return constant;
 }
 
-
-static pddl::ObjectList parse_constant_definitions(const std::vector<domain::ast::Name>& nodes, const pddl::TypeList& type_list, Context& context) {
+static pddl::ObjectList parse_constant_definitions(const std::vector<domain::ast::Name>& nodes, const pddl::TypeList& type_list, Context& context)
+{
     auto constant_list = pddl::ObjectList();
-    for (const auto& node : nodes) {
+    for (const auto& node : nodes)
+    {
         constant_list.push_back(parse_constant_definition(node, type_list, context));
     }
     return constant_list;
 }
 
-
-pddl::ObjectList parse(const ast::Constants& constants_node, Context& context) {
+pddl::ObjectList parse(const ast::Constants& constants_node, Context& context)
+{
     return boost::apply_visitor(ConstantListVisitor(context), constants_node.typed_list_of_names.get());
 }
 
-ConstantListVisitor::ConstantListVisitor(Context& context_)
-    : context(context_) { }
+ConstantListVisitor::ConstantListVisitor(Context& context_) : context(context_) {}
 
-pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& name_nodes) {
+pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& name_nodes)
+{
     // std::vector<ast::Name> has single base type "object"
     assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
     const auto [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
-    return parse_constant_definitions(name_nodes, pddl::TypeList{type}, context);
+    return parse_constant_definitions(name_nodes, pddl::TypeList { type }, context);
 }
 
-pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node) {
-    if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
+pddl::ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node)
+{
+    if (!context.requirements->test(pddl::RequirementEnum::TYPING))
+    {
         throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_list_of_names_recursively_node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::TYPING);
-    const auto type_list = boost::apply_visitor(
-        TypeReferenceTypeVisitor(context), typed_list_of_names_recursively_node.type);
+    const auto type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context), typed_list_of_names_recursively_node.type);
     // TypedListOfNamesRecursively has user defined base types
     auto constant_list = parse_constant_definitions(typed_list_of_names_recursively_node.names, type_list, context);
     // Recursively add objects.

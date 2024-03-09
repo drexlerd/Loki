@@ -22,13 +22,14 @@
 #include <loki/domain/pddl/declarations.hpp>
 #include <loki/domain/pddl/parser.hpp>
 
-
-namespace loki {
+namespace loki
+{
 
 /* Constants */
 extern pddl::ObjectList parse(const domain::ast::Constants& constants_node, Context& context);
 
-class ConstantListVisitor : boost::static_visitor<pddl::ObjectList> {
+class ConstantListVisitor : boost::static_visitor<pddl::ObjectList>
+{
 private:
     Context& context;
 
@@ -42,4 +43,4 @@ public:
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_CONSTANTS_HPP_
+#endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_CONSTANTS_HPP_

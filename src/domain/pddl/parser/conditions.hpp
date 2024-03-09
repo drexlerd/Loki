@@ -19,14 +19,13 @@
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_CONDITIONS_HPP_
 
 #include <loki/domain/ast/ast.hpp>
-#include <loki/domain/pddl/parser.hpp>
-#include <loki/domain/pddl/declarations.hpp>
 #include <loki/domain/pddl/conditions.hpp>
-
+#include <loki/domain/pddl/declarations.hpp>
+#include <loki/domain/pddl/parser.hpp>
 #include <variant>
 
-
-namespace loki {
+namespace loki
+{
 
 extern pddl::Condition parse(const domain::ast::GoalDescriptor& node, Context& context);
 extern pddl::Condition parse(const domain::ast::GoalDescriptorAtom& node, Context& context);
@@ -59,17 +58,19 @@ extern pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorAnd& n
 extern pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorPreference& node, Context& context);
 extern pddl::Condition parse(const domain::ast::PreconditionGoalDescriptorForall& node, Context& context);
 
-struct ConditionVisitor : boost::static_visitor<pddl::Condition> {
+struct ConditionVisitor : boost::static_visitor<pddl::Condition>
+{
     Context& context;
 
     ConditionVisitor(Context& context_);
 
     template<typename Node>
-    pddl::Condition operator()(const Node& node) const {
+    pddl::Condition operator()(const Node& node) const
+    {
         return parse(node, context);
     }
 };
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_CONDITIONS_HPP_
+#endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_CONDITIONS_HPP_

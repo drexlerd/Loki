@@ -15,34 +15,39 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-namespace loki {
+namespace loki
+{
 
 template<typename... Ts>
-PositionCache<Ts...>::PositionCache(const X3ErrorHandler& error_handler, const fs::path& file, int tabs)
-    : m_error_handler(PDDLErrorHandler(error_handler.get_error_handler().get_position_cache(), file, tabs)) { }
-
+PositionCache<Ts...>::PositionCache(const X3ErrorHandler& error_handler, const fs::path& file, int tabs) :
+    m_error_handler(PDDLErrorHandler(error_handler.get_error_handler().get_position_cache(), file, tabs))
+{
+}
 
 template<typename... Ts>
 template<typename T>
-void PositionCache<Ts...>::push_back(const PDDLElement<T>& element, const Position& position) {
+void PositionCache<Ts...>::push_back(const PDDLElement<T>& element, const Position& position)
+{
     auto& t_positions = std::get<PositionMapType<T>>(m_positions);
     t_positions[element].push_back(position);
 }
 
 template<typename... Ts>
 template<typename T>
-PositionList PositionCache<Ts...>::get(const PDDLElement<T>& element) const {
+PositionList PositionCache<Ts...>::get(const PDDLElement<T>& element) const
+{
     auto& t_positions = std::get<PositionMapType<T>>(m_positions);
     auto it = t_positions.find(element);
-    if (it != t_positions.end()) {
+    if (it != t_positions.end())
+    {
         return it->second;
     }
     return {};
 }
 
 template<typename... Ts>
-const PDDLErrorHandler& PositionCache<Ts...>::get_error_handler() const {
+const PDDLErrorHandler& PositionCache<Ts...>::get_error_handler() const
+{
     return m_error_handler;
 }
 

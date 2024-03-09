@@ -18,21 +18,21 @@
 #ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_NUMERIC_FLUENT_HPP_
 #define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_NUMERIC_FLUENT_HPP_
 
-#include "declarations.hpp"
-
-#include "../../common/pddl/base.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/problem/pddl/declarations.hpp"
 
 #include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
-
-namespace loki::pddl {
-class NumericFluentImpl : public Base<NumericFluentImpl> {
+namespace loki::pddl
+{
+class NumericFluentImpl : public Base<NumericFluentImpl>
+{
 private:
     Function m_function;
     double m_number;
@@ -58,20 +58,20 @@ public:
 
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::NumericFluent>
+{
+    bool operator()(const loki::pddl::NumericFluent& left_numeric_fluent, const loki::pddl::NumericFluent& right_numeric_fluent) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::NumericFluent>
-    {
-        bool operator()(const loki::pddl::NumericFluent& left_numeric_fluent, const loki::pddl::NumericFluent& right_numeric_fluent) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::NumericFluentImpl>
-    {
-        std::size_t operator()(const loki::pddl::NumericFluentImpl& numeric_fluent) const;
-    };
+template<>
+struct hash<loki::pddl::NumericFluentImpl>
+{
+    std::size_t operator()(const loki::pddl::NumericFluentImpl& numeric_fluent) const;
+};
 }
 
 #endif

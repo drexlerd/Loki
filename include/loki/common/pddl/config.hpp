@@ -18,14 +18,12 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_PDDL_CONFIG_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_PDDL_CONFIG_HPP_
 
-#include "error_reporting.hpp"
-
-#include "../ast/config.hpp"
-
+#include "loki/common/ast/config.hpp"
+#include "loki/common/pddl/error_reporting.hpp"
 
 namespace loki
 {
-    typedef PDDLErrorHandlerImpl<iterator_type> PDDLErrorHandler;
+typedef PDDLErrorHandlerImpl<iterator_type> PDDLErrorHandler;
 }
 
 #endif

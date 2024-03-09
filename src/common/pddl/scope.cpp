@@ -17,35 +17,23 @@
 
 #include <loki/common/pddl/scope.hpp>
 
+namespace loki
+{
 
-namespace loki {
+Scope::Scope(const Scope* parent_scope) : m_parent_scope(parent_scope) {}
 
-Scope::Scope(const Scope* parent_scope) : m_parent_scope(parent_scope) { }
+ScopeStack::ScopeStack(const PDDLErrorHandler& error_handler, const ScopeStack* parent) : m_error_handler(error_handler), m_parent(parent) {}
 
+void ScopeStack::open_scope() { m_stack.push_back(m_stack.empty() ? std::make_unique<Scope>() : std::make_unique<Scope>(m_stack.back().get())); }
 
-ScopeStack::ScopeStack(
-    const PDDLErrorHandler& error_handler,
-    const ScopeStack* parent)
-    : m_error_handler(error_handler)
-    , m_parent(parent) { }
-
-void ScopeStack::open_scope() {
-    m_stack.push_back(m_stack.empty()
-        ? std::make_unique<Scope>()
-        : std::make_unique<Scope>(m_stack.back().get()));
-}
-
-void ScopeStack::close_scope() {
+void ScopeStack::close_scope()
+{
     assert(!m_stack.empty());
     m_stack.pop_back();
 }
 
-const PDDLErrorHandler& ScopeStack::get_error_handler() const {
-    return m_error_handler;
-}
+const PDDLErrorHandler& ScopeStack::get_error_handler() const { return m_error_handler; }
 
-const std::deque<std::unique_ptr<Scope>>& ScopeStack::get_stack() const {
-    return m_stack;
-}
+const std::deque<std::unique_ptr<Scope>>& ScopeStack::get_stack() const { return m_stack; }
 
 }

@@ -18,13 +18,13 @@
 #ifndef LOKI_INCLUDE_LOKI_COMMON_HASH_HPP_
 #define LOKI_INCLUDE_LOKI_COMMON_HASH_HPP_
 
-#include <functional>
 #include <cstddef>
+#include <functional>
 #include <set>
 #include <vector>
 
-
-namespace loki {
+namespace loki
+{
 
 // --------------
 // Hash functions
@@ -65,13 +65,11 @@ inline std::size_t hash_container(const Container& container)
 }
 
 template<typename Container>
-struct hash_container_type {
-    size_t operator()(const Container& container) const {
-        return hash_container(container);
-    }
+struct hash_container_type
+{
+    size_t operator()(const Container& container) const { return hash_container(container); }
 };
 
 }
-
 
 #endif

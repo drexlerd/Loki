@@ -18,13 +18,12 @@
 #ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_PARSER_HPP_
 #define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_PARSER_HPP_
 
-#include "../../common/pddl/context.hpp"
-#include "declarations.hpp"
+#include "loki/common/pddl/context.hpp"
+#include "loki/problem/ast/ast.hpp"
+#include "loki/problem/pddl/declarations.hpp"
 
-#include "../ast/ast.hpp"
-
-
-namespace loki {
+namespace loki
+{
 
 extern pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context, const pddl::Domain& domain);
 

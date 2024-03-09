@@ -18,22 +18,22 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_PARAMETER_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_PARAMETER_HPP_
 
-#include "declarations.hpp"
-
-#include "../../common/pddl/base.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/domain/pddl/declarations.hpp"
 
 #include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
+namespace loki::pddl
+{
 
-namespace loki::pddl {
-
-class ParameterImpl : public Base<ParameterImpl> {
+class ParameterImpl : public Base<ParameterImpl>
+{
 private:
     Variable m_variable;
     TypeList m_types;
@@ -62,20 +62,20 @@ public:
 
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::Parameter>
+{
+    bool operator()(const loki::pddl::Parameter& left_parameter, const loki::pddl::Parameter& right_parameter) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::Parameter>
-    {
-        bool operator()(const loki::pddl::Parameter& left_parameter, const loki::pddl::Parameter& right_parameter) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::ParameterImpl>
-    {
-        std::size_t operator()(const loki::pddl::ParameterImpl& parameter) const;
-    };
+template<>
+struct hash<loki::pddl::ParameterImpl>
+{
+    std::size_t operator()(const loki::pddl::ParameterImpl& parameter) const;
+};
 }
 
 #endif

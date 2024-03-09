@@ -22,16 +22,15 @@
 using namespace loki::domain;
 using namespace std;
 
-
-namespace loki {
+namespace loki
+{
 
 /* Name */
-string parse(const ast::Name& node) {
-    return node.characters;
-}
+string parse(const ast::Name& node) { return node.characters; }
 
 /* Variable */
-pddl::Variable parse(const ast::Variable& node, Context& context) {
+pddl::Variable parse(const ast::Variable& node, Context& context)
+{
     const auto variable = context.factories.variables.get_or_create<pddl::VariableImpl>(node.characters);
     // Declare variable as being referenced.
     context.references.untrack(variable);
@@ -41,15 +40,15 @@ pddl::Variable parse(const ast::Variable& node, Context& context) {
 }
 
 /* Term */
-TermDeclarationTermVisitor::TermDeclarationTermVisitor(Context& context_)
-    : context(context_) { }
+TermDeclarationTermVisitor::TermDeclarationTermVisitor(Context& context_) : context(context_) {}
 
-
-pddl::Term TermDeclarationTermVisitor::operator()(const ast::Name& node) const {
+pddl::Term TermDeclarationTermVisitor::operator()(const ast::Name& node) const
+{
     const auto constant_name = parse(node);
     // Test for undefined constant.
     const auto binding = context.scopes.get<pddl::ObjectImpl>(constant_name);
-    if (!binding.has_value()) {
+    if (!binding.has_value())
+    {
         throw UndefinedConstantError(constant_name, context.scopes.get_error_handler()(node, ""));
     }
     // Constant are not tracked and hence must not be untracked.
@@ -61,12 +60,13 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Name& node) const {
     return term;
 }
 
-
-pddl::Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) const {
+pddl::Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) const
+{
     const auto variable = parse(node, context);
     // Test for multiple definition
     const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
-    if (binding.has_value()) {
+    if (binding.has_value())
+    {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
         const auto [_constant, position, error_handler] = binding.value();
         assert(position.has_value());
@@ -82,15 +82,15 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) con
     return term;
 }
 
+TermReferenceTermVisitor::TermReferenceTermVisitor(Context& context_) : context(context_) {}
 
-TermReferenceTermVisitor::TermReferenceTermVisitor(Context& context_)
-    : context(context_) { }
-
-pddl::Term TermReferenceTermVisitor::operator()(const ast::Name& node) const {
+pddl::Term TermReferenceTermVisitor::operator()(const ast::Name& node) const
+{
     const auto object_name = parse(node);
     // Test for undefined constant.
     const auto binding = context.scopes.get<pddl::ObjectImpl>(object_name);
-    if (!binding.has_value()) {
+    if (!binding.has_value())
+    {
         throw UndefinedConstantError(object_name, context.scopes.get_error_handler()(node, ""));
     }
     // Construct Term and return it
@@ -102,11 +102,13 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::Name& node) const {
     return term;
 }
 
-pddl::Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const {
+pddl::Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const
+{
     const auto variable = parse(node, context);
     // Test for undefined variable
     const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
-    if (!binding.has_value()) {
+    if (!binding.has_value())
+    {
         throw UndefinedVariableError(variable->get_name(), context.scopes.get_error_handler()(node, ""));
     }
     // Construct Term and return it
@@ -117,8 +119,6 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const
 }
 
 /* Number */
-double parse(const ast::Number& node) {
-    return node.value;
-}
+double parse(const ast::Number& node) { return node.value; }
 
 }

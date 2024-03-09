@@ -15,13 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include <loki/domain/parser.hpp>
 #include <loki/problem/parser.hpp>
 
-#include <iostream>
-
-
-int main() {
+int main()
+{
     // Parse the domain
     auto domain_parser = loki::DomainParser("data/gripper/domain.pddl");
     const auto domain = domain_parser.get_domain();
@@ -43,7 +42,6 @@ int main() {
     /* Note: since the PDDL objects are shared over the whole class of problems,
              the idexing scheme is most likely fragmented per problem.
              (In this specific case, it is not fragmented because both problems are structurally equivalent) */
-
 
     return 0;
 }

@@ -18,21 +18,21 @@
 #ifndef LOKI_INCLUDE_LOKI_PROBLEM_PDDL_METRIC_HPP_
 #define LOKI_INCLUDE_LOKI_PROBLEM_PDDL_METRIC_HPP_
 
-#include "declarations.hpp"
-
-#include "../../common/pddl/base.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/problem/pddl/declarations.hpp"
 
 #include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
-
-namespace loki::pddl {
-enum class OptimizationMetricEnum {
+namespace loki::pddl
+{
+enum class OptimizationMetricEnum
+{
     MINIMIZE,
     MAXIMIZE
 };
@@ -40,8 +40,8 @@ enum class OptimizationMetricEnum {
 extern std::unordered_map<OptimizationMetricEnum, std::string> optimization_metric_enum_to_string;
 extern const std::string& to_string(pddl::OptimizationMetricEnum optimization_metric);
 
-
-class OptimizationMetricImpl : public Base<OptimizationMetricImpl> {
+class OptimizationMetricImpl : public Base<OptimizationMetricImpl>
+{
 private:
     OptimizationMetricEnum m_optimization_metric;
     FunctionExpression m_function_expression;
@@ -67,20 +67,20 @@ public:
 
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::OptimizationMetric>
+{
+    bool operator()(const loki::pddl::OptimizationMetric& left_metric, const loki::pddl::OptimizationMetric& right_metric) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::OptimizationMetric>
-    {
-        bool operator()(const loki::pddl::OptimizationMetric& left_metric, const loki::pddl::OptimizationMetric& right_metric) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::OptimizationMetricImpl>
-    {
-        std::size_t operator()(const loki::pddl::OptimizationMetricImpl& metric) const;
-    };
+template<>
+struct hash<loki::pddl::OptimizationMetricImpl>
+{
+    std::size_t operator()(const loki::pddl::OptimizationMetricImpl& metric) const;
+};
 }
 
 #endif

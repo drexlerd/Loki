@@ -18,21 +18,21 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_FUNCTION_EXPRESSIONS_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_FUNCTION_EXPRESSIONS_HPP_
 
-#include "declarations.hpp"
-
-#include "../../common/pddl/base.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/domain/pddl/declarations.hpp"
 
 #include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
-
-namespace loki::pddl {
-enum class BinaryOperatorEnum {
+namespace loki::pddl
+{
+enum class BinaryOperatorEnum
+{
     MUL,
     PLUS,
     MINUS,
@@ -42,7 +42,8 @@ enum class BinaryOperatorEnum {
 extern std::unordered_map<BinaryOperatorEnum, std::string> binary_operator_enum_to_string;
 extern const std::string& to_string(pddl::BinaryOperatorEnum binary_operator);
 
-enum class MultiOperatorEnum {
+enum class MultiOperatorEnum
+{
     MUL,
     PLUS,
 };
@@ -50,9 +51,9 @@ enum class MultiOperatorEnum {
 extern std::unordered_map<MultiOperatorEnum, std::string> multi_operator_enum_to_string;
 extern const std::string& to_string(pddl::MultiOperatorEnum multi_operator);
 
-
 /* FunctionExpressionNumber */
-class FunctionExpressionNumberImpl : public Base<FunctionExpressionNumberImpl> {
+class FunctionExpressionNumberImpl : public Base<FunctionExpressionNumberImpl>
+{
 private:
     double m_number;
 
@@ -73,18 +74,18 @@ public:
     double get_number() const;
 };
 
-
 /* FunctionExpressionBinaryOperator */
-class FunctionExpressionBinaryOperatorImpl : public Base<FunctionExpressionBinaryOperatorImpl> {
+class FunctionExpressionBinaryOperatorImpl : public Base<FunctionExpressionBinaryOperatorImpl>
+{
 private:
     BinaryOperatorEnum m_binary_operator;
     FunctionExpression m_left_function_expression;
     FunctionExpression m_right_function_expression;
 
     FunctionExpressionBinaryOperatorImpl(int identifier,
-        BinaryOperatorEnum binary_operator,
-        FunctionExpression left_function_expression,
-        FunctionExpression right_function_expression);
+                                         BinaryOperatorEnum binary_operator,
+                                         FunctionExpression left_function_expression,
+                                         FunctionExpression right_function_expression);
 
     // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
@@ -103,16 +104,14 @@ public:
     const FunctionExpression& get_right_function_expression() const;
 };
 
-
 /* FunctionExpressionMultiOperator */
-class FunctionExpressionMultiOperatorImpl : public Base<FunctionExpressionMultiOperatorImpl> {
+class FunctionExpressionMultiOperatorImpl : public Base<FunctionExpressionMultiOperatorImpl>
+{
 private:
     MultiOperatorEnum m_multi_operator;
     FunctionExpressionList m_function_expressions;
 
-    FunctionExpressionMultiOperatorImpl(int identifier,
-        MultiOperatorEnum multi_operator,
-        FunctionExpressionList function_expressions);
+    FunctionExpressionMultiOperatorImpl(int identifier, MultiOperatorEnum multi_operator, FunctionExpressionList function_expressions);
 
     // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
@@ -130,9 +129,9 @@ public:
     const FunctionExpressionList& get_function_expressions() const;
 };
 
-
 /* FunctionExpressionMinus */
-class FunctionExpressionMinusImpl : public Base<FunctionExpressionMinusImpl> {
+class FunctionExpressionMinusImpl : public Base<FunctionExpressionMinusImpl>
+{
 private:
     FunctionExpression m_function_expression;
 
@@ -153,9 +152,9 @@ public:
     const FunctionExpression& get_function_expression() const;
 };
 
-
 /* FunctionExpressionFunction */
-class FunctionExpressionFunctionImpl : public Base<FunctionExpressionFunctionImpl> {
+class FunctionExpressionFunctionImpl : public Base<FunctionExpressionFunctionImpl>
+{
 private:
     Function m_function;
 
@@ -178,44 +177,44 @@ public:
 
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::FunctionExpression>
+{
+    bool operator()(const loki::pddl::FunctionExpression& left_function_expression, const loki::pddl::FunctionExpression& right_function_expression) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::FunctionExpression>
-    {
-        bool operator()(const loki::pddl::FunctionExpression& left_function_expression, const loki::pddl::FunctionExpression& right_function_expression) const;
-    };
+template<>
+struct hash<loki::pddl::FunctionExpressionNumberImpl>
+{
+    std::size_t operator()(const loki::pddl::FunctionExpressionNumberImpl& function_expressions) const;
+};
 
-    template<>
-    struct hash<loki::pddl::FunctionExpressionNumberImpl>
-    {
-        std::size_t operator()(const loki::pddl::FunctionExpressionNumberImpl& function_expressions) const;
-    };
+template<>
+struct hash<loki::pddl::FunctionExpressionBinaryOperatorImpl>
+{
+    std::size_t operator()(const loki::pddl::FunctionExpressionBinaryOperatorImpl& function_expressions) const;
+};
 
-    template<>
-    struct hash<loki::pddl::FunctionExpressionBinaryOperatorImpl>
-    {
-        std::size_t operator()(const loki::pddl::FunctionExpressionBinaryOperatorImpl& function_expressions) const;
-    };
+template<>
+struct hash<loki::pddl::FunctionExpressionMultiOperatorImpl>
+{
+    std::size_t operator()(const loki::pddl::FunctionExpressionMultiOperatorImpl& function_expressions) const;
+};
 
-    template<>
-    struct hash<loki::pddl::FunctionExpressionMultiOperatorImpl>
-    {
-        std::size_t operator()(const loki::pddl::FunctionExpressionMultiOperatorImpl& function_expressions) const;
-    };
+template<>
+struct hash<loki::pddl::FunctionExpressionMinusImpl>
+{
+    std::size_t operator()(const loki::pddl::FunctionExpressionMinusImpl& function_expressions) const;
+};
 
-    template<>
-    struct hash<loki::pddl::FunctionExpressionMinusImpl>
-    {
-        std::size_t operator()(const loki::pddl::FunctionExpressionMinusImpl& function_expressions) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::FunctionExpressionFunctionImpl>
-    {
-        std::size_t operator()(const loki::pddl::FunctionExpressionFunctionImpl& function_expressions) const;
-    };
+template<>
+struct hash<loki::pddl::FunctionExpressionFunctionImpl>
+{
+    std::size_t operator()(const loki::pddl::FunctionExpressionFunctionImpl& function_expressions) const;
+};
 }
 
 #endif

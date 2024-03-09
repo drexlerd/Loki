@@ -18,23 +18,23 @@
 #ifndef LOKI_INCLUDE_LOKI_DOMAIN_PDDL_DOMAIN_HPP_
 #define LOKI_INCLUDE_LOKI_DOMAIN_PDDL_DOMAIN_HPP_
 
-#include "declarations.hpp"
-#include "requirements.hpp"
-
-#include "../../common/pddl/base.hpp"
+#include "loki/common/pddl/base.hpp"
+#include "loki/domain/pddl/declarations.hpp"
+#include "loki/domain/pddl/requirements.hpp"
 
 #include <string>
 
-
-namespace loki {
+namespace loki
+{
 template<typename HolderType, ElementsPerSegment N>
 class PersistentFactory;
 }
 
+namespace loki::pddl
+{
 
-namespace loki::pddl {
-
-class DomainImpl : public Base<DomainImpl> {
+class DomainImpl : public Base<DomainImpl>
+{
 private:
     std::string m_name;
     Requirements m_requirements;
@@ -45,13 +45,13 @@ private:
     ActionList m_actions;
 
     DomainImpl(int identifier,
-        std::string name,
-        Requirements requirements,
-        TypeList types,
-        ObjectList constants,
-        PredicateList predicates,
-        FunctionSkeletonList functions,
-        ActionList actions);
+               std::string name,
+               Requirements requirements,
+               TypeList types,
+               ObjectList constants,
+               PredicateList predicates,
+               FunctionSkeletonList functions,
+               ActionList actions);
 
     // Give access to the constructor.
     template<typename HolderType, ElementsPerSegment N>
@@ -77,20 +77,20 @@ public:
 
 }
 
+namespace std
+{
+// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
+template<>
+struct less<loki::pddl::Domain>
+{
+    bool operator()(const loki::pddl::Domain& left_domain, const loki::pddl::Domain& right_domain) const;
+};
 
-namespace std {
-    // Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-    template<>
-    struct less<loki::pddl::Domain>
-    {
-        bool operator()(const loki::pddl::Domain& left_domain, const loki::pddl::Domain& right_domain) const;
-    };
-
-    template<>
-    struct hash<loki::pddl::DomainImpl>
-    {
-        std::size_t operator()(const loki::pddl::DomainImpl& domain) const;
-    };
+template<>
+struct hash<loki::pddl::DomainImpl>
+{
+    std::size_t operator()(const loki::pddl::DomainImpl& domain) const;
+};
 }
 
 #endif

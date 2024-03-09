@@ -18,16 +18,16 @@
 #ifndef LOKI_INCLUDE_LOKI_PROBLEM_PARSER_HPP_
 #define LOKI_INCLUDE_LOKI_PROBLEM_PARSER_HPP_
 
-#include "pddl/declarations.hpp"
+#include "loki/common/filesystem.hpp"
+#include "loki/common/pddl/context.hpp"
+#include "loki/domain/parser.hpp"
+#include "loki/problem/pddl/declarations.hpp"
 
-#include "../common/pddl/context.hpp"
-#include "../common/filesystem.hpp"
-#include "../domain/parser.hpp"
+namespace loki
+{
 
-
-namespace loki {
-
-class ProblemParser {
+class ProblemParser
+{
 private:
     fs::path m_file_path;
     // We need to keep the source in memory for error reporting.
