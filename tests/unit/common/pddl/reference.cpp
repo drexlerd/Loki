@@ -15,16 +15,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/common/pddl/persistent_factory.hpp>
-#include <loki/common/pddl/reference.hpp>
-#include <loki/domain/pddl/object.hpp>
-
 #include <gtest/gtest.h>
+#include <loki/pddl/object.hpp>
+#include <loki/pddl/persistent_factory.hpp>
+#include <loki/pddl/reference.hpp>
 
+namespace loki::domain::tests
+{
 
-namespace loki::domain::tests {
-
-TEST(LokiTests, ReferenceTest) {
+TEST(LokiTests, ReferenceTest)
+{
     PersistentFactory<pddl::ObjectImpl, 2> factory;
     const auto object_0 = factory.get_or_create<pddl::ObjectImpl>("object_0", pddl::TypeList());
     const auto object_1 = factory.get_or_create<pddl::ObjectImpl>("object_1", pddl::TypeList());

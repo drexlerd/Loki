@@ -17,42 +17,42 @@
 
 #include "utils.hpp"
 
-#include <loki/common/pddl/types.hpp>
-#include <loki/common/memory.hpp>
-
 #include <benchmark/benchmark.h>
-
 #include <iostream>
+#include <loki/memory.hpp>
+#include <loki/pddl/types.hpp>
 #include <random>
 
+namespace loki::benchmarks
+{
 
-namespace loki::benchmarks {
-
-struct AtomAccessResult {
+struct AtomAccessResult
+{
     int atom_identifier;
     loki::pddl::Predicate atom_predicate;
     loki::pddl::TermList atom_terms;
 };
 
-
-static AtomAccessResult access_atom_data(const loki::pddl::Atom& atom) {
+static AtomAccessResult access_atom_data(const loki::pddl::Atom& atom)
+{
     const auto atom_identifier = atom->get_identifier();
     const auto atom_predicate = atom->get_predicate();
     auto atom_terms = loki::pddl::TermList();
-    for (const auto& term : atom->get_terms()) {
+    for (const auto& term : atom->get_terms())
+    {
         atom_terms.push_back(term);
     }
 
-    return AtomAccessResult{
+    return AtomAccessResult {
         atom_identifier,
         atom_predicate,
         atom_terms,
     };
 }
 
-
 /// @brief In this benchmark, we evaluate the performance of accessing data in sequence
-static void BM_IterateAtoms(benchmark::State& state) {
+static void BM_IterateAtoms(benchmark::State& state)
+{
     const size_t num_atoms = state.range(0);
     const size_t num_predicates = 100;
     // Choose num_objects sufficiently large, we cast to size_t to stay slightly below to fit into the cache
@@ -61,8 +61,10 @@ static void BM_IterateAtoms(benchmark::State& state) {
     auto atoms = create_atoms(num_objects, num_predicates, factories);
     benchmark::DoNotOptimize(atoms);
 
-    for (auto _ : state) {
-        for (const auto& atom : atoms) {
+    for (auto _ : state)
+    {
+        for (const auto& atom : atoms)
+        {
             const auto atom_access_data = access_atom_data(atom);
             benchmark::DoNotOptimize(atom_access_data);
         }
@@ -71,8 +73,8 @@ static void BM_IterateAtoms(benchmark::State& state) {
     state.SetBytesProcessed(state.iterations() * atoms.size() * sizeof(loki::pddl::ActionImpl));
 }
 
-
-static void BM_RandomlyIterateAtoms(benchmark::State& state) {
+static void BM_RandomlyIterateAtoms(benchmark::State& state)
+{
     const size_t num_atoms = state.range(0);
     const size_t num_predicates = 100;
     const size_t num_objects = static_cast<size_t>(sqrt(num_atoms / num_predicates));
@@ -80,15 +82,17 @@ static void BM_RandomlyIterateAtoms(benchmark::State& state) {
     auto atoms = create_atoms(num_objects, num_predicates, factories);
     benchmark::DoNotOptimize(atoms);
 
-    std::random_device rd;  // Obtain a random number from hardware
-    std::mt19937 eng(rd()); // Seed the generator
+    std::random_device rd;   // Obtain a random number from hardware
+    std::mt19937 eng(rd());  // Seed the generator
 
-    for (auto _ : state) {
+    for (auto _ : state)
+    {
         std::vector<int> indices(atoms.size());
         std::iota(indices.begin(), indices.end(), 0);
         std::shuffle(indices.begin(), indices.end(), eng);
 
-        for (int index : indices) {
+        for (int index : indices)
+        {
             const auto atom_access_data = access_atom_data(atoms[index]);
             benchmark::DoNotOptimize(atom_access_data);
         }
@@ -99,14 +103,13 @@ static void BM_RandomlyIterateAtoms(benchmark::State& state) {
 
 }
 
-
 // Tetralith has Intel Xeon Gold 6130 with L1=512KB, L2=8192KB, L3=22528KB
 // sizeof(loki::pddl::AtomImpl)=56 => 9142 fit into L1, 146285 fit into L2, 402285 fit into L3
 
 // we just choose some reasonable numbers that can be observed in planning tasks
-BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(100);  // small tasks
-BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(1000);  // medium tasks
-BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(10000);  // large tasks
+BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(100);     // small tasks
+BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(1000);    // medium tasks
+BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(10000);   // large tasks
 BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(100000);  // huge tasks
 
 BENCHMARK(loki::benchmarks::BM_RandomlyIterateAtoms)->Arg(100);

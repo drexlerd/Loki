@@ -1,11 +1,7 @@
 file(GLOB_RECURSE SRC_FILES
-    "common/*.cpp" "common/**/*.cpp"
-    "domain/*.cpp" "domain/**/*.cpp"
-    "problem/*.cpp" "problem/**/*.cpp")
+    "*.cpp" "**/*.cpp")
 file(GLOB_RECURSE PRIVATE_HEADER_FILES
-    "common/*.hpp" "common/**/*.hpp"
-    "domain/*.hpp" "domain/**/*.hpp"
-    "problem/*.hpp" "problem/**/*.hpp")
+    "*.hpp" "**/*.hpp")
 file(GLOB_RECURSE PUBLIC_HEADER_FILES
     "../include/*.hpp" "../include/**/*.hpp")
 add_library(parsers STATIC ${SRC_FILES} ${PRIVATE_HEADER_FILES} ${PUBLIC_HEADER_FILES})

@@ -15,14 +15,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/common/pddl/segmented_vector.hpp>
-
 #include <gtest/gtest.h>
+#include <loki/pddl/segmented_vector.hpp>
 
+namespace loki::domain::tests
+{
 
-namespace loki::domain::tests {
-
-TEST(LokiTests, SegmentedVectorTest) {
+TEST(LokiTests, SegmentedVectorTest)
+{
     SegmentedVector<int, 2> vec;
     EXPECT_EQ(vec.size(), 0);
     EXPECT_EQ(vec.capacity(), 0);

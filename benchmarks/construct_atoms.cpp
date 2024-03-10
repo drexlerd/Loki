@@ -17,22 +17,23 @@
 
 #include "utils.hpp"
 
-#include <loki/common/pddl/types.hpp>
-#include <loki/common/memory.hpp>
-
 #include <benchmark/benchmark.h>
-
 #include <iostream>
+#include <loki/memory.hpp>
+#include <loki/pddl/types.hpp>
 #include <random>
 
-namespace loki::benchmarks {
+namespace loki::benchmarks
+{
 
 /// @brief In this benchmark, we evaluate the performance of constructing atoms.
-static void BM_ConstructAtoms(benchmark::State& state) {
+static void BM_ConstructAtoms(benchmark::State& state)
+{
     const size_t num_objects = 100;
     const size_t num_predicates = 10;
 
-    for (auto _ : state) {
+    for (auto _ : state)
+    {
         auto factories = loki::PDDLFactories();
 
         auto atoms = create_atoms(num_objects, num_predicates, factories);
@@ -41,7 +42,6 @@ static void BM_ConstructAtoms(benchmark::State& state) {
 }
 
 }
-
 
 BENCHMARK(loki::benchmarks::BM_ConstructAtoms);
 

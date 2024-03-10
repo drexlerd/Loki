@@ -15,15 +15,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/common/pddl/persistent_factory.hpp>
-#include <loki/domain/pddl/object.hpp>
-
 #include <gtest/gtest.h>
+#include <loki/pddl/object.hpp>
+#include <loki/pddl/persistent_factory.hpp>
 
+namespace loki::domain::tests
+{
 
-namespace loki::domain::tests {
-
-TEST(LokiTests, PersistentFactoryTest) {
+TEST(LokiTests, PersistentFactoryTest)
+{
     PersistentFactory<pddl::ObjectImpl, 2> factory;
     EXPECT_EQ(factory.size(), 0);
 
@@ -42,7 +42,6 @@ TEST(LokiTests, PersistentFactoryTest) {
     EXPECT_NE(object_0_0, object_1);
     EXPECT_EQ(object_1->get_identifier(), 1);
     EXPECT_EQ(object_1->get_name(), "object_1");
-
 }
 
 }

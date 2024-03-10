@@ -15,36 +15,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/common/pddl/garbage_collected_factory.hpp>
-#include <loki/common/hash.hpp>
-#include <loki/domain/pddl/object.hpp>
-
 #include <gtest/gtest.h>
-
+#include <loki/hash.hpp>
+#include <loki/pddl/garbage_collected_factory.hpp>
+#include <loki/pddl/object.hpp>
 #include <string>
 
-
-namespace loki::domain::tests {
+namespace loki::domain::tests
+{
 
 /// @brief A type to avoid friending in the pddl::Object since this class is not used.
-class ObjectImpl {
+class ObjectImpl
+{
 private:
     int m_identifier;
     std::string m_name;
 
-    ObjectImpl(int identifier, std::string name) : m_identifier(identifier), m_name(std::move(name)) { }
+    ObjectImpl(int identifier, std::string name) : m_identifier(identifier), m_name(std::move(name)) {}
 
     template<typename... Ts>
     friend class loki::GarbageCollectedFactory;
 
 public:
-    bool operator==(const ObjectImpl& other) const {
-        return m_name == other.m_name;
-    }
+    bool operator==(const ObjectImpl& other) const { return m_name == other.m_name; }
 
-    size_t hash() const {
-        return hash_combine(m_name);
-    }
+    size_t hash() const { return hash_combine(m_name); }
 
     int get_identifier() const { return m_identifier; }
     const std::string& get_name() const { return m_name; }
@@ -54,20 +49,20 @@ using Object = std::shared_ptr<ObjectImpl>;
 
 }
 
-
-namespace std {
-    template<>
-    struct hash<loki::domain::tests::ObjectImpl> {
-        size_t operator()(const loki::domain::tests::ObjectImpl& object) const {
-            return object.hash();
-        }
-    };
+namespace std
+{
+template<>
+struct hash<loki::domain::tests::ObjectImpl>
+{
+    size_t operator()(const loki::domain::tests::ObjectImpl& object) const { return object.hash(); }
+};
 }
 
+namespace loki::domain::tests
+{
 
-namespace loki::domain::tests {
-
-TEST(LokiTests, GarbageCollectedFactoryTest) {
+TEST(LokiTests, GarbageCollectedFactoryTest)
+{
     GarbageCollectedFactory<ObjectImpl> factory;
     EXPECT_EQ(factory.size<ObjectImpl>(), 0);
 

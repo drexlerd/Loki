@@ -15,18 +15,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../../src/domain/ast/parser.hpp"
-
-#include <loki/common/ast/parser_wrapper.hpp>
-#include <loki/domain/ast/ast.hpp>
-#include <loki/domain/ast/printer.hpp>
+#include "../../../../src/ast/parser.hpp"
 
 #include <gtest/gtest.h>
+#include <loki/ast/ast.hpp>
+#include <loki/ast/parser_wrapper.hpp>
+#include <loki/ast/printer.hpp>
 
+namespace loki::domain::tests
+{
 
-namespace loki::domain::tests {
-
-TEST(LokiTests, TermTest) {
+TEST(LokiTests, TermTest)
+{
     ast::Term ast;
 
     EXPECT_NO_THROW(parse_ast("?loki", term(), ast));

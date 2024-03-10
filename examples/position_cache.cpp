@@ -17,8 +17,7 @@
 
 #include <cassert>
 #include <iostream>
-#include <loki/domain/parser.hpp>
-#include <loki/problem/parser.hpp>
+#include <loki/parser.hpp>
 
 /// @brief Prints an error message when encourtering an And-Condition.
 struct TestUnsupportedAndConditionVisitor

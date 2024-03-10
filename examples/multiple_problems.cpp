@@ -16,8 +16,7 @@
  */
 
 #include <iostream>
-#include <loki/domain/parser.hpp>
-#include <loki/problem/parser.hpp>
+#include <loki/parser.hpp>
 
 int main()
 {

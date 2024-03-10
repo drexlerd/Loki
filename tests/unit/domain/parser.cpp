@@ -16,7 +16,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/domain/parser.hpp>
+#include <loki/parser.hpp>
 
 namespace loki::domain::tests
 {

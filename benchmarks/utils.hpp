@@ -18,16 +18,13 @@
 #ifndef LOKI_BENCHMARKS_UTILS_HPP_
 #define LOKI_BENCHMARKS_UTILS_HPP_
 
-#include <loki/common/pddl/types.hpp>
-#include <loki/common/memory.hpp>
+#include <loki/memory.hpp>
+#include <loki/pddl/types.hpp>
 
+namespace loki::benchmarks
+{
 
-namespace loki::benchmarks {
-
-extern loki::pddl::AtomList create_atoms(
-    size_t num_objects,
-    size_t num_predicates,
-    PDDLFactories& factories);
+extern loki::pddl::AtomList create_atoms(size_t num_objects, size_t num_predicates, PDDLFactories& factories);
 }
 
 #endif
