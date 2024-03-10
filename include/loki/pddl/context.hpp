@@ -18,10 +18,10 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_CONTEXT_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_CONTEXT_HPP_
 
+#include "loki/pddl/factories.hpp"
 #include "loki/pddl/position.hpp"
 #include "loki/pddl/reference.hpp"
 #include "loki/pddl/scope.hpp"
-#include "loki/pddl/types.hpp"
 
 namespace loki
 {

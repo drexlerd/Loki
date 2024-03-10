@@ -19,7 +19,7 @@
 #define LOKI_BENCHMARKS_UTILS_HPP_
 
 #include <loki/memory.hpp>
-#include <loki/pddl/types.hpp>
+#include <loki/pddl/factories.hpp>
 
 namespace loki::benchmarks
 {
