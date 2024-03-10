@@ -18,15 +18,15 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_EFFECTS_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_EFFECTS_HPP_
 
-#include <loki/domain/ast/ast.hpp>
-#include <loki/domain/pddl/parser.hpp>
-#include <loki/domain/pddl/declarations.hpp>
-#include <loki/domain/pddl/effects.hpp>
+#include "loki/domain/ast/ast.hpp"
+#include "loki/domain/pddl/declarations.hpp"
+#include "loki/domain/pddl/effects.hpp"
+#include "loki/domain/pddl/parser.hpp"
 
 #include <variant>
 
-
-namespace loki {
+namespace loki
+{
 
 /* AssignOperator */
 extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorAssign& node);
@@ -36,13 +36,14 @@ extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorIncrease&
 extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperatorDecrease& node);
 extern pddl::AssignOperatorEnum parse(const domain::ast::AssignOperator& node);
 
-struct AssignOperatorVisitor : boost::static_visitor<pddl::AssignOperatorEnum> {
+struct AssignOperatorVisitor : boost::static_visitor<pddl::AssignOperatorEnum>
+{
     template<typename Node>
-    pddl::AssignOperatorEnum operator()(const Node& node) const {
+    pddl::AssignOperatorEnum operator()(const Node& node) const
+    {
         return parse(node);
     }
 };
-
 
 /* Effects */
 extern pddl::Effect parse(const std::vector<domain::ast::Effect>& effect_nodes, Context& context);
@@ -55,18 +56,19 @@ extern pddl::Effect parse(const domain::ast::EffectConditionalForall& node, Cont
 extern pddl::Effect parse(const domain::ast::EffectConditionalWhen& node, Context& context);
 extern pddl::Effect parse(const domain::ast::EffectConditional& node, Context& context);
 
-struct EffectVisitor : boost::static_visitor<pddl::Effect> {
+struct EffectVisitor : boost::static_visitor<pddl::Effect>
+{
     Context& context;
 
     EffectVisitor(Context& context_);
 
     template<typename Node>
-    pddl::Effect operator()(const Node& node) const {
+    pddl::Effect operator()(const Node& node) const
+    {
         return parse(node, context);
     }
-
 };
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_EFFECTS_HPP_
+#endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_EFFECTS_HPP_

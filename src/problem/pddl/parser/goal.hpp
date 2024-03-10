@@ -18,12 +18,11 @@
 #ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_GOAL_HPP_
 #define LOKI_SRC_PROBLEM_PDDL_PARSER_GOAL_HPP_
 
-#include <loki/problem/ast/ast.hpp>
-#include <loki/problem/pddl/parser.hpp>
+#include "loki/problem/ast/ast.hpp"
+#include "loki/problem/pddl/parser.hpp"
 
-
-
-namespace loki {
+namespace loki
+{
 
 extern pddl::Condition parse(const problem::ast::Goal& node, Context& context);
 

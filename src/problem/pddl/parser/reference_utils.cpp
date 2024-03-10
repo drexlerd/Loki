@@ -17,25 +17,29 @@
 
 #include "reference_utils.hpp"
 
-#include <loki/problem/pddl/exceptions.hpp>
+#include "loki/problem/pddl/exceptions.hpp"
 
+namespace loki
+{
 
-namespace loki {
-
-void track_object_references(const pddl::ObjectList& object_list, Context& context) {
-    for (const auto& object : object_list) {
+void track_object_references(const pddl::ObjectList& object_list, Context& context)
+{
+    for (const auto& object : object_list)
+    {
         context.references.track(object);
     }
 }
 
-void test_object_references(const pddl::ObjectList& object_list, const Context& context) {
-    for (const auto& object : object_list) {
-        if (context.references.exists(object)) {
+void test_object_references(const pddl::ObjectList& object_list, const Context& context)
+{
+    for (const auto& object : object_list)
+    {
+        if (context.references.exists(object))
+        {
             const auto [_object, position, error_handler] = context.scopes.get<pddl::ObjectImpl>(object->get_name()).value();
             throw UnusedObjectError(object->get_name(), error_handler(position.value(), ""));
         }
     }
 }
-
 
 }

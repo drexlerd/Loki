@@ -18,16 +18,16 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_PREDICATES_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_PREDICATES_HPP_
 
-#include <loki/domain/ast/ast.hpp>
-#include <loki/domain/pddl/parser.hpp>
-#include <loki/domain/pddl/predicate.hpp>
+#include "loki/domain/ast/ast.hpp"
+#include "loki/domain/pddl/parser.hpp"
+#include "loki/domain/pddl/predicate.hpp"
 
-
-namespace loki {
+namespace loki
+{
 
 /* PredicateList */
 extern pddl::PredicateList parse(const domain::ast::Predicates& predicates_node, Context& context);
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_PREDICATES_HPP_
+#endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_PREDICATES_HPP_

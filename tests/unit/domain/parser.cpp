@@ -15,14 +15,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../include/loki/domain/parser.hpp"
-
 #include <gtest/gtest.h>
+#include <loki/domain/parser.hpp>
 
+namespace loki::domain::tests
+{
 
-namespace loki::domain::tests {
-
-TEST(LokiTests, DomainParserTest) {
+TEST(LokiTests, DomainParserTest)
+{
     const auto domain_file = fs::path(std::string(DATA_DIR) + "gripper/domain.pddl");
     const auto problem_file = fs::path(std::string(DATA_DIR) + "gripper/problem.pddl");
     DomainParser parser(domain_file);

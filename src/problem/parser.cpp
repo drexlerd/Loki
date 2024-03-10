@@ -15,30 +15,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/problem/parser.hpp>
+#include "loki/problem/parser.hpp"
 
-#include <loki/common/memory.hpp>
-#include <loki/common/ast/error_reporting.hpp>
-#include <loki/common/pddl/error_reporting.hpp>
-#include <loki/common/pddl/context.hpp>
-#include <loki/common/filesystem.hpp>
-#include <loki/common/ast/parser_wrapper.hpp>
-#include <loki/common/exceptions.hpp>
-#include <loki/problem/ast/parser.hpp>
-#include <loki/problem/ast/ast.hpp>
-#include <loki/problem/pddl/parser.hpp>
+#include "loki/common/ast/error_reporting.hpp"
+#include "loki/common/ast/parser_wrapper.hpp"
+#include "loki/common/exceptions.hpp"
+#include "loki/common/filesystem.hpp"
+#include "loki/common/memory.hpp"
+#include "loki/common/pddl/context.hpp"
+#include "loki/common/pddl/error_reporting.hpp"
+#include "loki/problem/ast/ast.hpp"
+#include "loki/problem/ast/parser.hpp"
+#include "loki/problem/pddl/parser.hpp"
 
 #include <cassert>
 #include <chrono>
 
+namespace loki
+{
 
-namespace loki {
-
-ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_parser)
-    : m_file_path(file_path)
-    , m_source(loki::read_file(file_path))
-    , m_position_cache(nullptr)
-    , m_scopes(nullptr) {
+ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_parser) :
+    m_file_path(file_path),
+    m_source(loki::read_file(file_path)),
+    m_position_cache(nullptr),
+    m_scopes(nullptr)
+{
     const auto start = std::chrono::high_resolution_clock::now();
     std::cout << "Started parsing problem file: " << file_path << std::endl;
 
@@ -46,7 +47,8 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
     auto problem_node = problem::ast::Problem();
     auto x3_error_handler = X3ErrorHandler(m_source.begin(), m_source.end(), file_path);
     bool success = parse_ast(m_source, problem::problem(), problem_node, x3_error_handler.get_error_handler());
-    if (!success) {
+    if (!success)
+    {
         throw SyntaxParserError("", x3_error_handler.get_error_stream().str());
     }
 
@@ -71,13 +73,8 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
     std::cout << "Peak resident set size: " << resident_set << " KB." << std::endl;
 }
 
-const PDDLPositionCache& ProblemParser::get_position_cache() const {
-    return *m_position_cache;
-}
+const PDDLPositionCache& ProblemParser::get_position_cache() const { return *m_position_cache; }
 
-const pddl::Problem& ProblemParser::get_problem() const {
-    return m_problem;
-}
-
+const pddl::Problem& ProblemParser::get_problem() const { return m_problem; }
 
 }

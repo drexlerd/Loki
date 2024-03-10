@@ -18,12 +18,12 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_REFERENCE_UTILS_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_REFERENCE_UTILS_HPP_
 
-#include <loki/common/pddl/context.hpp>
-#include <loki/domain/pddl/declarations.hpp>
-#include <loki/domain/pddl/parameter.hpp>
+#include "loki/common/pddl/context.hpp"
+#include "loki/domain/pddl/declarations.hpp"
+#include "loki/domain/pddl/parameter.hpp"
 
-
-namespace loki {
+namespace loki
+{
 
 // For tracking an untracking of lists of pddl objects
 

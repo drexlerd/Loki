@@ -15,55 +15,47 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/domain/pddl/literal.hpp>
+#include "loki/domain/pddl/literal.hpp"
 
-#include <loki/domain/pddl/atom.hpp>
-#include <loki/common/hash.hpp>
-#include <loki/common/collections.hpp>
+#include "loki/common/collections.hpp"
+#include "loki/common/hash.hpp"
+#include "loki/domain/pddl/atom.hpp"
 
-
-namespace loki::pddl {
-LiteralImpl::LiteralImpl(int identifier, bool is_negated, Atom atom)
-    : Base(identifier)
-    , m_is_negated(is_negated)
-    , m_atom(std::move(atom))
+namespace loki::pddl
 {
-}
+LiteralImpl::LiteralImpl(int identifier, bool is_negated, Atom atom) : Base(identifier), m_is_negated(is_negated), m_atom(std::move(atom)) {}
 
-bool LiteralImpl::is_structurally_equivalent_to_impl(const LiteralImpl& other) const {
+bool LiteralImpl::is_structurally_equivalent_to_impl(const LiteralImpl& other) const
+{
     return (m_is_negated == other.m_is_negated) && (m_atom == other.m_atom);
 }
 
-size_t LiteralImpl::hash_impl() const {
-    return hash_combine(m_is_negated, m_atom);
-}
+size_t LiteralImpl::hash_impl() const { return hash_combine(m_is_negated, m_atom); }
 
-void LiteralImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
-    if (m_is_negated) {
+void LiteralImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const
+{
+    if (m_is_negated)
+    {
         out << "(not " << *m_atom << ")";
-    } else {
+    }
+    else
+    {
         out << *m_atom;
     }
 }
 
-bool LiteralImpl::is_negated() const {
-    return m_is_negated;
-}
+bool LiteralImpl::is_negated() const { return m_is_negated; }
 
-const Atom& LiteralImpl::get_atom() const {
-    return m_atom;
-}
+const Atom& LiteralImpl::get_atom() const { return m_atom; }
 
 }
 
-namespace std {
-    bool less<loki::pddl::Literal>::operator()(
-        const loki::pddl::Literal& left_literal,
-        const loki::pddl::Literal& right_literal) const {
-        return *left_literal < *right_literal;
-    }
+namespace std
+{
+bool less<loki::pddl::Literal>::operator()(const loki::pddl::Literal& left_literal, const loki::pddl::Literal& right_literal) const
+{
+    return *left_literal < *right_literal;
+}
 
-    std::size_t hash<loki::pddl::LiteralImpl>::operator()(const loki::pddl::LiteralImpl& literal) const {
-        return literal.hash();
-    }
+std::size_t hash<loki::pddl::LiteralImpl>::operator()(const loki::pddl::LiteralImpl& literal) const { return literal.hash(); }
 }

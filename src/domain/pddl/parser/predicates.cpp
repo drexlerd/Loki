@@ -16,38 +16,41 @@
  */
 
 #include "predicates.hpp"
-#include "parameters.hpp"
+
 #include "common.hpp"
+#include "loki/domain/pddl/exceptions.hpp"
+#include "parameters.hpp"
 
-#include <loki/domain/pddl/exceptions.hpp>
+namespace loki
+{
 
-
-namespace loki {
-
-static void test_multiple_definition(const pddl::Predicate& predicate, const domain::ast::Predicate& node, const Context& context) {
+static void test_multiple_definition(const pddl::Predicate& predicate, const domain::ast::Predicate& node, const Context& context)
+{
     const auto predicate_name = predicate->get_name();
     const auto binding = context.scopes.get<pddl::PredicateImpl>(predicate_name);
-    if (binding.has_value()) {
+    if (binding.has_value())
+    {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
         auto message_2 = std::string("");
         const auto [_predicate, position, error_handler] = binding.value();
-        if (position.has_value()) {
+        if (position.has_value())
+        {
             message_2 = error_handler(position.value(), "First defined here:");
         }
         throw MultiDefinitionPredicateError(predicate_name, message_1 + message_2);
     }
 }
 
-
-static void insert_context_information(const pddl::Predicate& predicate, const domain::ast::Predicate& node, Context& context) {
+static void insert_context_information(const pddl::Predicate& predicate, const domain::ast::Predicate& node, Context& context)
+{
     context.positions.push_back(predicate, node);
     context.scopes.insert(predicate->get_name(), predicate, node);
 }
 
-
-static pddl::Predicate parse_predicate_definition(const domain::ast::AtomicFormulaSkeleton& node, Context& context) {
+static pddl::Predicate parse_predicate_definition(const domain::ast::AtomicFormulaSkeleton& node, Context& context)
+{
     context.scopes.open_scope();
-    const auto parameters = boost::apply_visitor(ParameterListVisitor(context),node.typed_list_of_variables);
+    const auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
     context.scopes.close_scope();
     const auto predicate_name = parse(node.predicate.name);
     const auto predicate = context.factories.predicates.get_or_create<pddl::PredicateImpl>(predicate_name, parameters);
@@ -56,17 +59,18 @@ static pddl::Predicate parse_predicate_definition(const domain::ast::AtomicFormu
     return predicate;
 }
 
-
-static pddl::PredicateList parse_predicate_definitions(const std::vector<domain::ast::AtomicFormulaSkeleton>& nodes, Context& context) {
+static pddl::PredicateList parse_predicate_definitions(const std::vector<domain::ast::AtomicFormulaSkeleton>& nodes, Context& context)
+{
     auto predicate_list = pddl::PredicateList();
-    for (const auto& node : nodes) {
+    for (const auto& node : nodes)
+    {
         predicate_list.push_back(parse_predicate_definition(node, context));
     }
     return predicate_list;
 }
 
-
-pddl::PredicateList parse(const domain::ast::Predicates& predicates_node, Context& context) {
+pddl::PredicateList parse(const domain::ast::Predicates& predicates_node, Context& context)
+{
     const auto predicate_list = parse_predicate_definitions(predicates_node.atomic_formula_skeletons, context);
     return predicate_list;
 }

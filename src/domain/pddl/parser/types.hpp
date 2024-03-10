@@ -18,14 +18,15 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_TYPES_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_TYPES_HPP_
 
-#include <loki/domain/ast/ast.hpp>
-#include <loki/domain/pddl/parser.hpp>
-#include <loki/domain/pddl/type.hpp>
+#include "loki/domain/ast/ast.hpp"
+#include "loki/domain/pddl/parser.hpp"
+#include "loki/domain/pddl/type.hpp"
 
+namespace loki
+{
 
-namespace loki {
-
-class TypeDeclarationTypeVisitor : boost::static_visitor<pddl::TypeList> {
+class TypeDeclarationTypeVisitor : boost::static_visitor<pddl::TypeList>
+{
 private:
     Context& context;
 
@@ -41,7 +42,8 @@ public:
     pddl::TypeList operator()(const domain::ast::TypeEither& node);
 };
 
-class TypeReferenceTypeVisitor : boost::static_visitor<pddl::TypeList> {
+class TypeReferenceTypeVisitor : boost::static_visitor<pddl::TypeList>
+{
 private:
     const Context& context;
 
@@ -57,7 +59,8 @@ public:
     pddl::TypeList operator()(const domain::ast::TypeEither& node);
 };
 
-class TypeDeclarationTypedListOfNamesVisitor : boost::static_visitor<pddl::TypeList> {
+class TypeDeclarationTypedListOfNamesVisitor : boost::static_visitor<pddl::TypeList>
+{
 private:
     Context& context;
 
@@ -69,9 +72,8 @@ public:
     pddl::TypeList operator()(const domain::ast::TypedListOfNamesRecursively& node);
 };
 
-
 extern pddl::TypeList parse(const domain::ast::Types& node, Context& context);
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_TYPES_HPP_
+#endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_TYPES_HPP_

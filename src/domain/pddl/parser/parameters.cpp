@@ -17,37 +17,39 @@
 
 #include "parameters.hpp"
 
-#include "types.hpp"
 #include "common.hpp"
-
-#include <loki/domain/pddl/exceptions.hpp>
+#include "loki/domain/pddl/exceptions.hpp"
+#include "types.hpp"
 
 using namespace loki::domain;
 using namespace std;
 
+namespace loki
+{
 
-namespace loki {
-
-static void test_multiple_definition(const pddl::Variable& variable, const ast::Variable& node, const Context& context) {
+static void test_multiple_definition(const pddl::Variable& variable, const ast::Variable& node, const Context& context)
+{
     const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
-    if (binding.has_value()) {
+    if (binding.has_value())
+    {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
         auto message_2 = std::string("");
         const auto [_variable, position, error_handler] = binding.value();
-        if (position.has_value()) {
+        if (position.has_value())
+        {
             message_2 = error_handler(position.value(), "First defined here:");
         }
         throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
     }
 }
 
-
-static void insert_context_information(const pddl::Variable& variable, const ast::Variable& node, Context& context) {
+static void insert_context_information(const pddl::Variable& variable, const ast::Variable& node, Context& context)
+{
     context.scopes.insert(variable->get_name(), variable, node);
 }
 
-
-static pddl::Parameter parse_parameter_definition(const domain::ast::Variable& variable_node, const pddl::TypeList& type_list, Context& context) {
+static pddl::Parameter parse_parameter_definition(const domain::ast::Variable& variable_node, const pddl::TypeList& type_list, Context& context)
+{
     const auto variable = parse(variable_node, context);
     test_multiple_definition(variable, variable_node, context);
     insert_context_information(variable, variable_node, context);
@@ -57,29 +59,32 @@ static pddl::Parameter parse_parameter_definition(const domain::ast::Variable& v
     return parameter;
 }
 
-
-static pddl::ParameterList parse_parameter_definitions(const std::vector<domain::ast::Variable>& variable_nodes, const pddl::TypeList& type_list, Context& context) {
+static pddl::ParameterList
+parse_parameter_definitions(const std::vector<domain::ast::Variable>& variable_nodes, const pddl::TypeList& type_list, Context& context)
+{
     auto parameter_list = pddl::ParameterList();
-    for (const auto& variable_node : variable_nodes) {
+    for (const auto& variable_node : variable_nodes)
+    {
         parameter_list.push_back(parse_parameter_definition(variable_node, type_list, context));
     }
     return parameter_list;
 }
 
+ParameterListVisitor::ParameterListVisitor(Context& context_) : context(context_) {}
 
-ParameterListVisitor::ParameterListVisitor(Context& context_)
-    : context(context_) { }
-
-pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>& nodes) {
+pddl::ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>& nodes)
+{
     // std::vector<ast::Variable> has single base type "object"
     const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("object", pddl::TypeList());
-    auto parameter_list = parse_parameter_definitions(nodes, pddl::TypeList{type}, context);
+    auto parameter_list = parse_parameter_definitions(nodes, pddl::TypeList { type }, context);
     return parameter_list;
 }
 
-pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVariablesRecursively& node) {
+pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVariablesRecursively& node)
+{
     // requires :typing
-    if (!context.requirements->test(pddl::RequirementEnum::TYPING)) {
+    if (!context.requirements->test(pddl::RequirementEnum::TYPING))
+    {
         throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::TYPING);
@@ -91,6 +96,5 @@ pddl::ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVaria
     parameter_list.insert(parameter_list.end(), additional_parameters.begin(), additional_parameters.end());
     return parameter_list;
 }
-
 
 }

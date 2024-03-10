@@ -15,45 +15,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/domain/pddl/variable.hpp>
-#include <loki/common/hash.hpp>
-#include <loki/common/collections.hpp>
+#include "loki/domain/pddl/variable.hpp"
 
+#include "loki/common/collections.hpp"
+#include "loki/common/hash.hpp"
 
-namespace loki::pddl {
-VariableImpl::VariableImpl(int identifier, std::string name)
-    : Base(identifier)
-    , m_name(std::move(name))
+namespace loki::pddl
 {
-}
+VariableImpl::VariableImpl(int identifier, std::string name) : Base(identifier), m_name(std::move(name)) {}
 
-bool VariableImpl::is_structurally_equivalent_to_impl(const VariableImpl& other) const {
-    return (m_name == other.m_name);
-}
+bool VariableImpl::is_structurally_equivalent_to_impl(const VariableImpl& other) const { return (m_name == other.m_name); }
 
-size_t VariableImpl::hash_impl() const {
-    return hash_combine(m_name);
-}
+size_t VariableImpl::hash_impl() const { return hash_combine(m_name); }
 
-void VariableImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
-    out << m_name;
-}
+void VariableImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const { out << m_name; }
 
-const std::string& VariableImpl::get_name() const {
-    return m_name;
-}
+const std::string& VariableImpl::get_name() const { return m_name; }
 
 }
 
+namespace std
+{
+bool less<loki::pddl::Variable>::operator()(const loki::pddl::Variable& left_variable, const loki::pddl::Variable& right_variable) const
+{
+    return *left_variable < *right_variable;
+}
 
-namespace std {
-    bool less<loki::pddl::Variable>::operator()(
-        const loki::pddl::Variable& left_variable,
-        const loki::pddl::Variable& right_variable) const {
-        return *left_variable < *right_variable;
-    }
-
-    std::size_t hash<loki::pddl::VariableImpl>::operator()(const loki::pddl::VariableImpl& variable) const {
-        return variable.hash();
-    }
+std::size_t hash<loki::pddl::VariableImpl>::operator()(const loki::pddl::VariableImpl& variable) const { return variable.hash(); }
 }

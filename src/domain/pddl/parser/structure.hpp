@@ -18,14 +18,14 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_STRUCTURE_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_STRUCTURE_HPP_
 
-#include <loki/domain/ast/ast.hpp>
-#include <loki/domain/pddl/parser.hpp>
-#include <loki/domain/pddl/declarations.hpp>
-#include <loki/domain/pddl/derived_predicate.hpp>
-#include <loki/domain/pddl/action.hpp>
+#include "loki/domain/ast/ast.hpp"
+#include "loki/domain/pddl/action.hpp"
+#include "loki/domain/pddl/declarations.hpp"
+#include "loki/domain/pddl/derived_predicate.hpp"
+#include "loki/domain/pddl/parser.hpp"
 
-
-namespace loki {
+namespace loki
+{
 
 extern std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(const domain::ast::ActionBody& node, Context& context);
 
@@ -33,22 +33,22 @@ extern pddl::Action parse(const domain::ast::Action& node, Context& context);
 
 extern pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, Context& context);
 
-struct StructureVisitor : boost::static_visitor<boost::variant<pddl::DerivedPredicate, pddl::Action>> {
+struct StructureVisitor : boost::static_visitor<boost::variant<pddl::DerivedPredicate, pddl::Action>>
+{
     Context& context;
 
     StructureVisitor(Context& context_);
 
     template<typename Node>
-    boost::variant<pddl::DerivedPredicate, pddl::Action> operator()(const Node& node) const {
+    boost::variant<pddl::DerivedPredicate, pddl::Action> operator()(const Node& node) const
+    {
         return parse(node, context);
     }
 };
 
 // TODO return durative action in the future as well.
-extern boost::variant<pddl::DerivedPredicate, pddl::Action> parse(
-    const domain::ast::Structure& node, Context& context);
-
+extern boost::variant<pddl::DerivedPredicate, pddl::Action> parse(const domain::ast::Structure& node, Context& context);
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_STRUCTURE_HPP_
+#endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_STRUCTURE_HPP_

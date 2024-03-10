@@ -18,18 +18,19 @@
 #ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_OBJECTS_HPP_
 #define LOKI_SRC_PROBLEM_PDDL_PARSER_OBJECTS_HPP_
 
-#include <loki/problem/ast/ast.hpp>
-#include <loki/problem/pddl/parser.hpp>
+#include "loki/problem/ast/ast.hpp"
+#include "loki/problem/pddl/parser.hpp"
 
-
-namespace loki {
+namespace loki
+{
 
 /* Object */
 extern pddl::Object parse_object_reference(const domain::ast::Name& name_node, Context& context);
 
 extern pddl::ObjectList parse(const problem::ast::Objects& objects_node, Context& context);
 
-class ObjectListVisitor : boost::static_visitor<pddl::ObjectList> {
+class ObjectListVisitor : boost::static_visitor<pddl::ObjectList>
+{
 private:
     Context& context;
 
@@ -43,4 +44,4 @@ public:
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_OBJECTS_HPP_
+#endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_OBJECTS_HPP_

@@ -18,10 +18,9 @@
 #include "conditions.hpp"
 
 #include "literal.hpp"
+#include "loki/domain/pddl/exceptions.hpp"
 #include "parameters.hpp"
 #include "reference_utils.hpp"
-
-#include <loki/domain/pddl/exceptions.hpp>
 
 namespace loki
 {

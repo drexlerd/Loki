@@ -15,50 +15,36 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/domain/pddl/object.hpp>
+#include "loki/domain/pddl/object.hpp"
 
-#include <loki/common/hash.hpp>
-#include <loki/common/collections.hpp>
+#include "loki/common/collections.hpp"
+#include "loki/common/hash.hpp"
 
-
-namespace loki::pddl {
-ObjectImpl::ObjectImpl(int identifier, std::string name, TypeList types)
-    : Base(identifier)
-    , m_name(std::move(name))
-    , m_types(std::move(types))
+namespace loki::pddl
 {
-}
+ObjectImpl::ObjectImpl(int identifier, std::string name, TypeList types) : Base(identifier), m_name(std::move(name)), m_types(std::move(types)) {}
 
-bool ObjectImpl::is_structurally_equivalent_to_impl(const ObjectImpl& other) const {
+bool ObjectImpl::is_structurally_equivalent_to_impl(const ObjectImpl& other) const
+{
     return (m_name == other.m_name) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types));
 }
 
-size_t ObjectImpl::hash_impl() const {
-    return hash_combine(m_name, hash_container(get_sorted_vector(m_types)));
-}
+size_t ObjectImpl::hash_impl() const { return hash_combine(m_name, hash_container(get_sorted_vector(m_types))); }
 
-void ObjectImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
-    out << m_name;
-}
+void ObjectImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const { out << m_name; }
 
-const std::string& ObjectImpl::get_name() const {
-    return m_name;
-}
+const std::string& ObjectImpl::get_name() const { return m_name; }
 
-const TypeList& ObjectImpl::get_bases() const {
-    return m_types;
-}
+const TypeList& ObjectImpl::get_bases() const { return m_types; }
 
 }
 
-namespace std {
-    bool less<loki::pddl::Object>::operator()(
-        const loki::pddl::Object& left_object,
-        const loki::pddl::Object& right_object) const {
-        return *left_object < *right_object;
-    }
+namespace std
+{
+bool less<loki::pddl::Object>::operator()(const loki::pddl::Object& left_object, const loki::pddl::Object& right_object) const
+{
+    return *left_object < *right_object;
+}
 
-    std::size_t hash<loki::pddl::ObjectImpl>::operator()(const loki::pddl::ObjectImpl& object) const {
-        return object.hash();
-    }
+std::size_t hash<loki::pddl::ObjectImpl>::operator()(const loki::pddl::ObjectImpl& object) const { return object.hash(); }
 }

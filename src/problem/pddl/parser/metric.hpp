@@ -18,46 +18,48 @@
 #ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_METRIC_HPP_
 #define LOKI_SRC_PROBLEM_PDDL_PARSER_METRIC_HPP_
 
-#include <loki/problem/ast/ast.hpp>
-#include <loki/problem/pddl/parser.hpp>
+#include "loki/problem/ast/ast.hpp"
+#include "loki/problem/pddl/parser.hpp"
 
-
-
-namespace loki {
+namespace loki
+{
 
 /* OptimizationMetricEnum */
 extern pddl::OptimizationMetricEnum parse(const problem::ast::Optimization& node, Context& context);
-extern pddl::OptimizationMetricEnum parse(const problem::ast::OptimizationMinimize& node, Context& context);   
+extern pddl::OptimizationMetricEnum parse(const problem::ast::OptimizationMinimize& node, Context& context);
 extern pddl::OptimizationMetricEnum parse(const problem::ast::OptimizationMaximize& node, Context& context);
 
-class OptimizationDeclarationVisitor : boost::static_visitor<pddl::OptimizationMetric> {
+class OptimizationDeclarationVisitor : boost::static_visitor<pddl::OptimizationMetric>
+{
 private:
     Context& context;
 
 public:
     OptimizationDeclarationVisitor(Context& context_);
 
-    template<typename Node> 
-    pddl::OptimizationMetricEnum operator()(const Node& node) const {
+    template<typename Node>
+    pddl::OptimizationMetricEnum operator()(const Node& node) const
+    {
         return parse(node, context);
     }
 };
-
 
 /* OptimizationMetric */
 extern pddl::OptimizationMetric parse(const problem::ast::MetricSpecification& node, Context& context);
 extern pddl::OptimizationMetric parse(const problem::ast::MetricSpecificationTotalCost& node, Context& context);
 extern pddl::OptimizationMetric parse(const problem::ast::MetricSpecificationGeneral& node, Context& context);
 
-class MetricSpecificationDeclarationVisitor : boost::static_visitor<pddl::OptimizationMetric> {
+class MetricSpecificationDeclarationVisitor : boost::static_visitor<pddl::OptimizationMetric>
+{
 private:
     Context& context;
 
 public:
     MetricSpecificationDeclarationVisitor(Context& context_);
 
-    template<typename Node> 
-    pddl::OptimizationMetric operator()(const Node& node) const {
+    template<typename Node>
+    pddl::OptimizationMetric operator()(const Node& node) const
+    {
         return parse(node, context);
     }
 };

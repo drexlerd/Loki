@@ -18,12 +18,11 @@
 #ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_FUNCTION_HPP_
 #define LOKI_SRC_PROBLEM_PDDL_PARSER_FUNCTION_HPP_
 
-#include <loki/problem/ast/ast.hpp>
-#include <loki/problem/pddl/parser.hpp>
+#include "loki/problem/ast/ast.hpp"
+#include "loki/problem/pddl/parser.hpp"
 
-
-
-namespace loki {
+namespace loki
+{
 
 /* FunctionExpression */
 extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpression& node, Context& context);
@@ -35,19 +34,20 @@ extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressi
 extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionTotalTime& node, Context& context);
 extern pddl::FunctionExpression parse(const problem::ast::MetricFunctionExpressionPreferences& node, Context& context);
 
-class MetricFunctionExpressionDeclarationVisitor : boost::static_visitor<pddl::FunctionExpression> {
+class MetricFunctionExpressionDeclarationVisitor : boost::static_visitor<pddl::FunctionExpression>
+{
 private:
-    Context& context; 
+    Context& context;
 
 public:
     MetricFunctionExpressionDeclarationVisitor(Context& context_);
 
     template<typename Node>
-    pddl::FunctionExpression operator()(const Node& node) const {
+    pddl::FunctionExpression operator()(const Node& node) const
+    {
         return parse(node, context);
     }
 };
-
 
 /* Function */
 extern pddl::Function parse(const problem::ast::BasicFunctionTerm& node, Context& context);

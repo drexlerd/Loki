@@ -15,78 +15,59 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/domain/pddl/term.hpp>
+#include "loki/domain/pddl/term.hpp"
 
-#include <loki/domain/pddl/object.hpp>
-#include <loki/domain/pddl/variable.hpp>
-#include <loki/common/hash.hpp>
-#include <loki/common/collections.hpp>
+#include "loki/common/collections.hpp"
+#include "loki/common/hash.hpp"
+#include "loki/domain/pddl/object.hpp"
+#include "loki/domain/pddl/variable.hpp"
 
-
-namespace loki::pddl {
-
+namespace loki::pddl
+{
 
 /* TermObjectImpl */
-TermObjectImpl::TermObjectImpl(int identifier, Object object)
-    : Base(identifier), m_object(std::move(object)) { }
+TermObjectImpl::TermObjectImpl(int identifier, Object object) : Base(identifier), m_object(std::move(object)) {}
 
-bool TermObjectImpl::is_structurally_equivalent_to_impl(const TermObjectImpl& other) const {
-    if (this != &other) {
+bool TermObjectImpl::is_structurally_equivalent_to_impl(const TermObjectImpl& other) const
+{
+    if (this != &other)
+    {
         return m_object == other.m_object;
     }
     return true;
 }
 
-size_t TermObjectImpl::hash_impl() const {
-    return hash_combine(m_object);
-}
+size_t TermObjectImpl::hash_impl() const { return hash_combine(m_object); }
 
-void TermObjectImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
-    out << *m_object;
-}
+void TermObjectImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const { out << *m_object; }
 
-const Object& TermObjectImpl::get_object() const {
-    return m_object;
-}
-
+const Object& TermObjectImpl::get_object() const { return m_object; }
 
 /* TermVariableImpl */
-TermVariableImpl::TermVariableImpl(int identifier, Variable variable)
-    : Base(identifier), m_variable(std::move(variable)) { }
+TermVariableImpl::TermVariableImpl(int identifier, Variable variable) : Base(identifier), m_variable(std::move(variable)) {}
 
-bool TermVariableImpl::is_structurally_equivalent_to_impl(const TermVariableImpl& other) const {
-    if (this != &other) {
+bool TermVariableImpl::is_structurally_equivalent_to_impl(const TermVariableImpl& other) const
+{
+    if (this != &other)
+    {
         return m_variable == other.m_variable;
     }
     return true;
 }
 
-size_t TermVariableImpl::hash_impl() const {
-    return hash_combine(m_variable);
-}
+size_t TermVariableImpl::hash_impl() const { return hash_combine(m_variable); }
 
-void TermVariableImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
-    out << *m_variable;
-}
+void TermVariableImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const { out << *m_variable; }
 
-const Variable& TermVariableImpl::get_variable() const {
-    return m_variable;
-}
+const Variable& TermVariableImpl::get_variable() const { return m_variable; }
 
 }
 
-namespace std {
-    bool less<loki::pddl::Term>::operator()(
-        const loki::pddl::Term& left_term,
-        const loki::pddl::Term& right_term) const {
-        return *left_term < *right_term;
-    }
+namespace std
+{
+bool less<loki::pddl::Term>::operator()(const loki::pddl::Term& left_term, const loki::pddl::Term& right_term) const { return *left_term < *right_term; }
 
-    std::size_t hash<loki::pddl::TermObjectImpl>::operator()(const loki::pddl::TermObjectImpl& term) const {
-        return term.hash();
-    }
+std::size_t hash<loki::pddl::TermObjectImpl>::operator()(const loki::pddl::TermObjectImpl& term) const { return term.hash(); }
 
-    std::size_t hash<loki::pddl::TermVariableImpl>::operator()(const loki::pddl::TermVariableImpl& term) const {
-        return term.hash();
-    }
+std::size_t hash<loki::pddl::TermVariableImpl>::operator()(const loki::pddl::TermVariableImpl& term) const { return term.hash(); }
 }

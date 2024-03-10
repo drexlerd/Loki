@@ -18,32 +18,33 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_UNPACK_VISITOR_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_UNPACK_VISITOR_HPP_
 
-#include <loki/common/ast/config.hpp>
-#include <loki/domain/pddl/parser.hpp>
+#include "loki/common/ast/config.hpp"
+#include "loki/domain/pddl/parser.hpp"
 
 #include <boost/variant.hpp>
-
 #include <functional>
 #include <iostream>
-#include <vector>
 #include <tuple>
+#include <vector>
 
-namespace loki {
+namespace loki
+{
 
 /// @brief Given a variant<T1,...,TN> this function allows visiting the variant
 ///        and pushing back in a respective vector<Ti>.
 ///        In the constructor, there must be given a vector<Ti> for all 1...N.
 template<typename... Ts>
-class UnpackingVisitor {
+class UnpackingVisitor
+{
 private:
     std::tuple<std::reference_wrapper<Ts>...> result;
 
 public:
-    UnpackingVisitor(Ts& ...result)
-        : result(std::make_tuple(std::ref(result)...)) { }
+    UnpackingVisitor(Ts&... result) : result(std::make_tuple(std::ref(result)...)) {}
 
     template<typename T>
-    void operator()(const T& element) {
+    void operator()(const T& element)
+    {
         std::get<std::reference_wrapper<std::vector<T>>>(result).get().push_back(element);
     }
 };

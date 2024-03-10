@@ -15,58 +15,47 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/problem/pddl/exceptions.hpp>
+#include "loki/problem/pddl/exceptions.hpp"
 
-#include <loki/domain/pddl/domain.hpp>
-#include <loki/domain/pddl/predicate.hpp>
+#include "loki/domain/pddl/domain.hpp"
+#include "loki/domain/pddl/predicate.hpp"
 
-
-namespace loki {
+namespace loki
+{
 /* Object */
-UnusedObjectError::UnusedObjectError(const std::string& name, const std::string& error_handler_output)
-    : SemanticParserError(
-        "The object with name \"" + name + "\" was never referred to.", error_handler_output) { }
+UnusedObjectError::UnusedObjectError(const std::string& name, const std::string& error_handler_output) :
+    SemanticParserError("The object with name \"" + name + "\" was never referred to.", error_handler_output)
+{
+}
 
-UndefinedObjectError::UndefinedObjectError(const std::string& name, const std::string& error_handler_output)
-    : SemanticParserError(
-        "The object with name \"" + name + "\" is undefined.", error_handler_output) { }
+UndefinedObjectError::UndefinedObjectError(const std::string& name, const std::string& error_handler_output) :
+    SemanticParserError("The object with name \"" + name + "\" is undefined.", error_handler_output)
+{
+}
 
-MultiDefinitionObjectError::MultiDefinitionObjectError(const std::string& name, const std::string& error_handler_output)
-    : SemanticParserError(
-        "The object with name \"" + name + "\" has already been defined.", error_handler_output) { }
+MultiDefinitionObjectError::MultiDefinitionObjectError(const std::string& name, const std::string& error_handler_output) :
+    SemanticParserError("The object with name \"" + name + "\" has already been defined.", error_handler_output)
+{
+}
 
 /* Compatibility errors */
-MismatchedDomainError::MismatchedDomainError(
-    const pddl::Domain& domain,
-    const std::string& domain_name,
-    const std::string& error_handler_output)
-    : SemanticParserError(
-        "Mismatched domain names \""
-            + domain->get_name()
-            + "!="
-            + domain_name
-            + ".",
-        error_handler_output) { }
+MismatchedDomainError::MismatchedDomainError(const pddl::Domain& domain, const std::string& domain_name, const std::string& error_handler_output) :
+    SemanticParserError("Mismatched domain names \"" + domain->get_name() + "!=" + domain_name + ".", error_handler_output)
+{
+}
 
-MismatchedPredicateObjectListError::MismatchedPredicateObjectListError(
-    const pddl::Predicate& predicate,
-    const pddl::ObjectList& object_list,
-    const std::string& error_handler_output)
-    : SemanticParserError(
-        "Mismatched number of terms for predicate \""
-            + predicate->get_name()
-            + "\" with sizes "
-            + std::to_string(predicate->get_parameters().size())
-            + "!="
-            + std::to_string(object_list.size())
-            + ".",
-        error_handler_output) { }
+MismatchedPredicateObjectListError::MismatchedPredicateObjectListError(const pddl::Predicate& predicate,
+                                                                       const pddl::ObjectList& object_list,
+                                                                       const std::string& error_handler_output) :
+    SemanticParserError("Mismatched number of terms for predicate \"" + predicate->get_name() + "\" with sizes "
+                            + std::to_string(predicate->get_parameters().size()) + "!=" + std::to_string(object_list.size()) + ".",
+                        error_handler_output)
+{
+}
 
-
-NegativeCostError::NegativeCostError(
-    const std::string& error_handler_output)
-    : SemanticParserError(
-        "Negative numbers in initial numeric fluents are not allowed with :action-costs",
-        error_handler_output) { }
+NegativeCostError::NegativeCostError(const std::string& error_handler_output) :
+    SemanticParserError("Negative numbers in initial numeric fluents are not allowed with :action-costs", error_handler_output)
+{
+}
 
 }

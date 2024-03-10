@@ -17,57 +17,69 @@
 
 #include "reference_utils.hpp"
 
-#include <loki/domain/pddl/exceptions.hpp>
+#include "loki/domain/pddl/exceptions.hpp"
 
+namespace loki
+{
 
-namespace loki {
-
-void track_variable_references(const pddl::ParameterList& parameter_list, Context& context) {
-    for (const auto& parameter : parameter_list) {
+void track_variable_references(const pddl::ParameterList& parameter_list, Context& context)
+{
+    for (const auto& parameter : parameter_list)
+    {
         context.references.track(parameter->get_variable());
     }
 }
 
-void test_variable_references(const pddl::ParameterList& parameter_list, const Context& context) {
-    for (const auto& parameter : parameter_list) {
-        if (context.references.exists(parameter->get_variable())) {
+void test_variable_references(const pddl::ParameterList& parameter_list, const Context& context)
+{
+    for (const auto& parameter : parameter_list)
+    {
+        if (context.references.exists(parameter->get_variable()))
+        {
             const auto [variable, position, error_handler] = context.scopes.get<pddl::VariableImpl>(parameter->get_variable()->get_name()).value();
             throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
         }
     }
 }
 
-
-void track_predicate_references(const pddl::PredicateList& predicate_list, Context& context) {
-    for (const auto& predicate : predicate_list) {
+void track_predicate_references(const pddl::PredicateList& predicate_list, Context& context)
+{
+    for (const auto& predicate : predicate_list)
+    {
         context.references.track(predicate);
     }
 }
 
-void test_predicate_references(const pddl::PredicateList& predicate_list, const Context& context) {
-    for (const auto& predicate : predicate_list) {
-        if (context.references.exists(predicate)) {
+void test_predicate_references(const pddl::PredicateList& predicate_list, const Context& context)
+{
+    for (const auto& predicate : predicate_list)
+    {
+        if (context.references.exists(predicate))
+        {
             const auto [_predicate, position, error_handler] = context.scopes.get<pddl::PredicateImpl>(predicate->get_name()).value();
             throw UnusedPredicateError(predicate->get_name(), error_handler(position.value(), ""));
         }
     }
 }
 
-
-void track_function_skeleton_references(const pddl::FunctionSkeletonList& function_skeleton_list, Context& context) {
-    for (const auto& function_skeleton : function_skeleton_list) {
+void track_function_skeleton_references(const pddl::FunctionSkeletonList& function_skeleton_list, Context& context)
+{
+    for (const auto& function_skeleton : function_skeleton_list)
+    {
         context.references.track(function_skeleton);
     }
 }
 
-void test_function_skeleton_references(const pddl::FunctionSkeletonList& function_skeleton_list, const Context& context) {
-    for (const auto& function_skeleton : function_skeleton_list) {
-        if (context.references.exists(function_skeleton)) {
+void test_function_skeleton_references(const pddl::FunctionSkeletonList& function_skeleton_list, const Context& context)
+{
+    for (const auto& function_skeleton : function_skeleton_list)
+    {
+        if (context.references.exists(function_skeleton))
+        {
             const auto [_function_skeleton, position, error_handler] = context.scopes.get<pddl::FunctionSkeletonImpl>(function_skeleton->get_name()).value();
             throw UnusedFunctionSkeletonError(function_skeleton->get_name(), error_handler(position.value(), ""));
         }
     }
 }
-
 
 }

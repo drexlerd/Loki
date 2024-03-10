@@ -18,16 +18,17 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_PARAMETERS_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_PARAMETERS_HPP_
 
-#include <loki/common/ast/config.hpp>
-#include <loki/domain/ast/ast.hpp>
-#include <loki/domain/pddl/parameter.hpp>
-#include <loki/domain/pddl/parser.hpp>
+#include "loki/common/ast/config.hpp"
+#include "loki/domain/ast/ast.hpp"
+#include "loki/domain/pddl/parameter.hpp"
+#include "loki/domain/pddl/parser.hpp"
 
-
-namespace loki {
+namespace loki
+{
 
 /* ParameterList */
-class ParameterListVisitor : boost::static_visitor<pddl::ParameterList> {
+class ParameterListVisitor : boost::static_visitor<pddl::ParameterList>
+{
 private:
     Context& context;
 
@@ -39,7 +40,6 @@ public:
     pddl::ParameterList operator()(const domain::ast::TypedListOfVariablesRecursively& node);
 };
 
-
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_PARAMETERS_HPP_
+#endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_PARAMETERS_HPP_

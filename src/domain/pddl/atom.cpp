@@ -15,61 +15,42 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/domain/pddl/atom.hpp>
+#include "loki/domain/pddl/atom.hpp"
 
-#include <loki/domain/pddl/predicate.hpp>
-#include <loki/domain/pddl/term.hpp>
-#include <loki/common/hash.hpp>
-#include <loki/common/collections.hpp>
-#include <loki/common/pddl/visitors.hpp>
+#include "loki/common/collections.hpp"
+#include "loki/common/hash.hpp"
+#include "loki/common/pddl/visitors.hpp"
+#include "loki/domain/pddl/predicate.hpp"
+#include "loki/domain/pddl/term.hpp"
 
-
-namespace loki::pddl {
-AtomImpl::AtomImpl(int identifier, Predicate predicate, TermList terms)
-    : Base(identifier)
-    , m_predicate(std::move(predicate))
-    , m_terms(std::move(terms))
+namespace loki::pddl
 {
-}
+AtomImpl::AtomImpl(int identifier, Predicate predicate, TermList terms) : Base(identifier), m_predicate(std::move(predicate)), m_terms(std::move(terms)) {}
 
-bool AtomImpl::is_structurally_equivalent_to_impl(const AtomImpl& other) const {
-    return (m_predicate == other.m_predicate)
-        && (m_terms == other.m_terms);
-}
+bool AtomImpl::is_structurally_equivalent_to_impl(const AtomImpl& other) const { return (m_predicate == other.m_predicate) && (m_terms == other.m_terms); }
 
-size_t AtomImpl::hash_impl() const {
-    return hash_combine(m_predicate, hash_container(m_terms));
-}
+size_t AtomImpl::hash_impl() const { return hash_combine(m_predicate, hash_container(m_terms)); }
 
-
-void AtomImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
+void AtomImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const
+{
     out << "(" << m_predicate->get_name();
-    for (size_t i = 0; i < m_terms.size(); ++i) {
+    for (size_t i = 0; i < m_terms.size(); ++i)
+    {
         out << " ";
         std::visit(StringifyVisitor(out, options), *m_terms[i]);
     }
     out << ")";
 }
 
-const Predicate& AtomImpl::get_predicate() const {
-    return m_predicate;
-}
+const Predicate& AtomImpl::get_predicate() const { return m_predicate; }
 
-const TermList& AtomImpl::get_terms() const {
-    return m_terms;
-}
+const TermList& AtomImpl::get_terms() const { return m_terms; }
 
 }
 
+namespace std
+{
+bool less<loki::pddl::Atom>::operator()(const loki::pddl::Atom& left_atom, const loki::pddl::Atom& right_atom) const { return *left_atom < *right_atom; }
 
-namespace std {
-    bool less<loki::pddl::Atom>::operator()(
-        const loki::pddl::Atom& left_atom,
-        const loki::pddl::Atom& right_atom) const {
-        return *left_atom < *right_atom;
-    }
-
-    std::size_t hash<loki::pddl::AtomImpl>::operator()(const loki::pddl::AtomImpl& atom) const {
-        return atom.hash();
-    }
+std::size_t hash<loki::pddl::AtomImpl>::operator()(const loki::pddl::AtomImpl& atom) const { return atom.hash(); }
 }

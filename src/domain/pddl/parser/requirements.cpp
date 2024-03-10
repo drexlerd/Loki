@@ -17,55 +17,63 @@
 
 #include "requirements.hpp"
 
-#include <loki/domain/pddl/exceptions.hpp>
+#include "loki/domain/pddl/exceptions.hpp"
 
 using namespace loki::domain;
 
+namespace loki
+{
 
-namespace loki {
-
-pddl::RequirementEnumSet parse(const ast::RequirementStrips&, Context& /*context*/) {
+pddl::RequirementEnumSet parse(const ast::RequirementStrips&, Context& /*context*/)
+{
     // Strips as the minimal requirement must not be tracked.
     return { pddl::RequirementEnum::STRIPS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementTyping&, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementTyping&, Context& context)
+{
     // Track
     context.references.track(pddl::RequirementEnum::TYPING);
     return { pddl::RequirementEnum::TYPING };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementNegativePreconditions&, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementNegativePreconditions&, Context& context)
+{
     // Track
     context.references.track(pddl::RequirementEnum::NEGATIVE_PRECONDITIONS);
     return { pddl::RequirementEnum::NEGATIVE_PRECONDITIONS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementDisjunctivePreconditions&, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementDisjunctivePreconditions&, Context& context)
+{
     // Track
     context.references.track(pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
     return { pddl::RequirementEnum::DISJUNCTIVE_PRECONDITIONS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementEquality&, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementEquality&, Context& context)
+{
     // Track
     context.references.track(pddl::RequirementEnum::EQUALITY);
     return { pddl::RequirementEnum::EQUALITY };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementExistentialPreconditions&, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementExistentialPreconditions&, Context& context)
+{
     // Track
     context.references.track(pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS);
     return { pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementUniversalPreconditions&, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementUniversalPreconditions&, Context& context)
+{
     // Track
     context.references.track(pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS);
     return { pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementQuantifiedPreconditions&, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementQuantifiedPreconditions&, Context& context)
+{
     // Track
     context.references.track(pddl::RequirementEnum::QUANTIFIED_PRECONDITIONS);
     context.references.track(pddl::RequirementEnum::EXISTENTIAL_PRECONDITIONS);
@@ -75,39 +83,40 @@ pddl::RequirementEnumSet parse(const ast::RequirementQuantifiedPreconditions&, C
              pddl::RequirementEnum::UNIVERSAL_PRECONDITIONS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementConditionalEffects&, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementConditionalEffects&, Context& context)
+{
     // Track
     context.references.track(pddl::RequirementEnum::CONDITIONAL_EFFECTS);
     return { pddl::RequirementEnum::CONDITIONAL_EFFECTS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementFluents&, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementFluents&, Context& context)
+{
     // Track
     // FLUENTS as a composite must not be tracked
     context.references.track(pddl::RequirementEnum::OBJECT_FLUENTS);
     context.references.track(pddl::RequirementEnum::NUMERIC_FLUENTS);
-    return { pddl::RequirementEnum::FLUENTS,
-             pddl::RequirementEnum::OBJECT_FLUENTS,
-             pddl::RequirementEnum::NUMERIC_FLUENTS };
+    return { pddl::RequirementEnum::FLUENTS, pddl::RequirementEnum::OBJECT_FLUENTS, pddl::RequirementEnum::NUMERIC_FLUENTS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementObjectFluents& node, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementObjectFluents& node, Context& context)
+{
     // Track
     context.references.track(pddl::RequirementEnum::OBJECT_FLUENTS);
-    throw UnsupportedRequirementError(
-        pddl::RequirementEnum::OBJECT_FLUENTS,
-        context.scopes.get_error_handler()(node, ""));
+    throw UnsupportedRequirementError(pddl::RequirementEnum::OBJECT_FLUENTS, context.scopes.get_error_handler()(node, ""));
 
     return { pddl::RequirementEnum::OBJECT_FLUENTS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementNumericFluents&, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementNumericFluents&, Context& context)
+{
     // Track
     context.references.track(pddl::RequirementEnum::NUMERIC_FLUENTS);
     return { pddl::RequirementEnum::NUMERIC_FLUENTS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementAdl&, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementAdl&, Context& context)
+{
     // Track
     // Strips as the minimal requirement must not be tracked.
     // ADL as a composite must not be tracked
@@ -131,74 +140,68 @@ pddl::RequirementEnumSet parse(const ast::RequirementAdl&, Context& context) {
              pddl::RequirementEnum::CONDITIONAL_EFFECTS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementDurativeActions& node, Context& context) {
-    throw UnsupportedRequirementError(
-        pddl::RequirementEnum::DURATIVE_ACTIONS,
-        context.scopes.get_error_handler()(node, ""));
+pddl::RequirementEnumSet parse(const ast::RequirementDurativeActions& node, Context& context)
+{
+    throw UnsupportedRequirementError(pddl::RequirementEnum::DURATIVE_ACTIONS, context.scopes.get_error_handler()(node, ""));
 
     // Track
     context.references.track(pddl::RequirementEnum::DURATIVE_ACTIONS);
     return { pddl::RequirementEnum::DURATIVE_ACTIONS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementDerivedPredicates& node, Context& context) {
-    throw UnsupportedRequirementError(
-        pddl::RequirementEnum::DERIVED_PREDICATES,
-        context.scopes.get_error_handler()(node, ""));
+pddl::RequirementEnumSet parse(const ast::RequirementDerivedPredicates& node, Context& context)
+{
+    throw UnsupportedRequirementError(pddl::RequirementEnum::DERIVED_PREDICATES, context.scopes.get_error_handler()(node, ""));
 
     // Track
     context.references.track(pddl::RequirementEnum::DERIVED_PREDICATES);
     return { pddl::RequirementEnum::DERIVED_PREDICATES };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementTimedInitialLiterals& node, Context& context) {
-    throw UnsupportedRequirementError(
-        pddl::RequirementEnum::TIMED_INITIAL_LITERALS,
-        context.scopes.get_error_handler()(node, ""));
+pddl::RequirementEnumSet parse(const ast::RequirementTimedInitialLiterals& node, Context& context)
+{
+    throw UnsupportedRequirementError(pddl::RequirementEnum::TIMED_INITIAL_LITERALS, context.scopes.get_error_handler()(node, ""));
 
     // Track
     context.references.track(pddl::RequirementEnum::TIMED_INITIAL_LITERALS);
     context.references.track(pddl::RequirementEnum::DURATIVE_ACTIONS);
-    return { pddl::RequirementEnum::TIMED_INITIAL_LITERALS,
-             pddl::RequirementEnum::DURATIVE_ACTIONS };
+    return { pddl::RequirementEnum::TIMED_INITIAL_LITERALS, pddl::RequirementEnum::DURATIVE_ACTIONS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementPreferences& node, Context& context) {
-    throw UnsupportedRequirementError(
-        pddl::RequirementEnum::PREFERENCES,
-        context.scopes.get_error_handler()(node, ""));
+pddl::RequirementEnumSet parse(const ast::RequirementPreferences& node, Context& context)
+{
+    throw UnsupportedRequirementError(pddl::RequirementEnum::PREFERENCES, context.scopes.get_error_handler()(node, ""));
 
     // Track
     context.references.track(pddl::RequirementEnum::PREFERENCES);
     return { pddl::RequirementEnum::PREFERENCES };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementConstraints& node, Context& context) {
-    throw UnsupportedRequirementError(
-        pddl::RequirementEnum::CONSTRAINTS,
-        context.scopes.get_error_handler()(node, ""));
+pddl::RequirementEnumSet parse(const ast::RequirementConstraints& node, Context& context)
+{
+    throw UnsupportedRequirementError(pddl::RequirementEnum::CONSTRAINTS, context.scopes.get_error_handler()(node, ""));
 
     // Track
     context.references.track(pddl::RequirementEnum::CONSTRAINTS);
     return { pddl::RequirementEnum::CONSTRAINTS };
-
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementActionCosts&, Context& context) {
+pddl::RequirementEnumSet parse(const ast::RequirementActionCosts&, Context& context)
+{
     // Track
     context.references.track(pddl::RequirementEnum::ACTION_COSTS);
     return { pddl::RequirementEnum::ACTION_COSTS };
 }
 
-pddl::RequirementEnumSet parse(const ast::Requirement& node, Context& context) {
-    return boost::apply_visitor(RequirementVisitor(context), node);
-}
+pddl::RequirementEnumSet parse(const ast::Requirement& node, Context& context) { return boost::apply_visitor(RequirementVisitor(context), node); }
 
-RequirementVisitor::RequirementVisitor(Context& context_) : context(context_) { }
+RequirementVisitor::RequirementVisitor(Context& context_) : context(context_) {}
 
-pddl::RequirementEnumSet parse(const ast::Requirements& requirements_node, Context& context) {
+pddl::RequirementEnumSet parse(const ast::Requirements& requirements_node, Context& context)
+{
     auto requirements = pddl::RequirementEnumSet();
-    for (const auto& requirement : requirements_node.requirements) {
+    for (const auto& requirement : requirements_node.requirements)
+    {
         auto additional_requirements = parse(requirement, context);
         requirements.insert(additional_requirements.begin(), additional_requirements.end());
     }

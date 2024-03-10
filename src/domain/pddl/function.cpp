@@ -15,62 +15,60 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "loki/domain/pddl/function.hpp"
 
-#include <loki/domain/pddl/function.hpp>
+#include "loki/common/hash.hpp"
+#include "loki/common/pddl/visitors.hpp"
+#include "loki/domain/pddl/function_skeleton.hpp"
+#include "loki/domain/pddl/term.hpp"
 
-#include <loki/domain/pddl/function_skeleton.hpp>
-#include <loki/domain/pddl/term.hpp>
-#include <loki/common/hash.hpp>
-#include <loki/common/pddl/visitors.hpp>
-
-
-namespace loki::pddl {
-FunctionImpl::FunctionImpl(int identifier, FunctionSkeleton function_skeleton, TermList terms)
-    : Base(identifier)
-    , m_function_skeleton(std::move(function_skeleton))
-    , m_terms(std::move(terms))
+namespace loki::pddl
+{
+FunctionImpl::FunctionImpl(int identifier, FunctionSkeleton function_skeleton, TermList terms) :
+    Base(identifier),
+    m_function_skeleton(std::move(function_skeleton)),
+    m_terms(std::move(terms))
 {
 }
 
-bool FunctionImpl::is_structurally_equivalent_to_impl(const FunctionImpl& other) const {
+bool FunctionImpl::is_structurally_equivalent_to_impl(const FunctionImpl& other) const
+{
     return (m_function_skeleton == other.m_function_skeleton) && (m_terms == other.m_terms);
 }
 
-size_t FunctionImpl::hash_impl() const {
-    return hash_combine(m_function_skeleton, hash_container(m_terms));
-}
+size_t FunctionImpl::hash_impl() const { return hash_combine(m_function_skeleton, hash_container(m_terms)); }
 
-void FunctionImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
-    if (m_terms.empty()) {
+void FunctionImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const
+{
+    if (m_terms.empty())
+    {
         out << "(" << m_function_skeleton->get_name() << ")";
-    } else {
+    }
+    else
+    {
         out << "(" << m_function_skeleton->get_name() << "(";
-        for (size_t i = 0; i < m_terms.size(); ++i) {
-            if (i != 0) out << " ";
+        for (size_t i = 0; i < m_terms.size(); ++i)
+        {
+            if (i != 0)
+                out << " ";
             std::visit(StringifyVisitor(out, options), *m_terms[i]);
         }
         out << "))";
     }
 }
 
-const FunctionSkeleton& FunctionImpl::get_function_skeleton() const {
-    return m_function_skeleton;
-}
+const FunctionSkeleton& FunctionImpl::get_function_skeleton() const { return m_function_skeleton; }
 
-const TermList& FunctionImpl::get_terms() const {
-    return m_terms;
-}
+const TermList& FunctionImpl::get_terms() const { return m_terms; }
 
 }
 
-namespace std {
-    bool less<loki::pddl::Function>::operator()(
-        const loki::pddl::Function& left_function,
-        const loki::pddl::Function& right_function) const {
-        return *left_function < *right_function;
-    }
+namespace std
+{
+bool less<loki::pddl::Function>::operator()(const loki::pddl::Function& left_function, const loki::pddl::Function& right_function) const
+{
+    return *left_function < *right_function;
+}
 
-    std::size_t hash<loki::pddl::FunctionImpl>::operator()(const loki::pddl::FunctionImpl& function) const {
-        return function.hash();
-    }
+std::size_t hash<loki::pddl::FunctionImpl>::operator()(const loki::pddl::FunctionImpl& function) const { return function.hash(); }
 }

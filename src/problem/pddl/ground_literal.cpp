@@ -15,55 +15,47 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/problem/pddl/ground_literal.hpp>
+#include "loki/problem/pddl/ground_literal.hpp"
 
-#include <loki/common/hash.hpp>
-#include <loki/common/collections.hpp>
-#include <loki/problem/pddl/ground_atom.hpp>
+#include "loki/common/collections.hpp"
+#include "loki/common/hash.hpp"
+#include "loki/problem/pddl/ground_atom.hpp"
 
-
-namespace loki::pddl {
-GroundLiteralImpl::GroundLiteralImpl(int identifier, bool is_negated, GroundAtom atom)
-    : Base(identifier)
-    , m_is_negated(is_negated)
-    , m_atom(std::move(atom))
+namespace loki::pddl
 {
-}
+GroundLiteralImpl::GroundLiteralImpl(int identifier, bool is_negated, GroundAtom atom) : Base(identifier), m_is_negated(is_negated), m_atom(std::move(atom)) {}
 
-bool GroundLiteralImpl::is_structurally_equivalent_to_impl(const GroundLiteralImpl& other) const {
+bool GroundLiteralImpl::is_structurally_equivalent_to_impl(const GroundLiteralImpl& other) const
+{
     return (m_is_negated == other.m_is_negated) && (m_atom == other.m_atom);
 }
 
-size_t GroundLiteralImpl::hash_impl() const {
-    return hash_combine(m_is_negated, m_atom);
-}
+size_t GroundLiteralImpl::hash_impl() const { return hash_combine(m_is_negated, m_atom); }
 
-void GroundLiteralImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
-    if (m_is_negated) {
+void GroundLiteralImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const
+{
+    if (m_is_negated)
+    {
         out << "(not " << *m_atom << ")";
-    } else {
+    }
+    else
+    {
         out << *m_atom;
     }
 }
 
-bool GroundLiteralImpl::is_negated() const {
-    return m_is_negated;
-}
+bool GroundLiteralImpl::is_negated() const { return m_is_negated; }
 
-const GroundAtom& GroundLiteralImpl::get_atom() const {
-    return m_atom;
-}
+const GroundAtom& GroundLiteralImpl::get_atom() const { return m_atom; }
 
 }
 
-namespace std {
-    bool less<loki::pddl::GroundLiteral>::operator()(
-        const loki::pddl::GroundLiteral& left_literal,
-        const loki::pddl::GroundLiteral& right_literal) const {
-        return *left_literal < *right_literal;
-    }
+namespace std
+{
+bool less<loki::pddl::GroundLiteral>::operator()(const loki::pddl::GroundLiteral& left_literal, const loki::pddl::GroundLiteral& right_literal) const
+{
+    return *left_literal < *right_literal;
+}
 
-    std::size_t hash<loki::pddl::GroundLiteralImpl>::operator()(const loki::pddl::GroundLiteralImpl& literal) const {
-        return literal.hash();
-    }
+std::size_t hash<loki::pddl::GroundLiteralImpl>::operator()(const loki::pddl::GroundLiteralImpl& literal) const { return literal.hash(); }
 }

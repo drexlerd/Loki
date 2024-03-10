@@ -18,18 +18,19 @@
 #ifndef LOKI_SRC_PROBLEM_PDDL_PARSER_GROUND_LITERAL_HPP_
 #define LOKI_SRC_PROBLEM_PDDL_PARSER_GROUND_LITERAL_HPP_
 
-#include <loki/problem/ast/ast.hpp>
-#include <loki/problem/pddl/parser.hpp>
+#include "loki/problem/ast/ast.hpp"
+#include "loki/problem/pddl/parser.hpp"
 
-
-namespace loki {
+namespace loki
+{
 
 /* Atom */
 extern pddl::GroundAtom parse(const problem::ast::AtomicFormulaOfNamesPredicate& node, Context& context);
 extern pddl::GroundAtom parse(const problem::ast::AtomicFormulaOfNamesEquality& node, Context& context);
 extern pddl::GroundAtom parse(const problem::ast::AtomicFormulaOfNames& node, Context& context);
 
-class GroundAtomicFormulaOfNamesVisitor : boost::static_visitor<pddl::GroundAtom> {
+class GroundAtomicFormulaOfNamesVisitor : boost::static_visitor<pddl::GroundAtom>
+{
 private:
     Context& context;
 
@@ -37,7 +38,8 @@ public:
     GroundAtomicFormulaOfNamesVisitor(Context& context_);
 
     template<typename Node>
-    pddl::GroundAtom operator()(const Node& node) const {
+    pddl::GroundAtom operator()(const Node& node) const
+    {
         return parse(node, context);
     }
 };
@@ -47,7 +49,8 @@ extern pddl::GroundLiteral parse(const problem::ast::Atom& node, Context& contex
 extern pddl::GroundLiteral parse(const problem::ast::NegatedAtom& node, Context& context);
 extern pddl::GroundLiteral parse(const problem::ast::Literal& node, Context& context);
 
-class GroundLiteralVisitor : boost::static_visitor<pddl::GroundLiteral> {
+class GroundLiteralVisitor : boost::static_visitor<pddl::GroundLiteral>
+{
 private:
     Context& context;
 
@@ -55,7 +58,8 @@ public:
     GroundLiteralVisitor(Context& context_);
 
     template<typename Node>
-    pddl::GroundLiteral operator()(const Node& node) const {
+    pddl::GroundLiteral operator()(const Node& node) const
+    {
         return parse(node, context);
     }
 };

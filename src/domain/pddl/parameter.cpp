@@ -15,72 +15,70 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/domain/pddl/parameter.hpp>
+#include "loki/domain/pddl/parameter.hpp"
 
-#include <loki/domain/pddl/type.hpp>
-#include <loki/domain/pddl/variable.hpp>
-#include <loki/common/hash.hpp>
-#include <loki/common/collections.hpp>
+#include "loki/common/collections.hpp"
+#include "loki/common/hash.hpp"
+#include "loki/domain/pddl/type.hpp"
+#include "loki/domain/pddl/variable.hpp"
 
 #include <cassert>
 
-
-namespace loki::pddl {
-ParameterImpl::ParameterImpl(int identifier, pddl::Variable variable, TypeList types)
-    : Base(identifier)
-    , m_variable(std::move(variable))
-    , m_types(std::move(types))
+namespace loki::pddl
+{
+ParameterImpl::ParameterImpl(int identifier, pddl::Variable variable, TypeList types) :
+    Base(identifier),
+    m_variable(std::move(variable)),
+    m_types(std::move(types))
 {
 }
 
-bool ParameterImpl::is_structurally_equivalent_to_impl(const ParameterImpl& other) const {
+bool ParameterImpl::is_structurally_equivalent_to_impl(const ParameterImpl& other) const
+{
     return (m_variable == other.m_variable) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types));
 }
 
-size_t ParameterImpl::hash_impl() const {
-    return hash_combine(m_variable, hash_container(get_sorted_vector(m_types)));
-}
+size_t ParameterImpl::hash_impl() const { return hash_combine(m_variable, hash_container(get_sorted_vector(m_types))); }
 
-void ParameterImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
-    str(out, options, true);
-}
+void ParameterImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const { str(out, options, true); }
 
-void ParameterImpl::str(std::ostringstream& out, const FormattingOptions& /*options*/, bool typing_enabled) const {
+void ParameterImpl::str(std::ostringstream& out, const FormattingOptions& /*options*/, bool typing_enabled) const
+{
     out << *m_variable;
-    if (typing_enabled) {
+    if (typing_enabled)
+    {
         assert(!m_types.empty());
         out << " - ";
-        if (m_types.size() > 1) {
+        if (m_types.size() > 1)
+        {
             out << "(either ";
-            for (size_t i = 0; i < m_types.size(); ++i) {
-                if (i != 0) out << " ";
+            for (size_t i = 0; i < m_types.size(); ++i)
+            {
+                if (i != 0)
+                    out << " ";
                 out << *m_types[i];
             }
             out << ")";
-        } else if (m_types.size() == 1) {
+        }
+        else if (m_types.size() == 1)
+        {
             out << *m_types.front();
         }
     }
 }
 
-const Variable& ParameterImpl::get_variable() const {
-    return m_variable;
-}
+const Variable& ParameterImpl::get_variable() const { return m_variable; }
 
-const TypeList& ParameterImpl::get_bases() const {
-    return m_types;
-}
+const TypeList& ParameterImpl::get_bases() const { return m_types; }
 
 }
 
-namespace std {
-    bool less<loki::pddl::Parameter>::operator()(
-        const loki::pddl::Parameter& left_parameter,
-        const loki::pddl::Parameter& right_parameter) const {
-        return *left_parameter < *right_parameter;
-    }
+namespace std
+{
+bool less<loki::pddl::Parameter>::operator()(const loki::pddl::Parameter& left_parameter, const loki::pddl::Parameter& right_parameter) const
+{
+    return *left_parameter < *right_parameter;
+}
 
-    std::size_t hash<loki::pddl::ParameterImpl>::operator()(const loki::pddl::ParameterImpl& parameter) const {
-        return parameter.hash();
-    }
+std::size_t hash<loki::pddl::ParameterImpl>::operator()(const loki::pddl::ParameterImpl& parameter) const { return parameter.hash(); }
 }

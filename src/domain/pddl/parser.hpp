@@ -18,16 +18,17 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_HPP_
 
-#include <loki/common/ast/config.hpp>
-#include <loki/domain/pddl/parser.hpp>
+#include "loki/common/ast/config.hpp"
+#include "loki/domain/pddl/parser.hpp"
 
 #include <boost/variant.hpp>
 
-
-namespace loki {
+namespace loki
+{
 
 template<typename T>
-class SetInsertVisitor : boost::static_visitor<T> {
+class SetInsertVisitor : boost::static_visitor<T>
+{
 private:
     Context& context;
 
@@ -38,4 +39,4 @@ public:
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_HPP_
+#endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_HPP_

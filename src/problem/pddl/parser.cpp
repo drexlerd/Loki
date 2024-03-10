@@ -15,46 +15,48 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/problem/pddl/parser.hpp>
-
-#include "parser/objects.hpp"
-#include "parser/initial.hpp"
-#include "parser/goal.hpp"
-#include "parser/metric.hpp"
-#include "parser/reference_utils.hpp"
+#include "loki/problem/pddl/parser.hpp"
 
 #include "../../domain/pddl/parser/common.hpp"
 #include "../../domain/pddl/parser/requirements.hpp"
 #include "../../domain/pddl/unpacking_visitor.hpp"
+#include "loki/domain/pddl/domain.hpp"
+#include "loki/domain/pddl/requirements.hpp"
+#include "loki/problem/pddl/exceptions.hpp"
+#include "parser/goal.hpp"
+#include "parser/initial.hpp"
+#include "parser/metric.hpp"
+#include "parser/objects.hpp"
+#include "parser/reference_utils.hpp"
 
-#include <loki/problem/pddl/exceptions.hpp>
-#include <loki/domain/pddl/domain.hpp>
-#include <loki/domain/pddl/requirements.hpp>
+namespace loki
+{
 
-
-namespace loki {
-
-pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context, const pddl::Domain& domain) {
+pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context, const pddl::Domain& domain)
+{
     /* Domain name section */
     const auto domain_name = parse(problem_node.domain_name.name);
-    if (domain_name != domain->get_name()) {
+    if (domain_name != domain->get_name())
+    {
         throw MismatchedDomainError(domain, domain_name, context.scopes.get_error_handler()(problem_node.domain_name, ""));
     }
     /* Problem name section */
     const auto problem_name = parse(problem_node.problem_name.name);
     /* Requirements section */
-    if (problem_node.requirements.has_value()) {
-        context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(
-            parse(problem_node.requirements.value(), context));
+    if (problem_node.requirements.has_value())
+    {
+        context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(parse(problem_node.requirements.value(), context));
         context.positions.push_back(context.requirements, problem_node.requirements.value());
-    } else {
+    }
+    else
+    {
         // Default requirements
-        context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(
-            pddl::RequirementEnumSet{pddl::RequirementEnum::STRIPS});
+        context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(pddl::RequirementEnumSet { pddl::RequirementEnum::STRIPS });
     }
     /* Objects section */
     auto objects = pddl::ObjectList();
-    if (problem_node.objects.has_value()) {
+    if (problem_node.objects.has_value())
+    {
         objects = parse(problem_node.objects.value(), context);
     }
     track_object_references(objects, context);
@@ -62,21 +64,30 @@ pddl::Problem parse(const problem::ast::Problem& problem_node, Context& context,
     auto initial_literals = pddl::GroundLiteralList();
     auto numeric_fluents = pddl::NumericFluentList();
     const auto initial_elements = parse(problem_node.initial, context);
-    for (const auto& initial_element : initial_elements) {
+    for (const auto& initial_element : initial_elements)
+    {
         std::visit(UnpackingVisitor(initial_literals, numeric_fluents), initial_element);
     }
     /* Goal section */
     const auto goal_condition = parse(problem_node.goal, context);
     /* Metric section */
     auto optimization_metric = std::optional<pddl::OptimizationMetric>();
-    if (problem_node.metric_specification.has_value()) {
+    if (problem_node.metric_specification.has_value())
+    {
         optimization_metric = parse(problem_node.metric_specification.value(), context);
     }
 
     // Check references
     test_object_references(objects, context);
 
-    const auto problem = context.factories.problems.get_or_create<pddl::ProblemImpl>(domain, problem_name, context.requirements, objects, initial_literals, numeric_fluents, goal_condition, optimization_metric);
+    const auto problem = context.factories.problems.get_or_create<pddl::ProblemImpl>(domain,
+                                                                                     problem_name,
+                                                                                     context.requirements,
+                                                                                     objects,
+                                                                                     initial_literals,
+                                                                                     numeric_fluents,
+                                                                                     goal_condition,
+                                                                                     optimization_metric);
     context.positions.push_back(problem, problem_node);
     return problem;
 }

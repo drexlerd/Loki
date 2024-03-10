@@ -18,7 +18,7 @@
 #ifndef LOKI_SRC_PROBLEM_AST_AST_ADAPTED_HPP_
 #define LOKI_SRC_PROBLEM_AST_AST_ADAPTED_HPP_
 
-#include <loki/problem/ast/ast.hpp>
+#include "loki/problem/ast/ast.hpp"
 
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
@@ -38,8 +38,14 @@ BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementNumericFluentsTotalC
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::InitialElementNumericFluentsGeneral, basic_function_term, number)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionNumber, number)
-BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionBinaryOperator, binary_operator, metric_function_expression_left, metric_function_expression_right)
-BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionMultiOperator, multi_operator, metric_function_expression_first, metric_function_expression_remaining)
+BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionBinaryOperator,
+                          binary_operator,
+                          metric_function_expression_left,
+                          metric_function_expression_right)
+BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionMultiOperator,
+                          multi_operator,
+                          metric_function_expression_first,
+                          metric_function_expression_remaining)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionMinus, metric_function_expression)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionBasicFunctionTerm, basic_function_term)
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::MetricFunctionExpressionPreferences, preference_name)
@@ -60,6 +66,5 @@ BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Goal, precondition_goal_descriptor
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Constraints, preference_constraint_goal_descriptor)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::problem::ast::Problem, problem_name, domain_name, requirements, objects, initial, goal, constraints, metric_specification)
-
 
 #endif

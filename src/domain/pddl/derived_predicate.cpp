@@ -15,53 +15,44 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/common/hash.hpp>
-#include <loki/common/collections.hpp>
-#include <loki/domain/pddl/conditions.hpp>
-#include <loki/domain/pddl/effects.hpp>
-#include <loki/domain/pddl/derived_predicate.hpp>
+#include "loki/domain/pddl/derived_predicate.hpp"
 
+#include "loki/common/collections.hpp"
+#include "loki/common/hash.hpp"
+#include "loki/domain/pddl/conditions.hpp"
+#include "loki/domain/pddl/effects.hpp"
 
-namespace loki::pddl {
-DerivedPredicateImpl::DerivedPredicateImpl(int identifier, ParameterList parameters, Condition condition)
-    : Base(identifier)
-    , m_parameters(std::move(parameters))
-    , m_condition(std::move(condition))
+namespace loki::pddl
+{
+DerivedPredicateImpl::DerivedPredicateImpl(int identifier, ParameterList parameters, Condition condition) :
+    Base(identifier),
+    m_parameters(std::move(parameters)),
+    m_condition(std::move(condition))
 {
 }
 
-bool DerivedPredicateImpl::is_structurally_equivalent_to_impl(const DerivedPredicateImpl& other) const {
-    return (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters))
-        && (m_condition == other.m_condition);
+bool DerivedPredicateImpl::is_structurally_equivalent_to_impl(const DerivedPredicateImpl& other) const
+{
+    return (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters)) && (m_condition == other.m_condition);
 }
 
-size_t DerivedPredicateImpl::hash_impl() const {
-    return hash_combine(hash_container(get_sorted_vector(m_parameters)), m_condition);
-}
+size_t DerivedPredicateImpl::hash_impl() const { return hash_combine(hash_container(get_sorted_vector(m_parameters)), m_condition); }
 
-void DerivedPredicateImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
-    out << "TODO";
-}
+void DerivedPredicateImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const { out << "TODO"; }
 
-const ParameterList& DerivedPredicateImpl::get_parameters() const {
-    return m_parameters;
-}
+const ParameterList& DerivedPredicateImpl::get_parameters() const { return m_parameters; }
 
-const Condition& DerivedPredicateImpl::get_condition() const {
-    return m_condition;
-}
+const Condition& DerivedPredicateImpl::get_condition() const { return m_condition; }
 
 }
 
+namespace std
+{
+bool less<loki::pddl::DerivedPredicate>::operator()(const loki::pddl::DerivedPredicate& left_predicate,
+                                                    const loki::pddl::DerivedPredicate& right_predicate) const
+{
+    return *left_predicate < *right_predicate;
+}
 
-namespace std {
-    bool less<loki::pddl::DerivedPredicate>::operator()(
-        const loki::pddl::DerivedPredicate& left_predicate,
-        const loki::pddl::DerivedPredicate& right_predicate) const {
-        return *left_predicate < *right_predicate;
-    }
-
-    std::size_t hash<loki::pddl::DerivedPredicateImpl>::operator()(const loki::pddl::DerivedPredicateImpl& action) const {
-        return action.hash();
-    }
+std::size_t hash<loki::pddl::DerivedPredicateImpl>::operator()(const loki::pddl::DerivedPredicateImpl& action) const { return action.hash(); }
 }

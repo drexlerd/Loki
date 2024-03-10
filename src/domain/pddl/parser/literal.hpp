@@ -18,45 +18,48 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_PARSER_LITERAL_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_PARSER_LITERAL_HPP_
 
-#include <loki/domain/ast/ast.hpp>
-#include <loki/domain/pddl/parser.hpp>
+#include "loki/domain/ast/ast.hpp"
+#include "loki/domain/pddl/parser.hpp"
 
-
-namespace loki {
+namespace loki
+{
 
 /* Atom */
 extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsPredicate& node, Context& context);
 extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTermsEquality& node, Context& context);
 extern pddl::Atom parse(const domain::ast::AtomicFormulaOfTerms& node, Context& context);
 
-struct AtomicFormulaOfTermsVisitor : boost::static_visitor<pddl::Atom> {
+struct AtomicFormulaOfTermsVisitor : boost::static_visitor<pddl::Atom>
+{
     Context& context;
 
     AtomicFormulaOfTermsVisitor(Context& context_);
 
     template<typename Node>
-    pddl::Atom operator()(const Node& node) const {
+    pddl::Atom operator()(const Node& node) const
+    {
         return parse(node, context);
     }
 };
-
 
 /* Literal */
 extern pddl::Literal parse(const domain::ast::Atom& node, Context& context);
 extern pddl::Literal parse(const domain::ast::NegatedAtom& node, Context& context);
 extern pddl::Literal parse(const domain::ast::Literal& node, Context& context);
 
-struct LiteralVisitor : boost::static_visitor<pddl::Literal> {
+struct LiteralVisitor : boost::static_visitor<pddl::Literal>
+{
     Context& context;
 
     LiteralVisitor(Context& context_);
 
     template<typename Node>
-    pddl::Literal operator()(const Node& node) const {
+    pddl::Literal operator()(const Node& node) const
+    {
         return parse(node, context);
     }
 };
 
 }
 
-#endif // LOKI_SRC_DOMAIN_PDDL_PARSER_OBJECTS_HPP_
+#endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_OBJECTS_HPP_

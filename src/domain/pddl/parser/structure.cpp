@@ -17,32 +17,35 @@
 
 #include "structure.hpp"
 
+#include "common.hpp"
 #include "conditions.hpp"
 #include "effects.hpp"
+#include "loki/domain/pddl/action.hpp"
+#include "loki/domain/pddl/derived_predicate.hpp"
+#include "loki/domain/pddl/exceptions.hpp"
 #include "parameters.hpp"
-#include "common.hpp"
 #include "reference_utils.hpp"
 
-#include <loki/domain/pddl/exceptions.hpp>
-#include <loki/domain/pddl/action.hpp>
-#include <loki/domain/pddl/derived_predicate.hpp>
+namespace loki
+{
 
-
-namespace loki {
-
-std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(const domain::ast::ActionBody& node, Context& context) {
+std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(const domain::ast::ActionBody& node, Context& context)
+{
     std::optional<pddl::Condition> condition;
-    if (node.precondition_goal_descriptor.has_value()) {
+    if (node.precondition_goal_descriptor.has_value())
+    {
         condition = parse(node.precondition_goal_descriptor.value(), context);
     }
     std::optional<pddl::Effect> effect;
-    if (node.effect.has_value()) {
+    if (node.effect.has_value())
+    {
         effect = parse(node.effect.value(), context);
     }
-    return {condition, effect};
+    return { condition, effect };
 }
 
-pddl::Action parse(const domain::ast::Action& node, Context& context) {
+pddl::Action parse(const domain::ast::Action& node, Context& context)
+{
     context.scopes.open_scope();
     auto name = parse(node.action_symbol.name);
     auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
@@ -55,8 +58,10 @@ pddl::Action parse(const domain::ast::Action& node, Context& context) {
     return action;
 }
 
-pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, Context& context) {
-    if (!context.requirements->test(pddl::RequirementEnum::DERIVED_PREDICATES)) {
+pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, Context& context)
+{
+    if (!context.requirements->test(pddl::RequirementEnum::DERIVED_PREDICATES))
+    {
         throw UndefinedRequirementError(pddl::RequirementEnum::DERIVED_PREDICATES, context.scopes.get_error_handler()(node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::DERIVED_PREDICATES);
@@ -72,15 +77,11 @@ pddl::DerivedPredicate parse(const domain::ast::DerivedPredicate& node, Context&
     return derived_predicate;
 }
 
+StructureVisitor::StructureVisitor(Context& context_) : context(context_) {}
 
-StructureVisitor::StructureVisitor(Context& context_)
-    : context(context_) { }
-
-
-boost::variant<pddl::DerivedPredicate, pddl::Action> parse(const domain::ast::Structure& node, Context& context) {
+boost::variant<pddl::DerivedPredicate, pddl::Action> parse(const domain::ast::Structure& node, Context& context)
+{
     return boost::apply_visitor(StructureVisitor(context), node);
 }
 
-
 }
-

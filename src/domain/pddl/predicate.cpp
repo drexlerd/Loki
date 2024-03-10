@@ -15,62 +15,56 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/domain/pddl/predicate.hpp>
+#include "loki/domain/pddl/predicate.hpp"
 
-#include <loki/domain/pddl/parameter.hpp>
-#include <loki/domain/pddl/variable.hpp>
-#include <loki/domain/pddl/type.hpp>
-#include <loki/common/hash.hpp>
+#include "loki/common/hash.hpp"
+#include "loki/domain/pddl/parameter.hpp"
+#include "loki/domain/pddl/type.hpp"
+#include "loki/domain/pddl/variable.hpp"
 
 #include <memory>
 
-namespace loki::pddl {
-PredicateImpl::PredicateImpl(int identifier, std::string name, ParameterList parameters)
-    : Base(identifier)
-    , m_name(std::move(name))
-    , m_parameters(std::move(parameters))
+namespace loki::pddl
+{
+PredicateImpl::PredicateImpl(int identifier, std::string name, ParameterList parameters) :
+    Base(identifier),
+    m_name(std::move(name)),
+    m_parameters(std::move(parameters))
 {
 }
 
-bool PredicateImpl::is_structurally_equivalent_to_impl(const PredicateImpl& other) const {
+bool PredicateImpl::is_structurally_equivalent_to_impl(const PredicateImpl& other) const
+{
     return (m_name == other.m_name) && (m_parameters == other.m_parameters);
 }
 
-size_t PredicateImpl::hash_impl() const {
-    return hash_combine(m_name, hash_container(m_parameters));
-}
+size_t PredicateImpl::hash_impl() const { return hash_combine(m_name, hash_container(m_parameters)); }
 
-void PredicateImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const {
-    str(out, options, true);
-}
+void PredicateImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const { str(out, options, true); }
 
-void PredicateImpl::str(std::ostringstream& out, const FormattingOptions& options, bool typing_enabled) const {
+void PredicateImpl::str(std::ostringstream& out, const FormattingOptions& options, bool typing_enabled) const
+{
     out << "(" << m_name;
-    for (size_t i = 0; i < m_parameters.size(); ++i) {
+    for (size_t i = 0; i < m_parameters.size(); ++i)
+    {
         out << " ";
         m_parameters[i]->str(out, options, typing_enabled);
     }
     out << ")";
 }
 
-const std::string& PredicateImpl::get_name() const {
-    return m_name;
-}
+const std::string& PredicateImpl::get_name() const { return m_name; }
 
-const ParameterList& PredicateImpl::get_parameters() const {
-    return m_parameters;
-}
+const ParameterList& PredicateImpl::get_parameters() const { return m_parameters; }
 
 }
 
-namespace std {
-    bool less<loki::pddl::Predicate>::operator()(
-        const loki::pddl::Predicate& left_predicate,
-        const loki::pddl::Predicate& right_predicate) const {
-        return *left_predicate < *right_predicate;
-    }
+namespace std
+{
+bool less<loki::pddl::Predicate>::operator()(const loki::pddl::Predicate& left_predicate, const loki::pddl::Predicate& right_predicate) const
+{
+    return *left_predicate < *right_predicate;
+}
 
-    std::size_t hash<loki::pddl::PredicateImpl>::operator()(const loki::pddl::PredicateImpl& predicate) const {
-        return predicate.hash();
-    }
+std::size_t hash<loki::pddl::PredicateImpl>::operator()(const loki::pddl::PredicateImpl& predicate) const { return predicate.hash(); }
 }

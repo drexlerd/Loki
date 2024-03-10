@@ -15,31 +15,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/domain/parser.hpp>
+#include "loki/domain/parser.hpp"
 
-#include <loki/common/memory.hpp>
-#include <loki/common/ast/error_reporting.hpp>
-#include <loki/common/pddl/error_reporting.hpp>
-#include <loki/common/pddl/context.hpp>
-#include <loki/common/filesystem.hpp>
-#include <loki/common/ast/parser_wrapper.hpp>
-#include <loki/common/exceptions.hpp>
-#include <loki/domain/ast/parser.hpp>
-#include <loki/domain/ast/ast.hpp>
-#include <loki/domain/pddl/parser.hpp>
+#include "loki/common/ast/error_reporting.hpp"
+#include "loki/common/ast/parser_wrapper.hpp"
+#include "loki/common/exceptions.hpp"
+#include "loki/common/filesystem.hpp"
+#include "loki/common/memory.hpp"
+#include "loki/common/pddl/context.hpp"
+#include "loki/common/pddl/error_reporting.hpp"
+#include "loki/domain/ast/ast.hpp"
+#include "loki/domain/ast/parser.hpp"
+#include "loki/domain/pddl/parser.hpp"
 
-#include <tuple>
 #include <chrono>
 #include <memory>
+#include <tuple>
 
+namespace loki
+{
 
-namespace loki {
-
-DomainParser::DomainParser(const fs::path& file_path)
-    : m_file_path(file_path)
-    , m_source(loki::read_file(file_path))
-    , m_position_cache(nullptr)
-    , m_scopes(nullptr) {
+DomainParser::DomainParser(const fs::path& file_path) :
+    m_file_path(file_path),
+    m_source(loki::read_file(file_path)),
+    m_position_cache(nullptr),
+    m_scopes(nullptr)
+{
     const auto start = std::chrono::high_resolution_clock::now();
     std::cout << "Started parsing domain file: " << file_path << std::endl;
 
@@ -47,7 +48,8 @@ DomainParser::DomainParser(const fs::path& file_path)
     auto node = domain::ast::Domain();
     auto x3_error_handler = X3ErrorHandler(m_source.begin(), m_source.end(), file_path);
     bool success = parse_ast(m_source, domain::domain(), node, x3_error_handler.get_error_handler());
-    if (!success) {
+    if (!success)
+    {
         throw SyntaxParserError("", x3_error_handler.get_error_stream().str());
     }
 
@@ -65,17 +67,15 @@ DomainParser::DomainParser(const fs::path& file_path)
     context.scopes.insert("number", base_type_number, {});
 
     // Create equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
-    const auto binary_parameterlist = pddl::ParameterList{
-        context.factories.parameters.get_or_create<pddl::ParameterImpl>(
-            context.factories.variables.get_or_create<pddl::VariableImpl>("?left_arg"),
-            pddl::TypeList{base_type_object}),
-        context.factories.parameters.get_or_create<pddl::ParameterImpl>(
-            context.factories.variables.get_or_create<pddl::VariableImpl>("?right_arg"),
-            pddl::TypeList{base_type_object})
+    const auto binary_parameterlist = pddl::ParameterList {
+        context.factories.parameters.get_or_create<pddl::ParameterImpl>(context.factories.variables.get_or_create<pddl::VariableImpl>("?left_arg"),
+                                                                        pddl::TypeList { base_type_object }),
+        context.factories.parameters.get_or_create<pddl::ParameterImpl>(context.factories.variables.get_or_create<pddl::VariableImpl>("?right_arg"),
+                                                                        pddl::TypeList { base_type_object })
 
     };
     const auto equal_predicate = context.factories.predicates.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist);
-        context.scopes.insert<pddl::PredicateImpl>("=", equal_predicate, {});
+    context.scopes.insert<pddl::PredicateImpl>("=", equal_predicate, {});
 
     m_domain = parse(node, context);
 
@@ -90,16 +90,10 @@ DomainParser::DomainParser(const fs::path& file_path)
     std::cout << "Peak resident set size: " << resident_set << " KB." << std::endl;
 }
 
-PDDLFactories& DomainParser::get_factories() {
-    return m_factories;
-}
+PDDLFactories& DomainParser::get_factories() { return m_factories; }
 
-const PDDLPositionCache& DomainParser::get_position_cache() const {
-    return *m_position_cache;
-}
+const PDDLPositionCache& DomainParser::get_position_cache() const { return *m_position_cache; }
 
-const pddl::Domain& DomainParser::get_domain() const {
-    return m_domain;
-}
+const pddl::Domain& DomainParser::get_domain() const { return m_domain; }
 
 }

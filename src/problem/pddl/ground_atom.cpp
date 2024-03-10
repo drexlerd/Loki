@@ -15,60 +15,52 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <loki/problem/pddl/ground_atom.hpp>
+#include "loki/problem/pddl/ground_atom.hpp"
 
-#include <loki/common/hash.hpp>
-#include <loki/common/collections.hpp>
-#include <loki/common/pddl/visitors.hpp>
-#include <loki/domain/pddl/predicate.hpp>
-#include <loki/domain/pddl/object.hpp>
+#include "loki/common/collections.hpp"
+#include "loki/common/hash.hpp"
+#include "loki/common/pddl/visitors.hpp"
+#include "loki/domain/pddl/object.hpp"
+#include "loki/domain/pddl/predicate.hpp"
 
-
-namespace loki::pddl {
-GroundAtomImpl::GroundAtomImpl(int identifier, Predicate predicate, ObjectList objects)
-    : Base(identifier)
-    , m_predicate(std::move(predicate))
-    , m_objects(std::move(objects))
+namespace loki::pddl
+{
+GroundAtomImpl::GroundAtomImpl(int identifier, Predicate predicate, ObjectList objects) :
+    Base(identifier),
+    m_predicate(std::move(predicate)),
+    m_objects(std::move(objects))
 {
 }
 
-bool GroundAtomImpl::is_structurally_equivalent_to_impl(const GroundAtomImpl& other) const {
-    return (m_predicate == other.m_predicate)
-        && (m_objects == other.m_objects);
+bool GroundAtomImpl::is_structurally_equivalent_to_impl(const GroundAtomImpl& other) const
+{
+    return (m_predicate == other.m_predicate) && (m_objects == other.m_objects);
 }
 
-size_t GroundAtomImpl::hash_impl() const {
-    return hash_combine(m_predicate, hash_container(m_objects));
-}
+size_t GroundAtomImpl::hash_impl() const { return hash_combine(m_predicate, hash_container(m_objects)); }
 
-
-void GroundAtomImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const {
+void GroundAtomImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const
+{
     out << "(" << m_predicate->get_name();
-    for (size_t i = 0; i < m_objects.size(); ++i) {
+    for (size_t i = 0; i < m_objects.size(); ++i)
+    {
         out << " " << *m_objects[i];
     }
     out << ")";
 }
 
-const Predicate& GroundAtomImpl::get_predicate() const {
-    return m_predicate;
-}
+const Predicate& GroundAtomImpl::get_predicate() const { return m_predicate; }
 
-const ObjectList& GroundAtomImpl::get_objects() const {
-    return m_objects;
-}
+const ObjectList& GroundAtomImpl::get_objects() const { return m_objects; }
 
 }
 
+namespace std
+{
+bool less<loki::pddl::GroundAtom>::operator()(const loki::pddl::GroundAtom& left_atom, const loki::pddl::GroundAtom& right_atom) const
+{
+    return *left_atom < *right_atom;
+}
 
-namespace std {
-    bool less<loki::pddl::GroundAtom>::operator()(
-        const loki::pddl::GroundAtom& left_atom,
-        const loki::pddl::GroundAtom& right_atom) const {
-        return *left_atom < *right_atom;
-    }
-
-    std::size_t hash<loki::pddl::GroundAtomImpl>::operator()(const loki::pddl::GroundAtomImpl& atom) const {
-        return atom.hash();
-    }
+std::size_t hash<loki::pddl::GroundAtomImpl>::operator()(const loki::pddl::GroundAtomImpl& atom) const { return atom.hash(); }
 }

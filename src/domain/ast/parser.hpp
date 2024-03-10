@@ -18,8 +18,9 @@
 #ifndef LOKI_SRC_DOMAIN_AST_PARSER_HPP_
 #define LOKI_SRC_DOMAIN_AST_PARSER_HPP_
 
+#include "loki/domain/ast/ast.hpp"
+
 #include <boost/spirit/home/x3.hpp>
-#include <loki/domain/ast/ast.hpp>
 
 namespace loki::domain
 {
