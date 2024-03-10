@@ -5,13 +5,9 @@ find_package(GTest "1.11.0" REQUIRED COMPONENTS GTest Main PATHS ${CMAKE_PREFIX_
 find_package(GTest)
 
 file(GLOB_RECURSE SRC_FILES
-    "common/*.cpp" "common/**/*.cpp"
-    "domain/*.cpp" "domain/**/*.cpp"
-    "problem/*.cpp" "problem/**/*.cpp")
+    "*.cpp" "**/*.cpp")
 file(GLOB_RECURSE HEADER_FILES
-    "common/*.hpp" "common/**/*.hpp"
-    "domain/*.hpp" "domain/**/*.hpp"
-    "problem/*.hpp" "problem/**/*.hpp")
+    "*.hpp" "**/*.hpp")
 
 set(TEST_NAME ${CMAKE_PROJECT_NAME}_tests)
 

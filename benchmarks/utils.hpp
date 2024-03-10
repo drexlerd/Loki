@@ -18,8 +18,8 @@
 #ifndef LOKI_BENCHMARKS_UTILS_HPP_
 #define LOKI_BENCHMARKS_UTILS_HPP_
 
-#include <loki/memory.hpp>
 #include <loki/pddl/factories.hpp>
+#include <loki/utils/memory.hpp>
 
 namespace loki::benchmarks
 {

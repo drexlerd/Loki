@@ -17,10 +17,10 @@
 
 #include "loki/pddl/metric.hpp"
 
-#include "loki/collections.hpp"
-#include "loki/hash.hpp"
 #include "loki/pddl/function_expressions.hpp"
 #include "loki/pddl/visitors.hpp"
+#include "loki/utils/collections.hpp"
+#include "loki/utils/hash.hpp"
 
 #include <cassert>
 

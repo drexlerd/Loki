@@ -17,8 +17,8 @@
 
 #include "loki/pddl/type.hpp"
 
-#include "loki/collections.hpp"
-#include "loki/hash.hpp"
+#include "loki/utils/collections.hpp"
+#include "loki/utils/hash.hpp"
 
 namespace loki::pddl
 {

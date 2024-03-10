@@ -25,7 +25,7 @@
 
 namespace loki
 {
-template<typename HolderType, ElementsPerSegment N>
+template<typename HolderType>
 class PersistentFactory;
 }
 
@@ -40,7 +40,7 @@ private:
     GroundLiteralImpl(int identifier, bool is_negated, GroundAtom atom);
 
     // Give access to the constructor.
-    template<typename HolderType, ElementsPerSegment N>
+    template<typename>
     friend class loki::PersistentFactory;
 
     /// @brief Test for semantic equivalence

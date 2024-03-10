@@ -17,8 +17,8 @@
 
 #include "loki/pddl/numeric_fluent.hpp"
 
-#include "loki/hash.hpp"
 #include "loki/pddl/function.hpp"
+#include "loki/utils/hash.hpp"
 
 namespace loki::pddl
 {

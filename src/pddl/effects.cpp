@@ -17,14 +17,14 @@
 
 #include "loki/pddl/effects.hpp"
 
-#include "loki/collections.hpp"
-#include "loki/hash.hpp"
 #include "loki/pddl/conditions.hpp"
 #include "loki/pddl/function.hpp"
 #include "loki/pddl/function_expressions.hpp"
 #include "loki/pddl/literal.hpp"
 #include "loki/pddl/parameter.hpp"
 #include "loki/pddl/visitors.hpp"
+#include "loki/utils/collections.hpp"
+#include "loki/utils/hash.hpp"
 
 #include <cassert>
 

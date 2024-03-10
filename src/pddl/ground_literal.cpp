@@ -17,9 +17,9 @@
 
 #include "loki/pddl/ground_literal.hpp"
 
-#include "loki/collections.hpp"
-#include "loki/hash.hpp"
 #include "loki/pddl/ground_atom.hpp"
+#include "loki/utils/collections.hpp"
+#include "loki/utils/hash.hpp"
 
 namespace loki::pddl
 {

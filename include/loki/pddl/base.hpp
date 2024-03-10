@@ -18,7 +18,7 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_BASE_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_BASE_HPP_
 
-#include "loki/printer.hpp"
+#include "loki/utils/printer.hpp"
 
 #include <algorithm>
 #include <sstream>

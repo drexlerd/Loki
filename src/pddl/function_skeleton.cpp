@@ -17,8 +17,8 @@
 
 #include "loki/pddl/function_skeleton.hpp"
 
-#include "loki/hash.hpp"
 #include "loki/pddl/parameter.hpp"
+#include "loki/utils/hash.hpp"
 
 namespace loki::pddl
 {

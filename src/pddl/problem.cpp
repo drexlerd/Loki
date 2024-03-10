@@ -17,8 +17,6 @@
 
 #include "loki/pddl/problem.hpp"
 
-#include "loki/collections.hpp"
-#include "loki/hash.hpp"
 #include "loki/pddl/conditions.hpp"
 #include "loki/pddl/domain.hpp"
 #include "loki/pddl/ground_literal.hpp"
@@ -27,6 +25,8 @@
 #include "loki/pddl/object.hpp"
 #include "loki/pddl/requirements.hpp"
 #include "loki/pddl/visitors.hpp"
+#include "loki/utils/collections.hpp"
+#include "loki/utils/hash.hpp"
 
 #include <iostream>
 

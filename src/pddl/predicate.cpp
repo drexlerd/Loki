@@ -17,10 +17,10 @@
 
 #include "loki/pddl/predicate.hpp"
 
-#include "loki/hash.hpp"
 #include "loki/pddl/parameter.hpp"
 #include "loki/pddl/type.hpp"
 #include "loki/pddl/variable.hpp"
+#include "loki/utils/hash.hpp"
 
 #include <memory>
 

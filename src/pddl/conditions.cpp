@@ -17,11 +17,11 @@
 
 #include "loki/pddl/conditions.hpp"
 
-#include "loki/collections.hpp"
-#include "loki/hash.hpp"
 #include "loki/pddl/literal.hpp"
 #include "loki/pddl/parameter.hpp"
 #include "loki/pddl/visitors.hpp"
+#include "loki/utils/collections.hpp"
+#include "loki/utils/hash.hpp"
 
 namespace loki::pddl
 {

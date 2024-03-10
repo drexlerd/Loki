@@ -18,9 +18,9 @@
 #ifndef LOKI_INCLUDE_LOKI_PARSER_HPP_
 #define LOKI_INCLUDE_LOKI_PARSER_HPP_
 
-#include "loki/filesystem.hpp"
 #include "loki/pddl/context.hpp"
 #include "loki/pddl/declarations.hpp"
+#include "loki/utils/filesystem.hpp"
 
 namespace loki
 {

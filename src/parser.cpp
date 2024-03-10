@@ -22,11 +22,11 @@
 #include "loki/ast/parser.hpp"
 #include "loki/ast/parser_wrapper.hpp"
 #include "loki/exceptions.hpp"
-#include "loki/filesystem.hpp"
-#include "loki/memory.hpp"
 #include "loki/pddl/context.hpp"
 #include "loki/pddl/error_reporting.hpp"
 #include "loki/pddl/parser.hpp"
+#include "loki/utils/filesystem.hpp"
+#include "loki/utils/memory.hpp"
 
 #include <chrono>
 #include <memory>

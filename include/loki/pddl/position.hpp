@@ -19,9 +19,9 @@
 #define LOKI_INCLUDE_LOKI_PDDL_POSITION_HPP_
 
 #include "loki/ast/error_reporting.hpp"
-#include "loki/filesystem.hpp"
-#include "loki/pddl/config.hpp"
 #include "loki/pddl/declarations.hpp"
+#include "loki/pddl/error_reporting.hpp"
+#include "loki/utils/filesystem.hpp"
 
 #include <unordered_map>
 

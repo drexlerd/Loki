@@ -26,10 +26,6 @@
 
 namespace loki
 {
-/**
- * Types
- */
-using ElementsPerSegment = size_t;
 
 /**
  * Common

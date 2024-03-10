@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/memory.hpp"
+#include "loki/utils/memory.hpp"
 
 namespace loki
 {

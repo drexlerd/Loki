@@ -19,7 +19,7 @@
 #define LOKI_INCLUDE_LOKI_AST_PRINTER_HPP_
 
 #include "loki/ast/ast.hpp"
-#include "loki/printer.hpp"
+#include "loki/utils/printer.hpp"
 
 namespace loki
 {

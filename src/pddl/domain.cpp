@@ -17,13 +17,13 @@
 
 #include "loki/pddl/domain.hpp"
 
-#include "loki/collections.hpp"
-#include "loki/hash.hpp"
 #include "loki/pddl/action.hpp"
 #include "loki/pddl/function_skeleton.hpp"
 #include "loki/pddl/object.hpp"
 #include "loki/pddl/predicate.hpp"
 #include "loki/pddl/type.hpp"
+#include "loki/utils/collections.hpp"
+#include "loki/utils/hash.hpp"
 
 #include <iostream>
 

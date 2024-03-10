@@ -18,9 +18,9 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_SCOPE_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_SCOPE_HPP_
 
-#include "config.hpp"
-#include "declarations.hpp"
 #include "loki/ast/config.hpp"
+#include "loki/pddl/declarations.hpp"
+#include "loki/pddl/error_reporting.hpp"
 #include "loki/pddl/function_skeleton.hpp"
 #include "loki/pddl/object.hpp"
 #include "loki/pddl/predicate.hpp"

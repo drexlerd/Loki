@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_PDDL_TYPES_HPP_
-#define LOKI_INCLUDE_LOKI_PDDL_TYPES_HPP_
+#ifndef LOKI_INCLUDE_LOKI_PDDL_FACTORIES_HPP_
+#define LOKI_INCLUDE_LOKI_PDDL_FACTORIES_HPP_
 
 #include "loki/pddl/action.hpp"
 #include "loki/pddl/atom.hpp"
@@ -34,7 +34,6 @@
 #include "loki/pddl/numeric_fluent.hpp"
 #include "loki/pddl/object.hpp"
 #include "loki/pddl/parameter.hpp"
-#include "loki/pddl/persistent_factory.hpp"
 #include "loki/pddl/position.hpp"
 #include "loki/pddl/predicate.hpp"
 #include "loki/pddl/problem.hpp"
@@ -42,6 +41,7 @@
 #include "loki/pddl/term.hpp"
 #include "loki/pddl/type.hpp"
 #include "loki/pddl/variable.hpp"
+#include "loki/utils/persistent_factory.hpp"
 
 namespace loki
 {
@@ -49,28 +49,28 @@ namespace loki
 // to avoid allocations and for continuous storage.
 // The values are just educated guesses based on the knowledge
 // that cache line size is 64 Bytes.
-using RequirementFactory = PersistentFactory<pddl::RequirementsImpl, 100>;
-using TypeFactory = PersistentFactory<pddl::TypeImpl, 1000>;
-using VariableFactory = PersistentFactory<pddl::VariableImpl, 1000>;
-using TermFactory = PersistentFactory<pddl::TermImpl, 1000>;
-using ObjectFactory = PersistentFactory<pddl::ObjectImpl, 1000>;
-using AtomFactory = PersistentFactory<pddl::AtomImpl, 1000>;
-using GroundAtomFactory = PersistentFactory<pddl::GroundAtomImpl, 1000>;
-using LiteralFactory = PersistentFactory<pddl::LiteralImpl, 1000>;
-using GroundLiteralFactory = PersistentFactory<pddl::GroundLiteralImpl, 1000>;
-using ParameterFactory = PersistentFactory<pddl::ParameterImpl, 1000>;
-using PredicateFactory = PersistentFactory<pddl::PredicateImpl, 1000>;
-using FunctionExpressionFactory = PersistentFactory<pddl::FunctionExpressionImpl, 1000>;
-using FunctionFactory = PersistentFactory<pddl::FunctionImpl, 1000>;
-using FunctionSkeletonFactory = PersistentFactory<pddl::FunctionSkeletonImpl, 1000>;
-using ConditionFactory = PersistentFactory<pddl::ConditionImpl, 1000>;
-using EffectFactory = PersistentFactory<pddl::EffectImpl, 1000>;
-using ActionFactory = PersistentFactory<pddl::ActionImpl, 100>;
-using DerivedPredicateFactory = PersistentFactory<pddl::DerivedPredicateImpl, 100>;
-using OptimizationMetricFactory = PersistentFactory<pddl::OptimizationMetricImpl, 100>;
-using NumericFluentFactory = PersistentFactory<pddl::NumericFluentImpl, 1000>;
-using DomainFactory = PersistentFactory<pddl::DomainImpl, 1>;
-using ProblemFactory = PersistentFactory<pddl::ProblemImpl, 100>;
+using RequirementFactory = PersistentFactory<pddl::RequirementsImpl>;
+using TypeFactory = PersistentFactory<pddl::TypeImpl>;
+using VariableFactory = PersistentFactory<pddl::VariableImpl>;
+using TermFactory = PersistentFactory<pddl::TermImpl>;
+using ObjectFactory = PersistentFactory<pddl::ObjectImpl>;
+using AtomFactory = PersistentFactory<pddl::AtomImpl>;
+using GroundAtomFactory = PersistentFactory<pddl::GroundAtomImpl>;
+using LiteralFactory = PersistentFactory<pddl::LiteralImpl>;
+using GroundLiteralFactory = PersistentFactory<pddl::GroundLiteralImpl>;
+using ParameterFactory = PersistentFactory<pddl::ParameterImpl>;
+using PredicateFactory = PersistentFactory<pddl::PredicateImpl>;
+using FunctionExpressionFactory = PersistentFactory<pddl::FunctionExpressionImpl>;
+using FunctionFactory = PersistentFactory<pddl::FunctionImpl>;
+using FunctionSkeletonFactory = PersistentFactory<pddl::FunctionSkeletonImpl>;
+using ConditionFactory = PersistentFactory<pddl::ConditionImpl>;
+using EffectFactory = PersistentFactory<pddl::EffectImpl>;
+using ActionFactory = PersistentFactory<pddl::ActionImpl>;
+using DerivedPredicateFactory = PersistentFactory<pddl::DerivedPredicateImpl>;
+using OptimizationMetricFactory = PersistentFactory<pddl::OptimizationMetricImpl>;
+using NumericFluentFactory = PersistentFactory<pddl::NumericFluentImpl>;
+using DomainFactory = PersistentFactory<pddl::DomainImpl>;
+using ProblemFactory = PersistentFactory<pddl::ProblemImpl>;
 
 using PDDLPositionCache = PositionCache<pddl::RequirementsImpl,
                                         pddl::TypeImpl,
@@ -121,7 +121,31 @@ struct PDDLFactories
     DomainFactory domains;
     ProblemFactory problems;
 
-    PDDLFactories() = default;
+    PDDLFactories() :
+        requirements(RequirementFactory(100)),
+        types(TypeFactory(1000)),
+        variables(VariableFactory(1000)),
+        terms(TermFactory(1000)),
+        objects(ObjectFactory(1000)),
+        atoms(AtomFactory(1000)),
+        ground_atoms(GroundAtomFactory(1000)),
+        literals(LiteralFactory(1000)),
+        ground_literals(GroundLiteralFactory(1000)),
+        parameters(ParameterFactory(1000)),
+        predicates(PredicateFactory(1000)),
+        function_expressions(FunctionExpressionFactory(1000)),
+        functions(FunctionFactory(1000)),
+        function_skeletons(FunctionSkeletonFactory(1000)),
+        conditions(ConditionFactory(1000)),
+        effects(EffectFactory(1000)),
+        actions(ActionFactory(100)),
+        derived_predicates(DerivedPredicateFactory(100)),
+        optimization_metrics(OptimizationMetricFactory(10)),
+        numeric_fluents(NumericFluentFactory(1000)),
+        domains(DomainFactory(1)),
+        problems(ProblemFactory(10))
+    {
+    }
 
     // delete copy and move to avoid dangling references.
     PDDLFactories(const PDDLFactories& other) = delete;

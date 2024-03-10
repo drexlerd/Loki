@@ -18,7 +18,7 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_ERROR_REPORTING_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_ERROR_REPORTING_HPP_
 
-#include "loki/filesystem.hpp"
+#include "loki/utils/filesystem.hpp"
 
 #include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
 #include <sstream>
@@ -193,6 +193,8 @@ std::string PDDLErrorHandlerImpl<Iterator>::operator()(Iterator err_first, Itera
     err_out << " <<-- Here" << std::endl;
     return err_out.str();
 }
+
+typedef PDDLErrorHandlerImpl<iterator_type> PDDLErrorHandler;
 
 }
 

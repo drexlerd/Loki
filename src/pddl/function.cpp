@@ -17,10 +17,10 @@
 
 #include "loki/pddl/function.hpp"
 
-#include "loki/hash.hpp"
 #include "loki/pddl/function_skeleton.hpp"
 #include "loki/pddl/term.hpp"
 #include "loki/pddl/visitors.hpp"
+#include "loki/utils/hash.hpp"
 
 namespace loki::pddl
 {
