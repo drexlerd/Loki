@@ -13,8 +13,13 @@ jobs:
     - name: Checkout Loki
       uses: actions/checkout@v2
 
-    - name: Install Valgrind
-      run: sudo apt-get install -y valgrind
+    - name: Install Valgrind (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y valgrind
+
+    - name: Install Valgrind (macOS) # Optional, if available and required
+      if: matrix.os == 'macos-latest'
+      run: brew install valgrind
 
     - name: Configure, Build, and Install Dependencies
       run: |
