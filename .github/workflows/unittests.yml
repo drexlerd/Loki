@@ -14,8 +14,8 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Install Valgrind (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get update && sudo apt-get install -y valgrind
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt-get update && sudo apt-get install -y valgrind
 
     - name: Install Valgrind (macOS) # Optional, if available and required
       if: matrix.os == 'macos-latest'
