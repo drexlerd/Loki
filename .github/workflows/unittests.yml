@@ -17,10 +17,6 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: sudo apt-get update && sudo apt-get install -y valgrind
 
-    - name: Install Valgrind (macOS) # Optional, if available and required
-      if: matrix.os == 'macos-latest'
-      run: brew install valgrind
-
     - name: Configure, Build, and Install Dependencies
       run: |
         cd dependencies
@@ -34,6 +30,7 @@ jobs:
         cmake --build build_debug
 
     - name: Debug Valgrind Test
+      if: matrix.os == 'ubuntu-latest'
       working-directory: build_debug/tests/unit
       run: valgrind --leak-check=full --track-origins=yes ./loki_tests
 
@@ -48,6 +45,7 @@ jobs:
         cmake --build build_release
 
     - name: Release Valgrind Test
+      if: matrix.os == 'ubuntu-latest'
       working-directory: build_release/tests/unit
       run: valgrind --leak-check=full --track-origins=yes ./loki_tests
 
