@@ -17,17 +17,21 @@
 
 #include "loki/exceptions.hpp"
 
+#include <string>
+
+using namespace std::string_literals;
+
 namespace loki
 {
-FileNotExistsError::FileNotExistsError(const std::string& path_to_file) : std::runtime_error("File does not exist at " + path_to_file) {}
+FileNotExistsError::FileNotExistsError(const std::string& path_to_file) : std::runtime_error("File does not exist at "s + path_to_file) {}
 
 SyntaxParserError::SyntaxParserError(const std::string& message, const std::string& error_handler_output) :
-    std::runtime_error(message + "\n" + error_handler_output)
+    std::runtime_error(message + "\n"s + error_handler_output)
 {
 }
 
 SemanticParserError::SemanticParserError(const std::string& message, const std::string& error_handler_output) :
-    std::runtime_error(message + "\n" + error_handler_output)
+    std::runtime_error(message + "\n"s + error_handler_output)
 {
 }
 
