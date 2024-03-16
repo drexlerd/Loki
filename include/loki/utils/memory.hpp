@@ -20,12 +20,7 @@
 
 // Taken from: https://stackoverflow.com/questions/669438/how-to-get-memory-usage-at-runtime-using-c
 
-#include <fstream>
-#include <ios>
-#include <iostream>
-#include <string>
 #include <tuple>
-#include <unistd.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //

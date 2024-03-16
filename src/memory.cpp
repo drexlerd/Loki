@@ -17,6 +17,14 @@
 
 #include "loki/utils/memory.hpp"
 
+#if defined(__linux__)
+
+#include <fstream>
+#include <ios>
+#include <iostream>
+#include <string>
+#include <unistd.h>
+
 namespace loki
 {
 
@@ -54,4 +62,35 @@ std::tuple<double, double> process_mem_usage()
     return std::make_tuple(vm_usage, resident_set);
 }
 
+#endif  // __linux__
+
+#if defined(__APPLE__)
+
+#include "memory_utils.hpp"
+
+#include <mach/mach.h>
+
+namespace loki
+{
+
+std::tuple<double, double> process_mem_usage()
+{
+    // macOS-specific implementation
+    mach_task_basic_info info;
+    mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
+
+    if (task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t) &info, &infoCount) != KERN_SUCCESS)
+    {
+        return std::make_tuple(0.0, 0.0);
+    }
+
+    double vm_usage = info.virtual_size / 1024.0 / 1024.0;       // convert from bytes to MB
+    double resident_set = info.resident_size / 1024.0 / 1024.0;  // convert from bytes to MB
+
+    return std::make_tuple(vm_usage, resident_set);
+}
+
+}  // namespace utils
+
+#endif  // __APPLE__
 }
