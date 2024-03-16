@@ -62,6 +62,8 @@ std::tuple<double, double> process_mem_usage()
     return std::make_tuple(vm_usage, resident_set);
 }
 
+}
+
 #endif  // __linux__
 
 #if defined(__APPLE__)
@@ -93,4 +95,3 @@ std::tuple<double, double> process_mem_usage()
 }  // namespace utils
 
 #endif  // __APPLE__
-}
