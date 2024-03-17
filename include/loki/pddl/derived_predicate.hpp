@@ -41,8 +41,7 @@ private:
     DerivedPredicateImpl(int identifier, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<DerivedPredicateImpl, loki::Hash<DerivedPredicateImpl*>, loki::EqualTo<DerivedPredicateImpl*>>;
 
     /// @brief Test for structural equivalence
     bool is_structurally_equivalent_to_impl(const DerivedPredicateImpl& other) const;

@@ -61,8 +61,7 @@ private:
     FunctionExpressionNumberImpl(int identifier, double number);
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<FunctionExpressionImpl, loki::Hash<FunctionExpressionImpl*>, loki::EqualTo<FunctionExpressionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionNumberImpl& other) const;
     size_t hash_impl() const;
@@ -89,8 +88,7 @@ private:
                                          FunctionExpression right_function_expression);
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<FunctionExpressionImpl, loki::Hash<FunctionExpressionImpl*>, loki::EqualTo<FunctionExpressionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionBinaryOperatorImpl& other) const;
     size_t hash_impl() const;
@@ -115,8 +113,7 @@ private:
     FunctionExpressionMultiOperatorImpl(int identifier, MultiOperatorEnum multi_operator, FunctionExpressionList function_expressions);
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<FunctionExpressionImpl, loki::Hash<FunctionExpressionImpl*>, loki::EqualTo<FunctionExpressionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionMultiOperatorImpl& other) const;
     size_t hash_impl() const;
@@ -139,8 +136,7 @@ private:
     FunctionExpressionMinusImpl(int identifier, FunctionExpression function_expression);
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<FunctionExpressionImpl, loki::Hash<FunctionExpressionImpl*>, loki::EqualTo<FunctionExpressionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionMinusImpl& other) const;
     size_t hash_impl() const;
@@ -162,8 +158,7 @@ private:
     FunctionExpressionFunctionImpl(int identifier, Function function);
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<FunctionExpressionImpl, loki::Hash<FunctionExpressionImpl*>, loki::EqualTo<FunctionExpressionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionFunctionImpl& other) const;
     size_t hash_impl() const;

@@ -42,8 +42,7 @@ private:
     ConditionLiteralImpl(int identifier, Literal literal);
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<ConditionImpl, loki::Hash<ConditionImpl*>, loki::EqualTo<ConditionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const ConditionLiteralImpl& other) const;
     size_t hash_impl() const;
@@ -65,8 +64,7 @@ private:
     ConditionAndImpl(int identifier, ConditionList conditions);
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<ConditionImpl, loki::Hash<ConditionImpl*>, loki::EqualTo<ConditionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const ConditionAndImpl& other) const;
     size_t hash_impl() const;
@@ -88,8 +86,7 @@ private:
     ConditionOrImpl(int identifier, ConditionList conditions);
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<ConditionImpl, loki::Hash<ConditionImpl*>, loki::EqualTo<ConditionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const ConditionOrImpl& other) const;
     size_t hash_impl() const;
@@ -111,8 +108,7 @@ private:
     ConditionNotImpl(int identifier, Condition condition);
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<ConditionImpl, loki::Hash<ConditionImpl*>, loki::EqualTo<ConditionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const ConditionNotImpl& other) const;
     size_t hash_impl() const;
@@ -135,8 +131,7 @@ private:
     ConditionImplyImpl(int identifier, Condition condition_left, Condition condition_right);
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<ConditionImpl, loki::Hash<ConditionImpl*>, loki::EqualTo<ConditionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const ConditionImplyImpl& other) const;
     size_t hash_impl() const;
@@ -160,8 +155,7 @@ private:
     ConditionExistsImpl(int identifier, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<ConditionImpl, loki::Hash<ConditionImpl*>, loki::EqualTo<ConditionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const ConditionExistsImpl& other) const;
     size_t hash_impl() const;
@@ -185,8 +179,7 @@ private:
     ConditionForallImpl(int identifier, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<ConditionImpl, loki::Hash<ConditionImpl*>, loki::EqualTo<ConditionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const ConditionForallImpl& other) const;
     size_t hash_impl() const;

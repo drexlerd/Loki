@@ -39,8 +39,7 @@ private:
     double m_number;
 
     // Give access to the constructor.
-    template<typename>
-    friend class loki::PDDLFactory;
+    friend class loki::PDDLFactory<NumericFluentImpl, loki::Hash<NumericFluentImpl*>, loki::EqualTo<NumericFluentImpl*>>;
 
     NumericFluentImpl(int identifier, Function function, double number);
 
