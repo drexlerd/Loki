@@ -20,13 +20,14 @@
 
 #include "loki/pddl/base.hpp"
 #include "loki/pddl/declarations.hpp"
+#include "loki/pddl/factory.hpp"
 
 #include <string>
 
 namespace loki
 {
-template<typename HolderType>
-class PersistentFactory;
+template<typename HolderType, typename Hash, typename EqualTo>
+class PDDLFactory;
 }
 
 namespace loki::pddl
@@ -41,7 +42,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const TermObjectImpl& other) const;
     size_t hash_impl() const;
@@ -63,7 +64,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const TermVariableImpl& other) const;
     size_t hash_impl() const;
@@ -76,28 +77,6 @@ public:
     const Variable& get_variable() const;
 };
 
-}
-
-namespace std
-{
-// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-template<>
-struct less<loki::pddl::Term>
-{
-    bool operator()(const loki::pddl::Term& left_term, const loki::pddl::Term& right_term) const;
-};
-
-template<>
-struct hash<loki::pddl::TermObjectImpl>
-{
-    std::size_t operator()(const loki::pddl::TermObjectImpl& term) const;
-};
-
-template<>
-struct hash<loki::pddl::TermVariableImpl>
-{
-    std::size_t operator()(const loki::pddl::TermVariableImpl& term) const;
-};
 }
 
 #endif

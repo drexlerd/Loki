@@ -33,13 +33,3 @@ void VariableImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*
 const std::string& VariableImpl::get_name() const { return m_name; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::Variable>::operator()(const loki::pddl::Variable& left_variable, const loki::pddl::Variable& right_variable) const
-{
-    return *left_variable < *right_variable;
-}
-
-std::size_t hash<loki::pddl::VariableImpl>::operator()(const loki::pddl::VariableImpl& variable) const { return variable.hash(); }
-}

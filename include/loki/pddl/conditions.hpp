@@ -20,13 +20,14 @@
 
 #include "loki/pddl/base.hpp"
 #include "loki/pddl/declarations.hpp"
+#include "loki/pddl/factory.hpp"
 
 #include <string>
 
 namespace loki
 {
-template<typename HolderType>
-class PersistentFactory;
+template<typename HolderType, typename Hash, typename EqualTo>
+class PDDLFactory;
 }
 
 namespace loki::pddl
@@ -42,7 +43,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const ConditionLiteralImpl& other) const;
     size_t hash_impl() const;
@@ -65,7 +66,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const ConditionAndImpl& other) const;
     size_t hash_impl() const;
@@ -88,7 +89,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const ConditionOrImpl& other) const;
     size_t hash_impl() const;
@@ -111,7 +112,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const ConditionNotImpl& other) const;
     size_t hash_impl() const;
@@ -135,7 +136,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const ConditionImplyImpl& other) const;
     size_t hash_impl() const;
@@ -160,7 +161,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const ConditionExistsImpl& other) const;
     size_t hash_impl() const;
@@ -185,7 +186,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const ConditionForallImpl& other) const;
     size_t hash_impl() const;
@@ -199,58 +200,6 @@ public:
     const Condition& get_condition() const;
 };
 
-}
-
-namespace std
-{
-// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-template<>
-struct less<loki::pddl::Condition>
-{
-    bool operator()(const loki::pddl::Condition& left_condition, const loki::pddl::Condition& right_condition) const;
-};
-
-template<>
-struct hash<loki::pddl::ConditionLiteralImpl>
-{
-    std::size_t operator()(const loki::pddl::ConditionLiteralImpl& condition) const;
-};
-
-template<>
-struct hash<loki::pddl::ConditionAndImpl>
-{
-    std::size_t operator()(const loki::pddl::ConditionAndImpl& condition) const;
-};
-
-template<>
-struct hash<loki::pddl::ConditionOrImpl>
-{
-    std::size_t operator()(const loki::pddl::ConditionOrImpl& condition) const;
-};
-
-template<>
-struct hash<loki::pddl::ConditionNotImpl>
-{
-    std::size_t operator()(const loki::pddl::ConditionNotImpl& condition) const;
-};
-
-template<>
-struct hash<loki::pddl::ConditionImplyImpl>
-{
-    std::size_t operator()(const loki::pddl::ConditionImplyImpl& condition) const;
-};
-
-template<>
-struct hash<loki::pddl::ConditionExistsImpl>
-{
-    std::size_t operator()(const loki::pddl::ConditionExistsImpl& condition) const;
-};
-
-template<>
-struct hash<loki::pddl::ConditionForallImpl>
-{
-    std::size_t operator()(const loki::pddl::ConditionForallImpl& condition) const;
-};
 }
 
 #endif

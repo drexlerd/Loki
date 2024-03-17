@@ -20,13 +20,14 @@
 
 #include "loki/pddl/base.hpp"
 #include "loki/pddl/declarations.hpp"
+#include "loki/pddl/factory.hpp"
 
 #include <string>
 
 namespace loki
 {
-template<typename HolderType>
-class PersistentFactory;
+template<typename HolderType, typename Hash, typename EqualTo>
+class PDDLFactory;
 }
 
 namespace loki::pddl
@@ -53,7 +54,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     // Give access to the private interface implementations.
     friend class Base<EffectLiteralImpl>;
@@ -76,7 +77,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     // Give access to the private interface implementations.
     friend class Base<EffectAndImpl>;
@@ -101,7 +102,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     // Give access to the private interface implementations.
     friend class Base<EffectNumericImpl>;
@@ -127,7 +128,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     // Give access to the private interface implementations.
     friend class Base<EffectConditionalForallImpl>;
@@ -152,7 +153,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const EffectConditionalWhenImpl& other) const;
     size_t hash_impl() const;
@@ -166,46 +167,6 @@ public:
     const Effect& get_effect() const;
 };
 
-}
-
-namespace std
-{
-// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-template<>
-struct less<loki::pddl::Effect>
-{
-    bool operator()(const loki::pddl::Effect& left_effect, const loki::pddl::Effect& right_effect) const;
-};
-
-template<>
-struct hash<loki::pddl::EffectLiteralImpl>
-{
-    std::size_t operator()(const loki::pddl::EffectLiteralImpl& effect) const;
-};
-
-template<>
-struct hash<loki::pddl::EffectAndImpl>
-{
-    std::size_t operator()(const loki::pddl::EffectAndImpl& effect) const;
-};
-
-template<>
-struct hash<loki::pddl::EffectNumericImpl>
-{
-    std::size_t operator()(const loki::pddl::EffectNumericImpl& effect) const;
-};
-
-template<>
-struct hash<loki::pddl::EffectConditionalForallImpl>
-{
-    std::size_t operator()(const loki::pddl::EffectConditionalForallImpl& effect) const;
-};
-
-template<>
-struct hash<loki::pddl::EffectConditionalWhenImpl>
-{
-    std::size_t operator()(const loki::pddl::EffectConditionalWhenImpl& effect) const;
-};
 }
 
 #endif

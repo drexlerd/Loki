@@ -189,21 +189,3 @@ const Condition& EffectConditionalWhenImpl::get_condition() const { return m_con
 const Effect& EffectConditionalWhenImpl::get_effect() const { return m_effect; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::Effect>::operator()(const loki::pddl::Effect& left_effect, const loki::pddl::Effect& right_effect) const
-{
-    return *left_effect < *right_effect;
-}
-
-std::size_t hash<loki::pddl::EffectLiteralImpl>::operator()(const loki::pddl::EffectLiteralImpl& effect) const { return effect.hash(); }
-
-std::size_t hash<loki::pddl::EffectAndImpl>::operator()(const loki::pddl::EffectAndImpl& effect) const { return effect.hash(); }
-
-std::size_t hash<loki::pddl::EffectNumericImpl>::operator()(const loki::pddl::EffectNumericImpl& effect) const { return effect.hash(); }
-
-std::size_t hash<loki::pddl::EffectConditionalForallImpl>::operator()(const loki::pddl::EffectConditionalForallImpl& effect) const { return effect.hash(); }
-
-std::size_t hash<loki::pddl::EffectConditionalWhenImpl>::operator()(const loki::pddl::EffectConditionalWhenImpl& effect) const { return effect.hash(); }
-}

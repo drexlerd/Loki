@@ -20,13 +20,14 @@
 
 #include "loki/pddl/base.hpp"
 #include "loki/pddl/declarations.hpp"
+#include "loki/pddl/factory.hpp"
 
 #include <string>
 
 namespace loki
 {
-template<typename HolderType>
-class PersistentFactory;
+template<typename HolderType, typename Hash, typename EqualTo>
+class PDDLFactory;
 }
 
 namespace loki::pddl
@@ -61,7 +62,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionNumberImpl& other) const;
     size_t hash_impl() const;
@@ -89,7 +90,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionBinaryOperatorImpl& other) const;
     size_t hash_impl() const;
@@ -115,7 +116,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionMultiOperatorImpl& other) const;
     size_t hash_impl() const;
@@ -139,7 +140,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionMinusImpl& other) const;
     size_t hash_impl() const;
@@ -162,7 +163,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionFunctionImpl& other) const;
     size_t hash_impl() const;
@@ -175,46 +176,6 @@ public:
     const Function& get_function() const;
 };
 
-}
-
-namespace std
-{
-// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-template<>
-struct less<loki::pddl::FunctionExpression>
-{
-    bool operator()(const loki::pddl::FunctionExpression& left_function_expression, const loki::pddl::FunctionExpression& right_function_expression) const;
-};
-
-template<>
-struct hash<loki::pddl::FunctionExpressionNumberImpl>
-{
-    std::size_t operator()(const loki::pddl::FunctionExpressionNumberImpl& function_expressions) const;
-};
-
-template<>
-struct hash<loki::pddl::FunctionExpressionBinaryOperatorImpl>
-{
-    std::size_t operator()(const loki::pddl::FunctionExpressionBinaryOperatorImpl& function_expressions) const;
-};
-
-template<>
-struct hash<loki::pddl::FunctionExpressionMultiOperatorImpl>
-{
-    std::size_t operator()(const loki::pddl::FunctionExpressionMultiOperatorImpl& function_expressions) const;
-};
-
-template<>
-struct hash<loki::pddl::FunctionExpressionMinusImpl>
-{
-    std::size_t operator()(const loki::pddl::FunctionExpressionMinusImpl& function_expressions) const;
-};
-
-template<>
-struct hash<loki::pddl::FunctionExpressionFunctionImpl>
-{
-    std::size_t operator()(const loki::pddl::FunctionExpressionFunctionImpl& function_expressions) const;
-};
 }
 
 #endif

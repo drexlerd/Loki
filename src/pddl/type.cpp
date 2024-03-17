@@ -38,10 +38,3 @@ const std::string& TypeImpl::get_name() const { return m_name; }
 const TypeList& TypeImpl::get_bases() const { return m_bases; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::Type>::operator()(const loki::pddl::Type& left_type, const loki::pddl::Type& right_type) const { return *left_type < *right_type; }
-
-std::size_t hash<loki::pddl::TypeImpl>::operator()(const loki::pddl::TypeImpl& type) const { return type.hash(); }
-}

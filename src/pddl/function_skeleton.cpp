@@ -57,14 +57,3 @@ const ParameterList& FunctionSkeletonImpl::get_parameters() const { return m_par
 const Type& FunctionSkeletonImpl::get_type() const { return m_type; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::FunctionSkeleton>::operator()(const loki::pddl::FunctionSkeleton& left_function, const loki::pddl::FunctionSkeleton& right_function) const
-{
-    return *left_function < *right_function;
-}
-
-std::size_t hash<loki::pddl::FunctionSkeletonImpl>::operator()(const loki::pddl::FunctionSkeletonImpl& function) const { return function.hash(); }
-
-}

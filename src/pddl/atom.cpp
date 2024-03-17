@@ -47,10 +47,3 @@ const Predicate& AtomImpl::get_predicate() const { return m_predicate; }
 const TermList& AtomImpl::get_terms() const { return m_terms; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::Atom>::operator()(const loki::pddl::Atom& left_atom, const loki::pddl::Atom& right_atom) const { return *left_atom < *right_atom; }
-
-std::size_t hash<loki::pddl::AtomImpl>::operator()(const loki::pddl::AtomImpl& atom) const { return atom.hash(); }
-}

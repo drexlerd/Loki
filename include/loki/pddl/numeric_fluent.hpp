@@ -20,13 +20,14 @@
 
 #include "loki/pddl/base.hpp"
 #include "loki/pddl/declarations.hpp"
+#include "loki/pddl/factory.hpp"
 
 #include <string>
 
 namespace loki
 {
-template<typename HolderType>
-class PersistentFactory;
+template<typename HolderType, typename Hash, typename EqualTo>
+class PDDLFactory;
 }
 
 namespace loki::pddl
@@ -39,7 +40,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     NumericFluentImpl(int identifier, Function function, double number);
 
@@ -56,22 +57,6 @@ public:
     double get_number() const;
 };
 
-}
-
-namespace std
-{
-// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-template<>
-struct less<loki::pddl::NumericFluent>
-{
-    bool operator()(const loki::pddl::NumericFluent& left_numeric_fluent, const loki::pddl::NumericFluent& right_numeric_fluent) const;
-};
-
-template<>
-struct hash<loki::pddl::NumericFluentImpl>
-{
-    std::size_t operator()(const loki::pddl::NumericFluentImpl& numeric_fluent) const;
-};
 }
 
 #endif

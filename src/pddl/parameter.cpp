@@ -72,13 +72,3 @@ const Variable& ParameterImpl::get_variable() const { return m_variable; }
 const TypeList& ParameterImpl::get_bases() const { return m_types; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::Parameter>::operator()(const loki::pddl::Parameter& left_parameter, const loki::pddl::Parameter& right_parameter) const
-{
-    return *left_parameter < *right_parameter;
-}
-
-std::size_t hash<loki::pddl::ParameterImpl>::operator()(const loki::pddl::ParameterImpl& parameter) const { return parameter.hash(); }
-}

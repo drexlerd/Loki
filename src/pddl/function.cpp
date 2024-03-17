@@ -62,13 +62,3 @@ const FunctionSkeleton& FunctionImpl::get_function_skeleton() const { return m_f
 const TermList& FunctionImpl::get_terms() const { return m_terms; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::Function>::operator()(const loki::pddl::Function& left_function, const loki::pddl::Function& right_function) const
-{
-    return *left_function < *right_function;
-}
-
-std::size_t hash<loki::pddl::FunctionImpl>::operator()(const loki::pddl::FunctionImpl& function) const { return function.hash(); }
-}

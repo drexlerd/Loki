@@ -20,6 +20,7 @@
 
 #include "loki/pddl/base.hpp"
 #include "loki/pddl/declarations.hpp"
+#include "loki/pddl/factory.hpp"
 
 #include <set>
 #include <string>
@@ -27,8 +28,8 @@
 
 namespace loki
 {
-template<typename HolderType>
-class PersistentFactory;
+template<typename HolderType, typename Hash, typename EqualTo>
+class PDDLFactory;
 }
 
 namespace loki::pddl
@@ -71,7 +72,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const RequirementsImpl& other) const;
@@ -87,22 +88,6 @@ public:
     const RequirementEnumSet& get_requirements() const;
 };
 
-}
-
-namespace std
-{
-// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-template<>
-struct less<loki::pddl::Requirements>
-{
-    bool operator()(const loki::pddl::Requirements& left_requirements, const loki::pddl::Requirements& right_requirements) const;
-};
-
-template<>
-struct hash<loki::pddl::RequirementsImpl>
-{
-    std::size_t operator()(const loki::pddl::RequirementsImpl& requirements) const;
-};
 }
 
 #endif

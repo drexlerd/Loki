@@ -45,14 +45,3 @@ const ParameterList& DerivedPredicateImpl::get_parameters() const { return m_par
 const Condition& DerivedPredicateImpl::get_condition() const { return m_condition; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::DerivedPredicate>::operator()(const loki::pddl::DerivedPredicate& left_predicate,
-                                                    const loki::pddl::DerivedPredicate& right_predicate) const
-{
-    return *left_predicate < *right_predicate;
-}
-
-std::size_t hash<loki::pddl::DerivedPredicateImpl>::operator()(const loki::pddl::DerivedPredicateImpl& action) const { return action.hash(); }
-}

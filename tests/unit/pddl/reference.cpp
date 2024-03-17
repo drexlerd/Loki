@@ -16,16 +16,16 @@
  */
 
 #include <gtest/gtest.h>
+#include <loki/pddl/factory.hpp>
 #include <loki/pddl/object.hpp>
 #include <loki/pddl/reference.hpp>
-#include <loki/utils/persistent_factory.hpp>
 
 namespace loki::domain::tests
 {
 
 TEST(LokiTests, ReferenceTest)
 {
-    PersistentFactory<pddl::ObjectImpl> factory(2);
+    PDDLFactory<pddl::ObjectImpl> factory(2);
     const auto object_0 = factory.get_or_create<pddl::ObjectImpl>("object_0", pddl::TypeList());
     const auto object_1 = factory.get_or_create<pddl::ObjectImpl>("object_1", pddl::TypeList());
 

@@ -49,13 +49,3 @@ bool GroundLiteralImpl::is_negated() const { return m_is_negated; }
 const GroundAtom& GroundLiteralImpl::get_atom() const { return m_atom; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::GroundLiteral>::operator()(const loki::pddl::GroundLiteral& left_literal, const loki::pddl::GroundLiteral& right_literal) const
-{
-    return *left_literal < *right_literal;
-}
-
-std::size_t hash<loki::pddl::GroundLiteralImpl>::operator()(const loki::pddl::GroundLiteralImpl& literal) const { return literal.hash(); }
-}

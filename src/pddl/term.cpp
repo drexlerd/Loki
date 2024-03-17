@@ -62,12 +62,3 @@ void TermVariableImpl::str_impl(std::ostringstream& out, const FormattingOptions
 const Variable& TermVariableImpl::get_variable() const { return m_variable; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::Term>::operator()(const loki::pddl::Term& left_term, const loki::pddl::Term& right_term) const { return *left_term < *right_term; }
-
-std::size_t hash<loki::pddl::TermObjectImpl>::operator()(const loki::pddl::TermObjectImpl& term) const { return term.hash(); }
-
-std::size_t hash<loki::pddl::TermVariableImpl>::operator()(const loki::pddl::TermVariableImpl& term) const { return term.hash(); }
-}

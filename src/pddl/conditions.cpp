@@ -230,25 +230,3 @@ const ParameterList& ConditionForallImpl::get_parameters() const { return m_para
 const Condition& ConditionForallImpl::get_condition() const { return m_condition; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::Condition>::operator()(const loki::pddl::Condition& left_condition, const loki::pddl::Condition& right_condition) const
-{
-    return std::visit(loki::pddl::LessComparatorVisitor(), *left_condition, *right_condition);
-}
-
-std::size_t hash<loki::pddl::ConditionLiteralImpl>::operator()(const loki::pddl::ConditionLiteralImpl& condition) const { return condition.hash(); }
-
-std::size_t hash<loki::pddl::ConditionAndImpl>::operator()(const loki::pddl::ConditionAndImpl& condition) const { return condition.hash(); }
-
-std::size_t hash<loki::pddl::ConditionOrImpl>::operator()(const loki::pddl::ConditionOrImpl& condition) const { return condition.hash(); }
-
-std::size_t hash<loki::pddl::ConditionNotImpl>::operator()(const loki::pddl::ConditionNotImpl& condition) const { return condition.hash(); }
-
-std::size_t hash<loki::pddl::ConditionImplyImpl>::operator()(const loki::pddl::ConditionImplyImpl& condition) const { return condition.hash(); }
-
-std::size_t hash<loki::pddl::ConditionExistsImpl>::operator()(const loki::pddl::ConditionExistsImpl& condition) const { return condition.hash(); }
-
-std::size_t hash<loki::pddl::ConditionForallImpl>::operator()(const loki::pddl::ConditionForallImpl& condition) const { return condition.hash(); }
-}

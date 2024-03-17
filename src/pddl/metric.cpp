@@ -65,14 +65,3 @@ OptimizationMetricEnum OptimizationMetricImpl::get_optimization_metric() const {
 const FunctionExpression& OptimizationMetricImpl::get_function_expression() const { return m_function_expression; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::OptimizationMetric>::operator()(const loki::pddl::OptimizationMetric& left_metric,
-                                                      const loki::pddl::OptimizationMetric& right_metric) const
-{
-    return *left_metric < *right_metric;
-}
-
-std::size_t hash<loki::pddl::OptimizationMetricImpl>::operator()(const loki::pddl::OptimizationMetricImpl& metric) const { return metric.hash(); }
-}

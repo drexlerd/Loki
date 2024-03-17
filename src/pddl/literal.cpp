@@ -49,13 +49,3 @@ bool LiteralImpl::is_negated() const { return m_is_negated; }
 const Atom& LiteralImpl::get_atom() const { return m_atom; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::Literal>::operator()(const loki::pddl::Literal& left_literal, const loki::pddl::Literal& right_literal) const
-{
-    return *left_literal < *right_literal;
-}
-
-std::size_t hash<loki::pddl::LiteralImpl>::operator()(const loki::pddl::LiteralImpl& literal) const { return literal.hash(); }
-}

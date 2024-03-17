@@ -15,9 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_UTILS_PERSISTENT_FACTORY_HPP_
-#define LOKI_INCLUDE_LOKI_UTILS_PERSISTENT_FACTORY_HPP_
+#ifndef LOKI_INCLUDE_LOKI_PDDL_FACTORY_HPP_
+#define LOKI_INCLUDE_LOKI_PDDL_FACTORY_HPP_
 
+#include "loki/pddl/utils.hpp"
 #include "loki/utils/segmented_vector.hpp"
 
 #include <memory>
@@ -29,32 +30,20 @@
 
 namespace loki
 {
-/// @brief The PersistentFactory class manages unique objects in a persistent
+
+/// @brief The PDDLFactory manages unique objects in a persistent
 ///        and efficient manner, utilizing a combination of unordered_set for
 ///        uniqueness checks and SegmentedVector for continuous and
 ///        cache-efficient storage.
 /// @tparam HolderType is the nested type which can be an std::variant.
 /// @tparam N is the number of elements per segment
-template<typename HolderType>
-class PersistentFactory
+template<typename HolderType, typename Hash = Hash<HolderType*>, typename EqualTo = EqualTo<HolderType*>>
+class PDDLFactory
 {
 private:
-    template<typename T>
-    struct DerferencedHash
-    {
-        std::size_t operator()(const T* ptr) const { return std::hash<T>()(*ptr); }
-    };
-
-    /// @brief Equality comparison of the objects underlying the pointers.
-    template<typename T>
-    struct DereferencedEquality
-    {
-        bool operator()(const T* left, const T* right) const { return *left == *right; }
-    };
-
     // We use an unordered_set to test for uniqueness.
     // We use pointers to the persistent memory to reduce allocations.
-    std::unordered_set<const HolderType*, DerferencedHash<HolderType>, DereferencedEquality<HolderType>> m_uniqueness_set;
+    std::unordered_set<const HolderType*, Hash, EqualTo> m_uniqueness_set;
     // Use pre-allocated memory to store PDDL object persistent and continuously for improved cache locality.
     SegmentedVector<HolderType> m_persistent_vector;
 
@@ -63,7 +52,7 @@ private:
     std::mutex m_mutex;
 
 public:
-    explicit PersistentFactory(size_t elements_per_segment) : m_persistent_vector(SegmentedVector<HolderType>(elements_per_segment)) {}
+    explicit PDDLFactory(size_t elements_per_segment) : m_persistent_vector(SegmentedVector<HolderType>(elements_per_segment)) {}
 
     /// @brief Returns a pointer to an existing object
     ///        or creates it before if it does not exist.

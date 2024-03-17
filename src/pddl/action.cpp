@@ -80,13 +80,3 @@ const std::optional<Condition>& ActionImpl::get_condition() const { return m_con
 const std::optional<Effect>& ActionImpl::get_effect() const { return m_effect; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::Action>::operator()(const loki::pddl::Action& left_action, const loki::pddl::Action& right_action) const
-{
-    return *left_action < *right_action;
-}
-
-std::size_t hash<loki::pddl::ActionImpl>::operator()(const loki::pddl::ActionImpl& action) const { return action.hash(); }
-}

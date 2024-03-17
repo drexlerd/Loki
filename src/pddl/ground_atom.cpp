@@ -54,13 +54,3 @@ const Predicate& GroundAtomImpl::get_predicate() const { return m_predicate; }
 const ObjectList& GroundAtomImpl::get_objects() const { return m_objects; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::GroundAtom>::operator()(const loki::pddl::GroundAtom& left_atom, const loki::pddl::GroundAtom& right_atom) const
-{
-    return *left_atom < *right_atom;
-}
-
-std::size_t hash<loki::pddl::GroundAtomImpl>::operator()(const loki::pddl::GroundAtomImpl& atom) const { return atom.hash(); }
-}

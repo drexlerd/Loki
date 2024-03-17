@@ -16,15 +16,15 @@
  */
 
 #include <gtest/gtest.h>
+#include <loki/pddl/factory.hpp>
 #include <loki/pddl/object.hpp>
-#include <loki/utils/persistent_factory.hpp>
 
 namespace loki::domain::tests
 {
 
 TEST(LokiTests, PersistentFactoryTest)
 {
-    PersistentFactory<pddl::ObjectImpl> factory(2);
+    PDDLFactory<pddl::ObjectImpl> factory(2);
     EXPECT_EQ(factory.size(), 0);
 
     // Test uniqueness: insert the same element twice

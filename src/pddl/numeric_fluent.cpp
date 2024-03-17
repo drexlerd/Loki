@@ -38,14 +38,3 @@ const Function& NumericFluentImpl::get_function() const { return m_function; }
 double NumericFluentImpl::get_number() const { return m_number; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::NumericFluent>::operator()(const loki::pddl::NumericFluent& left_numeric_fluent,
-                                                 const loki::pddl::NumericFluent& right_numeric_fluent) const
-{
-    return *left_numeric_fluent < *right_numeric_fluent;
-}
-
-std::size_t hash<loki::pddl::NumericFluentImpl>::operator()(const loki::pddl::NumericFluentImpl& numeric_fluent) const { return numeric_fluent.hash(); }
-}

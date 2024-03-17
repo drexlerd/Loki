@@ -75,13 +75,3 @@ bool RequirementsImpl::test(RequirementEnum requirement) const { return m_requir
 const RequirementEnumSet& RequirementsImpl::get_requirements() const { return m_requirements; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::Requirements>::operator()(const loki::pddl::Requirements& left_requirements, const loki::pddl::Requirements& right_requirements) const
-{
-    return *left_requirements < *right_requirements;
-}
-
-std::size_t hash<loki::pddl::RequirementsImpl>::operator()(const loki::pddl::RequirementsImpl& requirements) const { return requirements.hash(); }
-}

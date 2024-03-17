@@ -20,13 +20,14 @@
 
 #include "loki/pddl/base.hpp"
 #include "loki/pddl/declarations.hpp"
+#include "loki/pddl/factory.hpp"
 
 #include <string>
 
 namespace loki
 {
-template<typename HolderType>
-class PersistentFactory;
+template<typename HolderType, typename Hash, typename EqualTo>
+class PDDLFactory;
 }
 
 namespace loki::pddl
@@ -41,7 +42,7 @@ private:
 
     // Give access to the constructor.
     template<typename>
-    friend class loki::PersistentFactory;
+    friend class loki::PDDLFactory;
 
     /// @brief Test for structural equivalence
     bool is_structurally_equivalent_to_impl(const DerivedPredicateImpl& other) const;
@@ -56,22 +57,6 @@ public:
     const Condition& get_condition() const;
 };
 
-}
-
-namespace std
-{
-// Inject comparison and hash function to make pointers behave appropriately with ordered and unordered datastructures
-template<>
-struct less<loki::pddl::DerivedPredicate>
-{
-    bool operator()(const loki::pddl::DerivedPredicate& left_predicate, const loki::pddl::DerivedPredicate& right_predicate) const;
-};
-
-template<>
-struct hash<loki::pddl::DerivedPredicateImpl>
-{
-    std::size_t operator()(const loki::pddl::DerivedPredicateImpl& action) const;
-};
 }
 
 #endif

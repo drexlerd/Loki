@@ -145,13 +145,3 @@ const Condition& ProblemImpl::get_goal_condition() const { return m_goal_conditi
 const std::optional<OptimizationMetric>& ProblemImpl::get_optimization_metric() const { return m_optimization_metric; }
 
 }
-
-namespace std
-{
-bool less<loki::pddl::Problem>::operator()(const loki::pddl::Problem& left_problem, const loki::pddl::Problem& right_problem) const
-{
-    return *left_problem < *right_problem;
-}
-
-std::size_t hash<loki::pddl::ProblemImpl>::operator()(const loki::pddl::ProblemImpl& problem) const { return problem.hash(); }
-}
