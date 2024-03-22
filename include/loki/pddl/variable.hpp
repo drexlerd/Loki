@@ -50,6 +50,8 @@ private:
     friend class Base<VariableImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
+
     const std::string& get_name() const;
 };
 

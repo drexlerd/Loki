@@ -51,6 +51,8 @@ private:
     friend class Base<ObjectImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
+
     const std::string& get_name() const;
     const TypeList& get_bases() const;
 };

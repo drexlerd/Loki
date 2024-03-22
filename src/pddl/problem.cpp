@@ -101,12 +101,12 @@ void ProblemImpl::str(std::ostream& out, const FormattingOptions& options) const
         {
             if (i != 0)
                 out << "\n" << string(nested_options.indent, ' ');
-            const auto& constants = pair.second;
-            for (size_t i = 0; i < constants.size(); ++i)
+            const auto& objects = pair.second;
+            for (size_t i = 0; i < objects.size(); ++i)
             {
                 if (i != 0)
                     out << " ";
-                out << constants[i]->get_name();
+                objects[i]->str(out, nested_options, false);
             }
             if (m_requirements->test(RequirementEnum::TYPING))
             {
@@ -116,7 +116,7 @@ void ProblemImpl::str(std::ostream& out, const FormattingOptions& options) const
                 {
                     if (i != 0)
                         out << " ";
-                    out << types[i]->get_name();
+                    types[i]->str(out, nested_options, false);
                 }
             }
             ++i;

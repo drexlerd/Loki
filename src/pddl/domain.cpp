@@ -97,7 +97,7 @@ void DomainImpl::str(std::ostream& out, const FormattingOptions& options) const
             {
                 if (i != 0)
                     out << " ";
-                out << sub_types[i]->get_name();
+                sub_types[i]->str(out, nested_options, false);
             }
             out << " - ";
             const auto& types = pair.first;
@@ -105,7 +105,7 @@ void DomainImpl::str(std::ostream& out, const FormattingOptions& options) const
             {
                 if (i != 0)
                     out << " ";
-                out << types[i]->get_name();
+                types[i]->str(out, nested_options, false);
             }
             ++i;
         }
@@ -129,7 +129,7 @@ void DomainImpl::str(std::ostream& out, const FormattingOptions& options) const
             {
                 if (i != 0)
                     out << " ";
-                out << constants[i]->get_name();
+                constants[i]->str(out, nested_options, false);
             }
             if (m_requirements->test(RequirementEnum::TYPING))
             {
@@ -139,7 +139,7 @@ void DomainImpl::str(std::ostream& out, const FormattingOptions& options) const
                 {
                     if (i != 0)
                         out << " ";
-                    out << types[i]->get_name();
+                    types[i]->str(out, nested_options, false);
                 }
             }
             ++i;

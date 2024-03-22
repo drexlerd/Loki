@@ -17,6 +17,7 @@
 
 #include "loki/pddl/object.hpp"
 
+#include "loki/pddl/type.hpp"
 #include "loki/utils/collections.hpp"
 #include "loki/utils/hash.hpp"
 
@@ -30,6 +31,31 @@ bool ObjectImpl::is_structurally_equivalent_to_impl(const ObjectImpl& other) con
 }
 
 size_t ObjectImpl::hash_impl() const { return hash_combine(m_name, hash_container(get_sorted_vector(m_types))); }
+
+void ObjectImpl::str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const
+{
+    out << m_name;
+    if (typing_enabled)
+    {
+        assert(!m_types.empty());
+        out << " - ";
+        if (m_types.size() > 1)
+        {
+            out << "(either ";
+            for (size_t i = 0; i < m_types.size(); ++i)
+            {
+                if (i != 0)
+                    out << " ";
+                m_types[i]->str(out, options, false);
+            }
+            out << ")";
+        }
+        else if (m_types.size() == 1)
+        {
+            m_types.front()->str(out, options, false);
+        }
+    }
+}
 
 const std::string& ObjectImpl::get_name() const { return m_name; }
 
