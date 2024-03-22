@@ -35,15 +35,18 @@ struct LessComparatorVisitor
 
 struct StringifyVisitor
 {
-    std::ostringstream& out;
+    std::ostream& out;
     const FormattingOptions& options;
+    bool enable_typing;
 
-    StringifyVisitor(std::ostringstream& out_, const FormattingOptions& options_) : out(out_), options(options_) {}
+    StringifyVisitor(std::ostream& out_, const FormattingOptions& options_, bool enable_typing_) : out(out_), options(options_), enable_typing(enable_typing_)
+    {
+    }
 
     template<typename T>
     void operator()(const T& object)
     {
-        object.str(out, options);
+        object.str(out, options, enable_typing);
     }
 };
 

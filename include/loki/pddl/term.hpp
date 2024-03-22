@@ -45,12 +45,13 @@ private:
 
     bool is_structurally_equivalent_to_impl(const TermObjectImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<TermObjectImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
+
     const Object& get_object() const;
 };
 
@@ -66,12 +67,13 @@ private:
 
     bool is_structurally_equivalent_to_impl(const TermVariableImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<TermVariableImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
+
     const Variable& get_variable() const;
 };
 

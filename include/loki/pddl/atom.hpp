@@ -40,12 +40,13 @@ private:
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const AtomImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<AtomImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
+
     const Predicate& get_predicate() const;
     const TermList& get_terms() const;
 };

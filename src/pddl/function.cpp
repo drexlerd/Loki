@@ -38,7 +38,7 @@ bool FunctionImpl::is_structurally_equivalent_to_impl(const FunctionImpl& other)
 
 size_t FunctionImpl::hash_impl() const { return hash_combine(m_function_skeleton, hash_container(m_terms)); }
 
-void FunctionImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const
+void FunctionImpl::str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const
 {
     if (m_terms.empty())
     {
@@ -51,7 +51,7 @@ void FunctionImpl::str_impl(std::ostringstream& out, const FormattingOptions& op
         {
             if (i != 0)
                 out << " ";
-            std::visit(StringifyVisitor(out, options), *m_terms[i]);
+            std::visit(StringifyVisitor(out, options, typing_enabled), *m_terms[i]);
         }
         out << "))";
     }

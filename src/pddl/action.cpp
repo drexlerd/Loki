@@ -43,7 +43,7 @@ bool ActionImpl::is_structurally_equivalent_to_impl(const ActionImpl& other) con
 
 size_t ActionImpl::hash_impl() const { return hash_combine(m_name, hash_container(m_parameters), *m_condition, *m_effect); }
 
-void ActionImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const
+void ActionImpl::str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const
 {
     auto nested_options = FormattingOptions { options.indent + options.add_indent, options.add_indent };
     out << std::string(options.indent, ' ') << "(action " << m_name << "\n" << std::string(nested_options.indent, ' ') << ":parameters (";
@@ -51,20 +51,20 @@ void ActionImpl::str_impl(std::ostringstream& out, const FormattingOptions& opti
     {
         if (i != 0)
             out << " ";
-        out << *m_parameters[i];
+        m_parameters[i]->str(out, options, typing_enabled);
     }
     out << ")";
     out << "\n";
     out << std::string(nested_options.indent, ' ') << ":conditions ";
     if (m_condition.has_value())
-        std::visit(StringifyVisitor(out, options), *m_condition.value());
+        std::visit(StringifyVisitor(out, nested_options, typing_enabled), *m_condition.value());
     else
         out << "()";
 
     out << "\n";
     out << std::string(nested_options.indent, ' ') << ":effects ";
     if (m_effect.has_value())
-        std::visit(StringifyVisitor(out, options), *m_effect.value());
+        std::visit(StringifyVisitor(out, nested_options, typing_enabled), *m_effect.value());
     else
         out << "()";
 

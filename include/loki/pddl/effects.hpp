@@ -58,10 +58,11 @@ private:
     // Give access to the private interface implementations.
     friend class Base<EffectLiteralImpl>;
 
-public:
     bool is_structurally_equivalent_to_impl(const EffectLiteralImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
+
+public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
 
     const Literal& get_literal() const;
 };
@@ -80,10 +81,11 @@ private:
     // Give access to the private interface implementations.
     friend class Base<EffectAndImpl>;
 
-public:
     bool is_structurally_equivalent_to_impl(const EffectAndImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
+
+public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
 
     const EffectList& get_effects() const;
 };
@@ -104,10 +106,11 @@ private:
     // Give access to the private interface implementations.
     friend class Base<EffectNumericImpl>;
 
-public:
     bool is_structurally_equivalent_to_impl(const EffectNumericImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
+
+public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
 
     AssignOperatorEnum get_assign_operator() const;
     const Function& get_function() const;
@@ -129,10 +132,11 @@ private:
     // Give access to the private interface implementations.
     friend class Base<EffectConditionalForallImpl>;
 
-public:
     bool is_structurally_equivalent_to_impl(const EffectConditionalForallImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
+
+public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
 
     const ParameterList& get_parameters() const;
     const Effect& get_effect() const;
@@ -152,12 +156,13 @@ private:
 
     bool is_structurally_equivalent_to_impl(const EffectConditionalWhenImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<EffectConditionalWhenImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
+
     const Condition& get_condition() const;
     const Effect& get_effect() const;
 };

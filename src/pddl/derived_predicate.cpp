@@ -38,7 +38,7 @@ bool DerivedPredicateImpl::is_structurally_equivalent_to_impl(const DerivedPredi
 
 size_t DerivedPredicateImpl::hash_impl() const { return hash_combine(hash_container(get_sorted_vector(m_parameters)), m_condition); }
 
-void DerivedPredicateImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const { out << "TODO"; }
+void DerivedPredicateImpl::str(std::ostream& out, const FormattingOptions& /*options*/, bool typing_enabled) const { out << "TODO"; }
 
 const ParameterList& DerivedPredicateImpl::get_parameters() const { return m_parameters; }
 

@@ -46,12 +46,13 @@ private:
 
     bool is_structurally_equivalent_to_impl(const ConditionLiteralImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<ConditionLiteralImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
+
     const Literal& get_literal() const;
 };
 
@@ -68,12 +69,13 @@ private:
 
     bool is_structurally_equivalent_to_impl(const ConditionAndImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<ConditionAndImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
+
     const ConditionList& get_conditions() const;
 };
 
@@ -90,12 +92,13 @@ private:
 
     bool is_structurally_equivalent_to_impl(const ConditionOrImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<ConditionOrImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
+
     const ConditionList& get_conditions() const;
 };
 
@@ -112,12 +115,13 @@ private:
 
     bool is_structurally_equivalent_to_impl(const ConditionNotImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<ConditionNotImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
+
     const Condition& get_condition() const;
 };
 
@@ -135,12 +139,13 @@ private:
 
     bool is_structurally_equivalent_to_impl(const ConditionImplyImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<ConditionImplyImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
+
     const Condition& get_condition_left() const;
     const Condition& get_condition_right() const;
 };
@@ -159,12 +164,13 @@ private:
 
     bool is_structurally_equivalent_to_impl(const ConditionExistsImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<ConditionExistsImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
+
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
 };
@@ -183,12 +189,13 @@ private:
 
     bool is_structurally_equivalent_to_impl(const ConditionForallImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<ConditionForallImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
+
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
 };

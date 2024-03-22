@@ -76,12 +76,13 @@ private:
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const RequirementsImpl& other) const;
     size_t hash_impl() const;
-    void str_impl(std::ostringstream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<RequirementsImpl>;
 
 public:
+    void str(std::ostream& out, const FormattingOptions& options) const;
+
     bool test(RequirementEnum requirement) const;
 
     const RequirementEnumSet& get_requirements() const;

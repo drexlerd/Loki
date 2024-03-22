@@ -31,8 +31,6 @@ bool TypeImpl::is_structurally_equivalent_to_impl(const TypeImpl& other) const
 
 size_t TypeImpl::hash_impl() const { return hash_combine(m_name, hash_container(get_sorted_vector(m_bases))); }
 
-void TypeImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const { out << m_name; }
-
 const std::string& TypeImpl::get_name() const { return m_name; }
 
 const TypeList& TypeImpl::get_bases() const { return m_bases; }

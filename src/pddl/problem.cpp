@@ -24,6 +24,7 @@
 #include "loki/pddl/numeric_fluent.hpp"
 #include "loki/pddl/object.hpp"
 #include "loki/pddl/requirements.hpp"
+#include "loki/pddl/type.hpp"
 #include "loki/pddl/visitors.hpp"
 #include "loki/utils/collections.hpp"
 #include "loki/utils/hash.hpp"
@@ -75,24 +76,50 @@ size_t ProblemImpl::hash_impl() const
                         optimization_hash);
 }
 
-void ProblemImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const
+void ProblemImpl::str(std::ostream& out, const FormattingOptions& options) const
 {
     out << string(options.indent, ' ') << "(define (problem " << m_name << ")\n";
     auto nested_options = FormattingOptions { options.indent + options.add_indent, options.add_indent };
     out << string(nested_options.indent, ' ') << "(:domain " << m_domain->get_name() << ")\n";
     if (!m_requirements->get_requirements().empty())
     {
-        out << string(nested_options.indent, ' ') << *m_requirements << "\n";
+        out << string(nested_options.indent, ' ');
+        m_requirements->str(out, nested_options);
+        out << "\n";
     }
 
     if (!m_objects.empty())
     {
         out << string(nested_options.indent, ' ') << "(:objects ";
-        for (size_t i = 0; i < m_objects.size(); ++i)
+        std::unordered_map<pddl::TypeList, pddl::ObjectList, hash_container_type<pddl::TypeList>> objects_by_types;
+        for (const auto& object : m_objects)
+        {
+            objects_by_types[object->get_bases()].push_back(object);
+        }
+        size_t i = 0;
+        for (const auto& pair : objects_by_types)
         {
             if (i != 0)
-                out << " ";
-            out << *m_objects[i];
+                out << "\n" << string(nested_options.indent, ' ');
+            const auto& constants = pair.second;
+            for (size_t i = 0; i < constants.size(); ++i)
+            {
+                if (i != 0)
+                    out << " ";
+                out << constants[i]->get_name();
+            }
+            if (m_requirements->test(RequirementEnum::TYPING))
+            {
+                out << " - ";
+                const auto& types = pair.first;
+                for (size_t i = 0; i < types.size(); ++i)
+                {
+                    if (i != 0)
+                        out << " ";
+                    out << types[i]->get_name();
+                }
+            }
+            ++i;
         }
         out << ")\n";
     }
@@ -102,22 +129,24 @@ void ProblemImpl::str_impl(std::ostringstream& out, const FormattingOptions& opt
     {
         if (i != 0)
             out << " ";
-        out << *m_initial_literals[i];
+        m_initial_literals[i]->str(out, nested_options, m_requirements->test(RequirementEnum::TYPING));
     }
     for (size_t i = 0; i < m_numeric_fluents.size(); ++i)
     {
         out << " ";
-        out << *m_numeric_fluents[i];
+        m_numeric_fluents[i]->str(out, nested_options, m_requirements->test(RequirementEnum::TYPING));
     }
 
     out << ")\n";
     out << string(nested_options.indent, ' ') << "(:goal ";
-    std::visit(StringifyVisitor(out, options), *m_goal_condition);
+    std::visit(StringifyVisitor(out, options, m_requirements->test(RequirementEnum::TYPING)), *m_goal_condition);
 
     out << ")\n";
     if (m_optimization_metric.has_value())
     {
-        out << string(nested_options.indent, ' ') << "(:metric " << *m_optimization_metric.value() << ")\n";
+        out << string(nested_options.indent, ' ') << "(:metric ";
+        m_optimization_metric.value()->str(out, nested_options, m_requirements->test(RequirementEnum::TYPING));
+        out << ")\n";
     }
     /*
     if (node.constraints.has_value()) {
@@ -126,6 +155,12 @@ void ProblemImpl::str_impl(std::ostringstream& out, const FormattingOptions& opt
     */
 
     out << string(options.indent, ' ') << ")";
+}
+
+std::ostream& operator<<(std::ostream& os, const ProblemImpl& problem)
+{
+    problem.str(os, FormattingOptions { 0, 4 });
+    return os;
 }
 
 const Domain& ProblemImpl::get_domain() const { return m_domain; }

@@ -31,8 +31,6 @@ bool ObjectImpl::is_structurally_equivalent_to_impl(const ObjectImpl& other) con
 
 size_t ObjectImpl::hash_impl() const { return hash_combine(m_name, hash_container(get_sorted_vector(m_types))); }
 
-void ObjectImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const { out << m_name; }
-
 const std::string& ObjectImpl::get_name() const { return m_name; }
 
 const TypeList& ObjectImpl::get_bases() const { return m_types; }

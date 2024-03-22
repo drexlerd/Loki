@@ -56,7 +56,7 @@ bool EffectLiteralImpl::is_structurally_equivalent_to_impl(const EffectLiteralIm
 
 size_t EffectLiteralImpl::hash_impl() const { return std::hash<Literal>()(m_literal); }
 
-void EffectLiteralImpl::str_impl(std::ostringstream& out, const FormattingOptions& /*options*/) const { out << *m_literal; }
+void EffectLiteralImpl::str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const { m_literal->str(out, options, typing_enabled); }
 
 const Literal& EffectLiteralImpl::get_literal() const { return m_literal; }
 
@@ -73,14 +73,14 @@ bool EffectAndImpl::is_structurally_equivalent_to_impl(const EffectAndImpl& othe
 
 size_t EffectAndImpl::hash_impl() const { return hash_container(get_sorted_vector(m_effects)); }
 
-void EffectAndImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const
+void EffectAndImpl::str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const
 {
     out << "(and ";
     for (size_t i = 0; i < m_effects.size(); ++i)
     {
         if (i != 0)
             out << " ";
-        std::visit(StringifyVisitor(out, options), *m_effects[i]);
+        std::visit(StringifyVisitor(out, options, typing_enabled), *m_effects[i]);
     }
     out << ")";
 }
@@ -107,10 +107,12 @@ bool EffectNumericImpl::is_structurally_equivalent_to_impl(const EffectNumericIm
 
 size_t EffectNumericImpl::hash_impl() const { return hash_combine(m_assign_operator, m_function, m_function_expression); }
 
-void EffectNumericImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const
+void EffectNumericImpl::str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const
 {
-    out << "(" << to_string(m_assign_operator) << " " << *m_function << " ";
-    std::visit(StringifyVisitor(out, options), *m_function_expression);
+    out << "(" << to_string(m_assign_operator) << " ";
+    m_function->str(out, options, typing_enabled);
+    out << " ";
+    std::visit(StringifyVisitor(out, options, typing_enabled), *m_function_expression);
     out << ")";
 }
 
@@ -139,17 +141,17 @@ bool EffectConditionalForallImpl::is_structurally_equivalent_to_impl(const Effec
 
 size_t EffectConditionalForallImpl::hash_impl() const { return hash_combine(hash_container(m_parameters), m_effect); }
 
-void EffectConditionalForallImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const
+void EffectConditionalForallImpl::str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const
 {
     out << "(forall (";
     for (size_t i = 0; i < m_parameters.size(); ++i)
     {
         if (i != 0)
             out << " ";
-        out << *m_parameters[i];
+        m_parameters[i]->str(out, options, typing_enabled);
     }
     out << ") ";
-    std::visit(StringifyVisitor(out, options), *m_effect);
+    std::visit(StringifyVisitor(out, options, typing_enabled), *m_effect);
     out << ")";
 }
 
@@ -175,12 +177,12 @@ bool EffectConditionalWhenImpl::is_structurally_equivalent_to_impl(const EffectC
 
 size_t EffectConditionalWhenImpl::hash_impl() const { return hash_combine(m_condition, m_effect); }
 
-void EffectConditionalWhenImpl::str_impl(std::ostringstream& out, const FormattingOptions& options) const
+void EffectConditionalWhenImpl::str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const
 {
     out << "(when ";
-    std::visit(StringifyVisitor(out, options), *m_condition);
+    std::visit(StringifyVisitor(out, options, typing_enabled), *m_condition);
     out << " ";
-    std::visit(StringifyVisitor(out, options), *m_effect);
+    std::visit(StringifyVisitor(out, options, typing_enabled), *m_effect);
     out << ")";
 }
 
