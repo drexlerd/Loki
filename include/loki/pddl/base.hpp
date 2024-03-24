@@ -77,6 +77,25 @@ public:
 
     size_t hash() const { return self().hash_impl(); }
 
+    /// @brief Overload of the output stream insertion operator (operator<<).
+    friend std::ostream& operator<<(std::ostream& os, const Base& element)
+    {
+        os << element.str();
+        return os;
+    }
+
+    /// @brief Compute a string representation of this object.
+    void str(std::ostream& out, const FormattingOptions& options) const { self().str_impl(out, options); }
+
+    /// @brief Compute a string representation of this object.
+    std::string str() const
+    {
+        std::ostringstream out;
+        FormattingOptions options { 0, 4 };
+        str(out, options);
+        return out.str();
+    }
+
     /// @brief Returns the identifier
     int get_identifier() const { return m_identifier; }
 };

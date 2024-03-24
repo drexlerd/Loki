@@ -37,13 +37,13 @@ bool FunctionSkeletonImpl::is_structurally_equivalent_to_impl(const FunctionSkel
 
 size_t FunctionSkeletonImpl::hash_impl() const { return hash_combine(m_name, hash_container(m_parameters), m_type); }
 
-void FunctionSkeletonImpl::str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const
+void FunctionSkeletonImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
     out << "(" << m_name;
     for (size_t i = 0; i < m_parameters.size(); ++i)
     {
         out << " ";
-        m_parameters[i]->str(out, options, typing_enabled);
+        m_parameters[i]->str(out, options);
     }
     out << ")";
 }

@@ -65,13 +65,12 @@ private:
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionNumberImpl& other) const;
     size_t hash_impl() const;
+    void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<FunctionExpressionNumberImpl>;
 
 public:
-    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
-
     double get_number() const;
 };
 
@@ -93,13 +92,12 @@ private:
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionBinaryOperatorImpl& other) const;
     size_t hash_impl() const;
+    void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<FunctionExpressionBinaryOperatorImpl>;
 
 public:
-    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
-
     BinaryOperatorEnum get_binary_operator() const;
     const FunctionExpression& get_left_function_expression() const;
     const FunctionExpression& get_right_function_expression() const;
@@ -119,13 +117,12 @@ private:
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionMultiOperatorImpl& other) const;
     size_t hash_impl() const;
+    void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<FunctionExpressionMultiOperatorImpl>;
 
 public:
-    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
-
     MultiOperatorEnum get_multi_operator() const;
     const FunctionExpressionList& get_function_expressions() const;
 };
@@ -143,13 +140,12 @@ private:
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionMinusImpl& other) const;
     size_t hash_impl() const;
+    void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<FunctionExpressionMinusImpl>;
 
 public:
-    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
-
     const FunctionExpression& get_function_expression() const;
 };
 
@@ -166,13 +162,12 @@ private:
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionFunctionImpl& other) const;
     size_t hash_impl() const;
+    void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<FunctionExpressionFunctionImpl>;
 
 public:
-    void str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const;
-
     const Function& get_function() const;
 };
 

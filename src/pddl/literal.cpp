@@ -32,17 +32,17 @@ bool LiteralImpl::is_structurally_equivalent_to_impl(const LiteralImpl& other) c
 
 size_t LiteralImpl::hash_impl() const { return hash_combine(m_is_negated, m_atom); }
 
-void LiteralImpl::str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const
+void LiteralImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
     if (m_is_negated)
     {
         out << "(not ";
-        m_atom->str(out, options, typing_enabled);
+        m_atom->str(out, options);
         out << ")";
     }
     else
     {
-        m_atom->str(out, options, typing_enabled);
+        m_atom->str(out, options);
     }
 }
 

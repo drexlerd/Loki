@@ -37,16 +37,13 @@ struct StringifyVisitor
 {
     std::ostream& out;
     const FormattingOptions& options;
-    bool enable_typing;
 
-    StringifyVisitor(std::ostream& out_, const FormattingOptions& options_, bool enable_typing_) : out(out_), options(options_), enable_typing(enable_typing_)
-    {
-    }
+    StringifyVisitor(std::ostream& out_, const FormattingOptions& options_) : out(out_), options(options_) {}
 
     template<typename T>
     void operator()(const T& object)
     {
-        object.str(out, options, enable_typing);
+        object.str(out, options);
     }
 };
 

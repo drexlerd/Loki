@@ -53,10 +53,10 @@ bool OptimizationMetricImpl::is_structurally_equivalent_to_impl(const Optimizati
 
 size_t OptimizationMetricImpl::hash_impl() const { return hash_combine(m_optimization_metric, m_function_expression); }
 
-void OptimizationMetricImpl::str(std::ostream& out, const FormattingOptions& options, bool typing_enabled) const
+void OptimizationMetricImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
     out << "(" << to_string(m_optimization_metric) << " ";
-    std::visit(StringifyVisitor(out, options, typing_enabled), *m_function_expression);
+    std::visit(StringifyVisitor(out, options), *m_function_expression);
     out << ")";
 }
 
