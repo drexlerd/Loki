@@ -25,6 +25,8 @@
 namespace loki
 {
 
+extern void test_multiple_definition(const pddl::Predicate& predicate, const ast::Predicate& node, const Context& context);
+
 /* PredicateList */
 extern pddl::PredicateList parse(const ast::Predicates& predicates_node, Context& context);
 

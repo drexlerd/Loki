@@ -147,10 +147,8 @@ pddl::RequirementEnumSet parse(const ast::RequirementDurativeActions& node, Cont
     return { pddl::RequirementEnum::DURATIVE_ACTIONS };
 }
 
-pddl::RequirementEnumSet parse(const ast::RequirementDerivedPredicates& node, Context& context)
+pddl::RequirementEnumSet parse(const ast::RequirementDerivedPredicates&, Context& context)
 {
-    throw UnsupportedRequirementError(pddl::RequirementEnum::DERIVED_PREDICATES, context.scopes.get_error_handler()(node, ""));
-
     // Track
     context.references.track(pddl::RequirementEnum::DERIVED_PREDICATES);
     return { pddl::RequirementEnum::DERIVED_PREDICATES };

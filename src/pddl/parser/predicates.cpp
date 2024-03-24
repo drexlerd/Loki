@@ -24,7 +24,7 @@
 namespace loki
 {
 
-static void test_multiple_definition(const pddl::Predicate& predicate, const ast::Predicate& node, const Context& context)
+void test_multiple_definition(const pddl::Predicate& predicate, const ast::Predicate& node, const Context& context)
 {
     const auto predicate_name = predicate->get_name();
     const auto binding = context.scopes.get<pddl::PredicateImpl>(predicate_name);

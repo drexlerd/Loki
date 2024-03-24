@@ -891,7 +891,7 @@ struct Action : x3::position_tagged
 /* <derived-def> */
 struct DerivedPredicate : x3::position_tagged
 {
-    TypedListOfVariables typed_list_of_variables;
+    AtomicFormulaSkeleton atomic_formula_skeleton;
     GoalDescriptor goal_descriptor;
 };
 

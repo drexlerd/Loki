@@ -46,7 +46,7 @@ size_t ActionImpl::hash_impl() const { return hash_combine(m_name, hash_containe
 void ActionImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
     auto nested_options = FormattingOptions { options.indent + options.add_indent, options.add_indent };
-    out << std::string(options.indent, ' ') << "(action " << m_name << "\n" << std::string(nested_options.indent, ' ') << ":parameters (";
+    out << std::string(options.indent, ' ') << "(:action " << m_name << "\n" << std::string(nested_options.indent, ' ') << ":parameters (";
     for (size_t i = 0; i < m_parameters.size(); ++i)
     {
         if (i != 0)

@@ -550,7 +550,7 @@ std::string parse_text(const ast::Action& node, const FormattingOptions& options
 std::string parse_text(const ast::DerivedPredicate& node, const FormattingOptions& options)
 {
     std::stringstream ss;
-    ss << std::string(options.indent, ' ') << "(:derived " << parse_text(node.typed_list_of_variables, options) << " "
+    ss << std::string(options.indent, ' ') << "(:derived " << parse_text(node.atomic_formula_skeleton, options) << " "
        << parse_text(node.goal_descriptor, options) << ")";
     return ss.str();
 }

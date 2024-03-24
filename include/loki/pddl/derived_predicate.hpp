@@ -35,10 +35,10 @@ namespace loki::pddl
 class DerivedPredicateImpl : public Base<DerivedPredicateImpl>
 {
 private:
-    ParameterList m_parameters;
+    Predicate m_predicate;
     Condition m_condition;
 
-    DerivedPredicateImpl(int identifier, ParameterList parameters, Condition condition);
+    DerivedPredicateImpl(int identifier, Predicate predicate, Condition condition);
 
     // Give access to the constructor.
     friend class loki::PDDLFactory<DerivedPredicateImpl, loki::Hash<DerivedPredicateImpl*>, loki::EqualTo<DerivedPredicateImpl*>>;
@@ -52,7 +52,7 @@ private:
     friend class Base<DerivedPredicateImpl>;
 
 public:
-    const ParameterList& get_parameters() const;
+    const Predicate& get_predicate() const;
     const Condition& get_condition() const;
 };
 

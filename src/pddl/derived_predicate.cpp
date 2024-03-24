@@ -19,28 +19,36 @@
 
 #include "loki/pddl/conditions.hpp"
 #include "loki/pddl/effects.hpp"
+#include "loki/pddl/predicate.hpp"
+#include "loki/pddl/visitors.hpp"
 #include "loki/utils/collections.hpp"
 #include "loki/utils/hash.hpp"
 
 namespace loki::pddl
 {
-DerivedPredicateImpl::DerivedPredicateImpl(int identifier, ParameterList parameters, Condition condition) :
+DerivedPredicateImpl::DerivedPredicateImpl(int identifier, Predicate predicate, Condition condition) :
     Base(identifier),
-    m_parameters(std::move(parameters)),
+    m_predicate(std::move(predicate)),
     m_condition(std::move(condition))
 {
 }
 
 bool DerivedPredicateImpl::is_structurally_equivalent_to_impl(const DerivedPredicateImpl& other) const
 {
-    return (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters)) && (m_condition == other.m_condition);
+    return (m_predicate == other.m_predicate) && (m_condition == other.m_condition);
 }
 
-size_t DerivedPredicateImpl::hash_impl() const { return hash_combine(hash_container(get_sorted_vector(m_parameters)), m_condition); }
+size_t DerivedPredicateImpl::hash_impl() const { return hash_combine(m_predicate, m_condition); }
 
-void DerivedPredicateImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const { out << "TODO"; }
+void DerivedPredicateImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
+{
+    out << std::string(options.indent, ' ') << "(:derived ";
+    out << *m_predicate << " ";
+    std::visit(StringifyVisitor(out, options), *m_condition);
+    out << ")";
+}
 
-const ParameterList& DerivedPredicateImpl::get_parameters() const { return m_parameters; }
+const Predicate& DerivedPredicateImpl::get_predicate() const { return m_predicate; }
 
 const Condition& DerivedPredicateImpl::get_condition() const { return m_condition; }
 
