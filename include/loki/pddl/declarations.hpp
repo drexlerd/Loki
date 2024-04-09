@@ -137,6 +137,10 @@ class DerivedPredicateImpl;
 using DerivedPredicate = const DerivedPredicateImpl*;
 using DerivedPredicateList = std::vector<DerivedPredicate>;
 
+class AxiomImpl;
+using Axiom = const AxiomImpl*;
+using AxiomList = std::vector<Axiom>;
+
 class DomainImpl;
 using Domain = const DomainImpl*;
 using DomainList = std::vector<Domain>;

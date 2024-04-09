@@ -17,6 +17,7 @@
 
 #include "loki/pddl/parser.hpp"
 
+#include "loki/pddl/declarations.hpp"
 #include "loki/pddl/domain.hpp"
 #include "loki/pddl/exceptions.hpp"
 #include "loki/pddl/object.hpp"
@@ -99,6 +100,9 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context)
     test_predicate_references(predicates, context);
     test_function_skeleton_references(function_skeletons, context);
 
+    // TODO: add parsing of axioms in the grammar
+    auto axioms = pddl::AxiomList {};
+
     const auto domain = context.factories.domains.get_or_create<pddl::DomainImpl>(domain_name,
                                                                                   context.requirements,
                                                                                   types,
@@ -106,7 +110,8 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context)
                                                                                   predicates,
                                                                                   function_skeletons,
                                                                                   action_list,
-                                                                                  derived_predicate_list);
+                                                                                  derived_predicate_list,
+                                                                                  axioms);
     context.positions.push_back(domain, domain_node);
     return domain;
 }
@@ -159,6 +164,9 @@ pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pd
     // Check references
     test_object_references(objects, context);
 
+    // Axioms cannot be de defined for problems but may be added during translation
+    auto axioms = pddl::AxiomList {};
+
     const auto problem = context.factories.problems.get_or_create<pddl::ProblemImpl>(domain,
                                                                                      problem_name,
                                                                                      context.requirements,
@@ -166,7 +174,8 @@ pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pd
                                                                                      initial_literals,
                                                                                      numeric_fluents,
                                                                                      goal_condition,
-                                                                                     optimization_metric);
+                                                                                     optimization_metric,
+                                                                                     axioms);
     context.positions.push_back(problem, problem_node);
     return problem;
 }
