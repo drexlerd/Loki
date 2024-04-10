@@ -20,6 +20,7 @@
 #include "common.hpp"
 #include "conditions.hpp"
 #include "effects.hpp"
+#include "literal.hpp"
 #include "loki/pddl/action.hpp"
 #include "loki/pddl/derived_predicate.hpp"
 #include "loki/pddl/exceptions.hpp"
@@ -67,16 +68,15 @@ pddl::DerivedPredicate parse(const ast::DerivedPredicate& node, Context& context
     }
     context.references.untrack(pddl::RequirementEnum::DERIVED_PREDICATES);
     context.scopes.open_scope();
-    // Predicate
-    const auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.atomic_formula_skeleton.typed_list_of_variables);
-    const auto predicate_name = parse(node.atomic_formula_skeleton.predicate.name);
-    const auto predicate = context.factories.predicates.get_or_create<pddl::PredicateImpl>(predicate_name, parameter_list);
-    test_multiple_definition(predicate, node.atomic_formula_skeleton.predicate, context);
-    // condition
-    auto condition = parse(node.goal_descriptor, context);
+    // :vars
+    const auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
+    // :context
+    const auto condition = parse(node.goal_descriptor, context);
+    // :implies
+    const auto literal = parse(node.literal, context);
     test_variable_references(parameter_list, context);
     context.scopes.close_scope();
-    const auto derived_predicate = context.factories.derived_predicates.get_or_create<pddl::DerivedPredicateImpl>(predicate, condition);
+    const auto derived_predicate = context.factories.derived_predicates.get_or_create<pddl::DerivedPredicateImpl>(parameter_list, condition, literal);
     context.positions.push_back(derived_predicate, node);
     return derived_predicate;
 }

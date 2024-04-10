@@ -17,8 +17,8 @@
 
 #include "loki/pddl/problem.hpp"
 
-#include "loki/pddl/axiom.hpp"
 #include "loki/pddl/conditions.hpp"
+#include "loki/pddl/derived_predicate.hpp"
 #include "loki/pddl/domain.hpp"
 #include "loki/pddl/ground_literal.hpp"
 #include "loki/pddl/metric.hpp"
@@ -45,7 +45,7 @@ ProblemImpl::ProblemImpl(int identifier,
                          NumericFluentList numeric_fluents,
                          Condition goal_condition,
                          std::optional<OptimizationMetric> optimization_metric,
-                         AxiomList axioms) :
+                         DerivedPredicateList derived_predicates) :
     Base(identifier),
     m_domain(std::move(domain)),
     m_name(std::move(name)),
@@ -55,7 +55,7 @@ ProblemImpl::ProblemImpl(int identifier,
     m_numeric_fluents(std::move(numeric_fluents)),
     m_goal_condition(std::move(goal_condition)),
     m_optimization_metric(std::move(optimization_metric)),
-    m_axioms(std::move(axioms))
+    m_derived_predicates(std::move(derived_predicates))
 {
 }
 
@@ -64,7 +64,8 @@ bool ProblemImpl::is_structurally_equivalent_to_impl(const ProblemImpl& other) c
     return (m_domain == other.m_domain) && (m_name == other.m_name) && (m_requirements == other.m_requirements)
            && (get_sorted_vector(m_objects) == get_sorted_vector(other.m_objects))
            && (get_sorted_vector(m_initial_literals)) == get_sorted_vector(other.m_initial_literals) && (m_goal_condition == other.m_goal_condition)
-           && (m_optimization_metric == other.m_optimization_metric) && (get_sorted_vector(m_axioms) == get_sorted_vector(other.m_axioms));
+           && (m_optimization_metric == other.m_optimization_metric)
+           && (get_sorted_vector(m_derived_predicates) == get_sorted_vector(other.m_derived_predicates));
 }
 
 size_t ProblemImpl::hash_impl() const
@@ -77,7 +78,7 @@ size_t ProblemImpl::hash_impl() const
                         hash_container(get_sorted_vector(m_initial_literals)),
                         m_goal_condition,
                         optimization_hash,
-                        hash_container(get_sorted_vector(m_axioms)));
+                        hash_container(get_sorted_vector(m_derived_predicates)));
 }
 
 void ProblemImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
@@ -164,9 +165,9 @@ void ProblemImpl::str_impl(std::ostream& out, const FormattingOptions& options) 
     }
     */
 
-    for (const auto& axiom : m_axioms)
+    for (const auto& derived_predicate : m_derived_predicates)
     {
-        axiom->str(out, nested_options);
+        derived_predicate->str(out, nested_options);
     }
 
     out << string(options.indent, ' ') << ")";
@@ -194,6 +195,6 @@ const Condition& ProblemImpl::get_goal_condition() const { return m_goal_conditi
 
 const std::optional<OptimizationMetric>& ProblemImpl::get_optimization_metric() const { return m_optimization_metric; }
 
-const AxiomList& ProblemImpl::get_axioms() const { return m_axioms; }
+const DerivedPredicateList& ProblemImpl::get_derived_predicates() const { return m_derived_predicates; }
 
 }

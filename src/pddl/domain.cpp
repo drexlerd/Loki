@@ -18,7 +18,6 @@
 #include "loki/pddl/domain.hpp"
 
 #include "loki/pddl/action.hpp"
-#include "loki/pddl/axiom.hpp"
 #include "loki/pddl/derived_predicate.hpp"
 #include "loki/pddl/function_skeleton.hpp"
 #include "loki/pddl/object.hpp"
@@ -41,8 +40,7 @@ DomainImpl::DomainImpl(int identifier,
                        PredicateList predicates,
                        FunctionSkeletonList functions,
                        ActionList actions,
-                       DerivedPredicateList derived_predicates,
-                       AxiomList axioms) :
+                       DerivedPredicateList derived_predicates) :
     Base(identifier),
     m_name(std::move(name)),
     m_requirements(std::move(requirements)),
@@ -51,8 +49,7 @@ DomainImpl::DomainImpl(int identifier,
     m_predicates(std::move(predicates)),
     m_functions(std::move(functions)),
     m_actions(std::move(actions)),
-    m_derived_predicates(std::move(derived_predicates)),
-    m_axioms(std::move(axioms))
+    m_derived_predicates(std::move(derived_predicates))
 {
 }
 
@@ -62,8 +59,7 @@ bool DomainImpl::is_structurally_equivalent_to_impl(const DomainImpl& other) con
            && (get_sorted_vector(m_constants) == get_sorted_vector(other.m_constants))
            && (get_sorted_vector(m_predicates) == get_sorted_vector(other.m_predicates))
            && (get_sorted_vector(m_functions) == get_sorted_vector(other.m_functions)) && (get_sorted_vector(m_actions) == get_sorted_vector(other.m_actions))
-           && (get_sorted_vector(m_derived_predicates) == get_sorted_vector(other.m_derived_predicates))
-           && (get_sorted_vector(m_axioms) == get_sorted_vector(other.m_axioms));
+           && (get_sorted_vector(m_derived_predicates) == get_sorted_vector(other.m_derived_predicates));
 }
 
 size_t DomainImpl::hash_impl() const
@@ -75,8 +71,7 @@ size_t DomainImpl::hash_impl() const
                         hash_container(get_sorted_vector(m_predicates)),
                         hash_container(get_sorted_vector(m_functions)),
                         hash_container(get_sorted_vector(m_actions)),
-                        hash_container(get_sorted_vector(m_derived_predicates)),
-                        hash_container(get_sorted_vector(m_axioms)));
+                        hash_container(get_sorted_vector(m_derived_predicates)));
 }
 
 void DomainImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
@@ -204,11 +199,6 @@ void DomainImpl::str_impl(std::ostream& out, const FormattingOptions& options) c
         derived_predicate->str(out, nested_options);
     }
 
-    for (const auto& axiom : m_axioms)
-    {
-        axiom->str(out, nested_options);
-    }
-
     out << std::string(options.indent, ' ') << ")";
 }
 
@@ -233,7 +223,5 @@ const PredicateList& DomainImpl::get_predicates() const { return m_predicates; }
 const ActionList& DomainImpl::get_actions() const { return m_actions; }
 
 const DerivedPredicateList& DomainImpl::get_derived_predicates() const { return m_derived_predicates; }
-
-const AxiomList& DomainImpl::get_axioms() const { return m_axioms; }
 
 }

@@ -100,9 +100,6 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context)
     test_predicate_references(predicates, context);
     test_function_skeleton_references(function_skeletons, context);
 
-    // TODO: add parsing of axioms in the grammar
-    auto axioms = pddl::AxiomList {};
-
     const auto domain = context.factories.domains.get_or_create<pddl::DomainImpl>(domain_name,
                                                                                   context.requirements,
                                                                                   types,
@@ -110,8 +107,7 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context)
                                                                                   predicates,
                                                                                   function_skeletons,
                                                                                   action_list,
-                                                                                  derived_predicate_list,
-                                                                                  axioms);
+                                                                                  derived_predicate_list);
     context.positions.push_back(domain, domain_node);
     return domain;
 }
@@ -164,8 +160,8 @@ pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pd
     // Check references
     test_object_references(objects, context);
 
-    // Axioms cannot be de defined for problems but may be added during translation
-    auto axioms = pddl::AxiomList {};
+    // Derived_predicates cannot be de defined for problems but may be added during translation
+    auto derived_predicates = pddl::DerivedPredicateList {};
 
     const auto problem = context.factories.problems.get_or_create<pddl::ProblemImpl>(domain,
                                                                                      problem_name,
@@ -175,7 +171,7 @@ pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pd
                                                                                      numeric_fluents,
                                                                                      goal_condition,
                                                                                      optimization_metric,
-                                                                                     axioms);
+                                                                                     derived_predicates);
     context.positions.push_back(problem, problem_node);
     return problem;
 }

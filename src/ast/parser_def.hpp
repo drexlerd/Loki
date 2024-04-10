@@ -409,7 +409,8 @@ const auto action_body_def = -(keyword_lit(":precondition") > ((lit('(') >> lit(
 const auto action_def = (lit('(') >> keyword_lit(":action")) > action_symbol > keyword_lit(":parameters") > lit('(') > typed_list_of_variables > lit(')')
                         > action_body >> lit(')');
 
-const auto derived_predicate_def = (lit('(') >> keyword_lit(":derived")) > atomic_formula_skeleton > goal_descriptor > lit(')');
+const auto derived_predicate_def = (lit('(') >> keyword_lit(":derived")) > lit(":vars") > typed_list_of_variables > lit(":context") > goal_descriptor
+                                   > lit(":implies") > literal > lit(')');
 
 const auto define_keyword_def = keyword_lit("define");
 const auto domain_keyword_def = keyword_lit("domain");

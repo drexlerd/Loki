@@ -99,7 +99,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::ActionSymbol, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::ActionBody, precondition_goal_descriptor, effect)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Action, action_symbol, typed_list_of_variables, action_body)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::DerivedPredicate, atomic_formula_skeleton, goal_descriptor)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::DerivedPredicate, typed_list_of_variables, goal_descriptor, literal)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::DomainName, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Requirements, requirements)

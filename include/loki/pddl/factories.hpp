@@ -20,7 +20,6 @@
 
 #include "loki/pddl/action.hpp"
 #include "loki/pddl/atom.hpp"
-#include "loki/pddl/axiom.hpp"
 #include "loki/pddl/conditions.hpp"
 #include "loki/pddl/derived_predicate.hpp"
 #include "loki/pddl/domain.hpp"
@@ -68,7 +67,6 @@ using ConditionFactory = PDDLFactory<pddl::ConditionImpl>;
 using EffectFactory = PDDLFactory<pddl::EffectImpl>;
 using ActionFactory = PDDLFactory<pddl::ActionImpl>;
 using DerivedPredicateFactory = PDDLFactory<pddl::DerivedPredicateImpl>;
-using AxiomFactory = PDDLFactory<pddl::AxiomImpl>;
 using OptimizationMetricFactory = PDDLFactory<pddl::OptimizationMetricImpl>;
 using NumericFluentFactory = PDDLFactory<pddl::NumericFluentImpl>;
 using DomainFactory = PDDLFactory<pddl::DomainImpl>;
@@ -92,7 +90,6 @@ using PDDLPositionCache = PositionCache<pddl::RequirementsImpl,
                                         pddl::EffectImpl,
                                         pddl::ActionImpl,
                                         pddl::DerivedPredicateImpl,
-                                        pddl::AxiomImpl,
                                         pddl::OptimizationMetricImpl,
                                         pddl::NumericFluentImpl,
                                         pddl::DomainImpl,
@@ -119,7 +116,6 @@ struct PDDLFactories
     EffectFactory effects;
     ActionFactory actions;
     DerivedPredicateFactory derived_predicates;
-    AxiomFactory axioms;
     OptimizationMetricFactory optimization_metrics;
     NumericFluentFactory numeric_fluents;
     DomainFactory domains;
@@ -144,7 +140,6 @@ struct PDDLFactories
         effects(EffectFactory(1000)),
         actions(ActionFactory(100)),
         derived_predicates(DerivedPredicateFactory(100)),
-        axioms(AxiomFactory(100)),
         optimization_metrics(OptimizationMetricFactory(10)),
         numeric_fluents(NumericFluentFactory(1000)),
         domains(DomainFactory(1)),

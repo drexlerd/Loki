@@ -44,8 +44,8 @@ private:
     NumericFluentList m_numeric_fluents;
     Condition m_goal_condition;
     std::optional<OptimizationMetric> m_optimization_metric;
-    // Axioms cannot be de defined for problems but may be added during translation
-    AxiomList m_axioms;
+    // DerivedPredicate cannot be de defined for problems but may be added during translation
+    DerivedPredicateList m_derived_predicates;
 
     ProblemImpl(int identifier,
                 Domain domain,
@@ -56,7 +56,7 @@ private:
                 NumericFluentList numeric_fluents,
                 Condition goal_condition,
                 std::optional<OptimizationMetric> optimization_metric,
-                AxiomList axioms);
+                DerivedPredicateList derived_predicates);
 
     // Give access to the constructor.
     friend class loki::PDDLFactory<ProblemImpl, loki::Hash<ProblemImpl*>, loki::EqualTo<ProblemImpl*>>;
@@ -78,7 +78,7 @@ public:
     const NumericFluentList& get_numeric_fluents() const;
     const Condition& get_goal_condition() const;
     const std::optional<OptimizationMetric>& get_optimization_metric() const;
-    const AxiomList& get_axioms() const;
+    const DerivedPredicateList& get_derived_predicates() const;
 };
 
 }
