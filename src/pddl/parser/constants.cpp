@@ -28,7 +28,7 @@ namespace loki
 static void test_multiple_definition(const pddl::Object& constant, const ast::Name& node, const Context& context)
 {
     const auto constant_name = constant->get_name();
-    const auto binding = context.scopes.get<pddl::ObjectImpl>(constant_name);
+    const auto binding = context.scopes.get_object(constant_name);
     if (binding.has_value())
     {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
@@ -45,7 +45,7 @@ static void test_multiple_definition(const pddl::Object& constant, const ast::Na
 static void insert_context_information(const pddl::Object& constant, const ast::Name& node, Context& context)
 {
     context.positions.push_back(constant, node);
-    context.scopes.insert<pddl::ObjectImpl>(constant->get_name(), constant, node);
+    context.scopes.insert_object(constant->get_name(), constant, node);
 }
 
 static pddl::Object parse_constant_definition(const ast::Name& node, const pddl::TypeList& type_list, Context& context)
@@ -76,8 +76,8 @@ ConstantListVisitor::ConstantListVisitor(Context& context_) : context(context_) 
 pddl::ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& name_nodes)
 {
     // std::vector<ast::Name> has single base type "object"
-    assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
-    const auto [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
+    assert(context.scopes.get_type("object").has_value());
+    const auto [type, _position, _error_handler] = context.scopes.get_type("object").value();
     return parse_constant_definitions(name_nodes, pddl::TypeList { type }, context);
 }
 

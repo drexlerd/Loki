@@ -28,7 +28,7 @@ namespace loki
 pddl::GroundAtom parse(const ast::AtomicFormulaOfNamesPredicate& node, Context& context)
 {
     const auto name = parse(node.predicate.name);
-    const auto binding = context.scopes.get<pddl::PredicateImpl>(name);
+    const auto binding = context.scopes.get_predicate(name);
     if (!binding.has_value())
     {
         throw UndefinedPredicateError(name, context.scopes.get_error_handler()(node, ""));
@@ -54,8 +54,8 @@ pddl::GroundAtom parse(const ast::AtomicFormulaOfNamesEquality& node, Context& c
     {
         throw UndefinedRequirementError(pddl::RequirementEnum::EQUALITY, context.scopes.get_error_handler()(node, ""));
     }
-    assert(context.scopes.get<pddl::PredicateImpl>("=").has_value());
-    const auto [equal_predicate, _position, _error_handler] = context.scopes.get<pddl::PredicateImpl>("=").value();
+    assert(context.scopes.get_predicate("=").has_value());
+    const auto [equal_predicate, _position, _error_handler] = context.scopes.get_predicate("=").value();
     const auto object_left = parse_object_reference(node.name_left, context);
     const auto object_right = parse_object_reference(node.name_right, context);
     const auto atom = context.factories.ground_atoms.get_or_create<pddl::GroundAtomImpl>(equal_predicate, pddl::ObjectList { object_left, object_right });

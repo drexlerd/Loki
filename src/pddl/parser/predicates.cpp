@@ -27,7 +27,7 @@ namespace loki
 void test_multiple_definition(const pddl::Predicate& predicate, const ast::Predicate& node, const Context& context)
 {
     const auto predicate_name = predicate->get_name();
-    const auto binding = context.scopes.get<pddl::PredicateImpl>(predicate_name);
+    const auto binding = context.scopes.get_predicate(predicate_name);
     if (binding.has_value())
     {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
@@ -44,7 +44,7 @@ void test_multiple_definition(const pddl::Predicate& predicate, const ast::Predi
 static void insert_context_information(const pddl::Predicate& predicate, const ast::Predicate& node, Context& context)
 {
     context.positions.push_back(predicate, node);
-    context.scopes.insert(predicate->get_name(), predicate, node);
+    context.scopes.insert_predicate(predicate->get_name(), predicate, node);
 }
 
 static pddl::Predicate parse_predicate_definition(const ast::AtomicFormulaSkeleton& node, Context& context)
@@ -74,5 +74,11 @@ pddl::PredicateList parse(const ast::Predicates& predicates_node, Context& conte
     const auto predicate_list = parse_predicate_definitions(predicates_node.atomic_formula_skeletons, context);
     return predicate_list;
 }
+
+// pddl::PredicateList parse(const ast::DerivedPredicates& derived_predicates_node, Context& context)
+//{
+//     const auto predicate_list = parse_predicate_definitions(predicates_node.atomic_formula_skeletons, context);
+//     return predicate_list;
+// }
 
 }

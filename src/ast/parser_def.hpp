@@ -190,13 +190,14 @@ effect_conditional_type const effect_conditional = "effect_conditional";
 action_symbol_type const action_symbol = "action_symbol";
 action_body_type const action_body = "action_body";
 action_type const action = "action";
-derived_predicate_type const derived_predicate = "derived_predicate";
+axiom_type const axiom = "axiom";
 
 domain_name_type const domain_name = "domain_name";
 requirements_type const requirements = "requirements";
 types_type const types = "types";
 constants_type const constants = "constants";
 predicates_type const predicates = "predicates";
+derived_predicates_type const derived_predicates = "derived_predicates";
 functions_type const functions = "functions";
 constraints_type const constraints = "constraints";
 structure_type const structure = "structure";
@@ -409,8 +410,7 @@ const auto action_body_def = -(keyword_lit(":precondition") > ((lit('(') >> lit(
 const auto action_def = (lit('(') >> keyword_lit(":action")) > action_symbol > keyword_lit(":parameters") > lit('(') > typed_list_of_variables > lit(')')
                         > action_body >> lit(')');
 
-const auto derived_predicate_def = (lit('(') >> keyword_lit(":derived")) > lit(":vars") > typed_list_of_variables > lit(":context") > goal_descriptor
-                                   > lit(":implies") > literal > lit(')');
+const auto axiom_def = (lit('(') >> keyword_lit(":derived")) > lit(":context") > goal_descriptor > lit(":implies") > literal > lit(')');
 
 const auto define_keyword_def = keyword_lit("define");
 const auto domain_keyword_def = keyword_lit("domain");
@@ -419,12 +419,13 @@ const auto requirements_def = lit('(') >> keyword_lit(":requirements") > *requir
 const auto types_def = (lit('(') >> keyword_lit(":types") > typed_list_of_names) > lit(')');
 const auto constants_def = (lit('(') >> keyword_lit(":constants") > typed_list_of_names) > lit(')');
 const auto predicates_def = (lit('(') >> keyword_lit(":predicates") > *atomic_formula_skeleton) > lit(')');
+const auto derived_predicates_def = (lit('(') >> keyword_lit(":derived-predicates") > *atomic_formula_skeleton) > lit(')');
 const auto functions_def = (lit('(') >> keyword_lit(":functions") > *function_typed_list_of_atomic_function_skeletons) > lit(')');
 const auto constraints_def = (lit('(') >> keyword_lit(":constraints")) > constraint_goal_descriptor > lit(')');
-const auto structure_def = action | derived_predicate;
+const auto structure_def = action | axiom;
 
-const auto domain_def = lit('(') > define_keyword > domain_name > -requirements > -types > -constants > -predicates > -functions > -constraints > *structure
-                        > lit(')');
+const auto domain_def = lit('(') > define_keyword > domain_name > -requirements > -types > -constants > -predicates > -predicates > -functions > -constraints
+                        > *structure > lit(')');
 
 /**
  * Problem
@@ -599,9 +600,20 @@ BOOST_SPIRIT_DEFINE(effect,
                     action_symbol,
                     action_body,
                     action,
-                    derived_predicate)
+                    axiom)
 
-BOOST_SPIRIT_DEFINE(define_keyword, domain_keyword, domain_name, requirements, types, constants, predicates, functions, constraints, structure, domain)
+BOOST_SPIRIT_DEFINE(define_keyword,
+                    domain_keyword,
+                    domain_name,
+                    requirements,
+                    types,
+                    constants,
+                    predicates,
+                    derived_predicates,
+                    functions,
+                    constraints,
+                    structure,
+                    domain)
 
 /**
  * Problem
@@ -1003,7 +1015,7 @@ struct ActionClass : x3::annotate_on_success
 struct DurativeActionClass : x3::annotate_on_success
 {
 };
-struct DerivedPredicateClass : x3::annotate_on_success
+struct AxiomClass : x3::annotate_on_success
 {
 };
 
@@ -1327,13 +1339,14 @@ parser::effect_conditional_type const& effect_conditional() { return parser::eff
 parser::action_symbol_type const& action_symbol() { return parser::action_symbol; }
 parser::action_body_type const& action_body() { return parser::action_body; }
 parser::action_type const& action() { return parser::action; }
-parser::derived_predicate_type const& derived_predicate() { return parser::derived_predicate; }
+parser::axiom_type const& axiom() { return parser::axiom; }
 
 parser::domain_name_type const& domain_name() { return parser::domain_name; }
 parser::requirements_type const& requirements() { return parser::requirements; }
 parser::types_type const& types() { return parser::types; }
 parser::constants_type const& constants() { return parser::constants; }
 parser::predicates_type const& predicates() { return parser::predicates; }
+parser::derived_predicates_type const& derived_predicates() { return parser::derived_predicates; }
 parser::functions_type const& functions() { return parser::functions; }
 parser::constraints_type const& constraints() { return parser::constraints; }
 parser::structure_type const& structure() { return parser::structure; }

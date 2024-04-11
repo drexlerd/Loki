@@ -45,7 +45,7 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Name& node) const
 {
     const auto constant_name = parse(node);
     // Test for undefined constant.
-    const auto binding = context.scopes.get<pddl::ObjectImpl>(constant_name);
+    const auto binding = context.scopes.get_object(constant_name);
     if (!binding.has_value())
     {
         throw UndefinedConstantError(constant_name, context.scopes.get_error_handler()(node, ""));
@@ -63,7 +63,7 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) con
 {
     const auto variable = parse(node, context);
     // Test for multiple definition
-    const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
+    const auto binding = context.scopes.get_variable(variable->get_name());
     if (binding.has_value())
     {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
@@ -73,7 +73,7 @@ pddl::Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) con
         throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
     }
     // Add binding to scope
-    context.scopes.insert<pddl::VariableImpl>(variable->get_name(), variable, node);
+    context.scopes.insert_variable(variable->get_name(), variable, node);
     // Construct Term and return it
     const auto term = context.factories.terms.get_or_create<pddl::TermVariableImpl>(variable);
     // Add position of PDDL object
@@ -87,7 +87,7 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::Name& node) const
 {
     const auto object_name = parse(node);
     // Test for undefined constant.
-    const auto binding = context.scopes.get<pddl::ObjectImpl>(object_name);
+    const auto binding = context.scopes.get_object(object_name);
     if (!binding.has_value())
     {
         throw UndefinedConstantError(object_name, context.scopes.get_error_handler()(node, ""));
@@ -105,7 +105,7 @@ pddl::Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const
 {
     const auto variable = parse(node, context);
     // Test for undefined variable
-    const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
+    const auto binding = context.scopes.get_variable(variable->get_name());
     if (!binding.has_value())
     {
         throw UndefinedVariableError(variable->get_name(), context.scopes.get_error_handler()(node, ""));

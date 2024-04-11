@@ -21,7 +21,6 @@
 #include "loki/ast/ast.hpp"
 #include "loki/pddl/action.hpp"
 #include "loki/pddl/declarations.hpp"
-#include "loki/pddl/derived_predicate.hpp"
 #include "loki/pddl/parser.hpp"
 
 namespace loki
@@ -31,23 +30,23 @@ extern std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> p
 
 extern pddl::Action parse(const ast::Action& node, Context& context);
 
-extern pddl::DerivedPredicate parse(const ast::DerivedPredicate& node, Context& context);
+extern pddl::Axiom parse(const ast::Axiom& node, Context& context);
 
-struct StructureVisitor : boost::static_visitor<boost::variant<pddl::DerivedPredicate, pddl::Action>>
+struct StructureVisitor : boost::static_visitor<boost::variant<pddl::Axiom, pddl::Action>>
 {
     Context& context;
 
     StructureVisitor(Context& context_);
 
     template<typename Node>
-    boost::variant<pddl::DerivedPredicate, pddl::Action> operator()(const Node& node) const
+    boost::variant<pddl::Axiom, pddl::Action> operator()(const Node& node) const
     {
         return parse(node, context);
     }
 };
 
 // TODO return durative action in the future as well.
-extern boost::variant<pddl::DerivedPredicate, pddl::Action> parse(const ast::Structure& node, Context& context);
+extern boost::variant<pddl::Axiom, pddl::Action> parse(const ast::Structure& node, Context& context);
 
 }
 

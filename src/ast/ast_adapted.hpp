@@ -99,16 +99,17 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::ActionSymbol, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::ActionBody, precondition_goal_descriptor, effect)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Action, action_symbol, typed_list_of_variables, action_body)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::DerivedPredicate, typed_list_of_variables, goal_descriptor, literal)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::Axiom, goal_descriptor, literal)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::DomainName, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Requirements, requirements)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Types, typed_list_of_names)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Constants, typed_list_of_names)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Predicates, atomic_formula_skeletons)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::DerivedPredicates, atomic_formula_skeletons)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Functions, function_types_list_of_atomic_function_skeletons)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Constraints, constraint_goal_descriptor)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::Domain, domain_name, requirements, types, constants, predicates, functions, constraints, structures)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::Domain, domain_name, requirements, types, constants, predicates, derived_predicates, functions, constraints, structures)
 
 /**
  * Problem

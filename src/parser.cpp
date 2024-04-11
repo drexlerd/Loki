@@ -63,8 +63,8 @@ DomainParser::DomainParser(const fs::path& file_path) :
     // Create base types.
     const auto base_type_object = context.factories.types.get_or_create<pddl::TypeImpl>("object", pddl::TypeList());
     const auto base_type_number = context.factories.types.get_or_create<pddl::TypeImpl>("number", pddl::TypeList());
-    context.scopes.insert("object", base_type_object, {});
-    context.scopes.insert("number", base_type_number, {});
+    context.scopes.insert_type("object", base_type_object, {});
+    context.scopes.insert_type("number", base_type_number, {});
 
     // Create equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
     const auto binary_parameterlist = pddl::ParameterList {
@@ -75,7 +75,7 @@ DomainParser::DomainParser(const fs::path& file_path) :
 
     };
     const auto equal_predicate = context.factories.predicates.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist);
-    context.scopes.insert<pddl::PredicateImpl>("=", equal_predicate, {});
+    context.scopes.insert_predicate("=", equal_predicate, {});
 
     m_domain = parse(node, context);
 

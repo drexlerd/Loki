@@ -42,9 +42,10 @@ private:
     TypeList m_types;
     ObjectList m_constants;
     PredicateList m_predicates;
+    PredicateList m_derived_predicates;
     FunctionSkeletonList m_functions;
     ActionList m_actions;
-    DerivedPredicateList m_derived_predicates;
+    AxiomList m_axioms;
 
     DomainImpl(int identifier,
                std::string name,
@@ -52,9 +53,10 @@ private:
                TypeList types,
                ObjectList constants,
                PredicateList predicates,
+               PredicateList derived_predicates,
                FunctionSkeletonList functions,
                ActionList actions,
-               DerivedPredicateList derived_predicates);
+               AxiomList axioms);
 
     // Give access to the constructor.
     friend class loki::PDDLFactory<DomainImpl, loki::Hash<DomainImpl*>, loki::EqualTo<DomainImpl*>>;
@@ -73,9 +75,10 @@ public:
     const TypeList& get_types() const;
     const ObjectList& get_constants() const;
     const PredicateList& get_predicates() const;
+    const PredicateList& get_derived_predicates() const;
     const FunctionSkeletonList& get_functions() const;
     const ActionList& get_actions() const;
-    const DerivedPredicateList& get_derived_predicates() const;
+    const AxiomList& get_axioms() const;
 };
 
 }

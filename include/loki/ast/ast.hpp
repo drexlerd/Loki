@@ -160,7 +160,7 @@ struct ActionSymbol;
 struct ActionBody;
 
 struct Action;
-struct DerivedPredicate;  // :derived-predicates
+struct Axiom;  // :derived-predicates
 
 struct DomainName;
 struct Requirements;
@@ -889,9 +889,8 @@ struct Action : x3::position_tagged
 };
 
 /* <derived-def> */
-struct DerivedPredicate : x3::position_tagged
+struct Axiom : x3::position_tagged
 {
-    TypedListOfVariables typed_list_of_variables;
     GoalDescriptor goal_descriptor;
     Literal literal;
 };
@@ -914,6 +913,11 @@ struct Predicates : x3::position_tagged
     std::vector<AtomicFormulaSkeleton> atomic_formula_skeletons;
 };
 
+struct DerivedPredicates : x3::position_tagged
+{
+    std::vector<AtomicFormulaSkeleton> atomic_formula_skeletons;
+};
+
 /* <functions-def> */
 struct Functions : x3::position_tagged
 {
@@ -927,7 +931,7 @@ struct Constraints : x3::position_tagged
 };
 
 /* <structure-def> */
-struct Structure : x3::position_tagged, x3::variant<Action, DerivedPredicate>
+struct Structure : x3::position_tagged, x3::variant<Action, Axiom>
 {
     using base_type::base_type;
     using base_type::operator=;
@@ -946,6 +950,7 @@ struct Domain : x3::position_tagged
     boost::optional<Types> types;
     boost::optional<Constants> constants;
     boost::optional<Predicates> predicates;
+    boost::optional<Predicates> derived_predicates;
     boost::optional<Functions> functions;
     boost::optional<Constraints> constraints;
     std::vector<Structure> structures;

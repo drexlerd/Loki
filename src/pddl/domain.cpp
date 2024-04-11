@@ -18,7 +18,7 @@
 #include "loki/pddl/domain.hpp"
 
 #include "loki/pddl/action.hpp"
-#include "loki/pddl/derived_predicate.hpp"
+#include "loki/pddl/axiom.hpp"
 #include "loki/pddl/function_skeleton.hpp"
 #include "loki/pddl/object.hpp"
 #include "loki/pddl/predicate.hpp"
@@ -38,18 +38,20 @@ DomainImpl::DomainImpl(int identifier,
                        TypeList types,
                        ObjectList constants,
                        PredicateList predicates,
+                       PredicateList derived_predicates,
                        FunctionSkeletonList functions,
                        ActionList actions,
-                       DerivedPredicateList derived_predicates) :
+                       AxiomList axioms) :
     Base(identifier),
     m_name(std::move(name)),
     m_requirements(std::move(requirements)),
     m_types(std::move(types)),
     m_constants(std::move(constants)),
     m_predicates(std::move(predicates)),
+    m_derived_predicates(std::move(derived_predicates)),
     m_functions(std::move(functions)),
     m_actions(std::move(actions)),
-    m_derived_predicates(std::move(derived_predicates))
+    m_axioms(std::move(axioms))
 {
 }
 
@@ -58,8 +60,9 @@ bool DomainImpl::is_structurally_equivalent_to_impl(const DomainImpl& other) con
     return (m_name == other.m_name) && (m_requirements == other.m_requirements) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types))
            && (get_sorted_vector(m_constants) == get_sorted_vector(other.m_constants))
            && (get_sorted_vector(m_predicates) == get_sorted_vector(other.m_predicates))
+           && (get_sorted_vector(m_derived_predicates) == get_sorted_vector(other.m_derived_predicates))
            && (get_sorted_vector(m_functions) == get_sorted_vector(other.m_functions)) && (get_sorted_vector(m_actions) == get_sorted_vector(other.m_actions))
-           && (get_sorted_vector(m_derived_predicates) == get_sorted_vector(other.m_derived_predicates));
+           && (get_sorted_vector(m_axioms) == get_sorted_vector(other.m_axioms));
 }
 
 size_t DomainImpl::hash_impl() const
@@ -69,9 +72,10 @@ size_t DomainImpl::hash_impl() const
                         hash_container(get_sorted_vector(m_types)),
                         hash_container(get_sorted_vector(m_constants)),
                         hash_container(get_sorted_vector(m_predicates)),
+                        hash_container(get_sorted_vector(m_derived_predicates)),
                         hash_container(get_sorted_vector(m_functions)),
                         hash_container(get_sorted_vector(m_actions)),
-                        hash_container(get_sorted_vector(m_derived_predicates)));
+                        hash_container(get_sorted_vector(m_axioms)));
 }
 
 void DomainImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
@@ -169,6 +173,17 @@ void DomainImpl::str_impl(std::ostream& out, const FormattingOptions& options) c
         }
         out << ")\n";
     }
+    if (!m_derived_predicates.empty())
+    {
+        out << string(nested_options.indent, ' ') << "(:derived-predicates ";
+        for (size_t i = 0; i < m_derived_predicates.size(); ++i)
+        {
+            if (i != 0)
+                out << " ";
+            m_derived_predicates[i]->str(out, nested_options);
+        }
+        out << ")\n";
+    }
     if (!m_functions.empty())
     {
         out << string(nested_options.indent, ' ') << "(:functions ";
@@ -180,23 +195,14 @@ void DomainImpl::str_impl(std::ostream& out, const FormattingOptions& options) c
         }
     }
 
-    /*
-    if (node.constraints.has_value()) {
-        ss << string(nested_options.indent, ' ') << parse_text(node.constraints.value(), nested_options) << "\n";
-    }
-    for (size_t i = 0; i < node.structures.size(); ++i) {
-        ss << string(nested_options.indent, ' ') << parse_text(node.structures[i], nested_options) << "\n";
-    }
-    */
-
     for (const auto& action : m_actions)
     {
         action->str(out, nested_options);
     }
 
-    for (const auto& derived_predicate : m_derived_predicates)
+    for (const auto& axiom : m_axioms)
     {
-        derived_predicate->str(out, nested_options);
+        axiom->str(out, nested_options);
     }
 
     out << std::string(options.indent, ' ') << ")";
@@ -216,12 +222,14 @@ const TypeList& DomainImpl::get_types() const { return m_types; }
 
 const ObjectList& DomainImpl::get_constants() const { return m_constants; }
 
-const FunctionSkeletonList& DomainImpl::get_functions() const { return m_functions; }
-
 const PredicateList& DomainImpl::get_predicates() const { return m_predicates; }
+
+const PredicateList& DomainImpl::get_derived_predicates() const { return m_derived_predicates; }
+
+const FunctionSkeletonList& DomainImpl::get_functions() const { return m_functions; }
 
 const ActionList& DomainImpl::get_actions() const { return m_actions; }
 
-const DerivedPredicateList& DomainImpl::get_derived_predicates() const { return m_derived_predicates; }
+const AxiomList& DomainImpl::get_axioms() const { return m_axioms; }
 
 }

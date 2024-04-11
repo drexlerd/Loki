@@ -175,13 +175,14 @@ struct ActionSymbolClass;
 struct ActionBodyClass;
 struct ActionClass;
 struct DurativeActionClass;  // TODO
-struct DerivedPredicateClass;
+struct AxiomClass;
 
 struct DomainNameClass;
 struct RequirementsClass;
 struct TypesClass;
 struct ConstantsClass;
 struct PredicatesClass;
+struct DerivedPredicatesClass;
 struct FunctionsClass;
 struct ConstraintsClass;
 struct StructureClass;
@@ -371,13 +372,14 @@ typedef x3::rule<ActionSymbolClass, ast::ActionSymbol> action_symbol_type;
 typedef x3::rule<ActionBodyClass, ast::ActionBody> action_body_type;
 typedef x3::rule<ActionClass, ast::Action> action_type;
 
-typedef x3::rule<DerivedPredicateClass, ast::DerivedPredicate> derived_predicate_type;
+typedef x3::rule<AxiomClass, ast::Axiom> axiom_type;
 
 typedef x3::rule<DomainNameClass, ast::DomainName> domain_name_type;
 typedef x3::rule<RequirementsClass, ast::Requirements> requirements_type;
 typedef x3::rule<TypesClass, ast::Types> types_type;
 typedef x3::rule<ConstantsClass, ast::Constants> constants_type;
 typedef x3::rule<PredicatesClass, ast::Predicates> predicates_type;
+typedef x3::rule<DerivedPredicatesClass, ast::DerivedPredicates> derived_predicates_type;
 typedef x3::rule<FunctionsClass, ast::Functions> functions_type;
 typedef x3::rule<ConstraintsClass, ast::Constraints> constraints_type;
 typedef x3::rule<StructureClass, ast::Structure> structure_type;
@@ -559,9 +561,17 @@ BOOST_SPIRIT_DECLARE(effect_type,
                      action_symbol_type,
                      action_body_type,
                      action_type,
-                     derived_predicate_type)
+                     axiom_type)
 
-BOOST_SPIRIT_DECLARE(domain_name_type, requirements_type, types_type, constants_type, predicates_type, functions_type, constraints_type, structure_type)
+BOOST_SPIRIT_DECLARE(domain_name_type,
+                     requirements_type,
+                     types_type,
+                     constants_type,
+                     predicates_type,
+                     derived_predicates_type,
+                     functions_type,
+                     constraints_type,
+                     structure_type)
 
 BOOST_SPIRIT_DECLARE(basic_function_term_type)
 
@@ -750,13 +760,14 @@ parser::effect_conditional_type const& effect_conditional();
 parser::action_symbol_type const& action_symbol();
 parser::action_body_type const& action_body();
 parser::action_type const& action();
-parser::derived_predicate_type const& derived_predicate();
+parser::axiom_type const& axiom();
 
 parser::domain_name_type const& domain_name();
 parser::requirements_type const& requirements();
 parser::types_type const& types();
 parser::constants_type const& constants();
 parser::predicates_type const& predicates();
+parser::derived_predicates_type const& derived_predicates();
 parser::functions_type const& functions();
 parser::constraints_type const& constraints();
 parser::structure_type const& structure();

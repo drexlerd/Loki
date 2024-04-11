@@ -31,7 +31,7 @@ ObjectListVisitor::ObjectListVisitor(Context& context_) : context(context_) {}
 pddl::Object parse_object_reference(const ast::Name& name_node, Context& context)
 {
     const auto name = parse(name_node);
-    const auto binding = context.scopes.get<pddl::ObjectImpl>(name);
+    const auto binding = context.scopes.get_object(name);
     if (!binding.has_value())
     {
         throw UndefinedObjectError(name, context.scopes.get_error_handler()(name_node, ""));
@@ -44,7 +44,7 @@ pddl::Object parse_object_reference(const ast::Name& name_node, Context& context
 
 static void test_multiple_definition_object(const std::string& object_name, const ast::Name& name_node, const Context& context)
 {
-    const auto binding = context.scopes.get<pddl::ObjectImpl>(object_name);
+    const auto binding = context.scopes.get_object(object_name);
     if (binding.has_value())
     {
         const auto message_1 = context.scopes.get_error_handler()(name_node, "Defined here:");
@@ -64,7 +64,7 @@ static pddl::Object parse_object_definition(const ast::Name& name_node, const pd
     test_multiple_definition_object(name, name_node, context);
     const auto object = context.factories.objects.get_or_create<pddl::ObjectImpl>(name, type_list);
     context.positions.push_back(object, name_node);
-    context.scopes.insert<pddl::ObjectImpl>(name, object, name_node);
+    context.scopes.insert_object(name, object, name_node);
     return object;
 }
 
@@ -81,8 +81,8 @@ static pddl::ObjectList parse_object_definitions(const std::vector<ast::Name>& n
 pddl::ObjectList ObjectListVisitor::operator()(const std::vector<ast::Name>& name_nodes)
 {
     // std::vector<ast::Name> has single base type "object"
-    assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
-    const auto [type, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
+    assert(context.scopes.get_type("object").has_value());
+    const auto [type, _position, _error_handler] = context.scopes.get_type("object").value();
     auto object_list = parse_object_definitions(name_nodes, pddl::TypeList { type }, context);
     return object_list;
 }

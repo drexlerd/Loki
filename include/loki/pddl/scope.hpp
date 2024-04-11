@@ -43,28 +43,11 @@ namespace loki
 ///        The position points to the matched location
 ///        in the input stream and is used for error reporting.
 template<typename T>
-using BindingValueType = std::tuple<PDDLElement<T>, std::optional<Position>>;
+using BindingValueType = std::tuple<T, std::optional<Position>>;
 
 /// @brief Datastructure to store bindings of a type T.
 template<typename T>
-using BindingMapType = std::unordered_map<std::string, BindingValueType<T>>;
-
-/// @brief Encapsulates bindings for different types.
-template<typename... Ts>
-class Bindings
-{
-private:
-    std::tuple<BindingMapType<Ts>...> bindings;
-
-public:
-    /// @brief Returns a binding if it exists.
-    template<typename T>
-    std::optional<BindingValueType<T>> get(const std::string& key) const;
-
-    /// @brief Inserts a binding of type T
-    template<typename T>
-    void insert(const std::string& key, const PDDLElement<T>& binding, const std::optional<Position>& position);
-};
+using Bindings = std::unordered_map<std::string, BindingValueType<T>>;
 
 /// @brief Wraps bindings in a scope with reference to a parent scope.
 class Scope
@@ -72,7 +55,12 @@ class Scope
 private:
     const Scope* m_parent_scope;
 
-    Bindings<pddl::TypeImpl, pddl::ObjectImpl, pddl::PredicateImpl, pddl::FunctionSkeletonImpl, pddl::VariableImpl> bindings;
+    Bindings<pddl::Type> m_types;
+    Bindings<pddl::Object> m_objects;
+    Bindings<pddl::FunctionSkeleton> m_function_skeletons;
+    Bindings<pddl::Variable> m_variables;
+    Bindings<pddl::Predicate> m_predicates;
+    Bindings<pddl::Predicate> m_derived_predicates;
 
 public:
     explicit Scope(const Scope* parent_scope = nullptr);
@@ -83,18 +71,26 @@ public:
     Scope(Scope&& other) = delete;
     Scope& operator=(Scope&& other) = delete;
 
-    /// @brief Returns a binding if it exists.
-    template<typename T>
-    std::optional<BindingValueType<T>> get(const std::string& name) const;
+    /// @brief Return a binding if it exists.
+    std::optional<BindingValueType<pddl::Type>> get_type(const std::string& name) const;
+    std::optional<BindingValueType<pddl::Object>> get_object(const std::string& name) const;
+    std::optional<BindingValueType<pddl::FunctionSkeleton>> get_function_skeleton(const std::string& name) const;
+    std::optional<BindingValueType<pddl::Variable>> get_variable(const std::string& name) const;
+    std::optional<BindingValueType<pddl::Predicate>> get_predicate(const std::string& name) const;
+    std::optional<BindingValueType<pddl::Predicate>> get_derived_predicate(const std::string& name) const;
 
-    /// @brief Insert a binding of type T.
-    template<typename T>
-    void insert(const std::string& name, const PDDLElement<T>& element, const std::optional<Position>& position);
+    /// @brief Insert a binding.
+    void insert_type(const std::string& name, const pddl::Type& type, const std::optional<Position>& position);
+    void insert_object(const std::string& name, const pddl::Object& object, const std::optional<Position>& position);
+    void insert_function_skeleton(const std::string& name, const pddl::FunctionSkeleton& function_skeleton, const std::optional<Position>& position);
+    void insert_variable(const std::string& name, const pddl::Variable& variable, const std::optional<Position>& position);
+    void insert_predicate(const std::string& name, const pddl::Predicate& predicate, const std::optional<Position>& position);
+    void insert_derived_predicate(const std::string& name, const pddl::Predicate& derived_predicate, const std::optional<Position>& position);
 };
 
 /// @brief Encapsulates the result of search for a binding with the corresponding ErrorHandler.
 template<typename T>
-using ScopeStackSearchResult = std::tuple<const PDDLElement<T>, const std::optional<Position>, const PDDLErrorHandler&>;
+using ScopeStackSearchResult = std::tuple<T, const std::optional<Position>, const PDDLErrorHandler&>;
 
 /// @brief Implements a scoping mechanism to store bindings which are mappings from name to a pointer to a PDDL object
 ///        type and a position in the input stream that can be used to construct error messages with the given ErrorHandler.
@@ -134,13 +130,21 @@ public:
     /// @brief Deletes the topmost scope from the stack.
     void close_scope();
 
-    /// @brief Returns a binding if it exists.
-    template<typename T>
-    std::optional<ScopeStackSearchResult<T>> get(const std::string& name) const;
+    /// @brief Return a binding if it exists.
+    std::optional<ScopeStackSearchResult<pddl::Type>> get_type(const std::string& name) const;
+    std::optional<ScopeStackSearchResult<pddl::Object>> get_object(const std::string& name) const;
+    std::optional<ScopeStackSearchResult<pddl::FunctionSkeleton>> get_function_skeleton(const std::string& name) const;
+    std::optional<ScopeStackSearchResult<pddl::Variable>> get_variable(const std::string& name) const;
+    std::optional<ScopeStackSearchResult<pddl::Predicate>> get_predicate(const std::string& name) const;
+    std::optional<ScopeStackSearchResult<pddl::Predicate>> get_derived_predicate(const std::string& name) const;
 
-    /// @brief Insert a binding of type T.
-    template<typename T>
-    void insert(const std::string& name, const PDDLElement<T>& element, const std::optional<Position>& position);
+    /// @brief Insert a binding.
+    void insert_type(const std::string& name, const pddl::Type& type, const std::optional<Position>& position);
+    void insert_object(const std::string& name, const pddl::Object& object, const std::optional<Position>& position);
+    void insert_function_skeleton(const std::string& name, const pddl::FunctionSkeleton& function_skeleton, const std::optional<Position>& position);
+    void insert_variable(const std::string& name, const pddl::Variable& variable, const std::optional<Position>& position);
+    void insert_predicate(const std::string& name, const pddl::Predicate& predicate, const std::optional<Position>& position);
+    void insert_derived_predicate(const std::string& name, const pddl::Predicate& derived_predicate, const std::optional<Position>& position);
 
     /// @brief Get the error handler to print an error message.
     const PDDLErrorHandler& get_error_handler() const;
@@ -150,7 +154,5 @@ public:
 };
 
 }
-
-#include "scope.tpp"
 
 #endif

@@ -22,7 +22,7 @@
 #include "effects.hpp"
 #include "literal.hpp"
 #include "loki/pddl/action.hpp"
-#include "loki/pddl/derived_predicate.hpp"
+#include "loki/pddl/axiom.hpp"
 #include "loki/pddl/exceptions.hpp"
 #include "parameters.hpp"
 #include "predicates.hpp"
@@ -60,32 +60,26 @@ pddl::Action parse(const ast::Action& node, Context& context)
     return action;
 }
 
-pddl::DerivedPredicate parse(const ast::DerivedPredicate& node, Context& context)
+pddl::Axiom parse(const ast::Axiom& node, Context& context)
 {
     if (!context.requirements->test(pddl::RequirementEnum::DERIVED_PREDICATES))
     {
         throw UndefinedRequirementError(pddl::RequirementEnum::DERIVED_PREDICATES, context.scopes.get_error_handler()(node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::DERIVED_PREDICATES);
-    context.scopes.open_scope();
-    // :vars
-    const auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
+
     // :context
     const auto condition = parse(node.goal_descriptor, context);
     // :implies
     const auto literal = parse(node.literal, context);
-    test_variable_references(parameter_list, context);
-    context.scopes.close_scope();
-    const auto derived_predicate = context.factories.derived_predicates.get_or_create<pddl::DerivedPredicateImpl>(parameter_list, condition, literal);
+
+    const auto derived_predicate = context.factories.derived_predicates.get_or_create<pddl::AxiomImpl>(condition, literal);
     context.positions.push_back(derived_predicate, node);
     return derived_predicate;
 }
 
 StructureVisitor::StructureVisitor(Context& context_) : context(context_) {}
 
-boost::variant<pddl::DerivedPredicate, pddl::Action> parse(const ast::Structure& node, Context& context)
-{
-    return boost::apply_visitor(StructureVisitor(context), node);
-}
+boost::variant<pddl::Axiom, pddl::Action> parse(const ast::Structure& node, Context& context) { return boost::apply_visitor(StructureVisitor(context), node); }
 
 }

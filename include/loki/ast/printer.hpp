@@ -153,7 +153,7 @@ extern std::string parse_text(const ast::ActionSymbol& node, const FormattingOpt
 extern std::string parse_text(const ast::ActionBody& node, const FormattingOptions& options = {});
 
 extern std::string parse_text(const ast::Action& node, const FormattingOptions& options = {});
-extern std::string parse_text(const ast::DerivedPredicate& node, const FormattingOptions& options = {});
+extern std::string parse_text(const ast::Axiom& node, const FormattingOptions& options = {});
 
 extern std::string parse_text(const ast::DomainName& node, const FormattingOptions& options = {});
 extern std::string parse_text(const ast::Requirements& node, const FormattingOptions& options = {});

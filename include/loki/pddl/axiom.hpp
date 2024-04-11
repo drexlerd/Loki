@@ -32,28 +32,26 @@ class PDDLFactory;
 
 namespace loki::pddl
 {
-class DerivedPredicateImpl : public Base<DerivedPredicateImpl>
+class AxiomImpl : public Base<AxiomImpl>
 {
 private:
-    ParameterList m_parameters;
     Condition m_condition;
     Literal m_literal;
 
-    DerivedPredicateImpl(int identifier, ParameterList parameters, Condition condition, Literal literal);
+    AxiomImpl(int identifier, Condition condition, Literal literal);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<DerivedPredicateImpl, loki::Hash<DerivedPredicateImpl*>, loki::EqualTo<DerivedPredicateImpl*>>;
+    friend class loki::PDDLFactory<AxiomImpl, loki::Hash<AxiomImpl*>, loki::EqualTo<AxiomImpl*>>;
 
     /// @brief Test for structural equivalence
-    bool is_structurally_equivalent_to_impl(const DerivedPredicateImpl& other) const;
+    bool is_structurally_equivalent_to_impl(const AxiomImpl& other) const;
     size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
-    friend class Base<DerivedPredicateImpl>;
+    friend class Base<AxiomImpl>;
 
 public:
-    const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
     const Literal& get_literal() const;
 };

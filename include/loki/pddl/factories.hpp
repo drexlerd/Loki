@@ -20,8 +20,8 @@
 
 #include "loki/pddl/action.hpp"
 #include "loki/pddl/atom.hpp"
+#include "loki/pddl/axiom.hpp"
 #include "loki/pddl/conditions.hpp"
-#include "loki/pddl/derived_predicate.hpp"
 #include "loki/pddl/domain.hpp"
 #include "loki/pddl/effects.hpp"
 #include "loki/pddl/factory.hpp"
@@ -66,7 +66,7 @@ using FunctionSkeletonFactory = PDDLFactory<pddl::FunctionSkeletonImpl>;
 using ConditionFactory = PDDLFactory<pddl::ConditionImpl>;
 using EffectFactory = PDDLFactory<pddl::EffectImpl>;
 using ActionFactory = PDDLFactory<pddl::ActionImpl>;
-using DerivedPredicateFactory = PDDLFactory<pddl::DerivedPredicateImpl>;
+using DerivedPredicateFactory = PDDLFactory<pddl::AxiomImpl>;
 using OptimizationMetricFactory = PDDLFactory<pddl::OptimizationMetricImpl>;
 using NumericFluentFactory = PDDLFactory<pddl::NumericFluentImpl>;
 using DomainFactory = PDDLFactory<pddl::DomainImpl>;
@@ -89,7 +89,7 @@ using PDDLPositionCache = PositionCache<pddl::RequirementsImpl,
                                         pddl::ConditionImpl,
                                         pddl::EffectImpl,
                                         pddl::ActionImpl,
-                                        pddl::DerivedPredicateImpl,
+                                        pddl::AxiomImpl,
                                         pddl::OptimizationMetricImpl,
                                         pddl::NumericFluentImpl,
                                         pddl::DomainImpl,
