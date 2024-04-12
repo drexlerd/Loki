@@ -18,7 +18,7 @@ Loki is a C++17 library for efficient syntactic and semantic parsing of PDDL fil
 - [ ] :object-fluents
 - [x] :adl
 - [ ] :durative-actions
-- [ ] :derived-predicates
+- [x] :derived-predicates
 - [ ] :timed-initial-literals
 - [ ] :preferences
 - [ ] :constraints
