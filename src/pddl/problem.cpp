@@ -42,22 +42,22 @@ ProblemImpl::ProblemImpl(int identifier,
                          std::string name,
                          Requirements requirements,
                          ObjectList objects,
+                         PredicateList derived_predicates,
                          GroundLiteralList initial_literals,
                          NumericFluentList numeric_fluents,
-                         Condition goal_condition,
+                         std::optional<Condition> goal_condition,
                          std::optional<OptimizationMetric> optimization_metric,
-                         PredicateList derived_predicates,
                          AxiomList axioms) :
     Base(identifier),
     m_domain(std::move(domain)),
     m_name(std::move(name)),
     m_requirements(std::move(requirements)),
     m_objects(std::move(objects)),
+    m_derived_predicates(std::move(derived_predicates)),
     m_initial_literals(std::move(initial_literals)),
     m_numeric_fluents(std::move(numeric_fluents)),
     m_goal_condition(std::move(goal_condition)),
     m_optimization_metric(std::move(optimization_metric)),
-    m_derived_predicates(std::move(derived_predicates)),
     m_axioms(std::move(axioms))
 {
 }
@@ -74,13 +74,14 @@ bool ProblemImpl::is_structurally_equivalent_to_impl(const ProblemImpl& other) c
 
 size_t ProblemImpl::hash_impl() const
 {
-    size_t optimization_hash = (m_optimization_metric.has_value()) ? hash_combine(m_optimization_metric) : 0;
+    size_t goal_hash = (m_goal_condition.has_value()) ? hash_combine(m_goal_condition.value()) : 0;
+    size_t optimization_hash = (m_optimization_metric.has_value()) ? hash_combine(m_optimization_metric.value()) : 0;
     return hash_combine(m_domain,
                         m_name,
                         m_requirements,
                         hash_container(get_sorted_vector(m_objects)),
                         hash_container(get_sorted_vector(m_initial_literals)),
-                        m_goal_condition,
+                        goal_hash,
                         optimization_hash,
                         hash_container(get_sorted_vector(m_derived_predicates)),
                         hash_container(get_sorted_vector(m_axioms)));
@@ -142,7 +143,7 @@ void ProblemImpl::str_impl(std::ostream& out, const FormattingOptions& options) 
 
     if (!m_derived_predicates.empty())
     {
-        out << string(nested_options.indent, ' ') << "(:predicates ";
+        out << string(nested_options.indent, ' ') << "(:derived-predicates ";
         for (size_t i = 0; i < m_derived_predicates.size(); ++i)
         {
             if (i != 0)
@@ -152,24 +153,30 @@ void ProblemImpl::str_impl(std::ostream& out, const FormattingOptions& options) 
         out << ")\n";
     }
 
-    out << string(nested_options.indent, ' ') << "(:init ";
-    for (size_t i = 0; i < m_initial_literals.size(); ++i)
+    if (!(m_initial_literals.empty() && m_numeric_fluents.empty()))
     {
-        if (i != 0)
+        out << string(nested_options.indent, ' ') << "(:init ";
+        for (size_t i = 0; i < m_initial_literals.size(); ++i)
+        {
+            if (i != 0)
+                out << " ";
+            m_initial_literals[i]->str(out, nested_options);
+        }
+        for (size_t i = 0; i < m_numeric_fluents.size(); ++i)
+        {
             out << " ";
-        m_initial_literals[i]->str(out, nested_options);
+            m_numeric_fluents[i]->str(out, nested_options);
+        }
     }
-    for (size_t i = 0; i < m_numeric_fluents.size(); ++i)
+    out << ")\n";
+
+    if (m_goal_condition.has_value())
     {
-        out << " ";
-        m_numeric_fluents[i]->str(out, nested_options);
+        out << string(nested_options.indent, ' ') << "(:goal ";
+        std::visit(StringifyVisitor(out, options), *m_goal_condition.value());
+        out << ")\n";
     }
 
-    out << ")\n";
-    out << string(nested_options.indent, ' ') << "(:goal ";
-    std::visit(StringifyVisitor(out, options), *m_goal_condition);
-
-    out << ")\n";
     if (m_optimization_metric.has_value())
     {
         out << string(nested_options.indent, ' ') << "(:metric ";
@@ -199,15 +206,15 @@ const Requirements& ProblemImpl::get_requirements() const { return m_requirement
 
 const ObjectList& ProblemImpl::get_objects() const { return m_objects; }
 
+const PredicateList& ProblemImpl::get_derived_predicates() const { return m_derived_predicates; }
+
 const GroundLiteralList& ProblemImpl::get_initial_literals() const { return m_initial_literals; }
 
 const NumericFluentList& ProblemImpl::get_numeric_fluents() const { return m_numeric_fluents; }
 
-const Condition& ProblemImpl::get_goal_condition() const { return m_goal_condition; }
+const std::optional<Condition>& ProblemImpl::get_goal_condition() const { return m_goal_condition; }
 
 const std::optional<OptimizationMetric>& ProblemImpl::get_optimization_metric() const { return m_optimization_metric; }
-
-const PredicateList& ProblemImpl::get_derived_predicates() const { return m_derived_predicates; }
 
 const AxiomList& ProblemImpl::get_axioms() const { return m_axioms; }
 

@@ -903,8 +903,14 @@ string parse_text(const ast::Problem& node, const FormattingOptions& options)
     {
         ss << string(nested_options.indent, ' ') << parse_text(node.objects.value(), nested_options) << "\n";
     }
-    ss << string(nested_options.indent, ' ') << parse_text(node.initial, nested_options) << "\n";
-    ss << string(nested_options.indent, ' ') << parse_text(node.goal, nested_options) << "\n";
+    if (node.initial.has_value())
+    {
+        ss << string(nested_options.indent, ' ') << parse_text(node.initial.value(), nested_options) << "\n";
+    }
+    if (node.goal.has_value())
+    {
+        ss << string(nested_options.indent, ' ') << parse_text(node.goal.value(), nested_options) << "\n";
+    }
     if (node.constraints.has_value())
     {
         ss << string(nested_options.indent, ' ') << parse_text(node.constraints.value(), nested_options) << "\n";

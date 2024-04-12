@@ -21,6 +21,7 @@ project(integration_example VERSION "0.0.1" LANGUAGES C CXX)
 # CMake modules and macro files
 ##############################################################
 
+message("Prefix path: ${CMAKE_PREFIX_PATH}")
 find_package(loki COMPONENTS parsers REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 
 

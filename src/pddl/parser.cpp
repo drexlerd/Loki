@@ -159,13 +159,20 @@ pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pd
     /* Initial section */
     auto initial_literals = pddl::GroundLiteralList();
     auto numeric_fluents = pddl::NumericFluentList();
-    const auto initial_elements = parse(problem_node.initial, context);
-    for (const auto& initial_element : initial_elements)
+    if (problem_node.initial.has_value())
     {
-        std::visit(UnpackingVisitor(initial_literals, numeric_fluents), initial_element);
+        const auto initial_elements = parse(problem_node.initial.value(), context);
+        for (const auto& initial_element : initial_elements)
+        {
+            std::visit(UnpackingVisitor(initial_literals, numeric_fluents), initial_element);
+        }
     }
     /* Goal section */
-    const auto goal_condition = parse(problem_node.goal, context);
+    auto goal_condition = std::optional<pddl::Condition>();
+    if (problem_node.goal.has_value())
+    {
+        goal_condition = parse(problem_node.goal.value(), context);
+    }
     /* Metric section */
     auto optimization_metric = std::optional<pddl::OptimizationMetric>();
     if (problem_node.metric_specification.has_value())
@@ -191,11 +198,11 @@ pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pd
                                                                                      problem_name,
                                                                                      context.requirements,
                                                                                      objects,
+                                                                                     derived_predicates,
                                                                                      initial_literals,
                                                                                      numeric_fluents,
                                                                                      goal_condition,
                                                                                      optimization_metric,
-                                                                                     derived_predicates,
                                                                                      axioms);
     context.positions.push_back(problem, problem_node);
     return problem;

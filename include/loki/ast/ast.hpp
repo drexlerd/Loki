@@ -1238,8 +1238,8 @@ struct Problem : x3::position_tagged
     boost::optional<Requirements> requirements;
     boost::optional<Objects> objects;
     boost::optional<DerivedPredicates> derived_predicates;
-    Initial initial;
-    Goal goal;
+    boost::optional<Initial> initial;
+    boost::optional<Goal> goal;
     boost::optional<ProblemConstraints> constraints;
     boost::optional<MetricSpecification> metric_specification;
     boost::optional<std::vector<Axiom>> axioms;
