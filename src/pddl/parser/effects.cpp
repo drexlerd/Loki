@@ -59,7 +59,7 @@ pddl::Effect parse(const ast::EffectProductionLiteral& node, Context& context)
 
     if (context.derived_predicates.count(literal->get_atom()->get_predicate()))
     {
-        throw DerivedPredicateInEffectError(literal->get_atom()->get_predicate()->get_name(), context.scopes.get_error_handler()(node, ""));
+        throw UnexpectedDerivedPredicateInEffect(literal->get_atom()->get_predicate()->get_name(), context.scopes.get_error_handler()(node, ""));
     }
 
     context.positions.push_back(effect, node);

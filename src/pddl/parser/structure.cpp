@@ -69,6 +69,10 @@ pddl::Axiom parse(const ast::Axiom& node, Context& context)
     context.references.untrack(pddl::RequirementEnum::DERIVED_PREDICATES);
 
     const auto literal = parse(node.literal, context);
+    if (context.derived_predicates.count(literal->get_atom()->get_predicate()) == 0)
+    {
+        throw ExpectedDerivedPredicate(literal->get_atom()->get_predicate()->get_name(), context.scopes.get_error_handler()(node, ""));
+    }
     const auto condition = parse(node.goal_descriptor, context);
 
     const auto axiom = context.factories.axioms.get_or_create<pddl::AxiomImpl>(literal, condition);
