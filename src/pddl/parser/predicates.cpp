@@ -27,7 +27,7 @@ namespace loki
 static void test_multiple_definition(const pddl::Predicate& predicate, const ast::Predicate& node, const Context& context)
 {
     const auto predicate_name = predicate->get_name();
-    const auto binding = context.scopes.get_predicate(predicate_name);
+    const auto binding = context.scopes.get<pddl::PredicateImpl>(predicate_name);
     if (binding.has_value())
     {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
@@ -44,7 +44,7 @@ static void test_multiple_definition(const pddl::Predicate& predicate, const ast
 static void insert_context_information(const pddl::Predicate& predicate, const ast::Predicate& node, Context& context)
 {
     context.positions.push_back(predicate, node);
-    context.scopes.insert_predicate(predicate->get_name(), predicate, node);
+    context.scopes.insert(predicate->get_name(), predicate, node);
 }
 
 static pddl::Predicate parse_predicate_definition(const ast::AtomicFormulaSkeleton& node, Context& context)
@@ -78,7 +78,7 @@ pddl::PredicateList parse(const ast::Predicates& predicates_node, Context& conte
 static void test_multiple_definition(const pddl::Predicate& predicate, const ast::DerivedPredicate& node, const Context& context)
 {
     const auto predicate_name = predicate->get_name();
-    const auto binding = context.scopes.get_derived_predicate(predicate_name);
+    const auto binding = context.scopes.get<pddl::PredicateImpl>(predicate_name);
     if (binding.has_value())
     {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
@@ -95,7 +95,7 @@ static void test_multiple_definition(const pddl::Predicate& predicate, const ast
 static void insert_context_information(const pddl::Predicate& predicate, const ast::DerivedPredicate& node, Context& context)
 {
     context.positions.push_back(predicate, node);
-    context.scopes.insert_derived_predicate(predicate->get_name(), predicate, node);
+    context.scopes.insert(predicate->get_name(), predicate, node);
 }
 
 static pddl::Predicate parse_predicate_definition(const ast::DerivedAtomicFormulaSkeleton& node, Context& context)

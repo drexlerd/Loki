@@ -28,7 +28,7 @@ namespace loki
 
 static void test_multiple_definition(const pddl::Variable& variable, const ast::Variable& node, const Context& context)
 {
-    const auto binding = context.scopes.get_variable(variable->get_name());
+    const auto binding = context.scopes.get<pddl::VariableImpl>(variable->get_name());
     if (binding.has_value())
     {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
@@ -44,7 +44,7 @@ static void test_multiple_definition(const pddl::Variable& variable, const ast::
 
 static void insert_context_information(const pddl::Variable& variable, const ast::Variable& node, Context& context)
 {
-    context.scopes.insert_variable(variable->get_name(), variable, node);
+    context.scopes.insert(variable->get_name(), variable, node);
 }
 
 static pddl::Parameter parse_parameter_definition(const ast::Variable& variable_node, const pddl::TypeList& type_list, Context& context)

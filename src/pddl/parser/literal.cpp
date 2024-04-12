@@ -26,7 +26,7 @@ namespace loki
 pddl::Atom parse(const ast::AtomicFormulaOfTermsPredicate& node, Context& context)
 {
     auto predicate_name = parse(node.predicate.name);
-    auto binding = context.scopes.get_predicate(predicate_name);
+    auto binding = context.scopes.get<pddl::PredicateImpl>(predicate_name);
     if (!binding.has_value())
     {
         throw UndefinedPredicateError(predicate_name, context.scopes.get_error_handler()(node.predicate, ""));
@@ -55,8 +55,8 @@ pddl::Atom parse(const ast::AtomicFormulaOfTermsEquality& node, Context& context
         throw UndefinedRequirementError(pddl::RequirementEnum::EQUALITY, context.scopes.get_error_handler()(node, ""));
     }
     context.references.untrack(pddl::RequirementEnum::EQUALITY);
-    assert(context.scopes.get_predicate("=").has_value());
-    const auto [equal_predicate, _position, _error_handler] = context.scopes.get_predicate("=").value();
+    assert(context.scopes.get<pddl::PredicateImpl>("=").has_value());
+    const auto [equal_predicate, _position, _error_handler] = context.scopes.get<pddl::PredicateImpl>("=").value();
     auto left_term = boost::apply_visitor(TermReferenceTermVisitor(context), node.term_left);
     auto right_term = boost::apply_visitor(TermReferenceTermVisitor(context), node.term_right);
     const auto atom = context.factories.atoms.get_or_create<pddl::AtomImpl>(equal_predicate, pddl::TermList { left_term, right_term });
@@ -69,7 +69,7 @@ pddl::Atom parse(const ast::AtomicFormulaOfTerms& node, Context& context) { retu
 pddl::Atom parse(const ast::DerivedAtomicFormulaOfTerms& node, Context& context)
 {
     auto predicate_name = parse(node.derived_predicate.name);
-    auto binding = context.scopes.get_derived_predicate(predicate_name);
+    auto binding = context.scopes.get<pddl::PredicateImpl>(predicate_name);
     if (!binding.has_value())
     {
         throw UndefinedPredicateError(predicate_name, context.scopes.get_error_handler()(node.derived_predicate, ""));

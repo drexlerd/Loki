@@ -73,9 +73,9 @@ pddl::Axiom parse(const ast::Axiom& node, Context& context)
     // :implies
     const auto literal = parse(node.derived_literal, context);
 
-    const auto derived_predicate = context.factories.axioms.get_or_create<pddl::AxiomImpl>(condition, literal);
-    context.positions.push_back(derived_predicate, node);
-    return derived_predicate;
+    const auto axiom = context.factories.axioms.get_or_create<pddl::AxiomImpl>(condition, literal);
+    context.positions.push_back(axiom, node);
+    return axiom;
 }
 
 StructureVisitor::StructureVisitor(Context& context_) : context(context_) {}

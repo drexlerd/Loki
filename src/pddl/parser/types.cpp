@@ -69,7 +69,7 @@ TypeReferenceTypeVisitor::TypeReferenceTypeVisitor(const Context& context_) : co
 
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeObject&)
 {
-    const auto binding = context.scopes.get_type("object");
+    const auto binding = context.scopes.get<pddl::TypeImpl>("object");
     assert(binding.has_value());
     const auto [type, _position, _error_handler] = binding.value();
     return { type };
@@ -77,7 +77,7 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeObject&)
 
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeNumber&)
 {
-    const auto binding = context.scopes.get_type("number");
+    const auto binding = context.scopes.get<pddl::TypeImpl>("number");
     assert(binding.has_value());
     const auto [type, _position, _error_handler] = binding.value();
     return { type };
@@ -86,7 +86,7 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeNumber&)
 pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Name& node)
 {
     auto name = parse(node);
-    auto binding = context.scopes.get_type(name);
+    auto binding = context.scopes.get<pddl::TypeImpl>(name);
     if (!binding.has_value())
     {
         throw UndefinedTypeError(name, context.scopes.get_error_handler()(node, ""));
@@ -112,7 +112,7 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& node)
 static void test_multiple_definition(const pddl::Type& type, const ast::Name& node, const Context& context)
 {
     const auto type_name = type->get_name();
-    const auto binding = context.scopes.get_type(type_name);
+    const auto binding = context.scopes.get<pddl::TypeImpl>(type_name);
     if (binding.has_value())
     {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
@@ -143,7 +143,7 @@ static void test_reserved_type(const pddl::Type& type, const ast::Name& node, co
 static void insert_context_information(const pddl::Type& type, const ast::Name& node, Context& context)
 {
     context.positions.push_back(type, node);
-    context.scopes.insert_type(type->get_name(), type, node);
+    context.scopes.insert(type->get_name(), type, node);
 }
 
 static pddl::Type parse_type_definition(const ast::Name& node, const pddl::TypeList& type_list, Context& context)
@@ -171,8 +171,8 @@ TypeDeclarationTypedListOfNamesVisitor::TypeDeclarationTypedListOfNamesVisitor(C
 pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vector<ast::Name>& name_nodes)
 {
     // std::vector<ast::Name> has single base type "object"
-    assert(context.scopes.get_type("object").has_value());
-    const auto [type_object, _position, _error_handler] = context.scopes.get_type("object").value();
+    assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
+    const auto [type_object, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
     const auto type_list = parse_type_definitions(name_nodes, pddl::TypeList { type_object }, context);
     return type_list;
 }
