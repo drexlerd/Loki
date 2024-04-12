@@ -42,15 +42,9 @@ size_t AxiomImpl::hash_impl() const { return hash_combine(m_condition, m_literal
 void AxiomImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
     auto nested_options = FormattingOptions { options.indent + options.add_indent, options.add_indent };
-    out << std::string(options.indent, ' ') << "(:derived"
-        << "\n";
-
-    out << std::string(nested_options.indent, ' ') << ":context (";
+    out << std::string(options.indent, ' ') << "(:derived " << *m_literal << "\n";
+    out << std::string(nested_options.indent, ' ');
     std::visit(StringifyVisitor(out, nested_options), *m_condition);
-    out << ")\n";
-
-    out << std::string(nested_options.indent, ' ') << ":implies (" << *m_literal << ")\n";
-
     out << ")\n";
 }
 

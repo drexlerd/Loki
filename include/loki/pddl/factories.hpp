@@ -66,7 +66,7 @@ using FunctionSkeletonFactory = PDDLFactory<pddl::FunctionSkeletonImpl>;
 using ConditionFactory = PDDLFactory<pddl::ConditionImpl>;
 using EffectFactory = PDDLFactory<pddl::EffectImpl>;
 using ActionFactory = PDDLFactory<pddl::ActionImpl>;
-using DerivedPredicateFactory = PDDLFactory<pddl::AxiomImpl>;
+using AxiomFactory = PDDLFactory<pddl::AxiomImpl>;
 using OptimizationMetricFactory = PDDLFactory<pddl::OptimizationMetricImpl>;
 using NumericFluentFactory = PDDLFactory<pddl::NumericFluentImpl>;
 using DomainFactory = PDDLFactory<pddl::DomainImpl>;
@@ -104,18 +104,23 @@ struct PDDLFactories
     TermFactory terms;
     ObjectFactory objects;
     AtomFactory atoms;
+    AtomFactory derived_atoms;
     GroundAtomFactory ground_atoms;
+    GroundAtomFactory derived_ground_atoms;
     LiteralFactory literals;
+    LiteralFactory derived_literals;
     GroundLiteralFactory ground_literals;
+    GroundLiteralFactory derived_ground_literals;
     ParameterFactory parameters;
     PredicateFactory predicates;
+    PredicateFactory derived_predicates;
     FunctionExpressionFactory function_expressions;
     FunctionFactory functions;
     FunctionSkeletonFactory function_skeletons;
     ConditionFactory conditions;
     EffectFactory effects;
     ActionFactory actions;
-    DerivedPredicateFactory derived_predicates;
+    AxiomFactory axioms;
     OptimizationMetricFactory optimization_metrics;
     NumericFluentFactory numeric_fluents;
     DomainFactory domains;
@@ -128,18 +133,23 @@ struct PDDLFactories
         terms(TermFactory(1000)),
         objects(ObjectFactory(1000)),
         atoms(AtomFactory(1000)),
+        derived_atoms(AtomFactory(1000)),
         ground_atoms(GroundAtomFactory(1000)),
+        derived_ground_atoms(GroundAtomFactory(1000)),
         literals(LiteralFactory(1000)),
+        derived_literals(LiteralFactory(1000)),
         ground_literals(GroundLiteralFactory(1000)),
+        derived_ground_literals(GroundLiteralFactory(1000)),
         parameters(ParameterFactory(1000)),
         predicates(PredicateFactory(1000)),
+        derived_predicates(PredicateFactory(1000)),
         function_expressions(FunctionExpressionFactory(1000)),
         functions(FunctionFactory(1000)),
         function_skeletons(FunctionSkeletonFactory(1000)),
         conditions(ConditionFactory(1000)),
         effects(EffectFactory(1000)),
         actions(ActionFactory(100)),
-        derived_predicates(DerivedPredicateFactory(100)),
+        axioms(AxiomFactory(100)),
         optimization_metrics(OptimizationMetricFactory(10)),
         numeric_fluents(NumericFluentFactory(1000)),
         domains(DomainFactory(1)),

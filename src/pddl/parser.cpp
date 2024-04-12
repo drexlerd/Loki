@@ -81,6 +81,13 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context)
         predicates = parse(domain_node.predicates.value(), context);
     }
     track_predicate_references(predicates, context);
+    /* DerivedPredicates section */
+    auto derived_predicates = pddl::PredicateList();
+    if (domain_node.derived_predicates.has_value())
+    {
+        derived_predicates = parse(domain_node.derived_predicates.value(), context);
+    }
+    track_predicate_references(derived_predicates, context);
     /* Functions section */
     auto function_skeletons = pddl::FunctionSkeletonList();
     if (domain_node.functions.has_value())
@@ -88,7 +95,7 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context)
         function_skeletons = parse(domain_node.functions.value(), context);
     }
     track_function_skeleton_references(function_skeletons, context);
-    /* Action Schema section */
+    /* Structure section */
     auto axiom_list = pddl::AxiomList();
     auto action_list = pddl::ActionList();
     for (const auto& structure_node : domain_node.structures)
@@ -98,10 +105,8 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context)
     }
     // Check references
     test_predicate_references(predicates, context);
+    test_predicate_references(derived_predicates, context);
     test_function_skeleton_references(function_skeletons, context);
-
-    // TODO
-    auto derived_predicates = pddl::PredicateList {};
 
     const auto domain = context.factories.domains.get_or_create<pddl::DomainImpl>(domain_name,
                                                                                   context.requirements,
@@ -144,6 +149,13 @@ pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pd
         objects = parse(problem_node.objects.value(), context);
     }
     track_object_references(objects, context);
+    /* DerivedPredicates section */
+    auto derived_predicates = pddl::PredicateList();
+    if (problem_node.derived_predicates.has_value())
+    {
+        derived_predicates = parse(problem_node.derived_predicates.value(), context);
+    }
+    track_predicate_references(derived_predicates, context);
     /* Initial section */
     auto initial_literals = pddl::GroundLiteralList();
     auto numeric_fluents = pddl::NumericFluentList();
@@ -163,9 +175,17 @@ pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pd
 
     // Check references
     test_object_references(objects, context);
+    test_predicate_references(derived_predicates, context);
 
-    auto derived_predicates = pddl::PredicateList {};
-    auto axioms = pddl::AxiomList {};
+    /* Structure section */
+    auto axioms = pddl::AxiomList();
+    if (problem_node.axioms.has_value())
+    {
+        for (const auto& axiom_node : problem_node.axioms.value())
+        {
+            axioms.push_back(parse(axiom_node, context));
+        }
+    }
 
     const auto problem = context.factories.problems.get_or_create<pddl::ProblemImpl>(domain,
                                                                                      problem_name,

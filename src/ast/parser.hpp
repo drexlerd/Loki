@@ -55,6 +55,7 @@ struct FunctionSymbolClass;
 struct TermClass;
 struct NumberClass;
 struct PredicateClass;
+struct DerivedPredicateClass;
 
 struct RequirementStripsClass;
 struct RequirementTypingClass;
@@ -87,6 +88,7 @@ struct TypedListOfVariablesRecursivelyClass;
 struct TypedListOfVariablesClass;
 
 struct AtomicFormulaSkeletonClass;
+struct DerivedAtomicFormulaSkeletonClass;
 
 struct AtomicFunctionSkeletonTotalCostClass;
 struct AtomicFunctionSkeletonGeneralClass;
@@ -100,6 +102,10 @@ struct AtomicFormulaOfTermsClass;
 struct AtomClass;
 struct NegatedAtomClass;
 struct LiteralClass;
+struct DerivedAtomicFormulaOfTermsClass;
+struct DerivedAtomClass;
+struct DerivedNegatedAtomClass;
+struct DerivedLiteralClass;
 
 struct MultiOperatorMulClass;
 struct MultiOperatorPlusClass;
@@ -125,6 +131,7 @@ struct FunctionExpressionHeadClass;
 struct GoalDescriptorClass;
 struct GoalDescriptorAtomClass;
 struct GoalDescriptorLiteralClass;
+struct GoalDescriptorDerivedLiteralClass;
 struct GoalDescriptorAndClass;
 struct GoalDescriptorOrClass;
 struct GoalDescriptorNotClass;
@@ -250,6 +257,7 @@ typedef x3::rule<FunctionSymbolClass, ast::FunctionSymbol> function_symbol_type;
 typedef x3::rule<TermClass, ast::Term> term_type;
 typedef x3::rule<NumberClass, ast::Number> number_type;
 typedef x3::rule<PredicateClass, ast::Predicate> predicate_type;
+typedef x3::rule<DerivedPredicateClass, ast::DerivedPredicate> derived_predicate_type;
 
 typedef x3::rule<RequirementStripsClass, ast::RequirementStrips> requirement_strips_type;
 typedef x3::rule<RequirementTypingClass, ast::RequirementTyping> requirement_typing_type;
@@ -282,6 +290,7 @@ typedef x3::rule<TypedListOfVariablesRecursivelyClass, ast::TypedListOfVariables
 typedef x3::rule<TypedListOfVariablesClass, ast::TypedListOfVariables> typed_list_of_variables_type;
 
 typedef x3::rule<AtomicFormulaSkeletonClass, ast::AtomicFormulaSkeleton> atomic_formula_skeleton_type;
+typedef x3::rule<DerivedAtomicFormulaSkeletonClass, ast::DerivedAtomicFormulaSkeleton> derived_atomic_formula_skeleton_type;
 
 typedef x3::rule<AtomicFunctionSkeletonTotalCostClass, ast::AtomicFunctionSkeletonTotalCost> atomic_function_skeleton_total_cost_type;
 typedef x3::rule<AtomicFunctionSkeletonGeneralClass, ast::AtomicFunctionSkeletonGeneral> atomic_function_skeleton_general_type;
@@ -297,6 +306,10 @@ typedef x3::rule<AtomicFormulaOfTermsClass, ast::AtomicFormulaOfTerms> atomic_fo
 typedef x3::rule<AtomClass, ast::Atom> atom_type;
 typedef x3::rule<NegatedAtomClass, ast::NegatedAtom> negated_atom_type;
 typedef x3::rule<LiteralClass, ast::Literal> literal_type;
+typedef x3::rule<DerivedAtomicFormulaOfTermsClass, ast::DerivedAtomicFormulaOfTerms> derived_atomic_formula_of_terms_type;
+typedef x3::rule<DerivedAtomClass, ast::DerivedAtom> derived_atom_type;
+typedef x3::rule<DerivedNegatedAtomClass, ast::DerivedNegatedAtom> derived_negated_atom_type;
+typedef x3::rule<DerivedLiteralClass, ast::DerivedLiteral> derived_literal_type;
 
 typedef x3::rule<MultiOperatorMulClass, ast::MultiOperatorMul> multi_operator_mul_type;
 typedef x3::rule<MultiOperatorPlusClass, ast::MultiOperatorPlus> multi_operator_plus_type;
@@ -322,6 +335,7 @@ typedef x3::rule<FunctionExpressionHeadClass, ast::FunctionExpressionHead> funct
 typedef x3::rule<GoalDescriptorClass, ast::GoalDescriptor> goal_descriptor_type;
 typedef x3::rule<GoalDescriptorAtomClass, ast::GoalDescriptorAtom> goal_descriptor_atom_type;
 typedef x3::rule<GoalDescriptorLiteralClass, ast::GoalDescriptorLiteral> goal_descriptor_literal_type;
+typedef x3::rule<GoalDescriptorDerivedLiteralClass, ast::GoalDescriptorDerivedLiteral> goal_descriptor_derived_literal_type;
 typedef x3::rule<GoalDescriptorAndClass, ast::GoalDescriptorAnd> goal_descriptor_and_type;
 typedef x3::rule<GoalDescriptorOrClass, ast::GoalDescriptorOr> goal_descriptor_or_type;
 typedef x3::rule<GoalDescriptorNotClass, ast::GoalDescriptorNot> goal_descriptor_not_type;
@@ -445,7 +459,8 @@ BOOST_SPIRIT_DECLARE(name_type,
                      function_symbol_type,
                      term_type,
                      number_type,
-                     predicate_type)
+                     predicate_type,
+                     derived_predicate_type)
 
 BOOST_SPIRIT_DECLARE(requirement_strips_type,
                      requirement_typing_type,
@@ -477,7 +492,7 @@ BOOST_SPIRIT_DECLARE(type_type,
                      typed_list_of_variables_recursively_type,
                      typed_list_of_variables_type)
 
-BOOST_SPIRIT_DECLARE(atomic_formula_skeleton_type)
+BOOST_SPIRIT_DECLARE(atomic_formula_skeleton_type, derived_atomic_formula_skeleton_type)
 
 BOOST_SPIRIT_DECLARE(atomic_function_skeleton_total_cost_type,
                      atomic_function_skeleton_general_type,
@@ -485,7 +500,14 @@ BOOST_SPIRIT_DECLARE(atomic_function_skeleton_total_cost_type,
                      function_typed_list_of_atomic_function_skeletons_recursively_type,
                      function_typed_list_of_atomic_function_skeletons_type)
 
-BOOST_SPIRIT_DECLARE(atomic_formula_of_terms_type, atom_type, negated_atom_type, literal_type)
+BOOST_SPIRIT_DECLARE(atomic_formula_of_terms_type,
+                     atom_type,
+                     negated_atom_type,
+                     literal_type,
+                     derived_atomic_formula_of_terms_type,
+                     derived_atom_type,
+                     derived_negated_atom_type,
+                     derived_literal_type)
 
 BOOST_SPIRIT_DECLARE(multi_operator_mul_type,
                      multi_operator_plus_type,
@@ -512,6 +534,7 @@ BOOST_SPIRIT_DECLARE(function_expression_type,
 BOOST_SPIRIT_DECLARE(goal_descriptor_type,
                      goal_descriptor_atom_type,
                      goal_descriptor_literal_type,
+                     goal_descriptor_derived_literal_type,
                      goal_descriptor_and_type,
                      goal_descriptor_or_type,
                      goal_descriptor_not_type,
@@ -641,6 +664,7 @@ parser::function_symbol_total_cost_type const& function_symbol_total_cost();
 parser::function_symbol_type const& function_symbol();
 parser::term_type const& term();
 parser::predicate_type const& predicate();
+parser::derived_predicate_type const& derived_predicate();
 
 parser::requirement_strips_type const& requirement_strips();
 parser::requirement_typing_type const& requirement_typing();
@@ -673,6 +697,7 @@ parser::typed_list_of_variables_recursively_type const& typed_list_of_variables_
 parser::typed_list_of_variables_type const& typed_list_of_variables();
 
 parser::atomic_formula_skeleton_type const& atomic_formula_skeleton();
+parser::derived_atomic_formula_skeleton_type const& derived_atomic_formula_skeleton();
 
 parser::multi_operator_mul_type const& multi_operator_mul();
 parser::multi_operator_plus_type const& multi_operator_plus();
@@ -700,6 +725,10 @@ parser::atomic_formula_of_terms_type const& atomic_formula_of_terms();
 parser::atom_type const& atom();
 parser::negated_atom_type const& negated_atom();
 parser::literal_type const& literal();
+parser::derived_atomic_formula_of_terms_type const& derived_atomic_formula_of_terms();
+parser::derived_atom_type const& derived_atom();
+parser::derived_negated_atom_type const& derived_negated_atom();
+parser::derived_literal_type const& derived_literal();
 
 parser::function_expression_type const& function_expression();
 parser::function_head_type const& function_head();
@@ -711,6 +740,7 @@ parser::function_expression_head_type const& function_expression_head();
 parser::goal_descriptor_type const& goal_descriptor();
 parser::goal_descriptor_atom_type const& goal_descriptor_atom();
 parser::goal_descriptor_literal_type const& goal_descriptor_literal();
+parser::goal_descriptor_derived_literal_type const& goal_descriptor_derived_literal();
 parser::goal_descriptor_and_type const& goal_descriptor_and();
 parser::goal_descriptor_or_type const& goal_descriptor_or();
 parser::goal_descriptor_not_type const& goal_descriptor_not();

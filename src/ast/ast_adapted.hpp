@@ -33,6 +33,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::Name, characters)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Variable, characters)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionSymbol, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Predicate, name)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::DerivedPredicate, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Number, value)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::TypeEither, types)
@@ -41,6 +42,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::TypedListOfNamesRecursively, names, type, t
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::TypedListOfVariablesRecursively, variables, type, typed_list_of_variables)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::AtomicFormulaSkeleton, predicate, typed_list_of_variables)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::DerivedAtomicFormulaSkeleton, derived_predicate, typed_list_of_variables)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::AtomicFunctionSkeletonTotalCost, function_symbol)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::AtomicFunctionSkeletonGeneral, function_symbol, arguments)
@@ -53,6 +55,9 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::AtomicFormulaOfTermsPredicate, predicate, t
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::AtomicFormulaOfTermsEquality, term_left, term_right)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Atom, atomic_formula_of_terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::NegatedAtom, atomic_formula_of_terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::DerivedAtomicFormulaOfTerms, derived_predicate, terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::DerivedAtom, derived_atomic_formula_of_terms)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::DerivedNegatedAtom, derived_atomic_formula_of_terms)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionHead, function_symbol, terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionExpressionNumber, number)
@@ -62,6 +67,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionExpressionHead, function_head)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::GoalDescriptorAtom, atom)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::GoalDescriptorLiteral, literal)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::GoalDescriptorDerivedLiteral, derived_literal)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::GoalDescriptorAnd, goal_descriptors)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::GoalDescriptorOr, goal_descriptors)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::GoalDescriptorNot, goal_descriptor)
@@ -99,14 +105,14 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::ActionSymbol, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::ActionBody, precondition_goal_descriptor, effect)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Action, action_symbol, typed_list_of_variables, action_body)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::Axiom, goal_descriptor, literal)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::Axiom, derived_literal, goal_descriptor)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::DomainName, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Requirements, requirements)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Types, typed_list_of_names)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Constants, typed_list_of_names)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Predicates, atomic_formula_skeletons)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::DerivedPredicates, atomic_formula_skeletons)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::DerivedPredicates, derived_atomic_formula_skeletons)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Functions, function_types_list_of_atomic_function_skeletons)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Constraints, constraint_goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Domain, domain_name, requirements, types, constants, predicates, derived_predicates, functions, constraints, structures)
@@ -151,6 +157,16 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::Initial, initial_elements)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Goal, precondition_goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::ProblemConstraints, preference_constraint_goal_descriptor)
 
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::Problem, problem_name, domain_name, requirements, objects, initial, goal, constraints, metric_specification)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::Problem,
+                          problem_name,
+                          domain_name,
+                          requirements,
+                          objects,
+                          derived_predicates,
+                          initial,
+                          goal,
+                          constraints,
+                          metric_specification,
+                          axioms)
 
 #endif

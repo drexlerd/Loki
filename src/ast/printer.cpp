@@ -54,6 +54,8 @@ string parse_text(const ast::Term& node, const FormattingOptions& options) { ret
 
 std::string parse_text(const ast::Predicate& node, const FormattingOptions& options) { return parse_text(node.name, options); }
 
+std::string parse_text(const ast::DerivedPredicate& node, const FormattingOptions& options) { return parse_text(node.name, options); }
+
 string parse_text(const ast::Number& node, const FormattingOptions&)
 {
     stringstream ss;
@@ -161,6 +163,13 @@ std::string parse_text(const ast::AtomicFormulaSkeleton& node, const FormattingO
     return ss.str();
 }
 
+std::string parse_text(const ast::DerivedAtomicFormulaSkeleton& node, const FormattingOptions& options)
+{
+    std::stringstream ss;
+    ss << "(" << parse_text(node.derived_predicate, options) << " " << parse_text(node.typed_list_of_variables, options) << ")";
+    return ss.str();
+}
+
 std::string parse_text(const ast::AtomicFunctionSkeletonTotalCost& node, const FormattingOptions& /*options*/)
 {
     std::stringstream ss;
@@ -241,6 +250,23 @@ std::string parse_text(const ast::NegatedAtom& node, const FormattingOptions& op
 
 std::string parse_text(const ast::Literal& node, const FormattingOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
 
+std::string parse_text(const ast::DerivedAtomicFormulaOfTerms& node, const FormattingOptions& options)
+{
+    std::stringstream ss;
+    ss << "(" << parse_text(node.derived_predicate, options) << " " << parse_text(node.terms, options) << ")";
+    return ss.str();
+}
+
+std::string parse_text(const ast::DerivedAtom& node, const FormattingOptions& options) { return parse_text(node.derived_atomic_formula_of_terms, options); }
+
+std::string parse_text(const ast::DerivedNegatedAtom& node, const FormattingOptions& options)
+{
+    std::stringstream ss;
+    ss << "(not " << parse_text(node.derived_atomic_formula_of_terms, options) << ")";
+    return ss.str();
+}
+std::string parse_text(const ast::DerivedLiteral& node, const FormattingOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
+
 std::string parse_text(const ast::MultiOperatorMul&, const FormattingOptions&) { return "*"; }
 std::string parse_text(const ast::MultiOperatorPlus&, const FormattingOptions&) { return "+"; }
 std::string parse_text(const ast::MultiOperator& node, const FormattingOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
@@ -299,6 +325,8 @@ std::string parse_text(const ast::GoalDescriptor& node, const FormattingOptions&
 std::string parse_text(const ast::GoalDescriptorAtom& node, const FormattingOptions& options) { return parse_text(node.atom, options); }
 
 std::string parse_text(const ast::GoalDescriptorLiteral& node, const FormattingOptions& options) { return parse_text(node.literal, options); }
+
+std::string parse_text(const ast::GoalDescriptorDerivedLiteral& node, const FormattingOptions& options) { return parse_text(node.derived_literal, options); }
 
 std::string parse_text(const ast::GoalDescriptorAnd& node, const FormattingOptions& options)
 {
@@ -550,11 +578,9 @@ std::string parse_text(const ast::Action& node, const FormattingOptions& options
 std::string parse_text(const ast::Axiom& node, const FormattingOptions& options)
 {
     std::stringstream ss;
-    ss << std::string(options.indent, ' ') << "(:derived \n";
+    ss << std::string(options.indent, ' ') << "(:derived " << parse_text(node.derived_literal, options) << "\n";
     FormattingOptions nested_options { options.indent + options.add_indent, options.add_indent };
-    ss << std::string(nested_options.indent, ' ') << ":context " << parse_text(node.goal_descriptor, options) << "\n"
-       << std::string(nested_options.indent, ' ') << ":implies " << parse_text(node.literal, options) << "\n";
-    ss << std::string(options.indent, ' ') << ")";
+    ss << std::string(nested_options.indent, ' ') << parse_text(node.goal_descriptor, options) << ")\n";
     return ss.str();
 }
 

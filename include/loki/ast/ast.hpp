@@ -41,6 +41,7 @@ struct FunctionSymbol;
 struct Term;
 struct Number;
 struct Predicate;
+struct DerivedPredicate;  // ok
 
 struct RequirementStrips;
 struct RequirementTyping;
@@ -73,6 +74,7 @@ struct TypedListOfVariablesRecursively;  // :typing
 struct TypedListOfVariables;
 
 struct AtomicFormulaSkeleton;
+struct DerivedAtomicFormulaSkeleton;  // ok
 
 struct AtomicFunctionSkeletonTotalCost;
 struct AtomicFunctionSkeletonGeneral;
@@ -86,6 +88,11 @@ struct AtomicFormulaOfTerms;
 struct Atom;
 struct NegatedAtom;
 struct Literal;
+
+struct DerivedAtomicFormulaOfTerms;  // new
+struct DerivedAtom;                  // new
+struct DerivedNegatedAtom;           // new
+struct DerivedLiteral;               // new
 
 struct MultiOperatorMul;
 struct MultiOperatorPlus;
@@ -110,7 +117,8 @@ struct FunctionExpressionHead;
 
 struct GoalDescriptor;
 struct GoalDescriptorAtom;
-struct GoalDescriptorLiteral;  // :negative-preconditions
+struct GoalDescriptorLiteral;         // :negative-preconditions
+struct GoalDescriptorDerivedLiteral;  // new
 struct GoalDescriptorAnd;
 struct GoalDescriptorOr;                  // :disjunctive-preconditions
 struct GoalDescriptorNot;                 // :disjunctive-preconditions
@@ -167,6 +175,7 @@ struct Requirements;
 struct Types;  // : typing
 struct Constants;
 struct Predicates;
+struct DerivedPredicates;
 struct Functions;
 struct Constraints;  // :constraints
 struct Structure;
@@ -258,6 +267,11 @@ struct Number : x3::position_tagged
 
 /* <predicate-symbol> */
 struct Predicate : x3::position_tagged
+{
+    Name name;
+};
+
+struct DerivedPredicate : x3::position_tagged
 {
     Name name;
 };
@@ -427,6 +441,12 @@ struct AtomicFormulaSkeleton : x3::position_tagged
     TypedListOfVariables typed_list_of_variables;
 };
 
+struct DerivedAtomicFormulaSkeleton : x3::position_tagged
+{
+    DerivedPredicate derived_predicate;
+    TypedListOfVariables typed_list_of_variables;
+};
+
 /* <function typed list (atomic function skeleton)> */
 struct AtomicFunctionSkeletonTotalCost : x3::position_tagged
 {
@@ -491,6 +511,28 @@ struct NegatedAtom : x3::position_tagged
 };
 
 struct Literal : x3::position_tagged, x3::variant<Atom, NegatedAtom>
+{
+    using base_type::base_type;
+    using base_type::operator=;
+};
+
+struct DerivedAtomicFormulaOfTerms : x3::position_tagged
+{
+    DerivedPredicate derived_predicate;
+    std::vector<Term> terms;
+};
+
+struct DerivedAtom : x3::position_tagged
+{
+    DerivedAtomicFormulaOfTerms derived_atomic_formula_of_terms;
+};
+
+struct DerivedNegatedAtom : x3::position_tagged
+{
+    DerivedAtomicFormulaOfTerms derived_atomic_formula_of_terms;
+};
+
+struct DerivedLiteral : x3::position_tagged, x3::variant<DerivedAtom, DerivedNegatedAtom>
 {
     using base_type::base_type;
     using base_type::operator=;
@@ -617,6 +659,11 @@ struct GoalDescriptorAtom : x3::position_tagged
 struct GoalDescriptorLiteral : x3::position_tagged
 {
     Literal literal;
+};
+
+struct GoalDescriptorDerivedLiteral : x3::position_tagged
+{
+    DerivedLiteral derived_literal;
 };
 
 struct GoalDescriptorAnd : x3::position_tagged
@@ -891,8 +938,8 @@ struct Action : x3::position_tagged
 /* <derived-def> */
 struct Axiom : x3::position_tagged
 {
+    DerivedLiteral derived_literal;
     GoalDescriptor goal_descriptor;
-    Literal literal;
 };
 
 /* <types-def> */
@@ -915,7 +962,7 @@ struct Predicates : x3::position_tagged
 
 struct DerivedPredicates : x3::position_tagged
 {
-    std::vector<AtomicFormulaSkeleton> atomic_formula_skeletons;
+    std::vector<DerivedAtomicFormulaSkeleton> derived_atomic_formula_skeletons;
 };
 
 /* <functions-def> */
@@ -950,7 +997,7 @@ struct Domain : x3::position_tagged
     boost::optional<Types> types;
     boost::optional<Constants> constants;
     boost::optional<Predicates> predicates;
-    boost::optional<Predicates> derived_predicates;
+    boost::optional<DerivedPredicates> derived_predicates;
     boost::optional<Functions> functions;
     boost::optional<Constraints> constraints;
     std::vector<Structure> structures;
@@ -1190,10 +1237,12 @@ struct Problem : x3::position_tagged
     ProblemDomainName domain_name;
     boost::optional<Requirements> requirements;
     boost::optional<Objects> objects;
+    boost::optional<DerivedPredicates> derived_predicates;
     Initial initial;
     Goal goal;
     boost::optional<ProblemConstraints> constraints;
     boost::optional<MetricSpecification> metric_specification;
+    boost::optional<std::vector<Axiom>> axioms;
 };
 }
 
