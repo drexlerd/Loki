@@ -66,30 +66,6 @@ pddl::Atom parse(const ast::AtomicFormulaOfTermsEquality& node, Context& context
 
 pddl::Atom parse(const ast::AtomicFormulaOfTerms& node, Context& context) { return boost::apply_visitor(AtomicFormulaOfTermsVisitor(context), node); }
 
-pddl::Atom parse(const ast::DerivedAtomicFormulaOfTerms& node, Context& context)
-{
-    auto predicate_name = parse(node.derived_predicate.name);
-    auto binding = context.scopes.get<pddl::PredicateImpl>(predicate_name);
-    if (!binding.has_value())
-    {
-        throw UndefinedPredicateError(predicate_name, context.scopes.get_error_handler()(node.derived_predicate, ""));
-    }
-    auto term_list = pddl::TermList();
-    for (const auto& term_node : node.terms)
-    {
-        term_list.push_back(boost::apply_visitor(TermReferenceTermVisitor(context), term_node));
-    }
-    const auto [predicate, _position, _error_handler] = binding.value();
-    if (predicate->get_parameters().size() != term_list.size())
-    {
-        throw MismatchedPredicateTermListError(predicate, term_list, context.scopes.get_error_handler()(node, ""));
-    }
-    context.references.untrack(predicate);
-    const auto atom = context.factories.derived_atoms.get_or_create<pddl::AtomImpl>(predicate, term_list);
-    context.positions.push_back(atom, node);
-    return atom;
-}
-
 AtomicFormulaOfTermsVisitor::AtomicFormulaOfTermsVisitor(Context& context_) : context(context_) {}
 
 pddl::Literal parse(const ast::Atom& node, Context& context)
@@ -107,22 +83,6 @@ pddl::Literal parse(const ast::NegatedAtom& node, Context& context)
 }
 
 pddl::Literal parse(const ast::Literal& node, Context& context) { return boost::apply_visitor(LiteralVisitor(context), node); }
-
-pddl::Literal parse(const ast::DerivedAtom& node, Context& context)
-{
-    const auto literal = context.factories.derived_literals.get_or_create<pddl::LiteralImpl>(false, parse(node.derived_atomic_formula_of_terms, context));
-    context.positions.push_back(literal, node);
-    return literal;
-}
-
-pddl::Literal parse(const ast::DerivedNegatedAtom& node, Context& context)
-{
-    const auto literal = context.factories.derived_literals.get_or_create<pddl::LiteralImpl>(true, parse(node.derived_atomic_formula_of_terms, context));
-    context.positions.push_back(literal, node);
-    return literal;
-}
-
-pddl::Literal parse(const ast::DerivedLiteral& node, Context& context) { return boost::apply_visitor(LiteralVisitor(context), node); }
 
 LiteralVisitor::LiteralVisitor(Context& context_) : context(context_) {}
 

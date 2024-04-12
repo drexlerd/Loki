@@ -38,6 +38,7 @@ struct Context
     ReferencedPDDLObjects references;
     // For convenience, to avoid an additional parameter during semantic parsing
     pddl::Requirements requirements;
+    std::unordered_set<pddl::Predicate> derived_predicates;
 
     Context(PDDLFactories& factories_, PDDLPositionCache& positions_, ScopeStack& scopes_) :
         factories(factories_),

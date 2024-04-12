@@ -56,6 +56,12 @@ pddl::Effect parse(const ast::EffectProductionLiteral& node, Context& context)
 {
     auto literal = parse(node.literal, context);
     const auto effect = context.factories.effects.get_or_create<pddl::EffectLiteralImpl>(literal);
+
+    if (context.derived_predicates.count(literal->get_atom()->get_predicate()))
+    {
+        throw DerivedPredicateInEffectError(literal->get_atom()->get_predicate()->get_name(), context.scopes.get_error_handler()(node, ""));
+    }
+
     context.positions.push_back(effect, node);
     return effect;
 }

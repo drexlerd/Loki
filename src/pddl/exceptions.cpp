@@ -145,6 +145,11 @@ MismatchedFunctionSkeletonTermListError::MismatchedFunctionSkeletonTermListError
 {
 }
 
+DerivedPredicateInEffectError::DerivedPredicateInEffectError(const std::string& name, const std::string& error_handler_output) :
+    SemanticParserError("The derived predicate with name \"" + name + "\" is not allowed in an effect.", error_handler_output)
+{
+}
+
 /**
  * Problem
  */

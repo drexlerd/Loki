@@ -34,7 +34,6 @@ extern std::string parse_text(const ast::Number& node, const FormattingOptions& 
 extern std::string parse_text(const ast::FunctionSymbol& node, const FormattingOptions& options = {});
 extern std::string parse_text(const ast::Term& node, const FormattingOptions& options = {});
 extern std::string parse_text(const ast::Predicate& node, const FormattingOptions& options = {});
-extern std::string parse_text(const ast::DerivedPredicate& node, const FormattingOptions& options = {});
 
 extern std::string parse_text(const ast::RequirementStrips& node, const FormattingOptions& options = {});
 extern std::string parse_text(const ast::RequirementTyping& node, const FormattingOptions& options = {});
@@ -67,7 +66,6 @@ extern std::string parse_text(const ast::TypedListOfVariablesRecursively& node, 
 extern std::string parse_text(const ast::TypedListOfVariables& node, const FormattingOptions& options = {});
 
 extern std::string parse_text(const ast::AtomicFormulaSkeleton& node, const FormattingOptions& options = {});
-extern std::string parse_text(const ast::DerivedAtomicFormulaSkeleton& node, const FormattingOptions& options = {});
 
 extern std::string parse_text(const ast::AtomicFunctionSkeletonTotalCost& node, const FormattingOptions& options = {});
 extern std::string parse_text(const ast::AtomicFunctionSkeletonGeneral& node, const FormattingOptions& options = {});
@@ -81,10 +79,6 @@ extern std::string parse_text(const ast::AtomicFormulaOfTerms& node, const Forma
 extern std::string parse_text(const ast::Atom& node, const FormattingOptions& options = {});
 extern std::string parse_text(const ast::NegatedAtom& node, const FormattingOptions& options = {});
 extern std::string parse_text(const ast::Literal& node, const FormattingOptions& options = {});
-extern std::string parse_text(const ast::DerivedAtomicFormulaOfTerms& node, const FormattingOptions& options = {});
-extern std::string parse_text(const ast::DerivedAtom& node, const FormattingOptions& options = {});
-extern std::string parse_text(const ast::DerivedNegatedAtom& node, const FormattingOptions& options = {});
-extern std::string parse_text(const ast::DerivedLiteral& node, const FormattingOptions& options = {});
 
 extern std::string parse_text(const ast::MultiOperatorMul& node, const FormattingOptions& options = {});
 extern std::string parse_text(const ast::MultiOperatorPlus& node, const FormattingOptions& options = {});
@@ -110,7 +104,6 @@ extern std::string parse_text(const ast::FunctionExpressionHead& node, const For
 extern std::string parse_text(const ast::GoalDescriptor& node, const FormattingOptions& options = {});
 extern std::string parse_text(const ast::GoalDescriptorAtom& node, const FormattingOptions& options = {});
 extern std::string parse_text(const ast::GoalDescriptorLiteral& node, const FormattingOptions& options = {});
-extern std::string parse_text(const ast::GoalDescriptorDerivedLiteral& node, const FormattingOptions& options = {});
 extern std::string parse_text(const ast::GoalDescriptorAnd& node, const FormattingOptions& options = {});
 extern std::string parse_text(const ast::GoalDescriptorOr& node, const FormattingOptions& options = {});
 extern std::string parse_text(const ast::GoalDescriptorNot& node, const FormattingOptions& options = {});

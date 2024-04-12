@@ -69,7 +69,6 @@ function_symbol_type const function_symbol = "function_symbol";
 term_type const term = "term";
 number_type const number = "number";
 predicate_type const predicate = "predicate";
-derived_predicate_type const derived_predicate = "derived_predicate";
 
 requirement_strips_type const requirement_strips = "requirement_strips";
 requirement_typing_type const requirement_typing = "requirement_typing";
@@ -102,7 +101,6 @@ typed_list_of_variables_recursively_type const typed_list_of_variables_recursive
 typed_list_of_variables_type const typed_list_of_variables = "typed_list_of_variables";
 
 atomic_formula_skeleton_type const atomic_formula_skeleton = "atomic_formula_skeleton";
-derived_atomic_formula_skeleton_type const derived_atomic_formula_skeleton = "derived_atomic_formula_skeleton";
 
 atomic_function_skeleton_total_cost_type const atomic_function_skeleton_total_cost = "atomic_function_skeleton_total_cost";
 atomic_function_skeleton_general_type const atomic_function_skeleton_general = "atomic_function_skeleton_general";
@@ -118,10 +116,6 @@ atomic_formula_of_terms_type const atomic_formula_of_terms = "atomic_formula_of_
 atom_type const atom = "atom";
 negated_atom_type const negated_atom = "negated_atom";
 literal_type const literal = "literal";
-derived_atomic_formula_of_terms_type const derived_atomic_formula_of_terms = "derived_atomic_formula_of_terms";
-derived_atom_type const derived_atom = "derived_atom";
-derived_negated_atom_type const derived_negated_atom = "derived_negated_atom";
-derived_literal_type const derived_literal = "derived_literal";
 
 multi_operator_mul_type const multi_operator_mul = "multi_operator_mul";
 multi_operator_plus_type const multi_operator_plus = "multi_operator_plus";
@@ -147,7 +141,6 @@ function_expression_head_type const function_expression_head = "function_express
 goal_descriptor_type const goal_descriptor = "goal_descriptor";
 goal_descriptor_atom_type const goal_descriptor_atom = "goal_descriptor_atom";
 goal_descriptor_literal_type const goal_descriptor_literal = "goal_descriptor_literal";
-goal_descriptor_derived_literal_type const goal_descriptor_derived_literal = "goal_descriptor_derived_literal";
 goal_descriptor_and_type const goal_descriptor_and = "goal_descriptor_and";
 goal_descriptor_or_type const goal_descriptor_or = "goal_descriptor_or";
 goal_descriptor_not_type const goal_descriptor_not = "goal_descriptor_not";
@@ -276,7 +269,6 @@ const auto function_symbol_def = name;
 const auto term_def = name | variable;
 const auto number_def = double_;
 const auto predicate_def = name;
-const auto derived_predicate_def = name;
 
 const auto requirement_strips_def = keyword_lit(":strips") > x3::attr(ast::RequirementStrips {});
 const auto requirement_typing_def = keyword_lit(":typing") > x3::attr(ast::RequirementTyping {});
@@ -313,7 +305,6 @@ const auto typed_list_of_variables_recursively_def = (+variable >> lit('-')) > t
 const auto typed_list_of_variables_def = typed_list_of_variables_recursively | *variable;
 
 const auto atomic_formula_skeleton_def = lit('(') > predicate > typed_list_of_variables > lit(')');
-const auto derived_atomic_formula_skeleton_def = lit('(') > derived_predicate > typed_list_of_variables > lit(')');
 
 const auto atomic_function_skeleton_total_cost_def = lit('(') >> function_symbol_total_cost > lit(')');
 const auto atomic_function_skeleton_general_def = lit('(') > function_symbol > typed_list_of_variables > lit(')');
@@ -328,10 +319,6 @@ const auto atomic_formula_of_terms_def = atomic_formula_of_terms_equality | atom
 const auto atom_def = atomic_formula_of_terms;
 const auto negated_atom_def = (lit('(') >> keyword_lit("not")) > atomic_formula_of_terms > lit(')');
 const auto literal_def = negated_atom | atom;
-const auto derived_atomic_formula_of_terms_def = (lit('(') >> derived_predicate) > *term > lit(')');
-const auto derived_atom_def = derived_atomic_formula_of_terms;
-const auto derived_negated_atom_def = (lit('(') >> keyword_lit("not")) > derived_atomic_formula_of_terms > lit(')');
-const auto derived_literal_def = derived_negated_atom | derived_atom;
 
 const auto multi_operator_mul_def = lit('*') > x3::attr(ast::MultiOperatorMul {});
 const auto multi_operator_plus_def = lit('+') > x3::attr(ast::MultiOperatorPlus {});
@@ -360,7 +347,6 @@ const auto goal_descriptor_def = goal_descriptor_not | goal_descriptor_and | goa
                                  | goal_descriptor_forall | goal_descriptor_function_comparison | goal_descriptor_atom | goal_descriptor_literal;
 const auto goal_descriptor_atom_def = atom;
 const auto goal_descriptor_literal_def = literal;
-const auto goal_descriptor_derived_literal_def = derived_literal;
 const auto goal_descriptor_and_def = (lit('(') >> keyword_lit("and")) > *goal_descriptor > lit(')');
 const auto goal_descriptor_or_def = (lit('(') >> keyword_lit("or") > *goal_descriptor) > lit(')');
 const auto goal_descriptor_not_def = (lit('(') >> keyword_lit("not")) > goal_descriptor > lit(')');
@@ -424,7 +410,7 @@ const auto action_body_def = -(keyword_lit(":precondition") > ((lit('(') >> lit(
 const auto action_def = (lit('(') >> keyword_lit(":action")) > action_symbol > keyword_lit(":parameters") > lit('(') > typed_list_of_variables > lit(')')
                         > action_body >> lit(')');
 
-const auto axiom_def = (lit('(') >> keyword_lit(":derived")) > derived_literal > goal_descriptor > lit(')');
+const auto axiom_def = (lit('(') >> keyword_lit(":derived")) > literal > goal_descriptor > lit(')');
 
 const auto define_keyword_def = keyword_lit("define");
 const auto domain_keyword_def = keyword_lit("domain");
@@ -433,7 +419,7 @@ const auto requirements_def = lit('(') >> keyword_lit(":requirements") > *requir
 const auto types_def = (lit('(') >> keyword_lit(":types") > typed_list_of_names) > lit(')');
 const auto constants_def = (lit('(') >> keyword_lit(":constants") > typed_list_of_names) > lit(')');
 const auto predicates_def = (lit('(') >> keyword_lit(":predicates") > *atomic_formula_skeleton) > lit(')');
-const auto derived_predicates_def = (lit('(') >> keyword_lit(":derived-predicates") > *derived_atomic_formula_skeleton) > lit(')');
+const auto derived_predicates_def = (lit('(') >> keyword_lit(":derived-predicates") > *atomic_formula_skeleton) > lit(')');
 const auto functions_def = (lit('(') >> keyword_lit(":functions") > *function_typed_list_of_atomic_function_skeletons) > lit(')');
 const auto constraints_def = (lit('(') >> keyword_lit(":constraints")) > constraint_goal_descriptor > lit(')');
 const auto structure_def = action | axiom;
@@ -504,7 +490,7 @@ const auto problem_def = lit('(') > define_keyword > problem_name > problem_doma
 /**
  * Domain
  */
-BOOST_SPIRIT_DEFINE(name, variable, name_total_cost, function_symbol_total_cost, function_symbol, term, number, predicate, derived_predicate)
+BOOST_SPIRIT_DEFINE(name, variable, name_total_cost, function_symbol_total_cost, function_symbol, term, number, predicate)
 
 BOOST_SPIRIT_DEFINE(requirement_strips,
                     requirement_typing,
@@ -536,7 +522,7 @@ BOOST_SPIRIT_DEFINE(type,
                     typed_list_of_variables_recursively,
                     typed_list_of_variables)
 
-BOOST_SPIRIT_DEFINE(atomic_formula_skeleton, derived_atomic_formula_skeleton)
+BOOST_SPIRIT_DEFINE(atomic_formula_skeleton)
 
 BOOST_SPIRIT_DEFINE(atomic_function_skeleton_total_cost,
                     atomic_function_skeleton_general,
@@ -544,16 +530,7 @@ BOOST_SPIRIT_DEFINE(atomic_function_skeleton_total_cost,
                     function_typed_list_of_atomic_function_skeletons_recursively,
                     function_typed_list_of_atomic_function_skeletons)
 
-BOOST_SPIRIT_DEFINE(atomic_formula_of_terms_predicate,
-                    atomic_formula_of_terms_equality,
-                    atomic_formula_of_terms,
-                    atom,
-                    negated_atom,
-                    literal,
-                    derived_atomic_formula_of_terms,
-                    derived_atom,
-                    derived_negated_atom,
-                    derived_literal)
+BOOST_SPIRIT_DEFINE(atomic_formula_of_terms_predicate, atomic_formula_of_terms_equality, atomic_formula_of_terms, atom, negated_atom, literal)
 
 BOOST_SPIRIT_DEFINE(multi_operator_mul, multi_operator_plus, multi_operator, binary_operator_minus, binary_operator_div, binary_operator)
 
@@ -574,7 +551,6 @@ BOOST_SPIRIT_DEFINE(function_head,
 BOOST_SPIRIT_DEFINE(goal_descriptor,
                     goal_descriptor_atom,
                     goal_descriptor_literal,
-                    goal_descriptor_derived_literal,
                     goal_descriptor_and,
                     goal_descriptor_or,
                     goal_descriptor_not,
@@ -707,9 +683,6 @@ struct NumberClass : x3::annotate_on_success
 struct PredicateClass : x3::annotate_on_success
 {
 };
-struct DerivedPredicateClass : x3::annotate_on_success
-{
-};
 
 struct RequirementStripsClass : x3::annotate_on_success
 {
@@ -800,9 +773,6 @@ struct TypedListOfVariablesClass : x3::annotate_on_success
 struct AtomicFormulaSkeletonClass : x3::annotate_on_success
 {
 };
-struct DerivedAtomicFormulaSkeletonClass : x3::annotate_on_success
-{
-};
 
 struct AtomicFunctionSkeletonTotalCostClass : x3::annotate_on_success
 {
@@ -836,18 +806,6 @@ struct NegatedAtomClass : x3::annotate_on_success
 {
 };
 struct LiteralClass : x3::annotate_on_success
-{
-};
-struct DerivedAtomicFormulaOfTermsClass : x3::annotate_on_success
-{
-};
-struct DerivedAtomClass : x3::annotate_on_success
-{
-};
-struct DerivedNegatedAtomClass : x3::annotate_on_success
-{
-};
-struct DerivedLiteralClass : x3::annotate_on_success
 {
 };
 
@@ -915,9 +873,6 @@ struct GoalDescriptorAtomClass : x3::annotate_on_success
 {
 };
 struct GoalDescriptorLiteralClass : x3::annotate_on_success
-{
-};
-struct GoalDescriptorDerivedLiteralClass : x3::annotate_on_success
 {
 };
 struct GoalDescriptorAndClass : x3::annotate_on_success
@@ -1270,7 +1225,6 @@ parser::typed_list_of_variables_recursively_type const& typed_list_of_variables_
 parser::typed_list_of_variables_type const& typed_list_of_variables() { return parser::typed_list_of_variables; }
 
 parser::atomic_formula_skeleton_type const& atomic_formula_skeleton() { return parser::atomic_formula_skeleton; }
-parser::derived_atomic_formula_skeleton_type const& derived_atomic_formula_skeleton() { return parser::derived_atomic_formula_skeleton; }
 
 parser::atomic_function_skeleton_total_cost_type const& atomic_function_skeleton_total_cost() { return parser::atomic_function_skeleton_total_cost; }
 parser::atomic_function_skeleton_general_type const& atomic_function_skeleton_general() { return parser::atomic_function_skeleton_general; }
@@ -1290,10 +1244,6 @@ parser::atomic_formula_of_terms_type const& atomic_formula_of_terms() { return p
 parser::atom_type const& atom() { return parser::atom; }
 parser::negated_atom_type const& negated_atom() { return parser::negated_atom; }
 parser::literal_type const& literal() { return parser::literal; }
-parser::derived_atomic_formula_of_terms_type const& derived_atomic_formula_of_terms() { return parser::derived_atomic_formula_of_terms; }
-parser::derived_atom_type const& derived_atom() { return parser::derived_atom; }
-parser::derived_negated_atom_type const& derived_negated_atom() { return parser::derived_negated_atom; }
-parser::derived_literal_type const& derived_literal() { return parser::derived_literal; }
 
 parser::multi_operator_mul_type const& multi_operator_mul() { return parser::multi_operator_mul; }
 parser::multi_operator_plus_type const& multi_operator_plus() { return parser::multi_operator_plus; }
@@ -1319,7 +1269,6 @@ parser::function_expression_head_type const& function_expression_head() { return
 parser::goal_descriptor_type const& goal_descriptor() { return parser::goal_descriptor; }
 parser::goal_descriptor_atom_type const& goal_descriptor_atom() { return parser::goal_descriptor_atom; }
 parser::goal_descriptor_literal_type const& goal_descriptor_literal() { return parser::goal_descriptor_literal; }
-parser::goal_descriptor_derived_literal_type const& goal_descriptor_derived_literal() { return parser::goal_descriptor_derived_literal; }
 parser::goal_descriptor_and_type const& goal_descriptor_and() { return parser::goal_descriptor_and; }
 parser::goal_descriptor_or_type const& goal_descriptor_or() { return parser::goal_descriptor_or; }
 parser::goal_descriptor_not_type const& goal_descriptor_not() { return parser::goal_descriptor_not; }

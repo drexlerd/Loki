@@ -36,7 +36,6 @@ BOOST_SPIRIT_INSTANTIATE(function_symbol_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(term_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(number_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(predicate_type, iterator_type, context_type)
-BOOST_SPIRIT_INSTANTIATE(derived_predicate_type, iterator_type, context_type)
 
 BOOST_SPIRIT_INSTANTIATE(requirement_strips_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(requirement_typing_type, iterator_type, context_type)
@@ -69,7 +68,6 @@ BOOST_SPIRIT_INSTANTIATE(typed_list_of_variables_recursively_type, iterator_type
 BOOST_SPIRIT_INSTANTIATE(typed_list_of_variables_type, iterator_type, context_type)
 
 BOOST_SPIRIT_INSTANTIATE(atomic_formula_skeleton_type, iterator_type, context_type)
-BOOST_SPIRIT_INSTANTIATE(derived_atomic_formula_skeleton_type, iterator_type, context_type)
 
 BOOST_SPIRIT_INSTANTIATE(atomic_function_skeleton_total_cost_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(atomic_function_skeleton_general_type, iterator_type, context_type)
@@ -83,10 +81,6 @@ BOOST_SPIRIT_INSTANTIATE(atomic_formula_of_terms_type, iterator_type, context_ty
 BOOST_SPIRIT_INSTANTIATE(atom_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(negated_atom_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(literal_type, iterator_type, context_type)
-BOOST_SPIRIT_INSTANTIATE(derived_atomic_formula_of_terms_type, iterator_type, context_type)
-BOOST_SPIRIT_INSTANTIATE(derived_atom_type, iterator_type, context_type)
-BOOST_SPIRIT_INSTANTIATE(derived_negated_atom_type, iterator_type, context_type)
-BOOST_SPIRIT_INSTANTIATE(derived_literal_type, iterator_type, context_type)
 
 BOOST_SPIRIT_INSTANTIATE(multi_operator_mul_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(multi_operator_plus_type, iterator_type, context_type)
@@ -112,7 +106,6 @@ BOOST_SPIRIT_INSTANTIATE(function_expression_head_type, iterator_type, context_t
 BOOST_SPIRIT_INSTANTIATE(goal_descriptor_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(goal_descriptor_atom_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(goal_descriptor_literal_type, iterator_type, context_type)
-BOOST_SPIRIT_INSTANTIATE(goal_descriptor_derived_literal_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(goal_descriptor_and_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(goal_descriptor_or_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(goal_descriptor_not_type, iterator_type, context_type)

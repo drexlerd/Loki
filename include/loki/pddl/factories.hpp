@@ -106,14 +106,10 @@ struct PDDLFactories
     AtomFactory atoms;
     AtomFactory derived_atoms;
     GroundAtomFactory ground_atoms;
-    GroundAtomFactory derived_ground_atoms;
     LiteralFactory literals;
-    LiteralFactory derived_literals;
     GroundLiteralFactory ground_literals;
-    GroundLiteralFactory derived_ground_literals;
     ParameterFactory parameters;
     PredicateFactory predicates;
-    PredicateFactory derived_predicates;
     FunctionExpressionFactory function_expressions;
     FunctionFactory functions;
     FunctionSkeletonFactory function_skeletons;
@@ -135,14 +131,10 @@ struct PDDLFactories
         atoms(AtomFactory(1000)),
         derived_atoms(AtomFactory(1000)),
         ground_atoms(GroundAtomFactory(1000)),
-        derived_ground_atoms(GroundAtomFactory(1000)),
         literals(LiteralFactory(1000)),
-        derived_literals(LiteralFactory(1000)),
         ground_literals(GroundLiteralFactory(1000)),
-        derived_ground_literals(GroundLiteralFactory(1000)),
         parameters(ParameterFactory(1000)),
         predicates(PredicateFactory(1000)),
-        derived_predicates(PredicateFactory(1000)),
         function_expressions(FunctionExpressionFactory(1000)),
         functions(FunctionFactory(1000)),
         function_skeletons(FunctionSkeletonFactory(1000)),

@@ -157,6 +157,12 @@ public:
                                             const std::string& error_handler_output);
 };
 
+class DerivedPredicateInEffectError : public SemanticParserError
+{
+public:
+    DerivedPredicateInEffectError(const std::string& name, const std::string& error_handler_output);
+};
+
 /* Object */
 class UnusedObjectError : public SemanticParserError
 {

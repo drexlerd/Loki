@@ -35,10 +35,10 @@ namespace loki::pddl
 class AxiomImpl : public Base<AxiomImpl>
 {
 private:
-    Condition m_condition;
     Literal m_literal;
+    Condition m_condition;
 
-    AxiomImpl(int identifier, Condition condition, Literal literal);
+    AxiomImpl(int identifier, Literal literal, Condition condition);
 
     // Give access to the constructor.
     friend class loki::PDDLFactory<AxiomImpl, loki::Hash<AxiomImpl*>, loki::EqualTo<AxiomImpl*>>;
@@ -52,8 +52,8 @@ private:
     friend class Base<AxiomImpl>;
 
 public:
-    const Condition& get_condition() const;
     const Literal& get_literal() const;
+    const Condition& get_condition() const;
 };
 
 }

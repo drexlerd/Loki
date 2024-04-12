@@ -28,16 +28,16 @@
 
 namespace loki::pddl
 {
-AxiomImpl::AxiomImpl(int identifier, Condition condition, Literal literal) : Base(identifier), m_condition(std::move(condition)), m_literal(std::move(literal))
+AxiomImpl::AxiomImpl(int identifier, Literal literal, Condition condition) : Base(identifier), m_literal(std::move(literal)), m_condition(std::move(condition))
 {
 }
 
 bool AxiomImpl::is_structurally_equivalent_to_impl(const AxiomImpl& other) const
 {
-    return (m_condition == other.m_condition) && (m_literal == other.m_literal);
+    return (m_literal == other.m_literal) && (m_condition == other.m_condition);
 }
 
-size_t AxiomImpl::hash_impl() const { return hash_combine(m_condition, m_literal); }
+size_t AxiomImpl::hash_impl() const { return hash_combine(m_literal, m_condition); }
 
 void AxiomImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -48,8 +48,8 @@ void AxiomImpl::str_impl(std::ostream& out, const FormattingOptions& options) co
     out << ")\n";
 }
 
-const Condition& AxiomImpl::get_condition() const { return m_condition; }
-
 const Literal& AxiomImpl::get_literal() const { return m_literal; }
+
+const Condition& AxiomImpl::get_condition() const { return m_condition; }
 
 }

@@ -29,8 +29,6 @@ extern pddl::Atom parse(const ast::AtomicFormulaOfTermsPredicate& node, Context&
 extern pddl::Atom parse(const ast::AtomicFormulaOfTermsEquality& node, Context& context);
 extern pddl::Atom parse(const ast::AtomicFormulaOfTerms& node, Context& context);
 
-extern pddl::Atom parse(const ast::DerivedAtomicFormulaOfTerms& node, Context& context);
-
 struct AtomicFormulaOfTermsVisitor : boost::static_visitor<pddl::Atom>
 {
     Context& context;
@@ -48,10 +46,6 @@ struct AtomicFormulaOfTermsVisitor : boost::static_visitor<pddl::Atom>
 extern pddl::Literal parse(const ast::Atom& node, Context& context);
 extern pddl::Literal parse(const ast::NegatedAtom& node, Context& context);
 extern pddl::Literal parse(const ast::Literal& node, Context& context);
-
-extern pddl::Literal parse(const ast::DerivedAtom& node, Context& context);
-extern pddl::Literal parse(const ast::DerivedNegatedAtom& node, Context& context);
-extern pddl::Literal parse(const ast::DerivedLiteral& node, Context& context);
 
 struct LiteralVisitor : boost::static_visitor<pddl::Literal>
 {
