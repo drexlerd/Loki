@@ -80,6 +80,7 @@ configure_ccache()
 
 # Boost
 # Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
+message("Prefix path: ${CMAKE_PREFIX_PATH}")
 configure_boost()
 find_package(Boost ${BOOST_MIN_VERSION} REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(Boost_FOUND)
