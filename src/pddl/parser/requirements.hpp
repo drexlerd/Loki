@@ -18,9 +18,9 @@
 #ifndef LOKI_SRC_PDDL_PARSER_REQUIREMENTS_HPP_
 #define LOKI_SRC_PDDL_PARSER_REQUIREMENTS_HPP_
 
-#include "loki/ast/ast.hpp"
-#include "loki/ast/config.hpp"
-#include "loki/pddl/parser.hpp"
+#include "loki/details/ast/ast.hpp"
+#include "loki/details/ast/config.hpp"
+#include "loki/details/pddl/parser.hpp"
 
 namespace loki
 {

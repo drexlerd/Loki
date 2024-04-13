@@ -15,13 +15,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/pddl/conditions.hpp"
+#include "loki/details/pddl/conditions.hpp"
 
-#include "loki/pddl/literal.hpp"
-#include "loki/pddl/parameter.hpp"
-#include "loki/pddl/visitors.hpp"
-#include "loki/utils/collections.hpp"
-#include "loki/utils/hash.hpp"
+#include "loki/details/pddl/literal.hpp"
+#include "loki/details/pddl/parameter.hpp"
+#include "loki/details/pddl/visitors.hpp"
+#include "loki/details/utils/collections.hpp"
+#include "loki/details/utils/hash.hpp"
 
 namespace loki
 {

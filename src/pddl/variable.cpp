@@ -15,10 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/pddl/variable.hpp"
+#include "loki/details/pddl/variable.hpp"
 
-#include "loki/utils/collections.hpp"
-#include "loki/utils/hash.hpp"
+#include "loki/details/utils/collections.hpp"
+#include "loki/details/utils/hash.hpp"
 
 namespace loki
 {

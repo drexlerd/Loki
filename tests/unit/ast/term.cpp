@@ -18,9 +18,9 @@
 #include "../../../src/ast/parser.hpp"
 
 #include <gtest/gtest.h>
-#include <loki/ast/ast.hpp>
-#include <loki/ast/parser_wrapper.hpp>
-#include <loki/ast/printer.hpp>
+#include <loki/details/ast/ast.hpp>
+#include <loki/details/ast/parser_wrapper.hpp>
+#include <loki/details/ast/printer.hpp>
 
 namespace loki::domain::tests
 {

@@ -18,11 +18,11 @@
 #ifndef LOKI_SRC_PDDL_PARSER_FUNCTIONS_HPP_
 #define LOKI_SRC_PDDL_PARSER_FUNCTIONS_HPP_
 
-#include "loki/ast/ast.hpp"
-#include "loki/pddl/declarations.hpp"
-#include "loki/pddl/function_expressions.hpp"
-#include "loki/pddl/function_skeleton.hpp"
-#include "loki/pddl/parser.hpp"
+#include "loki/details/ast/ast.hpp"
+#include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/function_expressions.hpp"
+#include "loki/details/pddl/function_skeleton.hpp"
+#include "loki/details/pddl/parser.hpp"
 
 #include <variant>
 

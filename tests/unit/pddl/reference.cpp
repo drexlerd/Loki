@@ -16,9 +16,9 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/pddl/factory.hpp>
-#include <loki/pddl/object.hpp>
-#include <loki/pddl/reference.hpp>
+#include <loki/details/pddl/factory.hpp>
+#include <loki/details/pddl/object.hpp>
+#include <loki/details/pddl/reference.hpp>
 
 namespace loki::domain::tests
 {

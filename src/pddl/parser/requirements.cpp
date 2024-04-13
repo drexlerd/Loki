@@ -17,7 +17,7 @@
 
 #include "requirements.hpp"
 
-#include "loki/pddl/exceptions.hpp"
+#include "loki/details/pddl/exceptions.hpp"
 
 namespace loki
 {

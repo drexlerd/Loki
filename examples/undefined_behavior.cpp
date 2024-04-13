@@ -16,7 +16,7 @@
  */
 
 #include <iostream>
-#include <loki/parser.hpp>
+#include <loki/loki.hpp>
 
 /// @brief This example illustrates incorrect ownership handling
 int main()

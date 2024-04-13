@@ -19,7 +19,7 @@
 
 #include "common.hpp"
 #include "functions.hpp"
-#include "loki/pddl/exceptions.hpp"
+#include "loki/details/pddl/exceptions.hpp"
 
 using namespace std;
 

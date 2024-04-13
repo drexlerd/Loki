@@ -18,9 +18,9 @@
 #ifndef LOKI_SRC_PDDL_PARSER_REFERENCE_UTILS_HPP_
 #define LOKI_SRC_PDDL_PARSER_REFERENCE_UTILS_HPP_
 
-#include "loki/pddl/context.hpp"
-#include "loki/pddl/declarations.hpp"
-#include "loki/pddl/parameter.hpp"
+#include "loki/details/pddl/context.hpp"
+#include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/parameter.hpp"
 
 namespace loki
 {

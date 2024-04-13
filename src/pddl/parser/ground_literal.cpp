@@ -18,7 +18,7 @@
 #include "ground_literal.hpp"
 
 #include "common.hpp"
-#include "loki/pddl/exceptions.hpp"
+#include "loki/details/pddl/exceptions.hpp"
 #include "objects.hpp"
 
 namespace loki

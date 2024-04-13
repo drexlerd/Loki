@@ -15,12 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/pddl/metric.hpp"
+#include "loki/details/pddl/metric.hpp"
 
-#include "loki/pddl/function_expressions.hpp"
-#include "loki/pddl/visitors.hpp"
-#include "loki/utils/collections.hpp"
-#include "loki/utils/hash.hpp"
+#include "loki/details/pddl/function_expressions.hpp"
+#include "loki/details/pddl/visitors.hpp"
+#include "loki/details/utils/collections.hpp"
+#include "loki/details/utils/hash.hpp"
 
 #include <cassert>
 

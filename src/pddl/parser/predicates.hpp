@@ -18,9 +18,9 @@
 #ifndef LOKI_SRC_PDDL_PARSER_PREDICATES_HPP_
 #define LOKI_SRC_PDDL_PARSER_PREDICATES_HPP_
 
-#include "loki/ast/ast.hpp"
-#include "loki/pddl/parser.hpp"
-#include "loki/pddl/predicate.hpp"
+#include "loki/details/ast/ast.hpp"
+#include "loki/details/pddl/parser.hpp"
+#include "loki/details/pddl/predicate.hpp"
 
 namespace loki
 {

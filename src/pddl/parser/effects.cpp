@@ -21,7 +21,7 @@
 #include "conditions.hpp"
 #include "functions.hpp"
 #include "literal.hpp"
-#include "loki/pddl/exceptions.hpp"
+#include "loki/details/pddl/exceptions.hpp"
 #include "parameters.hpp"
 #include "reference_utils.hpp"
 

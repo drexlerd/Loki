@@ -15,15 +15,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/pddl/parser.hpp"
+#include "loki/details/pddl/parser.hpp"
 
-#include "loki/pddl/declarations.hpp"
-#include "loki/pddl/domain.hpp"
-#include "loki/pddl/exceptions.hpp"
-#include "loki/pddl/object.hpp"
-#include "loki/pddl/parameter.hpp"
-#include "loki/pddl/predicate.hpp"
-#include "loki/pddl/type.hpp"
+#include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/domain.hpp"
+#include "loki/details/pddl/exceptions.hpp"
+#include "loki/details/pddl/object.hpp"
+#include "loki/details/pddl/parameter.hpp"
+#include "loki/details/pddl/predicate.hpp"
+#include "loki/details/pddl/type.hpp"
 #include "parser/common.hpp"
 #include "parser/constants.hpp"
 #include "parser/functions.hpp"

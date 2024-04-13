@@ -15,11 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/pddl/exceptions.hpp"
+#include "loki/details/pddl/exceptions.hpp"
 
-#include "loki/pddl/domain.hpp"
-#include "loki/pddl/function_skeleton.hpp"
-#include "loki/pddl/predicate.hpp"
+#include "loki/details/pddl/domain.hpp"
+#include "loki/details/pddl/function_skeleton.hpp"
+#include "loki/details/pddl/predicate.hpp"
 
 #include <string>
 

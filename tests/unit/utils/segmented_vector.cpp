@@ -16,7 +16,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/utils/segmented_vector.hpp>
+#include <loki/details/utils/segmented_vector.hpp>
 
 namespace loki::domain::tests
 {

@@ -19,8 +19,8 @@
 
 #include <benchmark/benchmark.h>
 #include <iostream>
-#include <loki/pddl/factories.hpp>
-#include <loki/utils/memory.hpp>
+#include <loki/details/pddl/factories.hpp>
+#include <loki/details/utils/memory.hpp>
 #include <random>
 
 namespace loki::benchmarks

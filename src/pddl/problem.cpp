@@ -15,21 +15,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/pddl/problem.hpp"
+#include "loki/details/pddl/problem.hpp"
 
-#include "loki/pddl/axiom.hpp"
-#include "loki/pddl/conditions.hpp"
-#include "loki/pddl/domain.hpp"
-#include "loki/pddl/ground_literal.hpp"
-#include "loki/pddl/metric.hpp"
-#include "loki/pddl/numeric_fluent.hpp"
-#include "loki/pddl/object.hpp"
-#include "loki/pddl/predicate.hpp"
-#include "loki/pddl/requirements.hpp"
-#include "loki/pddl/type.hpp"
-#include "loki/pddl/visitors.hpp"
-#include "loki/utils/collections.hpp"
-#include "loki/utils/hash.hpp"
+#include "loki/details/pddl/axiom.hpp"
+#include "loki/details/pddl/conditions.hpp"
+#include "loki/details/pddl/domain.hpp"
+#include "loki/details/pddl/ground_literal.hpp"
+#include "loki/details/pddl/metric.hpp"
+#include "loki/details/pddl/numeric_fluent.hpp"
+#include "loki/details/pddl/object.hpp"
+#include "loki/details/pddl/predicate.hpp"
+#include "loki/details/pddl/requirements.hpp"
+#include "loki/details/pddl/type.hpp"
+#include "loki/details/pddl/visitors.hpp"
+#include "loki/details/utils/collections.hpp"
+#include "loki/details/utils/hash.hpp"
 
 #include <iostream>
 

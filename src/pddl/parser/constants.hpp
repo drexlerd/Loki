@@ -18,9 +18,9 @@
 #ifndef LOKI_SRC_PDDL_PARSER_CONSTANTS_HPP_
 #define LOKI_SRC_PDDL_PARSER_CONSTANTS_HPP_
 
-#include "loki/ast/ast.hpp"
-#include "loki/pddl/declarations.hpp"
-#include "loki/pddl/parser.hpp"
+#include "loki/details/ast/ast.hpp"
+#include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/parser.hpp"
 
 namespace loki
 {

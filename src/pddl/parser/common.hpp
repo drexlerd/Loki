@@ -18,8 +18,8 @@
 #ifndef LOKI_SRC_PDDL_PARSER_COMMON_HPP_
 #define LOKI_SRC_PDDL_PARSER_COMMON_HPP_
 
-#include "loki/ast/ast.hpp"
-#include "loki/pddl/context.hpp"
+#include "loki/details/ast/ast.hpp"
+#include "loki/details/pddl/context.hpp"
 
 namespace loki
 {

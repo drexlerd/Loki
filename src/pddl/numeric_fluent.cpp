@@ -15,10 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/pddl/numeric_fluent.hpp"
+#include "loki/details/pddl/numeric_fluent.hpp"
 
-#include "loki/pddl/function.hpp"
-#include "loki/utils/hash.hpp"
+#include "loki/details/pddl/function.hpp"
+#include "loki/details/utils/hash.hpp"
 
 namespace loki
 {

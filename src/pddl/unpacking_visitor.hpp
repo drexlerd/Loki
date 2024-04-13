@@ -18,8 +18,8 @@
 #ifndef LOKI_SRC_DOMAIN_PDDL_UNPACK_VISITOR_HPP_
 #define LOKI_SRC_DOMAIN_PDDL_UNPACK_VISITOR_HPP_
 
-#include "loki/ast/config.hpp"
-#include "loki/pddl/parser.hpp"
+#include "loki/details/ast/config.hpp"
+#include "loki/details/pddl/parser.hpp"
 
 #include <boost/variant.hpp>
 #include <functional>

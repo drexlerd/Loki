@@ -16,7 +16,7 @@
  */
 
 #include <iostream>
-#include <loki/parser.hpp>
+#include <loki/loki.hpp>
 
 int main(int argc, char** argv)
 {

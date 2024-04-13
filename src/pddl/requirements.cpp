@@ -15,9 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/pddl/requirements.hpp"
+#include "loki/details/pddl/requirements.hpp"
 
-#include "loki/utils/hash.hpp"
+#include "loki/details/utils/hash.hpp"
 
 #include <cassert>
 

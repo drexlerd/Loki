@@ -18,7 +18,7 @@
 #ifndef LOKI_SRC_DOMAIN_AST_PARSER_HPP_
 #define LOKI_SRC_DOMAIN_AST_PARSER_HPP_
 
-#include "loki/ast/ast.hpp"
+#include "loki/details/ast/ast.hpp"
 
 #include <boost/spirit/home/x3.hpp>
 

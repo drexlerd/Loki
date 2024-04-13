@@ -18,7 +18,7 @@
 #include "goal.hpp"
 
 #include "conditions.hpp"
-#include "loki/pddl/conditions.hpp"
+#include "loki/details/pddl/conditions.hpp"
 
 #include <iostream>
 

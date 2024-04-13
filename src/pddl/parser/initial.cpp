@@ -20,8 +20,7 @@
 #include "common.hpp"
 #include "functions.hpp"
 #include "ground_literal.hpp"
-#include "loki/exceptions.hpp"
-#include "loki/pddl/exceptions.hpp"
+#include "loki/details/pddl/exceptions.hpp"
 
 namespace loki
 {

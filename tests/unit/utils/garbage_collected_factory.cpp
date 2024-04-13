@@ -16,9 +16,9 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/pddl/object.hpp>
-#include <loki/utils/garbage_collected_factory.hpp>
-#include <loki/utils/hash.hpp>
+#include <loki/details/pddl/object.hpp>
+#include <loki/details/utils/garbage_collected_factory.hpp>
+#include <loki/details/utils/hash.hpp>
 #include <string>
 
 namespace loki::domain::tests

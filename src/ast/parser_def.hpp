@@ -19,10 +19,10 @@
 #define LOKI_SRC_DOMAIN_AST_PARSER_DEF_HPP_
 
 #include "ast_adapted.hpp"
-#include "loki/ast/ast.hpp"
-#include "loki/ast/error_handler.hpp"
-#include "loki/ast/parser.hpp"
-#include "loki/ast/parser_wrapper.hpp"
+#include "loki/details/ast/ast.hpp"
+#include "loki/details/ast/error_handler.hpp"
+#include "loki/details/ast/parser.hpp"
+#include "loki/details/ast/parser_wrapper.hpp"
 #include "parser.hpp"
 
 #include <boost/spirit/home/x3.hpp>
