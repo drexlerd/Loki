@@ -4,11 +4,26 @@
 /**
  * Parser
  */
+
+#include "loki/details/exceptions.hpp"
 #include "loki/details/parser.hpp"
+
+/**
+ * AST
+ */
+
+#include "loki/details/ast/ast.hpp"
+#include "loki/details/ast/config.hpp"
+#include "loki/details/ast/error_handler.hpp"
+#include "loki/details/ast/error_reporting.hpp"
+#include "loki/details/ast/parser.hpp"
+#include "loki/details/ast/parser_wrapper.hpp"
+#include "loki/details/ast/printer.hpp"
 
 /**
  * PDDL
  */
+
 #include "loki/details/pddl/action.hpp"
 #include "loki/details/pddl/atom.hpp"
 #include "loki/details/pddl/axiom.hpp"
@@ -31,10 +46,12 @@
 #include "loki/details/pddl/numeric_fluent.hpp"
 #include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/parameter.hpp"
+#include "loki/details/pddl/parser.hpp"
 #include "loki/details/pddl/position.hpp"
 #include "loki/details/pddl/predicate.hpp"
 #include "loki/details/pddl/reference.hpp"
 #include "loki/details/pddl/requirements.hpp"
+#include "loki/details/pddl/scope.hpp"
 #include "loki/details/pddl/term.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/utils.hpp"
