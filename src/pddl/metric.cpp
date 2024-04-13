@@ -26,14 +26,14 @@
 
 using namespace std;
 
-namespace loki::pddl
+namespace loki
 {
 std::unordered_map<OptimizationMetricEnum, std::string> optimization_metric_enum_to_string = {
     { OptimizationMetricEnum::MINIMIZE, "minimize" },
     { OptimizationMetricEnum::MAXIMIZE, "maximize" },
 };
 
-const std::string& to_string(pddl::OptimizationMetricEnum optimization_metric)
+const std::string& to_string(OptimizationMetricEnum optimization_metric)
 {
     assert(optimization_metric_enum_to_string.count(optimization_metric));
     return optimization_metric_enum_to_string.at(optimization_metric);

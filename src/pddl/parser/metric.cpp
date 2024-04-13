@@ -27,37 +27,34 @@ namespace loki
 {
 
 /* OptimizationMetricEnum */
-pddl::OptimizationMetricEnum parse(const ast::Optimization& node, Context& context)
-{
-    return boost::apply_visitor(OptimizationDeclarationVisitor(context), node);
-}
+OptimizationMetricEnum parse(const ast::Optimization& node, Context& context) { return boost::apply_visitor(OptimizationDeclarationVisitor(context), node); }
 
-pddl::OptimizationMetricEnum parse(const ast::OptimizationMinimize& /*node*/, Context& /*context*/) { return pddl::OptimizationMetricEnum::MINIMIZE; }
+OptimizationMetricEnum parse(const ast::OptimizationMinimize& /*node*/, Context& /*context*/) { return OptimizationMetricEnum::MINIMIZE; }
 
-pddl::OptimizationMetricEnum parse(const ast::OptimizationMaximize& /*node*/, Context& /*context*/) { return pddl::OptimizationMetricEnum::MAXIMIZE; }
+OptimizationMetricEnum parse(const ast::OptimizationMaximize& /*node*/, Context& /*context*/) { return OptimizationMetricEnum::MAXIMIZE; }
 
 OptimizationDeclarationVisitor::OptimizationDeclarationVisitor(Context& context_) : context(context_) {}
 
 /* OptimizationMetric */
-pddl::OptimizationMetric parse(const ast::MetricSpecification& node, Context& context)
+OptimizationMetric parse(const ast::MetricSpecification& node, Context& context)
 {
     return boost::apply_visitor(MetricSpecificationDeclarationVisitor(context), node);
 }
 
-pddl::OptimizationMetric parse(const ast::MetricSpecificationTotalCost& node, Context& context)
+OptimizationMetric parse(const ast::MetricSpecificationTotalCost& node, Context& context)
 {
-    const auto optimization = pddl::OptimizationMetricEnum::MINIMIZE;
+    const auto optimization = OptimizationMetricEnum::MINIMIZE;
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol_total_cost, context);
-    const auto function = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, pddl::TermList {});
-    const auto function_expression = context.factories.function_expressions.get_or_create<pddl::FunctionExpressionFunctionImpl>(function);
-    return context.factories.optimization_metrics.get_or_create<pddl::OptimizationMetricImpl>(optimization, function_expression);
+    const auto function = context.factories.get_or_create_function(function_skeleton, TermList {});
+    const auto function_expression = context.factories.get_or_create_function_expression_function(function);
+    return context.factories.get_or_create_optimization_metric(optimization, function_expression);
 }
 
-pddl::OptimizationMetric parse(const ast::MetricSpecificationGeneral& node, Context& context)
+OptimizationMetric parse(const ast::MetricSpecificationGeneral& node, Context& context)
 {
     const auto optimization = parse(node.optimization, context);
     const auto function_expression = parse(node.metric_function_expression, context);
-    return context.factories.optimization_metrics.get_or_create<pddl::OptimizationMetricImpl>(optimization, function_expression);
+    return context.factories.get_or_create_optimization_metric(optimization, function_expression);
 }
 
 MetricSpecificationDeclarationVisitor::MetricSpecificationDeclarationVisitor(Context& context_) : context(context_) {}

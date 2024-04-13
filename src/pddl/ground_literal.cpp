@@ -21,7 +21,7 @@
 #include "loki/utils/collections.hpp"
 #include "loki/utils/hash.hpp"
 
-namespace loki::pddl
+namespace loki
 {
 GroundLiteralImpl::GroundLiteralImpl(int identifier, bool is_negated, GroundAtom atom) : Base(identifier), m_is_negated(is_negated), m_atom(std::move(atom)) {}
 

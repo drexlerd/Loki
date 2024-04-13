@@ -20,7 +20,7 @@
 #include "loki/pddl/parameter.hpp"
 #include "loki/utils/hash.hpp"
 
-namespace loki::pddl
+namespace loki
 {
 FunctionSkeletonImpl::FunctionSkeletonImpl(int identifier, std::string name, ParameterList parameters, Type type) :
     Base(identifier),

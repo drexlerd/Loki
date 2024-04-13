@@ -21,7 +21,7 @@
 /// @brief This example illustrates incorrect ownership handling
 int main()
 {
-    auto domain = loki::pddl::Domain { nullptr };
+    auto domain = loki::Domain { nullptr };
     {
         // Parse the domain
         auto domain_parser = loki::DomainParser("data/gripper/domain.pddl");

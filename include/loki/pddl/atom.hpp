@@ -24,7 +24,7 @@
 
 #include <string>
 
-namespace loki::pddl
+namespace loki
 {
 class AtomImpl : public Base<AtomImpl>
 {
@@ -35,7 +35,7 @@ private:
     AtomImpl(int identifier, Predicate predicate, TermList terms);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<AtomImpl, loki::Hash<AtomImpl*>, loki::EqualTo<AtomImpl*>>;
+    friend class PDDLFactory<AtomImpl, Hash<AtomImpl*>, EqualTo<AtomImpl*>>;
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const AtomImpl& other) const;

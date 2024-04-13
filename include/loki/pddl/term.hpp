@@ -26,12 +26,6 @@
 
 namespace loki
 {
-template<typename HolderType, typename Hash, typename EqualTo>
-class PDDLFactory;
-}
-
-namespace loki::pddl
-{
 
 class TermObjectImpl : public Base<TermObjectImpl>
 {
@@ -41,7 +35,7 @@ private:
     TermObjectImpl(int identifier, Object object);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<TermImpl, loki::Hash<TermImpl*>, loki::EqualTo<TermImpl*>>;
+    friend class PDDLFactory<TermImpl, Hash<TermImpl*>, EqualTo<TermImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const TermObjectImpl& other) const;
     size_t hash_impl() const;
@@ -62,7 +56,7 @@ private:
     TermVariableImpl(int identifier, Variable variable);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<TermImpl, loki::Hash<TermImpl*>, loki::EqualTo<TermImpl*>>;
+    friend class PDDLFactory<TermImpl, Hash<TermImpl*>, EqualTo<TermImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const TermVariableImpl& other) const;
     size_t hash_impl() const;

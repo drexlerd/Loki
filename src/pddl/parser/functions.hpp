@@ -29,34 +29,34 @@
 namespace loki
 {
 /* MultiOperator */
-struct MultiOperatorVisitor : boost::static_visitor<pddl::MultiOperatorEnum>
+struct MultiOperatorVisitor : boost::static_visitor<MultiOperatorEnum>
 {
-    pddl::MultiOperatorEnum operator()(const ast::MultiOperatorMul& node) const;
-    pddl::MultiOperatorEnum operator()(const ast::MultiOperatorPlus& node) const;
+    MultiOperatorEnum operator()(const ast::MultiOperatorMul& node) const;
+    MultiOperatorEnum operator()(const ast::MultiOperatorPlus& node) const;
 };
 
 /* BinaryOperator */
-struct MultiToBinaryOperatorVisitor : boost::static_visitor<pddl::BinaryOperatorEnum>
+struct MultiToBinaryOperatorVisitor : boost::static_visitor<BinaryOperatorEnum>
 {
-    pddl::BinaryOperatorEnum operator()(const ast::MultiOperatorMul& node) const;
-    pddl::BinaryOperatorEnum operator()(const ast::MultiOperatorPlus& node) const;
+    BinaryOperatorEnum operator()(const ast::MultiOperatorMul& node) const;
+    BinaryOperatorEnum operator()(const ast::MultiOperatorPlus& node) const;
 };
 
-struct BinaryOperatorVisitor : boost::static_visitor<pddl::BinaryOperatorEnum>
+struct BinaryOperatorVisitor : boost::static_visitor<BinaryOperatorEnum>
 {
-    pddl::BinaryOperatorEnum operator()(const ast::BinaryOperatorDiv& node) const;
-    pddl::BinaryOperatorEnum operator()(const ast::BinaryOperatorMinus& node) const;
-    pddl::BinaryOperatorEnum operator()(const ast::MultiOperator& node) const;
+    BinaryOperatorEnum operator()(const ast::BinaryOperatorDiv& node) const;
+    BinaryOperatorEnum operator()(const ast::BinaryOperatorMinus& node) const;
+    BinaryOperatorEnum operator()(const ast::MultiOperator& node) const;
 };
 
 /* FunctionExpression */
-extern pddl::FunctionExpression parse(const ast::FunctionExpressionNumber& node, Context& context);
-extern pddl::FunctionExpression parse(const ast::FunctionExpressionBinaryOp& node, Context& context);
-extern pddl::FunctionExpression parse(const ast::FunctionExpressionMinus& node, Context& context);
-extern pddl::FunctionExpression parse(const ast::FunctionExpressionHead node, Context& context);
-extern pddl::FunctionExpression parse(const ast::FunctionExpression& node, Context& context);
+extern FunctionExpression parse(const ast::FunctionExpressionNumber& node, Context& context);
+extern FunctionExpression parse(const ast::FunctionExpressionBinaryOp& node, Context& context);
+extern FunctionExpression parse(const ast::FunctionExpressionMinus& node, Context& context);
+extern FunctionExpression parse(const ast::FunctionExpressionHead node, Context& context);
+extern FunctionExpression parse(const ast::FunctionExpression& node, Context& context);
 
-class FunctionExpressionVisitor : boost::static_visitor<pddl::FunctionExpression>
+class FunctionExpressionVisitor : boost::static_visitor<FunctionExpression>
 {
 private:
     Context& context;
@@ -65,21 +65,21 @@ public:
     FunctionExpressionVisitor(Context& context_);
 
     template<typename Node>
-    pddl::FunctionExpression operator()(const Node& node) const
+    FunctionExpression operator()(const Node& node) const
     {
         return parse(node, context);
     }
 };
 
 /* Function */
-extern pddl::Function parse(const ast::FunctionHead& node, Context& context);
+extern Function parse(const ast::FunctionHead& node, Context& context);
 
 /* FunctionSkeleton */
-extern pddl::FunctionSkeleton parse_function_skeleton_reference(const ast::FunctionSymbol& node, Context& context);
-extern pddl::FunctionSkeleton parse(const ast::AtomicFunctionSkeletonTotalCost& node);
-extern pddl::FunctionSkeleton parse(const ast::AtomicFunctionSkeletonGeneral& node);
+extern FunctionSkeleton parse_function_skeleton_reference(const ast::FunctionSymbol& node, Context& context);
+extern FunctionSkeleton parse(const ast::AtomicFunctionSkeletonTotalCost& node);
+extern FunctionSkeleton parse(const ast::AtomicFunctionSkeletonGeneral& node);
 
-class AtomicFunctionSkeletonVisitor : boost::static_visitor<pddl::FunctionSkeleton>
+class AtomicFunctionSkeletonVisitor : boost::static_visitor<FunctionSkeleton>
 {
 private:
     Context& context;
@@ -88,18 +88,18 @@ public:
     AtomicFunctionSkeletonVisitor(Context& context_);
 
     template<typename Node>
-    pddl::FunctionSkeleton operator()(const Node& node)
+    FunctionSkeleton operator()(const Node& node)
     {
         return parse(node, context);
     }
 };
 
 /* FunctionSkeletonList */
-extern pddl::FunctionSkeletonList parse(const std::vector<ast::AtomicFunctionSkeleton>& formula_skeleton_nodes);
-extern pddl::FunctionSkeletonList parse(const ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& function_skeleton_list_recursively_node);
-extern pddl::FunctionSkeletonList parse(const ast::Functions& functions_node, Context& context);
+extern FunctionSkeletonList parse(const std::vector<ast::AtomicFunctionSkeleton>& formula_skeleton_nodes);
+extern FunctionSkeletonList parse(const ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& function_skeleton_list_recursively_node);
+extern FunctionSkeletonList parse(const ast::Functions& functions_node, Context& context);
 
-class FunctionSkeletonListVisitor : boost::static_visitor<pddl::FunctionSkeletonList>
+class FunctionSkeletonListVisitor : boost::static_visitor<FunctionSkeletonList>
 {
 private:
     Context& context;
@@ -108,23 +108,23 @@ public:
     FunctionSkeletonListVisitor(Context& context_);
 
     template<typename Node>
-    pddl::FunctionSkeletonList operator()(const Node& node)
+    FunctionSkeletonList operator()(const Node& node)
     {
         return parse(node, context);
     }
 };
 
 /* FunctionExpression */
-extern pddl::FunctionExpression parse(const ast::MetricFunctionExpression& node, Context& context);
-extern pddl::FunctionExpression parse(const ast::MetricFunctionExpressionNumber& node, Context& context);
-extern pddl::FunctionExpression parse(const ast::MetricFunctionExpressionBinaryOperator& node, Context& context);
-extern pddl::FunctionExpression parse(const ast::MetricFunctionExpressionMultiOperator& node, Context& context);
-extern pddl::FunctionExpression parse(const ast::MetricFunctionExpressionMinus& node, Context& context);
-extern pddl::FunctionExpression parse(const ast::MetricFunctionExpressionBasicFunctionTerm& node, Context& context);
-extern pddl::FunctionExpression parse(const ast::MetricFunctionExpressionTotalTime& node, Context& context);
-extern pddl::FunctionExpression parse(const ast::MetricFunctionExpressionPreferences& node, Context& context);
+extern FunctionExpression parse(const ast::MetricFunctionExpression& node, Context& context);
+extern FunctionExpression parse(const ast::MetricFunctionExpressionNumber& node, Context& context);
+extern FunctionExpression parse(const ast::MetricFunctionExpressionBinaryOperator& node, Context& context);
+extern FunctionExpression parse(const ast::MetricFunctionExpressionMultiOperator& node, Context& context);
+extern FunctionExpression parse(const ast::MetricFunctionExpressionMinus& node, Context& context);
+extern FunctionExpression parse(const ast::MetricFunctionExpressionBasicFunctionTerm& node, Context& context);
+extern FunctionExpression parse(const ast::MetricFunctionExpressionTotalTime& node, Context& context);
+extern FunctionExpression parse(const ast::MetricFunctionExpressionPreferences& node, Context& context);
 
-class MetricFunctionExpressionDeclarationVisitor : boost::static_visitor<pddl::FunctionExpression>
+class MetricFunctionExpressionDeclarationVisitor : boost::static_visitor<FunctionExpression>
 {
 private:
     Context& context;
@@ -133,14 +133,14 @@ public:
     MetricFunctionExpressionDeclarationVisitor(Context& context_);
 
     template<typename Node>
-    pddl::FunctionExpression operator()(const Node& node) const
+    FunctionExpression operator()(const Node& node) const
     {
         return parse(node, context);
     }
 };
 
 /* Function */
-extern pddl::Function parse(const ast::BasicFunctionTerm& node, Context& context);
+extern Function parse(const ast::BasicFunctionTerm& node, Context& context);
 
 }
 

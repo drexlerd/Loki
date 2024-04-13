@@ -29,15 +29,15 @@ namespace loki::benchmarks
 struct AtomAccessResult
 {
     int atom_identifier;
-    loki::pddl::Predicate atom_predicate;
-    loki::pddl::TermList atom_terms;
+    loki::Predicate atom_predicate;
+    loki::TermList atom_terms;
 };
 
-static AtomAccessResult access_atom_data(const loki::pddl::Atom& atom)
+static AtomAccessResult access_atom_data(const loki::Atom& atom)
 {
     const auto atom_identifier = atom->get_identifier();
     const auto atom_predicate = atom->get_predicate();
-    auto atom_terms = loki::pddl::TermList();
+    auto atom_terms = loki::TermList();
     for (const auto& term : atom->get_terms())
     {
         atom_terms.push_back(term);
@@ -70,7 +70,7 @@ static void BM_IterateAtoms(benchmark::State& state)
         }
     }
 
-    state.SetBytesProcessed(state.iterations() * atoms.size() * sizeof(loki::pddl::ActionImpl));
+    state.SetBytesProcessed(state.iterations() * atoms.size() * sizeof(loki::ActionImpl));
 }
 
 static void BM_RandomlyIterateAtoms(benchmark::State& state)
@@ -98,13 +98,13 @@ static void BM_RandomlyIterateAtoms(benchmark::State& state)
         }
     }
 
-    state.SetBytesProcessed(state.iterations() * atoms.size() * sizeof(loki::pddl::ActionImpl));
+    state.SetBytesProcessed(state.iterations() * atoms.size() * sizeof(loki::ActionImpl));
 }
 
 }
 
 // Tetralith has Intel Xeon Gold 6130 with L1=512KB, L2=8192KB, L3=22528KB
-// sizeof(loki::pddl::AtomImpl)=56 => 9142 fit into L1, 146285 fit into L2, 402285 fit into L3
+// sizeof(loki::AtomImpl)=56 => 9142 fit into L1, 146285 fit into L2, 402285 fit into L3
 
 // we just choose some reasonable numbers that can be observed in planning tasks
 BENCHMARK(loki::benchmarks::BM_IterateAtoms)->Arg(100);     // small tasks

@@ -24,7 +24,7 @@
 #include "loki/utils/collections.hpp"
 #include "loki/utils/hash.hpp"
 
-namespace loki::pddl
+namespace loki
 {
 ActionImpl::ActionImpl(int identifier, std::string name, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect) :
     Base(identifier),

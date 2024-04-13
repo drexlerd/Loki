@@ -27,7 +27,7 @@ namespace loki
 {
 
 /* ParameterList */
-class ParameterListVisitor : boost::static_visitor<pddl::ParameterList>
+class ParameterListVisitor : boost::static_visitor<ParameterList>
 {
 private:
     Context& context;
@@ -35,9 +35,9 @@ private:
 public:
     ParameterListVisitor(Context& context_);
 
-    pddl::ParameterList operator()(const std::vector<ast::Variable>& nodes);
+    ParameterList operator()(const std::vector<ast::Variable>& nodes);
 
-    pddl::ParameterList operator()(const ast::TypedListOfVariablesRecursively& node);
+    ParameterList operator()(const ast::TypedListOfVariablesRecursively& node);
 };
 
 }

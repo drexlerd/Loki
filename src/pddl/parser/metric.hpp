@@ -25,11 +25,11 @@ namespace loki
 {
 
 /* OptimizationMetricEnum */
-extern pddl::OptimizationMetricEnum parse(const ast::Optimization& node, Context& context);
-extern pddl::OptimizationMetricEnum parse(const ast::OptimizationMinimize& node, Context& context);
-extern pddl::OptimizationMetricEnum parse(const ast::OptimizationMaximize& node, Context& context);
+extern OptimizationMetricEnum parse(const ast::Optimization& node, Context& context);
+extern OptimizationMetricEnum parse(const ast::OptimizationMinimize& node, Context& context);
+extern OptimizationMetricEnum parse(const ast::OptimizationMaximize& node, Context& context);
 
-class OptimizationDeclarationVisitor : boost::static_visitor<pddl::OptimizationMetric>
+class OptimizationDeclarationVisitor : boost::static_visitor<OptimizationMetric>
 {
 private:
     Context& context;
@@ -38,18 +38,18 @@ public:
     OptimizationDeclarationVisitor(Context& context_);
 
     template<typename Node>
-    pddl::OptimizationMetricEnum operator()(const Node& node) const
+    OptimizationMetricEnum operator()(const Node& node) const
     {
         return parse(node, context);
     }
 };
 
 /* OptimizationMetric */
-extern pddl::OptimizationMetric parse(const ast::MetricSpecification& node, Context& context);
-extern pddl::OptimizationMetric parse(const ast::MetricSpecificationTotalCost& node, Context& context);
-extern pddl::OptimizationMetric parse(const ast::MetricSpecificationGeneral& node, Context& context);
+extern OptimizationMetric parse(const ast::MetricSpecification& node, Context& context);
+extern OptimizationMetric parse(const ast::MetricSpecificationTotalCost& node, Context& context);
+extern OptimizationMetric parse(const ast::MetricSpecificationGeneral& node, Context& context);
 
-class MetricSpecificationDeclarationVisitor : boost::static_visitor<pddl::OptimizationMetric>
+class MetricSpecificationDeclarationVisitor : boost::static_visitor<OptimizationMetric>
 {
 private:
     Context& context;
@@ -58,7 +58,7 @@ public:
     MetricSpecificationDeclarationVisitor(Context& context_);
 
     template<typename Node>
-    pddl::OptimizationMetric operator()(const Node& node) const
+    OptimizationMetric operator()(const Node& node) const
     {
         return parse(node, context);
     }

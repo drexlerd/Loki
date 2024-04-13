@@ -26,12 +26,6 @@
 
 namespace loki
 {
-template<typename HolderType, typename Hash, typename EqualTo>
-class PDDLFactory;
-}
-
-namespace loki::pddl
-{
 class TypeImpl : public Base<TypeImpl>
 {
 private:
@@ -41,7 +35,7 @@ private:
     TypeImpl(int identifier, std::string name, TypeList bases = {});
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<TypeImpl, loki::Hash<TypeImpl*>, loki::EqualTo<TypeImpl*>>;
+    friend class PDDLFactory<TypeImpl, Hash<TypeImpl*>, EqualTo<TypeImpl*>>;
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const TypeImpl& other) const;

@@ -28,34 +28,34 @@
 namespace loki
 {
 
-pddl::AssignOperatorEnum parse(const ast::AssignOperatorAssign&) { return pddl::AssignOperatorEnum::ASSIGN; }
+AssignOperatorEnum parse(const ast::AssignOperatorAssign&) { return AssignOperatorEnum::ASSIGN; }
 
-pddl::AssignOperatorEnum parse(const ast::AssignOperatorScaleUp&) { return pddl::AssignOperatorEnum::SCALE_UP; }
+AssignOperatorEnum parse(const ast::AssignOperatorScaleUp&) { return AssignOperatorEnum::SCALE_UP; }
 
-pddl::AssignOperatorEnum parse(const ast::AssignOperatorScaleDown&) { return pddl::AssignOperatorEnum::SCALE_DOWN; }
+AssignOperatorEnum parse(const ast::AssignOperatorScaleDown&) { return AssignOperatorEnum::SCALE_DOWN; }
 
-pddl::AssignOperatorEnum parse(const ast::AssignOperatorIncrease&) { return pddl::AssignOperatorEnum::INCREASE; }
+AssignOperatorEnum parse(const ast::AssignOperatorIncrease&) { return AssignOperatorEnum::INCREASE; }
 
-pddl::AssignOperatorEnum parse(const ast::AssignOperatorDecrease&) { return pddl::AssignOperatorEnum::DECREASE; }
+AssignOperatorEnum parse(const ast::AssignOperatorDecrease&) { return AssignOperatorEnum::DECREASE; }
 
-pddl::AssignOperatorEnum parse(const ast::AssignOperator& node) { return boost::apply_visitor(AssignOperatorVisitor(), node); }
+AssignOperatorEnum parse(const ast::AssignOperator& node) { return boost::apply_visitor(AssignOperatorVisitor(), node); }
 
-pddl::Effect parse(const std::vector<ast::Effect>& effect_nodes, Context& context)
+Effect parse(const std::vector<ast::Effect>& effect_nodes, Context& context)
 {
-    auto effect_list = pddl::EffectList();
+    auto effect_list = EffectList();
     for (const auto& effect_node : effect_nodes)
     {
         effect_list.push_back(parse(effect_node, context));
     }
-    return context.factories.effects.get_or_create<pddl::EffectAndImpl>(effect_list);
+    return context.factories.get_or_create_effect_and(effect_list);
 }
 
-pddl::Effect parse(const ast::Effect& node, Context& context) { return boost::apply_visitor(EffectVisitor(context), node); }
+Effect parse(const ast::Effect& node, Context& context) { return boost::apply_visitor(EffectVisitor(context), node); }
 
-pddl::Effect parse(const ast::EffectProductionLiteral& node, Context& context)
+Effect parse(const ast::EffectProductionLiteral& node, Context& context)
 {
     auto literal = parse(node.literal, context);
-    const auto effect = context.factories.effects.get_or_create<pddl::EffectLiteralImpl>(literal);
+    const auto effect = context.factories.get_or_create_effect_literal(literal);
 
     if (context.derived_predicates.count(literal->get_atom()->get_predicate()))
     {
@@ -66,49 +66,49 @@ pddl::Effect parse(const ast::EffectProductionLiteral& node, Context& context)
     return effect;
 }
 
-pddl::Effect parse(const ast::EffectProductionNumericFluentTotalCost& node, Context& context)
+Effect parse(const ast::EffectProductionNumericFluentTotalCost& node, Context& context)
 {
-    if (!context.requirements->test(pddl::RequirementEnum::ACTION_COSTS))
+    if (!context.requirements->test(RequirementEnum::ACTION_COSTS))
     {
-        throw UndefinedRequirementError(pddl::RequirementEnum::ACTION_COSTS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(RequirementEnum::ACTION_COSTS, context.scopes.get_error_handler()(node, ""));
     }
-    context.references.untrack(pddl::RequirementEnum::ACTION_COSTS);
+    context.references.untrack(RequirementEnum::ACTION_COSTS);
     const auto assign_operator_increase = parse(node.assign_operator_increase);
     auto function_name = parse(node.function_symbol_total_cost.name);
     assert(function_name == "total-cost");
-    auto binding = context.scopes.get<pddl::FunctionSkeletonImpl>(function_name);
+    auto binding = context.scopes.get<FunctionSkeletonImpl>(function_name);
     if (!binding.has_value())
     {
         throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node.function_symbol_total_cost, ""));
     }
     const auto [function_skeleton, _position, _error_handler] = binding.value();
-    const auto function = context.factories.functions.get_or_create<pddl::FunctionImpl>(function_skeleton, pddl::TermList {});
+    const auto function = context.factories.get_or_create_function(function_skeleton, TermList {});
     context.references.untrack(function->get_function_skeleton());
     const auto function_expression = boost::apply_visitor(FunctionExpressionVisitor(context), node.numeric_term);
-    const auto effect = context.factories.effects.get_or_create<pddl::EffectNumericImpl>(assign_operator_increase, function, function_expression);
+    const auto effect = context.factories.get_or_create_effect_numeric(assign_operator_increase, function, function_expression);
     context.positions.push_back(effect, node);
     return effect;
 }
 
-pddl::Effect parse(const ast::EffectProductionNumericFluentGeneral& node, Context& context)
+Effect parse(const ast::EffectProductionNumericFluentGeneral& node, Context& context)
 {
-    if (!context.requirements->test(pddl::RequirementEnum::NUMERIC_FLUENTS))
+    if (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS))
     {
-        throw UndefinedRequirementError(pddl::RequirementEnum::NUMERIC_FLUENTS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(RequirementEnum::NUMERIC_FLUENTS, context.scopes.get_error_handler()(node, ""));
     }
-    context.references.untrack(pddl::RequirementEnum::NUMERIC_FLUENTS);
+    context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
     const auto assign_operator = parse(node.assign_operator);
     const auto function = parse(node.function_head, context);
     context.references.untrack(function->get_function_skeleton());
     const auto function_expression = parse(node.function_expression, context);
-    const auto effect = context.factories.effects.get_or_create<pddl::EffectNumericImpl>(assign_operator, function, function_expression);
+    const auto effect = context.factories.get_or_create_effect_numeric(assign_operator, function, function_expression);
     context.positions.push_back(effect, node);
     return effect;
 }
 
-pddl::Effect parse(const ast::EffectProduction& node, Context& context) { return boost::apply_visitor(EffectVisitor(context), node); }
+Effect parse(const ast::EffectProduction& node, Context& context) { return boost::apply_visitor(EffectVisitor(context), node); }
 
-pddl::Effect parse(const ast::EffectConditionalForall& node, Context& context)
+Effect parse(const ast::EffectConditionalForall& node, Context& context)
 {
     context.scopes.open_scope();
     const auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
@@ -116,30 +116,30 @@ pddl::Effect parse(const ast::EffectConditionalForall& node, Context& context)
     const auto child_effect = parse(node.effect, context);
     test_variable_references(parameter_list, context);
     context.scopes.close_scope();
-    const auto effect = context.factories.effects.get_or_create<pddl::EffectConditionalForallImpl>(parameter_list, child_effect);
+    const auto effect = context.factories.get_or_create_effect_conditional_forall(parameter_list, child_effect);
     context.positions.push_back(effect, node);
     return effect;
 }
 
-pddl::Effect parse(const ast::EffectConditionalWhen& node, Context& context)
+Effect parse(const ast::EffectConditionalWhen& node, Context& context)
 {
     context.scopes.open_scope();
     const auto condition = parse(node.goal_descriptor, context);
     const auto child_effect = parse(node.effect, context);
     context.scopes.close_scope();
-    const auto effect = context.factories.effects.get_or_create<pddl::EffectConditionalWhenImpl>(condition, child_effect);
+    const auto effect = context.factories.get_or_create_effect_conditional_when(condition, child_effect);
     context.positions.push_back(effect, node);
     return effect;
 }
 
-pddl::Effect parse(const ast::EffectConditional& node, Context& context)
+Effect parse(const ast::EffectConditional& node, Context& context)
 {
     // requires :conditional-effects
-    if (!context.requirements->test(pddl::RequirementEnum::CONDITIONAL_EFFECTS))
+    if (!context.requirements->test(RequirementEnum::CONDITIONAL_EFFECTS))
     {
-        throw UndefinedRequirementError(pddl::RequirementEnum::CONDITIONAL_EFFECTS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(RequirementEnum::CONDITIONAL_EFFECTS, context.scopes.get_error_handler()(node, ""));
     }
-    context.references.untrack(pddl::RequirementEnum::CONDITIONAL_EFFECTS);
+    context.references.untrack(RequirementEnum::CONDITIONAL_EFFECTS);
     const auto effect = boost::apply_visitor(EffectVisitor(context), node);
     context.positions.push_back(effect, node);
     return effect;

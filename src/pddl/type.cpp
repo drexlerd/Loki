@@ -20,7 +20,7 @@
 #include "loki/utils/collections.hpp"
 #include "loki/utils/hash.hpp"
 
-namespace loki::pddl
+namespace loki
 {
 TypeImpl::TypeImpl(int identifier, std::string name, TypeList bases) : Base(identifier), m_name(std::move(name)), m_bases(std::move(bases)) {}
 

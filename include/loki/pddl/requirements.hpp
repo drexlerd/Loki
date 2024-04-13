@@ -28,12 +28,6 @@
 
 namespace loki
 {
-template<typename HolderType, typename Hash, typename EqualTo>
-class PDDLFactory;
-}
-
-namespace loki::pddl
-{
 enum class RequirementEnum
 {
     STRIPS,
@@ -61,7 +55,7 @@ using RequirementEnumSet = std::set<RequirementEnum>;
 using RequirementEnumList = std::vector<RequirementEnum>;
 
 extern std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string;
-extern const std::string& to_string(pddl::RequirementEnum requirement);
+extern const std::string& to_string(RequirementEnum requirement);
 
 class RequirementsImpl : public Base<RequirementsImpl>
 {
@@ -71,7 +65,7 @@ private:
     RequirementsImpl(int identifier, RequirementEnumSet requirements);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<RequirementsImpl, loki::Hash<RequirementsImpl*>, loki::EqualTo<RequirementsImpl*>>;
+    friend class PDDLFactory<RequirementsImpl, Hash<RequirementsImpl*>, EqualTo<RequirementsImpl*>>;
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const RequirementsImpl& other) const;

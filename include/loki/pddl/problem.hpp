@@ -27,12 +27,6 @@
 
 namespace loki
 {
-template<typename HolderType, typename Hash, typename EqualTo>
-class PDDLFactory;
-}
-
-namespace loki::pddl
-{
 class ProblemImpl : public Base<ProblemImpl>
 {
 private:
@@ -60,7 +54,7 @@ private:
                 AxiomList axioms);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<ProblemImpl, loki::Hash<ProblemImpl*>, loki::EqualTo<ProblemImpl*>>;
+    friend class PDDLFactory<ProblemImpl, Hash<ProblemImpl*>, EqualTo<ProblemImpl*>>;
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const ProblemImpl& other) const;

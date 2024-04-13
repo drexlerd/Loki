@@ -22,7 +22,7 @@
 #include "loki/utils/collections.hpp"
 #include "loki/utils/hash.hpp"
 
-namespace loki::pddl
+namespace loki
 {
 
 /* TermObjectImpl */

@@ -35,7 +35,7 @@
 
 using namespace std;
 
-namespace loki::pddl
+namespace loki
 {
 ProblemImpl::ProblemImpl(int identifier,
                          Domain domain,
@@ -102,7 +102,7 @@ void ProblemImpl::str_impl(std::ostream& out, const FormattingOptions& options) 
     if (!m_objects.empty())
     {
         out << string(nested_options.indent, ' ') << "(:objects ";
-        std::unordered_map<pddl::TypeList, pddl::ObjectList, hash_container_type<pddl::TypeList>> objects_by_types;
+        std::unordered_map<TypeList, ObjectList, hash_container_type<TypeList>> objects_by_types;
         for (const auto& object : m_objects)
         {
             objects_by_types[object->get_bases()].push_back(object);

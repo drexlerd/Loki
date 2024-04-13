@@ -26,12 +26,6 @@
 
 namespace loki
 {
-template<typename HolderType, typename Hash, typename EqualTo>
-class PDDLFactory;
-}
-
-namespace loki::pddl
-{
 enum class BinaryOperatorEnum
 {
     MUL,
@@ -41,7 +35,7 @@ enum class BinaryOperatorEnum
 };
 
 extern std::unordered_map<BinaryOperatorEnum, std::string> binary_operator_enum_to_string;
-extern const std::string& to_string(pddl::BinaryOperatorEnum binary_operator);
+extern const std::string& to_string(BinaryOperatorEnum binary_operator);
 
 enum class MultiOperatorEnum
 {
@@ -50,7 +44,7 @@ enum class MultiOperatorEnum
 };
 
 extern std::unordered_map<MultiOperatorEnum, std::string> multi_operator_enum_to_string;
-extern const std::string& to_string(pddl::MultiOperatorEnum multi_operator);
+extern const std::string& to_string(MultiOperatorEnum multi_operator);
 
 /* FunctionExpressionNumber */
 class FunctionExpressionNumberImpl : public Base<FunctionExpressionNumberImpl>
@@ -61,7 +55,7 @@ private:
     FunctionExpressionNumberImpl(int identifier, double number);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<FunctionExpressionImpl, loki::Hash<FunctionExpressionImpl*>, loki::EqualTo<FunctionExpressionImpl*>>;
+    friend class PDDLFactory<FunctionExpressionImpl, Hash<FunctionExpressionImpl*>, EqualTo<FunctionExpressionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionNumberImpl& other) const;
     size_t hash_impl() const;
@@ -88,7 +82,7 @@ private:
                                          FunctionExpression right_function_expression);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<FunctionExpressionImpl, loki::Hash<FunctionExpressionImpl*>, loki::EqualTo<FunctionExpressionImpl*>>;
+    friend class PDDLFactory<FunctionExpressionImpl, Hash<FunctionExpressionImpl*>, EqualTo<FunctionExpressionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionBinaryOperatorImpl& other) const;
     size_t hash_impl() const;
@@ -113,7 +107,7 @@ private:
     FunctionExpressionMultiOperatorImpl(int identifier, MultiOperatorEnum multi_operator, FunctionExpressionList function_expressions);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<FunctionExpressionImpl, loki::Hash<FunctionExpressionImpl*>, loki::EqualTo<FunctionExpressionImpl*>>;
+    friend class PDDLFactory<FunctionExpressionImpl, Hash<FunctionExpressionImpl*>, EqualTo<FunctionExpressionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionMultiOperatorImpl& other) const;
     size_t hash_impl() const;
@@ -136,7 +130,7 @@ private:
     FunctionExpressionMinusImpl(int identifier, FunctionExpression function_expression);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<FunctionExpressionImpl, loki::Hash<FunctionExpressionImpl*>, loki::EqualTo<FunctionExpressionImpl*>>;
+    friend class PDDLFactory<FunctionExpressionImpl, Hash<FunctionExpressionImpl*>, EqualTo<FunctionExpressionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionMinusImpl& other) const;
     size_t hash_impl() const;
@@ -158,7 +152,7 @@ private:
     FunctionExpressionFunctionImpl(int identifier, Function function);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<FunctionExpressionImpl, loki::Hash<FunctionExpressionImpl*>, loki::EqualTo<FunctionExpressionImpl*>>;
+    friend class PDDLFactory<FunctionExpressionImpl, Hash<FunctionExpressionImpl*>, EqualTo<FunctionExpressionImpl*>>;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionFunctionImpl& other) const;
     size_t hash_impl() const;

@@ -26,12 +26,6 @@
 
 namespace loki
 {
-template<typename HolderType, typename Hash, typename EqualTo>
-class PDDLFactory;
-}
-
-namespace loki::pddl
-{
 class GroundAtomImpl : public Base<GroundAtomImpl>
 {
 private:
@@ -41,7 +35,7 @@ private:
     GroundAtomImpl(int identifier, Predicate predicate, ObjectList objects);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<GroundAtomImpl, loki::Hash<GroundAtomImpl*>, loki::EqualTo<GroundAtomImpl*>>;
+    friend class PDDLFactory<GroundAtomImpl, Hash<GroundAtomImpl*>, EqualTo<GroundAtomImpl*>>;
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const GroundAtomImpl& other) const;

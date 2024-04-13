@@ -29,41 +29,41 @@ namespace loki
 {
 
 /* AssignOperator */
-extern pddl::AssignOperatorEnum parse(const ast::AssignOperatorAssign& node);
-extern pddl::AssignOperatorEnum parse(const ast::AssignOperatorScaleUp& node);
-extern pddl::AssignOperatorEnum parse(const ast::AssignOperatorScaleDown& node);
-extern pddl::AssignOperatorEnum parse(const ast::AssignOperatorIncrease& node);
-extern pddl::AssignOperatorEnum parse(const ast::AssignOperatorDecrease& node);
-extern pddl::AssignOperatorEnum parse(const ast::AssignOperator& node);
+extern AssignOperatorEnum parse(const ast::AssignOperatorAssign& node);
+extern AssignOperatorEnum parse(const ast::AssignOperatorScaleUp& node);
+extern AssignOperatorEnum parse(const ast::AssignOperatorScaleDown& node);
+extern AssignOperatorEnum parse(const ast::AssignOperatorIncrease& node);
+extern AssignOperatorEnum parse(const ast::AssignOperatorDecrease& node);
+extern AssignOperatorEnum parse(const ast::AssignOperator& node);
 
-struct AssignOperatorVisitor : boost::static_visitor<pddl::AssignOperatorEnum>
+struct AssignOperatorVisitor : boost::static_visitor<AssignOperatorEnum>
 {
     template<typename Node>
-    pddl::AssignOperatorEnum operator()(const Node& node) const
+    AssignOperatorEnum operator()(const Node& node) const
     {
         return parse(node);
     }
 };
 
 /* Effects */
-extern pddl::Effect parse(const std::vector<ast::Effect>& effect_nodes, Context& context);
-extern pddl::Effect parse(const ast::Effect& node, Context& context);
-extern pddl::Effect parse(const ast::EffectProductionLiteral& node, Context& context);
-extern pddl::Effect parse(const ast::EffectProductionNumericFluentTotalCost& node, Context& context);
-extern pddl::Effect parse(const ast::EffectProductionNumericFluentGeneral& node, Context& context);
-extern pddl::Effect parse(const ast::EffectProduction& node, Context& context);
-extern pddl::Effect parse(const ast::EffectConditionalForall& node, Context& context);
-extern pddl::Effect parse(const ast::EffectConditionalWhen& node, Context& context);
-extern pddl::Effect parse(const ast::EffectConditional& node, Context& context);
+extern Effect parse(const std::vector<ast::Effect>& effect_nodes, Context& context);
+extern Effect parse(const ast::Effect& node, Context& context);
+extern Effect parse(const ast::EffectProductionLiteral& node, Context& context);
+extern Effect parse(const ast::EffectProductionNumericFluentTotalCost& node, Context& context);
+extern Effect parse(const ast::EffectProductionNumericFluentGeneral& node, Context& context);
+extern Effect parse(const ast::EffectProduction& node, Context& context);
+extern Effect parse(const ast::EffectConditionalForall& node, Context& context);
+extern Effect parse(const ast::EffectConditionalWhen& node, Context& context);
+extern Effect parse(const ast::EffectConditional& node, Context& context);
 
-struct EffectVisitor : boost::static_visitor<pddl::Effect>
+struct EffectVisitor : boost::static_visitor<Effect>
 {
     Context& context;
 
     EffectVisitor(Context& context_);
 
     template<typename Node>
-    pddl::Effect operator()(const Node& node) const
+    Effect operator()(const Node& node) const
     {
         return parse(node, context);
     }

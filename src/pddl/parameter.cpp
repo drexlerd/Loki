@@ -24,12 +24,9 @@
 
 #include <cassert>
 
-namespace loki::pddl
+namespace loki
 {
-ParameterImpl::ParameterImpl(int identifier, pddl::Variable variable, TypeList types) :
-    Base(identifier),
-    m_variable(std::move(variable)),
-    m_types(std::move(types))
+ParameterImpl::ParameterImpl(int identifier, Variable variable, TypeList types) : Base(identifier), m_variable(std::move(variable)), m_types(std::move(types))
 {
 }
 

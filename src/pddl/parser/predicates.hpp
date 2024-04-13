@@ -26,9 +26,9 @@ namespace loki
 {
 
 /* PredicateList */
-extern pddl::PredicateList parse(const ast::Predicates& predicates_node, Context& context);
+extern PredicateList parse(const ast::Predicates& predicates_node, Context& context);
 
-extern pddl::PredicateList parse(const ast::DerivedPredicates& derived_predicates_node, Context& context);
+extern PredicateList parse(const ast::DerivedPredicates& derived_predicates_node, Context& context);
 
 }
 

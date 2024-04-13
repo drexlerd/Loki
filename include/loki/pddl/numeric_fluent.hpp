@@ -26,12 +26,6 @@
 
 namespace loki
 {
-template<typename HolderType, typename Hash, typename EqualTo>
-class PDDLFactory;
-}
-
-namespace loki::pddl
-{
 class NumericFluentImpl : public Base<NumericFluentImpl>
 {
 private:
@@ -39,7 +33,7 @@ private:
     double m_number;
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<NumericFluentImpl, loki::Hash<NumericFluentImpl*>, loki::EqualTo<NumericFluentImpl*>>;
+    friend class PDDLFactory<NumericFluentImpl, Hash<NumericFluentImpl*>, EqualTo<NumericFluentImpl*>>;
 
     NumericFluentImpl(int identifier, Function function, double number);
 

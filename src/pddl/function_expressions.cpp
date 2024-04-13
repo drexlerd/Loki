@@ -24,7 +24,7 @@
 
 #include <cassert>
 
-namespace loki::pddl
+namespace loki
 {
 
 std::unordered_map<BinaryOperatorEnum, std::string> binary_operator_enum_to_string = {
@@ -34,7 +34,7 @@ std::unordered_map<BinaryOperatorEnum, std::string> binary_operator_enum_to_stri
     { BinaryOperatorEnum::DIV, "/" },
 };
 
-const std::string& to_string(pddl::BinaryOperatorEnum binary_operator)
+const std::string& to_string(BinaryOperatorEnum binary_operator)
 {
     assert(binary_operator_enum_to_string.count(binary_operator));
     return binary_operator_enum_to_string.at(binary_operator);
@@ -45,7 +45,7 @@ std::unordered_map<MultiOperatorEnum, std::string> multi_operator_enum_to_string
     { MultiOperatorEnum::PLUS, "+" },
 };
 
-const std::string& to_string(pddl::MultiOperatorEnum multi_operator)
+const std::string& to_string(MultiOperatorEnum multi_operator)
 {
     assert(multi_operator_enum_to_string.count(multi_operator));
     return multi_operator_enum_to_string.at(multi_operator);

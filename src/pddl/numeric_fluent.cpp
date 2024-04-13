@@ -20,7 +20,7 @@
 #include "loki/pddl/function.hpp"
 #include "loki/utils/hash.hpp"
 
-namespace loki::pddl
+namespace loki
 {
 NumericFluentImpl::NumericFluentImpl(int identifier, Function function, double number) : Base(identifier), m_function(std::move(function)), m_number(number) {}
 

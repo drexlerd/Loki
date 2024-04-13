@@ -37,8 +37,8 @@ struct Context
     // For checking that certain PDDL objects were referenced at least once
     ReferencedPDDLObjects references;
     // For convenience, to avoid an additional parameter during semantic parsing
-    pddl::Requirements requirements;
-    std::unordered_set<pddl::Predicate> derived_predicates;
+    Requirements requirements;
+    std::unordered_set<Predicate> derived_predicates;
 
     Context(PDDLFactories& factories_, PDDLPositionCache& positions_, ScopeStack& scopes_) :
         factories(factories_),

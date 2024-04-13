@@ -26,12 +26,6 @@
 
 namespace loki
 {
-template<typename HolderType, typename Hash, typename EqualTo>
-class PDDLFactory;
-}
-
-namespace loki::pddl
-{
 enum class AssignOperatorEnum
 {
     ASSIGN,
@@ -42,7 +36,7 @@ enum class AssignOperatorEnum
 };
 
 extern std::unordered_map<AssignOperatorEnum, std::string> assign_operator_enum_to_string;
-extern const std::string& to_string(pddl::AssignOperatorEnum assign_operator);
+extern const std::string& to_string(AssignOperatorEnum assign_operator);
 
 /* Literal */
 class EffectLiteralImpl : public Base<EffectLiteralImpl>
@@ -53,7 +47,7 @@ private:
     EffectLiteralImpl(int identifier, Literal literal);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<EffectImpl, loki::Hash<EffectImpl*>, loki::EqualTo<EffectImpl*>>;
+    friend class PDDLFactory<EffectImpl, Hash<EffectImpl*>, EqualTo<EffectImpl*>>;
 
     // Give access to the private interface implementations.
     friend class Base<EffectLiteralImpl>;

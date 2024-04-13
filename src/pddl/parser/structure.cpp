@@ -31,14 +31,14 @@
 namespace loki
 {
 
-std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(const ast::ActionBody& node, Context& context)
+std::tuple<std::optional<Condition>, std::optional<Effect>> parse(const ast::ActionBody& node, Context& context)
 {
-    std::optional<pddl::Condition> condition;
+    std::optional<Condition> condition;
     if (node.precondition_goal_descriptor.has_value())
     {
         condition = parse(node.precondition_goal_descriptor.value(), context);
     }
-    std::optional<pddl::Effect> effect;
+    std::optional<Effect> effect;
     if (node.effect.has_value())
     {
         effect = parse(node.effect.value(), context);
@@ -46,7 +46,7 @@ std::tuple<std::optional<pddl::Condition>, std::optional<pddl::Effect>> parse(co
     return { condition, effect };
 }
 
-pddl::Action parse(const ast::Action& node, Context& context)
+Action parse(const ast::Action& node, Context& context)
 {
     context.scopes.open_scope();
     auto name = parse(node.action_symbol.name);
@@ -55,18 +55,18 @@ pddl::Action parse(const ast::Action& node, Context& context)
     auto [condition, effect] = parse(node.action_body, context);
     test_variable_references(parameter_list, context);
     context.scopes.close_scope();
-    const auto action = context.factories.actions.get_or_create<pddl::ActionImpl>(name, parameter_list, condition, effect);
+    const auto action = context.factories.get_or_create_action(name, parameter_list, condition, effect);
     context.positions.push_back(action, node);
     return action;
 }
 
-pddl::Axiom parse(const ast::Axiom& node, Context& context)
+Axiom parse(const ast::Axiom& node, Context& context)
 {
-    if (!context.requirements->test(pddl::RequirementEnum::DERIVED_PREDICATES))
+    if (!context.requirements->test(RequirementEnum::DERIVED_PREDICATES))
     {
-        throw UndefinedRequirementError(pddl::RequirementEnum::DERIVED_PREDICATES, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(RequirementEnum::DERIVED_PREDICATES, context.scopes.get_error_handler()(node, ""));
     }
-    context.references.untrack(pddl::RequirementEnum::DERIVED_PREDICATES);
+    context.references.untrack(RequirementEnum::DERIVED_PREDICATES);
 
     const auto literal = parse(node.literal, context);
     if (context.derived_predicates.count(literal->get_atom()->get_predicate()) == 0)
@@ -75,13 +75,13 @@ pddl::Axiom parse(const ast::Axiom& node, Context& context)
     }
     const auto condition = parse(node.goal_descriptor, context);
 
-    const auto axiom = context.factories.axioms.get_or_create<pddl::AxiomImpl>(literal, condition);
+    const auto axiom = context.factories.get_or_create_axiom(literal, condition);
     context.positions.push_back(axiom, node);
     return axiom;
 }
 
 StructureVisitor::StructureVisitor(Context& context_) : context(context_) {}
 
-boost::variant<pddl::Axiom, pddl::Action> parse(const ast::Structure& node, Context& context) { return boost::apply_visitor(StructureVisitor(context), node); }
+boost::variant<Axiom, Action> parse(const ast::Structure& node, Context& context) { return boost::apply_visitor(StructureVisitor(context), node); }
 
 }

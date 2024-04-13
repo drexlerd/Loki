@@ -32,10 +32,6 @@ namespace loki
  */
 template<typename T>
 using PDDLElement = const T*;
-}
-
-namespace loki::pddl
-{
 
 /**
  * Domain

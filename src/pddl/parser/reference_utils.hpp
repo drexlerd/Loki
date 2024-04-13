@@ -27,21 +27,21 @@ namespace loki
 
 // For tracking an untracking of lists of pddl objects
 
-extern void track_variable_references(const pddl::ParameterList& parameter_list, Context& context);
+extern void track_variable_references(const ParameterList& parameter_list, Context& context);
 
-extern void test_variable_references(const pddl::ParameterList& parameter_list, const Context& context);
+extern void test_variable_references(const ParameterList& parameter_list, const Context& context);
 
-extern void track_predicate_references(const pddl::PredicateList& predicate_list, Context& context);
+extern void track_predicate_references(const PredicateList& predicate_list, Context& context);
 
-extern void test_predicate_references(const pddl::PredicateList& predicate_list, const Context& context);
+extern void test_predicate_references(const PredicateList& predicate_list, const Context& context);
 
-extern void track_function_skeleton_references(const pddl::FunctionSkeletonList& function_skeleton_list, Context& context);
+extern void track_function_skeleton_references(const FunctionSkeletonList& function_skeleton_list, Context& context);
 
-extern void test_function_skeleton_references(const pddl::FunctionSkeletonList& function_skeleton_list, const Context& context);
+extern void test_function_skeleton_references(const FunctionSkeletonList& function_skeleton_list, const Context& context);
 
-extern void track_object_references(const pddl::ObjectList& object_list, Context& context);
+extern void track_object_references(const ObjectList& object_list, Context& context);
 
-extern void test_object_references(const pddl::ObjectList& object_list, const Context& context);
+extern void test_object_references(const ObjectList& object_list, const Context& context);
 
 }
 

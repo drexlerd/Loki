@@ -40,7 +40,7 @@ private:
     std::unique_ptr<ScopeStack> m_scopes;
 
     // Parsed result
-    pddl::Domain m_domain;
+    Domain m_domain;
 
     friend class ProblemParser;
 
@@ -54,7 +54,7 @@ public:
     const PDDLPositionCache& get_position_cache() const;
 
     /// @brief Get the parsed domain.
-    const pddl::Domain& get_domain() const;
+    const Domain& get_domain() const;
 };
 
 class ProblemParser
@@ -70,7 +70,7 @@ private:
     std::unique_ptr<ScopeStack> m_scopes;
 
     // Parsed result
-    pddl::Problem m_problem;
+    Problem m_problem;
 
 public:
     explicit ProblemParser(const fs::path& file_path, DomainParser& domain_parser);
@@ -79,7 +79,7 @@ public:
     const PDDLPositionCache& get_position_cache() const;
 
     /// @brief Get the parsed problem.
-    const pddl::Problem& get_problem() const;
+    const Problem& get_problem() const;
 };
 
 }

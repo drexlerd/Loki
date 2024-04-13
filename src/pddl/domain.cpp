@@ -30,7 +30,7 @@
 
 using namespace std;
 
-namespace loki::pddl
+namespace loki
 {
 DomainImpl::DomainImpl(int identifier,
                        std::string name,
@@ -91,7 +91,7 @@ void DomainImpl::str_impl(std::ostream& out, const FormattingOptions& options) c
     if (!m_types.empty())
     {
         out << string(nested_options.indent, ' ') << "(:types ";
-        std::unordered_map<pddl::TypeList, pddl::TypeList, hash_container_type<pddl::TypeList>> subtypes_by_parent_types;
+        std::unordered_map<TypeList, TypeList, hash_container_type<TypeList>> subtypes_by_parent_types;
         for (const auto& type : m_types)
         {
             subtypes_by_parent_types[type->get_bases()].push_back(type);
@@ -130,7 +130,7 @@ void DomainImpl::str_impl(std::ostream& out, const FormattingOptions& options) c
     if (!m_constants.empty())
     {
         out << string(nested_options.indent, ' ') << "(:constants ";
-        std::unordered_map<pddl::TypeList, pddl::ObjectList, hash_container_type<pddl::TypeList>> constants_by_types;
+        std::unordered_map<TypeList, ObjectList, hash_container_type<TypeList>> constants_by_types;
         for (const auto& constant : m_constants)
         {
             constants_by_types[constant->get_bases()].push_back(constant);

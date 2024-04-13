@@ -28,7 +28,7 @@
 
 #include <cassert>
 
-namespace loki::pddl
+namespace loki
 {
 
 std::unordered_map<AssignOperatorEnum, std::string> assign_operator_enum_to_string = {
@@ -36,7 +36,7 @@ std::unordered_map<AssignOperatorEnum, std::string> assign_operator_enum_to_stri
     { AssignOperatorEnum::INCREASE, "increase" }, { AssignOperatorEnum::DECREASE, "decrease" },
 };
 
-const std::string& to_string(pddl::AssignOperatorEnum assign_operator)
+const std::string& to_string(AssignOperatorEnum assign_operator)
 {
     assert(assign_operator_enum_to_string.count(assign_operator));
     return assign_operator_enum_to_string.at(assign_operator);

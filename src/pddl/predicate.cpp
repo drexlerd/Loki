@@ -24,7 +24,7 @@
 
 #include <memory>
 
-namespace loki::pddl
+namespace loki
 {
 PredicateImpl::PredicateImpl(int identifier, std::string name, ParameterList parameters) :
     Base(identifier),

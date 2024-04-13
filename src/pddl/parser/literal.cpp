@@ -23,15 +23,15 @@
 namespace loki
 {
 
-pddl::Atom parse(const ast::AtomicFormulaOfTermsPredicate& node, Context& context)
+Atom parse(const ast::AtomicFormulaOfTermsPredicate& node, Context& context)
 {
     auto predicate_name = parse(node.predicate.name);
-    auto binding = context.scopes.get<pddl::PredicateImpl>(predicate_name);
+    auto binding = context.scopes.get<PredicateImpl>(predicate_name);
     if (!binding.has_value())
     {
         throw UndefinedPredicateError(predicate_name, context.scopes.get_error_handler()(node.predicate, ""));
     }
-    auto term_list = pddl::TermList();
+    auto term_list = TermList();
     for (const auto& term_node : node.terms)
     {
         term_list.push_back(boost::apply_visitor(TermReferenceTermVisitor(context), term_node));
@@ -42,47 +42,47 @@ pddl::Atom parse(const ast::AtomicFormulaOfTermsPredicate& node, Context& contex
         throw MismatchedPredicateTermListError(predicate, term_list, context.scopes.get_error_handler()(node, ""));
     }
     context.references.untrack(predicate);
-    const auto atom = context.factories.atoms.get_or_create<pddl::AtomImpl>(predicate, term_list);
+    const auto atom = context.factories.get_or_create_atom(predicate, term_list);
     context.positions.push_back(atom, node);
     return atom;
 }
 
-pddl::Atom parse(const ast::AtomicFormulaOfTermsEquality& node, Context& context)
+Atom parse(const ast::AtomicFormulaOfTermsEquality& node, Context& context)
 {
     // requires :equality
-    if (!context.requirements->test(pddl::RequirementEnum::EQUALITY))
+    if (!context.requirements->test(RequirementEnum::EQUALITY))
     {
-        throw UndefinedRequirementError(pddl::RequirementEnum::EQUALITY, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(RequirementEnum::EQUALITY, context.scopes.get_error_handler()(node, ""));
     }
-    context.references.untrack(pddl::RequirementEnum::EQUALITY);
-    assert(context.scopes.get<pddl::PredicateImpl>("=").has_value());
-    const auto [equal_predicate, _position, _error_handler] = context.scopes.get<pddl::PredicateImpl>("=").value();
+    context.references.untrack(RequirementEnum::EQUALITY);
+    assert(context.scopes.get<PredicateImpl>("=").has_value());
+    const auto [equal_predicate, _position, _error_handler] = context.scopes.get<PredicateImpl>("=").value();
     auto left_term = boost::apply_visitor(TermReferenceTermVisitor(context), node.term_left);
     auto right_term = boost::apply_visitor(TermReferenceTermVisitor(context), node.term_right);
-    const auto atom = context.factories.atoms.get_or_create<pddl::AtomImpl>(equal_predicate, pddl::TermList { left_term, right_term });
+    const auto atom = context.factories.get_or_create_atom(equal_predicate, TermList { left_term, right_term });
     context.positions.push_back(atom, node);
     return atom;
 }
 
-pddl::Atom parse(const ast::AtomicFormulaOfTerms& node, Context& context) { return boost::apply_visitor(AtomicFormulaOfTermsVisitor(context), node); }
+Atom parse(const ast::AtomicFormulaOfTerms& node, Context& context) { return boost::apply_visitor(AtomicFormulaOfTermsVisitor(context), node); }
 
 AtomicFormulaOfTermsVisitor::AtomicFormulaOfTermsVisitor(Context& context_) : context(context_) {}
 
-pddl::Literal parse(const ast::Atom& node, Context& context)
+Literal parse(const ast::Atom& node, Context& context)
 {
-    const auto literal = context.factories.literals.get_or_create<pddl::LiteralImpl>(false, parse(node.atomic_formula_of_terms, context));
+    const auto literal = context.factories.get_or_create_literal(false, parse(node.atomic_formula_of_terms, context));
     context.positions.push_back(literal, node);
     return literal;
 }
 
-pddl::Literal parse(const ast::NegatedAtom& node, Context& context)
+Literal parse(const ast::NegatedAtom& node, Context& context)
 {
-    const auto literal = context.factories.literals.get_or_create<pddl::LiteralImpl>(true, parse(node.atomic_formula_of_terms, context));
+    const auto literal = context.factories.get_or_create_literal(true, parse(node.atomic_formula_of_terms, context));
     context.positions.push_back(literal, node);
     return literal;
 }
 
-pddl::Literal parse(const ast::Literal& node, Context& context) { return boost::apply_visitor(LiteralVisitor(context), node); }
+Literal parse(const ast::Literal& node, Context& context) { return boost::apply_visitor(LiteralVisitor(context), node); }
 
 LiteralVisitor::LiteralVisitor(Context& context_) : context(context_) {}
 

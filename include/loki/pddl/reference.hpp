@@ -64,7 +64,7 @@ public:
     void untrack(T reference);
 };
 
-using ReferencedPDDLObjects = References<pddl::Object, pddl::Predicate, pddl::FunctionSkeleton, pddl::Variable, pddl::RequirementEnum>;
+using ReferencedPDDLObjects = References<Object, Predicate, FunctionSkeleton, Variable, RequirementEnum>;
 
 }
 

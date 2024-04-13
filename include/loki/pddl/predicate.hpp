@@ -26,12 +26,6 @@
 
 namespace loki
 {
-template<typename HolderType, typename Hash, typename EqualTo>
-class PDDLFactory;
-}
-
-namespace loki::pddl
-{
 
 // An alternative name is AtomSkeleton
 class PredicateImpl : public Base<PredicateImpl>
@@ -43,7 +37,7 @@ private:
     PredicateImpl(int identifier, std::string name, ParameterList parameters);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<PredicateImpl, loki::Hash<PredicateImpl*>, loki::EqualTo<PredicateImpl*>>;
+    friend class PDDLFactory<PredicateImpl, Hash<PredicateImpl*>, EqualTo<PredicateImpl*>>;
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const PredicateImpl& other) const;

@@ -127,34 +127,32 @@ public:
 class UnusedRequirementError : public SemanticParserError
 {
 public:
-    UnusedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output);
+    UnusedRequirementError(RequirementEnum requirement, const std::string& error_handler_output);
 };
 
 class UndefinedRequirementError : public SemanticParserError
 {
 public:
-    UndefinedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output);
+    UndefinedRequirementError(RequirementEnum requirement, const std::string& error_handler_output);
 };
 
 class UnsupportedRequirementError : public std::runtime_error
 {
 public:
-    explicit UnsupportedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output);
+    explicit UnsupportedRequirementError(RequirementEnum requirement, const std::string& error_handler_output);
 };
 
 /* Compatibility errors */
 class MismatchedPredicateTermListError : public SemanticParserError
 {
 public:
-    MismatchedPredicateTermListError(const pddl::Predicate& predicate, const pddl::TermList& term_list, const std::string& error_handler_output);
+    MismatchedPredicateTermListError(const Predicate& predicate, const TermList& term_list, const std::string& error_handler_output);
 };
 
 class MismatchedFunctionSkeletonTermListError : public SemanticParserError
 {
 public:
-    MismatchedFunctionSkeletonTermListError(const pddl::FunctionSkeleton& function_skeleton,
-                                            const pddl::TermList& term_list,
-                                            const std::string& error_handler_output);
+    MismatchedFunctionSkeletonTermListError(const FunctionSkeleton& function_skeleton, const TermList& term_list, const std::string& error_handler_output);
 };
 
 class UnexpectedDerivedPredicateInEffect : public SemanticParserError
@@ -192,13 +190,13 @@ public:
 class MismatchedDomainError : public SemanticParserError
 {
 public:
-    MismatchedDomainError(const pddl::Domain& domain, const std::string& domain_name, const std::string& error_handler_output);
+    MismatchedDomainError(const Domain& domain, const std::string& domain_name, const std::string& error_handler_output);
 };
 
 class MismatchedPredicateObjectListError : public SemanticParserError
 {
 public:
-    MismatchedPredicateObjectListError(const pddl::Predicate& predicate, const pddl::ObjectList& object_list, const std::string& error_handler_output);
+    MismatchedPredicateObjectListError(const Predicate& predicate, const ObjectList& object_list, const std::string& error_handler_output);
 };
 
 class NegativeCostError : public SemanticParserError

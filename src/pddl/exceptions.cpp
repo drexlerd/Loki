@@ -111,24 +111,24 @@ MultiDefinitionFunctionSkeletonError::MultiDefinitionFunctionSkeletonError(const
 }
 
 /* Requirement */
-UnusedRequirementError::UnusedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output) :
+UnusedRequirementError::UnusedRequirementError(RequirementEnum requirement, const std::string& error_handler_output) :
     SemanticParserError("The requirement with name \""s + to_string(requirement) + "\" was never used."s, error_handler_output)
 {
 }
 
-UndefinedRequirementError::UndefinedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output) :
+UndefinedRequirementError::UndefinedRequirementError(RequirementEnum requirement, const std::string& error_handler_output) :
     SemanticParserError("Undefined requirement: "s + to_string(requirement), error_handler_output)
 {
 }
 
-UnsupportedRequirementError::UnsupportedRequirementError(pddl::RequirementEnum requirement, const std::string& error_handler_output) :
+UnsupportedRequirementError::UnsupportedRequirementError(RequirementEnum requirement, const std::string& error_handler_output) :
     std::runtime_error("Unsupported requirement: "s + to_string(requirement) + "\n"s + error_handler_output)
 {
 }
 
 /* Compatibility errors */
-MismatchedPredicateTermListError::MismatchedPredicateTermListError(const pddl::Predicate& predicate,
-                                                                   const pddl::TermList& term_list,
+MismatchedPredicateTermListError::MismatchedPredicateTermListError(const Predicate& predicate,
+                                                                   const TermList& term_list,
                                                                    const std::string& error_handler_output) :
     SemanticParserError("Mismatched number of terms for predicate \""s + predicate->get_name() + "\" with sizes "s
                             + std::to_string(predicate->get_parameters().size()) + "!="s + std::to_string(term_list.size()) + "."s,
@@ -136,8 +136,8 @@ MismatchedPredicateTermListError::MismatchedPredicateTermListError(const pddl::P
 {
 }
 
-MismatchedFunctionSkeletonTermListError::MismatchedFunctionSkeletonTermListError(const pddl::FunctionSkeleton& function_skeleton,
-                                                                                 const pddl::TermList& term_list,
+MismatchedFunctionSkeletonTermListError::MismatchedFunctionSkeletonTermListError(const FunctionSkeleton& function_skeleton,
+                                                                                 const TermList& term_list,
                                                                                  const std::string& error_handler_output) :
     SemanticParserError("Mismatched number of terms for function skeleton \""s + function_skeleton->get_name() + "\" with sizes "s
                             + std::to_string(function_skeleton->get_parameters().size()) + "!="s + std::to_string(term_list.size()) + ".",
@@ -175,13 +175,13 @@ MultiDefinitionObjectError::MultiDefinitionObjectError(const std::string& name, 
 }
 
 /* Compatibility errors */
-MismatchedDomainError::MismatchedDomainError(const pddl::Domain& domain, const std::string& domain_name, const std::string& error_handler_output) :
+MismatchedDomainError::MismatchedDomainError(const Domain& domain, const std::string& domain_name, const std::string& error_handler_output) :
     SemanticParserError("Mismatched domain names \"" + domain->get_name() + "!=" + domain_name + ".", error_handler_output)
 {
 }
 
-MismatchedPredicateObjectListError::MismatchedPredicateObjectListError(const pddl::Predicate& predicate,
-                                                                       const pddl::ObjectList& object_list,
+MismatchedPredicateObjectListError::MismatchedPredicateObjectListError(const Predicate& predicate,
+                                                                       const ObjectList& object_list,
                                                                        const std::string& error_handler_output) :
     SemanticParserError("Mismatched number of terms for predicate \"" + predicate->get_name() + "\" with sizes "
                             + std::to_string(predicate->get_parameters().size()) + "!=" + std::to_string(object_list.size()) + ".",

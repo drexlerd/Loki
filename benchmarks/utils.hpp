@@ -24,7 +24,7 @@
 namespace loki::benchmarks
 {
 
-extern loki::pddl::AtomList create_atoms(size_t num_objects, size_t num_predicates, PDDLFactories& factories);
+extern loki::AtomList create_atoms(size_t num_objects, size_t num_predicates, PDDLFactories& factories);
 }
 
 #endif

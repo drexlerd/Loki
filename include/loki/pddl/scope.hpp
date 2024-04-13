@@ -72,7 +72,7 @@ class Scope
 private:
     const Scope* m_parent_scope;
 
-    Bindings<pddl::TypeImpl, pddl::ObjectImpl, pddl::PredicateImpl, pddl::FunctionSkeletonImpl, pddl::VariableImpl> bindings;
+    Bindings<TypeImpl, ObjectImpl, PredicateImpl, FunctionSkeletonImpl, VariableImpl> bindings;
 
 public:
     explicit Scope(const Scope* parent_scope = nullptr);

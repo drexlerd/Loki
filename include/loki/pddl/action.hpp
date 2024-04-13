@@ -25,7 +25,7 @@
 #include <optional>
 #include <string>
 
-namespace loki::pddl
+namespace loki
 {
 class ActionImpl : public Base<ActionImpl>
 {
@@ -38,7 +38,7 @@ private:
     ActionImpl(int identifier, std::string name, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<ActionImpl, loki::Hash<ActionImpl*>, loki::EqualTo<ActionImpl*>>;
+    friend class PDDLFactory<ActionImpl, Hash<ActionImpl*>, EqualTo<ActionImpl*>>;
 
     /// @brief Test for structural equivalence
     bool is_structurally_equivalent_to_impl(const ActionImpl& other) const;

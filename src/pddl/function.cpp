@@ -22,7 +22,7 @@
 #include "loki/pddl/visitors.hpp"
 #include "loki/utils/hash.hpp"
 
-namespace loki::pddl
+namespace loki
 {
 FunctionImpl::FunctionImpl(int identifier, FunctionSkeleton function_skeleton, TermList terms) :
     Base(identifier),

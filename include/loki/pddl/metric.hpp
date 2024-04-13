@@ -26,12 +26,6 @@
 
 namespace loki
 {
-template<typename HolderType, typename Hash, typename EqualTo>
-class PDDLFactory;
-}
-
-namespace loki::pddl
-{
 enum class OptimizationMetricEnum
 {
     MINIMIZE,
@@ -39,7 +33,7 @@ enum class OptimizationMetricEnum
 };
 
 extern std::unordered_map<OptimizationMetricEnum, std::string> optimization_metric_enum_to_string;
-extern const std::string& to_string(pddl::OptimizationMetricEnum optimization_metric);
+extern const std::string& to_string(OptimizationMetricEnum optimization_metric);
 
 class OptimizationMetricImpl : public Base<OptimizationMetricImpl>
 {
@@ -50,7 +44,7 @@ private:
     OptimizationMetricImpl(int identifier, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<OptimizationMetricImpl, loki::Hash<OptimizationMetricImpl*>, loki::EqualTo<OptimizationMetricImpl*>>;
+    friend class PDDLFactory<OptimizationMetricImpl, Hash<OptimizationMetricImpl*>, EqualTo<OptimizationMetricImpl*>>;
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const OptimizationMetricImpl& other) const;

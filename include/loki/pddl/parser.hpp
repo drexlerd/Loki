@@ -25,8 +25,8 @@
 namespace loki
 {
 
-extern pddl::Domain parse(const ast::Domain& domain_node, Context& context);
-extern pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pddl::Domain& domain);
+extern Domain parse(const ast::Domain& domain_node, Context& context);
+extern Problem parse(const ast::Problem& problem_node, Context& context, const Domain& domain);
 
 }
 

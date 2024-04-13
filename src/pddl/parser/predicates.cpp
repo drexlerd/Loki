@@ -24,10 +24,10 @@
 namespace loki
 {
 
-static void test_multiple_definition(const pddl::Predicate& predicate, const ast::Predicate& node, const Context& context)
+static void test_multiple_definition(const Predicate& predicate, const ast::Predicate& node, const Context& context)
 {
     const auto predicate_name = predicate->get_name();
-    const auto binding = context.scopes.get<pddl::PredicateImpl>(predicate_name);
+    const auto binding = context.scopes.get<PredicateImpl>(predicate_name);
     if (binding.has_value())
     {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
@@ -41,27 +41,27 @@ static void test_multiple_definition(const pddl::Predicate& predicate, const ast
     }
 }
 
-static void insert_context_information(const pddl::Predicate& predicate, const ast::Predicate& node, Context& context)
+static void insert_context_information(const Predicate& predicate, const ast::Predicate& node, Context& context)
 {
     context.positions.push_back(predicate, node);
     context.scopes.insert(predicate->get_name(), predicate, node);
 }
 
-static pddl::Predicate parse_predicate_definition(const ast::AtomicFormulaSkeleton& node, Context& context)
+static Predicate parse_predicate_definition(const ast::AtomicFormulaSkeleton& node, Context& context)
 {
     context.scopes.open_scope();
     const auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
     context.scopes.close_scope();
     const auto predicate_name = parse(node.predicate.name);
-    const auto predicate = context.factories.predicates.get_or_create<pddl::PredicateImpl>(predicate_name, parameters);
+    const auto predicate = context.factories.get_or_create_predicate(predicate_name, parameters);
     test_multiple_definition(predicate, node.predicate, context);
     insert_context_information(predicate, node.predicate, context);
     return predicate;
 }
 
-static pddl::PredicateList parse_predicate_definitions(const std::vector<ast::AtomicFormulaSkeleton>& nodes, Context& context)
+static PredicateList parse_predicate_definitions(const std::vector<ast::AtomicFormulaSkeleton>& nodes, Context& context)
 {
-    auto predicate_list = pddl::PredicateList();
+    auto predicate_list = PredicateList();
     for (const auto& node : nodes)
     {
         predicate_list.push_back(parse_predicate_definition(node, context));
@@ -69,17 +69,17 @@ static pddl::PredicateList parse_predicate_definitions(const std::vector<ast::At
     return predicate_list;
 }
 
-pddl::PredicateList parse(const ast::Predicates& predicates_node, Context& context)
+PredicateList parse(const ast::Predicates& predicates_node, Context& context)
 {
     const auto predicate_list = parse_predicate_definitions(predicates_node.atomic_formula_skeletons, context);
     return predicate_list;
 }
 
-pddl::PredicateList parse(const ast::DerivedPredicates& derived_predicates_node, Context& context)
+PredicateList parse(const ast::DerivedPredicates& derived_predicates_node, Context& context)
 {
     const auto predicate_list = parse_predicate_definitions(derived_predicates_node.atomic_formula_skeletons, context);
     // Allow distinguishing derived predicates from simple predicates.
-    context.derived_predicates = std::unordered_set<pddl::Predicate>(predicate_list.begin(), predicate_list.end());
+    context.derived_predicates = std::unordered_set<Predicate>(predicate_list.begin(), predicate_list.end());
     return predicate_list;
 }
 

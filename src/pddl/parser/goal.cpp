@@ -25,7 +25,7 @@
 namespace loki
 {
 
-pddl::Condition parse(const ast::Goal& node, Context& context)
+Condition parse(const ast::Goal& node, Context& context)
 {
     const auto condition = parse(node.precondition_goal_descriptor, context);
     return condition;

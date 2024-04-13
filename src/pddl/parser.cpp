@@ -44,60 +44,60 @@ using namespace std;
 namespace loki
 {
 
-pddl::Domain parse(const ast::Domain& domain_node, Context& context)
+Domain parse(const ast::Domain& domain_node, Context& context)
 {
     const auto domain_name = parse(domain_node.domain_name.name);
     /* Requirements section */
     if (domain_node.requirements.has_value())
     {
-        context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(parse(domain_node.requirements.value(), context));
+        context.requirements = context.factories.get_or_create_requirements(parse(domain_node.requirements.value(), context));
         context.positions.push_back(context.requirements, domain_node.requirements.value());
     }
     else
     {
         // Default requirements
-        context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(pddl::RequirementEnumSet { pddl::RequirementEnum::STRIPS });
+        context.requirements = context.factories.get_or_create_requirements(RequirementEnumSet { RequirementEnum::STRIPS });
     }
     /* Types section */
-    auto types = pddl::TypeList();
+    auto types = TypeList();
     if (domain_node.types.has_value())
     {
-        if (!context.requirements->test(pddl::RequirementEnum::TYPING))
+        if (!context.requirements->test(RequirementEnum::TYPING))
         {
-            throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(domain_node.types.value(), ""));
+            throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.get_error_handler()(domain_node.types.value(), ""));
         }
         types = parse(domain_node.types.value(), context);
     }
     /* Constants section */
-    auto constants = pddl::ObjectList();
+    auto constants = ObjectList();
     if (domain_node.constants.has_value())
     {
         constants = parse(domain_node.constants.value(), context);
     }
     /* Predicates section */
-    auto predicates = pddl::PredicateList();
+    auto predicates = PredicateList();
     if (domain_node.predicates.has_value())
     {
         predicates = parse(domain_node.predicates.value(), context);
     }
     track_predicate_references(predicates, context);
     /* DerivedPredicates section */
-    auto derived_predicates = pddl::PredicateList();
+    auto derived_predicates = PredicateList();
     if (domain_node.derived_predicates.has_value())
     {
         derived_predicates = parse(domain_node.derived_predicates.value(), context);
     }
     track_predicate_references(derived_predicates, context);
     /* Functions section */
-    auto function_skeletons = pddl::FunctionSkeletonList();
+    auto function_skeletons = FunctionSkeletonList();
     if (domain_node.functions.has_value())
     {
         function_skeletons = parse(domain_node.functions.value(), context);
     }
     track_function_skeleton_references(function_skeletons, context);
     /* Structure section */
-    auto axiom_list = pddl::AxiomList();
-    auto action_list = pddl::ActionList();
+    auto axiom_list = AxiomList();
+    auto action_list = ActionList();
     for (const auto& structure_node : domain_node.structures)
     {
         auto variant = boost::apply_visitor(StructureVisitor(context), structure_node);
@@ -108,20 +108,20 @@ pddl::Domain parse(const ast::Domain& domain_node, Context& context)
     test_predicate_references(derived_predicates, context);
     test_function_skeleton_references(function_skeletons, context);
 
-    const auto domain = context.factories.domains.get_or_create<pddl::DomainImpl>(domain_name,
-                                                                                  context.requirements,
-                                                                                  types,
-                                                                                  constants,
-                                                                                  predicates,
-                                                                                  derived_predicates,
-                                                                                  function_skeletons,
-                                                                                  action_list,
-                                                                                  axiom_list);
+    const auto domain = context.factories.get_or_create_domain(domain_name,
+                                                               context.requirements,
+                                                               types,
+                                                               constants,
+                                                               predicates,
+                                                               derived_predicates,
+                                                               function_skeletons,
+                                                               action_list,
+                                                               axiom_list);
     context.positions.push_back(domain, domain_node);
     return domain;
 }
 
-pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pddl::Domain& domain)
+Problem parse(const ast::Problem& problem_node, Context& context, const Domain& domain)
 {
     /* Domain name section */
     const auto domain_name = parse(problem_node.domain_name.name);
@@ -134,31 +134,31 @@ pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pd
     /* Requirements section */
     if (problem_node.requirements.has_value())
     {
-        context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(parse(problem_node.requirements.value(), context));
+        context.requirements = context.factories.get_or_create_requirements(parse(problem_node.requirements.value(), context));
         context.positions.push_back(context.requirements, problem_node.requirements.value());
     }
     else
     {
         // Default requirements
-        context.requirements = context.factories.requirements.get_or_create<pddl::RequirementsImpl>(pddl::RequirementEnumSet { pddl::RequirementEnum::STRIPS });
+        context.requirements = context.factories.get_or_create_requirements(RequirementEnumSet { RequirementEnum::STRIPS });
     }
     /* Objects section */
-    auto objects = pddl::ObjectList();
+    auto objects = ObjectList();
     if (problem_node.objects.has_value())
     {
         objects = parse(problem_node.objects.value(), context);
     }
     track_object_references(objects, context);
     /* DerivedPredicates section */
-    auto derived_predicates = pddl::PredicateList();
+    auto derived_predicates = PredicateList();
     if (problem_node.derived_predicates.has_value())
     {
         derived_predicates = parse(problem_node.derived_predicates.value(), context);
     }
     track_predicate_references(derived_predicates, context);
     /* Initial section */
-    auto initial_literals = pddl::GroundLiteralList();
-    auto numeric_fluents = pddl::NumericFluentList();
+    auto initial_literals = GroundLiteralList();
+    auto numeric_fluents = NumericFluentList();
     if (problem_node.initial.has_value())
     {
         const auto initial_elements = parse(problem_node.initial.value(), context);
@@ -168,13 +168,13 @@ pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pd
         }
     }
     /* Goal section */
-    auto goal_condition = std::optional<pddl::Condition>();
+    auto goal_condition = std::optional<Condition>();
     if (problem_node.goal.has_value())
     {
         goal_condition = parse(problem_node.goal.value(), context);
     }
     /* Metric section */
-    auto optimization_metric = std::optional<pddl::OptimizationMetric>();
+    auto optimization_metric = std::optional<OptimizationMetric>();
     if (problem_node.metric_specification.has_value())
     {
         optimization_metric = parse(problem_node.metric_specification.value(), context);
@@ -185,7 +185,7 @@ pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pd
     test_predicate_references(derived_predicates, context);
 
     /* Structure section */
-    auto axioms = pddl::AxiomList();
+    auto axioms = AxiomList();
     if (problem_node.axioms.has_value())
     {
         for (const auto& axiom_node : problem_node.axioms.value())
@@ -194,16 +194,16 @@ pddl::Problem parse(const ast::Problem& problem_node, Context& context, const pd
         }
     }
 
-    const auto problem = context.factories.problems.get_or_create<pddl::ProblemImpl>(domain,
-                                                                                     problem_name,
-                                                                                     context.requirements,
-                                                                                     objects,
-                                                                                     derived_predicates,
-                                                                                     initial_literals,
-                                                                                     numeric_fluents,
-                                                                                     goal_condition,
-                                                                                     optimization_metric,
-                                                                                     axioms);
+    const auto problem = context.factories.get_or_create_problem(domain,
+                                                                 problem_name,
+                                                                 context.requirements,
+                                                                 objects,
+                                                                 derived_predicates,
+                                                                 initial_literals,
+                                                                 numeric_fluents,
+                                                                 goal_condition,
+                                                                 optimization_metric,
+                                                                 axioms);
     context.positions.push_back(problem, problem_node);
     return problem;
 }

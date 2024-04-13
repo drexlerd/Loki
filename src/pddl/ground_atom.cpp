@@ -23,7 +23,7 @@
 #include "loki/utils/collections.hpp"
 #include "loki/utils/hash.hpp"
 
-namespace loki::pddl
+namespace loki
 {
 GroundAtomImpl::GroundAtomImpl(int identifier, Predicate predicate, ObjectList objects) :
     Base(identifier),

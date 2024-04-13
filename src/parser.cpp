@@ -61,20 +61,18 @@ DomainParser::DomainParser(const fs::path& file_path) :
     context.scopes.open_scope();
 
     // Create base types.
-    const auto base_type_object = context.factories.types.get_or_create<pddl::TypeImpl>("object", pddl::TypeList());
-    const auto base_type_number = context.factories.types.get_or_create<pddl::TypeImpl>("number", pddl::TypeList());
+    const auto base_type_object = context.factories.get_or_create_type("object", TypeList());
+    const auto base_type_number = context.factories.get_or_create_type("number", TypeList());
     context.scopes.insert("object", base_type_object, {});
     context.scopes.insert("number", base_type_number, {});
 
     // Create equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
-    const auto binary_parameterlist = pddl::ParameterList {
-        context.factories.parameters.get_or_create<pddl::ParameterImpl>(context.factories.variables.get_or_create<pddl::VariableImpl>("?left_arg"),
-                                                                        pddl::TypeList { base_type_object }),
-        context.factories.parameters.get_or_create<pddl::ParameterImpl>(context.factories.variables.get_or_create<pddl::VariableImpl>("?right_arg"),
-                                                                        pddl::TypeList { base_type_object })
+    const auto binary_parameterlist =
+        ParameterList { context.factories.get_or_create_parameter(context.factories.get_or_create_variable("?left_arg"), TypeList { base_type_object }),
+                        context.factories.get_or_create_parameter(context.factories.get_or_create_variable("?right_arg"), TypeList { base_type_object })
 
-    };
-    const auto equal_predicate = context.factories.predicates.get_or_create<pddl::PredicateImpl>("=", binary_parameterlist);
+        };
+    const auto equal_predicate = context.factories.get_or_create_predicate("=", binary_parameterlist);
     context.scopes.insert("=", equal_predicate, {});
 
     m_domain = parse(node, context);
@@ -94,7 +92,7 @@ PDDLFactories& DomainParser::get_factories() { return m_factories; }
 
 const PDDLPositionCache& DomainParser::get_position_cache() const { return *m_position_cache; }
 
-const pddl::Domain& DomainParser::get_domain() const { return m_domain; }
+const Domain& DomainParser::get_domain() const { return m_domain; }
 
 ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_parser) :
     m_file_path(file_path),
@@ -137,6 +135,6 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
 
 const PDDLPositionCache& ProblemParser::get_position_cache() const { return *m_position_cache; }
 
-const pddl::Problem& ProblemParser::get_problem() const { return m_problem; }
+const Problem& ProblemParser::get_problem() const { return m_problem; }
 
 }

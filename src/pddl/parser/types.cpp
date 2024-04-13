@@ -29,32 +29,32 @@ namespace loki
 
 TypeDeclarationTypeVisitor::TypeDeclarationTypeVisitor(Context& context_) : context(context_) {}
 
-pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeObject& node)
+TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeObject& node)
 {
-    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("object", pddl::TypeList());
+    const auto type = context.factories.get_or_create_type("object", TypeList());
     context.positions.push_back(type, node);
     return { type };
 }
 
-pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeNumber& node)
+TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeNumber& node)
 {
-    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>("number", pddl::TypeList());
+    const auto type = context.factories.get_or_create_type("number", TypeList());
     context.positions.push_back(type, node);
     return { type };
 }
 
-pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::Name& node)
+TypeList TypeDeclarationTypeVisitor::operator()(const ast::Name& node)
 {
     auto name = parse(node);
-    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>(name, pddl::TypeList());
+    const auto type = context.factories.get_or_create_type(name, TypeList());
     context.positions.push_back(type, node);
     return { type };
 }
 
-pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeEither& node)
+TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeEither& node)
 {
     // we flatten nested either types
-    pddl::TypeList type_list;
+    TypeList type_list;
     for (auto& child_node : node.types)
     {
         auto types = boost::apply_visitor(TypeDeclarationTypeVisitor(context), child_node);
@@ -67,26 +67,26 @@ pddl::TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeEither& nod
 
 TypeReferenceTypeVisitor::TypeReferenceTypeVisitor(const Context& context_) : context(context_) {}
 
-pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeObject&)
+TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeObject&)
 {
-    const auto binding = context.scopes.get<pddl::TypeImpl>("object");
+    const auto binding = context.scopes.get<TypeImpl>("object");
     assert(binding.has_value());
     const auto [type, _position, _error_handler] = binding.value();
     return { type };
 }
 
-pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeNumber&)
+TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeNumber&)
 {
-    const auto binding = context.scopes.get<pddl::TypeImpl>("number");
+    const auto binding = context.scopes.get<TypeImpl>("number");
     assert(binding.has_value());
     const auto [type, _position, _error_handler] = binding.value();
     return { type };
 }
 
-pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Name& node)
+TypeList TypeReferenceTypeVisitor::operator()(const ast::Name& node)
 {
     auto name = parse(node);
-    auto binding = context.scopes.get<pddl::TypeImpl>(name);
+    auto binding = context.scopes.get<TypeImpl>(name);
     if (!binding.has_value())
     {
         throw UndefinedTypeError(name, context.scopes.get_error_handler()(node, ""));
@@ -96,10 +96,10 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::Name& node)
     return { type };
 }
 
-pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& node)
+TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& node)
 {
     // we flatten nested either types
-    auto type_list = pddl::TypeList();
+    auto type_list = TypeList();
     for (auto& child_node : node.types)
     {
         auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context), child_node);
@@ -109,10 +109,10 @@ pddl::TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& node)
 }
 
 /* TypeDeclarationTypedListOfNamesVisitor */
-static void test_multiple_definition(const pddl::Type& type, const ast::Name& node, const Context& context)
+static void test_multiple_definition(const Type& type, const ast::Name& node, const Context& context)
 {
     const auto type_name = type->get_name();
-    const auto binding = context.scopes.get<pddl::TypeImpl>(type_name);
+    const auto binding = context.scopes.get<TypeImpl>(type_name);
     if (binding.has_value())
     {
         const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
@@ -126,7 +126,7 @@ static void test_multiple_definition(const pddl::Type& type, const ast::Name& no
     }
 }
 
-static void test_reserved_type(const pddl::Type& type, const ast::Name& node, const Context& context)
+static void test_reserved_type(const Type& type, const ast::Name& node, const Context& context)
 {
     if (type->get_name() == "object")
     {
@@ -140,25 +140,25 @@ static void test_reserved_type(const pddl::Type& type, const ast::Name& node, co
     }
 }
 
-static void insert_context_information(const pddl::Type& type, const ast::Name& node, Context& context)
+static void insert_context_information(const Type& type, const ast::Name& node, Context& context)
 {
     context.positions.push_back(type, node);
     context.scopes.insert(type->get_name(), type, node);
 }
 
-static pddl::Type parse_type_definition(const ast::Name& node, const pddl::TypeList& type_list, Context& context)
+static Type parse_type_definition(const ast::Name& node, const TypeList& type_list, Context& context)
 {
     const auto name = parse(node);
-    const auto type = context.factories.types.get_or_create<pddl::TypeImpl>(name, type_list);
+    const auto type = context.factories.get_or_create_type(name, type_list);
     test_reserved_type(type, node, context);
     test_multiple_definition(type, node, context);
     insert_context_information(type, node, context);
     return type;
 }
 
-static pddl::TypeList parse_type_definitions(const std::vector<ast::Name>& nodes, const pddl::TypeList& parent_type_list, Context& context)
+static TypeList parse_type_definitions(const std::vector<ast::Name>& nodes, const TypeList& parent_type_list, Context& context)
 {
-    auto type_list = pddl::TypeList();
+    auto type_list = TypeList();
     for (const auto& node : nodes)
     {
         type_list.push_back(parse_type_definition(node, parent_type_list, context));
@@ -168,23 +168,23 @@ static pddl::TypeList parse_type_definitions(const std::vector<ast::Name>& nodes
 
 TypeDeclarationTypedListOfNamesVisitor::TypeDeclarationTypedListOfNamesVisitor(Context& context_) : context(context_) {}
 
-pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vector<ast::Name>& name_nodes)
+TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vector<ast::Name>& name_nodes)
 {
     // std::vector<ast::Name> has single base type "object"
-    assert(context.scopes.get<pddl::TypeImpl>("object").has_value());
-    const auto [type_object, _position, _error_handler] = context.scopes.get<pddl::TypeImpl>("object").value();
-    const auto type_list = parse_type_definitions(name_nodes, pddl::TypeList { type_object }, context);
+    assert(context.scopes.get<TypeImpl>("object").has_value());
+    const auto [type_object, _position, _error_handler] = context.scopes.get<TypeImpl>("object").value();
+    const auto type_list = parse_type_definitions(name_nodes, TypeList { type_object }, context);
     return type_list;
 }
 
-pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node)
+TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node)
 {
     // requires :typing
-    if (!context.requirements->test(pddl::RequirementEnum::TYPING))
+    if (!context.requirements->test(RequirementEnum::TYPING))
     {
-        throw UndefinedRequirementError(pddl::RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_list_of_names_recursively_node, ""));
+        throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_list_of_names_recursively_node, ""));
     }
-    context.references.untrack(pddl::RequirementEnum::TYPING);
+    context.references.untrack(RequirementEnum::TYPING);
     // TypedListOfNamesRecursively has user defined base types.
     const auto parent_type_list = boost::apply_visitor(TypeDeclarationTypeVisitor(context), typed_list_of_names_recursively_node.type);
     auto type_list = parse_type_definitions(typed_list_of_names_recursively_node.names, parent_type_list, context);
@@ -197,7 +197,7 @@ pddl::TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::Typ
 
 /* Other functions */
 
-pddl::TypeList parse(const ast::Types& types_node, Context& context)
+TypeList parse(const ast::Types& types_node, Context& context)
 {
     return boost::apply_visitor(TypeDeclarationTypedListOfNamesVisitor(context), types_node.typed_list_of_names);
 }

@@ -26,7 +26,7 @@
 #include "loki/utils/collections.hpp"
 #include "loki/utils/hash.hpp"
 
-namespace loki::pddl
+namespace loki
 {
 AxiomImpl::AxiomImpl(int identifier, Literal literal, Condition condition) : Base(identifier), m_literal(std::move(literal)), m_condition(std::move(condition))
 {

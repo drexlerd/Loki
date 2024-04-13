@@ -25,7 +25,7 @@
 namespace loki
 {
 
-class TypeDeclarationTypeVisitor : boost::static_visitor<pddl::TypeList>
+class TypeDeclarationTypeVisitor : boost::static_visitor<TypeList>
 {
 private:
     Context& context;
@@ -33,16 +33,16 @@ private:
 public:
     TypeDeclarationTypeVisitor(Context& context_);
 
-    pddl::TypeList operator()(const ast::TypeObject& node);
+    TypeList operator()(const ast::TypeObject& node);
 
-    pddl::TypeList operator()(const ast::TypeNumber& node);
+    TypeList operator()(const ast::TypeNumber& node);
 
-    pddl::TypeList operator()(const ast::Name& node);
+    TypeList operator()(const ast::Name& node);
 
-    pddl::TypeList operator()(const ast::TypeEither& node);
+    TypeList operator()(const ast::TypeEither& node);
 };
 
-class TypeReferenceTypeVisitor : boost::static_visitor<pddl::TypeList>
+class TypeReferenceTypeVisitor : boost::static_visitor<TypeList>
 {
 private:
     const Context& context;
@@ -50,16 +50,16 @@ private:
 public:
     TypeReferenceTypeVisitor(const Context& context_);
 
-    pddl::TypeList operator()(const ast::TypeObject& node);
+    TypeList operator()(const ast::TypeObject& node);
 
-    pddl::TypeList operator()(const ast::TypeNumber& node);
+    TypeList operator()(const ast::TypeNumber& node);
 
-    pddl::TypeList operator()(const ast::Name& node);
+    TypeList operator()(const ast::Name& node);
 
-    pddl::TypeList operator()(const ast::TypeEither& node);
+    TypeList operator()(const ast::TypeEither& node);
 };
 
-class TypeDeclarationTypedListOfNamesVisitor : boost::static_visitor<pddl::TypeList>
+class TypeDeclarationTypedListOfNamesVisitor : boost::static_visitor<TypeList>
 {
 private:
     Context& context;
@@ -67,12 +67,12 @@ private:
 public:
     TypeDeclarationTypedListOfNamesVisitor(Context& context_);
 
-    pddl::TypeList operator()(const std::vector<ast::Name>& nodes);
+    TypeList operator()(const std::vector<ast::Name>& nodes);
 
-    pddl::TypeList operator()(const ast::TypedListOfNamesRecursively& node);
+    TypeList operator()(const ast::TypedListOfNamesRecursively& node);
 };
 
-extern pddl::TypeList parse(const ast::Types& node, Context& context);
+extern TypeList parse(const ast::Types& node, Context& context);
 
 }
 

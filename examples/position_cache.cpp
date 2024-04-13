@@ -42,19 +42,19 @@ struct TestUnsupportedAndConditionVisitor
     }
 
     /// @brief For inner nodes we need to recursively call the visitor
-    void operator()(const loki::pddl::ConditionOrImpl& node)
+    void operator()(const loki::ConditionOrImpl& node)
     {
         for (const auto& child_node : node.get_conditions())
         {
             // We call front() to obtain the first occurence.
-            const auto child_position = position_cache.get<loki::pddl::ConditionImpl>(child_node).front();
+            const auto child_position = position_cache.get<loki::ConditionImpl>(child_node).front();
             std::visit(TestUnsupportedAndConditionVisitor(child_position, position_cache, error_handler), *child_node);
         }
     }
 
     /// @brief For the unsupported And-Condition,
     ///        we print an clang-style error message and throw an exception.
-    void operator()(const loki::pddl::ConditionAndImpl&)
+    void operator()(const loki::ConditionAndImpl&)
     {
         std::cout << error_handler(position, "Your awesome error message.") << std::endl;
         throw std::runtime_error("Unexpected And-Condition.");
@@ -80,7 +80,7 @@ int main()
             continue;
         }
         // We call front() to obtain the first occurence.
-        auto condition_position = position_cache.get<loki::pddl::ConditionImpl>(condition.value()).front();
+        auto condition_position = position_cache.get<loki::ConditionImpl>(condition.value()).front();
         std::visit(TestUnsupportedAndConditionVisitor(condition_position, position_cache, error_handler), *condition.value());
     }
 

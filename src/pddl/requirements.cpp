@@ -21,7 +21,7 @@
 
 #include <cassert>
 
-namespace loki::pddl
+namespace loki
 {
 
 std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string = { { RequirementEnum::STRIPS, ":strips" },
@@ -44,7 +44,7 @@ std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string = { 
                                                                                 { RequirementEnum::CONSTRAINTS, ":constraints" },
                                                                                 { RequirementEnum::ACTION_COSTS, ":action-costs" } };
 
-const std::string& to_string(pddl::RequirementEnum requirement)
+const std::string& to_string(RequirementEnum requirement)
 {
     assert(requirement_enum_to_string.count(requirement));
     return requirement_enum_to_string.at(requirement);

@@ -22,7 +22,7 @@
 
 #include <sstream>
 
-namespace loki::pddl
+namespace loki
 {
 struct LessComparatorVisitor
 {
