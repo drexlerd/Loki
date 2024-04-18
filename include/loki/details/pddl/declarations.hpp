@@ -55,7 +55,9 @@ using VariableList = std::vector<Variable>;  // not used
 using VariableAssignment = std::unordered_map<Variable, Object>;
 
 class TermObjectImpl;
+using TermObject = const TermObjectImpl*;
 class TermVariableImpl;
+using TermVariable = const TermVariableImpl*;
 using TermImpl = std::variant<TermObjectImpl, TermVariableImpl>;
 using Term = const TermImpl*;
 using TermList = boost::container::small_vector<Term, 2>;  // often unary and binary predicates
@@ -80,11 +82,17 @@ using Literal = const LiteralImpl*;
 using LiteralList = std::vector<Literal>;
 
 class ConditionLiteralImpl;
+using ConditionLiteral = const ConditionLiteralImpl*;
 class ConditionAndImpl;
+using ConditionAnd = const ConditionAndImpl*;
 class ConditionOrImpl;
+using ConditionOr = const ConditionOrImpl*;
 class ConditionNotImpl;
+using ConditionNot = const ConditionNotImpl*;
 class ConditionImplyImpl;
+using ConditionImply = const ConditionImplyImpl*;
 class ConditionExistsImpl;
+using ConditionExists = const ConditionExistsImpl*;
 class ConditionForallImpl;
 using ConditionImpl =
     std::variant<ConditionLiteralImpl, ConditionAndImpl, ConditionOrImpl, ConditionNotImpl, ConditionImplyImpl, ConditionExistsImpl, ConditionForallImpl>;
@@ -92,19 +100,29 @@ using Condition = const ConditionImpl*;
 using ConditionList = std::vector<Condition>;
 
 class EffectLiteralImpl;
+using EffectLiteral = const EffectLiteralImpl*;
 class EffectAndImpl;
+using EffectAnd = const EffectAndImpl*;
 class EffectNumericImpl;
+using EffectNumeric = const EffectNumericImpl*;
 class EffectConditionalForallImpl;
+using EffectConditionalForall = const EffectConditionalForallImpl*;
 class EffectConditionalWhenImpl;
+using EffectConditionalWhen = const EffectConditionalWhenImpl*;
 using EffectImpl = std::variant<EffectLiteralImpl, EffectAndImpl, EffectNumericImpl, EffectConditionalForallImpl, EffectConditionalWhenImpl>;
 using Effect = const EffectImpl*;
 using EffectList = std::vector<Effect>;
 
 class FunctionExpressionNumberImpl;
+using FunctionExpressionNumber = const FunctionExpressionNumberImpl*;
 class FunctionExpressionBinaryOperatorImpl;
+using FunctionExpressionBinaryOperator = const FunctionExpressionBinaryOperatorImpl*;
 class FunctionExpressionMultiOperatorImpl;
+using FunctionExpressionMultiOperator = const FunctionExpressionMultiOperatorImpl*;
 class FunctionExpressionMinusImpl;
+using FunctionExpressionMinus = const FunctionExpressionMinusImpl*;
 class FunctionExpressionFunctionImpl;
+using FunctionExpressionFunction = const FunctionExpressionFunctionImpl*;
 using FunctionExpressionImpl = std::variant<FunctionExpressionNumberImpl,
                                             FunctionExpressionBinaryOperatorImpl,
                                             FunctionExpressionMultiOperatorImpl,
