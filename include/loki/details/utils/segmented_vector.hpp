@@ -58,6 +58,9 @@ private:
 public:
     explicit SegmentedVector(size_t elements_per_segment) : m_elements_per_segment(elements_per_segment), m_size(0), m_capacity(0) {}
 
+    /**
+     * Modifiers
+     */
     const T& push_back(T value)
     {
         // Increase capacity if necessary
@@ -75,6 +78,10 @@ public:
         return segment.back();
     }
 
+    /**
+     * Accessors
+     */
+
     T& operator[](size_t pos)
     {
         assert(pos < size());
@@ -86,6 +93,69 @@ public:
         assert(pos < size());
         return m_data[segment_index(pos)][element_index(pos)];
     }
+
+    /**
+     * Iterators
+     */
+    class const_iterator
+    {
+    private:
+        typename std::vector<std::vector<T>>::const_iterator m_outer_iter;
+        typename std::vector<std::vector<T>>::const_iterator m_outer_end;
+        typename std::vector<T>::const_iterator m_inner_iter;
+
+    public:
+        using difference_type = std::ptrdiff_t;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+        using iterator_category = std::forward_iterator_tag;
+
+        const_iterator(const std::vector<std::vector<T>>& data, bool begin) : m_outer_iter(begin ? data.begin() : data.end()), m_outer_end(data.end())
+        {
+            // Dereferencing end() is undefined behavior, so we must check before initializing the inner iterator.
+            if (begin && m_outer_iter != m_outer_end)
+            {
+                m_inner_iter = m_outer_iter->begin();
+            }
+        }
+
+        [[nodiscard]] decltype(auto) operator*() const { return *m_inner_iter; }
+
+        const_iterator& operator++()
+        {
+            if (++m_inner_iter == m_outer_iter->end())
+            {
+                if (++m_outer_iter != m_outer_end)
+                {
+                    m_inner_iter = m_outer_iter->begin();
+                }
+            }
+            return *this;
+        }
+
+        const_iterator operator++(int)
+        {
+            const_iterator tmp = *this;
+            ++(*this);
+            return tmp;
+        }
+
+        [[nodiscard]] bool operator==(const const_iterator& other) const
+        {
+            return m_outer_iter == other.m_outer_iter && (m_outer_iter == m_outer_end || m_inner_iter == other.m_inner_iter);
+        }
+
+        [[nodiscard]] bool operator!=(const const_iterator& other) const { return !(*this == other); }
+    };
+
+    [[nodiscard]] const_iterator begin() const { return const_iterator(m_data, true); }
+
+    [[nodiscard]] const_iterator end() const { return const_iterator(m_data, false); }
+
+    /**
+     * Capacity
+     */
 
     size_t size() const { return m_size; }
 

@@ -22,7 +22,6 @@
 #include "loki/details/utils/segmented_vector.hpp"
 
 #include <memory>
-#include <mutex>
 #include <tuple>
 #include <type_traits>
 #include <unordered_set>
@@ -49,8 +48,6 @@ private:
 
     size_t m_count = 0;
 
-    std::mutex m_mutex;
-
 public:
     explicit PDDLFactory(size_t elements_per_segment) : m_persistent_vector(SegmentedVector<HolderType>(elements_per_segment)) {}
 
@@ -59,7 +56,6 @@ public:
     template<typename SubType, typename... Args>
     [[nodiscard]] HolderType const* get_or_create(Args&&... args)
     {
-        std::lock_guard<std::mutex> hold(m_mutex);
         /* Construct and insert the element in persistent memory. */
         size_t identifier = m_count;
         // Ensure that element with identifier i is stored at position i.
@@ -90,6 +86,10 @@ public:
         return element_ptr;
     }
 
+    /**
+     * Accessors
+     */
+
     /// @brief Returns a pointer to an existing object with the given identifier.
     [[nodiscard]] HolderType const* get(size_t identifier) const
     {
@@ -100,6 +100,53 @@ public:
 
         throw std::invalid_argument("invalid identifier");
     }
+
+    /**
+     * Iterators
+     */
+    class const_iterator
+    {
+    private:
+        typename SegmentedVector<HolderType>::const_iterator m_iter;
+
+    public:
+        using difference_type = std::ptrdiff_t;
+        using value_type = HolderType;
+        using pointer = HolderType*;
+        using reference = HolderType&;
+        using iterator_category = std::forward_iterator_tag;
+
+        const_iterator(const SegmentedVector<HolderType>& persistent_vector, bool begin) : m_iter(begin ? persistent_vector.begin() : persistent_vector.end())
+        {
+        }
+
+        [[nodiscard]] decltype(auto) operator*() const { return *m_iter; }
+
+        const_iterator& operator++()
+        {
+            ++m_iter;
+            return *this;
+        }
+
+        const_iterator operator++(int)
+        {
+            const_iterator tmp = *this;
+            ++(*this);
+            return tmp;
+        }
+
+        [[nodiscard]] bool operator==(const const_iterator& other) const { return m_iter == other.m_iter; }
+
+        [[nodiscard]] bool operator!=(const const_iterator& other) const { return !(*this == other); }
+    };
+
+    [[nodiscard]] const_iterator begin() const { return const_iterator(m_persistent_vector, true); }
+
+    [[nodiscard]] const_iterator end() const { return const_iterator(m_persistent_vector, false); }
+
+    /**
+     * Capacity
+     */
 
     size_t size() const { return m_count; }
 };
