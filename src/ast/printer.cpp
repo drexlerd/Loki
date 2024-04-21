@@ -519,6 +519,13 @@ std::string parse_text(const ast::EffectConditionalWhen& node, const FormattingO
 
 std::string parse_text(const ast::EffectConditional& node, const FormattingOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
 
+std::string parse_text(const ast::EffectNumericFluentTotalCostOrEffect& node, const FormattingOptions& options)
+{
+    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+}
+
+std::string parse_text(const ast::EffectRoot& node, const FormattingOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
+
 std::string parse_text(const ast::ActionSymbol& node, const FormattingOptions& options) { return parse_text(node.name, options); }
 
 std::string parse_text(const ast::ActionBody& node, const FormattingOptions& options)

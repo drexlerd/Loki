@@ -40,6 +40,16 @@ AssignOperatorEnum parse(const ast::AssignOperatorDecrease&) { return AssignOper
 
 AssignOperatorEnum parse(const ast::AssignOperator& node) { return boost::apply_visitor(AssignOperatorVisitor(), node); }
 
+Effect parse(const std::vector<ast::EffectNumericFluentTotalCostOrEffect>& effect_nodes, Context& context)
+{
+    auto effect_list = EffectList();
+    for (const auto& effect_node : effect_nodes)
+    {
+        effect_list.push_back(boost::apply_visitor(EffectVisitor(context), effect_node));
+    }
+    return context.factories.get_or_create_effect_and(effect_list);
+}
+
 Effect parse(const std::vector<ast::Effect>& effect_nodes, Context& context)
 {
     auto effect_list = EffectList();
@@ -49,6 +59,8 @@ Effect parse(const std::vector<ast::Effect>& effect_nodes, Context& context)
     }
     return context.factories.get_or_create_effect_and(effect_list);
 }
+
+Effect parse(const ast::EffectRoot& node, Context& context) { return boost::apply_visitor(EffectVisitor(context), node); }
 
 Effect parse(const ast::Effect& node, Context& context) { return boost::apply_visitor(EffectVisitor(context), node); }
 

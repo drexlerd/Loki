@@ -55,7 +55,6 @@
   :precondition (and (lift-at ?f1) (above ?f2 ?f1))
   :effect (and (lift-at ?f2) (not (lift-at ?f1))))
 
-(:derived (served1 ?f1 - floor ?f2 - floor) (and (lift-at ?f2) (lift-at ?f1)))
 )
 
 

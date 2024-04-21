@@ -155,6 +155,8 @@ struct EffectProduction;
 struct EffectConditionalForall;
 struct EffectConditionalWhen;
 struct EffectConditional;
+struct EffectNumericFluentTotalCostOrEffect;
+struct EffectRoot;
 
 struct ActionSymbol;
 struct ActionBody;
@@ -819,6 +821,15 @@ struct AssignOperator :
 
 /* <effect> */
 // <p-effect>
+// struct EffectRoot :
+//    x3::position_tagged,
+//    x3::variant<x3::forward_ast<EffectProduction>, x3::forward_ast<EffectConditional>, x3::forward_ast<EffectProductionNumericFluentTotalCost>>,
+//    std::vector<x3::variant<EffectProductionNumericFluentTotalCost, Effect>>>
+//{
+//    using base_type::base_type;
+//    using base_type::operator=;
+//};
+
 struct Effect : x3::position_tagged, x3::variant<x3::forward_ast<EffectProduction>, x3::forward_ast<EffectConditional>, std::vector<Effect>>
 {
     using base_type::base_type;
@@ -844,9 +855,7 @@ struct EffectProductionNumericFluentGeneral : x3::position_tagged
     FunctionExpression function_expression;
 };
 
-struct EffectProduction :
-    x3::position_tagged,
-    x3::variant<EffectProductionLiteral, EffectProductionNumericFluentTotalCost, EffectProductionNumericFluentGeneral>
+struct EffectProduction : x3::position_tagged, x3::variant<EffectProductionLiteral, EffectProductionNumericFluentGeneral>
 {
     using base_type::base_type;
     using base_type::operator=;
@@ -870,6 +879,20 @@ struct EffectConditional : x3::position_tagged, x3::variant<EffectConditionalFor
     using base_type::operator=;
 };
 
+struct EffectNumericFluentTotalCostOrEffect : x3::position_tagged, x3::variant<EffectProductionNumericFluentTotalCost, Effect>
+{
+    using base_type::base_type;
+    using base_type::operator=;
+};
+
+struct EffectRoot :
+    x3::position_tagged,
+    x3::variant<EffectProduction, EffectConditional, EffectProductionNumericFluentTotalCost, std::vector<EffectNumericFluentTotalCostOrEffect>>
+{
+    using base_type::base_type;
+    using base_type::operator=;
+};
+
 /* <action-def> */
 struct ActionSymbol : x3::position_tagged
 {
@@ -879,7 +902,7 @@ struct ActionSymbol : x3::position_tagged
 struct ActionBody : x3::position_tagged
 {
     boost::optional<PreconditionGoalDescriptor> precondition_goal_descriptor;
-    boost::optional<Effect> effect;
+    boost::optional<EffectRoot> effect;
 };
 
 struct Action : x3::position_tagged

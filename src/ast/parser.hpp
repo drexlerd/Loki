@@ -171,6 +171,8 @@ struct EffectProductionClass;
 struct EffectConditionalForallClass;
 struct EffectConditionalWhenClass;
 struct EffectConditionalClass;
+struct EffectNumericFluentTotalCostOrEffectClass;
+struct EffectRootClass;
 struct ActionSymbolClass;
 struct ActionBodyClass;
 struct ActionClass;
@@ -368,6 +370,9 @@ typedef x3::rule<EffectProductionClass, ast::EffectProduction> effect_production
 typedef x3::rule<EffectConditionalForallClass, ast::EffectConditionalForall> effect_conditional_forall_type;
 typedef x3::rule<EffectConditionalWhenClass, ast::EffectConditionalWhen> effect_conditional_when_type;
 typedef x3::rule<EffectConditionalClass, ast::EffectConditional> effect_conditional_type;
+typedef x3::rule<EffectRootClass, ast::EffectRoot> effect_root_type;
+typedef x3::rule<EffectNumericFluentTotalCostOrEffectClass, ast::EffectNumericFluentTotalCostOrEffect> effect_numeric_fluent_total_cost_or_effect_type;
+
 typedef x3::rule<ActionSymbolClass, ast::ActionSymbol> action_symbol_type;
 typedef x3::rule<ActionBodyClass, ast::ActionBody> action_body_type;
 typedef x3::rule<ActionClass, ast::Action> action_type;
@@ -558,6 +563,8 @@ BOOST_SPIRIT_DECLARE(effect_type,
                      effect_conditional_forall_type,
                      effect_conditional_when_type,
                      effect_conditional_type,
+                     effect_numeric_fluent_total_cost_or_effect_type,
+                     effect_root_type,
                      action_symbol_type,
                      action_body_type,
                      action_type,
@@ -757,6 +764,9 @@ parser::effect_production_type const& effect_production();
 parser::effect_conditional_forall_type const& effect_conditional_forall();
 parser::effect_conditional_when_type const& effect_conditional_when();
 parser::effect_conditional_type const& effect_conditional();
+parser::effect_numeric_fluent_total_cost_or_effect_type const& effect_numeric_fluent_total_cost_or_effect();
+parser::effect_root_type const& effect_root();
+
 parser::action_symbol_type const& action_symbol();
 parser::action_body_type const& action_body();
 parser::action_type const& action();
