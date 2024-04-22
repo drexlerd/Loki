@@ -27,6 +27,9 @@ namespace loki
 
 std::vector<std::variant<GroundLiteral, NumericFluent>> parse(const ast::Initial& initial_node, Context& context)
 {
+    // TODO: IllformedFunctionDefinitionMissingValue and IllformedFunctionDefinitionMultipleValues using value_definitions.
+    std::unordered_map<FunctionSkeleton, std::unordered_set<Function>> value_definitions;
+
     auto initial_element_list = std::vector<std::variant<GroundLiteral, NumericFluent>>();
     for (const auto& initial_element : initial_node.initial_elements)
     {

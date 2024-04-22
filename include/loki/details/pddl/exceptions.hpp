@@ -186,6 +186,22 @@ public:
     MultiDefinitionObjectError(const std::string& name, const std::string& error_handler_output);
 };
 
+/* Function */
+
+class IllformedFunctionDefinitionMissingValue : public SemanticParserError
+{
+public:
+    IllformedFunctionDefinitionMissingValue(const FunctionSkeleton& function, const Function& values, const std::string& error_handler_output);
+};
+
+class IllformedFunctionDefinitionMultipleValues : public SemanticParserError
+{
+public:
+    IllformedFunctionDefinitionMultipleValues(const FunctionSkeleton& function_skeleton,
+                                              const Function& ground_function,
+                                              const std::string& error_handler_output);
+};
+
 /* Compatibility errors */
 class MismatchedDomainError : public SemanticParserError
 {

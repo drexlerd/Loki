@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <loki/details/pddl/factory.hpp>
 #include <loki/details/pddl/object.hpp>
+#include <loki/details/pddl/term.hpp>
 
 namespace loki::domain::tests
 {
@@ -52,6 +53,21 @@ TEST(LokiTests, FactoryIteratorEmptyTest)
     }
 
     EXPECT_EQ(objects.size(), 0);
+}
+
+TEST(LokiTests, FactoryVariantTest)
+{
+    PDDLFactory<ObjectImpl> objects(2);
+    PDDLFactory<TermImpl> terms(2);
+    const auto object_0 = objects.get_or_create<ObjectImpl>("object_0", TypeList());
+    const auto object_1 = objects.get_or_create<ObjectImpl>("object_1", TypeList());
+
+    const auto term_0_object_0 = terms.get_or_create<TermObjectImpl>(object_0);
+    const auto term_1_object_0 = terms.get_or_create<TermObjectImpl>(object_0);
+    const auto term_2_object_1 = terms.get_or_create<TermObjectImpl>(object_1);
+
+    EXPECT_EQ(term_0_object_0, term_1_object_0);
+    EXPECT_NE(term_0_object_0, term_2_object_1);
 }
 
 }

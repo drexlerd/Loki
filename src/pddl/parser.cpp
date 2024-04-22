@@ -167,6 +167,7 @@ Problem parse(const ast::Problem& problem_node, Context& context, const Domain& 
             std::visit(UnpackingVisitor(initial_literals, numeric_fluents), initial_element);
         }
     }
+
     /* Goal section */
     auto goal_condition = std::optional<Condition>();
     if (problem_node.goal.has_value())

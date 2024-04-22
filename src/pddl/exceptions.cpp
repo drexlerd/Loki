@@ -18,7 +18,9 @@
 #include "loki/details/pddl/exceptions.hpp"
 
 #include "loki/details/pddl/domain.hpp"
+#include "loki/details/pddl/function.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
+#include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/predicate.hpp"
 
 #include <string>
@@ -171,6 +173,24 @@ UndefinedObjectError::UndefinedObjectError(const std::string& name, const std::s
 
 MultiDefinitionObjectError::MultiDefinitionObjectError(const std::string& name, const std::string& error_handler_output) :
     SemanticParserError("The object with name \"" + name + "\" has already been defined.", error_handler_output)
+{
+}
+
+/* Function*/
+IllformedFunctionDefinitionMissingValue::IllformedFunctionDefinitionMissingValue(const FunctionSkeleton& function_skeleton,
+                                                                                 const Function& values,
+                                                                                 const std::string& error_handler_output) :
+    SemanticParserError("The function with name \"" + function_skeleton->str() + "\n misses a value definition in the initial state for arguments \""
+                            + values->str() + "\".",
+                        error_handler_output)
+{
+}
+
+IllformedFunctionDefinitionMultipleValues::IllformedFunctionDefinitionMultipleValues(const FunctionSkeleton& function_skeleton,
+                                                                                     const Function& ground_function,
+                                                                                     const std::string& error_handler_output) :
+    SemanticParserError("The function with name \"" + function_skeleton->str() + "\n has multiple values defined for \"" + ground_function->str() + "\".",
+                        error_handler_output)
 {
 }
 
