@@ -158,13 +158,6 @@ using DomainList = std::vector<Domain>;
 /**
  * Problem
  */
-class GroundAtomImpl;
-using GroundAtom = const GroundAtomImpl*;
-using GroundAtomList = std::vector<GroundAtom>;
-
-class GroundLiteralImpl;
-using GroundLiteral = const GroundLiteralImpl*;
-using GroundLiteralList = std::vector<GroundLiteral>;
 
 class NumericFluentImpl;
 using NumericFluent = const NumericFluentImpl*;

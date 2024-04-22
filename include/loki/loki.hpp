@@ -39,8 +39,6 @@
 #include "loki/details/pddl/function.hpp"
 #include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
-#include "loki/details/pddl/ground_atom.hpp"
-#include "loki/details/pddl/ground_literal.hpp"
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/metric.hpp"
 #include "loki/details/pddl/numeric_fluent.hpp"

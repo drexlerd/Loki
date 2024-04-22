@@ -20,7 +20,7 @@
 #include "loki/details/pddl/axiom.hpp"
 #include "loki/details/pddl/conditions.hpp"
 #include "loki/details/pddl/domain.hpp"
-#include "loki/details/pddl/ground_literal.hpp"
+#include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/metric.hpp"
 #include "loki/details/pddl/numeric_fluent.hpp"
 #include "loki/details/pddl/object.hpp"
@@ -43,7 +43,7 @@ ProblemImpl::ProblemImpl(int identifier,
                          Requirements requirements,
                          ObjectList objects,
                          PredicateList derived_predicates,
-                         GroundLiteralList initial_literals,
+                         LiteralList initial_literals,
                          NumericFluentList numeric_fluents,
                          std::optional<Condition> goal_condition,
                          std::optional<OptimizationMetric> optimization_metric,
@@ -208,7 +208,7 @@ const ObjectList& ProblemImpl::get_objects() const { return m_objects; }
 
 const PredicateList& ProblemImpl::get_derived_predicates() const { return m_derived_predicates; }
 
-const GroundLiteralList& ProblemImpl::get_initial_literals() const { return m_initial_literals; }
+const LiteralList& ProblemImpl::get_initial_literals() const { return m_initial_literals; }
 
 const NumericFluentList& ProblemImpl::get_numeric_fluents() const { return m_numeric_fluents; }
 

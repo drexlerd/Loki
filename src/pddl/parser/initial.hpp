@@ -27,14 +27,14 @@ namespace loki
 {
 
 /* Init */
-extern std::vector<std::variant<GroundLiteral, NumericFluent>> parse(const ast::Initial& initial_node, Context& context);
+extern std::vector<std::variant<Literal, NumericFluent>> parse(const ast::Initial& initial_node, Context& context);
 
-extern std::variant<GroundLiteral, NumericFluent> parse(const ast::InitialElementLiteral& node);
-extern std::variant<GroundLiteral, NumericFluent> parse(const ast::InitialElementTimedLiterals& node);
-extern std::variant<GroundLiteral, NumericFluent> parse(const ast::InitialElementNumericFluentsTotalCost& node);
-extern std::variant<GroundLiteral, NumericFluent> parse(const ast::InitialElementNumericFluentsGeneral& node);
+extern std::variant<Literal, NumericFluent> parse(const ast::InitialElementLiteral& node);
+extern std::variant<Literal, NumericFluent> parse(const ast::InitialElementTimedLiterals& node);
+extern std::variant<Literal, NumericFluent> parse(const ast::InitialElementNumericFluentsTotalCost& node);
+extern std::variant<Literal, NumericFluent> parse(const ast::InitialElementNumericFluentsGeneral& node);
 
-class InitialElementVisitor : boost::static_visitor<std::variant<GroundLiteral, NumericFluent>>
+class InitialElementVisitor : boost::static_visitor<std::variant<Literal, NumericFluent>>
 {
 private:
     Context& context;
@@ -43,7 +43,7 @@ public:
     InitialElementVisitor(Context& context_);
 
     template<typename Node>
-    std::variant<GroundLiteral, NumericFluent> operator()(const Node& node) const
+    std::variant<Literal, NumericFluent> operator()(const Node& node) const
     {
         return parse(node, context);
     }

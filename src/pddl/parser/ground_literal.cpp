@@ -25,7 +25,7 @@ namespace loki
 {
 
 /* Atom */
-GroundAtom parse(const ast::AtomicFormulaOfNamesPredicate& node, Context& context)
+Atom parse(const ast::AtomicFormulaOfNamesPredicate& node, Context& context)
 {
     const auto name = parse(node.predicate.name);
     const auto binding = context.scopes.get<PredicateImpl>(name);
@@ -33,22 +33,22 @@ GroundAtom parse(const ast::AtomicFormulaOfNamesPredicate& node, Context& contex
     {
         throw UndefinedPredicateError(name, context.scopes.get_error_handler()(node, ""));
     }
-    auto object_list = ObjectList();
+    auto term_list = TermList();
     for (const auto& name_node : node.names)
     {
-        object_list.push_back(parse_object_reference(name_node, context));
+        term_list.push_back(context.factories.get_or_create_term_object(parse_object_reference(name_node, context)));
     }
     const auto [predicate, _position, _error_handler] = binding.value();
-    if (predicate->get_parameters().size() != object_list.size())
+    if (predicate->get_parameters().size() != term_list.size())
     {
-        throw MismatchedPredicateObjectListError(predicate, object_list, context.scopes.get_error_handler()(node, ""));
+        throw MismatchedPredicateTermListError(predicate, term_list, context.scopes.get_error_handler()(node, ""));
     }
-    const auto atom = context.factories.get_or_create_ground_atom(predicate, object_list);
+    const auto atom = context.factories.get_or_create_atom(predicate, term_list);
     context.positions.push_back(atom, node);
     return atom;
 }
 
-GroundAtom parse(const ast::AtomicFormulaOfNamesEquality& node, Context& context)
+Atom parse(const ast::AtomicFormulaOfNamesEquality& node, Context& context)
 {
     if (!context.requirements->test(RequirementEnum::EQUALITY))
     {
@@ -56,33 +56,33 @@ GroundAtom parse(const ast::AtomicFormulaOfNamesEquality& node, Context& context
     }
     assert(context.scopes.get<PredicateImpl>("=").has_value());
     const auto [equal_predicate, _position, _error_handler] = context.scopes.get<PredicateImpl>("=").value();
-    const auto object_left = parse_object_reference(node.name_left, context);
-    const auto object_right = parse_object_reference(node.name_right, context);
-    const auto atom = context.factories.get_or_create_ground_atom(equal_predicate, ObjectList { object_left, object_right });
+    const auto term_left = context.factories.get_or_create_term_object(parse_object_reference(node.name_left, context));
+    const auto term_right = context.factories.get_or_create_term_object(parse_object_reference(node.name_right, context));
+    const auto atom = context.factories.get_or_create_atom(equal_predicate, TermList { term_left, term_right });
     context.positions.push_back(atom, node);
     return atom;
 }
 
-GroundAtom parse(const ast::AtomicFormulaOfNames& node, Context& context) { return boost::apply_visitor(GroundAtomicFormulaOfNamesVisitor(context), node); }
+Atom parse(const ast::AtomicFormulaOfNames& node, Context& context) { return boost::apply_visitor(GroundAtomicFormulaOfNamesVisitor(context), node); }
 
 GroundAtomicFormulaOfNamesVisitor::GroundAtomicFormulaOfNamesVisitor(Context& context_) : context(context_) {}
 
 /* Literal */
-GroundLiteral parse(const ast::GroundAtom& node, Context& context)
+Literal parse(const ast::GroundAtom& node, Context& context)
 {
-    const auto literal = context.factories.get_or_create_ground_literal(false, parse(node.atomic_formula_of_names, context));
+    const auto literal = context.factories.get_or_create_literal(false, parse(node.atomic_formula_of_names, context));
     context.positions.push_back(literal, node);
     return literal;
 }
 
-GroundLiteral parse(const ast::NegatedGroundAtom& node, Context& context)
+Literal parse(const ast::NegatedGroundAtom& node, Context& context)
 {
-    const auto literal = context.factories.get_or_create_ground_literal(true, parse(node.atomic_formula_of_names, context));
+    const auto literal = context.factories.get_or_create_literal(true, parse(node.atomic_formula_of_names, context));
     context.positions.push_back(literal, node);
     return literal;
 }
 
-GroundLiteral parse(const ast::GroundLiteral& node, Context& context) { return boost::apply_visitor(GroundLiteralVisitor(context), node); }
+Literal parse(const ast::GroundLiteral& node, Context& context) { return boost::apply_visitor(GroundLiteralVisitor(context), node); }
 
 GroundLiteralVisitor::GroundLiteralVisitor(Context& context_) : context(context_) {}
 

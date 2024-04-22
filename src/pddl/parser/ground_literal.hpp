@@ -25,11 +25,11 @@ namespace loki
 {
 
 /* Atom */
-extern GroundAtom parse(const ast::AtomicFormulaOfNamesPredicate& node, Context& context);
-extern GroundAtom parse(const ast::AtomicFormulaOfNamesEquality& node, Context& context);
-extern GroundAtom parse(const ast::AtomicFormulaOfNames& node, Context& context);
+extern Atom parse(const ast::AtomicFormulaOfNamesPredicate& node, Context& context);
+extern Atom parse(const ast::AtomicFormulaOfNamesEquality& node, Context& context);
+extern Atom parse(const ast::AtomicFormulaOfNames& node, Context& context);
 
-class GroundAtomicFormulaOfNamesVisitor : boost::static_visitor<GroundAtom>
+class GroundAtomicFormulaOfNamesVisitor : boost::static_visitor<Atom>
 {
 private:
     Context& context;
@@ -38,18 +38,18 @@ public:
     GroundAtomicFormulaOfNamesVisitor(Context& context_);
 
     template<typename Node>
-    GroundAtom operator()(const Node& node) const
+    Atom operator()(const Node& node) const
     {
         return parse(node, context);
     }
 };
 
 /* Literal */
-extern GroundLiteral parse(const ast::GroundAtom& node, Context& context);
-extern GroundLiteral parse(const ast::NegatedGroundAtom& node, Context& context);
-extern GroundLiteral parse(const ast::GroundLiteral& node, Context& context);
+extern Literal parse(const ast::GroundAtom& node, Context& context);
+extern Literal parse(const ast::NegatedGroundAtom& node, Context& context);
+extern Literal parse(const ast::GroundLiteral& node, Context& context);
 
-class GroundLiteralVisitor : boost::static_visitor<GroundLiteral>
+class GroundLiteralVisitor : boost::static_visitor<Literal>
 {
 private:
     Context& context;
@@ -58,7 +58,7 @@ public:
     GroundLiteralVisitor(Context& context_);
 
     template<typename Node>
-    GroundLiteral operator()(const Node& node) const
+    Literal operator()(const Node& node) const
     {
         return parse(node, context);
     }

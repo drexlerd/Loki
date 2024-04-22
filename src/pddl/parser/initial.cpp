@@ -20,17 +20,18 @@
 #include "common.hpp"
 #include "functions.hpp"
 #include "ground_literal.hpp"
+#include "literal.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 
 namespace loki
 {
 
-std::vector<std::variant<GroundLiteral, NumericFluent>> parse(const ast::Initial& initial_node, Context& context)
+std::vector<std::variant<Literal, NumericFluent>> parse(const ast::Initial& initial_node, Context& context)
 {
     // TODO: IllformedFunctionDefinitionMissingValue and IllformedFunctionDefinitionMultipleValues using value_definitions.
     std::unordered_map<FunctionSkeleton, std::unordered_set<Function>> value_definitions;
 
-    auto initial_element_list = std::vector<std::variant<GroundLiteral, NumericFluent>>();
+    auto initial_element_list = std::vector<std::variant<Literal, NumericFluent>>();
     for (const auto& initial_element : initial_node.initial_elements)
     {
         initial_element_list.push_back(boost::apply_visitor(InitialElementVisitor(context), initial_element));
@@ -38,14 +39,14 @@ std::vector<std::variant<GroundLiteral, NumericFluent>> parse(const ast::Initial
     return initial_element_list;
 }
 
-std::variant<GroundLiteral, NumericFluent> parse(const ast::InitialElementLiteral& node, Context& context) { return parse(node.literal, context); }
+std::variant<Literal, NumericFluent> parse(const ast::InitialElementLiteral& node, Context& context) { return parse(node.literal, context); }
 
-std::variant<GroundLiteral, NumericFluent> parse(const ast::InitialElementTimedLiterals& /*node*/, Context& /*context*/)
+std::variant<Literal, NumericFluent> parse(const ast::InitialElementTimedLiterals& /*node*/, Context& /*context*/)
 {
     throw NotImplementedError("InitialElementVisitor::operator()(const ast::InitialElementTimedLiterals& node)");
 }
 
-std::variant<GroundLiteral, NumericFluent> parse(const ast::InitialElementNumericFluentsTotalCost& node, Context& context)
+std::variant<Literal, NumericFluent> parse(const ast::InitialElementNumericFluentsTotalCost& node, Context& context)
 {
     if (!context.requirements->test(RequirementEnum::ACTION_COSTS))
     {
@@ -68,7 +69,7 @@ std::variant<GroundLiteral, NumericFluent> parse(const ast::InitialElementNumeri
     return context.factories.get_or_create_numeric_fluent(basic_function_term, number);
 }
 
-std::variant<GroundLiteral, NumericFluent> parse(const ast::InitialElementNumericFluentsGeneral& node, Context& context)
+std::variant<Literal, NumericFluent> parse(const ast::InitialElementNumericFluentsGeneral& node, Context& context)
 {
     if (!context.requirements->test(RequirementEnum::ACTION_COSTS))
     {

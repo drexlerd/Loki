@@ -157,7 +157,7 @@ Problem parse(const ast::Problem& problem_node, Context& context, const Domain& 
     }
     track_predicate_references(derived_predicates, context);
     /* Initial section */
-    auto initial_literals = GroundLiteralList();
+    auto initial_literals = LiteralList();
     auto numeric_fluents = NumericFluentList();
     if (problem_node.initial.has_value())
     {

@@ -29,8 +29,6 @@
 #include "loki/details/pddl/function.hpp"
 #include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
-#include "loki/details/pddl/ground_atom.hpp"
-#include "loki/details/pddl/ground_literal.hpp"
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/metric.hpp"
 #include "loki/details/pddl/numeric_fluent.hpp"
@@ -56,9 +54,7 @@ using VariableFactory = PDDLFactory<VariableImpl>;
 using TermFactory = PDDLFactory<TermImpl>;
 using ObjectFactory = PDDLFactory<ObjectImpl>;
 using AtomFactory = PDDLFactory<AtomImpl>;
-using GroundAtomFactory = PDDLFactory<GroundAtomImpl>;
 using LiteralFactory = PDDLFactory<LiteralImpl>;
-using GroundLiteralFactory = PDDLFactory<GroundLiteralImpl>;
 using ParameterFactory = PDDLFactory<ParameterImpl>;
 using PredicateFactory = PDDLFactory<PredicateImpl>;
 using FunctionExpressionFactory = PDDLFactory<FunctionExpressionImpl>;
@@ -79,9 +75,7 @@ using PDDLPositionCache = PositionCache<RequirementsImpl,
                                         TermImpl,
                                         ObjectImpl,
                                         AtomImpl,
-                                        GroundAtomImpl,
                                         LiteralImpl,
-                                        GroundLiteralImpl,
                                         ParameterImpl,
                                         PredicateImpl,
                                         FunctionExpressionImpl,
@@ -107,9 +101,7 @@ private:
     ObjectFactory objects;
     AtomFactory atoms;
     AtomFactory derived_atoms;
-    GroundAtomFactory ground_atoms;
     LiteralFactory literals;
-    GroundLiteralFactory ground_literals;
     ParameterFactory parameters;
     PredicateFactory predicates;
     FunctionExpressionFactory function_expressions;
@@ -133,9 +125,7 @@ public:
         objects(ObjectFactory(1000)),
         atoms(AtomFactory(1000)),
         derived_atoms(AtomFactory(1000)),
-        ground_atoms(GroundAtomFactory(1000)),
         literals(LiteralFactory(1000)),
-        ground_literals(GroundLiteralFactory(1000)),
         parameters(ParameterFactory(1000)),
         predicates(PredicateFactory(1000)),
         function_expressions(FunctionExpressionFactory(1000)),
@@ -175,17 +165,7 @@ public:
 
     Atom get_or_create_atom(Predicate predicate, TermList terms) { return atoms.get_or_create<AtomImpl>(std::move(predicate), std::move(terms)); }
 
-    GroundAtom get_or_create_ground_atom(Predicate predicate, ObjectList objects)
-    {
-        return ground_atoms.get_or_create<GroundAtomImpl>(std::move(predicate), std::move(objects));
-    }
-
     Literal get_or_create_literal(bool is_negated, Atom atom) { return literals.get_or_create<LiteralImpl>(std::move(is_negated), std::move(atom)); }
-
-    GroundLiteral get_or_create_ground_literal(bool is_negated, GroundAtom atom)
-    {
-        return ground_literals.get_or_create<GroundLiteralImpl>(std::move(is_negated), std::move(atom));
-    }
 
     Parameter get_or_create_parameter(Variable variable, TypeList types)
     {
@@ -321,7 +301,7 @@ public:
                                   Requirements requirements,
                                   ObjectList objects,
                                   PredicateList derived_predicates,
-                                  GroundLiteralList initial_literals,
+                                  LiteralList initial_literals,
                                   NumericFluentList numeric_fluents,
                                   std::optional<Condition> goal_condition,
                                   std::optional<OptimizationMetric> optimization_metric,
