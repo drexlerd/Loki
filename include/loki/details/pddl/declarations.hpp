@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_DECLARATIONS_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_DECLARATIONS_HPP_
 
-#include <boost/container/small_vector.hpp>
 #include <cstddef>
 #include <unordered_map>
 #include <variant>
@@ -42,8 +41,7 @@ using Requirements = const RequirementsImpl*;
 
 class TypeImpl;
 using Type = const TypeImpl*;
-using TypeList = boost::container::small_vector<Type, 1>;  // often single type
-// using TypeList = std::vector<Type>;
+using TypeList = std::vector<Type>;
 
 class ObjectImpl;
 using Object = const ObjectImpl*;
@@ -60,8 +58,7 @@ class TermVariableImpl;
 using TermVariable = const TermVariableImpl*;
 using TermImpl = std::variant<TermObjectImpl, TermVariableImpl>;
 using Term = const TermImpl*;
-using TermList = boost::container::small_vector<Term, 2>;  // often unary and binary predicates
-// using TermList = std::vector<Term>;
+using TermList = std::vector<Term>;
 
 class AtomImpl;
 using Atom = const AtomImpl*;
@@ -69,8 +66,7 @@ using AtomList = std::vector<Atom>;
 
 class ParameterImpl;
 using Parameter = const ParameterImpl*;
-using ParameterList = boost::container::small_vector<Parameter, 10>;  // often actions, quantifiers with few parameters
-// using ParameterList = std::vector<Parameter>;
+using ParameterList = std::vector<Parameter>;
 using ParameterAssignment = std::unordered_map<Parameter, Object>;
 
 class PredicateImpl;
