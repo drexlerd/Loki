@@ -46,9 +46,15 @@ std::variant<GroundLiteral, NumericFluent> parse(const ast::InitialElementNumeri
 {
     if (!context.requirements->test(RequirementEnum::ACTION_COSTS))
     {
-        throw UndefinedRequirementError(RequirementEnum::ACTION_COSTS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(RequirementEnum::ACTION_COSTS, context.positions.get_error_handler()(node, ""));
+    }
+    if ((!context.requirements->test(RequirementEnum::ACTION_COSTS)) && (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS)))
+    {
+        throw UndefinedRequirementError(RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
     }
     context.references.untrack(RequirementEnum::ACTION_COSTS);
+    context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
+
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol_total_cost, context);
     const auto basic_function_term = context.factories.get_or_create_function(function_skeleton, TermList {});
     double number = parse(node.number);
@@ -61,11 +67,17 @@ std::variant<GroundLiteral, NumericFluent> parse(const ast::InitialElementNumeri
 
 std::variant<GroundLiteral, NumericFluent> parse(const ast::InitialElementNumericFluentsGeneral& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS))
+    if (!context.requirements->test(RequirementEnum::ACTION_COSTS))
     {
-        throw UndefinedRequirementError(RequirementEnum::NUMERIC_FLUENTS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(RequirementEnum::ACTION_COSTS, context.positions.get_error_handler()(node, ""));
     }
+    if ((!context.requirements->test(RequirementEnum::ACTION_COSTS)) && (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS)))
+    {
+        throw UndefinedRequirementError(RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
+    }
+    context.references.untrack(RequirementEnum::ACTION_COSTS);
     context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
+
     const auto basic_function_term = parse(node.basic_function_term, context);
     double number = parse(node.number);
     if (number < 0 && context.requirements->test(RequirementEnum::ACTION_COSTS))

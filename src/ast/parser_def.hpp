@@ -313,7 +313,7 @@ const auto atomic_function_skeleton_general_def = lit('(') > function_symbol > t
 const auto atomic_function_skeleton_def = atomic_function_skeleton_total_cost | atomic_function_skeleton_general;
 const auto function_typed_list_of_atomic_function_skeletons_recursively_def =
     (+atomic_function_skeleton >> lit('-')) > type_number > -function_typed_list_of_atomic_function_skeletons;
-const auto function_typed_list_of_atomic_function_skeletons_def = function_typed_list_of_atomic_function_skeletons_recursively | *atomic_function_skeleton;
+const auto function_typed_list_of_atomic_function_skeletons_def = function_typed_list_of_atomic_function_skeletons_recursively | +atomic_function_skeleton;
 
 const auto atomic_formula_of_terms_predicate_def = (lit('(') >> predicate) > *term > lit(')');
 const auto atomic_formula_of_terms_equality_def = (lit('(') >> lit('=')) >> term > term > lit(')');
@@ -396,8 +396,6 @@ const auto assign_operator_def =
 // For action cost effects only
 const auto numeric_term_def = function_expression_number | function_expression_head;
 
-// const auto effect_root_def = ((lit('(') >> keyword_lit("and")) > *(effect_production_numeric_fluent_total_cost | effect) > lit(')')) | effect_conditional
-//                              | effect_production | effect_production_numeric_fluent_total_cost;
 const auto effect_root_def = ((lit('(') >> keyword_lit("and")) > *effect_numeric_fluent_total_cost_or_effect > lit(')')) | effect_conditional
                              | effect_production | effect_production_numeric_fluent_total_cost;
 const auto effect_def = ((lit('(') >> keyword_lit("and")) > *effect > lit(')')) | effect_conditional | effect_production;

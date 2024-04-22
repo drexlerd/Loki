@@ -75,6 +75,7 @@ DomainParser::DomainParser(const fs::path& file_path) :
     const auto equal_predicate = context.factories.get_or_create_predicate("=", binary_parameterlist);
     context.scopes.insert("=", equal_predicate, {});
 
+    std::cout << "Started semantic domain file: " << file_path << std::endl;
     m_domain = parse(node, context);
 
     // Only the global scope remains

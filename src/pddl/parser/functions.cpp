@@ -146,19 +146,12 @@ FunctionSkeleton parse(const ast::AtomicFunctionSkeletonTotalCost& node, Context
     {
         throw UndefinedRequirementError(RequirementEnum::ACTION_COSTS, context.positions.get_error_handler()(node, ""));
     }
-    else
-    {
-        context.references.untrack(RequirementEnum::ACTION_COSTS);
-    }
     if ((!context.requirements->test(RequirementEnum::ACTION_COSTS)) && (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS)))
     {
         throw UndefinedRequirementError(RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
     }
-    else
-    {
-        context.references.untrack(RequirementEnum::ACTION_COSTS);
-        context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
-    }
+    context.references.untrack(RequirementEnum::ACTION_COSTS);
+    context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
 
     assert(context.scopes.get<TypeImpl>("number").has_value());
     const auto [type, _position, _error_handler] = context.scopes.get<TypeImpl>("number").value();
@@ -173,10 +166,15 @@ FunctionSkeleton parse(const ast::AtomicFunctionSkeletonTotalCost& node, Context
 
 FunctionSkeleton parse(const ast::AtomicFunctionSkeletonGeneral& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS))
+    if (!context.requirements->test(RequirementEnum::ACTION_COSTS))
+    {
+        throw UndefinedRequirementError(RequirementEnum::ACTION_COSTS, context.positions.get_error_handler()(node, ""));
+    }
+    if ((!context.requirements->test(RequirementEnum::ACTION_COSTS)) && (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS)))
     {
         throw UndefinedRequirementError(RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
     }
+    context.references.untrack(RequirementEnum::ACTION_COSTS);
     context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
 
     context.scopes.open_scope();
