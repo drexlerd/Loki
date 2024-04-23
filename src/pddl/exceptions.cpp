@@ -154,7 +154,7 @@ UnexpectedDerivedPredicateInEffect::UnexpectedDerivedPredicateInEffect(const std
 {
 }
 
-IncompatibleObjectTypeError::IncompatibleObjectTypeError(const Object& object, const Variable& variable, const std::string& error_handler_output) :
+IncompatibleObjectToVariableError::IncompatibleObjectToVariableError(const Object& object, const Variable& variable, const std::string& error_handler_output) :
     SemanticParserError("The object with name \"" + object->get_name() + "\" does not satisfy the type requirement of variable with name \""
                             + variable->get_name() + "\".",
                         error_handler_output)

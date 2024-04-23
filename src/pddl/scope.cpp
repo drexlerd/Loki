@@ -25,7 +25,7 @@ std::optional<BindingSearchResult<Type>> Scope::get_type(const std::string& name
 {
     const auto it = m_types.find(name);
     if (it != m_types.end())
-        return std::make_tuple(it->second.first, it->second.second, m_error_handler);
+        return std::make_tuple(it->second.first, it->second.second, std::cref(m_error_handler));
     if (m_parent_scope)
     {
         return m_parent_scope->get_type(name);
@@ -37,7 +37,7 @@ std::optional<BindingSearchResult<Object>> Scope::get_object(const std::string& 
 {
     const auto it = m_objects.find(name);
     if (it != m_objects.end())
-        return std::make_tuple(it->second.first, it->second.second, m_error_handler);
+        return std::make_tuple(it->second.first, it->second.second, std::cref(m_error_handler));
     if (m_parent_scope)
     {
         return m_parent_scope->get_object(name);
@@ -49,7 +49,7 @@ std::optional<BindingSearchResult<FunctionSkeleton>> Scope::get_function_skeleto
 {
     const auto it = m_function_skeletons.find(name);
     if (it != m_function_skeletons.end())
-        return std::make_tuple(it->second.first, it->second.second, m_error_handler);
+        return std::make_tuple(it->second.first, it->second.second, std::cref(m_error_handler));
     if (m_parent_scope)
     {
         return m_parent_scope->get_function_skeleton(name);
@@ -61,7 +61,7 @@ std::optional<BindingSearchResult<Variable>> Scope::get_variable(const std::stri
 {
     const auto it = m_variables.find(name);
     if (it != m_variables.end())
-        return std::make_tuple(it->second.first, it->second.second, m_error_handler);
+        return std::make_tuple(it->second.first, it->second.second, std::cref(m_error_handler));
     if (m_parent_scope)
     {
         return m_parent_scope->get_variable(name);
@@ -73,7 +73,7 @@ std::optional<BindingSearchResult<Predicate>> Scope::get_predicate(const std::st
 {
     const auto it = m_predicates.find(name);
     if (it != m_predicates.end())
-        return std::make_tuple(it->second.first, it->second.second, m_error_handler);
+        return std::make_tuple(it->second.first, it->second.second, std::cref(m_error_handler));
     if (m_parent_scope)
     {
         return m_parent_scope->get_predicate(name);
@@ -85,29 +85,12 @@ std::optional<BindingSearchResult<Predicate>> Scope::get_derived_predicate(const
 {
     const auto it = m_derived_predicates.find(name);
     if (it != m_derived_predicates.end())
-        return std::make_tuple(it->second.first, it->second.second, m_error_handler);
+        return std::make_tuple(it->second.first, it->second.second, std::cref(m_error_handler));
     if (m_parent_scope)
     {
         return m_parent_scope->get_derived_predicate(name);
     }
     return std::nullopt;
-}
-
-const TypeSet& Scope::get_variable_types(const Variable& variable) const
-{
-    const auto it = m_variable_types.find(variable);
-    if (it != m_variable_types.end())
-    {
-        return it->second;
-    }
-    if (m_parent_scope)
-    {
-        return m_parent_scope->get_variable_types(variable);
-    }
-    else
-    {
-        throw std::logic_error("Expected types of variable to be known.");
-    }
 }
 
 void Scope::insert_type(const std::string& name, const Type& element, const std::optional<Position>& position)
@@ -144,12 +127,6 @@ void Scope::insert_derived_predicate(const std::string& name, const Predicate& e
 {
     assert(!this->get_derived_predicate(name));
     m_derived_predicates.emplace(name, BindingValueType<Predicate>(element, position));
-}
-
-void Scope::insert_variable_types(const Variable& variable, const TypeSet& types)
-{
-    assert(!this->m_variable_types.count(variable));
-    m_variable_types.emplace(variable, types);
 }
 
 const PDDLErrorHandler& Scope::get_error_handler() const { return m_error_handler; }

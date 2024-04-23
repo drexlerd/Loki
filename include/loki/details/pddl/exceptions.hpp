@@ -155,10 +155,10 @@ public:
     MismatchedFunctionSkeletonTermListError(const FunctionSkeleton& function_skeleton, const TermList& term_list, const std::string& error_handler_output);
 };
 
-class IncompatibleObjectTypeError : public SemanticParserError
+class IncompatibleObjectToVariableError : public SemanticParserError
 {
 public:
-    IncompatibleObjectTypeError(const Object& object, const Variable& variable, const std::string& error_handler_output);
+    IncompatibleObjectToVariableError(const Object& object, const Variable& variable, const std::string& error_handler_output);
 };
 
 class UnexpectedDerivedPredicateInEffect : public SemanticParserError

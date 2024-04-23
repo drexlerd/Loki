@@ -45,7 +45,7 @@ private:
     friend class ProblemParser;
 
 public:
-    explicit DomainParser(const fs::path& file_path);
+    DomainParser(const fs::path& file_path, bool quiet = true);
 
     /// @brief Get factories to create additional PDDL objects.
     PDDLFactories& get_factories();
@@ -73,7 +73,7 @@ private:
     Problem m_problem;
 
 public:
-    explicit ProblemParser(const fs::path& file_path, DomainParser& domain_parser);
+    explicit ProblemParser(const fs::path& file_path, DomainParser& domain_parser, bool quiet = true);
 
     /// @brief Get position caches to be able to reference back to the input PDDL file.
     const PDDLPositionCache& get_position_cache() const;

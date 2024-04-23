@@ -35,14 +35,17 @@
 namespace loki
 {
 
-DomainParser::DomainParser(const fs::path& file_path) :
+DomainParser::DomainParser(const fs::path& file_path, bool quiet) :
     m_file_path(file_path),
     m_source(loki::read_file(file_path)),
     m_position_cache(nullptr),
     m_scopes(nullptr)
 {
     const auto start = std::chrono::high_resolution_clock::now();
-    std::cout << "Started parsing domain file: " << file_path << std::endl;
+    if (!quiet)
+    {
+        std::cout << "Started parsing domain file: " << file_path << std::endl;
+    }
 
     /* Parse the AST */
     auto node = ast::Domain();
@@ -83,9 +86,12 @@ DomainParser::DomainParser(const fs::path& file_path) :
     const auto [vm_usage, resident_set] = process_mem_usage();
     const auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    std::cout << "Finished parsing after " << duration.count() << " milliseconds." << std::endl;
-    std::cout << "Peak virtual memory: " << vm_usage << " KB." << std::endl;
-    std::cout << "Peak resident set size: " << resident_set << " KB." << std::endl;
+    if (!quiet)
+    {
+        std::cout << "Finished parsing after " << duration.count() << " milliseconds." << std::endl;
+        std::cout << "Peak virtual memory: " << vm_usage << " KB." << std::endl;
+        std::cout << "Peak resident set size: " << resident_set << " KB." << std::endl;
+    }
 }
 
 PDDLFactories& DomainParser::get_factories() { return m_factories; }
@@ -94,14 +100,17 @@ const PDDLPositionCache& DomainParser::get_position_cache() const { return *m_po
 
 const Domain& DomainParser::get_domain() const { return m_domain; }
 
-ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_parser) :
+ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_parser, bool quiet) :
     m_file_path(file_path),
     m_source(loki::read_file(file_path)),
     m_position_cache(nullptr),
     m_scopes(nullptr)
 {
     const auto start = std::chrono::high_resolution_clock::now();
-    std::cout << "Started parsing problem file: " << file_path << std::endl;
+    if (!quiet)
+    {
+        std::cout << "Started parsing problem file: " << file_path << std::endl;
+    }
 
     /* Parse the AST */
     auto problem_node = ast::Problem();
@@ -128,9 +137,12 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
     const auto [vm_usage, resident_set] = process_mem_usage();
     const auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    std::cout << "Finished parsing after " << duration.count() << " milliseconds." << std::endl;
-    std::cout << "Peak virtual memory: " << vm_usage << " KB." << std::endl;
-    std::cout << "Peak resident set size: " << resident_set << " KB." << std::endl;
+    if (!quiet)
+    {
+        std::cout << "Finished parsing after " << duration.count() << " milliseconds." << std::endl;
+        std::cout << "Peak virtual memory: " << vm_usage << " KB." << std::endl;
+        std::cout << "Peak resident set size: " << resident_set << " KB." << std::endl;
+    }
 }
 
 const PDDLPositionCache& ProblemParser::get_position_cache() const { return *m_position_cache; }

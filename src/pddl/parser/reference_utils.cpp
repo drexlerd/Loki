@@ -17,6 +17,7 @@
 
 #include "reference_utils.hpp"
 
+#include "loki/details/ast/ast.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 
 namespace loki
@@ -42,21 +43,14 @@ void test_variable_references(const ParameterList& parameter_list, const Context
     }
 }
 
-void track_variable_type_information(const ParameterList& parameter_list, Context& context)
+static void test_object_type_consistent_with_variable(const Parameter& parameter, const Object& object, const Position& position, const Context& context)
 {
-    for (const auto& parameter : parameter_list)
-    {
-        context.scopes.top().insert_variable_types(parameter->get_variable(), collect_types_from_hierarchy(parameter->get_bases()));
-    }
-}
-
-void test_object_type_consistent_with_variable(const Object& object, const Variable& variable, const Context& context)
-{
-    const auto& variable_types = context.scopes.top().get_variable_types(variable);
+    // Object type must match any of those types.
+    const auto& parameter_types = TypeSet(parameter->get_bases().begin(), parameter->get_bases().end());
     bool is_consistent = false;
     for (const auto& type : collect_types_from_hierarchy(object->get_bases()))
     {
-        if (variable_types.count(type))
+        if (parameter_types.count(type))
         {
             is_consistent = true;
             break;
@@ -64,8 +58,23 @@ void test_object_type_consistent_with_variable(const Object& object, const Varia
     }
     if (!is_consistent)
     {
-        const auto [_object, position, error_handler] = context.scopes.top().get_object(object->get_name()).value();
-        throw IncompatibleObjectTypeError(object, variable, error_handler(position.value(), ""));
+        throw IncompatibleObjectToVariableError(object, parameter->get_variable(), context.scopes.top().get_error_handler()(position, ""));
+    }
+}
+
+void test_consistent_object_to_variable_assignment(const ParameterList& parameters,
+                                                   const TermList& terms,
+                                                   const PositionList& positions,
+                                                   const Context& context)
+{
+    assert(parameters.size() == terms.size());
+
+    for (size_t i = 0; i < parameters.size(); ++i)
+    {
+        if (const auto term_object = std::get_if<TermObjectImpl>(terms[i]))
+        {
+            test_object_type_consistent_with_variable(parameters[i], term_object->get_object(), positions[i], context);
+        }
     }
 }
 

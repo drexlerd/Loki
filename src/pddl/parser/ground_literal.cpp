@@ -20,6 +20,7 @@
 #include "common.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 #include "objects.hpp"
+#include "reference_utils.hpp"
 
 namespace loki
 {
@@ -34,15 +35,18 @@ Atom parse(const ast::AtomicFormulaOfNamesPredicate& node, Context& context)
         throw UndefinedPredicateError(name, context.scopes.top().get_error_handler()(node, ""));
     }
     auto term_list = TermList();
+    auto positions = PositionList();
     for (const auto& name_node : node.names)
     {
         term_list.push_back(context.factories.get_or_create_term_object(parse_object_reference(name_node, context)));
+        positions.push_back(name_node);
     }
     const auto [predicate, _position, _error_handler] = binding.value();
     if (predicate->get_parameters().size() != term_list.size())
     {
         throw MismatchedPredicateTermListError(predicate, term_list, context.scopes.top().get_error_handler()(node, ""));
     }
+    test_consistent_object_to_variable_assignment(predicate->get_parameters(), term_list, positions, context);
     const auto atom = context.factories.get_or_create_atom(predicate, term_list);
     context.positions.push_back(atom, node);
     return atom;

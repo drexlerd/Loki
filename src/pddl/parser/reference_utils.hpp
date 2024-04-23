@@ -31,9 +31,8 @@ extern void track_variable_references(const ParameterList& parameter_list, Conte
 
 extern void test_variable_references(const ParameterList& parameter_list, const Context& context);
 
-extern void track_variable_type_information(const ParameterList& parameter_list, Context& context);
-
-extern void test_object_type_consistent_with_variable(const Object& object, const Variable& variable, const Context& context);
+extern void
+test_consistent_object_to_variable_assignment(const ParameterList& parameters, const TermList& terms, const PositionList& positions, const Context& context);
 
 extern void track_predicate_references(const PredicateList& predicate_list, Context& context);
 
