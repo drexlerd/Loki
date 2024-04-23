@@ -71,7 +71,7 @@ Effect parse(const ast::EffectProductionLiteral& node, Context& context)
 
     if (context.derived_predicates.count(literal->get_atom()->get_predicate()))
     {
-        throw UnexpectedDerivedPredicateInEffect(literal->get_atom()->get_predicate()->get_name(), context.scopes.get_error_handler()(node, ""));
+        throw UnexpectedDerivedPredicateInEffect(literal->get_atom()->get_predicate()->get_name(), context.scopes.top().get_error_handler()(node, ""));
     }
 
     context.positions.push_back(effect, node);
@@ -82,16 +82,16 @@ Effect parse(const ast::EffectProductionNumericFluentTotalCost& node, Context& c
 {
     if (!context.requirements->test(RequirementEnum::ACTION_COSTS))
     {
-        throw UndefinedRequirementError(RequirementEnum::ACTION_COSTS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(RequirementEnum::ACTION_COSTS, context.scopes.top().get_error_handler()(node, ""));
     }
     context.references.untrack(RequirementEnum::ACTION_COSTS);
     const auto assign_operator_increase = parse(node.assign_operator_increase);
     auto function_name = parse(node.function_symbol_total_cost.name);
     assert(function_name == "total-cost");
-    auto binding = context.scopes.get<FunctionSkeletonImpl>(function_name);
+    auto binding = context.scopes.top().get_function_skeleton(function_name);
     if (!binding.has_value())
     {
-        throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node.function_symbol_total_cost, ""));
+        throw UndefinedFunctionSkeletonError(function_name, context.scopes.top().get_error_handler()(node.function_symbol_total_cost, ""));
     }
     const auto [function_skeleton, _position, _error_handler] = binding.value();
     const auto function = context.factories.get_or_create_function(function_skeleton, TermList {});
@@ -106,7 +106,7 @@ Effect parse(const ast::EffectProductionNumericFluentGeneral& node, Context& con
 {
     if (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS))
     {
-        throw UndefinedRequirementError(RequirementEnum::NUMERIC_FLUENTS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(RequirementEnum::NUMERIC_FLUENTS, context.scopes.top().get_error_handler()(node, ""));
     }
     context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
     const auto assign_operator = parse(node.assign_operator);
@@ -149,7 +149,7 @@ Effect parse(const ast::EffectConditional& node, Context& context)
     // requires :conditional-effects
     if (!context.requirements->test(RequirementEnum::CONDITIONAL_EFFECTS))
     {
-        throw UndefinedRequirementError(RequirementEnum::CONDITIONAL_EFFECTS, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(RequirementEnum::CONDITIONAL_EFFECTS, context.scopes.top().get_error_handler()(node, ""));
     }
     context.references.untrack(RequirementEnum::CONDITIONAL_EFFECTS);
     const auto effect = boost::apply_visitor(EffectVisitor(context), node);

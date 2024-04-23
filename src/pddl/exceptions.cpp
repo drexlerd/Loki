@@ -21,7 +21,9 @@
 #include "loki/details/pddl/function.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
 #include "loki/details/pddl/object.hpp"
+#include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/predicate.hpp"
+#include "loki/details/pddl/variable.hpp"
 
 #include <string>
 
@@ -149,6 +151,13 @@ MismatchedFunctionSkeletonTermListError::MismatchedFunctionSkeletonTermListError
 
 UnexpectedDerivedPredicateInEffect::UnexpectedDerivedPredicateInEffect(const std::string& name, const std::string& error_handler_output) :
     SemanticParserError("The derived predicate with name \"" + name + "\" is not allowed in an effect.", error_handler_output)
+{
+}
+
+IncompatibleObjectTypeError::IncompatibleObjectTypeError(const Object& object, const Variable& variable, const std::string& error_handler_output) :
+    SemanticParserError("The object with name \"" + object->get_name() + "\" does not satisfy the type requirement of variable with name \""
+                            + variable->get_name() + "\".",
+                        error_handler_output)
 {
 }
 

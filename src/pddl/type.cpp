@@ -59,4 +59,19 @@ const std::string& TypeImpl::get_name() const { return m_name; }
 
 const TypeList& TypeImpl::get_bases() const { return m_bases; }
 
+static void collect_types_from_hierarchy_recursively(const TypeList& types, TypeSet& ref_result)
+{
+    for (const auto& type : types)
+    {
+        ref_result.insert(type);
+        collect_types_from_hierarchy_recursively(type->get_bases(), ref_result);
+    }
+}
+
+TypeSet collect_types_from_hierarchy(const TypeList& types)
+{
+    auto result = TypeSet {};
+    collect_types_from_hierarchy_recursively(types, result);
+    return result;
+}
 }

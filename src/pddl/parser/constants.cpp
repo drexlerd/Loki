@@ -28,10 +28,10 @@ namespace loki
 static void test_multiple_definition(const Object& constant, const ast::Name& node, const Context& context)
 {
     const auto constant_name = constant->get_name();
-    const auto binding = context.scopes.get<ObjectImpl>(constant_name);
+    const auto binding = context.scopes.top().get_object(constant_name);
     if (binding.has_value())
     {
-        const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
+        const auto message_1 = context.scopes.top().get_error_handler()(node, "Defined here:");
         auto message_2 = std::string("");
         const auto [_object, position, error_handler] = binding.value();
         if (position.has_value())
@@ -45,7 +45,7 @@ static void test_multiple_definition(const Object& constant, const ast::Name& no
 static void insert_context_information(const Object& constant, const ast::Name& node, Context& context)
 {
     context.positions.push_back(constant, node);
-    context.scopes.insert(constant->get_name(), constant, node);
+    context.scopes.top().insert_object(constant->get_name(), constant, node);
 }
 
 static Object parse_constant_definition(const ast::Name& node, const TypeList& type_list, Context& context)
@@ -76,8 +76,8 @@ ConstantListVisitor::ConstantListVisitor(Context& context_) : context(context_) 
 ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& name_nodes)
 {
     // std::vector<ast::Name> has single base type "object"
-    assert(context.scopes.get<TypeImpl>("object").has_value());
-    const auto [type, _position, _error_handler] = context.scopes.get<TypeImpl>("object").value();
+    assert(context.scopes.top().get_type("object").has_value());
+    const auto [type, _position, _error_handler] = context.scopes.top().get_type("object").value();
     return parse_constant_definitions(name_nodes, TypeList { type }, context);
 }
 
@@ -85,7 +85,7 @@ ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecursivel
 {
     if (!context.requirements->test(RequirementEnum::TYPING))
     {
-        throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_list_of_names_recursively_node, ""));
+        throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.top().get_error_handler()(typed_list_of_names_recursively_node, ""));
     }
     context.references.untrack(RequirementEnum::TYPING);
     const auto type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context), typed_list_of_names_recursively_node.type);

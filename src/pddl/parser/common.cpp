@@ -45,10 +45,10 @@ Term TermDeclarationTermVisitor::operator()(const ast::Name& node) const
 {
     const auto constant_name = parse(node);
     // Test for undefined constant.
-    const auto binding = context.scopes.get<ObjectImpl>(constant_name);
+    const auto binding = context.scopes.top().get_object(constant_name);
     if (!binding.has_value())
     {
-        throw UndefinedConstantError(constant_name, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedConstantError(constant_name, context.scopes.top().get_error_handler()(node, ""));
     }
     // Constant are not tracked and hence must not be untracked.
     // Construct Term and return it
@@ -63,17 +63,17 @@ Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) const
 {
     const auto variable = parse(node, context);
     // Test for multiple definition
-    const auto binding = context.scopes.get<VariableImpl>(variable->get_name());
+    const auto binding = context.scopes.top().get_variable(variable->get_name());
     if (binding.has_value())
     {
-        const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
+        const auto message_1 = context.scopes.top().get_error_handler()(node, "Defined here:");
         const auto [_constant, position, error_handler] = binding.value();
         assert(position.has_value());
         const auto message_2 = error_handler(position.value(), "First defined here:");
         throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
     }
     // Add binding to scope
-    context.scopes.insert(variable->get_name(), variable, node);
+    context.scopes.top().insert_variable(variable->get_name(), variable, node);
     // Construct Term and return it
     const auto term = context.factories.get_or_create_term_variable(variable);
     // Add position of PDDL object
@@ -87,10 +87,10 @@ Term TermReferenceTermVisitor::operator()(const ast::Name& node) const
 {
     const auto object_name = parse(node);
     // Test for undefined constant.
-    const auto binding = context.scopes.get<ObjectImpl>(object_name);
+    const auto binding = context.scopes.top().get_object(object_name);
     if (!binding.has_value())
     {
-        throw UndefinedConstantError(object_name, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedConstantError(object_name, context.scopes.top().get_error_handler()(node, ""));
     }
     // Construct Term and return it
     const auto [object, _position, _error_handler] = binding.value();
@@ -105,10 +105,10 @@ Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const
 {
     const auto variable = parse(node, context);
     // Test for undefined variable
-    const auto binding = context.scopes.get<VariableImpl>(variable->get_name());
+    const auto binding = context.scopes.top().get_variable(variable->get_name());
     if (!binding.has_value())
     {
-        throw UndefinedVariableError(variable->get_name(), context.scopes.get_error_handler()(node, ""));
+        throw UndefinedVariableError(variable->get_name(), context.scopes.top().get_error_handler()(node, ""));
     }
     // Construct Term and return it
     const auto term = context.factories.get_or_create_term_variable(variable);

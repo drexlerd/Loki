@@ -27,10 +27,10 @@ namespace loki
 static void test_multiple_definition(const Predicate& predicate, const ast::Predicate& node, const Context& context)
 {
     const auto predicate_name = predicate->get_name();
-    const auto binding = context.scopes.get<PredicateImpl>(predicate_name);
+    const auto binding = context.scopes.top().get_predicate(predicate_name);
     if (binding.has_value())
     {
-        const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
+        const auto message_1 = context.scopes.top().get_error_handler()(node, "Defined here:");
         auto message_2 = std::string("");
         const auto [_predicate, position, error_handler] = binding.value();
         if (position.has_value())
@@ -44,7 +44,7 @@ static void test_multiple_definition(const Predicate& predicate, const ast::Pred
 static void insert_context_information(const Predicate& predicate, const ast::Predicate& node, Context& context)
 {
     context.positions.push_back(predicate, node);
-    context.scopes.insert(predicate->get_name(), predicate, node);
+    context.scopes.top().insert_predicate(predicate->get_name(), predicate, node);
 }
 
 static Predicate parse_predicate_definition(const ast::AtomicFormulaSkeleton& node, Context& context)

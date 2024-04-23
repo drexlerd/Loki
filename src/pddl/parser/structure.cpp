@@ -64,14 +64,14 @@ Axiom parse(const ast::Axiom& node, Context& context)
 {
     if (!context.requirements->test(RequirementEnum::DERIVED_PREDICATES))
     {
-        throw UndefinedRequirementError(RequirementEnum::DERIVED_PREDICATES, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(RequirementEnum::DERIVED_PREDICATES, context.scopes.top().get_error_handler()(node, ""));
     }
     context.references.untrack(RequirementEnum::DERIVED_PREDICATES);
 
     const auto literal = parse(node.literal, context);
     if (context.derived_predicates.count(literal->get_atom()->get_predicate()) == 0)
     {
-        throw ExpectedDerivedPredicate(literal->get_atom()->get_predicate()->get_name(), context.scopes.get_error_handler()(node, ""));
+        throw ExpectedDerivedPredicate(literal->get_atom()->get_predicate()->get_name(), context.scopes.top().get_error_handler()(node, ""));
     }
     const auto condition = parse(node.goal_descriptor, context);
 

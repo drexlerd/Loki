@@ -49,6 +49,10 @@ public:
     const std::string& get_name() const;
     const TypeList& get_bases() const;
 };
+
+/// @brief Collects all types from a hierarchy.
+extern TypeSet collect_types_from_hierarchy(const TypeList& types);
+
 }
 
 #endif

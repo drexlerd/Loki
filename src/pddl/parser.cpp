@@ -64,7 +64,7 @@ Domain parse(const ast::Domain& domain_node, Context& context)
     {
         if (!context.requirements->test(RequirementEnum::TYPING))
         {
-            throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.get_error_handler()(domain_node.types.value(), ""));
+            throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.top().get_error_handler()(domain_node.types.value(), ""));
         }
         types = parse(domain_node.types.value(), context);
     }
@@ -127,7 +127,7 @@ Problem parse(const ast::Problem& problem_node, Context& context, const Domain& 
     const auto domain_name = parse(problem_node.domain_name.name);
     if (domain_name != domain->get_name())
     {
-        throw MismatchedDomainError(domain, domain_name, context.scopes.get_error_handler()(problem_node.domain_name, ""));
+        throw MismatchedDomainError(domain, domain_name, context.scopes.top().get_error_handler()(problem_node.domain_name, ""));
     }
     /* Problem name section */
     const auto problem_name = parse(problem_node.problem_name.name);

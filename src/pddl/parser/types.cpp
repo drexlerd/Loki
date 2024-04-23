@@ -69,7 +69,7 @@ TypeReferenceTypeVisitor::TypeReferenceTypeVisitor(const Context& context_) : co
 
 TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeObject&)
 {
-    const auto binding = context.scopes.get<TypeImpl>("object");
+    const auto binding = context.scopes.top().get_type("object");
     assert(binding.has_value());
     const auto [type, _position, _error_handler] = binding.value();
     return { type };
@@ -77,7 +77,7 @@ TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeObject&)
 
 TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeNumber&)
 {
-    const auto binding = context.scopes.get<TypeImpl>("number");
+    const auto binding = context.scopes.top().get_type("number");
     assert(binding.has_value());
     const auto [type, _position, _error_handler] = binding.value();
     return { type };
@@ -86,10 +86,10 @@ TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeNumber&)
 TypeList TypeReferenceTypeVisitor::operator()(const ast::Name& node)
 {
     auto name = parse(node);
-    auto binding = context.scopes.get<TypeImpl>(name);
+    auto binding = context.scopes.top().get_type(name);
     if (!binding.has_value())
     {
-        throw UndefinedTypeError(name, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedTypeError(name, context.scopes.top().get_error_handler()(node, ""));
     }
     const auto [type, _position, _error_handler] = binding.value();
     context.positions.push_back(type, node);
@@ -112,10 +112,10 @@ TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& node)
 static void test_multiple_definition(const Type& type, const ast::Name& node, const Context& context)
 {
     const auto type_name = type->get_name();
-    const auto binding = context.scopes.get<TypeImpl>(type_name);
+    const auto binding = context.scopes.top().get_type(type_name);
     if (binding.has_value())
     {
-        const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
+        const auto message_1 = context.scopes.top().get_error_handler()(node, "Defined here:");
         auto message_2 = std::string("");
         const auto [_type, position, error_handler] = binding.value();
         if (position.has_value())
@@ -130,20 +130,20 @@ static void test_reserved_type(const Type& type, const ast::Name& node, const Co
 {
     if (type->get_name() == "object")
     {
-        throw ReservedTypeError("object", context.scopes.get_error_handler()(node, ""));
+        throw ReservedTypeError("object", context.scopes.top().get_error_handler()(node, ""));
     }
     // We also reserve type name number although PDDL specification allows it.
     // However, this allows using regular types as function types for simplicity.
     if (type->get_name() == "number")
     {
-        throw ReservedTypeError("number", context.scopes.get_error_handler()(node, ""));
+        throw ReservedTypeError("number", context.scopes.top().get_error_handler()(node, ""));
     }
 }
 
 static void insert_context_information(const Type& type, const ast::Name& node, Context& context)
 {
     context.positions.push_back(type, node);
-    context.scopes.insert(type->get_name(), type, node);
+    context.scopes.top().insert_type(type->get_name(), type, node);
 }
 
 static Type parse_type_definition(const ast::Name& node, const TypeList& type_list, Context& context)
@@ -171,8 +171,8 @@ TypeDeclarationTypedListOfNamesVisitor::TypeDeclarationTypedListOfNamesVisitor(C
 TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vector<ast::Name>& name_nodes)
 {
     // std::vector<ast::Name> has single base type "object"
-    assert(context.scopes.get<TypeImpl>("object").has_value());
-    const auto [type_object, _position, _error_handler] = context.scopes.get<TypeImpl>("object").value();
+    assert(context.scopes.top().get_type("object").has_value());
+    const auto [type_object, _position, _error_handler] = context.scopes.top().get_type("object").value();
     const auto type_list = parse_type_definitions(name_nodes, TypeList { type_object }, context);
     return type_list;
 }
@@ -182,7 +182,7 @@ TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::TypedList
     // requires :typing
     if (!context.requirements->test(RequirementEnum::TYPING))
     {
-        throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.get_error_handler()(typed_list_of_names_recursively_node, ""));
+        throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.top().get_error_handler()(typed_list_of_names_recursively_node, ""));
     }
     context.references.untrack(RequirementEnum::TYPING);
     // TypedListOfNamesRecursively has user defined base types.

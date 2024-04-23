@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <unordered_map>
+#include <unordered_set>
 #include <variant>
 #include <vector>
 
@@ -42,6 +43,7 @@ using Requirements = const RequirementsImpl*;
 class TypeImpl;
 using Type = const TypeImpl*;
 using TypeList = std::vector<Type>;
+using TypeSet = std::unordered_set<Type>;
 
 class ObjectImpl;
 using Object = const ObjectImpl*;

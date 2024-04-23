@@ -95,7 +95,7 @@ Function parse(const ast::FunctionHead& node, Context& context)
     }
     if (function_skeleton->get_parameters().size() != term_list.size())
     {
-        throw MismatchedFunctionSkeletonTermListError(function_skeleton, term_list, context.scopes.get_error_handler()(node, ""));
+        throw MismatchedFunctionSkeletonTermListError(function_skeleton, term_list, context.scopes.top().get_error_handler()(node, ""));
     }
     const auto function = context.factories.get_or_create_function(function_skeleton, term_list);
     context.positions.push_back(function, node);
@@ -107,10 +107,10 @@ Function parse(const ast::FunctionHead& node, Context& context)
 FunctionSkeleton parse_function_skeleton_reference(const ast::FunctionSymbol& node, Context& context)
 {
     auto function_name = parse(node.name);
-    auto binding = context.scopes.get<FunctionSkeletonImpl>(function_name);
+    auto binding = context.scopes.top().get_function_skeleton(function_name);
     if (!binding.has_value())
     {
-        throw UndefinedFunctionSkeletonError(function_name, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedFunctionSkeletonError(function_name, context.scopes.top().get_error_handler()(node, ""));
     }
     const auto [function_skeleton, _position, _error_handler] = binding.value();
     context.references.untrack(function_skeleton);
@@ -120,10 +120,10 @@ FunctionSkeleton parse_function_skeleton_reference(const ast::FunctionSymbol& no
 static void test_multiple_definition(const FunctionSkeleton& function_skeleton, const ast::Name& node, const Context& context)
 {
     const auto function_name = function_skeleton->get_name();
-    const auto binding = context.scopes.get<FunctionSkeletonImpl>(function_name);
+    const auto binding = context.scopes.top().get_function_skeleton(function_name);
     if (binding.has_value())
     {
-        const auto message_1 = context.scopes.get_error_handler()(node, "Defined here:");
+        const auto message_1 = context.scopes.top().get_error_handler()(node, "Defined here:");
         auto message_2 = std::string("");
         const auto [_function_skeleton, position, error_handler] = binding.value();
         if (position.has_value())
@@ -137,7 +137,7 @@ static void test_multiple_definition(const FunctionSkeleton& function_skeleton, 
 static void insert_context_information(const FunctionSkeleton& function_skeleton, const ast::Name& node, Context& context)
 {
     context.positions.push_back(function_skeleton, node);
-    context.scopes.insert(function_skeleton->get_name(), function_skeleton, node);
+    context.scopes.top().insert_function_skeleton(function_skeleton->get_name(), function_skeleton, node);
 }
 
 FunctionSkeleton parse(const ast::AtomicFunctionSkeletonTotalCost& node, Context& context)
@@ -153,8 +153,8 @@ FunctionSkeleton parse(const ast::AtomicFunctionSkeletonTotalCost& node, Context
     context.references.untrack(RequirementEnum::ACTION_COSTS);
     context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
 
-    assert(context.scopes.get<TypeImpl>("number").has_value());
-    const auto [type, _position, _error_handler] = context.scopes.get<TypeImpl>("number").value();
+    assert(context.scopes.top().get_type("number").has_value());
+    const auto [type, _position, _error_handler] = context.scopes.top().get_type("number").value();
     auto function_name = parse(node.function_symbol.name);
     auto function_skeleton = context.factories.get_or_create_function_skeleton(function_name, ParameterList {}, type);
 
@@ -181,8 +181,8 @@ FunctionSkeleton parse(const ast::AtomicFunctionSkeletonGeneral& node, Context& 
     auto function_parameters = boost::apply_visitor(ParameterListVisitor(context), node.arguments);
     context.scopes.close_scope();
 
-    assert(context.scopes.get<TypeImpl>("number").has_value());
-    const auto [type, _position, _error_handler] = context.scopes.get<TypeImpl>("number").value();
+    assert(context.scopes.top().get_type("number").has_value());
+    const auto [type, _position, _error_handler] = context.scopes.top().get_type("number").value();
     auto function_name = parse(node.function_symbol.name);
     auto function_skeleton = context.factories.get_or_create_function_skeleton(function_name, function_parameters, type);
 
@@ -313,7 +313,7 @@ Function parse(const ast::BasicFunctionTerm& node, Context& context)
     }
     if (function_skeleton->get_parameters().size() != term_list.size())
     {
-        throw MismatchedFunctionSkeletonTermListError(function_skeleton, term_list, context.scopes.get_error_handler()(node, ""));
+        throw MismatchedFunctionSkeletonTermListError(function_skeleton, term_list, context.scopes.top().get_error_handler()(node, ""));
     }
     const auto function = context.factories.get_or_create_function(function_skeleton, term_list);
     context.positions.push_back(function, node);

@@ -99,7 +99,7 @@ RequirementEnumSet parse(const ast::RequirementObjectFluents& node, Context& con
 {
     // Track
     context.references.track(RequirementEnum::OBJECT_FLUENTS);
-    throw UnsupportedRequirementError(RequirementEnum::OBJECT_FLUENTS, context.scopes.get_error_handler()(node, ""));
+    throw UnsupportedRequirementError(RequirementEnum::OBJECT_FLUENTS, context.scopes.top().get_error_handler()(node, ""));
 
     return { RequirementEnum::OBJECT_FLUENTS };
 }
@@ -138,7 +138,7 @@ RequirementEnumSet parse(const ast::RequirementAdl&, Context& context)
 
 RequirementEnumSet parse(const ast::RequirementDurativeActions& node, Context& context)
 {
-    throw UnsupportedRequirementError(RequirementEnum::DURATIVE_ACTIONS, context.scopes.get_error_handler()(node, ""));
+    throw UnsupportedRequirementError(RequirementEnum::DURATIVE_ACTIONS, context.scopes.top().get_error_handler()(node, ""));
 
     // Track
     context.references.track(RequirementEnum::DURATIVE_ACTIONS);
@@ -154,7 +154,7 @@ RequirementEnumSet parse(const ast::RequirementDerivedPredicates&, Context& cont
 
 RequirementEnumSet parse(const ast::RequirementTimedInitialLiterals& node, Context& context)
 {
-    throw UnsupportedRequirementError(RequirementEnum::TIMED_INITIAL_LITERALS, context.scopes.get_error_handler()(node, ""));
+    throw UnsupportedRequirementError(RequirementEnum::TIMED_INITIAL_LITERALS, context.scopes.top().get_error_handler()(node, ""));
 
     // Track
     context.references.track(RequirementEnum::TIMED_INITIAL_LITERALS);
@@ -164,7 +164,7 @@ RequirementEnumSet parse(const ast::RequirementTimedInitialLiterals& node, Conte
 
 RequirementEnumSet parse(const ast::RequirementPreferences& node, Context& context)
 {
-    throw UnsupportedRequirementError(RequirementEnum::PREFERENCES, context.scopes.get_error_handler()(node, ""));
+    throw UnsupportedRequirementError(RequirementEnum::PREFERENCES, context.scopes.top().get_error_handler()(node, ""));
 
     // Track
     context.references.track(RequirementEnum::PREFERENCES);
@@ -173,7 +173,7 @@ RequirementEnumSet parse(const ast::RequirementPreferences& node, Context& conte
 
 RequirementEnumSet parse(const ast::RequirementConstraints& node, Context& context)
 {
-    throw UnsupportedRequirementError(RequirementEnum::CONSTRAINTS, context.scopes.get_error_handler()(node, ""));
+    throw UnsupportedRequirementError(RequirementEnum::CONSTRAINTS, context.scopes.top().get_error_handler()(node, ""));
 
     // Track
     context.references.track(RequirementEnum::CONSTRAINTS);

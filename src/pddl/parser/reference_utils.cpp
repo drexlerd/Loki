@@ -36,9 +36,36 @@ void test_variable_references(const ParameterList& parameter_list, const Context
     {
         if (context.references.exists(parameter->get_variable()))
         {
-            const auto [variable, position, error_handler] = context.scopes.get<VariableImpl>(parameter->get_variable()->get_name()).value();
+            const auto [variable, position, error_handler] = context.scopes.top().get_variable(parameter->get_variable()->get_name()).value();
             throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
         }
+    }
+}
+
+void track_variable_type_information(const ParameterList& parameter_list, Context& context)
+{
+    for (const auto& parameter : parameter_list)
+    {
+        context.scopes.top().insert_variable_types(parameter->get_variable(), collect_types_from_hierarchy(parameter->get_bases()));
+    }
+}
+
+void test_object_type_consistent_with_variable(const Object& object, const Variable& variable, const Context& context)
+{
+    const auto& variable_types = context.scopes.top().get_variable_types(variable);
+    bool is_consistent = false;
+    for (const auto& type : collect_types_from_hierarchy(object->get_bases()))
+    {
+        if (variable_types.count(type))
+        {
+            is_consistent = true;
+            break;
+        }
+    }
+    if (!is_consistent)
+    {
+        const auto [_object, position, error_handler] = context.scopes.top().get_object(object->get_name()).value();
+        throw IncompatibleObjectTypeError(object, variable, error_handler(position.value(), ""));
     }
 }
 
@@ -56,7 +83,7 @@ void test_predicate_references(const PredicateList& predicate_list, const Contex
     {
         if (context.references.exists(predicate))
         {
-            const auto [_predicate, position, error_handler] = context.scopes.get<PredicateImpl>(predicate->get_name()).value();
+            const auto [_predicate, position, error_handler] = context.scopes.top().get_predicate(predicate->get_name()).value();
             throw UnusedPredicateError(predicate->get_name(), error_handler(position.value(), ""));
         }
     }
@@ -76,7 +103,7 @@ void test_function_skeleton_references(const FunctionSkeletonList& function_skel
     {
         if (context.references.exists(function_skeleton))
         {
-            const auto [_function_skeleton, position, error_handler] = context.scopes.get<FunctionSkeletonImpl>(function_skeleton->get_name()).value();
+            const auto [_function_skeleton, position, error_handler] = context.scopes.top().get_function_skeleton(function_skeleton->get_name()).value();
             throw UnusedFunctionSkeletonError(function_skeleton->get_name(), error_handler(position.value(), ""));
         }
     }
@@ -96,7 +123,7 @@ void test_object_references(const ObjectList& object_list, const Context& contex
     {
         if (context.references.exists(object))
         {
-            const auto [_object, position, error_handler] = context.scopes.get<ObjectImpl>(object->get_name()).value();
+            const auto [_object, position, error_handler] = context.scopes.top().get_object(object->get_name()).value();
             throw UnusedObjectError(object->get_name(), error_handler(position.value(), ""));
         }
     }

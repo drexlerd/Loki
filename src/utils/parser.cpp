@@ -63,8 +63,8 @@ DomainParser::DomainParser(const fs::path& file_path) :
     // Create base types.
     const auto base_type_object = context.factories.get_or_create_type("object", TypeList());
     const auto base_type_number = context.factories.get_or_create_type("number", TypeList());
-    context.scopes.insert("object", base_type_object, {});
-    context.scopes.insert("number", base_type_number, {});
+    context.scopes.top().insert_type("object", base_type_object, {});
+    context.scopes.top().insert_type("number", base_type_number, {});
 
     // Create equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
     const auto binary_parameterlist =
@@ -73,9 +73,8 @@ DomainParser::DomainParser(const fs::path& file_path) :
 
         };
     const auto equal_predicate = context.factories.get_or_create_predicate("=", binary_parameterlist);
-    context.scopes.insert("=", equal_predicate, {});
+    context.scopes.top().insert_predicate("=", equal_predicate, {});
 
-    std::cout << "Started semantic domain file: " << file_path << std::endl;
     m_domain = parse(node, context);
 
     // Only the global scope remains

@@ -26,10 +26,10 @@ namespace loki
 Atom parse(const ast::AtomicFormulaOfTermsPredicate& node, Context& context)
 {
     auto predicate_name = parse(node.predicate.name);
-    auto binding = context.scopes.get<PredicateImpl>(predicate_name);
+    auto binding = context.scopes.top().get_predicate(predicate_name);
     if (!binding.has_value())
     {
-        throw UndefinedPredicateError(predicate_name, context.scopes.get_error_handler()(node.predicate, ""));
+        throw UndefinedPredicateError(predicate_name, context.scopes.top().get_error_handler()(node.predicate, ""));
     }
     auto term_list = TermList();
     for (const auto& term_node : node.terms)
@@ -39,7 +39,7 @@ Atom parse(const ast::AtomicFormulaOfTermsPredicate& node, Context& context)
     const auto [predicate, _position, _error_handler] = binding.value();
     if (predicate->get_parameters().size() != term_list.size())
     {
-        throw MismatchedPredicateTermListError(predicate, term_list, context.scopes.get_error_handler()(node, ""));
+        throw MismatchedPredicateTermListError(predicate, term_list, context.scopes.top().get_error_handler()(node, ""));
     }
     context.references.untrack(predicate);
     const auto atom = context.factories.get_or_create_atom(predicate, term_list);
@@ -52,11 +52,11 @@ Atom parse(const ast::AtomicFormulaOfTermsEquality& node, Context& context)
     // requires :equality
     if (!context.requirements->test(RequirementEnum::EQUALITY))
     {
-        throw UndefinedRequirementError(RequirementEnum::EQUALITY, context.scopes.get_error_handler()(node, ""));
+        throw UndefinedRequirementError(RequirementEnum::EQUALITY, context.scopes.top().get_error_handler()(node, ""));
     }
     context.references.untrack(RequirementEnum::EQUALITY);
-    assert(context.scopes.get<PredicateImpl>("=").has_value());
-    const auto [equal_predicate, _position, _error_handler] = context.scopes.get<PredicateImpl>("=").value();
+    assert(context.scopes.top().get_predicate("=").has_value());
+    const auto [equal_predicate, _position, _error_handler] = context.scopes.top().get_predicate("=").value();
     auto left_term = boost::apply_visitor(TermReferenceTermVisitor(context), node.term_left);
     auto right_term = boost::apply_visitor(TermReferenceTermVisitor(context), node.term_right);
     const auto atom = context.factories.get_or_create_atom(equal_predicate, TermList { left_term, right_term });
