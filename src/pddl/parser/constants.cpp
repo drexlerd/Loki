@@ -18,6 +18,7 @@
 #include "constants.hpp"
 
 #include "common.hpp"
+#include "error_handling.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 #include "types.hpp"
 
@@ -25,22 +26,6 @@ using namespace std;
 
 namespace loki
 {
-static void test_multiple_definition(const Object& constant, const ast::Name& node, const Context& context)
-{
-    const auto constant_name = constant->get_name();
-    const auto binding = context.scopes.top().get_object(constant_name);
-    if (binding.has_value())
-    {
-        const auto message_1 = context.scopes.top().get_error_handler()(node, "Defined here:");
-        auto message_2 = std::string("");
-        const auto [_object, position, error_handler] = binding.value();
-        if (position.has_value())
-        {
-            message_2 = error_handler(position.value(), "First defined here:");
-        }
-        throw MultiDefinitionConstantError(constant_name, message_1 + message_2);
-    }
-}
 
 static void insert_context_information(const Object& constant, const ast::Name& node, Context& context)
 {
@@ -51,7 +36,7 @@ static void insert_context_information(const Object& constant, const ast::Name& 
 static Object parse_constant_definition(const ast::Name& node, const TypeList& type_list, Context& context)
 {
     const auto constant = context.factories.get_or_create_object(parse(node), type_list);
-    test_multiple_definition(constant, node, context);
+    test_multiple_definition_constant(constant, node, context);
     insert_context_information(constant, node, context);
     return constant;
 }
@@ -83,10 +68,7 @@ ObjectList ConstantListVisitor::operator()(const std::vector<ast::Name>& name_no
 
 ObjectList ConstantListVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node)
 {
-    if (!context.requirements->test(RequirementEnum::TYPING))
-    {
-        throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.top().get_error_handler()(typed_list_of_names_recursively_node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::TYPING, typed_list_of_names_recursively_node, context);
     context.references.untrack(RequirementEnum::TYPING);
     const auto type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context), typed_list_of_names_recursively_node.type);
     // TypedListOfNamesRecursively has user defined base types

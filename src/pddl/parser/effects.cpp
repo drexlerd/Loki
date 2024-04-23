@@ -19,6 +19,7 @@
 
 #include "common.hpp"
 #include "conditions.hpp"
+#include "error_handling.hpp"
 #include "functions.hpp"
 #include "literal.hpp"
 #include "loki/details/pddl/exceptions.hpp"
@@ -80,19 +81,13 @@ Effect parse(const ast::EffectProductionLiteral& node, Context& context)
 
 Effect parse(const ast::EffectProductionNumericFluentTotalCost& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::ACTION_COSTS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::ACTION_COSTS, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::ACTION_COSTS, node, context);
     context.references.untrack(RequirementEnum::ACTION_COSTS);
     const auto assign_operator_increase = parse(node.assign_operator_increase);
     auto function_name = parse(node.function_symbol_total_cost.name);
     assert(function_name == "total-cost");
+    test_undefined_function_skeleton(function_name, node.function_symbol_total_cost, context);
     auto binding = context.scopes.top().get_function_skeleton(function_name);
-    if (!binding.has_value())
-    {
-        throw UndefinedFunctionSkeletonError(function_name, context.scopes.top().get_error_handler()(node.function_symbol_total_cost, ""));
-    }
     const auto [function_skeleton, _position, _error_handler] = binding.value();
     const auto function = context.factories.get_or_create_function(function_skeleton, TermList {});
     context.references.untrack(function->get_function_skeleton());
@@ -104,10 +99,7 @@ Effect parse(const ast::EffectProductionNumericFluentTotalCost& node, Context& c
 
 Effect parse(const ast::EffectProductionNumericFluentGeneral& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::NUMERIC_FLUENTS, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::NUMERIC_FLUENTS, node, context);
     context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
     const auto assign_operator = parse(node.assign_operator);
     const auto function = parse(node.function_head, context);
@@ -146,11 +138,7 @@ Effect parse(const ast::EffectConditionalWhen& node, Context& context)
 
 Effect parse(const ast::EffectConditional& node, Context& context)
 {
-    // requires :conditional-effects
-    if (!context.requirements->test(RequirementEnum::CONDITIONAL_EFFECTS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::CONDITIONAL_EFFECTS, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::CONDITIONAL_EFFECTS, node, context);
     context.references.untrack(RequirementEnum::CONDITIONAL_EFFECTS);
     const auto effect = boost::apply_visitor(EffectVisitor(context), node);
     context.positions.push_back(effect, node);

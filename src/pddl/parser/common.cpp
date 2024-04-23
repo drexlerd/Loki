@@ -17,6 +17,7 @@
 
 #include "common.hpp"
 
+#include "error_handling.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 
 using namespace std;
@@ -31,9 +32,7 @@ string parse(const ast::Name& node) { return node.characters; }
 Variable parse(const ast::Variable& node, Context& context)
 {
     const auto variable = context.factories.get_or_create_variable(node.characters);
-    // Declare variable as being referenced.
     context.references.untrack(variable);
-    // Add position of PDDL object
     context.positions.push_back(variable, node);
     return variable;
 }
@@ -44,17 +43,11 @@ TermDeclarationTermVisitor::TermDeclarationTermVisitor(Context& context_) : cont
 Term TermDeclarationTermVisitor::operator()(const ast::Name& node) const
 {
     const auto constant_name = parse(node);
-    // Test for undefined constant.
-    const auto binding = context.scopes.top().get_object(constant_name);
-    if (!binding.has_value())
-    {
-        throw UndefinedConstantError(constant_name, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_constant(constant_name, node, context);
     // Constant are not tracked and hence must not be untracked.
-    // Construct Term and return it
+    const auto binding = context.scopes.top().get_object(constant_name);
     const auto [constant, _position, _error_handler] = binding.value();
     const auto term = context.factories.get_or_create_term_object(constant);
-    // Add position of PDDL object
     context.positions.push_back(term, node);
     return term;
 }
@@ -62,21 +55,9 @@ Term TermDeclarationTermVisitor::operator()(const ast::Name& node) const
 Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) const
 {
     const auto variable = parse(node, context);
-    // Test for multiple definition
-    const auto binding = context.scopes.top().get_variable(variable->get_name());
-    if (binding.has_value())
-    {
-        const auto message_1 = context.scopes.top().get_error_handler()(node, "Defined here:");
-        const auto [_constant, position, error_handler] = binding.value();
-        assert(position.has_value());
-        const auto message_2 = error_handler(position.value(), "First defined here:");
-        throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
-    }
-    // Add binding to scope
+    test_multiple_definition_variable(variable, node, context);
     context.scopes.top().insert_variable(variable->get_name(), variable, node);
-    // Construct Term and return it
     const auto term = context.factories.get_or_create_term_variable(variable);
-    // Add position of PDDL object
     context.positions.push_back(term, node);
     return term;
 }
@@ -86,17 +67,11 @@ TermReferenceTermVisitor::TermReferenceTermVisitor(Context& context_) : context(
 Term TermReferenceTermVisitor::operator()(const ast::Name& node) const
 {
     const auto object_name = parse(node);
-    // Test for undefined constant.
+    test_undefined_constant(object_name, node, context);
     const auto binding = context.scopes.top().get_object(object_name);
-    if (!binding.has_value())
-    {
-        throw UndefinedConstantError(object_name, context.scopes.top().get_error_handler()(node, ""));
-    }
-    // Construct Term and return it
     const auto [object, _position, _error_handler] = binding.value();
     context.references.untrack(object);
     const auto term = context.factories.get_or_create_term_object(object);
-    // Add position of PDDL object
     context.positions.push_back(term, node);
     return term;
 }
@@ -104,15 +79,8 @@ Term TermReferenceTermVisitor::operator()(const ast::Name& node) const
 Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const
 {
     const auto variable = parse(node, context);
-    // Test for undefined variable
-    const auto binding = context.scopes.top().get_variable(variable->get_name());
-    if (!binding.has_value())
-    {
-        throw UndefinedVariableError(variable->get_name(), context.scopes.top().get_error_handler()(node, ""));
-    }
-    // Construct Term and return it
+    test_undefined_variable(variable, node, context);
     const auto term = context.factories.get_or_create_term_variable(variable);
-    // Add position of PDDL object
     context.positions.push_back(term, node);
     return term;
 }

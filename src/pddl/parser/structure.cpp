@@ -20,6 +20,7 @@
 #include "common.hpp"
 #include "conditions.hpp"
 #include "effects.hpp"
+#include "error_handling.hpp"
 #include "literal.hpp"
 #include "loki/details/pddl/action.hpp"
 #include "loki/details/pddl/axiom.hpp"

@@ -17,6 +17,7 @@
 
 #include "conditions.hpp"
 
+#include "error_handling.hpp"
 #include "literal.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 #include "parameters.hpp"
@@ -48,10 +49,7 @@ Condition parse(const ast::GoalDescriptorAtom& node, Context& context)
 Condition parse(const ast::GoalDescriptorLiteral& node, Context& context)
 {
     // requires :negative-preconditions
-    if (!context.requirements->test(RequirementEnum::NEGATIVE_PRECONDITIONS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::NEGATIVE_PRECONDITIONS, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::NEGATIVE_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::NEGATIVE_PRECONDITIONS);
     const auto condition = context.factories.get_or_create_condition_literal(parse(node.literal, context));
     context.positions.push_back(condition, node);
@@ -69,10 +67,7 @@ Condition parse(const ast::GoalDescriptorAnd& node, Context& context)
 Condition parse(const ast::GoalDescriptorOr& node, Context& context)
 {
     // requires :disjunctive-preconditions
-    if (!context.requirements->test(RequirementEnum::DISJUNCTIVE_PRECONDITIONS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::DISJUNCTIVE_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
     auto condition_list = parse(node.goal_descriptors, context);
     const auto condition = context.factories.get_or_create_condition_or(condition_list);
@@ -83,10 +78,7 @@ Condition parse(const ast::GoalDescriptorOr& node, Context& context)
 Condition parse(const ast::GoalDescriptorNot& node, Context& context)
 {
     // requires :disjunctive-preconditions
-    if (!context.requirements->test(RequirementEnum::NEGATIVE_PRECONDITIONS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::NEGATIVE_PRECONDITIONS, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::NEGATIVE_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::NEGATIVE_PRECONDITIONS);
     auto child_condition = parse(node.goal_descriptor, context);
     const auto condition = context.factories.get_or_create_condition_not(child_condition);
@@ -96,10 +88,7 @@ Condition parse(const ast::GoalDescriptorNot& node, Context& context)
 
 Condition parse(const ast::GoalDescriptorImply& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::DISJUNCTIVE_PRECONDITIONS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::DISJUNCTIVE_PRECONDITIONS, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::DISJUNCTIVE_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
     auto condition_left = parse(node.goal_descriptor_left, context);
     auto condition_right = parse(node.goal_descriptor_right, context);
@@ -110,10 +99,7 @@ Condition parse(const ast::GoalDescriptorImply& node, Context& context)
 
 Condition parse(const ast::GoalDescriptorExists& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::EXISTENTIAL_PRECONDITIONS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::EXISTENTIAL_PRECONDITIONS, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::EXISTENTIAL_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::EXISTENTIAL_PRECONDITIONS);
     context.scopes.open_scope();
     auto parameter_list = boost::apply_visitor(ParameterListVisitor(context), node.typed_list_of_variables);
@@ -142,10 +128,7 @@ Condition parse_condition_forall(const ast::TypedListOfVariables& parameters_nod
 
 Condition parse(const ast::GoalDescriptorForall& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::UNIVERSAL_PRECONDITIONS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::UNIVERSAL_PRECONDITIONS, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::UNIVERSAL_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::UNIVERSAL_PRECONDITIONS);
     return parse_condition_forall(node.typed_list_of_variables, node.goal_descriptor, context);
 }
@@ -175,10 +158,7 @@ Condition parse(const ast::ConstraintGoalDescriptorAnd& node, Context& context)
 
 Condition parse(const ast::ConstraintGoalDescriptorForall& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::UNIVERSAL_PRECONDITIONS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::UNIVERSAL_PRECONDITIONS, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::UNIVERSAL_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::UNIVERSAL_PRECONDITIONS);
     return parse_condition_forall(node.typed_list_of_variables, node.constraint_goal_descriptor, context);
 }
@@ -251,19 +231,13 @@ Condition parse(const ast::PreconditionGoalDescriptorAnd& node, Context& context
 
 Condition parse(const ast::PreconditionGoalDescriptorPreference& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::PREFERENCES))
-    {
-        throw UndefinedRequirementError(RequirementEnum::PREFERENCES, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::PREFERENCES, node, context);
     throw NotImplementedError("parse(const ast::PreconditionGoalDescriptorPreference& node, Context& context)");
 }
 
 Condition parse(const ast::PreconditionGoalDescriptorForall& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::UNIVERSAL_PRECONDITIONS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::UNIVERSAL_PRECONDITIONS, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::UNIVERSAL_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::UNIVERSAL_PRECONDITIONS);
     return parse_condition_forall(node.typed_list_of_variables, node.precondition_goal_descriptor, context);
 }

@@ -18,6 +18,7 @@
 #include "ground_literal.hpp"
 
 #include "common.hpp"
+#include "error_handling.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 #include "objects.hpp"
 #include "reference_utils.hpp"

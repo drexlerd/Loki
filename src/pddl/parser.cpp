@@ -26,6 +26,7 @@
 #include "loki/details/pddl/type.hpp"
 #include "parser/common.hpp"
 #include "parser/constants.hpp"
+#include "parser/error_handling.hpp"
 #include "parser/functions.hpp"
 #include "parser/goal.hpp"
 #include "parser/initial.hpp"
