@@ -152,7 +152,11 @@ Scope& ScopeStack::top()
     assert(!m_stack.empty());
     return *m_stack.back();
 }
-const Scope& ScopeStack::top() const { return top(); }
+const Scope& ScopeStack::top() const
+{
+    assert(!m_stack.empty());
+    return *m_stack.back();
+}
 
 const std::deque<std::unique_ptr<Scope>>& ScopeStack::get_stack() const { return m_stack; }
 
