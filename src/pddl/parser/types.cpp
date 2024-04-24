@@ -57,7 +57,7 @@ TypeList TypeDeclarationTypeVisitor::operator()(const ast::TypeEither& node)
     TypeList type_list;
     for (auto& child_node : node.types)
     {
-        auto types = boost::apply_visitor(TypeDeclarationTypeVisitor(context), child_node);
+        auto types = boost::apply_visitor(*this, child_node);
         type_list.insert(type_list.end(), types.begin(), types.end());
     }
     return type_list;
@@ -99,7 +99,7 @@ TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& node)
     auto type_list = TypeList();
     for (auto& child_node : node.types)
     {
-        auto types = boost::apply_visitor(TypeReferenceTypeVisitor(context), child_node);
+        auto types = boost::apply_visitor(*this, child_node);
         type_list.insert(type_list.end(), types.begin(), types.end());
     }
     return type_list;
@@ -150,11 +150,11 @@ TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::TypedList
     test_undefined_requirement(RequirementEnum::TYPING, typed_list_of_names_recursively_node, context);
     context.references.untrack(RequirementEnum::TYPING);
     // TypedListOfNamesRecursively has user defined base types.
-    const auto parent_type_list = boost::apply_visitor(TypeDeclarationTypeVisitor(context), typed_list_of_names_recursively_node.type);
+    // Note: we use reference visitor here because parent types must already be declared
+    const auto parent_type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context), typed_list_of_names_recursively_node.type);
     auto type_list = parse_type_definitions(typed_list_of_names_recursively_node.names, parent_type_list, context);
     // Recursively add types.
-    const auto additional_types =
-        boost::apply_visitor(TypeDeclarationTypedListOfNamesVisitor(context), typed_list_of_names_recursively_node.typed_list_of_names.get());
+    const auto additional_types = boost::apply_visitor(*this, typed_list_of_names_recursively_node.typed_list_of_names.get());
     type_list.insert(type_list.end(), additional_types.begin(), additional_types.end());
     return type_list;
 }

@@ -275,25 +275,15 @@ static void test_object_type_consistent_with_variable(const Parameter& parameter
 {
     // Object type must match any of those types.
     const auto& parameter_types = TypeSet(parameter->get_bases().begin(), parameter->get_bases().end());
-    std::cout << "P: ";
-    for (const auto& type : parameter_types)
-    {
-        std::cout << type << ":" << type->get_name() << ":" << *type << ", ";
-    }
-    std::cout << std::endl;
     bool is_consistent = false;
-    std::cout << "T: " << object->get_name() << " ";
     for (const auto& type : collect_types_from_hierarchy(object->get_bases()))
     {
-        std::cout << type << ":" << type->get_name() << ":" << *type << ", ";
         if (parameter_types.count(type))
         {
             is_consistent = true;
             break;
         }
     }
-    std::cout << std::endl;
-    std::cout << "is_consistent: " << is_consistent << std::endl;
     if (!is_consistent)
     {
         throw IncompatibleObjectToVariableError(object, parameter->get_variable(), context.scopes.top().get_error_handler()(position, ""));
