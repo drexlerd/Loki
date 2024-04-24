@@ -31,6 +31,8 @@ namespace loki
 
 extern void test_undefined_requirement(RequirementEnum requirement, const Position& position, const Context& context);
 
+extern void test_undefined_requirements(RequirementEnumList requirements, const Position& position, const Context& context);
+
 /**
  * Test missing definitions
  */
@@ -61,6 +63,8 @@ extern void test_multiple_definition_predicate(const Predicate& predicate, const
 
 extern void test_multiple_definition_type(const Type& type, const Position& position, const Context& context);
 
+extern void test_multiple_definition_function_skeleton(const FunctionSkeleton& function_skeleton, const Position& node, const Context& context);
+
 /**
  * Test reserved keyword
  */
@@ -73,6 +77,11 @@ extern void test_reserved_type(const Type& type, const Position& node, const Con
 
 extern void
 test_mismatches_arity_between_predicate_and_terms(const Predicate& predicate, const TermList& terms, const Position& position, const Context& context);
+
+extern void test_mismatches_arity_between_function_skeleton_and_terms(const FunctionSkeleton& function_skeleton,
+                                                                      const TermList& terms,
+                                                                      const Position& position,
+                                                                      const Context& context);
 
 extern void test_expected_derived_predicate(const Predicate& predicate, const Position& position, const Context& context);
 

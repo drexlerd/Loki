@@ -18,6 +18,7 @@
 #include "functions.hpp"
 
 #include "common.hpp"
+#include "error_handling.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 #include "objects.hpp"
 #include "parameters.hpp"
@@ -93,10 +94,7 @@ Function parse(const ast::FunctionHead& node, Context& context)
     {
         term_list.push_back(boost::apply_visitor(TermReferenceTermVisitor(context), term_node));
     }
-    if (function_skeleton->get_parameters().size() != term_list.size())
-    {
-        throw MismatchedFunctionSkeletonTermListError(function_skeleton, term_list, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_mismatches_arity_between_function_skeleton_and_terms(function_skeleton, term_list, node, context);
     const auto function = context.factories.get_or_create_function(function_skeleton, term_list);
     context.positions.push_back(function, node);
     context.references.untrack(function->get_function_skeleton());
@@ -107,31 +105,11 @@ Function parse(const ast::FunctionHead& node, Context& context)
 FunctionSkeleton parse_function_skeleton_reference(const ast::FunctionSymbol& node, Context& context)
 {
     auto function_name = parse(node.name);
+    test_undefined_function_skeleton(function_name, node, context);
     auto binding = context.scopes.top().get_function_skeleton(function_name);
-    if (!binding.has_value())
-    {
-        throw UndefinedFunctionSkeletonError(function_name, context.scopes.top().get_error_handler()(node, ""));
-    }
     const auto [function_skeleton, _position, _error_handler] = binding.value();
     context.references.untrack(function_skeleton);
     return function_skeleton;
-}
-
-static void test_multiple_definition(const FunctionSkeleton& function_skeleton, const ast::Name& node, const Context& context)
-{
-    const auto function_name = function_skeleton->get_name();
-    const auto binding = context.scopes.top().get_function_skeleton(function_name);
-    if (binding.has_value())
-    {
-        const auto message_1 = context.scopes.top().get_error_handler()(node, "Defined here:");
-        auto message_2 = std::string("");
-        const auto [_function_skeleton, position, error_handler] = binding.value();
-        if (position.has_value())
-        {
-            message_2 = error_handler(position.value(), "First defined here:");
-        }
-        throw MultiDefinitionFunctionSkeletonError(function_name, message_1 + message_2);
-    }
 }
 
 static void insert_context_information(const FunctionSkeleton& function_skeleton, const ast::Name& node, Context& context)
@@ -142,14 +120,7 @@ static void insert_context_information(const FunctionSkeleton& function_skeleton
 
 FunctionSkeleton parse(const ast::AtomicFunctionSkeletonTotalCost& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::ACTION_COSTS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::ACTION_COSTS, context.positions.get_error_handler()(node, ""));
-    }
-    if ((!context.requirements->test(RequirementEnum::ACTION_COSTS)) && (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS)))
-    {
-        throw UndefinedRequirementError(RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
-    }
+    test_undefined_requirements(RequirementEnumList { RequirementEnum::ACTION_COSTS, RequirementEnum::NUMERIC_FLUENTS }, node, context);
     context.references.untrack(RequirementEnum::ACTION_COSTS);
     context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
 
@@ -158,7 +129,7 @@ FunctionSkeleton parse(const ast::AtomicFunctionSkeletonTotalCost& node, Context
     auto function_name = parse(node.function_symbol.name);
     auto function_skeleton = context.factories.get_or_create_function_skeleton(function_name, ParameterList {}, type);
 
-    test_multiple_definition(function_skeleton, node.function_symbol.name, context);
+    test_multiple_definition_function_skeleton(function_skeleton, node.function_symbol.name, context);
     insert_context_information(function_skeleton, node.function_symbol.name, context);
 
     return function_skeleton;
@@ -166,14 +137,7 @@ FunctionSkeleton parse(const ast::AtomicFunctionSkeletonTotalCost& node, Context
 
 FunctionSkeleton parse(const ast::AtomicFunctionSkeletonGeneral& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::ACTION_COSTS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::ACTION_COSTS, context.positions.get_error_handler()(node, ""));
-    }
-    if ((!context.requirements->test(RequirementEnum::ACTION_COSTS)) && (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS)))
-    {
-        throw UndefinedRequirementError(RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
-    }
+    test_undefined_requirements(RequirementEnumList { RequirementEnum::ACTION_COSTS, RequirementEnum::NUMERIC_FLUENTS }, node, context);
     context.references.untrack(RequirementEnum::ACTION_COSTS);
     context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
 
@@ -186,7 +150,7 @@ FunctionSkeleton parse(const ast::AtomicFunctionSkeletonGeneral& node, Context& 
     auto function_name = parse(node.function_symbol.name);
     auto function_skeleton = context.factories.get_or_create_function_skeleton(function_name, function_parameters, type);
 
-    test_multiple_definition(function_skeleton, node.function_symbol.name, context);
+    test_multiple_definition_function_skeleton(function_skeleton, node.function_symbol.name, context);
     insert_context_information(function_skeleton, node.function_symbol.name, context);
 
     return function_skeleton;
@@ -311,10 +275,7 @@ Function parse(const ast::BasicFunctionTerm& node, Context& context)
     {
         term_list.push_back(context.factories.get_or_create_term_object(parse_object_reference(name_node, context)));
     }
-    if (function_skeleton->get_parameters().size() != term_list.size())
-    {
-        throw MismatchedFunctionSkeletonTermListError(function_skeleton, term_list, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_mismatches_arity_between_function_skeleton_and_terms(function_skeleton, term_list, node, context);
     const auto function = context.factories.get_or_create_function(function_skeleton, term_list);
     context.positions.push_back(function, node);
     return function;

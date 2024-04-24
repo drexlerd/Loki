@@ -144,4 +144,4 @@ extern Function parse(const ast::BasicFunctionTerm& node, Context& context);
 
 }
 
-#endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_FUNCTIONS_HPP_
+#endif

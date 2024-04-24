@@ -35,6 +35,17 @@ void test_undefined_requirement(RequirementEnum requirement, const Position& pos
     }
 }
 
+void test_undefined_requirements(RequirementEnumList requirements, const Position& position, const Context& context)
+{
+    for (const auto& requirement : requirements)
+    {
+        if (!context.requirements->test(requirement))
+        {
+            throw UndefinedRequirementError(requirements, context.scopes.top().get_error_handler()(position, ""));
+        }
+    }
+}
+
 /**
  * Test missing definitions
  */
@@ -178,6 +189,23 @@ void test_multiple_definition_type(const Type& type, const Position& position, c
     }
 }
 
+void test_multiple_definition_function_skeleton(const FunctionSkeleton& function_skeleton, const Position& node, const Context& context)
+{
+    const auto function_name = function_skeleton->get_name();
+    const auto binding = context.scopes.top().get_function_skeleton(function_name);
+    if (binding.has_value())
+    {
+        const auto message_1 = context.scopes.top().get_error_handler()(node, "Defined here:");
+        auto message_2 = std::string("");
+        const auto [_function_skeleton, position, error_handler] = binding.value();
+        if (position.has_value())
+        {
+            message_2 = error_handler(position.value(), "First defined here:");
+        }
+        throw MultiDefinitionFunctionSkeletonError(function_name, message_1 + message_2);
+    }
+}
+
 /**
  * Test reserved keyword
  */
@@ -205,6 +233,17 @@ void test_mismatches_arity_between_predicate_and_terms(const Predicate& predicat
     if (predicate->get_parameters().size() != terms.size())
     {
         throw MismatchedPredicateTermListError(predicate, terms, context.scopes.top().get_error_handler()(position, ""));
+    }
+}
+
+void test_mismatches_arity_between_function_skeleton_and_terms(const FunctionSkeleton& function_skeleton,
+                                                               const TermList& terms,
+                                                               const Position& position,
+                                                               const Context& context)
+{
+    if (function_skeleton->get_parameters().size() != terms.size())
+    {
+        throw MismatchedFunctionSkeletonTermListError(function_skeleton, terms, context.scopes.top().get_error_handler()(position, ""));
     }
 }
 
@@ -236,15 +275,25 @@ static void test_object_type_consistent_with_variable(const Parameter& parameter
 {
     // Object type must match any of those types.
     const auto& parameter_types = TypeSet(parameter->get_bases().begin(), parameter->get_bases().end());
+    std::cout << "P: ";
+    for (const auto& type : parameter_types)
+    {
+        std::cout << type << ":" << type->get_name() << ":" << *type << ", ";
+    }
+    std::cout << std::endl;
     bool is_consistent = false;
+    std::cout << "T: " << object->get_name() << " ";
     for (const auto& type : collect_types_from_hierarchy(object->get_bases()))
     {
+        std::cout << type << ":" << type->get_name() << ":" << *type << ", ";
         if (parameter_types.count(type))
         {
             is_consistent = true;
             break;
         }
     }
+    std::cout << std::endl;
+    std::cout << "is_consistent: " << is_consistent << std::endl;
     if (!is_consistent)
     {
         throw IncompatibleObjectToVariableError(object, parameter->get_variable(), context.scopes.top().get_error_handler()(position, ""));

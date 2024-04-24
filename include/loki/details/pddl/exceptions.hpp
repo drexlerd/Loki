@@ -134,6 +134,7 @@ class UndefinedRequirementError : public SemanticParserError
 {
 public:
     UndefinedRequirementError(RequirementEnum requirement, const std::string& error_handler_output);
+    UndefinedRequirementError(RequirementEnumList requirements, const std::string& error_handler_output);
 };
 
 class UnsupportedRequirementError : public std::runtime_error

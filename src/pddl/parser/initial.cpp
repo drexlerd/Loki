@@ -49,37 +49,20 @@ std::variant<Literal, NumericFluent> parse(const ast::InitialElementTimedLiteral
 
 std::variant<Literal, NumericFluent> parse(const ast::InitialElementNumericFluentsTotalCost& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::ACTION_COSTS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::ACTION_COSTS, context.positions.get_error_handler()(node, ""));
-    }
-    if ((!context.requirements->test(RequirementEnum::ACTION_COSTS)) && (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS)))
-    {
-        throw UndefinedRequirementError(RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
-    }
+    test_undefined_requirements(RequirementEnumList { RequirementEnum::ACTION_COSTS, RequirementEnum::NUMERIC_FLUENTS }, node, context);
     context.references.untrack(RequirementEnum::ACTION_COSTS);
     context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
 
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol_total_cost, context);
     const auto basic_function_term = context.factories.get_or_create_function(function_skeleton, TermList {});
     double number = parse(node.number);
-    if (number < 0)
-    {
-        throw NegativeCostError(context.positions.get_error_handler()(node.number, ""));
-    }
+    test_nonnegative_number(number, node.number, context);
     return context.factories.get_or_create_numeric_fluent(basic_function_term, number);
 }
 
 std::variant<Literal, NumericFluent> parse(const ast::InitialElementNumericFluentsGeneral& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::ACTION_COSTS))
-    {
-        throw UndefinedRequirementError(RequirementEnum::ACTION_COSTS, context.positions.get_error_handler()(node, ""));
-    }
-    if ((!context.requirements->test(RequirementEnum::ACTION_COSTS)) && (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS)))
-    {
-        throw UndefinedRequirementError(RequirementEnum::NUMERIC_FLUENTS, context.positions.get_error_handler()(node, ""));
-    }
+    test_undefined_requirements(RequirementEnumList { RequirementEnum::ACTION_COSTS, RequirementEnum::NUMERIC_FLUENTS }, node, context);
     context.references.untrack(RequirementEnum::ACTION_COSTS);
     context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
 

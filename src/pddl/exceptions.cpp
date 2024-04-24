@@ -121,7 +121,26 @@ UnusedRequirementError::UnusedRequirementError(RequirementEnum requirement, cons
 }
 
 UndefinedRequirementError::UndefinedRequirementError(RequirementEnum requirement, const std::string& error_handler_output) :
-    SemanticParserError("Undefined requirement: "s + to_string(requirement), error_handler_output)
+    UndefinedRequirementError(RequirementEnumList { requirement }, error_handler_output)
+{
+}
+
+UndefinedRequirementError::UndefinedRequirementError(RequirementEnumList requirements, const std::string& error_handler_output) :
+    SemanticParserError(
+        "Undefined requirement: "s + [&requirements]() -> std::string
+        {
+            auto result = std::string {};
+            for (size_t i = 0; i < requirements.size(); ++i)
+            {
+                if (i != 0)
+                {
+                    result += " or ";
+                }
+                result += to_string(requirements[i]);
+            }
+            return result;
+        }(),
+        error_handler_output)
 {
 }
 
