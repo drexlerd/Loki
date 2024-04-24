@@ -37,12 +37,17 @@ void test_undefined_requirement(RequirementEnum requirement, const Position& pos
 
 void test_undefined_requirements(RequirementEnumList requirements, const Position& position, const Context& context)
 {
+    bool found = false;
     for (const auto& requirement : requirements)
     {
-        if (!context.requirements->test(requirement))
+        if (context.requirements->test(requirement))
         {
-            throw UndefinedRequirementError(requirements, context.scopes.top().get_error_handler()(position, ""));
+            found = true;
         }
+    }
+    if (!found)
+    {
+        throw UndefinedRequirementError(requirements, context.scopes.top().get_error_handler()(position, ""));
     }
 }
 

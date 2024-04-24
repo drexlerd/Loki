@@ -31,7 +31,7 @@
     (is-smooth smooth)
     (is-smooth verysmooth)
     (= (total-cost) 0)
-    (boardsize-successor b0 s1)
+    (boardsize-successor s0 s1)
     (boardsize-successor s1 s2)
     (boardsize-successor s2 s3)
     (has-colour glazer0 natural)
