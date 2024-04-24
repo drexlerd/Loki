@@ -37,9 +37,15 @@ extern void test_undefined_requirement(RequirementEnum requirement, const Positi
 
 extern void test_undefined_constant(const std::string& constant_name, const Position& position, const Context& context);
 
+extern void test_undefined_object(const std::string& object_name, const Position& position, const Context& context);
+
 extern void test_undefined_variable(const Variable& variable, const Position& position, const Context& context);
 
 extern void test_undefined_function_skeleton(const std::string& function_name, const Position& position, const Context& context);
+
+extern void test_undefined_predicate(const std::string& predicate_name, const Position& position, const Context& context);
+
+extern void test_undefined_type(const std::string& type_name, const Position& position, const Context& context);
 
 /**
  * Test multiple definitions
@@ -48,6 +54,33 @@ extern void test_undefined_function_skeleton(const std::string& function_name, c
 extern void test_multiple_definition_variable(const Variable& variable, const Position& position, const Context& context);
 
 extern void test_multiple_definition_constant(const Object& constant, const Position& node, const Context& context);
+
+extern void test_multiple_definition_object(const Object& object, const Position& node, const Context& context);
+
+extern void test_multiple_definition_predicate(const Predicate& predicate, const Position& node, const Context& context);
+
+extern void test_multiple_definition_type(const Type& type, const Position& position, const Context& context);
+
+/**
+ * Test reserved keyword
+ */
+
+extern void test_reserved_type(const Type& type, const Position& node, const Context& context);
+
+/**
+ * Test mismatch
+ */
+
+extern void
+test_mismatches_arity_between_predicate_and_terms(const Predicate& predicate, const TermList& terms, const Position& position, const Context& context);
+
+extern void test_expected_derived_predicate(const Predicate& predicate, const Position& position, const Context& context);
+
+/**
+ * Test variable initialization
+ */
+
+extern void test_nonnegative_number(double number, const Position& position, const Context& context);
 
 /**
  * Test assignment

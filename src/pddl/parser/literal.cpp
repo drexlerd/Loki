@@ -28,11 +28,7 @@ namespace loki
 Atom parse(const ast::AtomicFormulaOfTermsPredicate& node, Context& context)
 {
     auto predicate_name = parse(node.predicate.name);
-    auto binding = context.scopes.top().get_predicate(predicate_name);
-    if (!binding.has_value())
-    {
-        throw UndefinedPredicateError(predicate_name, context.scopes.top().get_error_handler()(node.predicate, ""));
-    }
+    test_undefined_predicate(predicate_name, node.predicate, context);
     auto term_list = TermList();
     auto positions = PositionList();
     for (const auto& term_node : node.terms)
@@ -40,11 +36,9 @@ Atom parse(const ast::AtomicFormulaOfTermsPredicate& node, Context& context)
         term_list.push_back(boost::apply_visitor(TermReferenceTermVisitor(context), term_node));
         positions.push_back(term_node);
     }
+    auto binding = context.scopes.top().get_predicate(predicate_name);
     const auto [predicate, _position, _error_handler] = binding.value();
-    if (predicate->get_parameters().size() != term_list.size())
-    {
-        throw MismatchedPredicateTermListError(predicate, term_list, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_mismatches_arity_between_predicate_and_terms(predicate, term_list, node, context);
     test_consistent_object_to_variable_assignment(predicate->get_parameters(), term_list, positions, context);
     context.references.untrack(predicate);
     const auto atom = context.factories.get_or_create_atom(predicate, term_list);
@@ -54,11 +48,7 @@ Atom parse(const ast::AtomicFormulaOfTermsPredicate& node, Context& context)
 
 Atom parse(const ast::AtomicFormulaOfTermsEquality& node, Context& context)
 {
-    // requires :equality
-    if (!context.requirements->test(RequirementEnum::EQUALITY))
-    {
-        throw UndefinedRequirementError(RequirementEnum::EQUALITY, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::EQUALITY, node, context);
     context.references.untrack(RequirementEnum::EQUALITY);
     assert(context.scopes.top().get_predicate("=").has_value());
     const auto [equal_predicate, _position, _error_handler] = context.scopes.top().get_predicate("=").value();

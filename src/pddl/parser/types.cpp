@@ -18,7 +18,7 @@
 #include "types.hpp"
 
 #include "common.hpp"
-#include "loki/details/pddl/exceptions.hpp"
+#include "error_handling.hpp"
 
 using namespace std;
 
@@ -86,11 +86,8 @@ TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeNumber&)
 TypeList TypeReferenceTypeVisitor::operator()(const ast::Name& node)
 {
     auto name = parse(node);
+    test_undefined_type(name, node, context);
     auto binding = context.scopes.top().get_type(name);
-    if (!binding.has_value())
-    {
-        throw UndefinedTypeError(name, context.scopes.top().get_error_handler()(node, ""));
-    }
     const auto [type, _position, _error_handler] = binding.value();
     context.positions.push_back(type, node);
     return { type };
@@ -109,36 +106,6 @@ TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& node)
 }
 
 /* TypeDeclarationTypedListOfNamesVisitor */
-static void test_multiple_definition(const Type& type, const ast::Name& node, const Context& context)
-{
-    const auto type_name = type->get_name();
-    const auto binding = context.scopes.top().get_type(type_name);
-    if (binding.has_value())
-    {
-        const auto message_1 = context.scopes.top().get_error_handler()(node, "Defined here:");
-        auto message_2 = std::string("");
-        const auto [_type, position, error_handler] = binding.value();
-        if (position.has_value())
-        {
-            message_2 = error_handler(position.value(), "First defined here:");
-        }
-        throw MultiDefinitionTypeError(type_name, message_1 + message_2);
-    }
-}
-
-static void test_reserved_type(const Type& type, const ast::Name& node, const Context& context)
-{
-    if (type->get_name() == "object")
-    {
-        throw ReservedTypeError("object", context.scopes.top().get_error_handler()(node, ""));
-    }
-    // We also reserve type name number although PDDL specification allows it.
-    // However, this allows using regular types as function types for simplicity.
-    if (type->get_name() == "number")
-    {
-        throw ReservedTypeError("number", context.scopes.top().get_error_handler()(node, ""));
-    }
-}
 
 static void insert_context_information(const Type& type, const ast::Name& node, Context& context)
 {
@@ -151,7 +118,7 @@ static Type parse_type_definition(const ast::Name& node, const TypeList& type_li
     const auto name = parse(node);
     const auto type = context.factories.get_or_create_type(name, type_list);
     test_reserved_type(type, node, context);
-    test_multiple_definition(type, node, context);
+    test_multiple_definition_type(type, node, context);
     insert_context_information(type, node, context);
     return type;
 }
@@ -180,10 +147,7 @@ TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vector<as
 TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node)
 {
     // requires :typing
-    if (!context.requirements->test(RequirementEnum::TYPING))
-    {
-        throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.top().get_error_handler()(typed_list_of_names_recursively_node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::TYPING, typed_list_of_names_recursively_node, context);
     context.references.untrack(RequirementEnum::TYPING);
     // TypedListOfNamesRecursively has user defined base types.
     const auto parent_type_list = boost::apply_visitor(TypeDeclarationTypeVisitor(context), typed_list_of_names_recursively_node.type);

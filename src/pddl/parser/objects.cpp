@@ -18,6 +18,7 @@
 #include "objects.hpp"
 
 #include "common.hpp"
+#include "error_handling.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 #include "types.hpp"
 
@@ -31,40 +32,25 @@ ObjectListVisitor::ObjectListVisitor(Context& context_) : context(context_) {}
 Object parse_object_reference(const ast::Name& name_node, Context& context)
 {
     const auto name = parse(name_node);
+    test_undefined_object(name, name_node, context);
     const auto binding = context.scopes.top().get_object(name);
-    if (!binding.has_value())
-    {
-        throw UndefinedObjectError(name, context.scopes.top().get_error_handler()(name_node, ""));
-    }
     const auto [object, _position, _error_handler] = binding.value();
     context.positions.push_back(object, name_node);
     context.references.untrack(object);
     return object;
 }
 
-static void test_multiple_definition_object(const std::string& object_name, const ast::Name& name_node, const Context& context)
+static void insert_context_information(const Object& object, const ast::Name& node, Context& context)
 {
-    const auto binding = context.scopes.top().get_object(object_name);
-    if (binding.has_value())
-    {
-        const auto message_1 = context.scopes.top().get_error_handler()(name_node, "Defined here:");
-        auto message_2 = std::string("");
-        const auto [_object, position, error_handler] = binding.value();
-        if (position.has_value())
-        {
-            message_2 = error_handler(position.value(), "First defined here:");
-        }
-        throw MultiDefinitionObjectError(object_name, message_1 + message_2);
-    }
+    context.positions.push_back(object, node);
+    context.scopes.top().insert_object(object->get_name(), object, node);
 }
 
 static Object parse_object_definition(const ast::Name& name_node, const TypeList& type_list, Context& context)
 {
-    const auto name = parse(name_node);
-    test_multiple_definition_object(name, name_node, context);
-    const auto object = context.factories.get_or_create_object(name, type_list);
-    context.positions.push_back(object, name_node);
-    context.scopes.top().insert_object(name, object, name_node);
+    const auto object = context.factories.get_or_create_object(parse(name_node), type_list);
+    test_multiple_definition_object(object, name_node, context);
+    insert_context_information(object, name_node, context);
     return object;
 }
 
@@ -89,10 +75,7 @@ ObjectList ObjectListVisitor::operator()(const std::vector<ast::Name>& name_node
 
 ObjectList ObjectListVisitor::operator()(const ast::TypedListOfNamesRecursively& node)
 {
-    if (!context.requirements->test(RequirementEnum::TYPING))
-    {
-        throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::TYPING, node, context);
     context.references.untrack(RequirementEnum::TYPING);
     // TypedListOfNamesRecursively has user defined base types
     const auto type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context), node.type);

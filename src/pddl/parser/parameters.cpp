@@ -18,7 +18,7 @@
 #include "parameters.hpp"
 
 #include "common.hpp"
-#include "loki/details/pddl/exceptions.hpp"
+#include "error_handling.hpp"
 #include "types.hpp"
 
 using namespace std;
@@ -26,33 +26,11 @@ using namespace std;
 namespace loki
 {
 
-static void test_multiple_definition(const Variable& variable, const ast::Variable& node, const Context& context)
-{
-    const auto binding = context.scopes.top().get_variable(variable->get_name());
-    if (binding.has_value())
-    {
-        const auto message_1 = context.scopes.top().get_error_handler()(node, "Defined here:");
-        auto message_2 = std::string("");
-        const auto [_variable, position, error_handler] = binding.value();
-        if (position.has_value())
-        {
-            message_2 = error_handler(position.value(), "First defined here:");
-        }
-        throw MultiDefinitionVariableError(variable->get_name(), message_1 + message_2);
-    }
-}
-
-static void insert_context_information(const Variable& variable, const ast::Variable& node, Context& context)
-{
-    context.scopes.top().insert_variable(variable->get_name(), variable, node);
-}
-
 static Parameter parse_parameter_definition(const ast::Variable& variable_node, const TypeList& type_list, Context& context)
 {
     const auto variable = parse(variable_node, context);
-    test_multiple_definition(variable, variable_node, context);
-    insert_context_information(variable, variable_node, context);
-
+    test_multiple_definition_variable(variable, variable_node, context);
+    context.scopes.top().insert_variable(variable->get_name(), variable, variable_node);
     const auto parameter = context.factories.get_or_create_parameter(variable, type_list);
     context.positions.push_back(parameter, variable_node);
     return parameter;
@@ -81,10 +59,7 @@ ParameterList ParameterListVisitor::operator()(const std::vector<ast::Variable>&
 ParameterList ParameterListVisitor::operator()(const ast::TypedListOfVariablesRecursively& node)
 {
     // requires :typing
-    if (!context.requirements->test(RequirementEnum::TYPING))
-    {
-        throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::TYPING, node, context);
     context.references.untrack(RequirementEnum::TYPING);
     const auto type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context), node.type);
     // TypedListOfVariablesRecursively has user defined types

@@ -30,11 +30,7 @@ namespace loki
 Atom parse(const ast::AtomicFormulaOfNamesPredicate& node, Context& context)
 {
     const auto name = parse(node.predicate.name);
-    const auto binding = context.scopes.top().get_predicate(name);
-    if (!binding.has_value())
-    {
-        throw UndefinedPredicateError(name, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_predicate(name, node, context);
     auto term_list = TermList();
     auto positions = PositionList();
     for (const auto& name_node : node.names)
@@ -42,11 +38,9 @@ Atom parse(const ast::AtomicFormulaOfNamesPredicate& node, Context& context)
         term_list.push_back(context.factories.get_or_create_term_object(parse_object_reference(name_node, context)));
         positions.push_back(name_node);
     }
+    const auto binding = context.scopes.top().get_predicate(name);
     const auto [predicate, _position, _error_handler] = binding.value();
-    if (predicate->get_parameters().size() != term_list.size())
-    {
-        throw MismatchedPredicateTermListError(predicate, term_list, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_mismatches_arity_between_predicate_and_terms(predicate, term_list, node, context);
     test_consistent_object_to_variable_assignment(predicate->get_parameters(), term_list, positions, context);
     const auto atom = context.factories.get_or_create_atom(predicate, term_list);
     context.positions.push_back(atom, node);
@@ -55,10 +49,8 @@ Atom parse(const ast::AtomicFormulaOfNamesPredicate& node, Context& context)
 
 Atom parse(const ast::AtomicFormulaOfNamesEquality& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::EQUALITY))
-    {
-        throw UndefinedRequirementError(RequirementEnum::EQUALITY, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::EQUALITY, node, context);
+    context.references.untrack(RequirementEnum::EQUALITY);
     assert(context.scopes.top().get_predicate("=").has_value());
     const auto [equal_predicate, _position, _error_handler] = context.scopes.top().get_predicate("=").value();
     const auto term_left = context.factories.get_or_create_term_object(parse_object_reference(node.name_left, context));

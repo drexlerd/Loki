@@ -18,6 +18,7 @@
 #include "initial.hpp"
 
 #include "common.hpp"
+#include "error_handling.hpp"
 #include "functions.hpp"
 #include "ground_literal.hpp"
 #include "literal.hpp"
@@ -84,10 +85,7 @@ std::variant<Literal, NumericFluent> parse(const ast::InitialElementNumericFluen
 
     const auto basic_function_term = parse(node.basic_function_term, context);
     double number = parse(node.number);
-    if (number < 0 && context.requirements->test(RequirementEnum::ACTION_COSTS))
-    {
-        throw NegativeCostError(context.positions.get_error_handler()(node.number, ""));
-    }
+    test_nonnegative_number(number, node.number, context);
     return context.factories.get_or_create_numeric_fluent(basic_function_term, number);
 }
 

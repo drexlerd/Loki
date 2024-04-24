@@ -24,7 +24,6 @@
 #include "literal.hpp"
 #include "loki/details/pddl/action.hpp"
 #include "loki/details/pddl/axiom.hpp"
-#include "loki/details/pddl/exceptions.hpp"
 #include "parameters.hpp"
 #include "predicates.hpp"
 #include "reference_utils.hpp"
@@ -63,19 +62,11 @@ Action parse(const ast::Action& node, Context& context)
 
 Axiom parse(const ast::Axiom& node, Context& context)
 {
-    if (!context.requirements->test(RequirementEnum::DERIVED_PREDICATES))
-    {
-        throw UndefinedRequirementError(RequirementEnum::DERIVED_PREDICATES, context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_undefined_requirement(RequirementEnum::DERIVED_PREDICATES, node, context);
     context.references.untrack(RequirementEnum::DERIVED_PREDICATES);
-
     const auto literal = parse(node.literal, context);
-    if (context.derived_predicates.count(literal->get_atom()->get_predicate()) == 0)
-    {
-        throw ExpectedDerivedPredicate(literal->get_atom()->get_predicate()->get_name(), context.scopes.top().get_error_handler()(node, ""));
-    }
+    test_expected_derived_predicate(literal->get_atom()->get_predicate(), node, context);
     const auto condition = parse(node.goal_descriptor, context);
-
     const auto axiom = context.factories.get_or_create_axiom(literal, condition);
     context.positions.push_back(axiom, node);
     return axiom;

@@ -18,28 +18,11 @@
 #include "predicates.hpp"
 
 #include "common.hpp"
-#include "loki/details/pddl/exceptions.hpp"
+#include "error_handling.hpp"
 #include "parameters.hpp"
 
 namespace loki
 {
-
-static void test_multiple_definition(const Predicate& predicate, const ast::Predicate& node, const Context& context)
-{
-    const auto predicate_name = predicate->get_name();
-    const auto binding = context.scopes.top().get_predicate(predicate_name);
-    if (binding.has_value())
-    {
-        const auto message_1 = context.scopes.top().get_error_handler()(node, "Defined here:");
-        auto message_2 = std::string("");
-        const auto [_predicate, position, error_handler] = binding.value();
-        if (position.has_value())
-        {
-            message_2 = error_handler(position.value(), "First defined here:");
-        }
-        throw MultiDefinitionPredicateError(predicate_name, message_1 + message_2);
-    }
-}
 
 static void insert_context_information(const Predicate& predicate, const ast::Predicate& node, Context& context)
 {
@@ -54,7 +37,7 @@ static Predicate parse_predicate_definition(const ast::AtomicFormulaSkeleton& no
     context.scopes.close_scope();
     const auto predicate_name = parse(node.predicate.name);
     const auto predicate = context.factories.get_or_create_predicate(predicate_name, parameters);
-    test_multiple_definition(predicate, node.predicate, context);
+    test_multiple_definition_predicate(predicate, node.predicate, context);
     insert_context_information(predicate, node.predicate, context);
     return predicate;
 }
