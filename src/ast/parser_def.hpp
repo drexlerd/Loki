@@ -1167,7 +1167,13 @@ struct PreferenceConstraintGoalDescriptorSimpleClass : x3::annotate_on_success
 {
 };
 
+struct ProblemKeywordClass : x3::annotate_on_success
+{
+};
 struct ProblemNameClass : x3::annotate_on_success
+{
+};
+struct ProblemDomainNameClass : x3::annotate_on_success
 {
 };
 struct ObjectsClass : x3::annotate_on_success
