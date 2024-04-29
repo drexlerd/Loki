@@ -103,6 +103,18 @@ public:
         return m_data[segment_index(pos)][element_index(pos)];
     }
 
+    T& at(size_t pos)
+    {
+        assert(pos < size());
+        return m_data[segment_index(pos)].at(element_index(pos));
+    }
+
+    const T& at(size_t pos) const
+    {
+        assert(pos < size());
+        return m_data[segment_index(pos)].at(element_index(pos));
+    }
+
     /**
      * Iterators
      */
