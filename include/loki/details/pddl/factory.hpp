@@ -57,32 +57,38 @@ public:
     [[nodiscard]] HolderType const* get_or_create(Args&&... args)
     {
         /* Construct and insert the element in persistent memory. */
-        size_t identifier = m_count;
+
         // Ensure that element with identifier i is stored at position i.
-        assert((identifier == (m_persistent_vector.size() - 1)) || (identifier == m_persistent_vector.size()));
+        size_t identifier = m_count;
+        assert(identifier == m_persistent_vector.size());
+
         // Explicitly call the constructor of T to give exclusive access to the factory.
         auto element = HolderType(std::move(SubType(identifier, std::forward<Args>(args)...)));
-        bool overwrite_last_element = (identifier == m_persistent_vector.size() - 1);
+        const auto* element_ptr = &(m_persistent_vector.push_back(std::move(element)));
         // The pointer to the location in persistent memory.
-        const auto* element_ptr =
-            overwrite_last_element ? &(m_persistent_vector[identifier] = std::move(element)) : &(m_persistent_vector.push_back(std::move(element)));
         assert(element_ptr);
+
         /* Test for uniqueness */
         auto it = m_uniqueness_set.find(element_ptr);
         if (it == m_uniqueness_set.end())
         {
-            // Element is unique!
+            /* Element is unique! */
+
             m_uniqueness_set.emplace(element_ptr);
             // Validate the element by increasing the identifier to the next free position
             ++m_count;
-            assert(m_uniqueness_set.size() == m_count);
         }
         else
         {
-            // Element is not unique!
-            // Return the existing one.
+            /* Element is not unique! */
+
             element_ptr = *it;
+            // Remove duplicate from vector
+            m_persistent_vector.pop_back();
         }
+        // Ensure that indexing matches size of uniqueness set.
+        assert(m_uniqueness_set.size() == m_count);
+
         return element_ptr;
     }
 
@@ -91,15 +97,7 @@ public:
      */
 
     /// @brief Returns a pointer to an existing object with the given identifier.
-    [[nodiscard]] HolderType const* get(size_t identifier) const
-    {
-        if (identifier < m_persistent_vector.size())
-        {
-            return &(m_persistent_vector[identifier]);
-        }
-
-        throw std::invalid_argument("invalid identifier");
-    }
+    [[nodiscard]] HolderType const* get(size_t identifier) const { return &(m_persistent_vector.at(identifier)); }
 
     /**
      * Iterators

@@ -46,6 +46,7 @@ private:
     {
         // Add an additional vector with capacity N
         m_data.resize(m_data.size() + 1);
+        // This reserve is important to avoid reallocations
         m_data.back().reserve(m_elements_per_segment);
         // Increase total capacity
         m_capacity += m_elements_per_segment;
@@ -76,6 +77,14 @@ public:
 
         // Fetch return value
         return segment.back();
+    }
+
+    void pop_back()
+    {
+        assert(m_size > 0);
+        auto& segment = m_data[segment_index(size() - 1)];
+        segment.pop_back();
+        --m_size;
     }
 
     /**
