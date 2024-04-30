@@ -263,7 +263,10 @@ public:
         return actions.get_or_create<ActionImpl>(std::move(name), std::move(parameters), std::move(condition), std::move(effect));
     }
 
-    Axiom get_or_create_axiom(Literal literal, Condition condition) { return axioms.get_or_create<AxiomImpl>(std::move(literal), std::move(condition)); }
+    Axiom get_or_create_axiom(ParameterList parameters, Literal literal, Condition condition)
+    {
+        return axioms.get_or_create<AxiomImpl>(std::move(parameters), std::move(literal), std::move(condition));
+    }
 
     OptimizationMetric get_or_create_optimization_metric(OptimizationMetricEnum metric, FunctionExpression function_expression)
     {

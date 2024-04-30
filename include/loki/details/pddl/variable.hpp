@@ -48,6 +48,8 @@ public:
     const std::string& get_name() const;
 };
 
+extern VariableSet collect_free_variables(const loki::ConditionImpl& condition);
+
 }
 
 #endif

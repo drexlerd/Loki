@@ -67,7 +67,21 @@ Axiom parse(const ast::Axiom& node, Context& context)
     const auto literal = parse(node.literal, context);
     test_expected_derived_predicate(literal->get_atom()->get_predicate(), node, context);
     const auto condition = parse(node.goal_descriptor, context);
-    const auto axiom = context.factories.get_or_create_axiom(literal, condition);
+    // Free variables and literal variables become explicit parameters
+    auto variables = collect_free_variables(*condition);
+    for (const auto& term : literal->get_atom()->get_terms())
+    {
+        if (const auto term_variable = std::get_if<TermVariableImpl>(term))
+        {
+            variables.insert(term_variable->get_variable());
+        }
+    }
+    auto parameters = ParameterList {};
+    for (const auto variable : variables)
+    {
+        parameters.push_back(context.factories.get_or_create_parameter(variable, TypeList {}));
+    }
+    const auto axiom = context.factories.get_or_create_axiom(parameters, literal, condition);
     context.positions.push_back(axiom, node);
     return axiom;
 }
