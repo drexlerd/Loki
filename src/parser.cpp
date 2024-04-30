@@ -21,6 +21,7 @@
 #include "loki/details/ast/error_reporting.hpp"
 #include "loki/details/ast/parser.hpp"
 #include "loki/details/ast/parser_wrapper.hpp"
+#include "loki/details/ast/printer.hpp"
 #include "loki/details/exceptions.hpp"
 #include "loki/details/pddl/context.hpp"
 #include "loki/details/pddl/error_reporting.hpp"

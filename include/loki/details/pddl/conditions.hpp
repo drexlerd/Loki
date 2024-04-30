@@ -116,7 +116,7 @@ public:
 };
 
 /* Imply */
-class ConditionImplyImpl : public Base<ConditionNotImpl>
+class ConditionImplyImpl : public Base<ConditionImplyImpl>
 {
 private:
     Condition m_condition_left;
