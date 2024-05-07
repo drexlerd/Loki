@@ -41,7 +41,7 @@ private:
     ActionList m_actions;
     AxiomList m_axioms;
 
-    DomainImpl(int identifier,
+    DomainImpl(size_t identifier,
                std::string name,
                Requirements requirements,
                TypeList types,

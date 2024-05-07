@@ -41,7 +41,7 @@ private:
     std::optional<OptimizationMetric> m_optimization_metric;
     AxiomList m_axioms;
 
-    ProblemImpl(int identifier,
+    ProblemImpl(size_t identifier,
                 Domain domain,
                 std::string name,
                 Requirements requirements,

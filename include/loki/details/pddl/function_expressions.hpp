@@ -52,7 +52,7 @@ class FunctionExpressionNumberImpl : public Base<FunctionExpressionNumberImpl>
 private:
     double m_number;
 
-    FunctionExpressionNumberImpl(int identifier, double number);
+    FunctionExpressionNumberImpl(size_t identifier, double number);
 
     // Give access to the constructor.
     friend class PDDLFactory<FunctionExpressionImpl, Hash<FunctionExpressionImpl*>, EqualTo<FunctionExpressionImpl*>>;
@@ -76,7 +76,7 @@ private:
     FunctionExpression m_left_function_expression;
     FunctionExpression m_right_function_expression;
 
-    FunctionExpressionBinaryOperatorImpl(int identifier,
+    FunctionExpressionBinaryOperatorImpl(size_t identifier,
                                          BinaryOperatorEnum binary_operator,
                                          FunctionExpression left_function_expression,
                                          FunctionExpression right_function_expression);
@@ -104,7 +104,7 @@ private:
     MultiOperatorEnum m_multi_operator;
     FunctionExpressionList m_function_expressions;
 
-    FunctionExpressionMultiOperatorImpl(int identifier, MultiOperatorEnum multi_operator, FunctionExpressionList function_expressions);
+    FunctionExpressionMultiOperatorImpl(size_t identifier, MultiOperatorEnum multi_operator, FunctionExpressionList function_expressions);
 
     // Give access to the constructor.
     friend class PDDLFactory<FunctionExpressionImpl, Hash<FunctionExpressionImpl*>, EqualTo<FunctionExpressionImpl*>>;
@@ -127,7 +127,7 @@ class FunctionExpressionMinusImpl : public Base<FunctionExpressionMinusImpl>
 private:
     FunctionExpression m_function_expression;
 
-    FunctionExpressionMinusImpl(int identifier, FunctionExpression function_expression);
+    FunctionExpressionMinusImpl(size_t identifier, FunctionExpression function_expression);
 
     // Give access to the constructor.
     friend class PDDLFactory<FunctionExpressionImpl, Hash<FunctionExpressionImpl*>, EqualTo<FunctionExpressionImpl*>>;
@@ -149,7 +149,7 @@ class FunctionExpressionFunctionImpl : public Base<FunctionExpressionFunctionImp
 private:
     Function m_function;
 
-    FunctionExpressionFunctionImpl(int identifier, Function function);
+    FunctionExpressionFunctionImpl(size_t identifier, Function function);
 
     // Give access to the constructor.
     friend class PDDLFactory<FunctionExpressionImpl, Hash<FunctionExpressionImpl*>, EqualTo<FunctionExpressionImpl*>>;

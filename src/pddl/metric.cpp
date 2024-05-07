@@ -39,7 +39,7 @@ const std::string& to_string(OptimizationMetricEnum optimization_metric)
     return optimization_metric_enum_to_string.at(optimization_metric);
 }
 
-OptimizationMetricImpl::OptimizationMetricImpl(int identifier, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression) :
+OptimizationMetricImpl::OptimizationMetricImpl(size_t identifier, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression) :
     Base(identifier),
     m_optimization_metric(optimization_metric),
     m_function_expression(std::move(function_expression))

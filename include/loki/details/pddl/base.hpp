@@ -21,6 +21,7 @@
 #include "loki/details/utils/printer.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <sstream>
 #include <vector>
 
@@ -53,9 +54,9 @@ template<typename Derived>
 class Base
 {
 protected:
-    int m_identifier;
+    size_t m_identifier;
 
-    explicit Base(int identifier) : m_identifier(identifier) {}
+    explicit Base(size_t identifier) : m_identifier(identifier) {}
     friend Derived;
 
 public:
@@ -97,7 +98,7 @@ public:
     }
 
     /// @brief Returns the identifier
-    int get_identifier() const { return m_identifier; }
+    size_t get_identifier() const { return m_identifier; }
 };
 
 }

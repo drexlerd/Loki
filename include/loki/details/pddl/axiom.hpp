@@ -34,7 +34,7 @@ private:
     Literal m_literal;
     Condition m_condition;
 
-    AxiomImpl(int identifier, ParameterList parameters, Literal literal, Condition condition);
+    AxiomImpl(size_t identifier, ParameterList parameters, Literal literal, Condition condition);
 
     // Give access to the constructor.
     friend class PDDLFactory<AxiomImpl, Hash<AxiomImpl*>, EqualTo<AxiomImpl*>>;

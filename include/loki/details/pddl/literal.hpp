@@ -32,7 +32,7 @@ private:
     bool m_is_negated;
     Atom m_atom;
 
-    LiteralImpl(int identifier, bool is_negated, Atom atom);
+    LiteralImpl(size_t identifier, bool is_negated, Atom atom);
 
     // Give access to the constructor.
     friend class PDDLFactory<LiteralImpl, Hash<LiteralImpl*>, EqualTo<LiteralImpl*>>;

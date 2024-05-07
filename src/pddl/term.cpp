@@ -26,7 +26,7 @@ namespace loki
 {
 
 /* TermObjectImpl */
-TermObjectImpl::TermObjectImpl(int identifier, Object object) : Base(identifier), m_object(std::move(object)) {}
+TermObjectImpl::TermObjectImpl(size_t identifier, Object object) : Base(identifier), m_object(std::move(object)) {}
 
 bool TermObjectImpl::is_structurally_equivalent_to_impl(const TermObjectImpl& other) const
 {
@@ -44,7 +44,7 @@ void TermObjectImpl::str_impl(std::ostream& out, const FormattingOptions& /*opti
 const Object& TermObjectImpl::get_object() const { return m_object; }
 
 /* TermVariableImpl */
-TermVariableImpl::TermVariableImpl(int identifier, Variable variable) : Base(identifier), m_variable(std::move(variable)) {}
+TermVariableImpl::TermVariableImpl(size_t identifier, Variable variable) : Base(identifier), m_variable(std::move(variable)) {}
 
 bool TermVariableImpl::is_structurally_equivalent_to_impl(const TermVariableImpl& other) const
 {

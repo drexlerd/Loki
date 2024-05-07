@@ -32,7 +32,7 @@ private:
     std::string m_name;
     TypeList m_bases;
 
-    TypeImpl(int identifier, std::string name, TypeList bases = {});
+    TypeImpl(size_t identifier, std::string name, TypeList bases = {});
 
     // Give access to the constructor.
     friend class PDDLFactory<TypeImpl, Hash<TypeImpl*>, EqualTo<TypeImpl*>>;

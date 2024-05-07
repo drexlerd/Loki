@@ -32,7 +32,7 @@ private:
     Predicate m_predicate;
     TermList m_terms;
 
-    AtomImpl(int identifier, Predicate predicate, TermList terms);
+    AtomImpl(size_t identifier, Predicate predicate, TermList terms);
 
     // Give access to the constructor.
     friend class PDDLFactory<AtomImpl, Hash<AtomImpl*>, EqualTo<AtomImpl*>>;

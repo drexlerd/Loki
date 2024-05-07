@@ -50,7 +50,7 @@ const std::string& to_string(RequirementEnum requirement)
     return requirement_enum_to_string.at(requirement);
 }
 
-RequirementsImpl::RequirementsImpl(int identifier, RequirementEnumSet requirements) : Base(identifier), m_requirements(std::move(requirements)) {}
+RequirementsImpl::RequirementsImpl(size_t identifier, RequirementEnumSet requirements) : Base(identifier), m_requirements(std::move(requirements)) {}
 
 bool RequirementsImpl::is_structurally_equivalent_to_impl(const RequirementsImpl& other) const { return (m_requirements == other.m_requirements); }
 

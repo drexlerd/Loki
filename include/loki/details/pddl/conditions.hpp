@@ -33,7 +33,7 @@ class ConditionLiteralImpl : public Base<ConditionLiteralImpl>
 private:
     Literal m_literal;
 
-    ConditionLiteralImpl(int identifier, Literal literal);
+    ConditionLiteralImpl(size_t identifier, Literal literal);
 
     // Give access to the constructor.
     friend class PDDLFactory<ConditionImpl, Hash<ConditionImpl*>, EqualTo<ConditionImpl*>>;
@@ -55,7 +55,7 @@ class ConditionAndImpl : public Base<ConditionAndImpl>
 private:
     ConditionList m_conditions;
 
-    ConditionAndImpl(int identifier, ConditionList conditions);
+    ConditionAndImpl(size_t identifier, ConditionList conditions);
 
     // Give access to the constructor.
     friend class PDDLFactory<ConditionImpl, Hash<ConditionImpl*>, EqualTo<ConditionImpl*>>;
@@ -77,7 +77,7 @@ class ConditionOrImpl : public Base<ConditionOrImpl>
 private:
     ConditionList m_conditions;
 
-    ConditionOrImpl(int identifier, ConditionList conditions);
+    ConditionOrImpl(size_t identifier, ConditionList conditions);
 
     // Give access to the constructor.
     friend class PDDLFactory<ConditionImpl, Hash<ConditionImpl*>, EqualTo<ConditionImpl*>>;
@@ -99,7 +99,7 @@ class ConditionNotImpl : public Base<ConditionNotImpl>
 private:
     Condition m_condition;
 
-    ConditionNotImpl(int identifier, Condition condition);
+    ConditionNotImpl(size_t identifier, Condition condition);
 
     // Give access to the constructor.
     friend class PDDLFactory<ConditionImpl, Hash<ConditionImpl*>, EqualTo<ConditionImpl*>>;
@@ -122,7 +122,7 @@ private:
     Condition m_condition_left;
     Condition m_condition_right;
 
-    ConditionImplyImpl(int identifier, Condition condition_left, Condition condition_right);
+    ConditionImplyImpl(size_t identifier, Condition condition_left, Condition condition_right);
 
     // Give access to the constructor.
     friend class PDDLFactory<ConditionImpl, Hash<ConditionImpl*>, EqualTo<ConditionImpl*>>;
@@ -146,7 +146,7 @@ private:
     ParameterList m_parameters;
     Condition m_condition;
 
-    ConditionExistsImpl(int identifier, ParameterList parameters, Condition condition);
+    ConditionExistsImpl(size_t identifier, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
     friend class PDDLFactory<ConditionImpl, Hash<ConditionImpl*>, EqualTo<ConditionImpl*>>;
@@ -170,7 +170,7 @@ private:
     ParameterList m_parameters;
     Condition m_condition;
 
-    ConditionForallImpl(int identifier, ParameterList parameters, Condition condition);
+    ConditionForallImpl(size_t identifier, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
     friend class PDDLFactory<ConditionImpl, Hash<ConditionImpl*>, EqualTo<ConditionImpl*>>;

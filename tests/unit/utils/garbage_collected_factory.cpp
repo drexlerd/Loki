@@ -31,7 +31,7 @@ private:
     int m_identifier;
     std::string m_name;
 
-    ObjectImpl(int identifier, std::string name) : m_identifier(identifier), m_name(std::move(name)) {}
+    ObjectImpl(size_t identifier, std::string name) : m_identifier(identifier), m_name(std::move(name)) {}
 
     template<typename... Ts>
     friend class loki::GarbageCollectedFactory;

@@ -32,7 +32,7 @@ private:
     FunctionSkeleton m_function_skeleton;
     TermList m_terms;
 
-    FunctionImpl(int identifier, FunctionSkeleton function_skeleton, TermList terms);
+    FunctionImpl(size_t identifier, FunctionSkeleton function_skeleton, TermList terms);
 
     // Give access to the constructor.
     friend class PDDLFactory<FunctionImpl, Hash<FunctionImpl*>, EqualTo<FunctionImpl*>>;

@@ -35,7 +35,7 @@ private:
     std::optional<Condition> m_condition;
     std::optional<Effect> m_effect;
 
-    ActionImpl(int identifier, std::string name, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);
+    ActionImpl(size_t identifier, std::string name, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);
 
     // Give access to the constructor.
     friend class PDDLFactory<ActionImpl, Hash<ActionImpl*>, EqualTo<ActionImpl*>>;

@@ -52,7 +52,7 @@ const std::string& to_string(MultiOperatorEnum multi_operator)
 }
 
 /* FunctionExpressionNumber */
-FunctionExpressionNumberImpl::FunctionExpressionNumberImpl(int identifier, double number) : Base(identifier), m_number(number) {}
+FunctionExpressionNumberImpl::FunctionExpressionNumberImpl(size_t identifier, double number) : Base(identifier), m_number(number) {}
 
 bool FunctionExpressionNumberImpl::is_structurally_equivalent_to_impl(const FunctionExpressionNumberImpl& other) const
 {
@@ -70,7 +70,7 @@ void FunctionExpressionNumberImpl::str_impl(std::ostream& out, const FormattingO
 double FunctionExpressionNumberImpl::get_number() const { return m_number; }
 
 /* FunctionExpressionBinaryOperator */
-FunctionExpressionBinaryOperatorImpl::FunctionExpressionBinaryOperatorImpl(int identifier,
+FunctionExpressionBinaryOperatorImpl::FunctionExpressionBinaryOperatorImpl(size_t identifier,
                                                                            BinaryOperatorEnum binary_operator,
                                                                            FunctionExpression left_function_expression,
                                                                            FunctionExpression right_function_expression) :
@@ -112,7 +112,7 @@ const FunctionExpression& FunctionExpressionBinaryOperatorImpl::get_left_functio
 const FunctionExpression& FunctionExpressionBinaryOperatorImpl::get_right_function_expression() const { return m_right_function_expression; }
 
 /* FunctionExpressionMultiOperator */
-FunctionExpressionMultiOperatorImpl::FunctionExpressionMultiOperatorImpl(int identifier,
+FunctionExpressionMultiOperatorImpl::FunctionExpressionMultiOperatorImpl(size_t identifier,
                                                                          MultiOperatorEnum multi_operator,
                                                                          FunctionExpressionList function_expressions) :
     Base(identifier),
@@ -152,7 +152,7 @@ MultiOperatorEnum FunctionExpressionMultiOperatorImpl::get_multi_operator() cons
 const FunctionExpressionList& FunctionExpressionMultiOperatorImpl::get_function_expressions() const { return m_function_expressions; }
 
 /* FunctionExpressionMinus */
-FunctionExpressionMinusImpl::FunctionExpressionMinusImpl(int identifier, FunctionExpression function_expression) :
+FunctionExpressionMinusImpl::FunctionExpressionMinusImpl(size_t identifier, FunctionExpression function_expression) :
     Base(identifier),
     m_function_expression(std::move(function_expression))
 {
@@ -179,7 +179,7 @@ void FunctionExpressionMinusImpl::str_impl(std::ostream& out, const FormattingOp
 const FunctionExpression& FunctionExpressionMinusImpl::get_function_expression() const { return m_function_expression; }
 
 /* FunctionExpressionFunction */
-FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(int identifier, Function function) : Base(identifier), m_function(std::move(function)) {}
+FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(size_t identifier, Function function) : Base(identifier), m_function(std::move(function)) {}
 
 bool FunctionExpressionFunctionImpl::is_structurally_equivalent_to_impl(const FunctionExpressionFunctionImpl& other) const
 {

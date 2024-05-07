@@ -44,7 +44,7 @@ class EffectLiteralImpl : public Base<EffectLiteralImpl>
 private:
     Literal m_literal;
 
-    EffectLiteralImpl(int identifier, Literal literal);
+    EffectLiteralImpl(size_t identifier, Literal literal);
 
     // Give access to the constructor.
     friend class PDDLFactory<EffectImpl, Hash<EffectImpl*>, EqualTo<EffectImpl*>>;
@@ -66,7 +66,7 @@ class EffectAndImpl : public Base<EffectAndImpl>
 private:
     EffectList m_effects;
 
-    EffectAndImpl(int identifier, EffectList effects);
+    EffectAndImpl(size_t identifier, EffectList effects);
 
     // Give access to the constructor.
     friend class loki::PDDLFactory<EffectImpl, loki::Hash<EffectImpl*>, loki::EqualTo<EffectImpl*>>;
@@ -90,7 +90,7 @@ private:
     Function m_function;
     FunctionExpression m_function_expression;
 
-    EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
+    EffectNumericImpl(size_t identifier, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
 
     // Give access to the constructor.
     friend class loki::PDDLFactory<EffectImpl, loki::Hash<EffectImpl*>, loki::EqualTo<EffectImpl*>>;
@@ -115,7 +115,7 @@ private:
     ParameterList m_parameters;
     Effect m_effect;
 
-    EffectConditionalForallImpl(int identifier, ParameterList parameters, Effect effect);
+    EffectConditionalForallImpl(size_t identifier, ParameterList parameters, Effect effect);
 
     // Give access to the constructor.
     friend class loki::PDDLFactory<EffectImpl, loki::Hash<EffectImpl*>, loki::EqualTo<EffectImpl*>>;
@@ -139,7 +139,7 @@ private:
     Condition m_condition;
     Effect m_effect;
 
-    EffectConditionalWhenImpl(int identifier, Condition condition, Effect effect);
+    EffectConditionalWhenImpl(size_t identifier, Condition condition, Effect effect);
 
     // Give access to the constructor.
     friend class loki::PDDLFactory<EffectImpl, loki::Hash<EffectImpl*>, loki::EqualTo<EffectImpl*>>;

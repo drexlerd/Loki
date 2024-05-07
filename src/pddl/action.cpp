@@ -26,7 +26,7 @@
 
 namespace loki
 {
-ActionImpl::ActionImpl(int identifier, std::string name, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect) :
+ActionImpl::ActionImpl(size_t identifier, std::string name, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect) :
     Base(identifier),
     m_name(std::move(name)),
     m_parameters(std::move(parameters)),

@@ -33,7 +33,7 @@ private:
     ParameterList m_parameters;
     Type m_type;
 
-    FunctionSkeletonImpl(int identifier, std::string name, ParameterList parameters, Type type);
+    FunctionSkeletonImpl(size_t identifier, std::string name, ParameterList parameters, Type type);
 
     // Give access to the constructor.
     friend class PDDLFactory<FunctionSkeletonImpl, Hash<FunctionSkeletonImpl*>, EqualTo<FunctionSkeletonImpl*>>;

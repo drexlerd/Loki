@@ -31,7 +31,7 @@ class VariableImpl : public Base<VariableImpl>
 private:
     std::string m_name;
 
-    VariableImpl(int identifier, std::string name);
+    VariableImpl(size_t identifier, std::string name);
 
     // Give access to the constructor.
     friend class PDDLFactory<VariableImpl, Hash<VariableImpl*>, EqualTo<VariableImpl*>>;

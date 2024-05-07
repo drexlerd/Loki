@@ -62,7 +62,7 @@ class RequirementsImpl : public Base<RequirementsImpl>
 private:
     RequirementEnumSet m_requirements;
 
-    RequirementsImpl(int identifier, RequirementEnumSet requirements);
+    RequirementsImpl(size_t identifier, RequirementEnumSet requirements);
 
     // Give access to the constructor.
     friend class PDDLFactory<RequirementsImpl, Hash<RequirementsImpl*>, EqualTo<RequirementsImpl*>>;

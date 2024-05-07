@@ -34,7 +34,7 @@ private:
     std::string m_name;
     ParameterList m_parameters;
 
-    PredicateImpl(int identifier, std::string name, ParameterList parameters);
+    PredicateImpl(size_t identifier, std::string name, ParameterList parameters);
 
     // Give access to the constructor.
     friend class PDDLFactory<PredicateImpl, Hash<PredicateImpl*>, EqualTo<PredicateImpl*>>;

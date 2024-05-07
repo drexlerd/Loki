@@ -32,7 +32,7 @@ class TermObjectImpl : public Base<TermObjectImpl>
 private:
     Object m_object;
 
-    TermObjectImpl(int identifier, Object object);
+    TermObjectImpl(size_t identifier, Object object);
 
     // Give access to the constructor.
     friend class PDDLFactory<TermImpl, Hash<TermImpl*>, EqualTo<TermImpl*>>;
@@ -53,7 +53,7 @@ class TermVariableImpl : public Base<TermVariableImpl>
 private:
     Variable m_variable;
 
-    TermVariableImpl(int identifier, Variable variable);
+    TermVariableImpl(size_t identifier, Variable variable);
 
     // Give access to the constructor.
     friend class PDDLFactory<TermImpl, Hash<TermImpl*>, EqualTo<TermImpl*>>;

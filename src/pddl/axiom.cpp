@@ -28,7 +28,7 @@
 
 namespace loki
 {
-AxiomImpl::AxiomImpl(int identifier, ParameterList parameters, Literal literal, Condition condition) :
+AxiomImpl::AxiomImpl(size_t identifier, ParameterList parameters, Literal literal, Condition condition) :
     Base(identifier),
     m_parameters(std::move(parameters)),
     m_literal(std::move(literal)),

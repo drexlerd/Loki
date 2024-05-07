@@ -32,7 +32,7 @@ using namespace std;
 
 namespace loki
 {
-DomainImpl::DomainImpl(int identifier,
+DomainImpl::DomainImpl(size_t identifier,
                        std::string name,
                        Requirements requirements,
                        TypeList types,

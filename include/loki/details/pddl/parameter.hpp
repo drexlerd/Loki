@@ -33,7 +33,7 @@ private:
     Variable m_variable;
     TypeList m_types;
 
-    ParameterImpl(int identifier, Variable variable, TypeList types);
+    ParameterImpl(size_t identifier, Variable variable, TypeList types);
 
     // Give access to the constructor.
     friend class PDDLFactory<ParameterImpl, Hash<ParameterImpl*>, EqualTo<ParameterImpl*>>;

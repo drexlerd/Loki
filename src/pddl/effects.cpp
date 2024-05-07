@@ -43,7 +43,7 @@ const std::string& to_string(AssignOperatorEnum assign_operator)
 }
 
 /* Literal */
-EffectLiteralImpl::EffectLiteralImpl(int identifier, Literal literal) : Base(identifier), m_literal(std::move(literal)) {}
+EffectLiteralImpl::EffectLiteralImpl(size_t identifier, Literal literal) : Base(identifier), m_literal(std::move(literal)) {}
 
 bool EffectLiteralImpl::is_structurally_equivalent_to_impl(const EffectLiteralImpl& other) const
 {
@@ -60,7 +60,7 @@ void EffectLiteralImpl::str_impl(std::ostream& out, const FormattingOptions& opt
 
 const Literal& EffectLiteralImpl::get_literal() const { return m_literal; }
 
-EffectAndImpl::EffectAndImpl(int identifier, EffectList effects) : Base(identifier), m_effects(std::move(effects)) {}
+EffectAndImpl::EffectAndImpl(size_t identifier, EffectList effects) : Base(identifier), m_effects(std::move(effects)) {}
 
 bool EffectAndImpl::is_structurally_equivalent_to_impl(const EffectAndImpl& other) const
 {
@@ -88,7 +88,7 @@ void EffectAndImpl::str_impl(std::ostream& out, const FormattingOptions& options
 const EffectList& EffectAndImpl::get_effects() const { return m_effects; }
 
 /* EffectNumeric */
-EffectNumericImpl::EffectNumericImpl(int identifier, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression) :
+EffectNumericImpl::EffectNumericImpl(size_t identifier, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression) :
     Base(identifier),
     m_assign_operator(assign_operator),
     m_function(std::move(function)),
@@ -123,7 +123,7 @@ const Function& EffectNumericImpl::get_function() const { return m_function; }
 const FunctionExpression& EffectNumericImpl::get_function_expression() const { return m_function_expression; }
 
 /* ConditionalForall */
-EffectConditionalForallImpl::EffectConditionalForallImpl(int identifier, ParameterList parameters, Effect effect) :
+EffectConditionalForallImpl::EffectConditionalForallImpl(size_t identifier, ParameterList parameters, Effect effect) :
     Base(identifier),
     m_parameters(std::move(parameters)),
     m_effect(std::move(effect))
@@ -159,7 +159,7 @@ const ParameterList& EffectConditionalForallImpl::get_parameters() const { retur
 
 const Effect& EffectConditionalForallImpl::get_effect() const { return m_effect; }
 
-EffectConditionalWhenImpl::EffectConditionalWhenImpl(int identifier, Condition condition, Effect effect) :
+EffectConditionalWhenImpl::EffectConditionalWhenImpl(size_t identifier, Condition condition, Effect effect) :
     Base(identifier),
     m_condition(std::move(condition)),
     m_effect(std::move(effect))

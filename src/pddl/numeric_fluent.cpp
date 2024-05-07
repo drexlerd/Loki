@@ -22,7 +22,9 @@
 
 namespace loki
 {
-NumericFluentImpl::NumericFluentImpl(int identifier, Function function, double number) : Base(identifier), m_function(std::move(function)), m_number(number) {}
+NumericFluentImpl::NumericFluentImpl(size_t identifier, Function function, double number) : Base(identifier), m_function(std::move(function)), m_number(number)
+{
+}
 
 bool NumericFluentImpl::is_structurally_equivalent_to_impl(const NumericFluentImpl& other) const
 {

@@ -24,7 +24,7 @@
 
 namespace loki
 {
-FunctionImpl::FunctionImpl(int identifier, FunctionSkeleton function_skeleton, TermList terms) :
+FunctionImpl::FunctionImpl(size_t identifier, FunctionSkeleton function_skeleton, TermList terms) :
     Base(identifier),
     m_function_skeleton(std::move(function_skeleton)),
     m_terms(std::move(terms))

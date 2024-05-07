@@ -41,7 +41,7 @@ private:
     OptimizationMetricEnum m_optimization_metric;
     FunctionExpression m_function_expression;
 
-    OptimizationMetricImpl(int identifier, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
+    OptimizationMetricImpl(size_t identifier, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
 
     // Give access to the constructor.
     friend class PDDLFactory<OptimizationMetricImpl, Hash<OptimizationMetricImpl*>, EqualTo<OptimizationMetricImpl*>>;

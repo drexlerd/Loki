@@ -75,7 +75,7 @@ public:
         std::lock_guard<std::mutex> hold(m_cache->mutex);
 
         auto& t_cache = std::get<PerTypeCache<T>>(m_cache->data);
-        int identifier = m_cache->count;
+        size_t identifier = m_cache->count;
         auto key = T(identifier, args...);
         const auto [it, inserted] = t_cache.uniqueness.insert(key);
         if (!inserted)

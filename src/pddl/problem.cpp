@@ -37,7 +37,7 @@ using namespace std;
 
 namespace loki
 {
-ProblemImpl::ProblemImpl(int identifier,
+ProblemImpl::ProblemImpl(size_t identifier,
                          Domain domain,
                          std::string name,
                          Requirements requirements,
