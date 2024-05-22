@@ -64,12 +64,16 @@ ProblemImpl::ProblemImpl(size_t identifier,
 
 bool ProblemImpl::is_structurally_equivalent_to_impl(const ProblemImpl& other) const
 {
-    return (m_domain == other.m_domain) && (m_name == other.m_name) && (m_requirements == other.m_requirements)
-           && (get_sorted_vector(m_objects) == get_sorted_vector(other.m_objects))
-           && (get_sorted_vector(m_initial_literals)) == get_sorted_vector(other.m_initial_literals) && (m_goal_condition == other.m_goal_condition)
-           && (m_optimization_metric == other.m_optimization_metric)
-           && (get_sorted_vector(m_derived_predicates) == get_sorted_vector(other.m_derived_predicates))
-           && (get_sorted_vector(m_axioms) == get_sorted_vector(other.m_axioms));
+    if (this != &other)
+    {
+        return (m_domain == other.m_domain) && (m_name == other.m_name) && (m_requirements == other.m_requirements)
+               && (get_sorted_vector(m_objects) == get_sorted_vector(other.m_objects))
+               && (get_sorted_vector(m_initial_literals)) == get_sorted_vector(other.m_initial_literals) && (m_goal_condition == other.m_goal_condition)
+               && (m_optimization_metric == other.m_optimization_metric)
+               && (get_sorted_vector(m_derived_predicates) == get_sorted_vector(other.m_derived_predicates))
+               && (get_sorted_vector(m_axioms) == get_sorted_vector(other.m_axioms));
+    }
+    return true;
 }
 
 size_t ProblemImpl::hash_impl() const

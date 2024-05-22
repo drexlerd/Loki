@@ -35,7 +35,11 @@ ParameterImpl::ParameterImpl(size_t identifier, Variable variable, TypeList type
 
 bool ParameterImpl::is_structurally_equivalent_to_impl(const ParameterImpl& other) const
 {
-    return (m_variable == other.m_variable) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types));
+    if (this != &other)
+    {
+        return (m_variable == other.m_variable) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types));
+    }
+    return true;
 }
 
 size_t ParameterImpl::hash_impl() const { return hash_combine(m_variable, hash_container(get_sorted_vector(m_types))); }

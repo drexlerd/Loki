@@ -49,15 +49,18 @@ Domain parse(const ast::Domain& domain_node, Context& context)
 {
     const auto domain_name = parse(domain_node.domain_name.name);
     /* Requirements section */
+    // Make :strips requirement explicit
+    auto requirements_set = RequirementEnumSet { RequirementEnum::STRIPS };
     if (domain_node.requirements.has_value())
     {
-        context.requirements = context.factories.get_or_create_requirements(parse(domain_node.requirements.value(), context));
-        context.positions.push_back(context.requirements, domain_node.requirements.value());
+        const auto domain_requirements_set = parse(domain_node.requirements.value(), context);
+        requirements_set.insert(domain_requirements_set.begin(), domain_requirements_set.end());
     }
-    else
+    const auto requirements = context.factories.get_or_create_requirements(requirements_set);
+    context.requirements = requirements;
+    if (domain_node.requirements.has_value())
     {
-        // Default requirements
-        context.requirements = context.factories.get_or_create_requirements(RequirementEnumSet { RequirementEnum::STRIPS });
+        context.positions.push_back(requirements, domain_node.requirements.value());
     }
     /* Types section */
     auto types = TypeList();
@@ -109,15 +112,9 @@ Domain parse(const ast::Domain& domain_node, Context& context)
     test_predicate_references(derived_predicates, context);
     test_function_skeleton_references(function_skeletons, context);
 
-    const auto domain = context.factories.get_or_create_domain(domain_name,
-                                                               context.requirements,
-                                                               types,
-                                                               constants,
-                                                               predicates,
-                                                               derived_predicates,
-                                                               function_skeletons,
-                                                               action_list,
-                                                               axiom_list);
+    const auto domain =
+        context.factories
+            .get_or_create_domain(domain_name, requirements, types, constants, predicates, derived_predicates, function_skeletons, action_list, axiom_list);
     context.positions.push_back(domain, domain_node);
     return domain;
 }
@@ -130,19 +127,30 @@ Problem parse(const ast::Problem& problem_node, Context& context, const Domain& 
     {
         throw MismatchedDomainError(domain, domain_name, context.scopes.top().get_error_handler()(problem_node.domain_name, ""));
     }
+
     /* Problem name section */
     const auto problem_name = parse(problem_node.problem_name.name);
+
     /* Requirements section */
+    // Make :strips requirement explicit
+    auto requirements_set = RequirementEnumSet { RequirementEnum::STRIPS };
     if (problem_node.requirements.has_value())
     {
-        context.requirements = context.factories.get_or_create_requirements(parse(problem_node.requirements.value(), context));
-        context.positions.push_back(context.requirements, problem_node.requirements.value());
+        // Keep the problem requirements as is.
+        const auto problem_requirements_set = parse(problem_node.requirements.value(), context);
+        requirements_set.insert(problem_requirements_set.begin(), problem_requirements_set.end());
     }
-    else
+    // Create a problem specific requirement
+    const auto requirements = context.factories.get_or_create_requirements(requirements_set);
+    //  Copy domain requirements over to the parsing context of the problem
+    const auto& domain_requirements_set = domain->get_requirements()->get_requirements();
+    requirements_set.insert(domain_requirements_set.begin(), domain_requirements_set.end());
+    context.requirements = context.factories.get_or_create_requirements(requirements_set);
+    if (problem_node.requirements.has_value())
     {
-        // Default requirements
-        context.requirements = context.factories.get_or_create_requirements(RequirementEnumSet { RequirementEnum::STRIPS });
+        context.positions.push_back(requirements, problem_node.requirements.value());
     }
+
     /* Objects section */
     auto objects = ObjectList();
     if (problem_node.objects.has_value())
@@ -150,6 +158,7 @@ Problem parse(const ast::Problem& problem_node, Context& context, const Domain& 
         objects = parse(problem_node.objects.value(), context);
     }
     track_object_references(objects, context);
+
     /* DerivedPredicates section */
     auto derived_predicates = PredicateList();
     if (problem_node.derived_predicates.has_value())
@@ -157,6 +166,7 @@ Problem parse(const ast::Problem& problem_node, Context& context, const Domain& 
         derived_predicates = parse(problem_node.derived_predicates.value(), context);
     }
     track_predicate_references(derived_predicates, context);
+
     /* Initial section */
     auto initial_literals = LiteralList();
     auto numeric_fluents = NumericFluentList();
@@ -175,6 +185,7 @@ Problem parse(const ast::Problem& problem_node, Context& context, const Domain& 
     {
         goal_condition = parse(problem_node.goal.value(), context);
     }
+
     /* Metric section */
     auto optimization_metric = std::optional<OptimizationMetric>();
     if (problem_node.metric_specification.has_value())
@@ -198,7 +209,7 @@ Problem parse(const ast::Problem& problem_node, Context& context, const Domain& 
 
     const auto problem = context.factories.get_or_create_problem(domain,
                                                                  problem_name,
-                                                                 context.requirements,
+                                                                 requirements,
                                                                  objects,
                                                                  derived_predicates,
                                                                  initial_literals,

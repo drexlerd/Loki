@@ -258,9 +258,10 @@ public:
         return effects.get_or_create<EffectConditionalWhenImpl>(std::move(condition), std::move(effect));
     }
 
-    Action get_or_create_action(std::string name, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect)
+    Action
+    get_or_create_action(std::string name, size_t original_arity, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect)
     {
-        return actions.get_or_create<ActionImpl>(std::move(name), std::move(parameters), std::move(condition), std::move(effect));
+        return actions.get_or_create<ActionImpl>(std::move(name), std::move(original_arity), std::move(parameters), std::move(condition), std::move(effect));
     }
 
     Axiom get_or_create_axiom(ParameterList parameters, Literal literal, Condition condition)

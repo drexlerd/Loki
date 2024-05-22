@@ -38,7 +38,11 @@ AxiomImpl::AxiomImpl(size_t identifier, ParameterList parameters, Literal litera
 
 bool AxiomImpl::is_structurally_equivalent_to_impl(const AxiomImpl& other) const
 {
-    return (m_parameters == other.m_parameters) && (m_literal == other.m_literal) && (m_condition == other.m_condition);
+    if (this != &other)
+    {
+        return (m_parameters == other.m_parameters) && (m_literal == other.m_literal) && (m_condition == other.m_condition);
+    }
+    return true;
 }
 
 size_t AxiomImpl::hash_impl() const { return hash_combine(hash_container(m_parameters), m_literal, m_condition); }

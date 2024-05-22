@@ -48,7 +48,11 @@ OptimizationMetricImpl::OptimizationMetricImpl(size_t identifier, OptimizationMe
 
 bool OptimizationMetricImpl::is_structurally_equivalent_to_impl(const OptimizationMetricImpl& other) const
 {
-    return (m_optimization_metric == other.m_optimization_metric) && (m_function_expression == other.m_function_expression);
+    if (this != &other)
+    {
+        return (m_optimization_metric == other.m_optimization_metric) && (m_function_expression == other.m_function_expression);
+    }
+    return true;
 }
 
 size_t OptimizationMetricImpl::hash_impl() const { return hash_combine(m_optimization_metric, m_function_expression); }

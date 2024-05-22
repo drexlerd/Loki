@@ -57,12 +57,16 @@ DomainImpl::DomainImpl(size_t identifier,
 
 bool DomainImpl::is_structurally_equivalent_to_impl(const DomainImpl& other) const
 {
-    return (m_name == other.m_name) && (m_requirements == other.m_requirements) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types))
-           && (get_sorted_vector(m_constants) == get_sorted_vector(other.m_constants))
-           && (get_sorted_vector(m_predicates) == get_sorted_vector(other.m_predicates))
-           && (get_sorted_vector(m_derived_predicates) == get_sorted_vector(other.m_derived_predicates))
-           && (get_sorted_vector(m_functions) == get_sorted_vector(other.m_functions)) && (get_sorted_vector(m_actions) == get_sorted_vector(other.m_actions))
-           && (get_sorted_vector(m_axioms) == get_sorted_vector(other.m_axioms));
+    if (this != &other)
+    {
+        return (m_name == other.m_name) && (m_requirements == other.m_requirements) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types))
+               && (get_sorted_vector(m_constants) == get_sorted_vector(other.m_constants))
+               && (get_sorted_vector(m_predicates) == get_sorted_vector(other.m_predicates))
+               && (get_sorted_vector(m_derived_predicates) == get_sorted_vector(other.m_derived_predicates))
+               && (get_sorted_vector(m_functions) == get_sorted_vector(other.m_functions))
+               && (get_sorted_vector(m_actions) == get_sorted_vector(other.m_actions)) && (get_sorted_vector(m_axioms) == get_sorted_vector(other.m_axioms));
+    }
+    return true;
 }
 
 size_t DomainImpl::hash_impl() const

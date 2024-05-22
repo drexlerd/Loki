@@ -33,7 +33,11 @@ FunctionImpl::FunctionImpl(size_t identifier, FunctionSkeleton function_skeleton
 
 bool FunctionImpl::is_structurally_equivalent_to_impl(const FunctionImpl& other) const
 {
-    return (m_function_skeleton == other.m_function_skeleton) && (m_terms == other.m_terms);
+    if (this != &other)
+    {
+        return (m_function_skeleton == other.m_function_skeleton) && (m_terms == other.m_terms);
+    }
+    return true;
 }
 
 size_t FunctionImpl::hash_impl() const { return hash_combine(m_function_skeleton, hash_container(m_terms)); }

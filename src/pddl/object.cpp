@@ -27,7 +27,11 @@ ObjectImpl::ObjectImpl(size_t identifier, std::string name, TypeList types) : Ba
 
 bool ObjectImpl::is_structurally_equivalent_to_impl(const ObjectImpl& other) const
 {
-    return (m_name == other.m_name) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types));
+    if (this != &other)
+    {
+        return (m_name == other.m_name) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types));
+    }
+    return true;
 }
 
 size_t ObjectImpl::hash_impl() const { return hash_combine(m_name, hash_container(get_sorted_vector(m_types))); }

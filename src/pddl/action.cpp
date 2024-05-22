@@ -26,9 +26,15 @@
 
 namespace loki
 {
-ActionImpl::ActionImpl(size_t identifier, std::string name, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect) :
+ActionImpl::ActionImpl(size_t identifier,
+                       std::string name,
+                       size_t original_arity,
+                       ParameterList parameters,
+                       std::optional<Condition> condition,
+                       std::optional<Effect> effect) :
     Base(identifier),
     m_name(std::move(name)),
+    m_original_arity(original_arity),
     m_parameters(std::move(parameters)),
     m_condition(std::move(condition)),
     m_effect(std::move(effect))
@@ -37,8 +43,12 @@ ActionImpl::ActionImpl(size_t identifier, std::string name, ParameterList parame
 
 bool ActionImpl::is_structurally_equivalent_to_impl(const ActionImpl& other) const
 {
-    return (m_name == other.m_name) && (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters)) && (*m_condition == *other.m_condition)
-           && (*m_effect == *other.m_effect);
+    if (this != &other)
+    {
+        return (m_name == other.m_name) && (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters)) && (*m_condition == *other.m_condition)
+               && (*m_effect == *other.m_effect);
+    }
+    return true;
 }
 
 size_t ActionImpl::hash_impl() const { return hash_combine(m_name, hash_container(m_parameters), *m_condition, *m_effect); }
@@ -72,6 +82,8 @@ void ActionImpl::str_impl(std::ostream& out, const FormattingOptions& options) c
 }
 
 const std::string& ActionImpl::get_name() const { return m_name; }
+
+size_t ActionImpl::get_original_arity() const { return m_original_arity; }
 
 const ParameterList& ActionImpl::get_parameters() const { return m_parameters; }
 

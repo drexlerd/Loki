@@ -55,7 +55,7 @@ Action parse(const ast::Action& node, Context& context)
     auto [condition, effect] = parse(node.action_body, context);
     test_variable_references(parameter_list, context);
     context.scopes.close_scope();
-    const auto action = context.factories.get_or_create_action(name, parameter_list, condition, effect);
+    const auto action = context.factories.get_or_create_action(name, parameter_list.size(), parameter_list, condition, effect);
     context.positions.push_back(action, node);
     return action;
 }

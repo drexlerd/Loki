@@ -31,11 +31,18 @@ class ActionImpl : public Base<ActionImpl>
 {
 private:
     std::string m_name;
+    // Indicate the original subseteq of variables before adding parameters during translations
+    size_t m_original_arity;
     ParameterList m_parameters;
     std::optional<Condition> m_condition;
     std::optional<Effect> m_effect;
 
-    ActionImpl(size_t identifier, std::string name, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);
+    ActionImpl(size_t identifier,
+               std::string name,
+               size_t original_arity,
+               ParameterList parameters,
+               std::optional<Condition> condition,
+               std::optional<Effect> effect);
 
     // Give access to the constructor.
     friend class PDDLFactory<ActionImpl, Hash<ActionImpl*>, EqualTo<ActionImpl*>>;
@@ -50,6 +57,7 @@ private:
 
 public:
     const std::string& get_name() const;
+    size_t get_original_arity() const;
     const ParameterList& get_parameters() const;
     const std::optional<Condition>& get_condition() const;
     const std::optional<Effect>& get_effect() const;

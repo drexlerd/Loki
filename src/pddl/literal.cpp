@@ -27,7 +27,11 @@ LiteralImpl::LiteralImpl(size_t identifier, bool is_negated, Atom atom) : Base(i
 
 bool LiteralImpl::is_structurally_equivalent_to_impl(const LiteralImpl& other) const
 {
-    return (m_is_negated == other.m_is_negated) && (m_atom == other.m_atom);
+    if (this != &other)
+    {
+        return (m_is_negated == other.m_is_negated) && (m_atom == other.m_atom);
+    }
+    return true;
 }
 
 size_t LiteralImpl::hash_impl() const { return hash_combine(m_is_negated, m_atom); }

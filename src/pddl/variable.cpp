@@ -29,7 +29,14 @@ namespace loki
 {
 VariableImpl::VariableImpl(size_t identifier, std::string name) : Base(identifier), m_name(std::move(name)) {}
 
-bool VariableImpl::is_structurally_equivalent_to_impl(const VariableImpl& other) const { return (m_name == other.m_name); }
+bool VariableImpl::is_structurally_equivalent_to_impl(const VariableImpl& other) const
+{
+    if (this != &other)
+    {
+        return (m_name == other.m_name);
+    }
+    return true;
+}
 
 size_t VariableImpl::hash_impl() const { return hash_combine(m_name); }
 

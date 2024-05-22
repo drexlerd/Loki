@@ -28,7 +28,11 @@ NumericFluentImpl::NumericFluentImpl(size_t identifier, Function function, doubl
 
 bool NumericFluentImpl::is_structurally_equivalent_to_impl(const NumericFluentImpl& other) const
 {
-    return (m_function == other.m_function) && (m_number == other.m_number);
+    if (this != &other)
+    {
+        return (m_function == other.m_function) && (m_number == other.m_number);
+    }
+    return true;
 }
 
 size_t NumericFluentImpl::hash_impl() const { return hash_combine(m_function, m_number); }

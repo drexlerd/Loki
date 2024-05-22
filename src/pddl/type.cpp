@@ -26,7 +26,11 @@ TypeImpl::TypeImpl(size_t identifier, std::string name, TypeList bases) : Base(i
 
 bool TypeImpl::is_structurally_equivalent_to_impl(const TypeImpl& other) const
 {
-    return (m_name == other.m_name) && (get_sorted_vector(m_bases) == get_sorted_vector(other.m_bases));
+    if (this != &other)
+    {
+        return (m_name == other.m_name) && (get_sorted_vector(m_bases) == get_sorted_vector(other.m_bases));
+    }
+    return true;
 }
 
 size_t TypeImpl::hash_impl() const { return hash_combine(m_name, hash_container(get_sorted_vector(m_bases))); }

@@ -32,7 +32,11 @@ FunctionSkeletonImpl::FunctionSkeletonImpl(size_t identifier, std::string name, 
 
 bool FunctionSkeletonImpl::is_structurally_equivalent_to_impl(const FunctionSkeletonImpl& other) const
 {
-    return (m_name == other.m_name) && (m_parameters == other.m_parameters) && (m_type == other.m_type);
+    if (this != &other)
+    {
+        return (m_name == other.m_name) && (m_parameters == other.m_parameters) && (m_type == other.m_type);
+    }
+    return true;
 }
 
 size_t FunctionSkeletonImpl::hash_impl() const { return hash_combine(m_name, hash_container(m_parameters), m_type); }
