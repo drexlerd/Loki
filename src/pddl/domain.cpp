@@ -98,7 +98,11 @@ void DomainImpl::str_impl(std::ostream& out, const FormattingOptions& options) c
         std::unordered_map<TypeList, TypeList, hash_container_type<TypeList>> subtypes_by_parent_types;
         for (const auto& type : m_types)
         {
-            subtypes_by_parent_types[type->get_bases()].push_back(type);
+            // We do not want to print root type "object"
+            if (!type->get_bases().empty())
+            {
+                subtypes_by_parent_types[type->get_bases()].push_back(type);
+            }
         }
         size_t i = 0;
         for (const auto& [types, sub_types] : subtypes_by_parent_types)

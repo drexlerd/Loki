@@ -61,15 +61,13 @@ extern void test_multiple_definition_object(const Object& object, const Position
 
 extern void test_multiple_definition_predicate(const Predicate& predicate, const Position& node, const Context& context);
 
-extern void test_multiple_definition_type(const Type& type, const Position& position, const Context& context);
-
 extern void test_multiple_definition_function_skeleton(const FunctionSkeleton& function_skeleton, const Position& node, const Context& context);
 
 /**
  * Test reserved keyword
  */
 
-extern void test_reserved_type(const Type& type, const Position& node, const Context& context);
+extern void test_reserved_type(const std::string& type_name, const Position& node, const Context& context);
 
 /**
  * Test mismatch

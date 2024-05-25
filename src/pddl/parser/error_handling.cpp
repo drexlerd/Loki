@@ -177,23 +177,6 @@ void test_multiple_definition_predicate(const Predicate& predicate, const Positi
     }
 }
 
-void test_multiple_definition_type(const Type& type, const Position& position, const Context& context)
-{
-    const auto type_name = type->get_name();
-    const auto binding = context.scopes.top().get_type(type_name);
-    if (binding.has_value())
-    {
-        const auto message_1 = context.scopes.top().get_error_handler()(position, "Defined here:");
-        auto message_2 = std::string("");
-        const auto [_type, position, error_handler] = binding.value();
-        if (position.has_value())
-        {
-            message_2 = error_handler(position.value(), "First defined here:");
-        }
-        throw MultiDefinitionTypeError(type_name, message_1 + message_2);
-    }
-}
-
 void test_multiple_definition_function_skeleton(const FunctionSkeleton& function_skeleton, const Position& node, const Context& context)
 {
     const auto function_name = function_skeleton->get_name();
@@ -215,15 +198,15 @@ void test_multiple_definition_function_skeleton(const FunctionSkeleton& function
  * Test reserved keyword
  */
 
-void test_reserved_type(const Type& type, const Position& node, const Context& context)
+void test_reserved_type(const std::string& type_name, const Position& node, const Context& context)
 {
-    if (type->get_name() == "object")
+    if (type_name == "object")
     {
         throw ReservedTypeError("object", context.scopes.top().get_error_handler()(node, ""));
     }
     // We also reserve type name number although PDDL specification allows it.
     // However, this allows using regular types as function types for simplicity.
-    if (type->get_name() == "number")
+    if (type_name == "number")
     {
         throw ReservedTypeError("number", context.scopes.top().get_error_handler()(node, ""));
     }

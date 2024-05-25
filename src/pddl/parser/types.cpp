@@ -20,6 +20,8 @@
 #include "common.hpp"
 #include "error_handling.hpp"
 
+#include <algorithm>
+
 using namespace std;
 
 namespace loki
@@ -107,63 +109,251 @@ TypeList TypeReferenceTypeVisitor::operator()(const ast::TypeEither& node)
 
 /* TypeDeclarationTypedListOfNamesVisitor */
 
-static void insert_context_information(const Type& type, const ast::Name& node, Context& context)
+CollectParentTypesHierarchyVisitor::CollectParentTypesHierarchyVisitor(Context& context_, std::unordered_map<std::string, Position>& type_last_occurrence_) :
+    context(context_),
+    type_last_occurrence(type_last_occurrence_)
 {
-    context.positions.push_back(type, node);
-    context.scopes.top().insert_type(type->get_name(), type, node);
 }
 
-static Type parse_type_definition(const ast::Name& node, const TypeList& type_list, Context& context)
-{
-    const auto name = parse(node);
-    const auto type = context.factories.get_or_create_type(name, type_list);
-    test_reserved_type(type, node, context);
-    test_multiple_definition_type(type, node, context);
-    insert_context_information(type, node, context);
-    return type;
+std::unordered_set<std::string> CollectParentTypesHierarchyVisitor::operator()(const ast::TypeObject&) { return std::unordered_set<std::string> { "object" }; }
+
+std::unordered_set<std::string> CollectParentTypesHierarchyVisitor::operator()(const ast::TypeNumber&)
+{  //
+    return std::unordered_set<std::string> { "number" };
 }
 
-static TypeList parse_type_definitions(const std::vector<ast::Name>& nodes, const TypeList& parent_type_list, Context& context)
+std::unordered_set<std::string> CollectParentTypesHierarchyVisitor::operator()(const ast::Name& node)
 {
-    auto type_list = TypeList();
-    for (const auto& node : nodes)
+    // Do not allow reserved types as user defined types!
+    const auto type_name = parse(node);
+
+    test_reserved_type(type_name, node, context);
+
+    type_last_occurrence[type_name] = node;
+
+    return std::unordered_set<std::string> { parse(node) };
+}
+
+std::unordered_set<std::string> CollectParentTypesHierarchyVisitor::operator()(const ast::TypeEither& node)
+{
+    auto type_names = std::unordered_set<std::string> {};
+    for (const auto& type_node : node.types)
     {
-        type_list.push_back(parse_type_definition(node, parent_type_list, context));
+        const auto nested_type_names = boost::apply_visitor(CollectParentTypesHierarchyVisitor(context, type_last_occurrence), type_node);
+
+        type_names.insert(nested_type_names.begin(), nested_type_names.end());
     }
-    return type_list;
+
+    return type_names;
 }
 
-TypeDeclarationTypedListOfNamesVisitor::TypeDeclarationTypedListOfNamesVisitor(Context& context_) : context(context_) {}
-
-TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const std::vector<ast::Name>& name_nodes)
+CollectTypesHierarchyVisitor::CollectTypesHierarchyVisitor(Context& context_,
+                                                           std::unordered_map<std::string, std::unordered_set<std::string>>& parent_types_,
+                                                           std::unordered_map<std::string, Position>& type_last_occurrence_) :
+    context(context_),
+    child_types(parent_types_),
+    type_last_occurrence(type_last_occurrence_)
 {
-    // std::vector<ast::Name> has single base type "object"
-    assert(context.scopes.top().get_type("object").has_value());
-    const auto [type_object, _position, _error_handler] = context.scopes.top().get_type("object").value();
-    const auto type_list = parse_type_definitions(name_nodes, TypeList { type_object }, context);
-    return type_list;
 }
 
-TypeList TypeDeclarationTypedListOfNamesVisitor::operator()(const ast::TypedListOfNamesRecursively& typed_list_of_names_recursively_node)
+void CollectTypesHierarchyVisitor::operator()(const std::vector<ast::Name>& nodes)
+{
+    for (const auto& name_node : nodes)
+    {
+        const auto child_type = parse(name_node);
+
+        child_types["object"].insert(child_type);
+
+        test_reserved_type(child_type, name_node, context);
+
+        type_last_occurrence[child_type] = name_node;
+    }
+}
+
+void CollectTypesHierarchyVisitor::operator()(const ast::TypedListOfNamesRecursively& node)
 {
     // requires :typing
-    test_undefined_requirement(RequirementEnum::TYPING, typed_list_of_names_recursively_node, context);
+    test_undefined_requirement(RequirementEnum::TYPING, node, context);
     context.references.untrack(RequirementEnum::TYPING);
-    // TypedListOfNamesRecursively has user defined base types.
-    // Note: we use reference visitor here because parent types must already be declared
-    const auto parent_type_list = boost::apply_visitor(TypeReferenceTypeVisitor(context), typed_list_of_names_recursively_node.type);
-    auto type_list = parse_type_definitions(typed_list_of_names_recursively_node.names, parent_type_list, context);
-    // Recursively add types.
-    const auto additional_types = boost::apply_visitor(*this, typed_list_of_names_recursively_node.typed_list_of_names.get());
-    type_list.insert(type_list.end(), additional_types.begin(), additional_types.end());
-    return type_list;
+
+    const auto parent_types = boost::apply_visitor(CollectParentTypesHierarchyVisitor(context, type_last_occurrence), node.type);
+
+    for (const auto& parent_type : parent_types)
+    {
+        for (const auto& name_node : node.names)
+        {
+            const auto child_type = parse(name_node);
+
+            child_types[parent_type].insert(child_type);
+
+            test_reserved_type(child_type, name_node, context);
+
+            type_last_occurrence[child_type] = name_node;
+        }
+    }
+
+    boost::apply_visitor(CollectTypesHierarchyVisitor(context, child_types, type_last_occurrence), node.typed_list_of_names.get());
 }
 
 /* Other functions */
 
+template<typename T>
+bool is_subseteq(const std::unordered_set<T>& set1, const std::unordered_set<T>& set2)
+{
+    for (const auto& element1 : set1)
+    {
+        if (!set2.count(element1))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 TypeList parse(const ast::Types& types_node, Context& context)
 {
-    return boost::apply_visitor(TypeDeclarationTypedListOfNamesVisitor(context), types_node.typed_list_of_names);
+    auto child_types = std::unordered_map<std::string, std::unordered_set<std::string>> {};
+    auto type_last_occurrence = std::unordered_map<std::string, Position> {};
+
+    boost::apply_visitor(CollectTypesHierarchyVisitor(context, child_types, type_last_occurrence), types_node.typed_list_of_names);
+
+    auto all_types = std::unordered_set<std::string> {};
+    for (const auto& [parent, childs] : child_types)
+    {
+        for (const auto& child : childs)
+        {
+            all_types.insert(child);
+        }
+        all_types.insert(parent);
+    }
+
+    // Construct topological sorting to construct elements at the root first.
+    std::unordered_map<std::string, std::unordered_map<std::string, bool>> l;
+
+    // Initialize matrix to transitively propagate parent child relationship
+    for (const auto& type : all_types)
+    {
+        for (const auto& type2 : all_types)
+        {
+            l[type][type2] = false;
+        }
+    }
+
+    for (const auto& [parent, childs] : child_types)
+    {
+        for (const auto& child : childs)
+        {
+            l[parent][child] = true;
+        }
+    }
+
+    // Transitive closure
+    for (const auto& type1 : all_types)
+    {
+        for (const auto& type2 : all_types)
+        {
+            for (const auto& type3 : all_types)
+            {
+                if (!l.at(type2).at(type3))
+                {
+                    l.at(type2).at(type3) = (l.at(type2).at(type1) && l.at(type1).at(type3));
+                }
+            }
+        }
+    }
+
+    auto remaining = all_types;
+
+    auto count_below_root_types = std::unordered_map<std::string, int> {};
+    for (const auto& type : all_types)
+    {
+        count_below_root_types[type] = 0;
+    }
+    for (const auto& parent : all_types)
+    {
+        for (const auto& child : all_types)
+        {
+            if (l.at(parent).at(child))
+            {
+                ++count_below_root_types[child];
+            }
+        }
+    }
+
+    auto ordering = std::vector<std::string> {};
+
+    while (!remaining.empty())
+    {
+        auto selected = std::vector<std::string> {};
+
+        bool found = false;
+
+        for (const auto& candidate_root_type : remaining)
+        {
+            if (count_below_root_types[candidate_root_type] == 0)
+            {
+                selected.push_back(candidate_root_type);
+                found = true;
+            }
+        }
+        if (!found)
+        {
+            throw std::runtime_error("Types hierarchy contains a circular dependency!");
+        }
+
+        for (const auto& type : selected)
+        {
+            ordering.push_back(type);
+            remaining.erase(type);
+            for (const auto& child : all_types)
+            {
+                if (l.at(type).at(child))
+                {
+                    --count_below_root_types[child];
+                }
+            }
+        }
+    }
+
+    auto base_type_names = std::unordered_map<std::string, std::unordered_set<std::string>> {};
+    for (const auto& parent : all_types)
+    {
+        for (const auto& child : all_types)
+        {
+            if (l.at(parent).at(child))
+            {
+                base_type_names[child].insert(parent);
+            }
+        }
+    }
+
+    auto types = std::unordered_map<std::string, Type> {};
+
+    for (const auto& type_name : ordering)
+    {
+        auto base_types = loki::TypeList {};
+        for (const auto& base_type_name : base_type_names[type_name])
+        {
+            base_types.push_back(types.at(base_type_name));
+        }
+        const auto type = context.factories.get_or_create_type(type_name, base_types);
+
+        types.emplace(type_name, type);
+    }
+
+    auto result = TypeList {};
+    for (const auto& [type_name, type] : types)
+    {
+        result.push_back(type);
+
+        // Base types were already added to the context.
+        if (type_name != "object" && type_name != "number")
+        {
+            context.scopes.top().insert_type(type_name, type, type_last_occurrence.at(type_name));
+        }
+    }
+
+    return result;
 }
 
 }

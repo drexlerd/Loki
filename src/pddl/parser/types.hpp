@@ -59,21 +59,50 @@ public:
     TypeList operator()(const ast::TypeEither& node);
 };
 
-class TypeDeclarationTypedListOfNamesVisitor : boost::static_visitor<TypeList>
+class CollectParentTypesHierarchyVisitor : boost::static_visitor<std::unordered_set<std::string>>
 {
 private:
     Context& context;
+    std::unordered_map<std::string, Position>& type_last_occurrence;
 
 public:
-    TypeDeclarationTypedListOfNamesVisitor(Context& context_);
+    CollectParentTypesHierarchyVisitor(Context& context_, std::unordered_map<std::string, Position>& type_last_occurrence_);
 
-    TypeList operator()(const std::vector<ast::Name>& nodes);
+    std::unordered_set<std::string> operator()(const ast::TypeObject& node);
 
-    TypeList operator()(const ast::TypedListOfNamesRecursively& node);
+    std::unordered_set<std::string> operator()(const ast::TypeNumber& node);
+
+    std::unordered_set<std::string> operator()(const ast::Name& node);
+
+    std::unordered_set<std::string> operator()(const ast::TypeEither& node);
+};
+
+class CollectTypesHierarchyVisitor
+{
+private:
+    Context& context;
+    std::unordered_map<std::string, std::unordered_set<std::string>>& child_types;
+    std::unordered_map<std::string, Position>& type_last_occurrence;
+
+public:
+    CollectTypesHierarchyVisitor(Context& context_,
+                                 std::unordered_map<std::string, std::unordered_set<std::string>>& parent_types_,
+                                 std::unordered_map<std::string, Position>& type_last_occurrence_);
+
+    void operator()(const std::vector<ast::Name>& nodes);
+
+    void operator()(const ast::TypedListOfNamesRecursively& node);
 };
 
 extern TypeList parse(const ast::Types& node, Context& context);
 
 }
+/*
+(:types hoist surface place area - object
+    container depot - place
+    storearea transitarea - area
+    area crate - surface)
+
+*/
 
 #endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_TYPES_HPP_
