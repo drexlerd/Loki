@@ -79,7 +79,10 @@ Term TermReferenceTermVisitor::operator()(const ast::Name& node) const
 Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const
 {
     const auto variable = parse(node, context);
-    test_undefined_variable(variable, node, context);
+    if (!context.allow_free_variables)
+    {
+        test_undefined_variable(variable, node, context);
+    }
     const auto term = context.factories.get_or_create_term_variable(variable);
     context.positions.push_back(term, node);
     return term;

@@ -64,9 +64,14 @@ Axiom parse(const ast::Axiom& node, Context& context)
 {
     test_undefined_requirement(RequirementEnum::DERIVED_PREDICATES, node, context);
     context.references.untrack(RequirementEnum::DERIVED_PREDICATES);
+
+    // Allow free variables in axiom head and body
+    context.allow_free_variables = true;
     const auto literal = parse(node.literal, context);
     test_expected_derived_predicate(literal->get_atom()->get_predicate(), node, context);
     const auto condition = parse(node.goal_descriptor, context);
+    context.allow_free_variables = false;
+
     // Free variables and literal variables become explicit parameters
     auto variables = collect_free_variables(*condition);
     for (const auto& term : literal->get_atom()->get_terms())

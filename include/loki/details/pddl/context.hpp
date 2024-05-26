@@ -36,6 +36,8 @@ struct Context
     ScopeStack& scopes;
     // For strict error checking
     bool strict;
+    // Toggle error checks during parsing
+    bool allow_free_variables;
     // For checking that certain PDDL objects were referenced at least once
     ReferencedPDDLObjects references;
     // For convenience, to avoid an additional parameter during semantic parsing
@@ -47,6 +49,7 @@ struct Context
         positions(positions_),
         scopes(scopes_),
         strict(strict_),
+        allow_free_variables(false),
         references(ReferencedPDDLObjects()),
         requirements(nullptr)
     {
