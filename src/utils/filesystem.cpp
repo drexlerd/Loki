@@ -19,6 +19,7 @@
 
 #include "loki/details/exceptions.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -53,6 +54,9 @@ std::string read_file(const fs::path& file_path)
             line.replace(tabPos, 1, "    ");
             tabPos += 4;  // Move past the new spaces
         }
+
+        // Convert line to lowercase
+        std::transform(line.begin(), line.end(), line.begin(), [](unsigned char c) { return std::tolower(c); });
 
         buffer << line << '\n';
     }
