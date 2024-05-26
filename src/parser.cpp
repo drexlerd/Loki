@@ -36,7 +36,7 @@
 namespace loki
 {
 
-DomainParser::DomainParser(const fs::path& file_path, bool quiet) :
+DomainParser::DomainParser(const fs::path& file_path, bool strict, bool quiet) :
     m_file_path(file_path),
     m_source(loki::read_file(file_path)),
     m_position_cache(nullptr),
@@ -60,7 +60,7 @@ DomainParser::DomainParser(const fs::path& file_path, bool quiet) :
     m_position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, file_path);
     m_scopes = std::make_unique<ScopeStack>(m_position_cache->get_error_handler());
 
-    auto context = Context(m_factories, *m_position_cache, *m_scopes);
+    auto context = Context(m_factories, *m_position_cache, *m_scopes, strict);
     // Initialize global scope
     context.scopes.open_scope();
 
@@ -101,7 +101,7 @@ const PDDLPositionCache& DomainParser::get_position_cache() const { return *m_po
 
 const Domain& DomainParser::get_domain() const { return m_domain; }
 
-ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_parser, bool quiet) :
+ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_parser, bool strict, bool quiet) :
     m_file_path(file_path),
     m_source(loki::read_file(file_path)),
     m_position_cache(nullptr),
@@ -125,7 +125,7 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
     m_position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, file_path);
     m_scopes = std::make_unique<ScopeStack>(m_position_cache->get_error_handler(), domain_parser.m_scopes.get());
 
-    auto context = Context(domain_parser.m_factories, *m_position_cache, *m_scopes);
+    auto context = Context(domain_parser.m_factories, *m_position_cache, *m_scopes, strict);
 
     // Initialize global scope
     context.scopes.open_scope();

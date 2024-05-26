@@ -34,16 +34,19 @@ struct Context
     PDDLPositionCache& positions;
     // For referencing to existing bindings
     ScopeStack& scopes;
+    // For strict error checking
+    bool strict;
     // For checking that certain PDDL objects were referenced at least once
     ReferencedPDDLObjects references;
     // For convenience, to avoid an additional parameter during semantic parsing
     Requirements requirements;
     std::unordered_set<Predicate> derived_predicates;
 
-    Context(PDDLFactories& factories_, PDDLPositionCache& positions_, ScopeStack& scopes_) :
+    Context(PDDLFactories& factories_, PDDLPositionCache& positions_, ScopeStack& scopes_, bool strict_ = false) :
         factories(factories_),
         positions(positions_),
         scopes(scopes_),
+        strict(strict_),
         references(ReferencedPDDLObjects()),
         requirements(nullptr)
     {

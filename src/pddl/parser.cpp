@@ -194,8 +194,11 @@ Problem parse(const ast::Problem& problem_node, Context& context, const Domain& 
     }
 
     // Check references
-    test_object_references(objects, context);
-    test_predicate_references(derived_predicates, context);
+    if (context.strict)
+    {
+        test_object_references(objects, context);
+        test_predicate_references(derived_predicates, context);
+    }
 
     /* Structure section */
     auto axioms = AxiomList();
