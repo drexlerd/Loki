@@ -36,6 +36,8 @@ struct Context
     ScopeStack& scopes;
     // For strict error checking
     bool strict;
+    // For printing warnings
+    bool quiet;
     // Toggle error checks during parsing
     bool allow_free_variables;
     // For checking that certain PDDL objects were referenced at least once
@@ -44,11 +46,12 @@ struct Context
     Requirements requirements;
     std::unordered_set<Predicate> derived_predicates;
 
-    Context(PDDLFactories& factories_, PDDLPositionCache& positions_, ScopeStack& scopes_, bool strict_ = false) :
+    Context(PDDLFactories& factories_, PDDLPositionCache& positions_, ScopeStack& scopes_, bool strict_ = false, bool quiet_ = true) :
         factories(factories_),
         positions(positions_),
         scopes(scopes_),
         strict(strict_),
+        quiet(quiet_),
         allow_free_variables(false),
         references(ReferencedPDDLObjects()),
         requirements(nullptr)

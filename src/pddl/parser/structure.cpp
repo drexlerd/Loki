@@ -54,8 +54,25 @@ Action parse(const ast::Action& node, Context& context)
     track_variable_references(parameter_list, context);
     auto [condition, effect] = parse(node.action_body, context);
     test_variable_references(parameter_list, context);
+    // Remove unused action parameters
+    auto used_parameters = ParameterList {};
+    for (const auto& parameter : parameter_list)
+    {
+        if (!context.references.exists(parameter->get_variable()))
+        {
+            used_parameters.push_back(parameter);
+        }
+        else
+        {
+            if (!context.quiet)
+            {
+                std::cout << "Removed unused parameter " << *parameter << " from action " << name << std::endl;
+            }
+        }
+    }
     context.scopes.close_scope();
-    const auto action = context.factories.get_or_create_action(name, parameter_list.size(), parameter_list, condition, effect);
+
+    const auto action = context.factories.get_or_create_action(name, used_parameters.size(), used_parameters, condition, effect);
     context.positions.push_back(action, node);
     return action;
 }

@@ -60,7 +60,7 @@ DomainParser::DomainParser(const fs::path& file_path, bool strict, bool quiet) :
     m_position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, file_path);
     m_scopes = std::make_unique<ScopeStack>(m_position_cache->get_error_handler());
 
-    auto context = Context(m_factories, *m_position_cache, *m_scopes, strict);
+    auto context = Context(m_factories, *m_position_cache, *m_scopes, strict, quiet);
     // Initialize global scope
     context.scopes.open_scope();
 
@@ -125,7 +125,7 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
     m_position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, file_path);
     m_scopes = std::make_unique<ScopeStack>(m_position_cache->get_error_handler(), domain_parser.m_scopes.get());
 
-    auto context = Context(domain_parser.m_factories, *m_position_cache, *m_scopes, strict);
+    auto context = Context(domain_parser.m_factories, *m_position_cache, *m_scopes, strict, quiet);
 
     // Initialize global scope
     context.scopes.open_scope();
