@@ -227,122 +227,70 @@ TypeList parse(const ast::Types& types_node, Context& context)
         all_types.insert(parent);
     }
 
-    // Construct topological sorting to construct elements at the root first.
-    std::unordered_map<std::string, std::unordered_map<std::string, bool>> l;
-
-    // Initialize matrix to transitively propagate parent child relationship
+    auto parent_types = std::unordered_map<std::string, std::unordered_set<std::string>> {};
     for (const auto& type : all_types)
     {
-        for (const auto& type2 : all_types)
-        {
-            l[type][type2] = false;
-        }
+        parent_types.emplace(type, std::unordered_set<std::string> {});
     }
 
     for (const auto& [parent, childs] : child_types)
     {
         for (const auto& child : childs)
         {
-            l[parent][child] = true;
+            parent_types[child].insert(parent);
         }
     }
 
-    // Transitive closure
-    for (const auto& type1 : all_types)
-    {
-        for (const auto& type2 : all_types)
-        {
-            for (const auto& type3 : all_types)
-            {
-                if (!l.at(type2).at(type3))
-                {
-                    l.at(type2).at(type3) = (l.at(type2).at(type1) && l.at(type1).at(type3));
-                }
-            }
-        }
-    }
+    const auto original_parent_types = parent_types;
+
+    auto instantiated_types = std::unordered_map<std::string, Type> {};
 
     auto remaining = all_types;
 
-    auto count_below_root_types = std::unordered_map<std::string, int> {};
-    for (const auto& type : all_types)
-    {
-        count_below_root_types[type] = 0;
-    }
-    for (const auto& parent : all_types)
-    {
-        for (const auto& child : all_types)
-        {
-            if (l.at(parent).at(child))
-            {
-                ++count_below_root_types[child];
-            }
-        }
-    }
-
-    auto ordering = std::vector<std::string> {};
-
     while (!remaining.empty())
     {
+        // Find types for which all base types are instantiated.
         auto selected = std::vector<std::string> {};
 
         bool found = false;
 
-        for (const auto& candidate_root_type : remaining)
+        for (const auto& type : remaining)
         {
-            if (count_below_root_types[candidate_root_type] == 0)
+            if (parent_types.at(type).empty())
             {
-                selected.push_back(candidate_root_type);
+                selected.push_back(type);
+
                 found = true;
             }
         }
+
         if (!found)
         {
             throw std::runtime_error("Types hierarchy contains a circular dependency!");
         }
 
-        for (const auto& type : selected)
+        // Instantiate the type
+        for (const auto& type_name : selected)
         {
-            ordering.push_back(type);
-            remaining.erase(type);
-            for (const auto& child : all_types)
+            remaining.erase(type_name);
+            for (const auto& child_type : all_types)
             {
-                if (l.at(type).at(child))
-                {
-                    --count_below_root_types[child];
-                }
+                parent_types[child_type].erase(type_name);
             }
-        }
-    }
 
-    auto base_type_names = std::unordered_map<std::string, std::unordered_set<std::string>> {};
-    for (const auto& parent : all_types)
-    {
-        for (const auto& child : all_types)
-        {
-            if (l.at(parent).at(child))
+            auto base_types = TypeList {};
+            for (const auto& base_type_name : original_parent_types.at(type_name))
             {
-                base_type_names[child].insert(parent);
+                base_types.push_back(instantiated_types.at(base_type_name));
             }
+            auto instantiated_type = context.factories.get_or_create_type(type_name, base_types);
+
+            instantiated_types.emplace(type_name, instantiated_type);
         }
-    }
-
-    auto types = std::unordered_map<std::string, Type> {};
-
-    for (const auto& type_name : ordering)
-    {
-        auto base_types = loki::TypeList {};
-        for (const auto& base_type_name : base_type_names[type_name])
-        {
-            base_types.push_back(types.at(base_type_name));
-        }
-        const auto type = context.factories.get_or_create_type(type_name, base_types);
-
-        types.emplace(type_name, type);
     }
 
     auto result = TypeList {};
-    for (const auto& [type_name, type] : types)
+    for (const auto& [type_name, type] : instantiated_types)
     {
         result.push_back(type);
 
