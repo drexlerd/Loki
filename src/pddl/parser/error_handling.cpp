@@ -300,48 +300,60 @@ void test_consistent_object_to_variable_assignment(const ParameterList& paramete
 
 void test_variable_references(const ParameterList& parameter_list, const Context& context)
 {
-    for (const auto& parameter : parameter_list)
+    if (context.strict)
     {
-        if (context.references.exists(parameter->get_variable()))
+        for (const auto& parameter : parameter_list)
         {
-            const auto [variable, position, error_handler] = context.scopes.top().get_variable(parameter->get_variable()->get_name()).value();
-            throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
+            if (context.references.exists(parameter->get_variable()))
+            {
+                const auto [variable, position, error_handler] = context.scopes.top().get_variable(parameter->get_variable()->get_name()).value();
+                throw UnusedVariableError(variable->get_name(), error_handler(position.value(), ""));
+            }
         }
     }
 }
 
 void test_object_references(const ObjectList& object_list, const Context& context)
 {
-    for (const auto& object : object_list)
+    if (context.strict)
     {
-        if (context.references.exists(object))
+        for (const auto& object : object_list)
         {
-            const auto [_object, position, error_handler] = context.scopes.top().get_object(object->get_name()).value();
-            throw UnusedObjectError(object->get_name(), error_handler(position.value(), ""));
+            if (context.references.exists(object))
+            {
+                const auto [_object, position, error_handler] = context.scopes.top().get_object(object->get_name()).value();
+                throw UnusedObjectError(object->get_name(), error_handler(position.value(), ""));
+            }
         }
     }
 }
 
 void test_predicate_references(const PredicateList& predicate_list, const Context& context)
 {
-    for (const auto& predicate : predicate_list)
+    if (context.strict)
     {
-        if (context.references.exists(predicate))
+        for (const auto& predicate : predicate_list)
         {
-            const auto [_predicate, position, error_handler] = context.scopes.top().get_predicate(predicate->get_name()).value();
-            throw UnusedPredicateError(predicate->get_name(), error_handler(position.value(), ""));
+            if (context.references.exists(predicate))
+            {
+                const auto [_predicate, position, error_handler] = context.scopes.top().get_predicate(predicate->get_name()).value();
+                throw UnusedPredicateError(predicate->get_name(), error_handler(position.value(), ""));
+            }
         }
     }
 }
 
 void test_function_skeleton_references(const FunctionSkeletonList& function_skeleton_list, const Context& context)
 {
-    for (const auto& function_skeleton : function_skeleton_list)
+    if (context.strict)
     {
-        if (context.references.exists(function_skeleton))
+        for (const auto& function_skeleton : function_skeleton_list)
         {
-            const auto [_function_skeleton, position, error_handler] = context.scopes.top().get_function_skeleton(function_skeleton->get_name()).value();
-            throw UnusedFunctionSkeletonError(function_skeleton->get_name(), error_handler(position.value(), ""));
+            if (context.references.exists(function_skeleton))
+            {
+                const auto [_function_skeleton, position, error_handler] = context.scopes.top().get_function_skeleton(function_skeleton->get_name()).value();
+                throw UnusedFunctionSkeletonError(function_skeleton->get_name(), error_handler(position.value(), ""));
+            }
         }
     }
 }
