@@ -33,7 +33,12 @@ private:
     ParameterList m_parameters;
     Condition m_condition;
 
-    AxiomImpl(size_t identifier, std::string derived_predicate_name, ParameterList parameters, Condition condition);
+    // Since translations might add additional parameters,
+    // we allow keeping track of parameters that are needed
+    // to ground the atom in the head of the axiom
+    size_t m_num_parameters_to_ground_head;
+
+    AxiomImpl(size_t identifier, std::string derived_predicate_name, ParameterList parameters, Condition condition, size_t num_parameters_to_ground_head);
 
     // Give access to the constructor.
     friend class PDDLFactory<AxiomImpl, Hash<AxiomImpl*>, EqualTo<AxiomImpl*>>;
@@ -50,6 +55,8 @@ public:
     const std::string& get_derived_predicate_name() const;
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
+
+    size_t get_num_parameters_to_ground_head() const;
 };
 
 }

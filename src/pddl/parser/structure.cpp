@@ -114,13 +114,26 @@ Axiom parse(const ast::Axiom& node, Context& context)
     }
 
     auto result_parameters = ParameterList {};
+    // Create parameters for head.
     for (const auto variable : variables)
     {
-        const auto base_types = parameter_variable_to_types.count(variable) ? parameter_variable_to_types.at(variable) :
-                                                                              TypeList { context.factories.get_or_create_type("object", TypeList {}) };
-        result_parameters.push_back(context.factories.get_or_create_parameter(variable, base_types));
+        if (parameter_variable_to_types.count(variable))
+        {
+            const auto base_types = parameter_variable_to_types.at(variable);
+            result_parameters.push_back(context.factories.get_or_create_parameter(variable, base_types));
+        }
     }
-    const auto axiom = context.factories.get_or_create_axiom(predicate_name, result_parameters, condition);
+    const auto num_parameters_to_ground_head = result_parameters.size();
+    // Create parameters for remaining free variables
+    for (const auto variable : variables)
+    {
+        if (!parameter_variable_to_types.count(variable))
+        {
+            const auto base_types = TypeList { context.factories.get_or_create_type("object", TypeList {}) };
+            result_parameters.push_back(context.factories.get_or_create_parameter(variable, base_types));
+        }
+    }
+    const auto axiom = context.factories.get_or_create_axiom(predicate_name, result_parameters, condition, num_parameters_to_ground_head);
     context.positions.push_back(axiom, node);
     return axiom;
 }
