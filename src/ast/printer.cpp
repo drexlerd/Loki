@@ -557,7 +557,7 @@ std::string parse_text(const ast::Action& node, const FormattingOptions& options
 std::string parse_text(const ast::Axiom& node, const FormattingOptions& options)
 {
     std::stringstream ss;
-    ss << std::string(options.indent, ' ') << "(:derived " << parse_text(node.literal, options) << "\n";
+    ss << std::string(options.indent, ' ') << "(:derived " << parse_text(node.atomic_formula_skeleton, options) << "\n";
     FormattingOptions nested_options { options.indent + options.add_indent, options.add_indent };
     ss << std::string(nested_options.indent, ' ') << parse_text(node.goal_descriptor, options) << ")\n";
     return ss.str();

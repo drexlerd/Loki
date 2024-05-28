@@ -40,8 +40,8 @@ Atom parse(const ast::AtomicFormulaOfNamesPredicate& node, Context& context)
     }
     const auto binding = context.scopes.top().get_predicate(name);
     const auto [predicate, _position, _error_handler] = binding.value();
-    test_mismatches_arity_between_predicate_and_terms(predicate, term_list, node, context);
-    test_consistent_object_to_variable_assignment(predicate->get_parameters(), term_list, positions, context);
+    test_arity_compatibility(predicate->get_parameters().size(), term_list.size(), node, context);
+    test_incompatible_grounding(predicate->get_parameters(), term_list, positions, context);
     const auto atom = context.factories.get_or_create_atom(predicate, term_list);
     context.positions.push_back(atom, node);
     return atom;

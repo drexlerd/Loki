@@ -19,6 +19,7 @@
 
 #include "loki/details/ast/ast.hpp"
 #include "loki/details/pddl/exceptions.hpp"
+#include "loki/details/pddl/type.hpp"
 
 namespace loki
 {
@@ -216,30 +217,22 @@ void test_reserved_type(const std::string& type_name, const Position& node, cons
  * Test arity mismatch
  */
 
-void test_mismatches_arity_between_predicate_and_terms(const Predicate& predicate, const TermList& terms, const Position& position, const Context& context)
+void test_arity_compatibility(size_t arity_1, size_t arity_2, const Position& position, const Context& context)
 {
-    if (predicate->get_parameters().size() != terms.size())
+    if (arity_1 != arity_2)
     {
-        throw MismatchedPredicateTermListError(predicate, terms, context.scopes.top().get_error_handler()(position, ""));
+        throw IncompatibleArityError(arity_1, arity_2, context.scopes.top().get_error_handler()(position, ""));
     }
 }
 
-void test_mismatches_arity_between_function_skeleton_and_terms(const FunctionSkeleton& function_skeleton,
-                                                               const TermList& terms,
-                                                               const Position& position,
-                                                               const Context& context)
+void test_parameter_type_compatibility(const Parameter& specialized_parameter,
+                                       const Parameter& generalized_parameter,
+                                       const Position& position,
+                                       const Context& context)
 {
-    if (function_skeleton->get_parameters().size() != terms.size())
+    if (!is_specialized_parameter(specialized_parameter, generalized_parameter))
     {
-        throw MismatchedFunctionSkeletonTermListError(function_skeleton, terms, context.scopes.top().get_error_handler()(position, ""));
-    }
-}
-
-void test_expected_derived_predicate(const Predicate& predicate, const Position& position, const Context& context)
-{
-    if (context.derived_predicates.count(predicate) == 0)
-    {
-        throw ExpectedDerivedPredicate(predicate->get_name(), context.scopes.top().get_error_handler()(position, ""));
+        throw IncompatibleParameterTypesError(specialized_parameter, generalized_parameter, context.scopes.top().get_error_handler()(position, ""));
     }
 }
 
@@ -259,7 +252,7 @@ void test_nonnegative_number(double number, const Position& position, const Cont
  * Test assignment
  */
 
-static void test_object_type_consistent_with_variable(const Parameter& parameter, const Object& object, const Position& position, const Context& context)
+static void test_incompatible_grounding(const Parameter& parameter, const Object& object, const Position& position, const Context& context)
 {
     // Object type must match any of those types.
     const auto& parameter_types = TypeSet(parameter->get_bases().begin(), parameter->get_bases().end());
@@ -274,14 +267,11 @@ static void test_object_type_consistent_with_variable(const Parameter& parameter
     }
     if (!is_consistent)
     {
-        throw IncompatibleObjectToVariableError(object, parameter->get_variable(), context.scopes.top().get_error_handler()(position, ""));
+        throw IncompatibleVariableGroundingError(object, parameter->get_variable(), context.scopes.top().get_error_handler()(position, ""));
     }
 }
 
-void test_consistent_object_to_variable_assignment(const ParameterList& parameters,
-                                                   const TermList& terms,
-                                                   const PositionList& positions,
-                                                   const Context& context)
+void test_incompatible_grounding(const ParameterList& parameters, const TermList& terms, const PositionList& positions, const Context& context)
 {
     assert(parameters.size() == terms.size());
 
@@ -289,7 +279,7 @@ void test_consistent_object_to_variable_assignment(const ParameterList& paramete
     {
         if (const auto term_object = std::get_if<TermObjectImpl>(terms[i]))
         {
-            test_object_type_consistent_with_variable(parameters[i], term_object->get_object(), positions[i], context);
+            test_incompatible_grounding(parameters[i], term_object->get_object(), positions[i], context);
         }
     }
 }

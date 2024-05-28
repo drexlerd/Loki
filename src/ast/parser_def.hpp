@@ -199,7 +199,6 @@ requirements_type const requirements = "requirements";
 types_type const types = "types";
 constants_type const constants = "constants";
 predicates_type const predicates = "predicates";
-derived_predicates_type const derived_predicates = "derived_predicates";
 functions_type const functions = "functions";
 constraints_type const constraints = "constraints";
 structure_type const structure = "structure";
@@ -415,7 +414,7 @@ const auto action_body_def = -(keyword_lit(":precondition") > ((lit('(') >> lit(
 const auto action_def = (lit('(') >> keyword_lit(":action")) > action_symbol > keyword_lit(":parameters") > lit('(') > typed_list_of_variables > lit(')')
                         > action_body >> lit(')');
 
-const auto axiom_def = (lit('(') >> keyword_lit(":derived")) > literal > goal_descriptor > lit(')');
+const auto axiom_def = (lit('(') >> keyword_lit(":derived")) > atomic_formula_skeleton > goal_descriptor > lit(')');
 
 const auto define_keyword_def = keyword_lit("define");
 const auto domain_keyword_def = keyword_lit("domain");
@@ -424,13 +423,12 @@ const auto requirements_def = lit('(') >> keyword_lit(":requirements") > *requir
 const auto types_def = (lit('(') >> keyword_lit(":types") > typed_list_of_names) > lit(')');
 const auto constants_def = (lit('(') >> keyword_lit(":constants") > typed_list_of_names) > lit(')');
 const auto predicates_def = (lit('(') >> keyword_lit(":predicates") > *atomic_formula_skeleton) > lit(')');
-const auto derived_predicates_def = (lit('(') >> keyword_lit(":derived-predicates") > *atomic_formula_skeleton) > lit(')');
 const auto functions_def = (lit('(') >> keyword_lit(":functions") > *function_typed_list_of_atomic_function_skeletons) > lit(')');
 const auto constraints_def = (lit('(') >> keyword_lit(":constraints")) > constraint_goal_descriptor > lit(')');
 const auto structure_def = action | axiom;
 
-const auto domain_def = lit('(') > define_keyword > domain_name > -requirements > -types > -constants > -predicates > -derived_predicates > -functions
-                        > -constraints > *structure > lit(')');
+const auto domain_def = lit('(') > define_keyword > domain_name > -requirements > -types > -constants > -predicates > -functions > -constraints > *structure
+                        > lit(')');
 
 /**
  * Problem
@@ -489,7 +487,7 @@ const auto goal_def = (lit('(') >> keyword_lit(":goal")) > precondition_goal_des
 const auto problem_constraints_def = (lit('(') >> keyword_lit(":constraints")) > preference_constraint_goal_descriptor > lit(')');
 const auto metric_specification_def = (lit('(') >> keyword_lit(":metric")) > (metric_specification_total_cost | metric_specification_general) > lit(')');
 
-const auto problem_def = lit('(') > define_keyword > problem_name > problem_domain_name > -requirements > -objects > -derived_predicates > -initial > -goal
+const auto problem_def = lit('(') > define_keyword > problem_name > problem_domain_name > -requirements > -objects > -predicates > -initial > -goal
                          > -problem_constraints > -metric_specification > -(*axiom) > lit(')');
 
 /**
@@ -609,18 +607,7 @@ BOOST_SPIRIT_DEFINE(effect,
                     action,
                     axiom)
 
-BOOST_SPIRIT_DEFINE(define_keyword,
-                    domain_keyword,
-                    domain_name,
-                    requirements,
-                    types,
-                    constants,
-                    predicates,
-                    derived_predicates,
-                    functions,
-                    constraints,
-                    structure,
-                    domain)
+BOOST_SPIRIT_DEFINE(define_keyword, domain_keyword, domain_name, requirements, types, constants, predicates, functions, constraints, structure, domain)
 
 /**
  * Problem
@@ -731,9 +718,6 @@ struct RequirementAdlClass : x3::annotate_on_success
 {
 };
 struct RequirementDurativeActionsClass : x3::annotate_on_success
-{
-};
-struct RequirementDerivedPredicatesClass : x3::annotate_on_success
 {
 };
 struct RequirementTimedInitialLiteralsClass : x3::annotate_on_success
@@ -1372,7 +1356,6 @@ parser::requirements_type const& requirements() { return parser::requirements; }
 parser::types_type const& types() { return parser::types; }
 parser::constants_type const& constants() { return parser::constants; }
 parser::predicates_type const& predicates() { return parser::predicates; }
-parser::derived_predicates_type const& derived_predicates() { return parser::derived_predicates; }
 parser::functions_type const& functions() { return parser::functions; }
 parser::constraints_type const& constraints() { return parser::constraints; }
 parser::structure_type const& structure() { return parser::structure; }

@@ -36,7 +36,6 @@ private:
     TypeList m_types;
     ObjectList m_constants;
     PredicateList m_predicates;
-    PredicateList m_derived_predicates;
     FunctionSkeletonList m_functions;
     ActionList m_actions;
     AxiomList m_axioms;
@@ -47,7 +46,6 @@ private:
                TypeList types,
                ObjectList constants,
                PredicateList predicates,
-               PredicateList derived_predicates,
                FunctionSkeletonList functions,
                ActionList actions,
                AxiomList axioms);
@@ -69,7 +67,6 @@ public:
     const TypeList& get_types() const;
     const ObjectList& get_constants() const;
     const PredicateList& get_predicates() const;
-    const PredicateList& get_derived_predicates() const;
     const FunctionSkeletonList& get_functions() const;
     const ActionList& get_actions() const;
     const AxiomList& get_axioms() const;

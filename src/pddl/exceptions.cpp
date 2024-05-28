@@ -23,6 +23,7 @@
 #include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/predicate.hpp"
+#include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
 
 #include <string>
@@ -149,42 +150,6 @@ UnsupportedRequirementError::UnsupportedRequirementError(RequirementEnum require
 {
 }
 
-/* Compatibility errors */
-MismatchedPredicateTermListError::MismatchedPredicateTermListError(const Predicate& predicate,
-                                                                   const TermList& term_list,
-                                                                   const std::string& error_handler_output) :
-    SemanticParserError("Mismatched number of terms for predicate \""s + predicate->get_name() + "\" with sizes "s
-                            + std::to_string(predicate->get_parameters().size()) + "!="s + std::to_string(term_list.size()) + "."s,
-                        error_handler_output)
-{
-}
-
-MismatchedFunctionSkeletonTermListError::MismatchedFunctionSkeletonTermListError(const FunctionSkeleton& function_skeleton,
-                                                                                 const TermList& term_list,
-                                                                                 const std::string& error_handler_output) :
-    SemanticParserError("Mismatched number of terms for function skeleton \""s + function_skeleton->get_name() + "\" with sizes "s
-                            + std::to_string(function_skeleton->get_parameters().size()) + "!="s + std::to_string(term_list.size()) + ".",
-                        error_handler_output)
-{
-}
-
-UnexpectedDerivedPredicateInEffect::UnexpectedDerivedPredicateInEffect(const std::string& name, const std::string& error_handler_output) :
-    SemanticParserError("The derived predicate with name \"" + name + "\" is not allowed in an effect.", error_handler_output)
-{
-}
-
-IncompatibleObjectToVariableError::IncompatibleObjectToVariableError(const Object& object, const Variable& variable, const std::string& error_handler_output) :
-    SemanticParserError("The object with name \"" + object->get_name() + "\" does not satisfy the type requirement of variable with name \""
-                            + variable->get_name() + "\".",
-                        error_handler_output)
-{
-}
-
-ExpectedDerivedPredicate::ExpectedDerivedPredicate(const std::string& name, const std::string& error_handler_output) :
-    SemanticParserError("The predicate with name \"" + name + "\" is not a derived predicate.", error_handler_output)
-{
-}
-
 /**
  * Problem
  */
@@ -223,17 +188,31 @@ IllformedFunctionDefinitionMultipleValues::IllformedFunctionDefinitionMultipleVa
 }
 
 /* Compatibility errors */
-MismatchedDomainError::MismatchedDomainError(const Domain& domain, const std::string& domain_name, const std::string& error_handler_output) :
-    SemanticParserError("Mismatched domain names \"" + domain->get_name() + "!=" + domain_name + ".", error_handler_output)
+IncompatibleParameterTypesError::IncompatibleParameterTypesError(const Parameter& specialized_parameter,
+                                                                 const Parameter& generalized_parameter,
+                                                                 const std::string& error_handler_output) :
+    SemanticParserError("The types of the parameter \""s + specialized_parameter->str() + "\" are incompatible with the types of parameter \""
+                            + generalized_parameter->str() + "\"s",
+                        error_handler_output)
 {
 }
 
-MismatchedPredicateObjectListError::MismatchedPredicateObjectListError(const Predicate& predicate,
-                                                                       const ObjectList& object_list,
+IncompatibleArityError::IncompatibleArityError(const size_t arity_1, const size_t arity_2, const std::string& error_handler_output) :
+    SemanticParserError("Mismatched arity "s + std::to_string(arity_1) + "!="s + std::to_string(arity_2) + "."s, error_handler_output)
+{
+}
+
+IncompatibleVariableGroundingError::IncompatibleVariableGroundingError(const Object& object,
+                                                                       const Variable& variable,
                                                                        const std::string& error_handler_output) :
-    SemanticParserError("Mismatched number of terms for predicate \"" + predicate->get_name() + "\" with sizes "
-                            + std::to_string(predicate->get_parameters().size()) + "!=" + std::to_string(object_list.size()) + ".",
+    SemanticParserError("The object with name \"" + object->get_name() + "\" does not satisfy the type requirement of variable with name \""
+                            + variable->get_name() + "\".",
                         error_handler_output)
+{
+}
+
+MismatchedDomainError::MismatchedDomainError(const Domain& domain, const std::string& domain_name, const std::string& error_handler_output) :
+    SemanticParserError("Mismatched domain names \"" + domain->get_name() + "!=" + domain_name + ".", error_handler_output)
 {
 }
 

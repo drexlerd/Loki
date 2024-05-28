@@ -384,7 +384,6 @@ typedef x3::rule<RequirementsClass, ast::Requirements> requirements_type;
 typedef x3::rule<TypesClass, ast::Types> types_type;
 typedef x3::rule<ConstantsClass, ast::Constants> constants_type;
 typedef x3::rule<PredicatesClass, ast::Predicates> predicates_type;
-typedef x3::rule<DerivedPredicatesClass, ast::DerivedPredicates> derived_predicates_type;
 typedef x3::rule<FunctionsClass, ast::Functions> functions_type;
 typedef x3::rule<ConstraintsClass, ast::Constraints> constraints_type;
 typedef x3::rule<StructureClass, ast::Structure> structure_type;
@@ -570,15 +569,7 @@ BOOST_SPIRIT_DECLARE(effect_type,
                      action_type,
                      axiom_type)
 
-BOOST_SPIRIT_DECLARE(domain_name_type,
-                     requirements_type,
-                     types_type,
-                     constants_type,
-                     predicates_type,
-                     derived_predicates_type,
-                     functions_type,
-                     constraints_type,
-                     structure_type)
+BOOST_SPIRIT_DECLARE(domain_name_type, requirements_type, types_type, constants_type, predicates_type, functions_type, constraints_type, structure_type)
 
 BOOST_SPIRIT_DECLARE(basic_function_term_type)
 
@@ -777,7 +768,6 @@ parser::requirements_type const& requirements();
 parser::types_type const& types();
 parser::constants_type const& constants();
 parser::predicates_type const& predicates();
-parser::derived_predicates_type const& derived_predicates();
 parser::functions_type const& functions();
 parser::constraints_type const& constraints();
 parser::structure_type const& structure();

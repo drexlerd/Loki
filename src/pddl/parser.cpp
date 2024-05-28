@@ -85,13 +85,6 @@ Domain parse(const ast::Domain& domain_node, Context& context)
         predicates = parse(domain_node.predicates.value(), context);
     }
     track_predicate_references(predicates, context);
-    /* DerivedPredicates section */
-    auto derived_predicates = PredicateList();
-    if (domain_node.derived_predicates.has_value())
-    {
-        derived_predicates = parse(domain_node.derived_predicates.value(), context);
-    }
-    track_predicate_references(derived_predicates, context);
     /* Functions section */
     auto function_skeletons = FunctionSkeletonList();
     if (domain_node.functions.has_value())
@@ -109,12 +102,10 @@ Domain parse(const ast::Domain& domain_node, Context& context)
     }
     // Check references
     test_predicate_references(predicates, context);
-    test_predicate_references(derived_predicates, context);
     test_function_skeleton_references(function_skeletons, context);
 
     const auto domain =
-        context.factories
-            .get_or_create_domain(domain_name, requirements, types, constants, predicates, derived_predicates, function_skeletons, action_list, axiom_list);
+        context.factories.get_or_create_domain(domain_name, requirements, types, constants, predicates, function_skeletons, action_list, axiom_list);
     context.positions.push_back(domain, domain_node);
     return domain;
 }

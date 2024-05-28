@@ -81,18 +81,6 @@ std::optional<BindingSearchResult<Predicate>> Scope::get_predicate(const std::st
     return std::nullopt;
 }
 
-std::optional<BindingSearchResult<Predicate>> Scope::get_derived_predicate(const std::string& name) const
-{
-    const auto it = m_derived_predicates.find(name);
-    if (it != m_derived_predicates.end())
-        return std::make_tuple(it->second.first, it->second.second, std::cref(m_error_handler));
-    if (m_parent_scope)
-    {
-        return m_parent_scope->get_derived_predicate(name);
-    }
-    return std::nullopt;
-}
-
 void Scope::insert_type(const std::string& name, const Type& element, const std::optional<Position>& position)
 {
     assert(!this->get_type(name));
@@ -121,12 +109,6 @@ void Scope::insert_predicate(const std::string& name, const Predicate& element, 
 {
     assert(!this->get_predicate(name));
     m_predicates.emplace(name, BindingValueType<Predicate>(element, position));
-}
-
-void Scope::insert_derived_predicate(const std::string& name, const Predicate& element, const std::optional<Position>& position)
-{
-    assert(!this->get_derived_predicate(name));
-    m_derived_predicates.emplace(name, BindingValueType<Predicate>(element, position));
 }
 
 const PDDLErrorHandler& Scope::get_error_handler() const { return m_error_handler; }

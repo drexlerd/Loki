@@ -51,6 +51,10 @@ public:
     const TypeList& get_bases() const;
 };
 
+/// @brief Return true iff specialized_parameter is a specialized version of generalized_parameter
+/// by checking whether the types are compatible
+extern bool is_specialized_parameter(const Parameter& specialized_parameter, const Parameter& generalized_parameter);
+
 }
 
 #endif

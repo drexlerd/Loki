@@ -65,7 +65,6 @@ private:
     Bindings<FunctionSkeleton> m_function_skeletons;
     Bindings<Variable> m_variables;
     Bindings<Predicate> m_predicates;
-    Bindings<Predicate> m_derived_predicates;
 
 public:
     Scope(const PDDLErrorHandler& error_handler, const Scope* parent_scope = nullptr);
@@ -82,7 +81,6 @@ public:
     std::optional<BindingSearchResult<FunctionSkeleton>> get_function_skeleton(const std::string& name) const;
     std::optional<BindingSearchResult<Variable>> get_variable(const std::string& name) const;
     std::optional<BindingSearchResult<Predicate>> get_predicate(const std::string& name) const;
-    std::optional<BindingSearchResult<Predicate>> get_derived_predicate(const std::string& name) const;
 
     /// @brief Insert a binding.
     void insert_type(const std::string& name, const Type& type, const std::optional<Position>& position);
@@ -90,7 +88,6 @@ public:
     void insert_function_skeleton(const std::string& name, const FunctionSkeleton& function_skeleton, const std::optional<Position>& position);
     void insert_variable(const std::string& name, const Variable& variable, const std::optional<Position>& position);
     void insert_predicate(const std::string& name, const Predicate& predicate, const std::optional<Position>& position);
-    void insert_derived_predicate(const std::string& name, const Predicate& derived_predicate, const std::optional<Position>& position);
 
     /// @brief Get the error handler to print an error message.
     const PDDLErrorHandler& get_error_handler() const;

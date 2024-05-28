@@ -97,12 +97,5 @@ public:
 extern TypeList parse(const ast::Types& node, Context& context);
 
 }
-/*
-(:types hoist surface place area - object
-    container depot - place
-    storearea transitarea - area
-    area crate - surface)
-
-*/
 
 #endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_TYPES_HPP_

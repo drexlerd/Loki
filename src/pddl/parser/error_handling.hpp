@@ -70,31 +70,23 @@ extern void test_multiple_definition_function_skeleton(const FunctionSkeleton& f
 extern void test_reserved_type(const std::string& type_name, const Position& node, const Context& context);
 
 /**
- * Test mismatch
- */
-
-extern void
-test_mismatches_arity_between_predicate_and_terms(const Predicate& predicate, const TermList& terms, const Position& position, const Context& context);
-
-extern void test_mismatches_arity_between_function_skeleton_and_terms(const FunctionSkeleton& function_skeleton,
-                                                                      const TermList& terms,
-                                                                      const Position& position,
-                                                                      const Context& context);
-
-extern void test_expected_derived_predicate(const Predicate& predicate, const Position& position, const Context& context);
-
-/**
  * Test variable initialization
  */
 
 extern void test_nonnegative_number(double number, const Position& position, const Context& context);
 
 /**
- * Test assignment
+ * Test compatibility
  */
 
-extern void
-test_consistent_object_to_variable_assignment(const ParameterList& parameters, const TermList& terms, const PositionList& positions, const Context& context);
+extern void test_arity_compatibility(size_t arity_1, size_t arity_2, const Position& position, const Context& context);
+
+extern void test_parameter_type_compatibility(const Parameter& specialized_parameter,
+                                              const Parameter& generalized_parameter,
+                                              const Position& position,
+                                              const Context& context);
+
+extern void test_incompatible_grounding(const ParameterList& parameters, const TermList& terms, const PositionList& positions, const Context& context);
 
 /**
  * Test references

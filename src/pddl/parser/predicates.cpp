@@ -58,12 +58,4 @@ PredicateList parse(const ast::Predicates& predicates_node, Context& context)
     return predicate_list;
 }
 
-PredicateList parse(const ast::DerivedPredicates& derived_predicates_node, Context& context)
-{
-    const auto predicate_list = parse_predicate_definitions(derived_predicates_node.atomic_formula_skeletons, context);
-    // Allow distinguishing derived predicates from simple predicates.
-    context.derived_predicates = std::unordered_set<Predicate>(predicate_list.begin(), predicate_list.end());
-    return predicate_list;
-}
-
 }

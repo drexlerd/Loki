@@ -264,9 +264,9 @@ public:
         return actions.get_or_create<ActionImpl>(std::move(name), std::move(original_arity), std::move(parameters), std::move(condition), std::move(effect));
     }
 
-    Axiom get_or_create_axiom(ParameterList parameters, Literal literal, Condition condition)
+    Axiom get_or_create_axiom(std::string derived_predicate_name, ParameterList parameters, Condition condition)
     {
-        return axioms.get_or_create<AxiomImpl>(std::move(parameters), std::move(literal), std::move(condition));
+        return axioms.get_or_create<AxiomImpl>(std::move(derived_predicate_name), std::move(parameters), std::move(condition));
     }
 
     OptimizationMetric get_or_create_optimization_metric(OptimizationMetricEnum metric, FunctionExpression function_expression)
@@ -284,7 +284,6 @@ public:
                                 TypeList types,
                                 ObjectList constants,
                                 PredicateList predicates,
-                                PredicateList derived_predicates,
                                 FunctionSkeletonList functions,
                                 ActionList actions,
                                 AxiomList axioms)
@@ -294,7 +293,6 @@ public:
                                                  std::move(types),
                                                  std::move(constants),
                                                  std::move(predicates),
-                                                 std::move(derived_predicates),
                                                  std::move(functions),
                                                  std::move(actions),
                                                  std::move(axioms));

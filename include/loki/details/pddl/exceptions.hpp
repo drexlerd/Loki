@@ -143,37 +143,6 @@ public:
     explicit UnsupportedRequirementError(RequirementEnum requirement, const std::string& error_handler_output);
 };
 
-/* Compatibility errors */
-class MismatchedPredicateTermListError : public SemanticParserError
-{
-public:
-    MismatchedPredicateTermListError(const Predicate& predicate, const TermList& term_list, const std::string& error_handler_output);
-};
-
-class MismatchedFunctionSkeletonTermListError : public SemanticParserError
-{
-public:
-    MismatchedFunctionSkeletonTermListError(const FunctionSkeleton& function_skeleton, const TermList& term_list, const std::string& error_handler_output);
-};
-
-class IncompatibleObjectToVariableError : public SemanticParserError
-{
-public:
-    IncompatibleObjectToVariableError(const Object& object, const Variable& variable, const std::string& error_handler_output);
-};
-
-class UnexpectedDerivedPredicateInEffect : public SemanticParserError
-{
-public:
-    UnexpectedDerivedPredicateInEffect(const std::string& name, const std::string& error_handler_output);
-};
-
-class ExpectedDerivedPredicate : public SemanticParserError
-{
-public:
-    ExpectedDerivedPredicate(const std::string& name, const std::string& error_handler_output);
-};
-
 /* Object */
 class UnusedObjectError : public SemanticParserError
 {
@@ -210,16 +179,29 @@ public:
 };
 
 /* Compatibility errors */
+
+class IncompatibleArityError : public SemanticParserError
+{
+public:
+    IncompatibleArityError(const size_t arity_1, const size_t arity_2, const std::string& error_handler_output);
+};
+
+class IncompatibleVariableGroundingError : public SemanticParserError
+{
+public:
+    IncompatibleVariableGroundingError(const Object& object, const Variable& variable, const std::string& error_handler_output);
+};
+
+class IncompatibleParameterTypesError : public SemanticParserError
+{
+public:
+    IncompatibleParameterTypesError(const Parameter& specialized_parameter, const Parameter& generalized_parameter, const std::string& error_handler_output);
+};
+
 class MismatchedDomainError : public SemanticParserError
 {
 public:
     MismatchedDomainError(const Domain& domain, const std::string& domain_name, const std::string& error_handler_output);
-};
-
-class MismatchedPredicateObjectListError : public SemanticParserError
-{
-public:
-    MismatchedPredicateObjectListError(const Predicate& predicate, const ObjectList& object_list, const std::string& error_handler_output);
 };
 
 class NegativeCostError : public SemanticParserError

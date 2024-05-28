@@ -28,10 +28,10 @@
 
 namespace loki
 {
-AxiomImpl::AxiomImpl(size_t identifier, ParameterList parameters, Literal literal, Condition condition) :
+AxiomImpl::AxiomImpl(size_t identifier, std::string derived_predicate_name, ParameterList parameters, Condition condition) :
     Base(identifier),
+    m_derived_predicate_name(std::move(derived_predicate_name)),
     m_parameters(std::move(parameters)),
-    m_literal(std::move(literal)),
     m_condition(std::move(condition))
 {
 }
@@ -40,23 +40,29 @@ bool AxiomImpl::is_structurally_equivalent_to_impl(const AxiomImpl& other) const
 {
     if (this != &other)
     {
-        return (m_parameters == other.m_parameters) && (m_literal == other.m_literal) && (m_condition == other.m_condition);
+        return (m_derived_predicate_name == other.m_derived_predicate_name) && (m_parameters == other.m_parameters) && (m_condition == other.m_condition);
     }
     return true;
 }
 
-size_t AxiomImpl::hash_impl() const { return hash_combine(hash_container(m_parameters), m_literal, m_condition); }
+size_t AxiomImpl::hash_impl() const { return hash_combine(m_derived_predicate_name, m_derived_predicate_name, hash_container(m_parameters), m_condition); }
 
 void AxiomImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
     auto nested_options = FormattingOptions { options.indent + options.add_indent, options.add_indent };
-    out << std::string(options.indent, ' ') << "(:derived " << *m_literal << "\n";
+    out << std::string(options.indent, ' ') << "(:derived " << m_derived_predicate_name;
+    for (size_t i = 0; i < m_parameters.size(); ++i)
+    {
+        out << " ";
+        m_parameters[i]->str(out, options);
+    }
+    out << "\n";
     out << std::string(nested_options.indent, ' ');
     std::visit(StringifyVisitor(out, nested_options), *m_condition);
     out << ")\n";
 }
 
-const Literal& AxiomImpl::get_literal() const { return m_literal; }
+const std::string& AxiomImpl::get_derived_predicate_name() const { return m_derived_predicate_name; }
 
 const Condition& AxiomImpl::get_condition() const { return m_condition; }
 

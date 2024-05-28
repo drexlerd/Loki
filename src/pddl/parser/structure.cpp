@@ -21,6 +21,7 @@
 #include "conditions.hpp"
 #include "effects.hpp"
 #include "error_handling.hpp"
+#include "functions.hpp"
 #include "literal.hpp"
 #include "loki/details/pddl/action.hpp"
 #include "loki/details/pddl/axiom.hpp"
@@ -83,27 +84,43 @@ Axiom parse(const ast::Axiom& node, Context& context)
     context.references.untrack(RequirementEnum::DERIVED_PREDICATES);
 
     // Allow free variables in axiom head and body
+    context.scopes.open_scope();
     context.allow_free_variables = true;
-    const auto literal = parse(node.literal, context);
-    test_expected_derived_predicate(literal->get_atom()->get_predicate(), node, context);
+
+    auto predicate_name = parse(node.atomic_formula_skeleton.predicate.name);
+    test_undefined_predicate(predicate_name, node.atomic_formula_skeleton.predicate.name, context);
+
+    const auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.atomic_formula_skeleton.typed_list_of_variables);
+    const auto [predicate, position_, error_handler] = context.scopes.top().get_predicate(predicate_name).value();
+    test_arity_compatibility(parameters.size(), predicate->get_parameters().size(), node.atomic_formula_skeleton, context);
+
     const auto condition = parse(node.goal_descriptor, context);
+
     context.allow_free_variables = false;
+    context.scopes.close_scope();
 
     // Free variables and literal variables become explicit parameters
     auto variables = collect_free_variables(*condition);
-    for (const auto& term : literal->get_atom()->get_terms())
+    auto parameter_variable_to_types = std::unordered_map<Variable, TypeList> {};
+    for (size_t i = 0; i < parameters.size(); ++i)
     {
-        if (const auto term_variable = std::get_if<TermVariableImpl>(term))
-        {
-            variables.insert(term_variable->get_variable());
-        }
+        const auto axiom_parameter = parameters[i];
+        const auto predicate_parameter = predicate->get_parameters()[i];
+
+        test_parameter_type_compatibility(axiom_parameter, predicate_parameter, node.atomic_formula_skeleton, context);
+
+        parameter_variable_to_types[axiom_parameter->get_variable()] = axiom_parameter->get_bases();
+        variables.insert(axiom_parameter->get_variable());
     }
-    auto parameters = ParameterList {};
+
+    auto result_parameters = ParameterList {};
     for (const auto variable : variables)
     {
-        parameters.push_back(context.factories.get_or_create_parameter(variable, TypeList {}));
+        const auto base_types = parameter_variable_to_types.count(variable) ? parameter_variable_to_types.at(variable) :
+                                                                              TypeList { context.factories.get_or_create_type("object", TypeList {}) };
+        result_parameters.push_back(context.factories.get_or_create_parameter(variable, base_types));
     }
-    const auto axiom = context.factories.get_or_create_axiom(parameters, literal, condition);
+    const auto axiom = context.factories.get_or_create_axiom(predicate_name, result_parameters, condition);
     context.positions.push_back(axiom, node);
     return axiom;
 }

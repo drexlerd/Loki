@@ -29,12 +29,11 @@ namespace loki
 class AxiomImpl : public Base<AxiomImpl>
 {
 private:
-    // We make parameters explicit although the textual representation has them implicit.
+    std::string m_derived_predicate_name;
     ParameterList m_parameters;
-    Literal m_literal;
     Condition m_condition;
 
-    AxiomImpl(size_t identifier, ParameterList parameters, Literal literal, Condition condition);
+    AxiomImpl(size_t identifier, std::string derived_predicate_name, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
     friend class PDDLFactory<AxiomImpl, Hash<AxiomImpl*>, EqualTo<AxiomImpl*>>;
@@ -48,8 +47,8 @@ private:
     friend class Base<AxiomImpl>;
 
 public:
+    const std::string& get_derived_predicate_name() const;
     const ParameterList& get_parameters() const;
-    const Literal& get_literal() const;
     const Condition& get_condition() const;
 };
 

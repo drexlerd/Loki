@@ -169,7 +169,6 @@ struct Requirements;
 struct Types;  // : typing
 struct Constants;
 struct Predicates;
-struct DerivedPredicates;
 struct Functions;
 struct Constraints;  // :constraints
 struct Structure;
@@ -915,7 +914,7 @@ struct Action : x3::position_tagged
 /* <derived-def> */
 struct Axiom : x3::position_tagged
 {
-    Literal literal;
+    AtomicFormulaSkeleton atomic_formula_skeleton;
     GoalDescriptor goal_descriptor;
 };
 
@@ -933,11 +932,6 @@ struct Constants : x3::position_tagged
 
 /* <predicates-def> */
 struct Predicates : x3::position_tagged
-{
-    std::vector<AtomicFormulaSkeleton> atomic_formula_skeletons;
-};
-
-struct DerivedPredicates : x3::position_tagged
 {
     std::vector<AtomicFormulaSkeleton> atomic_formula_skeletons;
 };
@@ -974,7 +968,6 @@ struct Domain : x3::position_tagged
     boost::optional<Types> types;
     boost::optional<Constants> constants;
     boost::optional<Predicates> predicates;
-    boost::optional<DerivedPredicates> derived_predicates;
     boost::optional<Functions> functions;
     boost::optional<Constraints> constraints;
     std::vector<Structure> structures;
@@ -1214,7 +1207,7 @@ struct Problem : x3::position_tagged
     ProblemDomainName domain_name;
     boost::optional<Requirements> requirements;
     boost::optional<Objects> objects;
-    boost::optional<DerivedPredicates> derived_predicates;
+    boost::optional<Predicates> derived_predicates;
     boost::optional<Initial> initial;
     boost::optional<Goal> goal;
     boost::optional<ProblemConstraints> constraints;

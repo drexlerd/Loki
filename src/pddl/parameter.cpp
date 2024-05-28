@@ -72,4 +72,16 @@ const Variable& ParameterImpl::get_variable() const { return m_variable; }
 
 const TypeList& ParameterImpl::get_bases() const { return m_types; }
 
+bool is_specialized_parameter(const Parameter& specialized_parameter, const Parameter& generalized_parameter)
+{
+    for (const auto& type : specialized_parameter->get_bases())
+    {
+        if (is_subtype_or_equal(type, generalized_parameter->get_bases()))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 }

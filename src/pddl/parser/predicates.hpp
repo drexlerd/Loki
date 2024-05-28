@@ -28,8 +28,6 @@ namespace loki
 /* PredicateList */
 extern PredicateList parse(const ast::Predicates& predicates_node, Context& context);
 
-extern PredicateList parse(const ast::DerivedPredicates& derived_predicates_node, Context& context);
-
 }
 
 #endif  // LOKI_SRC_DOMAIN_PDDL_PARSER_PREDICATES_HPP_

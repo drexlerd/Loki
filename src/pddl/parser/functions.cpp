@@ -94,7 +94,7 @@ Function parse(const ast::FunctionHead& node, Context& context)
     {
         term_list.push_back(boost::apply_visitor(TermReferenceTermVisitor(context), term_node));
     }
-    test_mismatches_arity_between_function_skeleton_and_terms(function_skeleton, term_list, node, context);
+    test_arity_compatibility(function_skeleton->get_parameters().size(), term_list.size(), node, context);
     const auto function = context.factories.get_or_create_function(function_skeleton, term_list);
     context.positions.push_back(function, node);
     context.references.untrack(function->get_function_skeleton());
@@ -275,7 +275,7 @@ Function parse(const ast::BasicFunctionTerm& node, Context& context)
     {
         term_list.push_back(context.factories.get_or_create_term_object(parse_object_reference(name_node, context)));
     }
-    test_mismatches_arity_between_function_skeleton_and_terms(function_skeleton, term_list, node, context);
+    test_arity_compatibility(function_skeleton->get_parameters().size(), term_list.size(), node, context);
     const auto function = context.factories.get_or_create_function(function_skeleton, term_list);
     context.positions.push_back(function, node);
     return function;

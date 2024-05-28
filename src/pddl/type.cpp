@@ -78,4 +78,18 @@ TypeSet collect_types_from_hierarchy(const TypeList& types)
     collect_types_from_hierarchy_recursively(types, result);
     return result;
 }
+
+bool is_subtype_or_equal(const Type& type, const TypeList& parent_types)
+{
+    const auto parent_types_of_type = collect_types_from_hierarchy(TypeList { type });
+    const auto parent_types_set = TypeSet(parent_types.begin(), parent_types.end());
+    for (const auto& parent_type_of_type : parent_types_of_type)
+    {
+        if (parent_types_set.count(parent_type_of_type))
+        {
+            return true;
+        }
+    }
+    return false;
+}
 }

@@ -44,7 +44,6 @@ struct Context
     ReferencedPDDLObjects references;
     // For convenience, to avoid an additional parameter during semantic parsing
     Requirements requirements;
-    std::unordered_set<Predicate> derived_predicates;
 
     Context(PDDLFactories& factories_, PDDLPositionCache& positions_, ScopeStack& scopes_, bool strict_ = false, bool quiet_ = true) :
         factories(factories_),

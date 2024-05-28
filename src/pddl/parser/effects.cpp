@@ -70,11 +70,6 @@ Effect parse(const ast::EffectProductionLiteral& node, Context& context)
     auto literal = parse(node.literal, context);
     const auto effect = context.factories.get_or_create_effect_literal(literal);
 
-    if (context.derived_predicates.count(literal->get_atom()->get_predicate()))
-    {
-        throw UnexpectedDerivedPredicateInEffect(literal->get_atom()->get_predicate()->get_name(), context.scopes.top().get_error_handler()(node, ""));
-    }
-
     context.positions.push_back(effect, node);
     return effect;
 }
