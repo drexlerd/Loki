@@ -46,6 +46,10 @@ private:
 
 public:
     DomainParser(const fs::path& file_path, bool strict = false, bool quiet = true);
+    DomainParser(const DomainParser& other) = delete;
+    DomainParser& operator=(const DomainParser& other) = delete;
+    DomainParser(DomainParser&& other) = default;
+    DomainParser& operator=(DomainParser&& other) = default;
 
     /// @brief Get factories to create additional PDDL objects.
     PDDLFactories& get_factories();
@@ -73,7 +77,11 @@ private:
     Problem m_problem;
 
 public:
-    explicit ProblemParser(const fs::path& file_path, DomainParser& domain_parser, bool strict = false, bool quiet = true);
+    ProblemParser(const fs::path& file_path, DomainParser& domain_parser, bool strict = false, bool quiet = true);
+    ProblemParser(const ProblemParser& other) = delete;
+    ProblemParser& operator=(const ProblemParser& other) = delete;
+    ProblemParser(ProblemParser&& other) = default;
+    ProblemParser& operator=(ProblemParser&& other) = default;
 
     /// @brief Get position caches to be able to reference back to the input PDDL file.
     const PDDLPositionCache& get_position_cache() const;

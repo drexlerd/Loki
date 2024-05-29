@@ -141,12 +141,10 @@ public:
         problems(ProblemFactory(10))
     {
     }
-
-    // delete copy and move to avoid dangling references.
     PDDLFactories(const PDDLFactories& other) = delete;
     PDDLFactories& operator=(const PDDLFactories& other) = delete;
-    PDDLFactories(PDDLFactories&& other) = delete;
-    PDDLFactories& operator=(PDDLFactories&& other) = delete;
+    PDDLFactories(PDDLFactories&& other) = default;
+    PDDLFactories& operator=(PDDLFactories&& other) = default;
 
     Requirements get_or_create_requirements(RequirementEnumSet requirement_set)
     {

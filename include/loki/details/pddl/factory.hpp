@@ -50,6 +50,10 @@ private:
 
 public:
     explicit PDDLFactory(size_t elements_per_segment) : m_persistent_vector(SegmentedVector<HolderType>(elements_per_segment)) {}
+    PDDLFactory(const PDDLFactory& other) = delete;
+    PDDLFactory& operator=(const PDDLFactory& other) = delete;
+    PDDLFactory(PDDLFactory&& other) = default;
+    PDDLFactory& operator=(PDDLFactory&& other) = default;
 
     /// @brief Returns a pointer to an existing object
     ///        or creates it before if it does not exist.
