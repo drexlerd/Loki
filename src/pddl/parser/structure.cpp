@@ -90,7 +90,7 @@ Axiom parse(const ast::Axiom& node, Context& context)
     auto predicate_name = parse(node.atomic_formula_skeleton.predicate.name);
     test_undefined_predicate(predicate_name, node.atomic_formula_skeleton.predicate.name, context);
 
-    const auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.atomic_formula_skeleton.typed_list_of_variables);
+    auto parameters = boost::apply_visitor(ParameterListVisitor(context), node.atomic_formula_skeleton.typed_list_of_variables);
     const auto [predicate, position_, error_handler] = context.scopes.top().get_predicate(predicate_name).value();
     test_arity_compatibility(parameters.size(), predicate->get_parameters().size(), node.atomic_formula_skeleton, context);
 
@@ -101,7 +101,8 @@ Axiom parse(const ast::Axiom& node, Context& context)
 
     // Free variables and literal variables become explicit parameters
     auto variables = collect_free_variables(*condition);
-    auto parameter_variable_to_types = std::unordered_map<Variable, TypeList> {};
+    // Check whether axiom parameters match derived predicate and
+    // subtract axiom parameter variables from free variables
     for (size_t i = 0; i < parameters.size(); ++i)
     {
         const auto axiom_parameter = parameters[i];
@@ -109,18 +110,16 @@ Axiom parse(const ast::Axiom& node, Context& context)
 
         test_parameter_type_compatibility(axiom_parameter, predicate_parameter, node.atomic_formula_skeleton, context);
 
-        parameter_variable_to_types[axiom_parameter->get_variable()] = axiom_parameter->get_bases();
-        variables.insert(axiom_parameter->get_variable());
+        variables.erase(axiom_parameter->get_variable());
     }
-
-    auto result_parameters = ParameterList {};
+    // Turn free variables not mentioned in the parameter list into parameters
     for (const auto variable : variables)
     {
-        const auto base_types = parameter_variable_to_types.count(variable) ? parameter_variable_to_types.at(variable) :
-                                                                              TypeList { context.factories.get_or_create_type("object", TypeList {}) };
-        result_parameters.push_back(context.factories.get_or_create_parameter(variable, base_types));
+        const auto base_types = TypeList { context.factories.get_or_create_type("object", TypeList {}) };
+
+        parameters.push_back(context.factories.get_or_create_parameter(variable, base_types));
     }
-    const auto axiom = context.factories.get_or_create_axiom(predicate_name, result_parameters, condition);
+    const auto axiom = context.factories.get_or_create_axiom(predicate_name, parameters, condition);
     context.positions.push_back(axiom, node);
     return axiom;
 }
