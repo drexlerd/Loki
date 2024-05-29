@@ -113,13 +113,14 @@ Axiom parse(const ast::Axiom& node, Context& context)
         variables.erase(axiom_parameter->get_variable());
     }
     // Turn free variables not mentioned in the parameter list into parameters
+    // Those parameters must be appended to the parameter list
     for (const auto variable : variables)
     {
         const auto base_types = TypeList { context.factories.get_or_create_type("object", TypeList {}) };
 
         parameters.push_back(context.factories.get_or_create_parameter(variable, base_types));
     }
-    const auto axiom = context.factories.get_or_create_axiom(predicate_name, parameters, condition);
+    const auto axiom = context.factories.get_or_create_axiom(predicate_name, parameters, condition, parameters.size());
     context.positions.push_back(axiom, node);
     return axiom;
 }
