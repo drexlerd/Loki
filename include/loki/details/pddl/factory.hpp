@@ -48,6 +48,15 @@ private:
 
     size_t m_count = 0;
 
+    void range_check(size_t pos) const
+    {
+        if (pos >= size())
+        {
+            throw std::out_of_range("SegmentedVector::range_check: pos (which is " + std::to_string(pos) + ") >= this->size() (which is "
+                                    + std::to_string(size()) + ")");
+        }
+    }
+
 public:
     explicit PDDLFactory(size_t elements_per_segment) : m_persistent_vector(SegmentedVector<HolderType>(elements_per_segment)) {}
     PDDLFactory(const PDDLFactory& other) = delete;
@@ -101,7 +110,17 @@ public:
      */
 
     /// @brief Returns a pointer to an existing object with the given identifier.
-    [[nodiscard]] HolderType const* get(size_t identifier) const { return &(m_persistent_vector.at(identifier)); }
+    [[nodiscard]] HolderType const* operator[](size_t identifier) const
+    {
+        assert(identifier < size());
+        return &(m_persistent_vector.at(identifier));
+    }
+
+    [[nodiscard]] HolderType const* at(size_t identifier) const
+    {
+        range_check(identifier);
+        return &(m_persistent_vector.at(identifier));
+    }
 
     /**
      * Iterators

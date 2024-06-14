@@ -56,6 +56,15 @@ private:
 
     size_t element_index(size_t pos) const { return pos % m_elements_per_segment; }
 
+    void range_check(size_t pos) const
+    {
+        if (pos >= size())
+        {
+            throw std::out_of_range("SegmentedVector::range_check: pos (which is " + std::to_string(pos) + ") >= this->size() (which is "
+                                    + std::to_string(size()) + ")");
+        }
+    }
+
 public:
     explicit SegmentedVector(size_t elements_per_segment) : m_elements_per_segment(elements_per_segment), m_size(0), m_capacity(0) {}
 
@@ -105,13 +114,13 @@ public:
 
     T& at(size_t pos)
     {
-        assert(pos < size());
+        range_check(pos);
         return m_data[segment_index(pos)].at(element_index(pos));
     }
 
     const T& at(size_t pos) const
     {
-        assert(pos < size());
+        range_check(pos);
         return m_data[segment_index(pos)].at(element_index(pos));
     }
 
