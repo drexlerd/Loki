@@ -71,7 +71,7 @@ public:
     /**
      * Modifiers
      */
-    const T& push_back(T value)
+    void push_back(T value)
     {
         // Increase capacity if necessary
         if (m_size >= m_capacity)
@@ -83,9 +83,24 @@ public:
         // Take ownership of memory
         segment.push_back(std::move(value));
         ++m_size;
+    }
 
-        // Fetch return value
-        return segment.back();
+    template<typename... Args>
+    T& emplace_back(Args&&... args)
+    {
+        // Increase capacity if necessary
+        if (m_size >= m_capacity)
+        {
+            increase_capacity();
+        }
+
+        auto& segment = m_data[segment_index(size())];
+
+        // Emplace the new element directly in the segment
+        auto& element = segment.emplace_back(std::forward<Args>(args)...);
+        ++m_size;
+
+        return element;
     }
 
     void pop_back()
@@ -122,6 +137,18 @@ public:
     {
         range_check(pos);
         return m_data[segment_index(pos)].at(element_index(pos));
+    }
+
+    T& back()
+    {
+        range_check(size() - 1);
+        return m_data[segment_index(size() - 1)].at(element_index(size() - 1));
+    }
+
+    const T& back() const
+    {
+        range_check(size() - 1);
+        return m_data[segment_index(size() - 1)].at(element_index(size() - 1));
     }
 
     /**

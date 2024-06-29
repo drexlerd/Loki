@@ -76,8 +76,7 @@ public:
         assert(identifier == m_persistent_vector.size());
 
         // Explicitly call the constructor of T to give exclusive access to the factory.
-        auto element = HolderType(std::move(SubType(identifier, std::forward<Args>(args)...)));
-        const auto* element_ptr = &(m_persistent_vector.push_back(std::move(element)));
+        const auto* element_ptr = &m_persistent_vector.emplace_back(SubType(identifier, std::forward<Args>(args)...));
         // The pointer to the location in persistent memory.
         assert(element_ptr);
 
