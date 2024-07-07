@@ -23,7 +23,7 @@ namespace loki::domain::tests
 
 TEST(LokiTests, SegmentedVectorTest)
 {
-    SegmentedVector<int> vec(2);
+    SegmentedVector<int> vec(1);
     EXPECT_EQ(vec.size(), 0);
     EXPECT_EQ(vec.capacity(), 0);
 
@@ -40,7 +40,7 @@ TEST(LokiTests, SegmentedVectorTest)
     vec.push_back(0);
     EXPECT_EQ(vec.size(), 3);
     EXPECT_EQ(vec[2], 0);
-    EXPECT_EQ(vec.capacity(), 4);
+    EXPECT_EQ(vec.capacity(), 6);
 }
 
 }

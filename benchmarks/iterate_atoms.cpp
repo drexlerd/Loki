@@ -28,7 +28,7 @@ namespace loki::benchmarks
 
 struct AtomAccessResult
 {
-    int atom_identifier;
+    size_t atom_identifier;
     loki::Predicate atom_predicate;
     loki::TermList atom_terms;
 };

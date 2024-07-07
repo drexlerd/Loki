@@ -35,26 +35,28 @@ template<typename T>
 class SegmentedVector
 {
 private:
-    size_t m_elements_per_segment;
+    size_t m_num_element_per_segment;
+    size_t m_maximum_num_elements_per_segment;
 
-    std::vector<std::vector<T>> m_data;
+    std::vector<std::vector<T>> m_segments;
+
+    std::vector<T*> m_accessor;
 
     size_t m_size;
     size_t m_capacity;
 
     void increase_capacity()
     {
+        // Use doubling strategy to make future insertions cheaper.
+        m_num_element_per_segment = std::min(2 * m_num_element_per_segment, m_maximum_num_elements_per_segment);
+
         // Add an additional vector with capacity N
-        m_data.resize(m_data.size() + 1);
+        m_segments.resize(m_segments.size() + 1);
         // This reserve is important to avoid reallocations
-        m_data.back().reserve(m_elements_per_segment);
+        m_segments.back().reserve(m_num_element_per_segment);
         // Increase total capacity
-        m_capacity += m_elements_per_segment;
+        m_capacity += m_num_element_per_segment;
     }
-
-    size_t segment_index(size_t pos) const { return pos / m_elements_per_segment; }
-
-    size_t element_index(size_t pos) const { return pos % m_elements_per_segment; }
 
     void range_check(size_t pos) const
     {
@@ -66,7 +68,13 @@ private:
     }
 
 public:
-    explicit SegmentedVector(size_t elements_per_segment) : m_elements_per_segment(elements_per_segment), m_size(0), m_capacity(0) {}
+    explicit SegmentedVector(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
+        m_num_element_per_segment(initial_num_element_per_segment),
+        m_maximum_num_elements_per_segment(maximum_num_elements_per_segment),
+        m_size(0),
+        m_capacity(0)
+    {
+    }
 
     /**
      * Modifiers
@@ -78,10 +86,11 @@ public:
         {
             increase_capacity();
         }
-        auto& segment = m_data[segment_index(size())];
 
-        // Take ownership of memory
-        segment.push_back(std::move(value));
+        // Take ownership of memory, store address in accessor.
+        auto& segment = m_segments.back();
+        auto& element = segment.emplace_back(std::move(value));
+        m_accessor.push_back(&element);
         ++m_size;
     }
 
@@ -94,10 +103,10 @@ public:
             increase_capacity();
         }
 
-        auto& segment = m_data[segment_index(size())];
-
         // Emplace the new element directly in the segment
+        auto& segment = m_segments.back();
         auto& element = segment.emplace_back(std::forward<Args>(args)...);
+        m_accessor.push_back(&element);
         ++m_size;
 
         return element;
@@ -106,8 +115,9 @@ public:
     void pop_back()
     {
         assert(m_size > 0);
-        auto& segment = m_data[segment_index(size() - 1)];
+        auto& segment = m_segments.back();
         segment.pop_back();
+        m_accessor.pop_back();
         --m_size;
     }
 
@@ -118,97 +128,44 @@ public:
     T& operator[](size_t pos)
     {
         assert(pos < size());
-        return m_data[segment_index(pos)][element_index(pos)];
+        return *m_accessor[pos];
     }
 
     const T& operator[](size_t pos) const
     {
         assert(pos < size());
-        return m_data[segment_index(pos)][element_index(pos)];
+        return *m_accessor[pos];
     }
 
     T& at(size_t pos)
     {
         range_check(pos);
-        return m_data[segment_index(pos)].at(element_index(pos));
+        return *m_accessor[pos];
     }
 
     const T& at(size_t pos) const
     {
         range_check(pos);
-        return m_data[segment_index(pos)].at(element_index(pos));
+        return *m_accessor[pos];
     }
 
     T& back()
     {
         range_check(size() - 1);
-        return m_data[segment_index(size() - 1)].at(element_index(size() - 1));
+        return *m_accessor.back();
     }
 
     const T& back() const
     {
         range_check(size() - 1);
-        return m_data[segment_index(size() - 1)].at(element_index(size() - 1));
+        return *m_accessor.back();
     }
 
-    /**
-     * Iterators
-     */
-    class const_iterator
-    {
-    private:
-        typename std::vector<std::vector<T>>::const_iterator m_outer_iter;
-        typename std::vector<std::vector<T>>::const_iterator m_outer_end;
-        typename std::vector<T>::const_iterator m_inner_iter;
+    auto begin() const { return m_accessor.begin(); }
 
-    public:
-        using difference_type = std::ptrdiff_t;
-        using value_type = T;
-        using pointer = T*;
-        using reference = T&;
-        using iterator_category = std::forward_iterator_tag;
+    auto end() const { return m_accessor.end(); }
 
-        const_iterator(const std::vector<std::vector<T>>& data, bool begin) : m_outer_iter(begin ? data.begin() : data.end()), m_outer_end(data.end())
-        {
-            // Dereferencing end() is undefined behavior, so we must check before initializing the inner iterator.
-            if (begin && m_outer_iter != m_outer_end)
-            {
-                m_inner_iter = m_outer_iter->begin();
-            }
-        }
-
-        [[nodiscard]] decltype(auto) operator*() const { return *m_inner_iter; }
-
-        const_iterator& operator++()
-        {
-            if (++m_inner_iter == m_outer_iter->end())
-            {
-                if (++m_outer_iter != m_outer_end)
-                {
-                    m_inner_iter = m_outer_iter->begin();
-                }
-            }
-            return *this;
-        }
-
-        const_iterator operator++(int)
-        {
-            const_iterator tmp = *this;
-            ++(*this);
-            return tmp;
-        }
-
-        [[nodiscard]] bool operator==(const const_iterator& other) const
-        {
-            return m_outer_iter == other.m_outer_iter && (m_outer_iter == m_outer_end || m_inner_iter == other.m_inner_iter);
-        }
-
-        [[nodiscard]] bool operator!=(const const_iterator& other) const { return !(*this == other); }
-    };
-
-    [[nodiscard]] const_iterator begin() const { return const_iterator(m_data, true); }
-
-    [[nodiscard]] const_iterator end() const { return const_iterator(m_data, false); }
+    size_t num_segments() const { return m_segments.size(); }
 
     /**
      * Capacity

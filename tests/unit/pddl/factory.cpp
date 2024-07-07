@@ -33,7 +33,7 @@ TEST(LokiTests, FactoryIteratorTest)
     auto objects = ObjectList {};
     for (const auto& object : factory)
     {
-        objects.push_back(&object);
+        objects.push_back(object);
     }
 
     EXPECT_EQ(objects.size(), 3);
@@ -49,7 +49,7 @@ TEST(LokiTests, FactoryIteratorEmptyTest)
     auto objects = ObjectList {};
     for (const auto& object : factory)
     {
-        objects.push_back(&object);
+        objects.push_back(object);
     }
 
     EXPECT_EQ(objects.size(), 0);

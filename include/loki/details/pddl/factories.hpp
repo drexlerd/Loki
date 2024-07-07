@@ -44,30 +44,26 @@
 
 namespace loki
 {
-// The segmented sizes are chosen sufficiently large to avoid
-// to avoid allocations and for continuous storage.
-// The values are just educated guesses based on the knowledge
-// that cache line size is 64 Bytes.
-using RequirementFactory = PDDLFactory<RequirementsImpl>;
-using TypeFactory = PDDLFactory<TypeImpl>;
-using VariableFactory = PDDLFactory<VariableImpl>;
-using TermFactory = PDDLFactory<TermImpl>;
-using ObjectFactory = PDDLFactory<ObjectImpl>;
-using AtomFactory = PDDLFactory<AtomImpl>;
-using LiteralFactory = PDDLFactory<LiteralImpl>;
-using ParameterFactory = PDDLFactory<ParameterImpl>;
-using PredicateFactory = PDDLFactory<PredicateImpl>;
-using FunctionExpressionFactory = PDDLFactory<FunctionExpressionImpl>;
-using FunctionFactory = PDDLFactory<FunctionImpl>;
-using FunctionSkeletonFactory = PDDLFactory<FunctionSkeletonImpl>;
-using ConditionFactory = PDDLFactory<ConditionImpl>;
-using EffectFactory = PDDLFactory<EffectImpl>;
-using ActionFactory = PDDLFactory<ActionImpl>;
-using AxiomFactory = PDDLFactory<AxiomImpl>;
-using OptimizationMetricFactory = PDDLFactory<OptimizationMetricImpl>;
-using NumericFluentFactory = PDDLFactory<NumericFluentImpl>;
-using DomainFactory = PDDLFactory<DomainImpl>;
-using ProblemFactory = PDDLFactory<ProblemImpl>;
+using VariadicPDDLFactories = VariadicPDDLFactory<RequirementsImpl,
+                                                  TypeImpl,
+                                                  VariableImpl,
+                                                  TermImpl,
+                                                  ObjectImpl,
+                                                  AtomImpl,
+                                                  LiteralImpl,
+                                                  ParameterImpl,
+                                                  PredicateImpl,
+                                                  FunctionExpressionImpl,
+                                                  FunctionImpl,
+                                                  FunctionSkeletonImpl,
+                                                  ConditionImpl,
+                                                  EffectImpl,
+                                                  ActionImpl,
+                                                  AxiomImpl,
+                                                  OptimizationMetricImpl,
+                                                  NumericFluentImpl,
+                                                  DomainImpl,
+                                                  ProblemImpl>;
 
 using PDDLPositionCache = PositionCache<RequirementsImpl,
                                         TypeImpl,
@@ -94,53 +90,10 @@ using PDDLPositionCache = PositionCache<RequirementsImpl,
 class PDDLFactories
 {
 private:
-    RequirementFactory requirements;
-    TypeFactory types;
-    VariableFactory variables;
-    TermFactory terms;
-    ObjectFactory objects;
-    AtomFactory atoms;
-    AtomFactory derived_atoms;
-    LiteralFactory literals;
-    ParameterFactory parameters;
-    PredicateFactory predicates;
-    FunctionExpressionFactory function_expressions;
-    FunctionFactory functions;
-    FunctionSkeletonFactory function_skeletons;
-    ConditionFactory conditions;
-    EffectFactory effects;
-    ActionFactory actions;
-    AxiomFactory axioms;
-    OptimizationMetricFactory optimization_metrics;
-    NumericFluentFactory numeric_fluents;
-    DomainFactory domains;
-    ProblemFactory problems;
+    VariadicPDDLFactories m_factories;
 
 public:
-    PDDLFactories() :
-        requirements(RequirementFactory(100)),
-        types(TypeFactory(100)),
-        variables(VariableFactory(100)),
-        terms(TermFactory(100)),
-        objects(ObjectFactory(100)),
-        atoms(AtomFactory(100)),
-        derived_atoms(AtomFactory(100)),
-        literals(LiteralFactory(100)),
-        parameters(ParameterFactory(100)),
-        predicates(PredicateFactory(100)),
-        function_expressions(FunctionExpressionFactory(100)),
-        functions(FunctionFactory(100)),
-        function_skeletons(FunctionSkeletonFactory(100)),
-        conditions(ConditionFactory(100)),
-        effects(EffectFactory(100)),
-        actions(ActionFactory(100)),
-        axioms(AxiomFactory(100)),
-        optimization_metrics(OptimizationMetricFactory(10)),
-        numeric_fluents(NumericFluentFactory(100)),
-        domains(DomainFactory(10)),
-        problems(ProblemFactory(10))
-    {
-    }
+    PDDLFactories() : m_factories() {}
     PDDLFactories(const PDDLFactories& other) = delete;
     PDDLFactories& operator=(const PDDLFactories& other) = delete;
     PDDLFactories(PDDLFactories&& other) = default;
@@ -148,133 +101,161 @@ public:
 
     Requirements get_or_create_requirements(RequirementEnumSet requirement_set)
     {
-        return requirements.get_or_create<RequirementsImpl>(std::move(requirement_set));
+        return m_factories.get<RequirementsImpl>().get_or_create<RequirementsImpl>(std::move(requirement_set));
     }
 
-    Type get_or_create_type(std::string name, TypeList bases) { return types.get_or_create<TypeImpl>(std::move(name), std::move(bases)); }
+    Type get_or_create_type(std::string name, TypeList bases) { return m_factories.get<TypeImpl>().get_or_create<TypeImpl>(std::move(name), std::move(bases)); }
 
-    Variable get_or_create_variable(std::string name) { return variables.get_or_create<VariableImpl>(std::move(name)); }
+    Variable get_or_create_variable(std::string name) { return m_factories.get<VariableImpl>().get_or_create<VariableImpl>(std::move(name)); }
 
-    Term get_or_create_term_variable(Variable variable) { return terms.get_or_create<TermVariableImpl>(std::move(variable)); }
+    Term get_or_create_term_variable(Variable variable) { return m_factories.get<TermImpl>().get_or_create<TermVariableImpl>(std::move(variable)); }
 
-    Term get_or_create_term_object(Object object) { return terms.get_or_create<TermObjectImpl>(std::move(object)); }
+    Term get_or_create_term_object(Object object) { return m_factories.get<TermImpl>().get_or_create<TermObjectImpl>(std::move(object)); }
 
-    Object get_or_create_object(std::string name, TypeList types) { return objects.get_or_create<ObjectImpl>(std::move(name), std::move(types)); }
+    Object get_or_create_object(std::string name, TypeList types)
+    {
+        return m_factories.get<ObjectImpl>().get_or_create<ObjectImpl>(std::move(name), std::move(types));
+    }
 
-    Atom get_or_create_atom(Predicate predicate, TermList terms) { return atoms.get_or_create<AtomImpl>(std::move(predicate), std::move(terms)); }
+    Atom get_or_create_atom(Predicate predicate, TermList terms)
+    {
+        return m_factories.get<AtomImpl>().get_or_create<AtomImpl>(std::move(predicate), std::move(terms));
+    }
 
-    Literal get_or_create_literal(bool is_negated, Atom atom) { return literals.get_or_create<LiteralImpl>(std::move(is_negated), std::move(atom)); }
+    Literal get_or_create_literal(bool is_negated, Atom atom)
+    {
+        return m_factories.get<LiteralImpl>().get_or_create<LiteralImpl>(std::move(is_negated), std::move(atom));
+    }
 
     Parameter get_or_create_parameter(Variable variable, TypeList types)
     {
-        return parameters.get_or_create<ParameterImpl>(std::move(variable), std::move(types));
+        return m_factories.get<ParameterImpl>().get_or_create<ParameterImpl>(std::move(variable), std::move(types));
     }
 
     Predicate get_or_create_predicate(std::string name, ParameterList parameters)
     {
-        return predicates.get_or_create<PredicateImpl>(std::move(name), std::move(parameters));
+        return m_factories.get<PredicateImpl>().get_or_create<PredicateImpl>(std::move(name), std::move(parameters));
     }
 
     FunctionExpression get_or_create_function_expression_number(double number)
     {
-        return function_expressions.get_or_create<FunctionExpressionNumberImpl>(number);
+        return m_factories.get<FunctionExpressionImpl>().get_or_create<FunctionExpressionNumberImpl>(number);
     }
 
     FunctionExpression get_or_create_function_expression_binary_operator(BinaryOperatorEnum binary_operator,
                                                                          FunctionExpression left_function_expression,
                                                                          FunctionExpression right_function_expression)
     {
-        return function_expressions.get_or_create<FunctionExpressionBinaryOperatorImpl>(binary_operator,
-                                                                                        std::move(left_function_expression),
-                                                                                        std::move(right_function_expression));
+        return m_factories.get<FunctionExpressionImpl>().get_or_create<FunctionExpressionBinaryOperatorImpl>(binary_operator,
+                                                                                                             std::move(left_function_expression),
+                                                                                                             std::move(right_function_expression));
     }
 
     FunctionExpression get_or_create_function_expression_multi_operator(MultiOperatorEnum multi_operator, FunctionExpressionList function_expressions_)
     {
-        return function_expressions.get_or_create<FunctionExpressionMultiOperatorImpl>(multi_operator, std::move(function_expressions_));
+        return m_factories.get<FunctionExpressionImpl>().get_or_create<FunctionExpressionMultiOperatorImpl>(multi_operator, std::move(function_expressions_));
     }
 
     FunctionExpression get_or_create_function_expression_minus(FunctionExpression function_expression)
     {
-        return function_expressions.get_or_create<FunctionExpressionMinusImpl>(std::move(function_expression));
+        return m_factories.get<FunctionExpressionImpl>().get_or_create<FunctionExpressionMinusImpl>(std::move(function_expression));
     }
 
     FunctionExpression get_or_create_function_expression_function(Function function)
     {
-        return function_expressions.get_or_create<FunctionExpressionFunctionImpl>(std::move(function));
+        return m_factories.get<FunctionExpressionImpl>().get_or_create<FunctionExpressionFunctionImpl>(std::move(function));
     }
 
     Function get_or_create_function(FunctionSkeleton function_skeleton, TermList terms)
     {
-        return functions.get_or_create<FunctionImpl>(std::move(function_skeleton), std::move(terms));
+        return m_factories.get<FunctionImpl>().get_or_create<FunctionImpl>(std::move(function_skeleton), std::move(terms));
     }
 
     FunctionSkeleton get_or_create_function_skeleton(std::string name, ParameterList parameters, Type type)
     {
-        return function_skeletons.get_or_create<FunctionSkeletonImpl>(std::move(name), std::move(parameters), std::move(type));
+        return m_factories.get<FunctionSkeletonImpl>().get_or_create<FunctionSkeletonImpl>(std::move(name), std::move(parameters), std::move(type));
     }
 
-    Condition get_or_create_condition_literal(Literal literal) { return conditions.get_or_create<ConditionLiteralImpl>(std::move(literal)); }
+    Condition get_or_create_condition_literal(Literal literal)
+    {
+        return m_factories.get<ConditionImpl>().get_or_create<ConditionLiteralImpl>(std::move(literal));
+    }
 
-    Condition get_or_create_condition_and(ConditionList conditions_) { return conditions.get_or_create<ConditionAndImpl>(std::move(conditions_)); }
+    Condition get_or_create_condition_and(ConditionList conditions_)
+    {
+        return m_factories.get<ConditionImpl>().get_or_create<ConditionAndImpl>(std::move(conditions_));
+    }
 
-    Condition get_or_create_condition_or(ConditionList conditions_) { return conditions.get_or_create<ConditionOrImpl>(std::move(conditions_)); }
+    Condition get_or_create_condition_or(ConditionList conditions_)
+    {
+        return m_factories.get<ConditionImpl>().get_or_create<ConditionOrImpl>(std::move(conditions_));
+    }
 
-    Condition get_or_create_condition_not(Condition condition) { return conditions.get_or_create<ConditionNotImpl>(std::move(condition)); }
+    Condition get_or_create_condition_not(Condition condition)
+    {
+        return m_factories.get<ConditionImpl>().get_or_create<ConditionNotImpl>(std::move(condition));
+    }
 
     Condition get_or_create_condition_imply(Condition condition_left, Condition condition_right)
     {
-        return conditions.get_or_create<ConditionImplyImpl>(std::move(condition_left), std::move(condition_right));
+        return m_factories.get<ConditionImpl>().get_or_create<ConditionImplyImpl>(std::move(condition_left), std::move(condition_right));
     }
 
     Condition get_or_create_condition_exists(ParameterList parameters, Condition condition)
     {
-        return conditions.get_or_create<ConditionExistsImpl>(std::move(parameters), std::move(condition));
+        return m_factories.get<ConditionImpl>().get_or_create<ConditionExistsImpl>(std::move(parameters), std::move(condition));
     }
 
     Condition get_or_create_condition_forall(ParameterList parameters, Condition condition)
     {
-        return conditions.get_or_create<ConditionForallImpl>(std::move(parameters), std::move(condition));
+        return m_factories.get<ConditionImpl>().get_or_create<ConditionForallImpl>(std::move(parameters), std::move(condition));
     }
 
-    Effect get_or_create_effect_literal(Literal literal) { return effects.get_or_create<EffectLiteralImpl>(std::move(literal)); }
+    Effect get_or_create_effect_literal(Literal literal) { return m_factories.get<EffectImpl>().get_or_create<EffectLiteralImpl>(std::move(literal)); }
 
-    Effect get_or_create_effect_and(EffectList effects_) { return effects.get_or_create<EffectAndImpl>(std::move(effects_)); }
+    Effect get_or_create_effect_and(EffectList effects_) { return m_factories.get<EffectImpl>().get_or_create<EffectAndImpl>(std::move(effects_)); }
 
     Effect get_or_create_effect_numeric(AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression)
     {
-        return effects.get_or_create<EffectNumericImpl>(std::move(assign_operator), std::move(function), std::move(function_expression));
+        return m_factories.get<EffectImpl>().get_or_create<EffectNumericImpl>(std::move(assign_operator), std::move(function), std::move(function_expression));
     }
 
     Effect get_or_create_effect_conditional_forall(ParameterList parameters, Effect effect)
     {
-        return effects.get_or_create<EffectConditionalForallImpl>(std::move(parameters), std::move(effect));
+        return m_factories.get<EffectImpl>().get_or_create<EffectConditionalForallImpl>(std::move(parameters), std::move(effect));
     }
 
     Effect get_or_create_effect_conditional_when(Condition condition, Effect effect)
     {
-        return effects.get_or_create<EffectConditionalWhenImpl>(std::move(condition), std::move(effect));
+        return m_factories.get<EffectImpl>().get_or_create<EffectConditionalWhenImpl>(std::move(condition), std::move(effect));
     }
 
     Action
     get_or_create_action(std::string name, size_t original_arity, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect)
     {
-        return actions.get_or_create<ActionImpl>(std::move(name), std::move(original_arity), std::move(parameters), std::move(condition), std::move(effect));
+        return m_factories.get<ActionImpl>().get_or_create<ActionImpl>(std::move(name),
+                                                                       std::move(original_arity),
+                                                                       std::move(parameters),
+                                                                       std::move(condition),
+                                                                       std::move(effect));
     }
 
     Axiom get_or_create_axiom(std::string derived_predicate_name, ParameterList parameters, Condition condition, size_t num_parameters_to_ground_head)
     {
-        return axioms.get_or_create<AxiomImpl>(std::move(derived_predicate_name), std::move(parameters), std::move(condition), num_parameters_to_ground_head);
+        return m_factories.get<AxiomImpl>().get_or_create<AxiomImpl>(std::move(derived_predicate_name),
+                                                                     std::move(parameters),
+                                                                     std::move(condition),
+                                                                     num_parameters_to_ground_head);
     }
 
     OptimizationMetric get_or_create_optimization_metric(OptimizationMetricEnum metric, FunctionExpression function_expression)
     {
-        return optimization_metrics.get_or_create<OptimizationMetricImpl>(std::move(metric), std::move(function_expression));
+        return m_factories.get<OptimizationMetricImpl>().get_or_create<OptimizationMetricImpl>(std::move(metric), std::move(function_expression));
     }
 
     NumericFluent get_or_create_numeric_fluent(Function function, double number)
     {
-        return numeric_fluents.get_or_create<NumericFluentImpl>(std::move(function), std::move(number));
+        return m_factories.get<NumericFluentImpl>().get_or_create<NumericFluentImpl>(std::move(function), std::move(number));
     }
 
     Domain get_or_create_domain(std::string name,
@@ -286,14 +267,14 @@ public:
                                 ActionList actions,
                                 AxiomList axioms)
     {
-        return domains.get_or_create<DomainImpl>(std::move(name),
-                                                 std::move(requirements),
-                                                 std::move(types),
-                                                 std::move(constants),
-                                                 std::move(predicates),
-                                                 std::move(functions),
-                                                 std::move(actions),
-                                                 std::move(axioms));
+        return m_factories.get<DomainImpl>().get_or_create<DomainImpl>(std::move(name),
+                                                                       std::move(requirements),
+                                                                       std::move(types),
+                                                                       std::move(constants),
+                                                                       std::move(predicates),
+                                                                       std::move(functions),
+                                                                       std::move(actions),
+                                                                       std::move(axioms));
     }
 
     Problem get_or_create_problem(Domain domain,
@@ -307,16 +288,16 @@ public:
                                   std::optional<OptimizationMetric> optimization_metric,
                                   AxiomList axioms)
     {
-        return problems.get_or_create<ProblemImpl>(std::move(domain),
-                                                   std::move(name),
-                                                   std::move(requirements),
-                                                   std::move(objects),
-                                                   std::move(derived_predicates),
-                                                   std::move(initial_literals),
-                                                   std::move(numeric_fluents),
-                                                   std::move(goal_condition),
-                                                   std::move(optimization_metric),
-                                                   std::move(axioms));
+        return m_factories.get<ProblemImpl>().get_or_create<ProblemImpl>(std::move(domain),
+                                                                         std::move(name),
+                                                                         std::move(requirements),
+                                                                         std::move(objects),
+                                                                         std::move(derived_predicates),
+                                                                         std::move(initial_literals),
+                                                                         std::move(numeric_fluents),
+                                                                         std::move(goal_condition),
+                                                                         std::move(optimization_metric),
+                                                                         std::move(axioms));
     }
 };
 

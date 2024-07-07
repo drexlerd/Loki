@@ -46,8 +46,6 @@ private:
     // Use pre-allocated memory to store PDDL object persistent and continuously for improved cache locality.
     SegmentedVector<HolderType> m_persistent_vector;
 
-    size_t m_count = 0;
-
     void range_check(size_t pos) const
     {
         if (pos >= size())
@@ -58,7 +56,10 @@ private:
     }
 
 public:
-    explicit PDDLFactory(size_t elements_per_segment) : m_persistent_vector(SegmentedVector<HolderType>(elements_per_segment)) {}
+    explicit PDDLFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
+        m_persistent_vector(SegmentedVector<HolderType>(initial_num_element_per_segment, maximum_num_elements_per_segment))
+    {
+    }
     PDDLFactory(const PDDLFactory& other) = delete;
     PDDLFactory& operator=(const PDDLFactory& other) = delete;
     PDDLFactory(PDDLFactory&& other) = default;
@@ -72,7 +73,7 @@ public:
         /* Construct and insert the element in persistent memory. */
 
         // Ensure that element with identifier i is stored at position i.
-        size_t identifier = m_count;
+        size_t identifier = m_uniqueness_set.size();
         assert(identifier == m_persistent_vector.size());
 
         // Explicitly call the constructor of T to give exclusive access to the factory.
@@ -87,8 +88,6 @@ public:
             /* Element is unique! */
 
             m_uniqueness_set.emplace(element_ptr);
-            // Validate the element by increasing the identifier to the next free position
-            ++m_count;
         }
         else
         {
@@ -98,8 +97,6 @@ public:
             // Remove duplicate from vector
             m_persistent_vector.pop_back();
         }
-        // Ensure that indexing matches size of uniqueness set.
-        assert(m_uniqueness_set.size() == m_count);
 
         return element_ptr;
     }
@@ -121,54 +118,42 @@ public:
         return &(m_persistent_vector.at(identifier));
     }
 
-    /**
-     * Iterators
-     */
-    class const_iterator
-    {
-    private:
-        typename SegmentedVector<HolderType>::const_iterator m_iter;
+    [[nodiscard]] auto begin() const { return m_persistent_vector.begin(); }
 
-    public:
-        using difference_type = std::ptrdiff_t;
-        using value_type = HolderType;
-        using pointer = HolderType*;
-        using reference = HolderType&;
-        using iterator_category = std::forward_iterator_tag;
+    [[nodiscard]] auto end() const { return m_persistent_vector.end(); }
 
-        const_iterator(const SegmentedVector<HolderType>& persistent_vector, bool begin) : m_iter(begin ? persistent_vector.begin() : persistent_vector.end())
-        {
-        }
-
-        [[nodiscard]] decltype(auto) operator*() const { return *m_iter; }
-
-        const_iterator& operator++()
-        {
-            ++m_iter;
-            return *this;
-        }
-
-        const_iterator operator++(int)
-        {
-            const_iterator tmp = *this;
-            ++(*this);
-            return tmp;
-        }
-
-        [[nodiscard]] bool operator==(const const_iterator& other) const { return m_iter == other.m_iter; }
-
-        [[nodiscard]] bool operator!=(const const_iterator& other) const { return !(*this == other); }
-    };
-
-    [[nodiscard]] const_iterator begin() const { return const_iterator(m_persistent_vector, true); }
-
-    [[nodiscard]] const_iterator end() const { return const_iterator(m_persistent_vector, false); }
+    [[nodiscard]] const SegmentedVector<HolderType>& get_storage() const { return m_persistent_vector; }
 
     /**
      * Capacity
      */
 
-    size_t size() const { return m_count; }
+    [[nodiscard]] size_t size() const { return m_persistent_vector.size(); }
+};
+
+template<typename... Ts>
+class VariadicPDDLFactory
+{
+private:
+    std::tuple<PDDLFactory<Ts>...> m_factories;
+
+public:
+    VariadicPDDLFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
+        m_factories(std::make_tuple(PDDLFactory<Ts>(initial_num_element_per_segment, maximum_num_elements_per_segment)...))
+    {
+    }
+
+    template<typename T>
+    [[nodiscard]] PDDLFactory<T>& get()
+    {
+        return std::get<PDDLFactory<T>>(m_factories);
+    }
+
+    template<typename T>
+    [[nodiscard]] const PDDLFactory<T>& get() const
+    {
+        return std::get<PDDLFactory<T>>(m_factories);
+    }
 };
 
 }
