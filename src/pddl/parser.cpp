@@ -45,7 +45,7 @@ using namespace std;
 namespace loki
 {
 
-Domain parse(const ast::Domain& domain_node, Context& context)
+Domain parse(const fs::path& filepath, const ast::Domain& domain_node, Context& context)
 {
     const auto domain_name = parse(domain_node.domain_name.name);
     /* Requirements section */
@@ -105,12 +105,12 @@ Domain parse(const ast::Domain& domain_node, Context& context)
     test_function_skeleton_references(function_skeletons, context);
 
     const auto domain =
-        context.factories.get_or_create_domain(domain_name, requirements, types, constants, predicates, function_skeletons, action_list, axiom_list);
+        context.factories.get_or_create_domain(filepath, domain_name, requirements, types, constants, predicates, function_skeletons, action_list, axiom_list);
     context.positions.push_back(domain, domain_node);
     return domain;
 }
 
-Problem parse(const ast::Problem& problem_node, Context& context, const Domain& domain)
+Problem parse(const fs::path& filepath, const ast::Problem& problem_node, Context& context, const Domain& domain)
 {
     /* Domain name section */
     const auto domain_name = parse(problem_node.domain_name.name);
@@ -198,7 +198,8 @@ Problem parse(const ast::Problem& problem_node, Context& context, const Domain& 
         }
     }
 
-    const auto problem = context.factories.get_or_create_problem(domain,
+    const auto problem = context.factories.get_or_create_problem(filepath,
+                                                                 domain,
                                                                  problem_name,
                                                                  requirements,
                                                                  objects,

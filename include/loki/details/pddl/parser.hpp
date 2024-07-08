@@ -25,8 +25,8 @@
 namespace loki
 {
 
-extern Domain parse(const ast::Domain& domain_node, Context& context);
-extern Problem parse(const ast::Problem& problem_node, Context& context, const Domain& domain);
+extern Domain parse(const fs::path& filepath, const ast::Domain& domain_node, Context& context);
+extern Problem parse(const fs::path& filepath, const ast::Problem& problem_node, Context& context, const Domain& domain);
 
 }
 

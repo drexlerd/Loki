@@ -22,7 +22,9 @@
 #include "loki/details/pddl/declarations.hpp"
 #include "loki/details/pddl/factory.hpp"
 #include "loki/details/pddl/requirements.hpp"
+#include "loki/details/utils/filesystem.hpp"
 
+#include <optional>
 #include <string>
 
 namespace loki
@@ -31,6 +33,7 @@ namespace loki
 class DomainImpl : public Base<DomainImpl>
 {
 private:
+    std::optional<fs::path> m_filepath;
     std::string m_name;
     Requirements m_requirements;
     TypeList m_types;
@@ -41,6 +44,7 @@ private:
     AxiomList m_axioms;
 
     DomainImpl(size_t identifier,
+               std::optional<fs::path> filepath,
                std::string name,
                Requirements requirements,
                TypeList types,
@@ -62,6 +66,7 @@ private:
     friend class Base<DomainImpl>;
 
 public:
+    const std::optional<fs::path>& get_filepath() const;
     const std::string& get_name() const;
     const Requirements& get_requirements() const;
     const TypeList& get_types() const;

@@ -33,6 +33,7 @@ using namespace std;
 namespace loki
 {
 DomainImpl::DomainImpl(size_t identifier,
+                       std::optional<fs::path> filepath,
                        std::string name,
                        Requirements requirements,
                        TypeList types,
@@ -42,6 +43,7 @@ DomainImpl::DomainImpl(size_t identifier,
                        ActionList actions,
                        AxiomList axioms) :
     Base(identifier),
+    m_filepath(std::move(filepath)),
     m_name(std::move(name)),
     m_requirements(std::move(requirements)),
     m_types(std::move(types)),
@@ -206,6 +208,8 @@ std::ostream& operator<<(std::ostream& os, const DomainImpl& domain)
     domain.str(os, FormattingOptions { 0, 4 });
     return os;
 }
+
+const std::optional<fs::path>& DomainImpl::get_filepath() const { return m_filepath; }
 
 const std::string& DomainImpl::get_name() const { return m_name; }
 

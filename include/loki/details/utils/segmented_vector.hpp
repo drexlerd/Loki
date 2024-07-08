@@ -47,6 +47,8 @@ private:
 
     void increase_capacity()
     {
+        assert(m_num_element_per_segment > 0);
+
         // Use doubling strategy to make future insertions cheaper.
         m_num_element_per_segment = std::min(2 * m_num_element_per_segment, m_maximum_num_elements_per_segment);
 
@@ -68,9 +70,10 @@ private:
     }
 
 public:
-    explicit SegmentedVector(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
+    SegmentedVector(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
         m_num_element_per_segment(initial_num_element_per_segment),
         m_maximum_num_elements_per_segment(maximum_num_elements_per_segment),
+        m_segments(),
         m_size(0),
         m_capacity(0)
     {

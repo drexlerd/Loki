@@ -38,6 +38,7 @@ using namespace std;
 namespace loki
 {
 ProblemImpl::ProblemImpl(size_t identifier,
+                         std::optional<fs::path> filepath,
                          Domain domain,
                          std::string name,
                          Requirements requirements,
@@ -49,6 +50,7 @@ ProblemImpl::ProblemImpl(size_t identifier,
                          std::optional<OptimizationMetric> optimization_metric,
                          AxiomList axioms) :
     Base(identifier),
+    m_filepath(std::move(filepath)),
     m_domain(std::move(domain)),
     m_name(std::move(name)),
     m_requirements(std::move(requirements)),
@@ -204,6 +206,8 @@ std::ostream& operator<<(std::ostream& os, const ProblemImpl& problem)
     problem.str(os, FormattingOptions { 0, 4 });
     return os;
 }
+
+const std::optional<fs::path>& ProblemImpl::get_filepath() const { return m_filepath; }
 
 const Domain& ProblemImpl::get_domain() const { return m_domain; }
 

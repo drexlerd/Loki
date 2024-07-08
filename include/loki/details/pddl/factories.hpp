@@ -258,7 +258,8 @@ public:
         return m_factories.get<NumericFluentImpl>().get_or_create<NumericFluentImpl>(std::move(function), std::move(number));
     }
 
-    Domain get_or_create_domain(std::string name,
+    Domain get_or_create_domain(std::optional<fs::path> filepath,
+                                std::string name,
                                 Requirements requirements,
                                 TypeList types,
                                 ObjectList constants,
@@ -267,7 +268,8 @@ public:
                                 ActionList actions,
                                 AxiomList axioms)
     {
-        return m_factories.get<DomainImpl>().get_or_create<DomainImpl>(std::move(name),
+        return m_factories.get<DomainImpl>().get_or_create<DomainImpl>(std::move(filepath),
+                                                                       std::move(name),
                                                                        std::move(requirements),
                                                                        std::move(types),
                                                                        std::move(constants),
@@ -277,7 +279,8 @@ public:
                                                                        std::move(axioms));
     }
 
-    Problem get_or_create_problem(Domain domain,
+    Problem get_or_create_problem(std::optional<fs::path> filepath,
+                                  Domain domain,
                                   std::string name,
                                   Requirements requirements,
                                   ObjectList objects,
@@ -288,7 +291,8 @@ public:
                                   std::optional<OptimizationMetric> optimization_metric,
                                   AxiomList axioms)
     {
-        return m_factories.get<ProblemImpl>().get_or_create<ProblemImpl>(std::move(domain),
+        return m_factories.get<ProblemImpl>().get_or_create<ProblemImpl>(std::move(filepath),
+                                                                         std::move(domain),
                                                                          std::move(name),
                                                                          std::move(requirements),
                                                                          std::move(objects),

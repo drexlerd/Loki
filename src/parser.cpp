@@ -36,28 +36,28 @@
 namespace loki
 {
 
-DomainParser::DomainParser(const fs::path& file_path, bool strict, bool quiet) :
-    m_file_path(file_path),
-    m_source(loki::read_file(file_path)),
+DomainParser::DomainParser(const fs::path& filepath, bool strict, bool quiet) :
+    m_filepath(filepath),
+    m_source(loki::read_file(filepath)),
     m_position_cache(nullptr),
     m_scopes(nullptr)
 {
     const auto start = std::chrono::high_resolution_clock::now();
     if (!quiet)
     {
-        std::cout << "Started parsing domain file: " << file_path << std::endl;
+        std::cout << "Started parsing domain file: " << filepath << std::endl;
     }
 
     /* Parse the AST */
     auto node = ast::Domain();
-    auto x3_error_handler = X3ErrorHandler(m_source.begin(), m_source.end(), file_path);
+    auto x3_error_handler = X3ErrorHandler(m_source.begin(), m_source.end(), filepath);
     bool success = parse_ast(m_source, domain(), node, x3_error_handler.get_error_handler());
     if (!success)
     {
         throw SyntaxParserError("", x3_error_handler.get_error_stream().str());
     }
 
-    m_position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, file_path);
+    m_position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, filepath);
     m_scopes = std::make_unique<ScopeStack>(m_position_cache->get_error_handler());
 
     auto context = Context(m_factories, *m_position_cache, *m_scopes, strict, quiet);
@@ -79,7 +79,7 @@ DomainParser::DomainParser(const fs::path& file_path, bool strict, bool quiet) :
     const auto equal_predicate = context.factories.get_or_create_predicate("=", binary_parameterlist);
     context.scopes.top().insert_predicate("=", equal_predicate, {});
 
-    m_domain = parse(node, context);
+    m_domain = parse(filepath, node, context);
 
     // Only the global scope remains
     assert(context.scopes.get_stack().size() == 1);
@@ -101,28 +101,28 @@ const PDDLPositionCache& DomainParser::get_position_cache() const { return *m_po
 
 const Domain& DomainParser::get_domain() const { return m_domain; }
 
-ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_parser, bool strict, bool quiet) :
-    m_file_path(file_path),
-    m_source(loki::read_file(file_path)),
+ProblemParser::ProblemParser(const fs::path& filepath, DomainParser& domain_parser, bool strict, bool quiet) :
+    m_filepath(filepath),
+    m_source(loki::read_file(filepath)),
     m_position_cache(nullptr),
     m_scopes(nullptr)
 {
     const auto start = std::chrono::high_resolution_clock::now();
     if (!quiet)
     {
-        std::cout << "Started parsing problem file: " << file_path << std::endl;
+        std::cout << "Started parsing problem file: " << filepath << std::endl;
     }
 
     /* Parse the AST */
     auto problem_node = ast::Problem();
-    auto x3_error_handler = X3ErrorHandler(m_source.begin(), m_source.end(), file_path);
+    auto x3_error_handler = X3ErrorHandler(m_source.begin(), m_source.end(), filepath);
     bool success = parse_ast(m_source, problem(), problem_node, x3_error_handler.get_error_handler());
     if (!success)
     {
         throw SyntaxParserError("", x3_error_handler.get_error_stream().str());
     }
 
-    m_position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, file_path);
+    m_position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, filepath);
     m_scopes = std::make_unique<ScopeStack>(m_position_cache->get_error_handler(), domain_parser.m_scopes.get());
 
     auto context = Context(domain_parser.m_factories, *m_position_cache, *m_scopes, strict, quiet);
@@ -130,7 +130,7 @@ ProblemParser::ProblemParser(const fs::path& file_path, DomainParser& domain_par
     // Initialize global scope
     context.scopes.open_scope();
 
-    m_problem = parse(problem_node, context, domain_parser.get_domain());
+    m_problem = parse(filepath, problem_node, context, domain_parser.get_domain());
 
     // Only the global scope remains
     assert(context.scopes.get_stack().size() == 1);

@@ -28,7 +28,7 @@ namespace loki
 class DomainParser
 {
 private:
-    fs::path m_file_path;
+    fs::path m_filepath;
     // We need to keep the source in memory for error reporting.
     std::string m_source;
 
@@ -64,7 +64,7 @@ public:
 class ProblemParser
 {
 private:
-    fs::path m_file_path;
+    fs::path m_filepath;
     // We need to keep the source in memory for error reporting.
     std::string m_source;
 
