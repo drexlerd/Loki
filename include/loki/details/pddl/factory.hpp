@@ -41,9 +41,10 @@ class PDDLFactory
 {
 private:
     // We use an unordered_set to test for uniqueness.
-    // We use pointers to the persistent memory to reduce allocations.
+    // We use pointers to the persistent memory.
     std::unordered_set<const HolderType*, Hash, EqualTo> m_uniqueness_set;
-    // Use pre-allocated memory to store PDDL object persistent and continuously for improved cache locality.
+
+    // Use pre-allocated memory to store PDDL object persistent.
     SegmentedVector<HolderType> m_persistent_vector;
 
     void range_check(size_t pos) const
