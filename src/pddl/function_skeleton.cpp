@@ -19,13 +19,14 @@
 
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/utils/hash.hpp"
+#include "loki/details/utils/collections.hpp"
 
 namespace loki
 {
 FunctionSkeletonImpl::FunctionSkeletonImpl(size_t identifier, std::string name, ParameterList parameters, Type type) :
     Base(identifier),
     m_name(std::move(name)),
-    m_parameters(std::move(parameters)),
+    m_parameters(parameters),
     m_type(std::move(type))
 {
 }
@@ -34,12 +35,12 @@ bool FunctionSkeletonImpl::is_structurally_equivalent_to_impl(const FunctionSkel
 {
     if (this != &other)
     {
-        return (m_name == other.m_name) && (m_parameters == other.m_parameters) && (m_type == other.m_type);
+        return (m_name == other.m_name) && (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters)) && (m_type == other.m_type);
     }
     return true;
 }
 
-size_t FunctionSkeletonImpl::hash_impl() const { return hash_combine(m_name, hash_container(m_parameters), m_type); }
+size_t FunctionSkeletonImpl::hash_impl() const { return HashCombiner()(m_name, get_sorted_vector(m_parameters), m_type); }
 
 void FunctionSkeletonImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {

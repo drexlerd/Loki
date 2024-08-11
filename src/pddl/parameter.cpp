@@ -42,7 +42,7 @@ bool ParameterImpl::is_structurally_equivalent_to_impl(const ParameterImpl& othe
     return true;
 }
 
-size_t ParameterImpl::hash_impl() const { return hash_combine(m_variable, hash_container(get_sorted_vector(m_types))); }
+size_t ParameterImpl::hash_impl() const { return HashCombiner()(m_variable, get_sorted_vector(m_types)); }
 
 void ParameterImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const
 {

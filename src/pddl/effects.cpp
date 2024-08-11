@@ -54,7 +54,7 @@ bool EffectLiteralImpl::is_structurally_equivalent_to_impl(const EffectLiteralIm
     return true;
 }
 
-size_t EffectLiteralImpl::hash_impl() const { return std::hash<Literal>()(m_literal); }
+size_t EffectLiteralImpl::hash_impl() const { return HashCombiner()(m_literal); }
 
 void EffectLiteralImpl::str_impl(std::ostream& out, const FormattingOptions& options) const { m_literal->str(out, options); }
 
@@ -71,7 +71,7 @@ bool EffectAndImpl::is_structurally_equivalent_to_impl(const EffectAndImpl& othe
     return true;
 }
 
-size_t EffectAndImpl::hash_impl() const { return hash_container(get_sorted_vector(m_effects)); }
+size_t EffectAndImpl::hash_impl() const { return HashCombiner()(get_sorted_vector(m_effects)); }
 
 void EffectAndImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -105,7 +105,7 @@ bool EffectNumericImpl::is_structurally_equivalent_to_impl(const EffectNumericIm
     return true;
 }
 
-size_t EffectNumericImpl::hash_impl() const { return hash_combine(m_assign_operator, m_function, m_function_expression); }
+size_t EffectNumericImpl::hash_impl() const { return HashCombiner()(m_assign_operator, m_function, m_function_expression); }
 
 void EffectNumericImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -134,12 +134,12 @@ bool EffectConditionalForallImpl::is_structurally_equivalent_to_impl(const Effec
 {
     if (this != &other)
     {
-        return (m_parameters == other.m_parameters) && (m_effect == other.m_effect);
+        return (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters)) && (m_effect == other.m_effect);
     }
     return true;
 }
 
-size_t EffectConditionalForallImpl::hash_impl() const { return hash_combine(hash_container(m_parameters), m_effect); }
+size_t EffectConditionalForallImpl::hash_impl() const { return HashCombiner()(get_sorted_vector(m_parameters), m_effect); }
 
 void EffectConditionalForallImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -175,7 +175,7 @@ bool EffectConditionalWhenImpl::is_structurally_equivalent_to_impl(const EffectC
     return true;
 }
 
-size_t EffectConditionalWhenImpl::hash_impl() const { return hash_combine(m_condition, m_effect); }
+size_t EffectConditionalWhenImpl::hash_impl() const { return HashCombiner()(m_condition, m_effect); }
 
 void EffectConditionalWhenImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {

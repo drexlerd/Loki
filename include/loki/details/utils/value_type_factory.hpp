@@ -15,10 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_PDDL_FACTORY_HPP_
-#define LOKI_INCLUDE_LOKI_PDDL_FACTORY_HPP_
+#ifndef LOKI_INCLUDE_LOKI_UTILS_VALUE_TYPE_FACTORY_HPP_
+#define LOKI_INCLUDE_LOKI_UTILS_VALUE_TYPE_FACTORY_HPP_
 
-#include "loki/details/pddl/utils.hpp"
+#include "loki/details/utils/hash.hpp"
+#include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/segmented_vector.hpp"
 
 #include <memory>
@@ -30,14 +31,15 @@
 namespace loki
 {
 
-/// @brief The PDDLFactory manages unique objects in a persistent
-///        and efficient manner, utilizing a combination of unordered_set for
-///        uniqueness checks and SegmentedVector for continuous and
-///        cache-efficient storage.
-/// @tparam HolderType is the nested type which can be an std::variant.
-/// @tparam N is the number of elements per segment
-template<typename HolderType, typename Hash = Hash<HolderType*>, typename EqualTo = EqualTo<HolderType*>>
-class PDDLFactory
+/// @brief `UniqueValueTypeFactory` manages unique creation of objects
+/// in a persistent and efficient manner, utilizing a combination of unordered_set for
+/// uniqueness checks and SegmentedVector for continuous and cache-efficient storage of value types.
+/// @tparam HolderType is the holder value type which can be an std::variant.
+/// Note that using a base class value type will result in object slicing.
+/// @tparam Hash the hash function, default takes the hash value of the dereferenced object.
+/// @tparam EqualTo the comparison function, default compares the dereferenced objects.
+template<typename HolderType, typename Hash = Hash<const HolderType*, true>, typename EqualTo = EqualTo<const HolderType*, true>>
+class UniqueValueTypeFactory
 {
 private:
     // We use an unordered_set to test for uniqueness.
@@ -57,19 +59,19 @@ private:
     }
 
 public:
-    PDDLFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
+    UniqueValueTypeFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
         m_persistent_vector(SegmentedVector<HolderType>(initial_num_element_per_segment, maximum_num_elements_per_segment))
     {
     }
-    PDDLFactory(const PDDLFactory& other) = delete;
-    PDDLFactory& operator=(const PDDLFactory& other) = delete;
-    PDDLFactory(PDDLFactory&& other) = default;
-    PDDLFactory& operator=(PDDLFactory&& other) = default;
+    UniqueValueTypeFactory(const UniqueValueTypeFactory& other) = delete;
+    UniqueValueTypeFactory& operator=(const UniqueValueTypeFactory& other) = delete;
+    UniqueValueTypeFactory(UniqueValueTypeFactory&& other) = default;
+    UniqueValueTypeFactory& operator=(UniqueValueTypeFactory&& other) = default;
 
     /// @brief Returns a pointer to an existing object
     ///        or creates it before if it does not exist.
     template<typename SubType, typename... Args>
-    [[nodiscard]] HolderType const* get_or_create(Args&&... args)
+    HolderType const* get_or_create(Args&&... args)
     {
         /* Construct and insert the element in persistent memory. */
 
@@ -107,53 +109,53 @@ public:
      */
 
     /// @brief Returns a pointer to an existing object with the given identifier.
-    [[nodiscard]] HolderType const* operator[](size_t identifier) const
+    HolderType const* operator[](size_t identifier) const
     {
         assert(identifier < size());
         return &(m_persistent_vector.at(identifier));
     }
 
-    [[nodiscard]] HolderType const* at(size_t identifier) const
+    HolderType const* at(size_t identifier) const
     {
         range_check(identifier);
         return &(m_persistent_vector.at(identifier));
     }
 
-    [[nodiscard]] auto begin() const { return m_persistent_vector.begin(); }
+    auto begin() const { return m_persistent_vector.begin(); }
 
-    [[nodiscard]] auto end() const { return m_persistent_vector.end(); }
+    auto end() const { return m_persistent_vector.end(); }
 
-    [[nodiscard]] const SegmentedVector<HolderType>& get_storage() const { return m_persistent_vector; }
+    const SegmentedVector<HolderType>& get_storage() const { return m_persistent_vector; }
 
     /**
      * Capacity
      */
 
-    [[nodiscard]] size_t size() const { return m_persistent_vector.size(); }
+    size_t size() const { return m_persistent_vector.size(); }
 };
 
 template<typename... Ts>
-class VariadicPDDLFactory
+class VariadicUniqueValueTypeFactory
 {
 private:
-    std::tuple<PDDLFactory<Ts>...> m_factories;
+    std::tuple<UniqueValueTypeFactory<Ts>...> m_factories;
 
 public:
-    VariadicPDDLFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
-        m_factories(std::make_tuple(PDDLFactory<Ts>(initial_num_element_per_segment, maximum_num_elements_per_segment)...))
+    VariadicUniqueValueTypeFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
+        m_factories(std::make_tuple(UniqueValueTypeFactory<Ts>(initial_num_element_per_segment, maximum_num_elements_per_segment)...))
     {
     }
 
     template<typename T>
-    [[nodiscard]] PDDLFactory<T>& get()
+    UniqueValueTypeFactory<T>& get()
     {
-        return std::get<PDDLFactory<T>>(m_factories);
+        return std::get<UniqueValueTypeFactory<T>>(m_factories);
     }
 
     template<typename T>
-    [[nodiscard]] const PDDLFactory<T>& get() const
+    const UniqueValueTypeFactory<T>& get() const
     {
-        return std::get<PDDLFactory<T>>(m_factories);
+        return std::get<UniqueValueTypeFactory<T>>(m_factories);
     }
 };
 

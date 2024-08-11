@@ -36,7 +36,7 @@ bool AtomImpl::is_structurally_equivalent_to_impl(const AtomImpl& other) const
     return true;
 }
 
-size_t AtomImpl::hash_impl() const { return hash_combine(m_predicate, hash_container(m_terms)); }
+size_t AtomImpl::hash_impl() const { return HashCombiner()(m_predicate, m_terms); }
 
 void AtomImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {

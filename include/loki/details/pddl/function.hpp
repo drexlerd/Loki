@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/factory.hpp"
+#include "loki/details/utils/value_type_factory.hpp"
 
 #include <string>
 
@@ -35,7 +35,7 @@ private:
     FunctionImpl(size_t identifier, FunctionSkeleton function_skeleton, TermList terms);
 
     // Give access to the constructor.
-    friend class PDDLFactory<FunctionImpl, Hash<FunctionImpl*>, EqualTo<FunctionImpl*>>;
+    friend class UniqueValueTypeFactory<FunctionImpl, Hash<const FunctionImpl*, true>, EqualTo<const FunctionImpl*, true>>;
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const FunctionImpl& other) const;

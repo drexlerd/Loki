@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/factory.hpp"
+#include "loki/details/utils/value_type_factory.hpp"
 
 #include <optional>
 #include <string>
@@ -45,7 +45,7 @@ private:
                std::optional<Effect> effect);
 
     // Give access to the constructor.
-    friend class PDDLFactory<ActionImpl, Hash<ActionImpl*>, EqualTo<ActionImpl*>>;
+    friend class UniqueValueTypeFactory<ActionImpl, Hash<const ActionImpl*, true>, EqualTo<const ActionImpl*, true>>;
 
     /// @brief Test for structural equivalence
     bool is_structurally_equivalent_to_impl(const ActionImpl& other) const;

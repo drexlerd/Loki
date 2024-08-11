@@ -21,6 +21,7 @@
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
 #include "loki/details/utils/hash.hpp"
+#include "loki/details/utils/collections.hpp"
 
 #include <memory>
 
@@ -37,12 +38,12 @@ bool PredicateImpl::is_structurally_equivalent_to_impl(const PredicateImpl& othe
 {
     if (this != &other)
     {
-        return (m_name == other.m_name) && (m_parameters == other.m_parameters);
+        return (m_name == other.m_name) && (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters));
     }
     return true;
 }
 
-size_t PredicateImpl::hash_impl() const { return hash_combine(m_name, hash_container(m_parameters)); }
+size_t PredicateImpl::hash_impl() const { return HashCombiner()(m_name, get_sorted_vector(m_parameters)); }
 
 void PredicateImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {

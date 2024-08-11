@@ -80,17 +80,17 @@ bool ProblemImpl::is_structurally_equivalent_to_impl(const ProblemImpl& other) c
 
 size_t ProblemImpl::hash_impl() const
 {
-    size_t goal_hash = (m_goal_condition.has_value()) ? hash_combine(m_goal_condition.value()) : 0;
-    size_t optimization_hash = (m_optimization_metric.has_value()) ? hash_combine(m_optimization_metric.value()) : 0;
-    return hash_combine(m_domain,
+    size_t goal_hash = (m_goal_condition.has_value()) ? HashCombiner()(m_goal_condition.value()) : 0;
+    size_t optimization_hash = (m_optimization_metric.has_value()) ? HashCombiner()(m_optimization_metric.value()) : 0;
+    return HashCombiner()(m_domain,
                         m_name,
                         m_requirements,
-                        hash_container(get_sorted_vector(m_objects)),
-                        hash_container(get_sorted_vector(m_initial_literals)),
+                        get_sorted_vector(m_objects),
+                        get_sorted_vector(m_initial_literals),
                         goal_hash,
                         optimization_hash,
-                        hash_container(get_sorted_vector(m_derived_predicates)),
-                        hash_container(get_sorted_vector(m_axioms)));
+                        get_sorted_vector(m_derived_predicates),
+                        get_sorted_vector(m_axioms));
 }
 
 void ProblemImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
@@ -108,7 +108,7 @@ void ProblemImpl::str_impl(std::ostream& out, const FormattingOptions& options) 
     if (!m_objects.empty())
     {
         out << string(nested_options.indent, ' ') << "(:objects ";
-        std::unordered_map<TypeList, ObjectList, hash_container_type<TypeList>> objects_by_types;
+        std::unordered_map<TypeList, ObjectList, Hash<TypeList>> objects_by_types;
         for (const auto& object : m_objects)
         {
             objects_by_types[object->get_bases()].push_back(object);

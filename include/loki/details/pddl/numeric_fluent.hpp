@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/factory.hpp"
+#include "loki/details/utils/value_type_factory.hpp"
 
 #include <string>
 
@@ -33,7 +33,7 @@ private:
     double m_number;
 
     // Give access to the constructor.
-    friend class PDDLFactory<NumericFluentImpl, Hash<NumericFluentImpl*>, EqualTo<NumericFluentImpl*>>;
+    friend class UniqueValueTypeFactory<NumericFluentImpl, Hash<const NumericFluentImpl*, true>, EqualTo<const NumericFluentImpl*, true>>;
 
     NumericFluentImpl(size_t identifier, Function function, double number);
 

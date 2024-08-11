@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/factory.hpp"
+#include "loki/details/utils/value_type_factory.hpp"
 
 #include <string>
 
@@ -47,7 +47,7 @@ private:
     EffectLiteralImpl(size_t identifier, Literal literal);
 
     // Give access to the constructor.
-    friend class PDDLFactory<EffectImpl, Hash<EffectImpl*>, EqualTo<EffectImpl*>>;
+    friend class UniqueValueTypeFactory<EffectImpl, Hash<const EffectImpl*, true>, EqualTo<const EffectImpl*, true>>;
 
     // Give access to the private interface implementations.
     friend class Base<EffectLiteralImpl>;
@@ -69,7 +69,7 @@ private:
     EffectAndImpl(size_t identifier, EffectList effects);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<EffectImpl, loki::Hash<EffectImpl*>, loki::EqualTo<EffectImpl*>>;
+    friend class UniqueValueTypeFactory<EffectImpl, Hash<const EffectImpl*, true>, EqualTo<const EffectImpl*, true>>;
 
     // Give access to the private interface implementations.
     friend class Base<EffectAndImpl>;
@@ -93,7 +93,7 @@ private:
     EffectNumericImpl(size_t identifier, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<EffectImpl, loki::Hash<EffectImpl*>, loki::EqualTo<EffectImpl*>>;
+    friend class UniqueValueTypeFactory<EffectImpl, Hash<const EffectImpl*, true>, EqualTo<const EffectImpl*, true>>;
 
     // Give access to the private interface implementations.
     friend class Base<EffectNumericImpl>;
@@ -118,7 +118,7 @@ private:
     EffectConditionalForallImpl(size_t identifier, ParameterList parameters, Effect effect);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<EffectImpl, loki::Hash<EffectImpl*>, loki::EqualTo<EffectImpl*>>;
+    friend class UniqueValueTypeFactory<EffectImpl, Hash<const EffectImpl*, true>, EqualTo<const EffectImpl*, true>>;
 
     // Give access to the private interface implementations.
     friend class Base<EffectConditionalForallImpl>;
@@ -142,7 +142,7 @@ private:
     EffectConditionalWhenImpl(size_t identifier, Condition condition, Effect effect);
 
     // Give access to the constructor.
-    friend class loki::PDDLFactory<EffectImpl, loki::Hash<EffectImpl*>, loki::EqualTo<EffectImpl*>>;
+    friend class UniqueValueTypeFactory<EffectImpl, Hash<const EffectImpl*, true>, EqualTo<const EffectImpl*, true>>;
 
     bool is_structurally_equivalent_to_impl(const EffectConditionalWhenImpl& other) const;
     size_t hash_impl() const;

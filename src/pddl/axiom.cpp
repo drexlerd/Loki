@@ -45,12 +45,12 @@ bool AxiomImpl::is_structurally_equivalent_to_impl(const AxiomImpl& other) const
 {
     if (this != &other)
     {
-        return (m_derived_predicate_name == other.m_derived_predicate_name) && (m_parameters == other.m_parameters) && (m_condition == other.m_condition);
+        return (m_derived_predicate_name == other.m_derived_predicate_name) && (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters)) && (m_condition == other.m_condition);
     }
     return true;
 }
 
-size_t AxiomImpl::hash_impl() const { return hash_combine(m_derived_predicate_name, m_derived_predicate_name, hash_container(m_parameters), m_condition); }
+size_t AxiomImpl::hash_impl() const { return HashCombiner()(m_derived_predicate_name, m_derived_predicate_name, get_sorted_vector(m_parameters), m_condition); }
 
 void AxiomImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {

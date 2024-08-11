@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/factory.hpp"
+#include "loki/details/utils/value_type_factory.hpp"
 
 #include <string>
 
@@ -37,7 +37,7 @@ private:
     PredicateImpl(size_t identifier, std::string name, ParameterList parameters);
 
     // Give access to the constructor.
-    friend class PDDLFactory<PredicateImpl, Hash<PredicateImpl*>, EqualTo<PredicateImpl*>>;
+    friend class UniqueValueTypeFactory<PredicateImpl, Hash<const PredicateImpl*, true>, EqualTo<const PredicateImpl*, true>>;
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const PredicateImpl& other) const;

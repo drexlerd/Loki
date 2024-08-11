@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/factory.hpp"
+#include "loki/details/utils/value_type_factory.hpp"
 
 #include <string>
 
@@ -35,7 +35,7 @@ private:
     LiteralImpl(size_t identifier, bool is_negated, Atom atom);
 
     // Give access to the constructor.
-    friend class PDDLFactory<LiteralImpl, Hash<LiteralImpl*>, EqualTo<LiteralImpl*>>;
+    friend class UniqueValueTypeFactory<LiteralImpl, Hash<const LiteralImpl*, true>, EqualTo<const LiteralImpl*, true>>;
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const LiteralImpl& other) const;

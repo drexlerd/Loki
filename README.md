@@ -1,6 +1,6 @@
 # Loki
 
-Loki is a C++17 library for efficient syntactic and semantic parsing of PDDL files. Loki implements exhaustive error handling to provide meaningful clang-style messages for syntactic, semantic, and modeling errors. The resulting PDDL objects are structurally uniquely constructed immutable pointer objects stored in persistent and continuous memory to enable hashing in constant time, equality comparison in constant time, and cache-efficient data access.
+Loki is a C++20 library for syntactic and semantic parsing of PDDL files.
 
 ## Supported PDDL Requirements
 
@@ -53,9 +53,7 @@ cmake --install build --prefix=<path/to/installation-directory>
 
 ## Integration Instructions
 
-We provide a CMake Superbuild project [here](https://github.com/drexlerd/Loki/tree/main/tests/integration/dependencies) that takes care of downloading, building, and installing Loki together and its dependencies. You can simply copy it to your project or integrate it in your own Superbuild and run it similarly to the Superbuild project from above.
-
-TODO
+We provide a CMake Superbuild project [here](https://github.com/drexlerd/Loki/tree/main/tests/integration/dependencies) that takes care of downloading, building, and installing Loki together and its dependencies. You can simply copy it to your project or integrate it in your own Superbuild and run it similarly to the Superbuild project from above. An example planning library based on Loki is available [here](https://github.com/simon-stahlberg/mimir).
 
 
 ## Running the Examples

@@ -56,7 +56,7 @@ bool ConditionAndImpl::is_structurally_equivalent_to_impl(const ConditionAndImpl
     return true;
 }
 
-size_t ConditionAndImpl::hash_impl() const { return hash_container(get_sorted_vector(m_conditions)); }
+size_t ConditionAndImpl::hash_impl() const { return HashCombiner()(get_sorted_vector(m_conditions)); }
 
 void ConditionAndImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -84,7 +84,7 @@ bool ConditionOrImpl::is_structurally_equivalent_to_impl(const ConditionOrImpl& 
     return true;
 }
 
-size_t ConditionOrImpl::hash_impl() const { return hash_container(get_sorted_vector(m_conditions)); }
+size_t ConditionOrImpl::hash_impl() const { return HashCombiner()(get_sorted_vector(m_conditions)); }
 
 void ConditionOrImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -112,7 +112,7 @@ bool ConditionNotImpl::is_structurally_equivalent_to_impl(const ConditionNotImpl
     return true;
 }
 
-size_t ConditionNotImpl::hash_impl() const { return hash_combine(m_condition); }
+size_t ConditionNotImpl::hash_impl() const { return HashCombiner()(m_condition); }
 
 void ConditionNotImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -140,7 +140,7 @@ bool ConditionImplyImpl::is_structurally_equivalent_to_impl(const ConditionImply
     return true;
 }
 
-size_t ConditionImplyImpl::hash_impl() const { return hash_combine(m_condition_left, m_condition_right); }
+size_t ConditionImplyImpl::hash_impl() const { return HashCombiner()(m_condition_left, m_condition_right); }
 
 void ConditionImplyImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -167,12 +167,12 @@ bool ConditionExistsImpl::is_structurally_equivalent_to_impl(const ConditionExis
 {
     if (this != &other)
     {
-        return (m_parameters == other.m_parameters) && (m_condition == other.m_condition);
+        return (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters)) && (m_condition == other.m_condition);
     }
     return true;
 }
 
-size_t ConditionExistsImpl::hash_impl() const { return hash_combine(hash_container(m_parameters), m_condition); }
+size_t ConditionExistsImpl::hash_impl() const { return HashCombiner()(get_sorted_vector(m_parameters), m_condition); }
 
 void ConditionExistsImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -209,7 +209,7 @@ bool ConditionForallImpl::is_structurally_equivalent_to_impl(const ConditionFora
     return true;
 }
 
-size_t ConditionForallImpl::hash_impl() const { return hash_combine(hash_container(m_parameters), m_condition); }
+size_t ConditionForallImpl::hash_impl() const { return HashCombiner()(get_sorted_vector(m_parameters), m_condition); }
 
 void ConditionForallImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {

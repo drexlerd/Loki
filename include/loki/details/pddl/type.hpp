@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/factory.hpp"
+#include "loki/details/utils/value_type_factory.hpp"
 
 #include <string>
 
@@ -35,7 +35,7 @@ private:
     TypeImpl(size_t identifier, std::string name, TypeList bases = {});
 
     // Give access to the constructor.
-    friend class PDDLFactory<TypeImpl, Hash<TypeImpl*>, EqualTo<TypeImpl*>>;
+    friend class UniqueValueTypeFactory<TypeImpl, Hash<const TypeImpl*, true>, EqualTo<const TypeImpl*, true>>;
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const TypeImpl& other) const;

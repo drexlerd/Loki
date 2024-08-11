@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/factory.hpp"
+#include "loki/details/utils/value_type_factory.hpp"
 
 #include <string>
 
@@ -35,7 +35,7 @@ private:
     TermObjectImpl(size_t identifier, Object object);
 
     // Give access to the constructor.
-    friend class PDDLFactory<TermImpl, Hash<TermImpl*>, EqualTo<TermImpl*>>;
+    friend class UniqueValueTypeFactory<TermImpl, Hash<const TermImpl*, true>, EqualTo<const TermImpl*, true>>;
 
     bool is_structurally_equivalent_to_impl(const TermObjectImpl& other) const;
     size_t hash_impl() const;
@@ -56,7 +56,7 @@ private:
     TermVariableImpl(size_t identifier, Variable variable);
 
     // Give access to the constructor.
-    friend class PDDLFactory<TermImpl, Hash<TermImpl*>, EqualTo<TermImpl*>>;
+    friend class UniqueValueTypeFactory<TermImpl, Hash<const TermImpl*, true>, EqualTo<const TermImpl*, true>>;
 
     bool is_structurally_equivalent_to_impl(const TermVariableImpl& other) const;
     size_t hash_impl() const;

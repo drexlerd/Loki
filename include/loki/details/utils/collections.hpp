@@ -36,7 +36,6 @@ boost::container::small_vector<typename Collection::value_type, 100> get_sorted_
     std::sort(result.begin(), result.end());
     return result;
 }
-
 }
 
 #endif

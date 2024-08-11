@@ -25,7 +25,7 @@
 #include "loki/details/pddl/declarations.hpp"
 #include "loki/details/pddl/domain.hpp"
 #include "loki/details/pddl/effects.hpp"
-#include "loki/details/pddl/factory.hpp"
+#include "loki/details/utils/value_type_factory.hpp"
 #include "loki/details/pddl/function.hpp"
 #include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
@@ -44,7 +44,7 @@
 
 namespace loki
 {
-using VariadicPDDLFactories = VariadicPDDLFactory<RequirementsImpl,
+using VariadicPDDLFactories = VariadicUniqueValueTypeFactory<RequirementsImpl,
                                                   TypeImpl,
                                                   VariableImpl,
                                                   TermImpl,

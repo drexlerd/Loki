@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
+ *<
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -18,56 +18,116 @@
 #ifndef LOKI_INCLUDE_LOKI_UTILS_HASH_HPP_
 #define LOKI_INCLUDE_LOKI_UTILS_HASH_HPP_
 
+#include "loki/details/utils/concepts.hpp"
+
 #include <cstddef>
+#include <cstdint>
 #include <functional>
-#include <set>
-#include <vector>
+#include <span>
+#include <utility>
 
 namespace loki
 {
 
-// --------------
-// Hash functions
-// --------------
+/**
+ * Forward declarations
+ */
+
+template<typename T, bool Deref = false>
+struct Hash;
+
+/**
+ * Hashing utilities
+ */
+
+template<bool Deref = false>
+struct HashCombiner
+{
+public:
+    template<typename T>
+    void operator()(size_t& seed, const T& value) const
+    {
+        seed ^= loki::Hash<T, Deref>()(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+
+    void operator()(size_t& seed, const std::size_t& value) const { seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2); }
+
+    template<typename... Types>
+    size_t operator()(const Types&... args) const
+    {
+        size_t seed = 0;
+        ((*this)(seed, args), ...);
+        return seed;
+    }
+};
+
+/**
+ * Hasher
+ */
 
 template<typename T>
-inline void hash_combine(size_t& seed, const T& val)
+concept HasHashMemberFunction = requires(T a)
 {
-    seed ^= std::hash<T>()(val) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-}
-
-template<>
-inline void hash_combine(size_t& seed, const std::size_t& val)
-{
-    seed ^= val + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-}
-
-template<typename... Types>
-inline size_t hash_combine(const Types&... args)
-{
-    size_t seed = 0;
-    (hash_combine(seed, args), ...);
-    return seed;
-}
-
-template<class Container>
-inline std::size_t hash_container(const Container& container)
-{
-    using T = typename Container::value_type;
-    const auto hash_function = std::hash<T>();
-    std::size_t aggregated_hash = 0;
-    for (const auto& item : container)
     {
-        const auto item_hash = hash_function(item);
-        hash_combine(aggregated_hash, item_hash);
-    }
-    return aggregated_hash;
-}
+        a.hash()
+        } -> std::same_as<size_t>;
+};
 
-template<typename Container>
-struct hash_container_type
+/// @brief `Hash` implements hashing of types T.
+/// If a type T provides a function hash() that returns a size_t then use it.
+/// Otherwise, fallback to using std::hash instead.
+/// @tparam T
+/// @tparam Deref
+template<typename T, bool Deref>
+struct Hash
 {
-    size_t operator()(const Container& container) const { return hash_container(container); }
+    size_t operator()(const T& element) const
+    {
+        if constexpr (Deref && IsDereferencable<T>)
+        {
+            if (!element)
+            {
+                throw std::logic_error("Hash<T, Deref>::operator(): Tried to illegally dereference an object.");
+            }
+            using DereferencedType = std::decay_t<decltype(*element)>;
+            return loki::Hash<DereferencedType, Deref>()(*element);
+        }
+        else if constexpr (HasHashMemberFunction<T>)
+        {
+            return element.hash();
+        }
+        else
+        {
+            return std::hash<T>()(element);
+        }
+    }
+};
+
+/// Spezialization for std::ranges::forward_range.
+template<typename ForwardRange, bool Deref>
+requires std::ranges::forward_range<ForwardRange>
+struct Hash<ForwardRange, Deref>
+{
+    size_t operator()(const ForwardRange& range) const
+    {
+        std::size_t aggregated_hash = 0;
+        for (const auto& item : range)
+        {
+            loki::HashCombiner<Deref>()(aggregated_hash, item);
+        }
+        return aggregated_hash;
+    }
+};
+
+/// Spezialization for std::variant.
+template<typename Variant, bool Deref>
+requires IsVariant<Variant>
+struct Hash<Variant, Deref>
+{
+    size_t operator()(const Variant& variant) const
+    {
+        return std::visit([](const auto& arg) { return Hash<std::decay_t<decltype(arg)>, Deref>()(arg); }, variant);
+    }
 };
 
 }

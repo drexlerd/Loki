@@ -38,7 +38,7 @@ bool VariableImpl::is_structurally_equivalent_to_impl(const VariableImpl& other)
     return true;
 }
 
-size_t VariableImpl::hash_impl() const { return hash_combine(m_name); }
+size_t VariableImpl::hash_impl() const { return HashCombiner()(m_name); }
 
 void VariableImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const { out << m_name; }
 

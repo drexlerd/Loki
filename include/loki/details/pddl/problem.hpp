@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/factory.hpp"
+#include "loki/details/utils/value_type_factory.hpp"
 #include "loki/details/utils/filesystem.hpp"
 
 #include <optional>
@@ -57,7 +57,7 @@ private:
                 AxiomList axioms);
 
     // Give access to the constructor.
-    friend class PDDLFactory<ProblemImpl, Hash<ProblemImpl*>, EqualTo<ProblemImpl*>>;
+    friend class UniqueValueTypeFactory<ProblemImpl, Hash<const ProblemImpl*, true>, EqualTo<const ProblemImpl*, true>>;
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const ProblemImpl& other) const;

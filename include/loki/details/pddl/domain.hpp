@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/factory.hpp"
+#include "loki/details/utils/value_type_factory.hpp"
 #include "loki/details/pddl/requirements.hpp"
 #include "loki/details/utils/filesystem.hpp"
 
@@ -55,7 +55,7 @@ private:
                AxiomList axioms);
 
     // Give access to the constructor.
-    friend class PDDLFactory<DomainImpl, Hash<DomainImpl*>, EqualTo<DomainImpl*>>;
+    friend class UniqueValueTypeFactory<DomainImpl, Hash<const DomainImpl*, true>, EqualTo<const DomainImpl*, true>>;
 
     /// @brief Test for structural equivalence
     bool is_structurally_equivalent_to_impl(const DomainImpl& other) const;

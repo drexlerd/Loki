@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/factory.hpp"
+#include "loki/details/utils/value_type_factory.hpp"
 
 #include <string>
 
@@ -37,7 +37,7 @@ private:
     AxiomImpl(size_t identifier, std::string derived_predicate_name, ParameterList parameters, Condition condition, size_t num_parameters_to_ground_head);
 
     // Give access to the constructor.
-    friend class PDDLFactory<AxiomImpl, Hash<AxiomImpl*>, EqualTo<AxiomImpl*>>;
+    friend class UniqueValueTypeFactory<AxiomImpl, Hash<const AxiomImpl*, true>, EqualTo<const AxiomImpl*, true>>;
 
     /// @brief Test for structural equivalence
     bool is_structurally_equivalent_to_impl(const AxiomImpl& other) const;

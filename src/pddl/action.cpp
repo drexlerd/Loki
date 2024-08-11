@@ -51,7 +51,7 @@ bool ActionImpl::is_structurally_equivalent_to_impl(const ActionImpl& other) con
     return true;
 }
 
-size_t ActionImpl::hash_impl() const { return hash_combine(m_name, hash_container(m_parameters), *m_condition, *m_effect); }
+size_t ActionImpl::hash_impl() const { return HashCombiner()(m_name, get_sorted_vector(m_parameters), m_condition, m_effect); }
 
 void ActionImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {

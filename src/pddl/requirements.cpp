@@ -61,7 +61,7 @@ bool RequirementsImpl::is_structurally_equivalent_to_impl(const RequirementsImpl
     return true;
 }
 
-size_t RequirementsImpl::hash_impl() const { return hash_container(m_requirements); }
+size_t RequirementsImpl::hash_impl() const { return HashCombiner()(m_requirements); }
 
 void RequirementsImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const
 {

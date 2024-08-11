@@ -34,7 +34,7 @@ bool LiteralImpl::is_structurally_equivalent_to_impl(const LiteralImpl& other) c
     return true;
 }
 
-size_t LiteralImpl::hash_impl() const { return hash_combine(m_is_negated, m_atom); }
+size_t LiteralImpl::hash_impl() const { return HashCombiner()(m_is_negated, m_atom); }
 
 void LiteralImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
