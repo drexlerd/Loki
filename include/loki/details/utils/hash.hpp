@@ -76,6 +76,8 @@ concept HasHashMemberFunction = requires(T a)
 /// @brief `Hash` implements hashing of types T.
 /// If a type T provides a function hash() that returns a size_t then use it.
 /// Otherwise, fallback to using std::hash instead.
+/// If Deref is set to true, the type T must be dereferencable, and
+/// in which case the object of type T is deferences before computing the hash value.
 /// @tparam T
 /// @tparam Deref
 template<typename T, bool Deref>
@@ -83,14 +85,17 @@ struct Hash
 {
     size_t operator()(const T& element) const
     {
-        if constexpr (Deref && IsDereferencable<T>)
+        if constexpr (Deref)
         {
+            static_assert(IsDereferencable<T>);
+
             if (!element)
             {
                 throw std::logic_error("Hash<T, Deref>::operator(): Tried to illegally dereference an object.");
             }
             using DereferencedType = std::decay_t<decltype(*element)>;
-            return loki::Hash<DereferencedType, Deref>()(*element);
+            // The type T is a value type after deferencing, so we can set Deref = false.
+            return loki::Hash<DereferencedType, false>()(*element);
         }
         else if constexpr (HasHashMemberFunction<T>)
         {
