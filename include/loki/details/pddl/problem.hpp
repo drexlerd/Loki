@@ -43,7 +43,7 @@ private:
     std::optional<OptimizationMetric> m_optimization_metric;
     AxiomList m_axioms;
 
-    ProblemImpl(size_t identifier,
+    ProblemImpl(size_t index,
                 std::optional<fs::path> filepath,
                 Domain domain,
                 std::string name,

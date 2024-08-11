@@ -35,7 +35,7 @@ struct AtomAccessResult
 
 static AtomAccessResult access_atom_data(const loki::Atom& atom)
 {
-    const auto atom_identifier = atom->get_identifier();
+    const auto atom_identifier = atom->get_index();
     const auto atom_predicate = atom->get_predicate();
     auto atom_terms = loki::TermList();
     for (const auto& term : atom->get_terms())

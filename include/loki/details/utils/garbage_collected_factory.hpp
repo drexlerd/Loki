@@ -43,7 +43,7 @@ private:
     struct PerTypeCache
     {
         std::unordered_set<T> uniqueness;
-        std::unordered_map<int, std::weak_ptr<const T>> identifier_to_object;
+        std::unordered_map<int, std::weak_ptr<const T>> index_to_object;
     };
 
     /// @brief Encapsulates the data of all types.
@@ -75,32 +75,32 @@ public:
         std::lock_guard<std::mutex> hold(m_cache->mutex);
 
         auto& t_cache = std::get<PerTypeCache<T>>(m_cache->data);
-        size_t identifier = m_cache->count;
-        auto key = T(identifier, args...);
+        size_t index = m_cache->count;
+        auto key = T(index, args...);
         const auto [it, inserted] = t_cache.uniqueness.insert(key);
         if (!inserted)
         {
-            assert(t_cache.identifier_to_object.count(it->get_identifier()));
-            return t_cache.identifier_to_object.at(it->get_identifier()).lock();
+            assert(t_cache.index_to_object.count(it->get_index()));
+            return t_cache.index_to_object.at(it->get_index()).lock();
         }
         ++m_cache->count;
         /* Must explicitly call the constructor of T to give exclusive access to the factory. */
         // Extensions: To ensure that the memory for T and the control block is allocated once,
         // we could use std::allocated_shared and provide a custom allocator.
-        sp = std::shared_ptr<T>(new T(identifier, args...),
-                                [cache = m_cache, identifier](T* x)
+        sp = std::shared_ptr<T>(new T(index, args...),
+                                [cache = m_cache, index](T* x)
                                 {
                                     {
                                         std::lock_guard<std::mutex> hold(cache->mutex);
                                         auto& t_cache = std::get<PerTypeCache<T>>(cache->data);
                                         t_cache.uniqueness.erase(*x);
-                                        t_cache.identifier_to_object.erase(identifier);
+                                        t_cache.index_to_object.erase(index);
                                     }
                                     /* After cache removal, we can call the objects destructor
                                         and recursively call the deleter of children if their ref count goes to 0 */
                                     delete x;
                                 });
-        t_cache.identifier_to_object.emplace(identifier, sp);
+        t_cache.index_to_object.emplace(index, sp);
         return sp;
     }
 

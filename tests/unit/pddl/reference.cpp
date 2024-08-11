@@ -16,7 +16,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/details/pddl/factory.hpp>
+#include <loki/details/utils/value_type_factory.hpp>
 #include <loki/details/pddl/object.hpp>
 #include <loki/details/pddl/reference.hpp>
 
@@ -25,7 +25,7 @@ namespace loki::domain::tests
 
 TEST(LokiTests, ReferenceTest)
 {
-    PDDLFactory<ObjectImpl> factory(2);
+    UniqueValueTypeFactory<ObjectImpl> factory(2);
     const auto object_0 = factory.get_or_create<ObjectImpl>("object_0", TypeList());
     const auto object_1 = factory.get_or_create<ObjectImpl>("object_1", TypeList());
 

@@ -22,7 +22,7 @@
 
 namespace loki
 {
-NumericFluentImpl::NumericFluentImpl(size_t identifier, Function function, double number) : Base(identifier), m_function(std::move(function)), m_number(number)
+NumericFluentImpl::NumericFluentImpl(size_t index, Function function, double number) : Base(index), m_function(std::move(function)), m_number(number)
 {
 }
 

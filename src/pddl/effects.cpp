@@ -43,7 +43,7 @@ const std::string& to_string(AssignOperatorEnum assign_operator)
 }
 
 /* Literal */
-EffectLiteralImpl::EffectLiteralImpl(size_t identifier, Literal literal) : Base(identifier), m_literal(std::move(literal)) {}
+EffectLiteralImpl::EffectLiteralImpl(size_t index, Literal literal) : Base(index), m_literal(std::move(literal)) {}
 
 bool EffectLiteralImpl::is_structurally_equivalent_to_impl(const EffectLiteralImpl& other) const
 {
@@ -60,7 +60,7 @@ void EffectLiteralImpl::str_impl(std::ostream& out, const FormattingOptions& opt
 
 const Literal& EffectLiteralImpl::get_literal() const { return m_literal; }
 
-EffectAndImpl::EffectAndImpl(size_t identifier, EffectList effects) : Base(identifier), m_effects(std::move(effects)) {}
+EffectAndImpl::EffectAndImpl(size_t index, EffectList effects) : Base(index), m_effects(std::move(effects)) {}
 
 bool EffectAndImpl::is_structurally_equivalent_to_impl(const EffectAndImpl& other) const
 {
@@ -88,8 +88,8 @@ void EffectAndImpl::str_impl(std::ostream& out, const FormattingOptions& options
 const EffectList& EffectAndImpl::get_effects() const { return m_effects; }
 
 /* EffectNumeric */
-EffectNumericImpl::EffectNumericImpl(size_t identifier, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression) :
-    Base(identifier),
+EffectNumericImpl::EffectNumericImpl(size_t index, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression) :
+    Base(index),
     m_assign_operator(assign_operator),
     m_function(std::move(function)),
     m_function_expression(std::move(function_expression))
@@ -123,8 +123,8 @@ const Function& EffectNumericImpl::get_function() const { return m_function; }
 const FunctionExpression& EffectNumericImpl::get_function_expression() const { return m_function_expression; }
 
 /* ConditionalForall */
-EffectConditionalForallImpl::EffectConditionalForallImpl(size_t identifier, ParameterList parameters, Effect effect) :
-    Base(identifier),
+EffectConditionalForallImpl::EffectConditionalForallImpl(size_t index, ParameterList parameters, Effect effect) :
+    Base(index),
     m_parameters(std::move(parameters)),
     m_effect(std::move(effect))
 {
@@ -159,8 +159,8 @@ const ParameterList& EffectConditionalForallImpl::get_parameters() const { retur
 
 const Effect& EffectConditionalForallImpl::get_effect() const { return m_effect; }
 
-EffectConditionalWhenImpl::EffectConditionalWhenImpl(size_t identifier, Condition condition, Effect effect) :
-    Base(identifier),
+EffectConditionalWhenImpl::EffectConditionalWhenImpl(size_t index, Condition condition, Effect effect) :
+    Base(index),
     m_condition(std::move(condition)),
     m_effect(std::move(effect))
 {

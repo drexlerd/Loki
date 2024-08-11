@@ -43,7 +43,7 @@ private:
     ActionList m_actions;
     AxiomList m_axioms;
 
-    DomainImpl(size_t identifier,
+    DomainImpl(size_t index,
                std::optional<fs::path> filepath,
                std::string name,
                Requirements requirements,

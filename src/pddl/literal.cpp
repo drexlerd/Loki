@@ -23,7 +23,7 @@
 
 namespace loki
 {
-LiteralImpl::LiteralImpl(size_t identifier, bool is_negated, Atom atom) : Base(identifier), m_is_negated(is_negated), m_atom(std::move(atom)) {}
+LiteralImpl::LiteralImpl(size_t index, bool is_negated, Atom atom) : Base(index), m_is_negated(is_negated), m_atom(std::move(atom)) {}
 
 bool LiteralImpl::is_structurally_equivalent_to_impl(const LiteralImpl& other) const
 {

@@ -32,7 +32,7 @@ class TermObjectImpl : public Base<TermObjectImpl>
 private:
     Object m_object;
 
-    TermObjectImpl(size_t identifier, Object object);
+    TermObjectImpl(size_t index, Object object);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<TermImpl, Hash<const TermImpl*, true>, EqualTo<const TermImpl*, true>>;
@@ -53,7 +53,7 @@ class TermVariableImpl : public Base<TermVariableImpl>
 private:
     Variable m_variable;
 
-    TermVariableImpl(size_t identifier, Variable variable);
+    TermVariableImpl(size_t index, Variable variable);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<TermImpl, Hash<const TermImpl*, true>, EqualTo<const TermImpl*, true>>;

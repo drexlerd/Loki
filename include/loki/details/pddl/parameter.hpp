@@ -33,7 +33,7 @@ private:
     Variable m_variable;
     TypeList m_types;
 
-    ParameterImpl(size_t identifier, Variable variable, TypeList types);
+    ParameterImpl(size_t index, Variable variable, TypeList types);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<ParameterImpl, Hash<const ParameterImpl*, true>, EqualTo<const ParameterImpl*, true>>;

@@ -54,9 +54,9 @@ template<typename Derived>
 class Base
 {
 protected:
-    size_t m_identifier;
+    size_t m_index;
 
-    explicit Base(size_t identifier) : m_identifier(identifier) {}
+    explicit Base(size_t index) : m_index(index) {}
     friend Derived;
 
 public:
@@ -72,9 +72,9 @@ public:
 
     bool operator!=(const Base& other) const { return !(*this == other); }
 
-    bool operator<(const Base& other) const { return m_identifier < other.m_identifier; }
+    bool operator<(const Base& other) const { return m_index < other.m_index; }
 
-    bool operator>(const Base& other) const { return m_identifier > other.m_identifier; }
+    bool operator>(const Base& other) const { return m_index > other.m_index; }
 
     size_t hash() const { return self().hash_impl(); }
 
@@ -98,7 +98,7 @@ public:
     }
 
     /// @brief Returns the identifier
-    size_t get_identifier() const { return m_identifier; }
+    size_t get_index() const { return m_index; }
 };
 
 }

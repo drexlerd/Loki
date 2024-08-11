@@ -26,13 +26,13 @@
 
 namespace loki
 {
-ActionImpl::ActionImpl(size_t identifier,
+ActionImpl::ActionImpl(size_t index,
                        std::string name,
                        size_t original_arity,
                        ParameterList parameters,
                        std::optional<Condition> condition,
                        std::optional<Effect> effect) :
-    Base(identifier),
+    Base(index),
     m_name(std::move(name)),
     m_original_arity(original_arity),
     m_parameters(std::move(parameters)),

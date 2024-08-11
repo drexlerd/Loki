@@ -16,7 +16,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/details/pddl/factory.hpp>
+#include <loki/details/utils/value_type_factory.hpp>
 #include <loki/details/pddl/object.hpp>
 #include <loki/details/pddl/term.hpp>
 
@@ -25,7 +25,7 @@ namespace loki::domain::tests
 
 TEST(LokiTests, FactoryIteratorTest)
 {
-    PDDLFactory<ObjectImpl> factory(2);
+    UniqueValueTypeFactory<ObjectImpl> factory(2);
     const auto object_0 = factory.get_or_create<ObjectImpl>("object_0", TypeList());
     const auto object_1 = factory.get_or_create<ObjectImpl>("object_1", TypeList());
     const auto object_2 = factory.get_or_create<ObjectImpl>("object_2", TypeList());
@@ -44,7 +44,7 @@ TEST(LokiTests, FactoryIteratorTest)
 
 TEST(LokiTests, FactoryIteratorEmptyTest)
 {
-    PDDLFactory<ObjectImpl> factory(4);
+    UniqueValueTypeFactory<ObjectImpl> factory(4);
 
     auto objects = ObjectList {};
     for (const auto& object : factory)
@@ -57,8 +57,8 @@ TEST(LokiTests, FactoryIteratorEmptyTest)
 
 TEST(LokiTests, FactoryVariantTest)
 {
-    PDDLFactory<ObjectImpl> objects(2);
-    PDDLFactory<TermImpl> terms(2);
+    UniqueValueTypeFactory<ObjectImpl> objects(2);
+    UniqueValueTypeFactory<TermImpl> terms(2);
     const auto object_0 = objects.get_or_create<ObjectImpl>("object_0", TypeList());
     const auto object_1 = objects.get_or_create<ObjectImpl>("object_1", TypeList());
 

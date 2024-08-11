@@ -26,8 +26,8 @@
 
 namespace loki
 {
-ParameterImpl::ParameterImpl(size_t identifier, Variable variable, TypeList types) :
-    Base(identifier),
+ParameterImpl::ParameterImpl(size_t index, Variable variable, TypeList types) :
+    Base(index),
     m_variable(std::move(variable)),
     m_types(std::move(types))
 {

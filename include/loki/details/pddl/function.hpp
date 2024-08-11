@@ -32,7 +32,7 @@ private:
     FunctionSkeleton m_function_skeleton;
     TermList m_terms;
 
-    FunctionImpl(size_t identifier, FunctionSkeleton function_skeleton, TermList terms);
+    FunctionImpl(size_t index, FunctionSkeleton function_skeleton, TermList terms);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<FunctionImpl, Hash<const FunctionImpl*, true>, EqualTo<const FunctionImpl*, true>>;

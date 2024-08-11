@@ -27,7 +27,7 @@ namespace loki
 {
 
 /* Literal */
-ConditionLiteralImpl::ConditionLiteralImpl(size_t identifier, Literal literal) : Base(identifier), m_literal(std::move(literal)) {}
+ConditionLiteralImpl::ConditionLiteralImpl(size_t index, Literal literal) : Base(index), m_literal(std::move(literal)) {}
 
 bool ConditionLiteralImpl::is_structurally_equivalent_to_impl(const ConditionLiteralImpl& other) const
 {
@@ -45,7 +45,7 @@ void ConditionLiteralImpl::str_impl(std::ostream& out, const FormattingOptions& 
 const Literal& ConditionLiteralImpl::get_literal() const { return m_literal; }
 
 /* And */
-ConditionAndImpl::ConditionAndImpl(size_t identifier, ConditionList conditions) : Base(identifier), m_conditions(std::move(conditions)) {}
+ConditionAndImpl::ConditionAndImpl(size_t index, ConditionList conditions) : Base(index), m_conditions(std::move(conditions)) {}
 
 bool ConditionAndImpl::is_structurally_equivalent_to_impl(const ConditionAndImpl& other) const
 {
@@ -73,7 +73,7 @@ void ConditionAndImpl::str_impl(std::ostream& out, const FormattingOptions& opti
 const ConditionList& ConditionAndImpl::get_conditions() const { return m_conditions; }
 
 /* Or */
-ConditionOrImpl::ConditionOrImpl(size_t identifier, ConditionList conditions) : Base(identifier), m_conditions(std::move(conditions)) {}
+ConditionOrImpl::ConditionOrImpl(size_t index, ConditionList conditions) : Base(index), m_conditions(std::move(conditions)) {}
 
 bool ConditionOrImpl::is_structurally_equivalent_to_impl(const ConditionOrImpl& other) const
 {
@@ -101,7 +101,7 @@ void ConditionOrImpl::str_impl(std::ostream& out, const FormattingOptions& optio
 const ConditionList& ConditionOrImpl::get_conditions() const { return m_conditions; }
 
 /* Not */
-ConditionNotImpl::ConditionNotImpl(size_t identifier, Condition condition) : Base(identifier), m_condition(std::move(condition)) {}
+ConditionNotImpl::ConditionNotImpl(size_t index, Condition condition) : Base(index), m_condition(std::move(condition)) {}
 
 bool ConditionNotImpl::is_structurally_equivalent_to_impl(const ConditionNotImpl& other) const
 {
@@ -124,8 +124,8 @@ void ConditionNotImpl::str_impl(std::ostream& out, const FormattingOptions& opti
 const Condition& ConditionNotImpl::get_condition() const { return m_condition; }
 
 /* Imply */
-ConditionImplyImpl::ConditionImplyImpl(size_t identifier, Condition condition_left, Condition condition_right) :
-    Base(identifier),
+ConditionImplyImpl::ConditionImplyImpl(size_t index, Condition condition_left, Condition condition_right) :
+    Base(index),
     m_condition_left(std::move(condition_left)),
     m_condition_right(std::move(condition_right))
 {
@@ -156,8 +156,8 @@ const Condition& ConditionImplyImpl::get_condition_left() const { return m_condi
 const Condition& ConditionImplyImpl::get_condition_right() const { return m_condition_right; }
 
 /* Exists */
-ConditionExistsImpl::ConditionExistsImpl(size_t identifier, ParameterList parameters, Condition condition) :
-    Base(identifier),
+ConditionExistsImpl::ConditionExistsImpl(size_t index, ParameterList parameters, Condition condition) :
+    Base(index),
     m_parameters(std::move(parameters)),
     m_condition(std::move(condition))
 {
@@ -193,8 +193,8 @@ const ParameterList& ConditionExistsImpl::get_parameters() const { return m_para
 const Condition& ConditionExistsImpl::get_condition() const { return m_condition; }
 
 /* Forall */
-ConditionForallImpl::ConditionForallImpl(size_t identifier, ParameterList parameters, Condition condition) :
-    Base(identifier),
+ConditionForallImpl::ConditionForallImpl(size_t index, ParameterList parameters, Condition condition) :
+    Base(index),
     m_parameters(std::move(parameters)),
     m_condition(std::move(condition))
 {

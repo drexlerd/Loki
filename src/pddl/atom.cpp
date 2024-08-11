@@ -25,7 +25,7 @@
 
 namespace loki
 {
-AtomImpl::AtomImpl(size_t identifier, Predicate predicate, TermList terms) : Base(identifier), m_predicate(std::move(predicate)), m_terms(std::move(terms)) {}
+AtomImpl::AtomImpl(size_t index, Predicate predicate, TermList terms) : Base(index), m_predicate(std::move(predicate)), m_terms(std::move(terms)) {}
 
 bool AtomImpl::is_structurally_equivalent_to_impl(const AtomImpl& other) const
 {

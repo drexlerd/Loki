@@ -16,7 +16,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/details/pddl/factory.hpp>
+#include <loki/details/utils/value_type_factory.hpp>
 #include <loki/details/pddl/object.hpp>
 
 namespace loki::domain::tests
@@ -24,13 +24,13 @@ namespace loki::domain::tests
 
 TEST(LokiTests, PersistentFactoryTest)
 {
-    PDDLFactory<ObjectImpl> factory(2);
+    UniqueValueTypeFactory<ObjectImpl> factory(2);
     EXPECT_EQ(factory.size(), 0);
 
     // Test uniqueness: insert the same element twice
     const auto object_0_0 = factory.get_or_create<ObjectImpl>("object_0", TypeList());
     EXPECT_EQ(factory.size(), 1);
-    EXPECT_EQ(object_0_0->get_identifier(), 0);
+    EXPECT_EQ(object_0_0->get_index(), 0);
     EXPECT_EQ(object_0_0->get_name(), "object_0");
 
     const auto object_0_1 = factory.get_or_create<ObjectImpl>("object_0", TypeList());
@@ -40,7 +40,7 @@ TEST(LokiTests, PersistentFactoryTest)
     const auto object_1 = factory.get_or_create<ObjectImpl>("object_1", TypeList());
     EXPECT_EQ(factory.size(), 2);
     EXPECT_NE(object_0_0, object_1);
-    EXPECT_EQ(object_1->get_identifier(), 1);
+    EXPECT_EQ(object_1->get_index(), 1);
     EXPECT_EQ(object_1->get_name(), "object_1");
 }
 

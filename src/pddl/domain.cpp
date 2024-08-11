@@ -32,7 +32,7 @@ using namespace std;
 
 namespace loki
 {
-DomainImpl::DomainImpl(size_t identifier,
+DomainImpl::DomainImpl(size_t index,
                        std::optional<fs::path> filepath,
                        std::string name,
                        Requirements requirements,
@@ -42,7 +42,7 @@ DomainImpl::DomainImpl(size_t identifier,
                        FunctionSkeletonList functions,
                        ActionList actions,
                        AxiomList axioms) :
-    Base(identifier),
+    Base(index),
     m_filepath(std::move(filepath)),
     m_name(std::move(name)),
     m_requirements(std::move(requirements)),

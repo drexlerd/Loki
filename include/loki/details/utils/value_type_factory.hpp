@@ -76,11 +76,11 @@ public:
         /* Construct and insert the element in persistent memory. */
 
         // Ensure that element with identifier i is stored at position i.
-        size_t identifier = m_uniqueness_set.size();
-        assert(identifier == m_persistent_vector.size());
+        size_t index = m_uniqueness_set.size();
+        assert(index == m_persistent_vector.size());
 
         // Explicitly call the constructor of T to give exclusive access to the factory.
-        const auto* element_ptr = &m_persistent_vector.emplace_back(SubType(identifier, std::forward<Args>(args)...));
+        const auto* element_ptr = &m_persistent_vector.emplace_back(SubType(index, std::forward<Args>(args)...));
         // The pointer to the location in persistent memory.
         assert(element_ptr);
 
@@ -108,17 +108,17 @@ public:
      * Accessors
      */
 
-    /// @brief Returns a pointer to an existing object with the given identifier.
-    HolderType const* operator[](size_t identifier) const
+    /// @brief Returns a pointer to an existing object with the given pos.
+    HolderType const* operator[](size_t pos) const
     {
-        assert(identifier < size());
-        return &(m_persistent_vector.at(identifier));
+        assert(pos < size());
+        return &(m_persistent_vector.at(pos));
     }
 
-    HolderType const* at(size_t identifier) const
+    HolderType const* at(size_t pos) const
     {
-        range_check(identifier);
-        return &(m_persistent_vector.at(identifier));
+        range_check(pos);
+        return &(m_persistent_vector.at(pos));
     }
 
     auto begin() const { return m_persistent_vector.begin(); }

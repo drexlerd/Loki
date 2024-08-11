@@ -32,7 +32,7 @@ private:
     bool m_is_negated;
     Atom m_atom;
 
-    LiteralImpl(size_t identifier, bool is_negated, Atom atom);
+    LiteralImpl(size_t index, bool is_negated, Atom atom);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<LiteralImpl, Hash<const LiteralImpl*, true>, EqualTo<const LiteralImpl*, true>>;

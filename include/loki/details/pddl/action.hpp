@@ -37,7 +37,7 @@ private:
     std::optional<Condition> m_condition;
     std::optional<Effect> m_effect;
 
-    ActionImpl(size_t identifier,
+    ActionImpl(size_t index,
                std::string name,
                size_t original_arity,
                ParameterList parameters,

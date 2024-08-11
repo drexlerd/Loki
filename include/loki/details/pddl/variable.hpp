@@ -31,7 +31,7 @@ class VariableImpl : public Base<VariableImpl>
 private:
     std::string m_name;
 
-    VariableImpl(size_t identifier, std::string name);
+    VariableImpl(size_t index, std::string name);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<VariableImpl, Hash<const VariableImpl*, true>, EqualTo<const VariableImpl*, true>>;

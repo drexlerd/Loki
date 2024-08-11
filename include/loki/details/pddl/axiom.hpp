@@ -34,7 +34,7 @@ private:
     Condition m_condition;
     size_t m_num_parameters_to_ground_head;
 
-    AxiomImpl(size_t identifier, std::string derived_predicate_name, ParameterList parameters, Condition condition, size_t num_parameters_to_ground_head);
+    AxiomImpl(size_t index, std::string derived_predicate_name, ParameterList parameters, Condition condition, size_t num_parameters_to_ground_head);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<AxiomImpl, Hash<const AxiomImpl*, true>, EqualTo<const AxiomImpl*, true>>;

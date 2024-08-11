@@ -52,7 +52,7 @@ class FunctionExpressionNumberImpl : public Base<FunctionExpressionNumberImpl>
 private:
     double m_number;
 
-    FunctionExpressionNumberImpl(size_t identifier, double number);
+    FunctionExpressionNumberImpl(size_t index, double number);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<FunctionExpressionImpl, Hash<const FunctionExpressionImpl*, true>, EqualTo<const FunctionExpressionImpl*, true>>;
@@ -76,7 +76,7 @@ private:
     FunctionExpression m_left_function_expression;
     FunctionExpression m_right_function_expression;
 
-    FunctionExpressionBinaryOperatorImpl(size_t identifier,
+    FunctionExpressionBinaryOperatorImpl(size_t index,
                                          BinaryOperatorEnum binary_operator,
                                          FunctionExpression left_function_expression,
                                          FunctionExpression right_function_expression);
@@ -104,7 +104,7 @@ private:
     MultiOperatorEnum m_multi_operator;
     FunctionExpressionList m_function_expressions;
 
-    FunctionExpressionMultiOperatorImpl(size_t identifier, MultiOperatorEnum multi_operator, FunctionExpressionList function_expressions);
+    FunctionExpressionMultiOperatorImpl(size_t index, MultiOperatorEnum multi_operator, FunctionExpressionList function_expressions);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<FunctionExpressionImpl, Hash<const FunctionExpressionImpl*, true>, EqualTo<const FunctionExpressionImpl*, true>>;
@@ -127,7 +127,7 @@ class FunctionExpressionMinusImpl : public Base<FunctionExpressionMinusImpl>
 private:
     FunctionExpression m_function_expression;
 
-    FunctionExpressionMinusImpl(size_t identifier, FunctionExpression function_expression);
+    FunctionExpressionMinusImpl(size_t index, FunctionExpression function_expression);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<FunctionExpressionImpl, Hash<const FunctionExpressionImpl*, true>, EqualTo<const FunctionExpressionImpl*, true>>;
@@ -149,7 +149,7 @@ class FunctionExpressionFunctionImpl : public Base<FunctionExpressionFunctionImp
 private:
     Function m_function;
 
-    FunctionExpressionFunctionImpl(size_t identifier, Function function);
+    FunctionExpressionFunctionImpl(size_t index, Function function);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<FunctionExpressionImpl, Hash<const FunctionExpressionImpl*, true>, EqualTo<const FunctionExpressionImpl*, true>>;

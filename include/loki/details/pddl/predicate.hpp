@@ -34,7 +34,7 @@ private:
     std::string m_name;
     ParameterList m_parameters;
 
-    PredicateImpl(size_t identifier, std::string name, ParameterList parameters);
+    PredicateImpl(size_t index, std::string name, ParameterList parameters);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<PredicateImpl, Hash<const PredicateImpl*, true>, EqualTo<const PredicateImpl*, true>>;

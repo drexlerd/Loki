@@ -35,7 +35,7 @@ private:
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<NumericFluentImpl, Hash<const NumericFluentImpl*, true>, EqualTo<const NumericFluentImpl*, true>>;
 
-    NumericFluentImpl(size_t identifier, Function function, double number);
+    NumericFluentImpl(size_t index, Function function, double number);
 
     /// @brief Test for semantic equivalence
     bool is_structurally_equivalent_to_impl(const NumericFluentImpl& other) const;

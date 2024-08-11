@@ -32,7 +32,7 @@ private:
     std::string m_name;
     TypeList m_types;
 
-    ObjectImpl(size_t identifier, std::string name, TypeList types = {});
+    ObjectImpl(size_t index, std::string name, TypeList types = {});
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<ObjectImpl, Hash<const ObjectImpl*, true>, EqualTo<const ObjectImpl*, true>>;

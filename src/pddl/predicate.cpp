@@ -27,8 +27,8 @@
 
 namespace loki
 {
-PredicateImpl::PredicateImpl(size_t identifier, std::string name, ParameterList parameters) :
-    Base(identifier),
+PredicateImpl::PredicateImpl(size_t index, std::string name, ParameterList parameters) :
+    Base(index),
     m_name(std::move(name)),
     m_parameters(std::move(parameters))
 {

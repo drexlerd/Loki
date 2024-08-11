@@ -29,7 +29,7 @@ struct LessComparatorVisitor
     template<typename T1, typename T2>
     bool operator()(const T1& object_left, const T2& object_right) const
     {
-        return object_left.get_identifier() < object_right.get_identifier();
+        return object_left.get_index() < object_right.get_index();
     }
 };
 

@@ -23,8 +23,8 @@
 
 namespace loki
 {
-FunctionSkeletonImpl::FunctionSkeletonImpl(size_t identifier, std::string name, ParameterList parameters, Type type) :
-    Base(identifier),
+FunctionSkeletonImpl::FunctionSkeletonImpl(size_t index, std::string name, ParameterList parameters, Type type) :
+    Base(index),
     m_name(std::move(name)),
     m_parameters(parameters),
     m_type(std::move(type))

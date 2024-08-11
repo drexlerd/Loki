@@ -23,7 +23,7 @@
 
 namespace loki
 {
-ObjectImpl::ObjectImpl(size_t identifier, std::string name, TypeList types) : Base(identifier), m_name(std::move(name)), m_types(std::move(types)) {}
+ObjectImpl::ObjectImpl(size_t index, std::string name, TypeList types) : Base(index), m_name(std::move(name)), m_types(std::move(types)) {}
 
 bool ObjectImpl::is_structurally_equivalent_to_impl(const ObjectImpl& other) const
 {

@@ -62,7 +62,7 @@ class RequirementsImpl : public Base<RequirementsImpl>
 private:
     RequirementEnumSet m_requirements;
 
-    RequirementsImpl(size_t identifier, RequirementEnumSet requirements);
+    RequirementsImpl(size_t index, RequirementEnumSet requirements);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<RequirementsImpl, Hash<const RequirementsImpl*, true>, EqualTo<const RequirementsImpl*, true>>;

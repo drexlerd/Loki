@@ -41,7 +41,7 @@ private:
     OptimizationMetricEnum m_optimization_metric;
     FunctionExpression m_function_expression;
 
-    OptimizationMetricImpl(size_t identifier, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
+    OptimizationMetricImpl(size_t index, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
 
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<OptimizationMetricImpl, Hash<const OptimizationMetricImpl*, true>, EqualTo<const OptimizationMetricImpl*, true>>;

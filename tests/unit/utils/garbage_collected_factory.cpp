@@ -28,10 +28,10 @@ namespace loki::domain::tests
 class ObjectImpl
 {
 private:
-    int m_identifier;
+    int m_index;
     std::string m_name;
 
-    ObjectImpl(size_t identifier, std::string name) : m_identifier(identifier), m_name(std::move(name)) {}
+    ObjectImpl(size_t index, std::string name) : m_index(index), m_name(std::move(name)) {}
 
     template<typename... Ts>
     friend class loki::GarbageCollectedFactory;
@@ -39,9 +39,9 @@ private:
 public:
     bool operator==(const ObjectImpl& other) const { return m_name == other.m_name; }
 
-    size_t hash() const { return hash_combine(m_name); }
+    size_t hash() const { return HashCombiner()(m_name); }
 
-    int get_identifier() const { return m_identifier; }
+    int get_index() const { return m_index; }
     const std::string& get_name() const { return m_name; }
 };
 
