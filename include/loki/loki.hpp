@@ -35,7 +35,6 @@
 #include "loki/details/pddl/error_reporting.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 #include "loki/details/pddl/factories.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
 #include "loki/details/pddl/function.hpp"
 #include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
