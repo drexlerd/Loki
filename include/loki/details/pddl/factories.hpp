@@ -41,9 +41,18 @@
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
 #include "loki/details/utils/unique_value_type_factory.hpp"
+#include "loki/details/utils/variadic_container.hpp"
 
 namespace loki
 {
+
+// Ensure that specialization is available.
+static_assert(IsShallowHashSpecialized<const VariableImpl*>::value);
+static_assert(IsShallowEqualToSpecialized<const VariableImpl*>::value);
+
+using VariableFactory = UniqueValueTypeFactory<VariableImpl, ShallowHash<const VariableImpl*>, ShallowEqualTo<const VariableImpl*>>;
+
+using VariadicPDDLConstructorFactory = VariadicContainer<VariableFactory>;
 
 template<typename... Ts>
 class VariadicPDDLFactory
@@ -69,10 +78,6 @@ public:
         return std::get<UniqueValueTypeFactory<T>>(m_factories);
     }
 };
-
-static_assert(IsShallowHashSpecialized<const VariableImpl*>::value);
-
-static_assert(IsShallowEqualToSpecialized<const VariableImpl*>::value);
 
 using VariadicPDDLFactories = VariadicPDDLFactory<RequirementsImpl,
                                                   TypeImpl,
@@ -121,6 +126,8 @@ class PDDLFactories
 {
 private:
     VariadicPDDLFactories m_factories;
+
+    VariadicPDDLConstructorFactory m_variadic_factory;
 
 public:
     PDDLFactories();

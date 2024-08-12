@@ -50,7 +50,7 @@ struct ShallowEqualTo<std::variant<Ts...>>
         return std::visit(
             [](const auto& lhs, const auto& rhs) -> bool
             {
-                if constexpr (std::is_same_v<std::decay_t<decltype(lhs)>, std::decay_t<decltype(rhs)>>)
+                if constexpr (std::is_same_v<decltype(lhs), decltype(rhs)>)
                 {
                     return ShallowEqualTo<decltype(lhs)>()(lhs, rhs);
                 }

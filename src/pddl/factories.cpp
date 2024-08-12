@@ -19,7 +19,7 @@
 
 namespace loki
 {
-PDDLFactories::PDDLFactories() : m_factories() {}
+PDDLFactories::PDDLFactories() : m_factories(), m_variadic_factory(VariableFactory()) {}
 
 PDDLFactories::PDDLFactories(PDDLFactories&& other) = default;
 
@@ -35,7 +35,10 @@ Type PDDLFactories::get_or_create_type(std::string name, TypeList bases)
     return m_factories.get<TypeImpl>().get_or_create<TypeImpl>(std::move(name), std::move(bases));
 }
 
-Variable PDDLFactories::get_or_create_variable(std::string name) { return m_factories.get<VariableImpl>().get_or_create<VariableImpl>(std::move(name)); }
+Variable PDDLFactories::get_or_create_variable(std::string name)
+{
+    return m_variadic_factory.get<VariableFactory>().get_or_create<VariableImpl>(std::move(name));
+}
 
 Term PDDLFactories::get_or_create_term_variable(Variable variable) { return m_factories.get<TermImpl>().get_or_create<TermVariableImpl>(std::move(variable)); }
 
