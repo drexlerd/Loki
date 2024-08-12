@@ -61,7 +61,6 @@
 #include "loki/details/utils/collections.hpp"
 #include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/filesystem.hpp"
-#include "loki/details/utils/garbage_collected_factory.hpp"
 #include "loki/details/utils/hash.hpp"
 #include "loki/details/utils/memory.hpp"
 #include "loki/details/utils/printer.hpp"

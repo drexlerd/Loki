@@ -48,17 +48,17 @@ const ParameterList& FunctionSkeletonImpl::get_parameters() const { return m_par
 
 const Type& FunctionSkeletonImpl::get_type() const { return m_type; }
 
-size_t ShallowHash<FunctionSkeletonImpl>::operator()(const FunctionSkeletonImpl& e) const
+size_t ShallowHash<const FunctionSkeletonImpl*>::operator()(const FunctionSkeletonImpl* e) const
 {
-    return ShallowHashCombiner()(e.get_name(), e.get_type(), get_sorted_vector(e.get_parameters()));
+    return ShallowHashCombiner()(e->get_name(), e->get_type(), get_sorted_vector(e->get_parameters()));
 }
 
-bool ShallowEqualTo<FunctionSkeletonImpl>::operator()(const FunctionSkeletonImpl& l, const FunctionSkeletonImpl& r) const
+bool ShallowEqualTo<const FunctionSkeletonImpl*>::operator()(const FunctionSkeletonImpl* l, const FunctionSkeletonImpl* r) const
 {
     if (&l != &r)
     {
-        return (l.get_name() == r.get_name()) && (l.get_type() == r.get_type())
-               && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()));
+        return (l->get_name() == r->get_name()) && (l->get_type() == r->get_type())
+               && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
     }
     return true;
 }

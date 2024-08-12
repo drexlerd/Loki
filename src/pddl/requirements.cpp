@@ -70,13 +70,13 @@ bool RequirementsImpl::test(RequirementEnum requirement) const { return m_requir
 
 const RequirementEnumSet& RequirementsImpl::get_requirements() const { return m_requirements; }
 
-size_t ShallowHash<RequirementsImpl>::operator()(const RequirementsImpl& e) const { return ShallowHashCombiner()(e.get_requirements()); }
+size_t ShallowHash<const RequirementsImpl*>::operator()(const RequirementsImpl* e) const { return ShallowHashCombiner()(e->get_requirements()); }
 
-bool ShallowEqualTo<RequirementsImpl>::operator()(const RequirementsImpl& l, const RequirementsImpl& r) const
+bool ShallowEqualTo<const RequirementsImpl*>::operator()(const RequirementsImpl* l, const RequirementsImpl* r) const
 {
     if (&l != &r)
     {
-        return (l.get_requirements() == r.get_requirements());
+        return (l->get_requirements() == r->get_requirements());
     }
     return true;
 }

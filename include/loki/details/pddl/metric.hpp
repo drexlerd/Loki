@@ -57,15 +57,15 @@ public:
 };
 
 template<>
-struct ShallowHash<OptimizationMetricImpl>
+struct ShallowHash<const OptimizationMetricImpl*>
 {
-    size_t operator()(const OptimizationMetricImpl& e) const;
+    size_t operator()(const OptimizationMetricImpl* e) const;
 };
 
 template<>
-struct ShallowEqualTo<OptimizationMetricImpl>
+struct ShallowEqualTo<const OptimizationMetricImpl*>
 {
-    bool operator()(const OptimizationMetricImpl& l, const OptimizationMetricImpl& r) const;
+    bool operator()(const OptimizationMetricImpl* l, const OptimizationMetricImpl* r) const;
 };
 
 }

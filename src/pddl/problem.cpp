@@ -200,28 +200,28 @@ const std::optional<OptimizationMetric>& ProblemImpl::get_optimization_metric() 
 
 const AxiomList& ProblemImpl::get_axioms() const { return m_axioms; }
 
-size_t ShallowHash<ProblemImpl>::operator()(const ProblemImpl& e) const
+size_t ShallowHash<const ProblemImpl*>::operator()(const ProblemImpl* e) const
 {
-    return ShallowHashCombiner()(e.get_name(),
-                                 e.get_domain(),
-                                 get_sorted_vector(e.get_objects()),
-                                 get_sorted_vector(e.get_derived_predicates()),
-                                 get_sorted_vector(e.get_initial_literals()),
-                                 get_sorted_vector(e.get_numeric_fluents()),
-                                 e.get_goal_condition(),
-                                 e.get_optimization_metric());
+    return ShallowHashCombiner()(e->get_name(),
+                                 e->get_domain(),
+                                 get_sorted_vector(e->get_objects()),
+                                 get_sorted_vector(e->get_derived_predicates()),
+                                 get_sorted_vector(e->get_initial_literals()),
+                                 get_sorted_vector(e->get_numeric_fluents()),
+                                 e->get_goal_condition(),
+                                 e->get_optimization_metric());
 }
 
-bool ShallowEqualTo<ProblemImpl>::operator()(const ProblemImpl& l, const ProblemImpl& r) const
+bool ShallowEqualTo<const ProblemImpl*>::operator()(const ProblemImpl* l, const ProblemImpl* r) const
 {
     if (&l != &r)
     {
-        return (l.get_name() == r.get_name()) && (l.get_domain() == r.get_domain())
-               && (get_sorted_vector(l.get_objects()) == get_sorted_vector(r.get_objects()))
-               && (get_sorted_vector(l.get_derived_predicates()) == get_sorted_vector(r.get_derived_predicates()))
-               && (get_sorted_vector(l.get_initial_literals()) == get_sorted_vector(r.get_initial_literals()))
-               && (get_sorted_vector(l.get_numeric_fluents()) == get_sorted_vector(r.get_numeric_fluents()))
-               && (l.get_goal_condition() == r.get_goal_condition()) && (l.get_optimization_metric() == r.get_optimization_metric());
+        return (l->get_name() == r->get_name()) && (l->get_domain() == r->get_domain())
+               && (get_sorted_vector(l->get_objects()) == get_sorted_vector(r->get_objects()))
+               && (get_sorted_vector(l->get_derived_predicates()) == get_sorted_vector(r->get_derived_predicates()))
+               && (get_sorted_vector(l->get_initial_literals()) == get_sorted_vector(r->get_initial_literals()))
+               && (get_sorted_vector(l->get_numeric_fluents()) == get_sorted_vector(r->get_numeric_fluents()))
+               && (l->get_goal_condition() == r->get_goal_condition()) && (l->get_optimization_metric() == r->get_optimization_metric());
     }
     return true;
 }

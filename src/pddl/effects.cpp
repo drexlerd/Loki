@@ -49,9 +49,9 @@ void EffectLiteralImpl::str_impl(std::ostream& out, const FormattingOptions& opt
 
 const Literal& EffectLiteralImpl::get_literal() const { return m_literal; }
 
-size_t ShallowHash<EffectLiteralImpl>::operator()(const EffectLiteralImpl& e) const { return ShallowHashCombiner()(e.get_literal()); }
+size_t ShallowHash<const EffectLiteralImpl&>::operator()(const EffectLiteralImpl& e) const { return ShallowHashCombiner()(e.get_literal()); }
 
-bool ShallowEqualTo<EffectLiteralImpl>::operator()(const EffectLiteralImpl& l, const EffectLiteralImpl& r) const
+bool ShallowEqualTo<const EffectLiteralImpl&>::operator()(const EffectLiteralImpl& l, const EffectLiteralImpl& r) const
 {
     if (&l != &r)
     {
@@ -77,9 +77,9 @@ void EffectAndImpl::str_impl(std::ostream& out, const FormattingOptions& options
 
 const EffectList& EffectAndImpl::get_effects() const { return m_effects; }
 
-size_t ShallowHash<EffectAndImpl>::operator()(const EffectAndImpl& e) const { return ShallowHashCombiner()(get_sorted_vector(e.get_effects())); }
+size_t ShallowHash<const EffectAndImpl&>::operator()(const EffectAndImpl& e) const { return ShallowHashCombiner()(get_sorted_vector(e.get_effects())); }
 
-bool ShallowEqualTo<EffectAndImpl>::operator()(const EffectAndImpl& l, const EffectAndImpl& r) const
+bool ShallowEqualTo<const EffectAndImpl&>::operator()(const EffectAndImpl& l, const EffectAndImpl& r) const
 {
     if (&l != &r)
     {
@@ -112,12 +112,12 @@ const Function& EffectNumericImpl::get_function() const { return m_function; }
 
 const FunctionExpression& EffectNumericImpl::get_function_expression() const { return m_function_expression; }
 
-size_t ShallowHash<EffectNumericImpl>::operator()(const EffectNumericImpl& e) const
+size_t ShallowHash<const EffectNumericImpl&>::operator()(const EffectNumericImpl& e) const
 {
     return ShallowHashCombiner()(e.get_assign_operator(), e.get_function(), e.get_function_expression());
 }
 
-bool ShallowEqualTo<EffectNumericImpl>::operator()(const EffectNumericImpl& l, const EffectNumericImpl& r) const
+bool ShallowEqualTo<const EffectNumericImpl&>::operator()(const EffectNumericImpl& l, const EffectNumericImpl& r) const
 {
     if (&l != &r)
     {
@@ -153,12 +153,12 @@ const ParameterList& EffectConditionalForallImpl::get_parameters() const { retur
 
 const Effect& EffectConditionalForallImpl::get_effect() const { return m_effect; }
 
-size_t ShallowHash<EffectConditionalForallImpl>::operator()(const EffectConditionalForallImpl& e) const
+size_t ShallowHash<const EffectConditionalForallImpl&>::operator()(const EffectConditionalForallImpl& e) const
 {
     return ShallowHashCombiner()(e.get_effect(), get_sorted_vector(e.get_parameters()));
 }
 
-bool ShallowEqualTo<EffectConditionalForallImpl>::operator()(const EffectConditionalForallImpl& l, const EffectConditionalForallImpl& r) const
+bool ShallowEqualTo<const EffectConditionalForallImpl&>::operator()(const EffectConditionalForallImpl& l, const EffectConditionalForallImpl& r) const
 {
     if (&l != &r)
     {
@@ -188,12 +188,12 @@ const Condition& EffectConditionalWhenImpl::get_condition() const { return m_con
 
 const Effect& EffectConditionalWhenImpl::get_effect() const { return m_effect; }
 
-size_t ShallowHash<EffectConditionalWhenImpl>::operator()(const EffectConditionalWhenImpl& e) const
+size_t ShallowHash<const EffectConditionalWhenImpl&>::operator()(const EffectConditionalWhenImpl& e) const
 {
     return ShallowHashCombiner()(e.get_condition(), e.get_effect());
 }
 
-bool ShallowEqualTo<EffectConditionalWhenImpl>::operator()(const EffectConditionalWhenImpl& l, const EffectConditionalWhenImpl& r) const
+bool ShallowEqualTo<const EffectConditionalWhenImpl&>::operator()(const EffectConditionalWhenImpl& l, const EffectConditionalWhenImpl& r) const
 {
     if (&l != &r)
     {
@@ -201,5 +201,14 @@ bool ShallowEqualTo<EffectConditionalWhenImpl>::operator()(const EffectCondition
     }
     return true;
 }
+
+/* EffectImpl */
+
+size_t ShallowHash<const EffectImpl*>::operator()(const EffectImpl* e) const
+{
+    return std::visit([](const auto& arg) { return ShallowHash<decltype(arg)>()(arg); }, *e);
+}
+
+bool ShallowEqualTo<const EffectImpl*>::operator()(const EffectImpl* l, const EffectImpl* r) const { return ShallowEqualTo<EffectImpl>()(*l, *r); }
 
 }

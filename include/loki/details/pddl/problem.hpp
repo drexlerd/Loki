@@ -79,15 +79,15 @@ public:
 };
 
 template<>
-struct ShallowHash<ProblemImpl>
+struct ShallowHash<const ProblemImpl*>
 {
-    size_t operator()(const ProblemImpl& e) const;
+    size_t operator()(const ProblemImpl* e) const;
 };
 
 template<>
-struct ShallowEqualTo<ProblemImpl>
+struct ShallowEqualTo<const ProblemImpl*>
 {
-    bool operator()(const ProblemImpl& l, const ProblemImpl& r) const;
+    bool operator()(const ProblemImpl* l, const ProblemImpl* r) const;
 };
 
 }

@@ -18,15 +18,50 @@
 #ifndef LOKI_INCLUDE_LOKI_UTILS_EQUAL_TO_HPP_
 #define LOKI_INCLUDE_LOKI_UTILS_EQUAL_TO_HPP_
 
+#include "loki/details/utils/concepts.hpp"
+
 #include <functional>
 
 namespace loki
 {
 
 template<typename T>
+struct IsShallowEqualToSpecialized : std::false_type
+{
+};
+
+template<typename T>
 struct ShallowEqualTo
 {
     bool operator()(const T& l, const T& r) const { return std::equal<T>()(l, r); }
+};
+
+/// Spezialization for std::variant.
+template<typename... Ts>
+struct ShallowEqualTo<std::variant<Ts...>>
+{
+    bool operator()(const std::variant<Ts...>& l, const std::variant<Ts...>& r) const
+    {
+        if (l.index() != r.index())
+        {
+            return false;  // Different types held
+        }
+        // Compare the held values, but only if they are of the same type
+        return std::visit(
+            [](const auto& lhs, const auto& rhs) -> bool
+            {
+                if constexpr (std::is_same_v<std::decay_t<decltype(lhs)>, std::decay_t<decltype(rhs)>>)
+                {
+                    return ShallowEqualTo<decltype(lhs)>()(lhs, rhs);
+                }
+                else
+                {
+                    return false;  // Different types can't be equal
+                }
+            },
+            l,
+            r);
+    }
 };
 
 }

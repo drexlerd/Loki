@@ -48,13 +48,13 @@ public:
 };
 
 template<>
-struct ShallowHash<ConditionLiteralImpl>
+struct ShallowHash<const ConditionLiteralImpl&>
 {
     size_t operator()(const ConditionLiteralImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<ConditionLiteralImpl>
+struct ShallowEqualTo<const ConditionLiteralImpl&>
 {
     bool operator()(const ConditionLiteralImpl& l, const ConditionLiteralImpl& r) const;
 };
@@ -80,13 +80,13 @@ public:
 };
 
 template<>
-struct ShallowHash<ConditionAndImpl>
+struct ShallowHash<const ConditionAndImpl&>
 {
     size_t operator()(const ConditionAndImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<ConditionAndImpl>
+struct ShallowEqualTo<const ConditionAndImpl&>
 {
     bool operator()(const ConditionAndImpl& l, const ConditionAndImpl& r) const;
 };
@@ -114,13 +114,13 @@ public:
 };
 
 template<>
-struct ShallowHash<ConditionOrImpl>
+struct ShallowHash<const ConditionOrImpl&>
 {
     size_t operator()(const ConditionOrImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<ConditionOrImpl>
+struct ShallowEqualTo<const ConditionOrImpl&>
 {
     bool operator()(const ConditionOrImpl& l, const ConditionOrImpl& r) const;
 };
@@ -146,13 +146,13 @@ public:
 };
 
 template<>
-struct ShallowHash<ConditionNotImpl>
+struct ShallowHash<const ConditionNotImpl&>
 {
     size_t operator()(const ConditionNotImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<ConditionNotImpl>
+struct ShallowEqualTo<const ConditionNotImpl&>
 {
     bool operator()(const ConditionNotImpl& l, const ConditionNotImpl& r) const;
 };
@@ -180,13 +180,13 @@ public:
 };
 
 template<>
-struct ShallowHash<ConditionImplyImpl>
+struct ShallowHash<const ConditionImplyImpl&>
 {
     size_t operator()(const ConditionImplyImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<ConditionImplyImpl>
+struct ShallowEqualTo<const ConditionImplyImpl&>
 {
     bool operator()(const ConditionImplyImpl& l, const ConditionImplyImpl& r) const;
 };
@@ -214,13 +214,13 @@ public:
 };
 
 template<>
-struct ShallowHash<ConditionExistsImpl>
+struct ShallowHash<const ConditionExistsImpl&>
 {
     size_t operator()(const ConditionExistsImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<ConditionExistsImpl>
+struct ShallowEqualTo<const ConditionExistsImpl&>
 {
     bool operator()(const ConditionExistsImpl& l, const ConditionExistsImpl& r) const;
 };
@@ -248,15 +248,29 @@ public:
 };
 
 template<>
-struct ShallowHash<ConditionForallImpl>
+struct ShallowHash<const ConditionForallImpl&>
 {
     size_t operator()(const ConditionForallImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<ConditionForallImpl>
+struct ShallowEqualTo<const ConditionForallImpl&>
 {
     bool operator()(const ConditionForallImpl& l, const ConditionForallImpl& r) const;
+};
+
+/* ConditionImpl */
+
+template<>
+struct ShallowHash<const ConditionImpl*>
+{
+    size_t operator()(const ConditionImpl* e) const;
+};
+
+template<>
+struct ShallowEqualTo<const ConditionImpl*>
+{
+    bool operator()(const ConditionImpl* l, const ConditionImpl* r) const;
 };
 
 }

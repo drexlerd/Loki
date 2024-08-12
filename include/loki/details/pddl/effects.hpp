@@ -59,13 +59,13 @@ public:
 };
 
 template<>
-struct ShallowHash<EffectLiteralImpl>
+struct ShallowHash<const EffectLiteralImpl&>
 {
     size_t operator()(const EffectLiteralImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<EffectLiteralImpl>
+struct ShallowEqualTo<const EffectLiteralImpl&>
 {
     bool operator()(const EffectLiteralImpl& l, const EffectLiteralImpl& r) const;
 };
@@ -91,13 +91,13 @@ public:
 };
 
 template<>
-struct ShallowHash<EffectAndImpl>
+struct ShallowHash<const EffectAndImpl&>
 {
     size_t operator()(const EffectAndImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<EffectAndImpl>
+struct ShallowEqualTo<const EffectAndImpl&>
 {
     bool operator()(const EffectAndImpl& l, const EffectAndImpl& r) const;
 };
@@ -127,13 +127,13 @@ public:
 };
 
 template<>
-struct ShallowHash<EffectNumericImpl>
+struct ShallowHash<const EffectNumericImpl&>
 {
     size_t operator()(const EffectNumericImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<EffectNumericImpl>
+struct ShallowEqualTo<const EffectNumericImpl&>
 {
     bool operator()(const EffectNumericImpl& l, const EffectNumericImpl& r) const;
 };
@@ -161,13 +161,13 @@ public:
 };
 
 template<>
-struct ShallowHash<EffectConditionalForallImpl>
+struct ShallowHash<const EffectConditionalForallImpl&>
 {
     size_t operator()(const EffectConditionalForallImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<EffectConditionalForallImpl>
+struct ShallowEqualTo<const EffectConditionalForallImpl&>
 {
     bool operator()(const EffectConditionalForallImpl& l, const EffectConditionalForallImpl& r) const;
 };
@@ -195,15 +195,29 @@ public:
 };
 
 template<>
-struct ShallowHash<EffectConditionalWhenImpl>
+struct ShallowHash<const EffectConditionalWhenImpl&>
 {
     size_t operator()(const EffectConditionalWhenImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<EffectConditionalWhenImpl>
+struct ShallowEqualTo<const EffectConditionalWhenImpl&>
 {
     bool operator()(const EffectConditionalWhenImpl& l, const EffectConditionalWhenImpl& r) const;
+};
+
+/* EffectImpl */
+
+template<>
+struct ShallowHash<const EffectImpl*>
+{
+    size_t operator()(const EffectImpl* e) const;
+};
+
+template<>
+struct ShallowEqualTo<const EffectImpl*>
+{
+    bool operator()(const EffectImpl* l, const EffectImpl* r) const;
 };
 
 }

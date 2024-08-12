@@ -16,8 +16,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/details/utils/value_type_factory.hpp>
 #include <loki/details/pddl/object.hpp>
+#include <loki/details/utils/unique_value_type_factory.hpp>
 
 namespace loki::domain::tests
 {

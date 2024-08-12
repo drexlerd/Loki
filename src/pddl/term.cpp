@@ -32,9 +32,9 @@ void TermObjectImpl::str_impl(std::ostream& out, const FormattingOptions& /*opti
 
 const Object& TermObjectImpl::get_object() const { return m_object; }
 
-size_t ShallowHash<TermObjectImpl>::operator()(const TermObjectImpl& e) const { return ShallowHashCombiner()(e.get_object()); }
+size_t ShallowHash<const TermObjectImpl&>::operator()(const TermObjectImpl& e) const { return ShallowHashCombiner()(e.get_object()); }
 
-bool ShallowEqualTo<TermObjectImpl>::operator()(const TermObjectImpl& l, const TermObjectImpl& r) const
+bool ShallowEqualTo<const TermObjectImpl&>::operator()(const TermObjectImpl& l, const TermObjectImpl& r) const
 {
     if (&l != &r)
     {
@@ -50,9 +50,9 @@ void TermVariableImpl::str_impl(std::ostream& out, const FormattingOptions& /*op
 
 const Variable& TermVariableImpl::get_variable() const { return m_variable; }
 
-size_t ShallowHash<TermVariableImpl>::operator()(const TermVariableImpl& e) const { return ShallowHashCombiner()(e.get_variable()); }
+size_t ShallowHash<const TermVariableImpl&>::operator()(const TermVariableImpl& e) const { return ShallowHashCombiner()(e.get_variable()); }
 
-bool ShallowEqualTo<TermVariableImpl>::operator()(const TermVariableImpl& l, const TermVariableImpl& r) const
+bool ShallowEqualTo<const TermVariableImpl&>::operator()(const TermVariableImpl& l, const TermVariableImpl& r) const
 {
     if (&l != &r)
     {
@@ -60,5 +60,14 @@ bool ShallowEqualTo<TermVariableImpl>::operator()(const TermVariableImpl& l, con
     }
     return true;
 }
+
+/* TermImpl */
+
+size_t ShallowHash<const TermImpl*>::operator()(const TermImpl* e) const
+{
+    return std::visit([](const auto& arg) { return ShallowHash<decltype(arg)>()(arg); }, *e);
+}
+
+bool ShallowEqualTo<const TermImpl*>::operator()(const TermImpl* l, const TermImpl* r) const { return ShallowEqualTo<TermImpl>()(*l, *r); }
 
 }

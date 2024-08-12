@@ -48,15 +48,15 @@ public:
 };
 
 template<>
-struct ShallowHash<NumericFluentImpl>
+struct ShallowHash<const NumericFluentImpl*>
 {
-    size_t operator()(const NumericFluentImpl& e) const;
+    size_t operator()(const NumericFluentImpl* e) const;
 };
 
 template<>
-struct ShallowEqualTo<NumericFluentImpl>
+struct ShallowEqualTo<const NumericFluentImpl*>
 {
-    bool operator()(const NumericFluentImpl& l, const NumericFluentImpl& r) const;
+    bool operator()(const NumericFluentImpl* l, const NumericFluentImpl* r) const;
 };
 
 }

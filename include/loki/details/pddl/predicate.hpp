@@ -50,15 +50,15 @@ public:
 };
 
 template<>
-struct ShallowHash<PredicateImpl>
+struct ShallowHash<const PredicateImpl*>
 {
-    size_t operator()(const PredicateImpl& e) const;
+    size_t operator()(const PredicateImpl* e) const;
 };
 
 template<>
-struct ShallowEqualTo<PredicateImpl>
+struct ShallowEqualTo<const PredicateImpl*>
 {
-    bool operator()(const PredicateImpl& l, const PredicateImpl& r) const;
+    bool operator()(const PredicateImpl* l, const PredicateImpl* r) const;
 };
 
 }

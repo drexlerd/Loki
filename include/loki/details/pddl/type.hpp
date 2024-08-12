@@ -48,15 +48,15 @@ public:
 };
 
 template<>
-struct ShallowHash<TypeImpl>
+struct ShallowHash<const TypeImpl*>
 {
-    size_t operator()(const TypeImpl& e) const;
+    size_t operator()(const TypeImpl* e) const;
 };
 
 template<>
-struct ShallowEqualTo<TypeImpl>
+struct ShallowEqualTo<const TypeImpl*>
 {
-    bool operator()(const TypeImpl& l, const TypeImpl& r) const;
+    bool operator()(const TypeImpl* l, const TypeImpl* r) const;
 };
 
 /// @brief Collects all types from a hierarchy.

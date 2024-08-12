@@ -46,15 +46,24 @@ public:
 };
 
 template<>
-struct ShallowHash<VariableImpl>
+struct ShallowHash<const VariableImpl*>
 {
-    size_t operator()(const VariableImpl& e) const;
+    size_t operator()(const VariableImpl* e) const;
 };
 
 template<>
-struct ShallowEqualTo<VariableImpl>
+struct ShallowEqualTo<const VariableImpl*>
 {
-    bool operator()(const VariableImpl& l, const VariableImpl& r) const;
+    bool operator()(const VariableImpl* l, const VariableImpl* r) const;
+};
+
+template<>
+struct IsShallowHashSpecialized<const VariableImpl*> : std::true_type
+{
+};
+template<>
+struct IsShallowEqualToSpecialized<const VariableImpl*> : std::true_type
+{
 };
 
 extern VariableSet collect_free_variables(const loki::ConditionImpl& condition);

@@ -202,29 +202,29 @@ const ActionList& DomainImpl::get_actions() const { return m_actions; }
 
 const AxiomList& DomainImpl::get_axioms() const { return m_axioms; }
 
-size_t ShallowHash<DomainImpl>::operator()(const DomainImpl& e) const
+size_t ShallowHash<const DomainImpl*>::operator()(const DomainImpl* e) const
 {
-    return ShallowHashCombiner()(e.get_name(),
-                                 e.get_requirements(),
-                                 get_sorted_vector(e.get_types()),
-                                 get_sorted_vector(e.get_constants()),
-                                 get_sorted_vector(e.get_predicates()),
-                                 get_sorted_vector(e.get_functions()),
-                                 get_sorted_vector(e.get_actions()),
-                                 get_sorted_vector(e.get_axioms()));
+    return ShallowHashCombiner()(e->get_name(),
+                                 e->get_requirements(),
+                                 get_sorted_vector(e->get_types()),
+                                 get_sorted_vector(e->get_constants()),
+                                 get_sorted_vector(e->get_predicates()),
+                                 get_sorted_vector(e->get_functions()),
+                                 get_sorted_vector(e->get_actions()),
+                                 get_sorted_vector(e->get_axioms()));
 }
 
-bool ShallowEqualTo<DomainImpl>::operator()(const DomainImpl& l, const DomainImpl& r) const
+bool ShallowEqualTo<const DomainImpl*>::operator()(const DomainImpl* l, const DomainImpl* r) const
 {
     if (&l != &r)
     {
-        return (l.get_name() == r.get_name()) && (l.get_requirements() == r.get_requirements())
-               && (get_sorted_vector(l.get_types()) == get_sorted_vector(r.get_types()))
-               && (get_sorted_vector(l.get_constants()) == get_sorted_vector(r.get_constants()))
-               && (get_sorted_vector(l.get_predicates()) == get_sorted_vector(r.get_predicates()))
-               && (get_sorted_vector(l.get_functions()) == get_sorted_vector(r.get_functions()))
-               && (get_sorted_vector(l.get_actions()) == get_sorted_vector(r.get_actions()))
-               && (get_sorted_vector(l.get_axioms()) == get_sorted_vector(r.get_axioms()));
+        return (l->get_name() == r->get_name()) && (l->get_requirements() == r->get_requirements())
+               && (get_sorted_vector(l->get_types()) == get_sorted_vector(r->get_types()))
+               && (get_sorted_vector(l->get_constants()) == get_sorted_vector(r->get_constants()))
+               && (get_sorted_vector(l->get_predicates()) == get_sorted_vector(r->get_predicates()))
+               && (get_sorted_vector(l->get_functions()) == get_sorted_vector(r->get_functions()))
+               && (get_sorted_vector(l->get_actions()) == get_sorted_vector(r->get_actions()))
+               && (get_sorted_vector(l->get_axioms()) == get_sorted_vector(r->get_axioms()));
     }
     return true;
 }

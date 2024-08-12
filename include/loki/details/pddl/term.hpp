@@ -49,13 +49,13 @@ public:
 };
 
 template<>
-struct ShallowHash<TermObjectImpl>
+struct ShallowHash<const TermObjectImpl&>
 {
     size_t operator()(const TermObjectImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<TermObjectImpl>
+struct ShallowEqualTo<const TermObjectImpl&>
 {
     bool operator()(const TermObjectImpl& l, const TermObjectImpl& r) const;
 };
@@ -82,15 +82,29 @@ public:
 };
 
 template<>
-struct ShallowHash<TermVariableImpl>
+struct ShallowHash<const TermVariableImpl&>
 {
     size_t operator()(const TermVariableImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<TermVariableImpl>
+struct ShallowEqualTo<const TermVariableImpl&>
 {
     bool operator()(const TermVariableImpl& l, const TermVariableImpl& r) const;
+};
+
+/* TermImpl */
+
+template<>
+struct ShallowHash<const TermImpl*>
+{
+    size_t operator()(const TermImpl* e) const;
+};
+
+template<>
+struct ShallowEqualTo<const TermImpl*>
+{
+    bool operator()(const TermImpl* l, const TermImpl* r) const;
 };
 
 }

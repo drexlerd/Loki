@@ -38,7 +38,7 @@ namespace loki
 /// Note that using a base class value type will result in object slicing.
 /// @tparam Hash the hash function, default uses `ShallowHash` hasher.
 /// @tparam EqualTo the comparison function, default uses `ShallowEqualTo`.
-template<typename HolderType, typename Hash = ShallowHash<HolderType>, typename EqualTo = ShallowEqualTo<HolderType>>
+template<typename HolderType, typename Hash = ShallowHash<const HolderType*>, typename EqualTo = ShallowEqualTo<const HolderType*>>
 class UniqueValueTypeFactory
 {
 private:
@@ -132,31 +132,6 @@ public:
      */
 
     size_t size() const { return m_persistent_vector.size(); }
-};
-
-template<typename... Ts>
-class VariadicUniqueValueTypeFactory
-{
-private:
-    std::tuple<UniqueValueTypeFactory<Ts>...> m_factories;
-
-public:
-    VariadicPDDLFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
-        m_factories(std::make_tuple(UniqueValueTypeFactory<Ts>(initial_num_element_per_segment, maximum_num_elements_per_segment)...))
-    {
-    }
-
-    template<typename T>
-    UniqueValueTypeFactory<T>& get()
-    {
-        return std::get<UniqueValueTypeFactory<T>>(m_factories);
-    }
-
-    template<typename T>
-    const UniqueValueTypeFactory<T>& get() const
-    {
-        return std::get<UniqueValueTypeFactory<T>>(m_factories);
-    }
 };
 
 }

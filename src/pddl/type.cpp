@@ -52,13 +52,13 @@ const std::string& TypeImpl::get_name() const { return m_name; }
 
 const TypeList& TypeImpl::get_bases() const { return m_bases; }
 
-size_t ShallowHash<TypeImpl>::operator()(const TypeImpl& e) const { return ShallowHashCombiner()(e.get_name(), get_sorted_vector(e.get_bases())); }
+size_t ShallowHash<const TypeImpl*>::operator()(const TypeImpl* e) const { return ShallowHashCombiner()(e->get_name(), get_sorted_vector(e->get_bases())); }
 
-bool ShallowEqualTo<TypeImpl>::operator()(const TypeImpl& l, const TypeImpl& r) const
+bool ShallowEqualTo<const TypeImpl*>::operator()(const TypeImpl* l, const TypeImpl* r) const
 {
     if (&l != &r)
     {
-        return (l.get_name() == r.get_name()) && (get_sorted_vector(l.get_bases()) == get_sorted_vector(r.get_bases()));
+        return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_bases()) == get_sorted_vector(r->get_bases()));
     }
     return true;
 }

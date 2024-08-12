@@ -23,6 +23,7 @@
 #include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <string>
+#include <unordered_map>
 
 namespace loki
 {
@@ -67,13 +68,13 @@ public:
 };
 
 template<>
-struct ShallowHash<FunctionExpressionNumberImpl>
+struct ShallowHash<const FunctionExpressionNumberImpl&>
 {
     size_t operator()(const FunctionExpressionNumberImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<FunctionExpressionNumberImpl>
+struct ShallowEqualTo<const FunctionExpressionNumberImpl&>
 {
     bool operator()(const FunctionExpressionNumberImpl& l, const FunctionExpressionNumberImpl& r) const;
 };
@@ -106,13 +107,13 @@ public:
 };
 
 template<>
-struct ShallowHash<FunctionExpressionBinaryOperatorImpl>
+struct ShallowHash<const FunctionExpressionBinaryOperatorImpl&>
 {
     size_t operator()(const FunctionExpressionBinaryOperatorImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<FunctionExpressionBinaryOperatorImpl>
+struct ShallowEqualTo<const FunctionExpressionBinaryOperatorImpl&>
 {
     bool operator()(const FunctionExpressionBinaryOperatorImpl& l, const FunctionExpressionBinaryOperatorImpl& r) const;
 };
@@ -140,13 +141,13 @@ public:
 };
 
 template<>
-struct ShallowHash<FunctionExpressionMultiOperatorImpl>
+struct ShallowHash<const FunctionExpressionMultiOperatorImpl&>
 {
     size_t operator()(const FunctionExpressionMultiOperatorImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<FunctionExpressionMultiOperatorImpl>
+struct ShallowEqualTo<const FunctionExpressionMultiOperatorImpl&>
 {
     bool operator()(const FunctionExpressionMultiOperatorImpl& l, const FunctionExpressionMultiOperatorImpl& r) const;
 };
@@ -172,13 +173,13 @@ public:
 };
 
 template<>
-struct ShallowHash<FunctionExpressionMinusImpl>
+struct ShallowHash<const FunctionExpressionMinusImpl&>
 {
     size_t operator()(const FunctionExpressionMinusImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<FunctionExpressionMinusImpl>
+struct ShallowEqualTo<const FunctionExpressionMinusImpl&>
 {
     bool operator()(const FunctionExpressionMinusImpl& l, const FunctionExpressionMinusImpl& r) const;
 };
@@ -204,15 +205,29 @@ public:
 };
 
 template<>
-struct ShallowHash<FunctionExpressionFunctionImpl>
+struct ShallowHash<const FunctionExpressionFunctionImpl&>
 {
     size_t operator()(const FunctionExpressionFunctionImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<FunctionExpressionFunctionImpl>
+struct ShallowEqualTo<const FunctionExpressionFunctionImpl&>
 {
     bool operator()(const FunctionExpressionFunctionImpl& l, const FunctionExpressionFunctionImpl& r) const;
+};
+
+/* FunctionExpressionImpl */
+
+template<>
+struct ShallowHash<const FunctionExpressionImpl*>
+{
+    size_t operator()(const FunctionExpressionImpl* e) const;
+};
+
+template<>
+struct ShallowEqualTo<const FunctionExpressionImpl*>
+{
+    bool operator()(const FunctionExpressionImpl* l, const FunctionExpressionImpl* r) const;
 };
 
 }

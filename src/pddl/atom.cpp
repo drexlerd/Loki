@@ -42,13 +42,13 @@ const Predicate& AtomImpl::get_predicate() const { return m_predicate; }
 
 const TermList& AtomImpl::get_terms() const { return m_terms; }
 
-size_t ShallowHash<AtomImpl>::operator()(const AtomImpl& e) const { return ShallowHashCombiner()(e.get_predicate(), e.get_terms()); }
+size_t ShallowHash<const AtomImpl*>::operator()(const AtomImpl* e) const { return ShallowHashCombiner()(e->get_predicate(), e->get_terms()); }
 
-bool ShallowEqualTo<AtomImpl>::operator()(const AtomImpl& l, const AtomImpl& r) const
+bool ShallowEqualTo<const AtomImpl*>::operator()(const AtomImpl* l, const AtomImpl* r) const
 {
     if (&l != &r)
     {
-        return (l.get_predicate() == r.get_predicate()) && (l.get_terms() == r.get_terms());
+        return (l->get_predicate() == r->get_predicate()) && (l->get_terms() == r->get_terms());
     }
     return true;
 }

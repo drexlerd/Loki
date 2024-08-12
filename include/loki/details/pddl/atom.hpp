@@ -48,15 +48,15 @@ public:
 };
 
 template<>
-struct ShallowHash<AtomImpl>
+struct ShallowHash<const AtomImpl*>
 {
-    size_t operator()(const AtomImpl& e) const;
+    size_t operator()(const AtomImpl* e) const;
 };
 
 template<>
-struct ShallowEqualTo<AtomImpl>
+struct ShallowEqualTo<const AtomImpl*>
 {
-    bool operator()(const AtomImpl& l, const AtomImpl& r) const;
+    bool operator()(const AtomImpl* l, const AtomImpl* r) const;
 };
 
 }

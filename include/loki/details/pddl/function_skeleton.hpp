@@ -50,15 +50,15 @@ public:
 };
 
 template<>
-struct ShallowHash<FunctionSkeletonImpl>
+struct ShallowHash<const FunctionSkeletonImpl*>
 {
-    size_t operator()(const FunctionSkeletonImpl& e) const;
+    size_t operator()(const FunctionSkeletonImpl* e) const;
 };
 
 template<>
-struct ShallowEqualTo<FunctionSkeletonImpl>
+struct ShallowEqualTo<const FunctionSkeletonImpl*>
 {
-    bool operator()(const FunctionSkeletonImpl& l, const FunctionSkeletonImpl& r) const;
+    bool operator()(const FunctionSkeletonImpl* l, const FunctionSkeletonImpl* r) const;
 };
 
 }

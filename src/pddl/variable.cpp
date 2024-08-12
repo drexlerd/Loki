@@ -33,13 +33,13 @@ void VariableImpl::str_impl(std::ostream& out, const FormattingOptions& /*option
 
 const std::string& VariableImpl::get_name() const { return m_name; }
 
-size_t ShallowHash<VariableImpl>::operator()(const VariableImpl& e) const { return ShallowHashCombiner()(e.get_name()); }
+size_t ShallowHash<const VariableImpl*>::operator()(const VariableImpl* e) const { return ShallowHashCombiner()(e->get_name()); }
 
-bool ShallowEqualTo<VariableImpl>::operator()(const VariableImpl& l, const VariableImpl& r) const
+bool ShallowEqualTo<const VariableImpl*>::operator()(const VariableImpl* l, const VariableImpl* r) const
 {
     if (&l != &r)
     {
-        return (l.get_name() == r.get_name());
+        return (l->get_name() == r->get_name());
     }
     return true;
 }

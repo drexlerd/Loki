@@ -48,15 +48,15 @@ public:
 };
 
 template<>
-struct ShallowHash<ObjectImpl>
+struct ShallowHash<const ObjectImpl*>
 {
-    size_t operator()(const ObjectImpl& e) const;
+    size_t operator()(const ObjectImpl* e) const;
 };
 
 template<>
-struct ShallowEqualTo<ObjectImpl>
+struct ShallowEqualTo<const ObjectImpl*>
 {
-    bool operator()(const ObjectImpl& l, const ObjectImpl& r) const;
+    bool operator()(const ObjectImpl* l, const ObjectImpl* r) const;
 };
 
 }

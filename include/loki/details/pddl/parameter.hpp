@@ -49,15 +49,15 @@ public:
 };
 
 template<>
-struct ShallowHash<ParameterImpl>
+struct ShallowHash<const ParameterImpl*>
 {
-    size_t operator()(const ParameterImpl& e) const;
+    size_t operator()(const ParameterImpl* e) const;
 };
 
 template<>
-struct ShallowEqualTo<ParameterImpl>
+struct ShallowEqualTo<const ParameterImpl*>
 {
-    bool operator()(const ParameterImpl& l, const ParameterImpl& r) const;
+    bool operator()(const ParameterImpl* l, const ParameterImpl* r) const;
 };
 
 /// @brief Return true iff specialized_parameter is a specialized version of generalized_parameter

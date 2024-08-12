@@ -52,15 +52,15 @@ public:
 };
 
 template<>
-struct ShallowHash<AxiomImpl>
+struct ShallowHash<const AxiomImpl*>
 {
-    size_t operator()(const AxiomImpl& e) const;
+    size_t operator()(const AxiomImpl* e) const;
 };
 
 template<>
-struct ShallowEqualTo<AxiomImpl>
+struct ShallowEqualTo<const AxiomImpl*>
 {
-    bool operator()(const AxiomImpl& l, const AxiomImpl& r) const;
+    bool operator()(const AxiomImpl* l, const AxiomImpl* r) const;
 };
 
 }

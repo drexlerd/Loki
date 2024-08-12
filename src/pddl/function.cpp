@@ -54,13 +54,13 @@ const FunctionSkeleton& FunctionImpl::get_function_skeleton() const { return m_f
 
 const TermList& FunctionImpl::get_terms() const { return m_terms; }
 
-size_t ShallowHash<FunctionImpl>::operator()(const FunctionImpl& e) const { return ShallowHashCombiner()(e.get_function_skeleton(), e.get_terms()); }
+size_t ShallowHash<const FunctionImpl*>::operator()(const FunctionImpl* e) const { return ShallowHashCombiner()(e->get_function_skeleton(), e->get_terms()); }
 
-bool ShallowEqualTo<FunctionImpl>::operator()(const FunctionImpl& l, const FunctionImpl& r) const
+bool ShallowEqualTo<const FunctionImpl*>::operator()(const FunctionImpl* l, const FunctionImpl* r) const
 {
     if (&l != &r)
     {
-        return (l.get_function_skeleton() == r.get_function_skeleton()) && (l.get_terms() == r.get_terms());
+        return (l->get_function_skeleton() == r->get_function_skeleton()) && (l->get_terms() == r->get_terms());
     }
     return true;
 }

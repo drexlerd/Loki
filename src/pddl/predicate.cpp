@@ -49,16 +49,16 @@ const std::string& PredicateImpl::get_name() const { return m_name; }
 
 const ParameterList& PredicateImpl::get_parameters() const { return m_parameters; }
 
-size_t ShallowHash<PredicateImpl>::operator()(const PredicateImpl& e) const
+size_t ShallowHash<const PredicateImpl*>::operator()(const PredicateImpl* e) const
 {
-    return ShallowHashCombiner()(e.get_name(), get_sorted_vector(e.get_parameters()));
+    return ShallowHashCombiner()(e->get_name(), get_sorted_vector(e->get_parameters()));
 }
 
-bool ShallowEqualTo<PredicateImpl>::operator()(const PredicateImpl& l, const PredicateImpl& r) const
+bool ShallowEqualTo<const PredicateImpl*>::operator()(const PredicateImpl* l, const PredicateImpl* r) const
 {
     if (&l != &r)
     {
-        return (l.get_name() == r.get_name()) && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()));
+        return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
     }
     return true;
 }

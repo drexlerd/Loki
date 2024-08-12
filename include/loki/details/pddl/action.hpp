@@ -66,15 +66,15 @@ public:
 };
 
 template<>
-struct ShallowHash<ActionImpl>
+struct ShallowHash<const ActionImpl*>
 {
-    size_t operator()(const ActionImpl& e) const;
+    size_t operator()(const ActionImpl* e) const;
 };
 
 template<>
-struct ShallowEqualTo<ActionImpl>
+struct ShallowEqualTo<const ActionImpl*>
 {
-    bool operator()(const ActionImpl& l, const ActionImpl& r) const;
+    bool operator()(const ActionImpl* l, const ActionImpl* r) const;
 };
 
 }

@@ -31,6 +31,11 @@ namespace loki
 {
 
 template<typename T>
+struct IsShallowHashSpecialized : std::false_type
+{
+};
+
+template<typename T>
 struct ShallowHash
 {
     size_t operator()(const T& element) const { return std::hash<T>()(element); }
@@ -79,7 +84,7 @@ struct ShallowHash<Variant>
 {
     size_t operator()(const Variant& variant) const
     {
-        return std::visit([](const auto& arg) { return ShallowHash<std::decay_t<decltype(arg)>>()(arg); }, variant);
+        return std::visit([](const auto& arg) { return ShallowHash<decltype(arg)>()(arg); }, variant);
     }
 };
 

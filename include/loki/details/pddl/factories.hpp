@@ -45,26 +45,55 @@
 namespace loki
 {
 
-using VariadicPDDLFactories = VariadicUniqueValueTypeFactory<RequirementsImpl,
-                                                             TypeImpl,
-                                                             VariableImpl,
-                                                             TermImpl,
-                                                             ObjectImpl,
-                                                             AtomImpl,
-                                                             LiteralImpl,
-                                                             ParameterImpl,
-                                                             PredicateImpl,
-                                                             FunctionExpressionImpl,
-                                                             FunctionImpl,
-                                                             FunctionSkeletonImpl,
-                                                             ConditionImpl,
-                                                             EffectImpl,
-                                                             ActionImpl,
-                                                             AxiomImpl,
-                                                             OptimizationMetricImpl,
-                                                             NumericFluentImpl,
-                                                             DomainImpl,
-                                                             ProblemImpl>;
+template<typename... Ts>
+class VariadicPDDLFactory
+{
+private:
+    std::tuple<UniqueValueTypeFactory<Ts>...> m_factories;
+
+public:
+    VariadicPDDLFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
+        m_factories(std::make_tuple(UniqueValueTypeFactory<Ts>(initial_num_element_per_segment, maximum_num_elements_per_segment)...))
+    {
+    }
+
+    template<typename T>
+    UniqueValueTypeFactory<T>& get()
+    {
+        return std::get<UniqueValueTypeFactory<T>>(m_factories);
+    }
+
+    template<typename T>
+    const UniqueValueTypeFactory<T>& get() const
+    {
+        return std::get<UniqueValueTypeFactory<T>>(m_factories);
+    }
+};
+
+static_assert(IsShallowHashSpecialized<const VariableImpl*>::value);
+
+static_assert(IsShallowEqualToSpecialized<const VariableImpl*>::value);
+
+using VariadicPDDLFactories = VariadicPDDLFactory<RequirementsImpl,
+                                                  TypeImpl,
+                                                  VariableImpl,
+                                                  TermImpl,
+                                                  ObjectImpl,
+                                                  AtomImpl,
+                                                  LiteralImpl,
+                                                  ParameterImpl,
+                                                  PredicateImpl,
+                                                  FunctionExpressionImpl,
+                                                  FunctionImpl,
+                                                  FunctionSkeletonImpl,
+                                                  ConditionImpl,
+                                                  EffectImpl,
+                                                  ActionImpl,
+                                                  AxiomImpl,
+                                                  OptimizationMetricImpl,
+                                                  NumericFluentImpl,
+                                                  DomainImpl,
+                                                  ProblemImpl>;
 
 using PDDLPositionCache = PositionCache<RequirementsImpl,
                                         TypeImpl,
