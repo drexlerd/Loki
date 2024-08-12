@@ -20,8 +20,8 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
 #include "loki/details/utils/filesystem.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <optional>
 #include <string>
@@ -57,11 +57,8 @@ private:
                 AxiomList axioms);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ProblemImpl, Hash<const ProblemImpl*, true>, EqualTo<const ProblemImpl*, true>>;
+    friend class UniqueValueTypeFactory<ProblemImpl>;
 
-    /// @brief Test for semantic equivalence
-    bool is_structurally_equivalent_to_impl(const ProblemImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -79,6 +76,18 @@ public:
     const std::optional<Condition>& get_goal_condition() const;
     const std::optional<OptimizationMetric>& get_optimization_metric() const;
     const AxiomList& get_axioms() const;
+};
+
+template<>
+struct ShallowHash<ProblemImpl>
+{
+    size_t operator()(const ProblemImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<ProblemImpl>
+{
+    bool operator()(const ProblemImpl& l, const ProblemImpl& r) const;
 };
 
 }

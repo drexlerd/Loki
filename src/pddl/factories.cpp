@@ -169,11 +169,11 @@ Action PDDLFactories::get_or_create_action(std::string name,
                                            std::optional<Condition> condition,
                                            std::optional<Effect> effect)
 {
-    return m_factories.get<ActionImpl>().get_or_create<ActionImpl>(std::move(name),
-                                                                   std::move(original_arity),
-                                                                   std::move(parameters),
-                                                                   std::move(condition),
-                                                                   std::move(effect));
+    return m_factories.get<ActionFactory>().get_or_create<ActionImpl>(std::move(name),
+                                                                      std::move(original_arity),
+                                                                      std::move(parameters),
+                                                                      std::move(condition),
+                                                                      std::move(effect));
 }
 
 Axiom PDDLFactories::get_or_create_axiom(std::string derived_predicate_name,

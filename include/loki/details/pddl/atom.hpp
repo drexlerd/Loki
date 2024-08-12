@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <string>
 

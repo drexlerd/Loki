@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <optional>
 #include <string>
@@ -45,22 +45,36 @@ private:
                std::optional<Effect> effect);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ActionImpl, Hash<const ActionImpl*, true>, EqualTo<const ActionImpl*, true>>;
+    friend class UniqueValueTypeFactory<ActionImpl>;
 
-    /// @brief Test for structural equivalence
-    bool is_structurally_equivalent_to_impl(const ActionImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<ActionImpl>;
 
 public:
+    ActionImpl(const ActionImpl& other) = delete;
+    ActionImpl& operator=(const ActionImpl& other) = delete;
+    ActionImpl(ActionImpl&& other) = default;
+    ActionImpl& operator=(ActionImpl&& other) = default;
+
     const std::string& get_name() const;
     size_t get_original_arity() const;
     const ParameterList& get_parameters() const;
     const std::optional<Condition>& get_condition() const;
     const std::optional<Effect>& get_effect() const;
+};
+
+template<>
+struct ShallowHash<ActionImpl>
+{
+    size_t operator()(const ActionImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<ActionImpl>
+{
+    bool operator()(const ActionImpl& l, const ActionImpl& r) const;
 };
 
 }

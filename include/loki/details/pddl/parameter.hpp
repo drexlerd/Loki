@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <string>
 
@@ -36,11 +36,8 @@ private:
     ParameterImpl(size_t index, Variable variable, TypeList types);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ParameterImpl, Hash<const ParameterImpl*, true>, EqualTo<const ParameterImpl*, true>>;
+    friend class UniqueValueTypeFactory<ParameterImpl>;
 
-    /// @brief Test for semantic equivalence
-    bool is_structurally_equivalent_to_impl(const ParameterImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -49,6 +46,18 @@ private:
 public:
     const Variable& get_variable() const;
     const TypeList& get_bases() const;
+};
+
+template<>
+struct ShallowHash<ParameterImpl>
+{
+    size_t operator()(const ParameterImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<ParameterImpl>
+{
+    bool operator()(const ParameterImpl& l, const ParameterImpl& r) const;
 };
 
 /// @brief Return true iff specialized_parameter is a specialized version of generalized_parameter

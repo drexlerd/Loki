@@ -41,18 +41,6 @@ ActionImpl::ActionImpl(size_t index,
 {
 }
 
-bool ActionImpl::is_structurally_equivalent_to_impl(const ActionImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_name == other.m_name) && (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters)) && (*m_condition == *other.m_condition)
-               && (*m_effect == *other.m_effect);
-    }
-    return true;
-}
-
-size_t ActionImpl::hash_impl() const { return HashCombiner()(m_name, get_sorted_vector(m_parameters), m_condition, m_effect); }
-
 void ActionImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
     auto nested_options = FormattingOptions { options.indent + options.add_indent, options.add_indent };
@@ -91,4 +79,18 @@ const std::optional<Condition>& ActionImpl::get_condition() const { return m_con
 
 const std::optional<Effect>& ActionImpl::get_effect() const { return m_effect; }
 
+size_t ShallowHash<ActionImpl>::operator()(const ActionImpl& e) const
+{
+    return ShallowHashCombiner()(e.get_name(), get_sorted_vector(e.get_parameters()), e.get_condition(), e.get_effect());
+}
+
+bool ShallowEqualTo<ActionImpl>::operator()(const ActionImpl& l, const ActionImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_name() == r.get_name()) && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()))
+               && (l.get_condition() == r.get_condition()) && (r.get_effect() == r.get_effect());
+    }
+    return true;
+}
 }

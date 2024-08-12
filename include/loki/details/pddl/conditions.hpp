@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <string>
 
@@ -49,6 +49,18 @@ public:
     const Literal& get_literal() const;
 };
 
+template<>
+struct ShallowHash<DomainImpl>
+{
+    size_t operator()(const DomainImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<DomainImpl>
+{
+    bool operator()(const DomainImpl& l, const DomainImpl& r) const;
+};
+
 /* And */
 class ConditionAndImpl : public Base<ConditionAndImpl>
 {
@@ -69,6 +81,18 @@ private:
 
 public:
     const ConditionList& get_conditions() const;
+};
+
+template<>
+struct ShallowHash<DomainImpl>
+{
+    size_t operator()(const DomainImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<DomainImpl>
+{
+    bool operator()(const DomainImpl& l, const DomainImpl& r) const;
 };
 
 /* Or */
@@ -93,6 +117,18 @@ public:
     const ConditionList& get_conditions() const;
 };
 
+template<>
+struct ShallowHash<DomainImpl>
+{
+    size_t operator()(const DomainImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<DomainImpl>
+{
+    bool operator()(const DomainImpl& l, const DomainImpl& r) const;
+};
+
 /* Not */
 class ConditionNotImpl : public Base<ConditionNotImpl>
 {
@@ -115,6 +151,18 @@ public:
     const Condition& get_condition() const;
 };
 
+template<>
+struct ShallowHash<DomainImpl>
+{
+    size_t operator()(const DomainImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<DomainImpl>
+{
+    bool operator()(const DomainImpl& l, const DomainImpl& r) const;
+};
+
 /* Imply */
 class ConditionImplyImpl : public Base<ConditionImplyImpl>
 {
@@ -125,10 +173,8 @@ private:
     ConditionImplyImpl(size_t index, Condition condition_left, Condition condition_right);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl, Hash<const ConditionImpl*, true>, EqualTo<const ConditionImpl*, true>>;
+    friend class UniqueValueTypeFactory<ConditionImpl>;
 
-    bool is_structurally_equivalent_to_impl(const ConditionImplyImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -137,6 +183,18 @@ private:
 public:
     const Condition& get_condition_left() const;
     const Condition& get_condition_right() const;
+};
+
+template<>
+struct ShallowHash<ConditionImplyImpl>
+{
+    size_t operator()(const ConditionImplyImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<ConditionImplyImpl>
+{
+    bool operator()(const ConditionImplyImpl& l, const ConditionImplyImpl& r) const;
 };
 
 /* Exists */
@@ -149,10 +207,8 @@ private:
     ConditionExistsImpl(size_t index, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl, Hash<const ConditionImpl*, true>, EqualTo<const ConditionImpl*, true>>;
+    friend class UniqueValueTypeFactory<ConditionImpl>;
 
-    bool is_structurally_equivalent_to_impl(const ConditionExistsImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -161,6 +217,18 @@ private:
 public:
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
+};
+
+template<>
+struct ShallowHash<ConditionExistsImpl>
+{
+    size_t operator()(const ConditionExistsImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<ConditionExistsImpl>
+{
+    bool operator()(const ConditionExistsImpl& l, const ConditionExistsImpl& r) const;
 };
 
 /* Forall */
@@ -173,10 +241,8 @@ private:
     ConditionForallImpl(size_t index, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl, Hash<const ConditionImpl*, true>, EqualTo<const ConditionImpl*, true>>;
+    friend class UniqueValueTypeFactory<ConditionImpl>;
 
-    bool is_structurally_equivalent_to_impl(const ConditionForallImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -185,6 +251,18 @@ private:
 public:
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
+};
+
+template<>
+struct ShallowHash<ConditionForallImpl>
+{
+    size_t operator()(const ConditionForallImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<ConditionForallImpl>
+{
+    bool operator()(const ConditionForallImpl& l, const ConditionForallImpl& r) const;
 };
 
 }

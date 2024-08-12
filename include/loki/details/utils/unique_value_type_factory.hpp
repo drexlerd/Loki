@@ -15,11 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_UTILS_VALUE_TYPE_FACTORY_HPP_
-#define LOKI_INCLUDE_LOKI_UTILS_VALUE_TYPE_FACTORY_HPP_
+#ifndef LOKI_INCLUDE_LOKI_UTILS_UNIQUE_VALUE_FACTORY_HPP_
+#define LOKI_INCLUDE_LOKI_UTILS_UNIQUE_VALUE_FACTORY_HPP_
 
-#include "loki/details/utils/hash.hpp"
 #include "loki/details/utils/equal_to.hpp"
+#include "loki/details/utils/hash.hpp"
 #include "loki/details/utils/segmented_vector.hpp"
 
 #include <memory>
@@ -36,9 +36,9 @@ namespace loki
 /// uniqueness checks and SegmentedVector for continuous and cache-efficient storage of value types.
 /// @tparam HolderType is the holder value type which can be an std::variant.
 /// Note that using a base class value type will result in object slicing.
-/// @tparam Hash the hash function, default takes the hash value of the dereferenced object.
-/// @tparam EqualTo the comparison function, default compares the dereferenced objects.
-template<typename HolderType, typename Hash = Hash<const HolderType*, true>, typename EqualTo = EqualTo<const HolderType*, true>>
+/// @tparam Hash the hash function, default uses `ShallowHash` hasher.
+/// @tparam EqualTo the comparison function, default uses `ShallowEqualTo`.
+template<typename HolderType, typename Hash = ShallowHash<HolderType>, typename EqualTo = ShallowEqualTo<HolderType>>
 class UniqueValueTypeFactory
 {
 private:
@@ -141,7 +141,7 @@ private:
     std::tuple<UniqueValueTypeFactory<Ts>...> m_factories;
 
 public:
-    VariadicUniqueValueTypeFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
+    VariadicPDDLFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
         m_factories(std::make_tuple(UniqueValueTypeFactory<Ts>(initial_num_element_per_segment, maximum_num_elements_per_segment)...))
     {
     }

@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <string>
 
@@ -44,11 +44,8 @@ private:
     OptimizationMetricImpl(size_t index, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<OptimizationMetricImpl, Hash<const OptimizationMetricImpl*, true>, EqualTo<const OptimizationMetricImpl*, true>>;
+    friend class UniqueValueTypeFactory<OptimizationMetricImpl>;
 
-    /// @brief Test for semantic equivalence
-    bool is_structurally_equivalent_to_impl(const OptimizationMetricImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -57,6 +54,18 @@ private:
 public:
     OptimizationMetricEnum get_optimization_metric() const;
     const FunctionExpression& get_function_expression() const;
+};
+
+template<>
+struct ShallowHash<OptimizationMetricImpl>
+{
+    size_t operator()(const OptimizationMetricImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<OptimizationMetricImpl>
+{
+    bool operator()(const OptimizationMetricImpl& l, const OptimizationMetricImpl& r) const;
 };
 
 }

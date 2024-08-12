@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <string>
 
@@ -47,17 +47,27 @@ private:
     EffectLiteralImpl(size_t index, Literal literal);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<EffectImpl, Hash<const EffectImpl*, true>, EqualTo<const EffectImpl*, true>>;
+    friend class UniqueValueTypeFactory<EffectImpl>;
+
+    void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<EffectLiteralImpl>;
 
-    bool is_structurally_equivalent_to_impl(const EffectLiteralImpl& other) const;
-    size_t hash_impl() const;
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
 public:
     const Literal& get_literal() const;
+};
+
+template<>
+struct ShallowHash<EffectLiteralImpl>
+{
+    size_t operator()(const EffectLiteralImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<EffectLiteralImpl>
+{
+    bool operator()(const EffectLiteralImpl& l, const EffectLiteralImpl& r) const;
 };
 
 /* And */
@@ -69,17 +79,27 @@ private:
     EffectAndImpl(size_t index, EffectList effects);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<EffectImpl, Hash<const EffectImpl*, true>, EqualTo<const EffectImpl*, true>>;
+    friend class UniqueValueTypeFactory<EffectImpl>;
+
+    void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<EffectAndImpl>;
 
-    bool is_structurally_equivalent_to_impl(const EffectAndImpl& other) const;
-    size_t hash_impl() const;
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
 public:
     const EffectList& get_effects() const;
+};
+
+template<>
+struct ShallowHash<EffectAndImpl>
+{
+    size_t operator()(const EffectAndImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<EffectAndImpl>
+{
+    bool operator()(const EffectAndImpl& l, const EffectAndImpl& r) const;
 };
 
 /* EffectNumeric */
@@ -93,19 +113,29 @@ private:
     EffectNumericImpl(size_t index, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<EffectImpl, Hash<const EffectImpl*, true>, EqualTo<const EffectImpl*, true>>;
+    friend class UniqueValueTypeFactory<EffectImpl>;
+
+    void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<EffectNumericImpl>;
-
-    bool is_structurally_equivalent_to_impl(const EffectNumericImpl& other) const;
-    size_t hash_impl() const;
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
 public:
     AssignOperatorEnum get_assign_operator() const;
     const Function& get_function() const;
     const FunctionExpression& get_function_expression() const;
+};
+
+template<>
+struct ShallowHash<EffectNumericImpl>
+{
+    size_t operator()(const EffectNumericImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<EffectNumericImpl>
+{
+    bool operator()(const EffectNumericImpl& l, const EffectNumericImpl& r) const;
 };
 
 /* ConditionalForall */
@@ -118,18 +148,28 @@ private:
     EffectConditionalForallImpl(size_t index, ParameterList parameters, Effect effect);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<EffectImpl, Hash<const EffectImpl*, true>, EqualTo<const EffectImpl*, true>>;
+    friend class UniqueValueTypeFactory<EffectImpl>;
+
+    void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
     friend class Base<EffectConditionalForallImpl>;
 
-    bool is_structurally_equivalent_to_impl(const EffectConditionalForallImpl& other) const;
-    size_t hash_impl() const;
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
 public:
     const ParameterList& get_parameters() const;
     const Effect& get_effect() const;
+};
+
+template<>
+struct ShallowHash<EffectConditionalForallImpl>
+{
+    size_t operator()(const EffectConditionalForallImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<EffectConditionalForallImpl>
+{
+    bool operator()(const EffectConditionalForallImpl& l, const EffectConditionalForallImpl& r) const;
 };
 
 /* ConditionalWhen */
@@ -142,10 +182,8 @@ private:
     EffectConditionalWhenImpl(size_t index, Condition condition, Effect effect);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<EffectImpl, Hash<const EffectImpl*, true>, EqualTo<const EffectImpl*, true>>;
+    friend class UniqueValueTypeFactory<EffectImpl>;
 
-    bool is_structurally_equivalent_to_impl(const EffectConditionalWhenImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -154,6 +192,18 @@ private:
 public:
     const Condition& get_condition() const;
     const Effect& get_effect() const;
+};
+
+template<>
+struct ShallowHash<EffectConditionalWhenImpl>
+{
+    size_t operator()(const EffectConditionalWhenImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<EffectConditionalWhenImpl>
+{
+    bool operator()(const EffectConditionalWhenImpl& l, const EffectConditionalWhenImpl& r) const;
 };
 
 }

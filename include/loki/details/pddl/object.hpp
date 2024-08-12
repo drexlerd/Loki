@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <string>
 
@@ -35,11 +35,8 @@ private:
     ObjectImpl(size_t index, std::string name, TypeList types = {});
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ObjectImpl, Hash<const ObjectImpl*, true>, EqualTo<const ObjectImpl*, true>>;
+    friend class UniqueValueTypeFactory<ObjectImpl>;
 
-    /// @brief Test for semantic equivalence
-    bool is_structurally_equivalent_to_impl(const ObjectImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -48,6 +45,18 @@ private:
 public:
     const std::string& get_name() const;
     const TypeList& get_bases() const;
+};
+
+template<>
+struct ShallowHash<ObjectImpl>
+{
+    size_t operator()(const ObjectImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<ObjectImpl>
+{
+    bool operator()(const ObjectImpl& l, const ObjectImpl& r) const;
 };
 
 }

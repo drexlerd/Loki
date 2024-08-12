@@ -29,20 +29,20 @@ namespace loki
 {
 VariableImpl::VariableImpl(size_t index, std::string name) : Base(index), m_name(std::move(name)) {}
 
-bool VariableImpl::is_structurally_equivalent_to_impl(const VariableImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_name == other.m_name);
-    }
-    return true;
-}
-
-size_t VariableImpl::hash_impl() const { return HashCombiner()(m_name); }
-
 void VariableImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const { out << m_name; }
 
 const std::string& VariableImpl::get_name() const { return m_name; }
+
+size_t ShallowHash<VariableImpl>::operator()(const VariableImpl& e) const { return ShallowHashCombiner()(e.get_name()); }
+
+bool ShallowEqualTo<VariableImpl>::operator()(const VariableImpl& l, const VariableImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_name() == r.get_name());
+    }
+    return true;
+}
 
 static void collect_free_variables_recursively(const loki::ConditionImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
 {

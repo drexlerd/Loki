@@ -24,17 +24,6 @@ namespace loki
 {
 TypeImpl::TypeImpl(size_t index, std::string name, TypeList bases) : Base(index), m_name(std::move(name)), m_bases(std::move(bases)) {}
 
-bool TypeImpl::is_structurally_equivalent_to_impl(const TypeImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_name == other.m_name) && (get_sorted_vector(m_bases) == get_sorted_vector(other.m_bases));
-    }
-    return true;
-}
-
-size_t TypeImpl::hash_impl() const { return HashCombiner()(m_name, get_sorted_vector(m_bases)); }
-
 void TypeImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const
 {
     out << m_name;
@@ -62,6 +51,17 @@ void TypeImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/)
 const std::string& TypeImpl::get_name() const { return m_name; }
 
 const TypeList& TypeImpl::get_bases() const { return m_bases; }
+
+size_t ShallowHash<TypeImpl>::operator()(const TypeImpl& e) const { return ShallowHashCombiner()(e.get_name(), get_sorted_vector(e.get_bases())); }
+
+bool ShallowEqualTo<TypeImpl>::operator()(const TypeImpl& l, const TypeImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_name() == r.get_name()) && (get_sorted_vector(l.get_bases()) == get_sorted_vector(r.get_bases()));
+    }
+    return true;
+}
 
 static void collect_types_from_hierarchy_recursively(const TypeList& types, TypeSet& ref_result)
 {

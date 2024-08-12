@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <set>
 #include <string>
@@ -65,11 +65,8 @@ private:
     RequirementsImpl(size_t index, RequirementEnumSet requirements);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<RequirementsImpl, Hash<const RequirementsImpl*, true>, EqualTo<const RequirementsImpl*, true>>;
+    friend class UniqueValueTypeFactory<RequirementsImpl>;
 
-    /// @brief Test for semantic equivalence
-    bool is_structurally_equivalent_to_impl(const RequirementsImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -79,6 +76,18 @@ public:
     bool test(RequirementEnum requirement) const;
 
     const RequirementEnumSet& get_requirements() const;
+};
+
+template<>
+struct ShallowHash<RequirementsImpl>
+{
+    size_t operator()(const RequirementsImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<RequirementsImpl>
+{
+    bool operator()(const RequirementsImpl& l, const RequirementsImpl& r) const;
 };
 
 }

@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <string>
 
@@ -35,11 +35,8 @@ private:
     LiteralImpl(size_t index, bool is_negated, Atom atom);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<LiteralImpl, Hash<const LiteralImpl*, true>, EqualTo<const LiteralImpl*, true>>;
+    friend class UniqueValueTypeFactory<LiteralImpl>;
 
-    /// @brief Test for semantic equivalence
-    bool is_structurally_equivalent_to_impl(const LiteralImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -48,6 +45,18 @@ private:
 public:
     bool is_negated() const;
     const Atom& get_atom() const;
+};
+
+template<>
+struct ShallowHash<LiteralImpl>
+{
+    size_t operator()(const LiteralImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<LiteralImpl>
+{
+    bool operator()(const LiteralImpl& l, const LiteralImpl& r) const;
 };
 
 }

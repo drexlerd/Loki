@@ -25,7 +25,6 @@
 #include "loki/details/pddl/declarations.hpp"
 #include "loki/details/pddl/domain.hpp"
 #include "loki/details/pddl/effects.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
 #include "loki/details/pddl/function.hpp"
 #include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
@@ -41,29 +40,31 @@
 #include "loki/details/pddl/term.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 namespace loki
 {
+
 using VariadicPDDLFactories = VariadicUniqueValueTypeFactory<RequirementsImpl,
-                                                  TypeImpl,
-                                                  VariableImpl,
-                                                  TermImpl,
-                                                  ObjectImpl,
-                                                  AtomImpl,
-                                                  LiteralImpl,
-                                                  ParameterImpl,
-                                                  PredicateImpl,
-                                                  FunctionExpressionImpl,
-                                                  FunctionImpl,
-                                                  FunctionSkeletonImpl,
-                                                  ConditionImpl,
-                                                  EffectImpl,
-                                                  ActionImpl,
-                                                  AxiomImpl,
-                                                  OptimizationMetricImpl,
-                                                  NumericFluentImpl,
-                                                  DomainImpl,
-                                                  ProblemImpl>;
+                                                             TypeImpl,
+                                                             VariableImpl,
+                                                             TermImpl,
+                                                             ObjectImpl,
+                                                             AtomImpl,
+                                                             LiteralImpl,
+                                                             ParameterImpl,
+                                                             PredicateImpl,
+                                                             FunctionExpressionImpl,
+                                                             FunctionImpl,
+                                                             FunctionSkeletonImpl,
+                                                             ConditionImpl,
+                                                             EffectImpl,
+                                                             ActionImpl,
+                                                             AxiomImpl,
+                                                             OptimizationMetricImpl,
+                                                             NumericFluentImpl,
+                                                             DomainImpl,
+                                                             ProblemImpl>;
 
 using PDDLPositionCache = PositionCache<RequirementsImpl,
                                         TypeImpl,

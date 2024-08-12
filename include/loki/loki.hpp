@@ -59,13 +59,13 @@
  */
 
 #include "loki/details/utils/collections.hpp"
+#include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/filesystem.hpp"
 #include "loki/details/utils/garbage_collected_factory.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
 #include "loki/details/utils/hash.hpp"
-#include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/memory.hpp"
 #include "loki/details/utils/printer.hpp"
 #include "loki/details/utils/segmented_vector.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #endif

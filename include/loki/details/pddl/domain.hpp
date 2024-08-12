@@ -20,9 +20,9 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
 #include "loki/details/pddl/requirements.hpp"
 #include "loki/details/utils/filesystem.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <optional>
 #include <string>
@@ -55,11 +55,8 @@ private:
                AxiomList axioms);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<DomainImpl, Hash<const DomainImpl*, true>, EqualTo<const DomainImpl*, true>>;
+    friend class UniqueValueTypeFactory<DomainImpl>;
 
-    /// @brief Test for structural equivalence
-    bool is_structurally_equivalent_to_impl(const DomainImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -75,6 +72,18 @@ public:
     const FunctionSkeletonList& get_functions() const;
     const ActionList& get_actions() const;
     const AxiomList& get_axioms() const;
+};
+
+template<>
+struct ShallowHash<DomainImpl>
+{
+    size_t operator()(const DomainImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<DomainImpl>
+{
+    bool operator()(const DomainImpl& l, const DomainImpl& r) const;
 };
 
 }

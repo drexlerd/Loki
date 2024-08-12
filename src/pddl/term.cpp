@@ -28,37 +28,37 @@ namespace loki
 /* TermObjectImpl */
 TermObjectImpl::TermObjectImpl(size_t index, Object object) : Base(index), m_object(std::move(object)) {}
 
-bool TermObjectImpl::is_structurally_equivalent_to_impl(const TermObjectImpl& other) const
-{
-    if (this != &other)
-    {
-        return m_object == other.m_object;
-    }
-    return true;
-}
-
-size_t TermObjectImpl::hash_impl() const { return HashCombiner()(m_object); }
-
 void TermObjectImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const { out << m_object->get_name(); }
 
 const Object& TermObjectImpl::get_object() const { return m_object; }
 
-/* TermVariableImpl */
-TermVariableImpl::TermVariableImpl(size_t index, Variable variable) : Base(index), m_variable(std::move(variable)) {}
+size_t ShallowHash<TermObjectImpl>::operator()(const TermObjectImpl& e) const { return ShallowHashCombiner()(e.get_object()); }
 
-bool TermVariableImpl::is_structurally_equivalent_to_impl(const TermVariableImpl& other) const
+bool ShallowEqualTo<TermObjectImpl>::operator()(const TermObjectImpl& l, const TermObjectImpl& r) const
 {
-    if (this != &other)
+    if (&l != &r)
     {
-        return m_variable == other.m_variable;
+        return (l.get_object() == r.get_object());
     }
     return true;
 }
 
-size_t TermVariableImpl::hash_impl() const { return HashCombiner()(m_variable); }
+/* TermVariableImpl */
+TermVariableImpl::TermVariableImpl(size_t index, Variable variable) : Base(index), m_variable(std::move(variable)) {}
 
 void TermVariableImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const { out << m_variable->get_name(); }
 
 const Variable& TermVariableImpl::get_variable() const { return m_variable; }
+
+size_t ShallowHash<TermVariableImpl>::operator()(const TermVariableImpl& e) const { return ShallowHashCombiner()(e.get_variable()); }
+
+bool ShallowEqualTo<TermVariableImpl>::operator()(const TermVariableImpl& l, const TermVariableImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_variable() == r.get_variable());
+    }
+    return true;
+}
 
 }

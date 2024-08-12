@@ -68,15 +68,9 @@ public:
 
     constexpr const auto& self() const { return static_cast<Derived const&>(*this); }
 
-    bool operator==(const Base& other) const { return self().is_structurally_equivalent_to_impl(other.self()); }
-
-    bool operator!=(const Base& other) const { return !(*this == other); }
-
     bool operator<(const Base& other) const { return m_index < other.m_index; }
 
     bool operator>(const Base& other) const { return m_index > other.m_index; }
-
-    size_t hash() const { return self().hash_impl(); }
 
     /// @brief Overload of the output stream insertion operator (operator<<).
     friend std::ostream& operator<<(std::ostream& os, const Base& element)

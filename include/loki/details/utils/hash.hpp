@@ -23,31 +23,27 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <ranges>
 #include <span>
 #include <utility>
 
 namespace loki
 {
 
-/**
- * Forward declarations
- */
-
-template<typename T, bool Deref = false>
-struct Hash;
-
-/**
- * Hashing utilities
- */
+template<typename T>
+struct ShallowHash
+{
+    size_t operator()(const T& element) const { return std::hash<T>()(element); }
+};
 
 template<bool Deref = false>
-struct HashCombiner
+struct ShallowHashCombiner
 {
 public:
     template<typename T>
     void operator()(size_t& seed, const T& value) const
     {
-        seed ^= loki::Hash<T, Deref>()(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= ShallowHash<T>()(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     }
 
     void operator()(size_t& seed, const std::size_t& value) const { seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2); }
@@ -61,77 +57,30 @@ public:
     }
 };
 
-/**
- * Hasher
- */
-
-template<typename T>
-concept HasHashMemberFunction = requires(T a)
-{
-    {
-        a.hash()
-        } -> std::same_as<size_t>;
-};
-
-/// @brief `Hash` implements hashing of types T.
-/// If a type T provides a function hash() that returns a size_t then use it.
-/// Otherwise, fallback to using std::hash instead.
-/// If Deref is set to true, the type T must be dereferencable, and
-/// in which case the object of type T is deferences before computing the hash value.
-/// @tparam T
-/// @tparam Deref
-template<typename T, bool Deref>
-struct Hash
-{
-    size_t operator()(const T& element) const
-    {
-        if constexpr (Deref)
-        {
-            static_assert(IsDereferencable<T>);
-
-            if (!element)
-            {
-                throw std::logic_error("Hash<T, Deref>::operator(): Tried to illegally dereference an object.");
-            }
-            using DereferencedType = std::decay_t<decltype(*element)>;
-            // The type T is a value type after deferencing, so we can set Deref = false.
-            return loki::Hash<DereferencedType, false>()(*element);
-        }
-        else if constexpr (HasHashMemberFunction<T>)
-        {
-            return element.hash();
-        }
-        else
-        {
-            return std::hash<T>()(element);
-        }
-    }
-};
-
 /// Spezialization for std::ranges::forward_range.
-template<typename ForwardRange, bool Deref>
-requires std::ranges::forward_range<ForwardRange>
-struct Hash<ForwardRange, Deref>
+template<typename ForwardRange>
+    requires std::ranges::forward_range<ForwardRange>
+struct ShallowHash<ForwardRange>
 {
     size_t operator()(const ForwardRange& range) const
     {
         std::size_t aggregated_hash = 0;
         for (const auto& item : range)
         {
-            loki::HashCombiner<Deref>()(aggregated_hash, item);
+            ShallowHashCombiner()(aggregated_hash, item);
         }
         return aggregated_hash;
     }
 };
 
 /// Spezialization for std::variant.
-template<typename Variant, bool Deref>
-requires IsVariant<Variant>
-struct Hash<Variant, Deref>
+template<typename Variant>
+    requires IsVariant<Variant>
+struct ShallowHash<Variant>
 {
     size_t operator()(const Variant& variant) const
     {
-        return std::visit([](const auto& arg) { return Hash<std::decay_t<decltype(arg)>, Deref>()(arg); }, variant);
+        return std::visit([](const auto& arg) { return ShallowHash<std::decay_t<decltype(arg)>>()(arg); }, variant);
     }
 };
 

@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <string>
 
@@ -55,10 +55,8 @@ private:
     FunctionExpressionNumberImpl(size_t index, double number);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<FunctionExpressionImpl, Hash<const FunctionExpressionImpl*, true>, EqualTo<const FunctionExpressionImpl*, true>>;
+    friend class UniqueValueTypeFactory<FunctionExpressionImpl>;
 
-    bool is_structurally_equivalent_to_impl(const FunctionExpressionNumberImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -66,6 +64,18 @@ private:
 
 public:
     double get_number() const;
+};
+
+template<>
+struct ShallowHash<FunctionExpressionNumberImpl>
+{
+    size_t operator()(const FunctionExpressionNumberImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<FunctionExpressionNumberImpl>
+{
+    bool operator()(const FunctionExpressionNumberImpl& l, const FunctionExpressionNumberImpl& r) const;
 };
 
 /* FunctionExpressionBinaryOperator */
@@ -82,10 +92,8 @@ private:
                                          FunctionExpression right_function_expression);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<FunctionExpressionImpl, Hash<const FunctionExpressionImpl*, true>, EqualTo<const FunctionExpressionImpl*, true>>;
+    friend class UniqueValueTypeFactory<FunctionExpressionImpl>;
 
-    bool is_structurally_equivalent_to_impl(const FunctionExpressionBinaryOperatorImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -95,6 +103,18 @@ public:
     BinaryOperatorEnum get_binary_operator() const;
     const FunctionExpression& get_left_function_expression() const;
     const FunctionExpression& get_right_function_expression() const;
+};
+
+template<>
+struct ShallowHash<FunctionExpressionBinaryOperatorImpl>
+{
+    size_t operator()(const FunctionExpressionBinaryOperatorImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<FunctionExpressionBinaryOperatorImpl>
+{
+    bool operator()(const FunctionExpressionBinaryOperatorImpl& l, const FunctionExpressionBinaryOperatorImpl& r) const;
 };
 
 /* FunctionExpressionMultiOperator */
@@ -107,10 +127,8 @@ private:
     FunctionExpressionMultiOperatorImpl(size_t index, MultiOperatorEnum multi_operator, FunctionExpressionList function_expressions);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<FunctionExpressionImpl, Hash<const FunctionExpressionImpl*, true>, EqualTo<const FunctionExpressionImpl*, true>>;
+    friend class UniqueValueTypeFactory<FunctionExpressionImpl>;
 
-    bool is_structurally_equivalent_to_impl(const FunctionExpressionMultiOperatorImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -119,6 +137,18 @@ private:
 public:
     MultiOperatorEnum get_multi_operator() const;
     const FunctionExpressionList& get_function_expressions() const;
+};
+
+template<>
+struct ShallowHash<FunctionExpressionMultiOperatorImpl>
+{
+    size_t operator()(const FunctionExpressionMultiOperatorImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<FunctionExpressionMultiOperatorImpl>
+{
+    bool operator()(const FunctionExpressionMultiOperatorImpl& l, const FunctionExpressionMultiOperatorImpl& r) const;
 };
 
 /* FunctionExpressionMinus */
@@ -130,7 +160,7 @@ private:
     FunctionExpressionMinusImpl(size_t index, FunctionExpression function_expression);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<FunctionExpressionImpl, Hash<const FunctionExpressionImpl*, true>, EqualTo<const FunctionExpressionImpl*, true>>;
+    friend class UniqueValueTypeFactory<FunctionExpressionImpl>;
 
     bool is_structurally_equivalent_to_impl(const FunctionExpressionMinusImpl& other) const;
     size_t hash_impl() const;
@@ -143,6 +173,18 @@ public:
     const FunctionExpression& get_function_expression() const;
 };
 
+template<>
+struct ShallowHash<FunctionExpressionMinusImpl>
+{
+    size_t operator()(const FunctionExpressionMinusImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<FunctionExpressionMinusImpl>
+{
+    bool operator()(const FunctionExpressionMinusImpl& l, const FunctionExpressionMinusImpl& r) const;
+};
+
 /* FunctionExpressionFunction */
 class FunctionExpressionFunctionImpl : public Base<FunctionExpressionFunctionImpl>
 {
@@ -152,10 +194,8 @@ private:
     FunctionExpressionFunctionImpl(size_t index, Function function);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<FunctionExpressionImpl, Hash<const FunctionExpressionImpl*, true>, EqualTo<const FunctionExpressionImpl*, true>>;
+    friend class UniqueValueTypeFactory<FunctionExpressionImpl>;
 
-    bool is_structurally_equivalent_to_impl(const FunctionExpressionFunctionImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -163,6 +203,18 @@ private:
 
 public:
     const Function& get_function() const;
+};
+
+template<>
+struct ShallowHash<FunctionExpressionFunctionImpl>
+{
+    size_t operator()(const FunctionExpressionFunctionImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<FunctionExpressionFunctionImpl>
+{
+    bool operator()(const FunctionExpressionFunctionImpl& l, const FunctionExpressionFunctionImpl& r) const;
 };
 
 }

@@ -20,12 +20,14 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <string>
 
 namespace loki
 {
+
+/* TermObjectImpl */
 
 class TermObjectImpl : public Base<TermObjectImpl>
 {
@@ -35,10 +37,8 @@ private:
     TermObjectImpl(size_t index, Object object);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<TermImpl, Hash<const TermImpl*, true>, EqualTo<const TermImpl*, true>>;
+    friend class UniqueValueTypeFactory<TermImpl>;
 
-    bool is_structurally_equivalent_to_impl(const TermObjectImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -48,6 +48,20 @@ public:
     const Object& get_object() const;
 };
 
+template<>
+struct ShallowHash<TermObjectImpl>
+{
+    size_t operator()(const TermObjectImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<TermObjectImpl>
+{
+    bool operator()(const TermObjectImpl& l, const TermObjectImpl& r) const;
+};
+
+/* TermVariableImpl */
+
 class TermVariableImpl : public Base<TermVariableImpl>
 {
 private:
@@ -56,10 +70,8 @@ private:
     TermVariableImpl(size_t index, Variable variable);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<TermImpl, Hash<const TermImpl*, true>, EqualTo<const TermImpl*, true>>;
+    friend class UniqueValueTypeFactory<TermImpl>;
 
-    bool is_structurally_equivalent_to_impl(const TermVariableImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -67,6 +79,18 @@ private:
 
 public:
     const Variable& get_variable() const;
+};
+
+template<>
+struct ShallowHash<TermVariableImpl>
+{
+    size_t operator()(const TermVariableImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<TermVariableImpl>
+{
+    bool operator()(const TermVariableImpl& l, const TermVariableImpl& r) const;
 };
 
 }

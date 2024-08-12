@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/value_type_factory.hpp"
+#include "loki/details/utils/unique_value_type_factory.hpp"
 
 #include <string>
 
@@ -33,13 +33,10 @@ private:
     double m_number;
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<NumericFluentImpl, Hash<const NumericFluentImpl*, true>, EqualTo<const NumericFluentImpl*, true>>;
+    friend class UniqueValueTypeFactory<NumericFluentImpl>;
 
     NumericFluentImpl(size_t index, Function function, double number);
 
-    /// @brief Test for semantic equivalence
-    bool is_structurally_equivalent_to_impl(const NumericFluentImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -48,6 +45,18 @@ private:
 public:
     const Function& get_function() const;
     double get_number() const;
+};
+
+template<>
+struct ShallowHash<NumericFluentImpl>
+{
+    size_t operator()(const NumericFluentImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<NumericFluentImpl>
+{
+    bool operator()(const NumericFluentImpl& l, const NumericFluentImpl& r) const;
 };
 
 }
