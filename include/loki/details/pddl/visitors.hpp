@@ -24,15 +24,6 @@
 
 namespace loki
 {
-struct LessComparatorVisitor
-{
-    template<typename T1, typename T2>
-    bool operator()(const T1& object_left, const T2& object_right) const
-    {
-        return object_left.get_index() < object_right.get_index();
-    }
-};
-
 struct StringifyVisitor
 {
     std::ostream& out;
