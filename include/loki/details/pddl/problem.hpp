@@ -21,7 +21,7 @@
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 #include "loki/details/utils/filesystem.hpp"
-#include "loki/details/utils/unique_value_type_factory.hpp"
+#include "loki/details/utils/unique_factory.hpp"
 
 #include <optional>
 #include <string>
@@ -57,7 +57,7 @@ private:
                 AxiomList axioms);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ProblemImpl>;
+    friend class UniqueFactory<ProblemImpl>;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 

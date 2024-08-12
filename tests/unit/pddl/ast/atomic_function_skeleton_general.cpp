@@ -25,24 +25,20 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, FunctionSymbolTest)
+TEST(LokiTests, PddlAstAtomicFunctionSkeletonGeneralTest)
 {
-    // A function symbol is just a name
-    ast::FunctionSymbol ast;
+    ast::AtomicFunctionSkeletonGeneral ast;
 
-    EXPECT_NO_THROW(parse_ast("loki", function_symbol(), ast));
-    EXPECT_EQ(parse_text(ast), "loki");
-    EXPECT_NO_THROW(parse_ast("loki kilo", function_symbol(), ast));
-    EXPECT_NO_THROW(parse_ast("loki", function_symbol(), ast));
-    EXPECT_NO_THROW(parse_ast("loki(kilo)", function_symbol(), ast));
-    EXPECT_EQ(parse_text(ast), "loki");
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2)", atomic_function_skeleton_general(), ast));
+    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2)");
 
-    EXPECT_ANY_THROW(parse_ast("1loki", function_symbol(), ast));
-    EXPECT_ANY_THROW(parse_ast("-loki", function_symbol(), ast));
-    EXPECT_ANY_THROW(parse_ast("+loki", function_symbol(), ast));
-    EXPECT_ANY_THROW(parse_ast("*loki", function_symbol(), ast));
-    EXPECT_ANY_THROW(parse_ast("/loki", function_symbol(), ast));
-    EXPECT_ANY_THROW(parse_ast("?loki", function_symbol(), ast));
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 - type1 ?var2 - type2)", atomic_function_skeleton_general(), ast));
+    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 - type1\n?var2 - type2)");
+
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2 - type1)", atomic_function_skeleton_general(), ast));
+    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2 - type1)");
+
+    EXPECT_ANY_THROW(parse_ast("(?var1 ?var2 - type1)", atomic_function_skeleton_general(), ast));
 }
 
 }

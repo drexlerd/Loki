@@ -25,23 +25,17 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, NameTest)
+TEST(LokiTests, PddlAstTypedListOfVariablesRecursivelyTest)
 {
-    ast::Name ast;
+    ast::TypedListOfVariablesRecursively ast;
 
-    EXPECT_NO_THROW(parse_ast("loki", name(), ast));
-    EXPECT_EQ(parse_text(ast), "loki");
-    EXPECT_NO_THROW(parse_ast("loki kilo", name(), ast));
-    EXPECT_NO_THROW(parse_ast("loki", name(), ast));
-    EXPECT_NO_THROW(parse_ast("loki(kilo)", name(), ast));
-    EXPECT_EQ(parse_text(ast), "loki");
+    // recursive
+    EXPECT_NO_THROW(parse_ast("?var1 ?var2 - type1", typed_list_of_variables_recursively(), ast));
+    EXPECT_EQ(parse_text(ast), "?var1 ?var2 - type1");
 
-    EXPECT_ANY_THROW(parse_ast("1loki", name(), ast));
-    EXPECT_ANY_THROW(parse_ast("-loki", name(), ast));
-    EXPECT_ANY_THROW(parse_ast("+loki", name(), ast));
-    EXPECT_ANY_THROW(parse_ast("*loki", name(), ast));
-    EXPECT_ANY_THROW(parse_ast("/loki", name(), ast));
-    EXPECT_ANY_THROW(parse_ast("?loki", name(), ast));
+    // implicit "object" type
+    EXPECT_ANY_THROW(parse_ast("name1 name2", typed_list_of_variables_recursively(), ast));
+    EXPECT_ANY_THROW(parse_ast("?var1 ?var2", typed_list_of_variables_recursively(), ast));
 }
 
 }

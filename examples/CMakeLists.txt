@@ -9,11 +9,3 @@ target_link_libraries(single_problem loki::parsers)
 
 add_executable(undefined_behavior "undefined_behavior.cpp")
 target_link_libraries(undefined_behavior loki::parsers)
-
-
-add_custom_target(example_domain ALL
-    COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/data/gripper/domain.pddl" "${CMAKE_BINARY_DIR}/data/gripper/domain.pddl")
-add_custom_target(example_problem_0 ALL
-    COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/data/gripper/p-2-0.pddl" "${CMAKE_BINARY_DIR}/data/gripper/p-2-0.pddl")
-add_custom_target(example_problem_1 ALL
-    COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/data/gripper/p-2-1.pddl" "${CMAKE_BINARY_DIR}/data/gripper/p-2-1.pddl")

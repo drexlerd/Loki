@@ -25,19 +25,24 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, FunctionTypedListOfAtomicFunctionSkeletonsRecursivelyTest)
+TEST(LokiTests, PddlAstFunctionSymbolTest)
 {
-    ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively ast;
+    // A function symbol is just a name
+    ast::FunctionSymbol ast;
 
-    // recursive
-    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - number", function_typed_list_of_atomic_function_skeletons_recursively(), ast));
-    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2) - number");
+    EXPECT_NO_THROW(parse_ast("loki", function_symbol(), ast));
+    EXPECT_EQ(parse_text(ast), "loki");
+    EXPECT_NO_THROW(parse_ast("loki kilo", function_symbol(), ast));
+    EXPECT_NO_THROW(parse_ast("loki", function_symbol(), ast));
+    EXPECT_NO_THROW(parse_ast("loki(kilo)", function_symbol(), ast));
+    EXPECT_EQ(parse_text(ast), "loki");
 
-    // implicit "number" type
-    EXPECT_ANY_THROW(parse_ast("(function-symbol1 ?var1 ?var2)", function_typed_list_of_atomic_function_skeletons_recursively(), ast));
-
-    // function type does not match "number"
-    EXPECT_ANY_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - wrong", function_typed_list_of_atomic_function_skeletons_recursively(), ast));
+    EXPECT_ANY_THROW(parse_ast("1loki", function_symbol(), ast));
+    EXPECT_ANY_THROW(parse_ast("-loki", function_symbol(), ast));
+    EXPECT_ANY_THROW(parse_ast("+loki", function_symbol(), ast));
+    EXPECT_ANY_THROW(parse_ast("*loki", function_symbol(), ast));
+    EXPECT_ANY_THROW(parse_ast("/loki", function_symbol(), ast));
+    EXPECT_ANY_THROW(parse_ast("?loki", function_symbol(), ast));
 }
 
 }

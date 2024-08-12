@@ -40,37 +40,36 @@
 #include "loki/details/pddl/term.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
-#include "loki/details/utils/unique_value_type_factory.hpp"
+#include "loki/details/utils/unique_factory.hpp"
 #include "loki/details/utils/variadic_container.hpp"
 
 namespace loki
 {
 
-using RequirementsFactory = UniqueValueTypeFactory<RequirementsImpl, ShallowHash<const RequirementsImpl*>, ShallowEqualTo<const RequirementsImpl*>>;
-using TypeFactory = UniqueValueTypeFactory<TypeImpl, ShallowHash<const TypeImpl*>, ShallowEqualTo<const TypeImpl*>>;
-using VariableFactory = UniqueValueTypeFactory<VariableImpl, ShallowHash<const VariableImpl*>, ShallowEqualTo<const VariableImpl*>>;
-using TermFactory = UniqueValueTypeFactory<TermImpl, ShallowHash<const TermImpl*>, ShallowEqualTo<const TermImpl*>>;
-using ObjectFactory = UniqueValueTypeFactory<ObjectImpl, ShallowHash<const ObjectImpl*>, ShallowEqualTo<const ObjectImpl*>>;
-using AtomFactory = UniqueValueTypeFactory<AtomImpl, ShallowHash<const AtomImpl*>, ShallowEqualTo<const AtomImpl*>>;
-using LiteralFactory = UniqueValueTypeFactory<LiteralImpl, ShallowHash<const LiteralImpl*>, ShallowEqualTo<const LiteralImpl*>>;
-using ParameterFactory = UniqueValueTypeFactory<ParameterImpl, ShallowHash<const ParameterImpl*>, ShallowEqualTo<const ParameterImpl*>>;
-using PredicateFactory = UniqueValueTypeFactory<PredicateImpl, ShallowHash<const PredicateImpl*>, ShallowEqualTo<const PredicateImpl*>>;
+using RequirementsFactory = UniqueFactory<RequirementsImpl, ShallowHash<const RequirementsImpl*>, ShallowEqualTo<const RequirementsImpl*>>;
+using TypeFactory = UniqueFactory<TypeImpl, ShallowHash<const TypeImpl*>, ShallowEqualTo<const TypeImpl*>>;
+using VariableFactory = UniqueFactory<VariableImpl, ShallowHash<const VariableImpl*>, ShallowEqualTo<const VariableImpl*>>;
+using TermFactory = UniqueFactory<TermImpl, ShallowHash<const TermImpl*>, ShallowEqualTo<const TermImpl*>>;
+using ObjectFactory = UniqueFactory<ObjectImpl, ShallowHash<const ObjectImpl*>, ShallowEqualTo<const ObjectImpl*>>;
+using AtomFactory = UniqueFactory<AtomImpl, ShallowHash<const AtomImpl*>, ShallowEqualTo<const AtomImpl*>>;
+using LiteralFactory = UniqueFactory<LiteralImpl, ShallowHash<const LiteralImpl*>, ShallowEqualTo<const LiteralImpl*>>;
+using ParameterFactory = UniqueFactory<ParameterImpl, ShallowHash<const ParameterImpl*>, ShallowEqualTo<const ParameterImpl*>>;
+using PredicateFactory = UniqueFactory<PredicateImpl, ShallowHash<const PredicateImpl*>, ShallowEqualTo<const PredicateImpl*>>;
 using FunctionExpressionFactory =
-    UniqueValueTypeFactory<FunctionExpressionImpl, ShallowHash<const FunctionExpressionImpl*>, ShallowEqualTo<const FunctionExpressionImpl*>>;
-using FunctionFactory = UniqueValueTypeFactory<FunctionImpl, ShallowHash<const FunctionImpl*>, ShallowEqualTo<const FunctionImpl*>>;
-using FunctionSkeletonFactory =
-    UniqueValueTypeFactory<FunctionSkeletonImpl, ShallowHash<const FunctionSkeletonImpl*>, ShallowEqualTo<const FunctionSkeletonImpl*>>;
-using ConditionFactory = UniqueValueTypeFactory<ConditionImpl, ShallowHash<const ConditionImpl*>, ShallowEqualTo<const ConditionImpl*>>;
-using EffectFactory = UniqueValueTypeFactory<EffectImpl, ShallowHash<const EffectImpl*>, ShallowEqualTo<const EffectImpl*>>;
-using ActionFactory = UniqueValueTypeFactory<ActionImpl, ShallowHash<const ActionImpl*>, ShallowEqualTo<const ActionImpl*>>;
-using AxiomFactory = UniqueValueTypeFactory<AxiomImpl, ShallowHash<const AxiomImpl*>, ShallowEqualTo<const AxiomImpl*>>;
+    UniqueFactory<FunctionExpressionImpl, ShallowHash<const FunctionExpressionImpl*>, ShallowEqualTo<const FunctionExpressionImpl*>>;
+using FunctionFactory = UniqueFactory<FunctionImpl, ShallowHash<const FunctionImpl*>, ShallowEqualTo<const FunctionImpl*>>;
+using FunctionSkeletonFactory = UniqueFactory<FunctionSkeletonImpl, ShallowHash<const FunctionSkeletonImpl*>, ShallowEqualTo<const FunctionSkeletonImpl*>>;
+using ConditionFactory = UniqueFactory<ConditionImpl, ShallowHash<const ConditionImpl*>, ShallowEqualTo<const ConditionImpl*>>;
+using EffectFactory = UniqueFactory<EffectImpl, ShallowHash<const EffectImpl*>, ShallowEqualTo<const EffectImpl*>>;
+using ActionFactory = UniqueFactory<ActionImpl, ShallowHash<const ActionImpl*>, ShallowEqualTo<const ActionImpl*>>;
+using AxiomFactory = UniqueFactory<AxiomImpl, ShallowHash<const AxiomImpl*>, ShallowEqualTo<const AxiomImpl*>>;
 using OptimizationMetricFactory =
-    UniqueValueTypeFactory<OptimizationMetricImpl, ShallowHash<const OptimizationMetricImpl*>, ShallowEqualTo<const OptimizationMetricImpl*>>;
-using NumericFluentFactory = UniqueValueTypeFactory<NumericFluentImpl, ShallowHash<const NumericFluentImpl*>, ShallowEqualTo<const NumericFluentImpl*>>;
-using DomainFactory = UniqueValueTypeFactory<DomainImpl, ShallowHash<const DomainImpl*>, ShallowEqualTo<const DomainImpl*>>;
-using ProblemFactory = UniqueValueTypeFactory<ProblemImpl, ShallowHash<const ProblemImpl*>, ShallowEqualTo<const ProblemImpl*>>;
+    UniqueFactory<OptimizationMetricImpl, ShallowHash<const OptimizationMetricImpl*>, ShallowEqualTo<const OptimizationMetricImpl*>>;
+using NumericFluentFactory = UniqueFactory<NumericFluentImpl, ShallowHash<const NumericFluentImpl*>, ShallowEqualTo<const NumericFluentImpl*>>;
+using DomainFactory = UniqueFactory<DomainImpl, ShallowHash<const DomainImpl*>, ShallowEqualTo<const DomainImpl*>>;
+using ProblemFactory = UniqueFactory<ProblemImpl, ShallowHash<const ProblemImpl*>, ShallowEqualTo<const ProblemImpl*>>;
 
-using VariadicPDDLConstructorFactory = VariadicContainer<RequirementsFactory,  //
+using VariadicPDDLConstructorFactory = VariadicContainer<RequirementsFactory,
                                                          TypeFactory,
                                                          VariableFactory,
                                                          TermFactory,
@@ -90,27 +89,6 @@ using VariadicPDDLConstructorFactory = VariadicContainer<RequirementsFactory,  /
                                                          NumericFluentFactory,
                                                          DomainFactory,
                                                          ProblemFactory>;
-
-using PDDLPositionCache = PositionCache<RequirementsImpl,
-                                        TypeImpl,
-                                        VariableImpl,
-                                        TermImpl,
-                                        ObjectImpl,
-                                        AtomImpl,
-                                        LiteralImpl,
-                                        ParameterImpl,
-                                        PredicateImpl,
-                                        FunctionExpressionImpl,
-                                        FunctionImpl,
-                                        FunctionSkeletonImpl,
-                                        ConditionImpl,
-                                        EffectImpl,
-                                        ActionImpl,
-                                        AxiomImpl,
-                                        OptimizationMetricImpl,
-                                        NumericFluentImpl,
-                                        DomainImpl,
-                                        ProblemImpl>;
 
 /// @brief Collection of factories for the unique creation of PDDL objects.
 class PDDLFactories
@@ -216,6 +194,28 @@ public:
                                   std::optional<OptimizationMetric> optimization_metric,
                                   AxiomList axioms);
 };
+
+// Here is a good place to define the `PDDLPositionCache` alias since we have all includes available.
+using PDDLPositionCache = PositionCache<RequirementsImpl,
+                                        TypeImpl,
+                                        VariableImpl,
+                                        TermImpl,
+                                        ObjectImpl,
+                                        AtomImpl,
+                                        LiteralImpl,
+                                        ParameterImpl,
+                                        PredicateImpl,
+                                        FunctionExpressionImpl,
+                                        FunctionImpl,
+                                        FunctionSkeletonImpl,
+                                        ConditionImpl,
+                                        EffectImpl,
+                                        ActionImpl,
+                                        AxiomImpl,
+                                        OptimizationMetricImpl,
+                                        NumericFluentImpl,
+                                        DomainImpl,
+                                        ProblemImpl>;
 
 }
 

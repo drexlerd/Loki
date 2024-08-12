@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/unique_value_type_factory.hpp"
+#include "loki/details/utils/unique_factory.hpp"
 
 #include <string>
 
@@ -37,7 +37,7 @@ private:
     TermObjectImpl(size_t index, Object object);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<TermImpl>;
+    friend class UniqueFactory<TermImpl>;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
@@ -70,7 +70,7 @@ private:
     TermVariableImpl(size_t index, Variable variable);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<TermImpl>;
+    friend class UniqueFactory<TermImpl>;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 

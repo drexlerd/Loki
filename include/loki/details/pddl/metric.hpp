@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/unique_value_type_factory.hpp"
+#include "loki/details/utils/unique_factory.hpp"
 
 #include <string>
 
@@ -44,7 +44,7 @@ private:
     OptimizationMetricImpl(size_t index, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<OptimizationMetricImpl>;
+    friend class UniqueFactory<OptimizationMetricImpl>;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 

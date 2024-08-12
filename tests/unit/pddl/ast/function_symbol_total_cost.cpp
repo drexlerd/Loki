@@ -25,22 +25,15 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, NumberTest)
+TEST(LokiTests, PddlAstFunctionSymbolTotalCostTest)
 {
-    ast::Number ast;
+    ast::FunctionSymbol ast;
 
-    EXPECT_NO_THROW(parse_ast("5", number(), ast));
-    EXPECT_EQ(parse_text(ast), "5");
-    EXPECT_NO_THROW(parse_ast("4.2", number(), ast));
-    EXPECT_EQ(parse_text(ast), "4.2");
-    EXPECT_NO_THROW(parse_ast("6 7", number(), ast));
-    EXPECT_EQ(parse_text(ast), "6");
-    // TODO: Is this really what we want?
-    EXPECT_NO_THROW(parse_ast("1loki", number(), ast));
-    EXPECT_EQ(parse_text(ast), "1");
+    EXPECT_NO_THROW(parse_ast("total-cost", function_symbol_total_cost(), ast));
+    EXPECT_EQ(parse_text(ast), "total-cost");
 
-    EXPECT_ANY_THROW(parse_ast("loki", number(), ast));
-    EXPECT_ANY_THROW(parse_ast("(5)", number(), ast));
+    // wrong keyword
+    EXPECT_ANY_THROW(parse_ast("loki ", function_symbol_total_cost(), ast));
 }
 
 }

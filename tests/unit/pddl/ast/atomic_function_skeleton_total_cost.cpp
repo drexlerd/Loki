@@ -25,23 +25,14 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, VariableTest)
+TEST(LokiTests, PddlAstAtomicFunctionSkeletonTotalCostTest)
 {
-    ast::Variable ast;
+    ast::AtomicFunctionSkeletonTotalCost ast;
 
-    EXPECT_NO_THROW(parse_ast("?loki", variable(), ast));
-    EXPECT_EQ(parse_text(ast), "?loki");
-    EXPECT_NO_THROW(parse_ast("?loki ?kilo", variable(), ast));
-    EXPECT_EQ(parse_text(ast), "?loki");
-    EXPECT_NO_THROW(parse_ast("?loki(?kilo)", variable(), ast));
-    EXPECT_EQ(parse_text(ast), "?loki");
+    EXPECT_NO_THROW(parse_ast("(total-cost)", atomic_function_skeleton_total_cost(), ast));
+    EXPECT_EQ(parse_text(ast), "(total-cost)");
 
-    EXPECT_ANY_THROW(parse_ast("loki", variable(), ast));
-    EXPECT_ANY_THROW(parse_ast("1loki", variable(), ast));
-    EXPECT_ANY_THROW(parse_ast("-loki", variable(), ast));
-    EXPECT_ANY_THROW(parse_ast("+loki", variable(), ast));
-    EXPECT_ANY_THROW(parse_ast("*loki", variable(), ast));
-    EXPECT_ANY_THROW(parse_ast("/loki", variable(), ast));
+    EXPECT_ANY_THROW(parse_ast("(loki)", atomic_function_skeleton_total_cost(), ast));
 }
 
 }

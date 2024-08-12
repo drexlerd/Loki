@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/unique_value_type_factory.hpp"
+#include "loki/details/utils/unique_factory.hpp"
 
 #include <optional>
 #include <string>
@@ -45,7 +45,7 @@ private:
                std::optional<Effect> effect);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ActionImpl>;
+    friend class UniqueFactory<ActionImpl>;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
@@ -53,11 +53,6 @@ private:
     friend class Base<ActionImpl>;
 
 public:
-    ActionImpl(const ActionImpl& other) = delete;
-    ActionImpl& operator=(const ActionImpl& other) = delete;
-    ActionImpl(ActionImpl&& other) = default;
-    ActionImpl& operator=(ActionImpl&& other) = default;
-
     const std::string& get_name() const;
     size_t get_original_arity() const;
     const ParameterList& get_parameters() const;

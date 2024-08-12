@@ -25,24 +25,23 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, PredicateTest)
+TEST(LokiTests, PddlAstTypedListOfNamesTest)
 {
-    // A predicate is just a name
-    ast::Predicate ast;
+    ast::TypedListOfNames ast;
 
-    EXPECT_NO_THROW(parse_ast("loki", predicate(), ast));
-    EXPECT_EQ(parse_text(ast), "loki");
-    EXPECT_NO_THROW(parse_ast("loki kilo", predicate(), ast));
-    EXPECT_NO_THROW(parse_ast("loki", predicate(), ast));
-    EXPECT_NO_THROW(parse_ast("loki(kilo)", predicate(), ast));
-    EXPECT_EQ(parse_text(ast), "loki");
+    // recursive alternative
+    EXPECT_NO_THROW(parse_ast("name1 name2 - type1 name3 name4 - type2", typed_list_of_names(), ast));
+    EXPECT_EQ(parse_text(ast), "name1 name2 - type1\nname3 name4 - type2");
 
-    EXPECT_ANY_THROW(parse_ast("1loki", predicate(), ast));
-    EXPECT_ANY_THROW(parse_ast("-loki", predicate(), ast));
-    EXPECT_ANY_THROW(parse_ast("+loki", predicate(), ast));
-    EXPECT_ANY_THROW(parse_ast("*loki", predicate(), ast));
-    EXPECT_ANY_THROW(parse_ast("/loki", predicate(), ast));
-    EXPECT_ANY_THROW(parse_ast("?loki", predicate(), ast));
+    // implicit "object" type alternative
+    EXPECT_NO_THROW(parse_ast("name1 name2", typed_list_of_names(), ast));
+    EXPECT_EQ(parse_text(ast), "name1 name2");
+
+    EXPECT_NO_THROW(parse_ast("?var1 ?var2", typed_list_of_names(), ast));
+    EXPECT_EQ(parse_text(ast), "");
+
+    EXPECT_NO_THROW(parse_ast("- type1", typed_list_of_names(), ast));
+    EXPECT_EQ(parse_text(ast), "");
 }
 
 }

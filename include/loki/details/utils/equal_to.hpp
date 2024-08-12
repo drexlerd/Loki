@@ -25,13 +25,14 @@
 namespace loki
 {
 
-/// @brief `ShallowEqual` a hasher that should implemented to work in the following context:
-/// any object of a custom type `T` should have nested objects that are unique.
-/// @tparam T the type of the hasher.
+/// @brief `ShallowEqualTo` is a comparator that should be implemented to work in the context where
+/// all objects of a custom type `T` are uniquely created and uncopieable.
+/// This ensures that pointers can simply be compared and do not need to be dereferenced.
+/// @tparam T the type of the object to compare.
 template<typename T>
 struct ShallowEqualTo
 {
-    bool operator()(const T& l, const T& r) const { return std::equal<T>()(l, r); }
+    bool operator()(const T& l, const T& r) const { return std::equal_to<T>()(l, r); }
 };
 
 /// Spezialization for std::variant.

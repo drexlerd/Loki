@@ -21,17 +21,17 @@
 int main()
 {
     // Parse the domain
-    auto domain_parser = loki::DomainParser("data/gripper/domain.pddl");
+    auto domain_parser = loki::DomainParser(std::string(DATA_DIR) + "gripper/domain.pddl");
     const auto domain = domain_parser.get_domain();
     std::cout << *domain << std::endl;
 
     // Parse first problem
-    const auto problem_parser = loki::ProblemParser("data/gripper/p-2-0.pddl", domain_parser);
+    const auto problem_parser = loki::ProblemParser(std::string(DATA_DIR) + "gripper/p-2-0.pddl", domain_parser);
     const auto problem1 = problem_parser.get_problem();
     std::cout << *problem1 << std::endl;
 
     // Parse second problem where the constants are reordered
-    const auto problem_parser2 = loki::ProblemParser("data/gripper/p-2-1.pddl", domain_parser);
+    const auto problem_parser2 = loki::ProblemParser(std::string(DATA_DIR) + "gripper/p-2-1.pddl", domain_parser);
     const auto problem2 = problem_parser2.get_problem();
     std::cout << *problem2 << std::endl;
 

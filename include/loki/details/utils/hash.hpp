@@ -24,12 +24,15 @@
 #include <cstdint>
 #include <functional>
 #include <ranges>
-#include <span>
 #include <utility>
 
 namespace loki
 {
 
+/// @brief `ShallowHash` is a hasher that should be implemented to work in the context where
+/// all objects of a custom type `T` are uniquely created and uncopieable.
+/// This ensures that pointers can simply be hashed and do not need to be dereferenced.
+/// @tparam T the type of the object to hash.
 template<typename T>
 struct ShallowHash
 {

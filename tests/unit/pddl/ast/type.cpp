@@ -25,24 +25,16 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, TermTest)
+TEST(LokiTests, PddlAstTypeTest)
 {
-    ast::Term ast;
+    ast::Type ast;
 
-    EXPECT_NO_THROW(parse_ast("?loki", term(), ast));
-    EXPECT_EQ(parse_text(ast), "?loki");
-    EXPECT_NO_THROW(parse_ast("loki", term(), ast));
-    EXPECT_EQ(parse_text(ast), "loki");
-    EXPECT_NO_THROW(parse_ast("?loki(?kilo)", term(), ast));
-    EXPECT_EQ(parse_text(ast), "?loki");
-    EXPECT_NO_THROW(parse_ast("loki(kilo)", term(), ast));
-    EXPECT_EQ(parse_text(ast), "loki");
+    EXPECT_NO_THROW(parse_ast("(either type1 type2)", type(), ast));
+    EXPECT_EQ(parse_text(ast), "(either type1 type2)");
+    EXPECT_NO_THROW(parse_ast("(either type1 (either type2 type3))", type(), ast));
+    EXPECT_EQ(parse_text(ast), "(either type1 (either type2 type3))");
 
-    EXPECT_ANY_THROW(parse_ast("1loki", term(), ast));
-    EXPECT_ANY_THROW(parse_ast("-loki", term(), ast));
-    EXPECT_ANY_THROW(parse_ast("+loki", term(), ast));
-    EXPECT_ANY_THROW(parse_ast("*loki", term(), ast));
-    EXPECT_ANY_THROW(parse_ast("/loki", term(), ast));
+    EXPECT_NO_THROW(parse_ast("either", type(), ast));  // type either expects parenthesis around
 }
 
 }

@@ -25,15 +25,20 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, FunctionSymbolTotalCostTest)
+TEST(LokiTests, PddlAstFunctionTypedListOfAtomicFunctionSkeletonsTest)
 {
-    ast::FunctionSymbol ast;
+    ast::FunctionTypedListOfAtomicFunctionSkeletons ast;
 
-    EXPECT_NO_THROW(parse_ast("total-cost", function_symbol_total_cost(), ast));
-    EXPECT_EQ(parse_text(ast), "total-cost");
+    // recursive alternative
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - number", function_typed_list_of_atomic_function_skeletons(), ast));
+    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2) - number");
 
-    // wrong keyword
-    EXPECT_ANY_THROW(parse_ast("loki ", function_symbol_total_cost(), ast));
+    // implicit "number" type alternative
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2)", function_typed_list_of_atomic_function_skeletons(), ast));
+    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2)");
+
+    // function type does not match "number"
+    EXPECT_ANY_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - wrong", function_typed_list_of_atomic_function_skeletons(), ast));
 }
 
 }

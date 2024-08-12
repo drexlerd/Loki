@@ -25,20 +25,19 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, AtomicFormulaSkeletonTest)
+TEST(LokiTests, PddlAstFunctionTypedListOfAtomicFunctionSkeletonsRecursivelyTest)
 {
-    ast::AtomicFormulaSkeleton ast;
+    ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively ast;
 
-    EXPECT_NO_THROW(parse_ast("(predicate1 ?var1 ?var2)", atomic_formula_skeleton(), ast));
-    EXPECT_EQ(parse_text(ast), "(predicate1 ?var1 ?var2)");
+    // recursive
+    EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - number", function_typed_list_of_atomic_function_skeletons_recursively(), ast));
+    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2) - number");
 
-    EXPECT_NO_THROW(parse_ast("(predicate1 ?var1 - type1 ?var2 - type2)", atomic_formula_skeleton(), ast));
-    EXPECT_EQ(parse_text(ast), "(predicate1 ?var1 - type1\n?var2 - type2)");
+    // implicit "number" type
+    EXPECT_ANY_THROW(parse_ast("(function-symbol1 ?var1 ?var2)", function_typed_list_of_atomic_function_skeletons_recursively(), ast));
 
-    EXPECT_NO_THROW(parse_ast("(predicate1 ?var1 ?var2 - type1)", atomic_formula_skeleton(), ast));
-    EXPECT_EQ(parse_text(ast), "(predicate1 ?var1 ?var2 - type1)");
-
-    EXPECT_ANY_THROW(parse_ast("(?var1 ?var2 - type1)", atomic_formula_skeleton(), ast));
+    // function type does not match "number"
+    EXPECT_ANY_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - wrong", function_typed_list_of_atomic_function_skeletons_recursively(), ast));
 }
 
 }

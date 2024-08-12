@@ -27,33 +27,14 @@
 
 namespace loki
 {
-/// @brief Implements a common base class for PDDL objects.
-///
-///        Each PDDL object has an identifier.
-///        Identifiers are used to describe and detect semantically equivalent PDDL object.
-///        Detecting semantic equivalence is important for
-///            - reducing the required memory by detecting duplicates
-///            - reducing comparison and hashing to pointer level instead of traversing the whole structure
-///        For the following type of PDDL objects, loki detects semantic equivalence:
-///            * Type
-///            * Object
-///            * Variable
-///            * Term
-///            * Atom
-///            * NumericFluent
-///            * Literal
-///            * Parameter
-///            * Function
-///            * FunctionSkeleton
-///            * Requirements
-///        For the remaining type of PDDL objects, loki approximates semantic equivalence
-///        with structural equivalence where collections of objects are sorted by the identifier.
-///        For example, loki detects semantic equivalence of a conjunction of atoms
-///        but loki does not detect semantic equivalence of an arbitrary formula of atoms.
+/// @brief `Base` implements a common base class for PDDL objects.
+/// PDDL objects are uniquely created through a factory and are therefore made uncopieable.
 template<typename Derived>
 class Base
 {
-protected:
+private:
+    constexpr const auto& self() const { return static_cast<Derived const&>(*this); }
+
     size_t m_index;
 
     explicit Base(size_t index) : m_index(index) {}
@@ -65,8 +46,6 @@ public:
     Base& operator=(const Base& other) = delete;
     Base(Base&& other) = default;
     Base& operator=(Base&& other) = default;
-
-    constexpr const auto& self() const { return static_cast<Derived const&>(*this); }
 
     bool operator<(const Base& other) const { return m_index < other.m_index; }
 
@@ -91,7 +70,7 @@ public:
         return out.str();
     }
 
-    /// @brief Returns the identifier
+    /// @brief Get the index.
     size_t get_index() const { return m_index; }
 };
 

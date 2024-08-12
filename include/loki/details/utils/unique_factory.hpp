@@ -31,47 +31,51 @@
 namespace loki
 {
 
-/// @brief `UniqueValueTypeFactory` manages unique creation of objects
+/// @brief `UniqueFactory` manages unique creation of objects
 /// in a persistent and efficient manner, utilizing a combination of unordered_set for
 /// uniqueness checks and SegmentedVector for continuous and cache-efficient storage of value types.
 /// @tparam HolderType is the holder value type which can be an std::variant.
 /// Note that using a base class value type will result in object slicing.
 /// @tparam Hash the hash function, default uses `ShallowHash` hasher.
-/// @tparam EqualTo the comparison function, default uses `ShallowEqualTo`.
+/// @tparam EqualTo the comparison function, default uses `ShallowEqualTo` comparator.
 template<typename HolderType, typename Hash = ShallowHash<const HolderType*>, typename EqualTo = ShallowEqualTo<const HolderType*>>
-class UniqueValueTypeFactory
+class UniqueFactory
 {
 private:
     // We use an unordered_set to test for uniqueness.
-    // We use pointers to the persistent memory.
     std::unordered_set<const HolderType*, Hash, EqualTo> m_uniqueness_set;
 
-    // Use pre-allocated memory to store PDDL object persistent.
+    // We use pre-allocated memory to store objects persistent.
     SegmentedVector<HolderType> m_persistent_vector;
 
     void range_check(size_t pos) const
     {
         if (pos >= size())
         {
-            throw std::out_of_range("SegmentedVector::range_check: pos (which is " + std::to_string(pos) + ") >= this->size() (which is "
-                                    + std::to_string(size()) + ")");
+            throw std::out_of_range("UniqueFactory::range_check: pos (which is " + std::to_string(pos) + ") >= this->size() (which is " + std::to_string(size())
+                                    + ")");
         }
     }
 
 public:
-    UniqueValueTypeFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
+    UniqueFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
         m_persistent_vector(SegmentedVector<HolderType>(initial_num_element_per_segment, maximum_num_elements_per_segment))
     {
     }
-    UniqueValueTypeFactory(const UniqueValueTypeFactory& other) = delete;
-    UniqueValueTypeFactory& operator=(const UniqueValueTypeFactory& other) = delete;
-    UniqueValueTypeFactory(UniqueValueTypeFactory&& other) = default;
-    UniqueValueTypeFactory& operator=(UniqueValueTypeFactory&& other) = default;
+    UniqueFactory(const UniqueFactory& other) = delete;
+    UniqueFactory& operator=(const UniqueFactory& other) = delete;
+    UniqueFactory(UniqueFactory&& other) = default;
+    UniqueFactory& operator=(UniqueFactory&& other) = default;
 
-    /// @brief Returns a pointer to an existing object
-    ///        or creates it before if it does not exist.
+    /// @brief Returns a pointer to an existing object or creates it before if it does not exist.
+    /// The `SubType` is not allowed to be copieable because `ShallowHash` and `ShallowEqualTo`
+    /// is implemented to hash and compare simply the pointers.
+    /// The `HolderType` is allowed to be copieable but `ShallowHash` and `ShallowEqualTo`
+    /// will have to take this into account by hashing and comparing the nested `SubType`.
+    /// For example, if `HolderType` is a std::variant, then `ShallowHash` and `ShallowEqual`
+    /// will hash or compare the nested `SubType` object.
     template<typename SubType, typename... Args>
-    HolderType const* get_or_create(Args&&... args)
+    requires(!std::is_copy_constructible_v<SubType>) HolderType const* get_or_create(Args&&... args)
     {
         /* Construct and insert the element in persistent memory. */
 

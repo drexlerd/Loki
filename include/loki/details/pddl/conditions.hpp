@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/unique_value_type_factory.hpp"
+#include "loki/details/utils/unique_factory.hpp"
 
 #include <string>
 
@@ -36,7 +36,7 @@ private:
     ConditionLiteralImpl(size_t index, Literal literal);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl>;
+    friend class UniqueFactory<ConditionImpl>;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
@@ -68,7 +68,7 @@ private:
     ConditionAndImpl(size_t index, ConditionList conditions);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl>;
+    friend class UniqueFactory<ConditionImpl>;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
@@ -100,7 +100,7 @@ private:
     ConditionOrImpl(size_t index, ConditionList conditions);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl>;
+    friend class UniqueFactory<ConditionImpl>;
 
     bool is_structurally_equivalent_to_impl(const ConditionOrImpl& other) const;
     size_t hash_impl() const;
@@ -134,7 +134,7 @@ private:
     ConditionNotImpl(size_t index, Condition condition);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl>;
+    friend class UniqueFactory<ConditionImpl>;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
@@ -167,7 +167,7 @@ private:
     ConditionImplyImpl(size_t index, Condition condition_left, Condition condition_right);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl>;
+    friend class UniqueFactory<ConditionImpl>;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
@@ -201,7 +201,7 @@ private:
     ConditionExistsImpl(size_t index, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl>;
+    friend class UniqueFactory<ConditionImpl>;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
@@ -235,7 +235,7 @@ private:
     ConditionForallImpl(size_t index, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl>;
+    friend class UniqueFactory<ConditionImpl>;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 

@@ -25,7 +25,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, TypedListOfVariablesTest)
+TEST(LokiTests, PddlAstTypedListOfVariablesTest)
 {
     ast::TypedListOfVariables ast;
 

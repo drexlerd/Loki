@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/unique_value_type_factory.hpp"
+#include "loki/details/utils/unique_factory.hpp"
 
 #include <string>
 
@@ -35,7 +35,7 @@ private:
     LiteralImpl(size_t index, bool is_negated, Atom atom);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<LiteralImpl>;
+    friend class UniqueFactory<LiteralImpl>;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 

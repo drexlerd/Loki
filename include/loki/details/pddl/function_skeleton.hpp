@@ -20,7 +20,7 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/unique_value_type_factory.hpp"
+#include "loki/details/utils/unique_factory.hpp"
 
 #include <string>
 
@@ -36,7 +36,7 @@ private:
     FunctionSkeletonImpl(size_t index, std::string name, ParameterList parameters, Type type);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<FunctionSkeletonImpl>;
+    friend class UniqueFactory<FunctionSkeletonImpl>;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 

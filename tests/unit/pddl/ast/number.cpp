@@ -25,17 +25,22 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, TypedListOfNamesRecursivelyTest)
+TEST(LokiTests, PddlAstNumberTest)
 {
-    ast::TypedListOfNamesRecursively ast;
+    ast::Number ast;
 
-    // recursive
-    EXPECT_NO_THROW(parse_ast("name1 name2 - type1", typed_list_of_names_recursively(), ast));
-    EXPECT_EQ(parse_text(ast), "name1 name2 - type1");
+    EXPECT_NO_THROW(parse_ast("5", number(), ast));
+    EXPECT_EQ(parse_text(ast), "5");
+    EXPECT_NO_THROW(parse_ast("4.2", number(), ast));
+    EXPECT_EQ(parse_text(ast), "4.2");
+    EXPECT_NO_THROW(parse_ast("6 7", number(), ast));
+    EXPECT_EQ(parse_text(ast), "6");
+    // TODO: Is this really what we want?
+    EXPECT_NO_THROW(parse_ast("1loki", number(), ast));
+    EXPECT_EQ(parse_text(ast), "1");
 
-    // implicit "object" type
-    EXPECT_ANY_THROW(parse_ast("name1 name2", typed_list_of_names_recursively(), ast));
-    EXPECT_ANY_THROW(parse_ast("?var1 ?var2", typed_list_of_names_recursively(), ast));
+    EXPECT_ANY_THROW(parse_ast("loki", number(), ast));
+    EXPECT_ANY_THROW(parse_ast("(5)", number(), ast));
 }
 
 }

@@ -25,16 +25,17 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, TypeEitherTest)
+TEST(LokiTests, PddlAstTypedListOfNamesRecursivelyTest)
 {
-    ast::TypeEither ast;
+    ast::TypedListOfNamesRecursively ast;
 
-    EXPECT_NO_THROW(parse_ast("(either type1 type2)", type_either(), ast));
-    EXPECT_EQ(parse_text(ast), "(either type1 type2)");
-    EXPECT_NO_THROW(parse_ast("(either type1 (either type2 type3))", type_either(), ast));
-    EXPECT_EQ(parse_text(ast), "(either type1 (either type2 type3))");
+    // recursive
+    EXPECT_NO_THROW(parse_ast("name1 name2 - type1", typed_list_of_names_recursively(), ast));
+    EXPECT_EQ(parse_text(ast), "name1 name2 - type1");
 
-    EXPECT_ANY_THROW(parse_ast("either", type_either(), ast));  // can be parsed into name
+    // implicit "object" type
+    EXPECT_ANY_THROW(parse_ast("name1 name2", typed_list_of_names_recursively(), ast));
+    EXPECT_ANY_THROW(parse_ast("?var1 ?var2", typed_list_of_names_recursively(), ast));
 }
 
 }
