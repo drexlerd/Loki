@@ -42,36 +42,26 @@ const std::string& to_string(AssignOperatorEnum assign_operator)
     return assign_operator_enum_to_string.at(assign_operator);
 }
 
-/* Literal */
+/* EffectLiteral */
 EffectLiteralImpl::EffectLiteralImpl(size_t index, Literal literal) : Base(index), m_literal(std::move(literal)) {}
-
-bool EffectLiteralImpl::is_structurally_equivalent_to_impl(const EffectLiteralImpl& other) const
-{
-    if (this != &other)
-    {
-        return m_literal == other.m_literal;
-    }
-    return true;
-}
-
-size_t EffectLiteralImpl::hash_impl() const { return HashCombiner()(m_literal); }
 
 void EffectLiteralImpl::str_impl(std::ostream& out, const FormattingOptions& options) const { m_literal->str(out, options); }
 
 const Literal& EffectLiteralImpl::get_literal() const { return m_literal; }
 
-EffectAndImpl::EffectAndImpl(size_t index, EffectList effects) : Base(index), m_effects(std::move(effects)) {}
+size_t ShallowHash<EffectLiteralImpl>::operator()(const EffectLiteralImpl& e) const { return ShallowHashCombiner()(e.get_literal()); }
 
-bool EffectAndImpl::is_structurally_equivalent_to_impl(const EffectAndImpl& other) const
+bool ShallowEqualTo<EffectLiteralImpl>::operator()(const EffectLiteralImpl& l, const EffectLiteralImpl& r) const
 {
-    if (this != &other)
+    if (&l != &r)
     {
-        return get_sorted_vector(m_effects) == get_sorted_vector(other.m_effects);
+        return (l.get_literal() == r.get_literal());
     }
     return true;
 }
 
-size_t EffectAndImpl::hash_impl() const { return HashCombiner()(get_sorted_vector(m_effects)); }
+/* EffectAnd */
+EffectAndImpl::EffectAndImpl(size_t index, EffectList effects) : Base(index), m_effects(std::move(effects)) {}
 
 void EffectAndImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -87,6 +77,17 @@ void EffectAndImpl::str_impl(std::ostream& out, const FormattingOptions& options
 
 const EffectList& EffectAndImpl::get_effects() const { return m_effects; }
 
+size_t ShallowHash<EffectAndImpl>::operator()(const EffectAndImpl& e) const { return ShallowHashCombiner()(get_sorted_vector(e.get_effects())); }
+
+bool ShallowEqualTo<EffectAndImpl>::operator()(const EffectAndImpl& l, const EffectAndImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (get_sorted_vector(l.get_effects()) == get_sorted_vector(r.get_effects()));
+    }
+    return true;
+}
+
 /* EffectNumeric */
 EffectNumericImpl::EffectNumericImpl(size_t index, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression) :
     Base(index),
@@ -95,17 +96,6 @@ EffectNumericImpl::EffectNumericImpl(size_t index, AssignOperatorEnum assign_ope
     m_function_expression(std::move(function_expression))
 {
 }
-
-bool EffectNumericImpl::is_structurally_equivalent_to_impl(const EffectNumericImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_assign_operator == other.m_assign_operator) && (m_function == other.m_function) && (m_function_expression == other.m_function_expression);
-    }
-    return true;
-}
-
-size_t EffectNumericImpl::hash_impl() const { return HashCombiner()(m_assign_operator, m_function, m_function_expression); }
 
 void EffectNumericImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -122,24 +112,28 @@ const Function& EffectNumericImpl::get_function() const { return m_function; }
 
 const FunctionExpression& EffectNumericImpl::get_function_expression() const { return m_function_expression; }
 
-/* ConditionalForall */
+size_t ShallowHash<EffectNumericImpl>::operator()(const EffectNumericImpl& e) const
+{
+    return ShallowHashCombiner()(e.get_assign_operator(), e.get_function(), e.get_function_expression());
+}
+
+bool ShallowEqualTo<EffectNumericImpl>::operator()(const EffectNumericImpl& l, const EffectNumericImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_assign_operator() == r.get_assign_operator()) && (l.get_function() == r.get_function())
+               && (l.get_function_expression() == r.get_function_expression());
+    }
+    return true;
+}
+
+/* ConditionalConditionalForall */
 EffectConditionalForallImpl::EffectConditionalForallImpl(size_t index, ParameterList parameters, Effect effect) :
     Base(index),
     m_parameters(std::move(parameters)),
     m_effect(std::move(effect))
 {
 }
-
-bool EffectConditionalForallImpl::is_structurally_equivalent_to_impl(const EffectConditionalForallImpl& other) const
-{
-    if (this != &other)
-    {
-        return (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters)) && (m_effect == other.m_effect);
-    }
-    return true;
-}
-
-size_t EffectConditionalForallImpl::hash_impl() const { return HashCombiner()(get_sorted_vector(m_parameters), m_effect); }
 
 void EffectConditionalForallImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -159,23 +153,27 @@ const ParameterList& EffectConditionalForallImpl::get_parameters() const { retur
 
 const Effect& EffectConditionalForallImpl::get_effect() const { return m_effect; }
 
+size_t ShallowHash<EffectConditionalForallImpl>::operator()(const EffectConditionalForallImpl& e) const
+{
+    return ShallowHashCombiner()(e.get_effect(), get_sorted_vector(e.get_parameters()));
+}
+
+bool ShallowEqualTo<EffectConditionalForallImpl>::operator()(const EffectConditionalForallImpl& l, const EffectConditionalForallImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_effect() == r.get_effect()) && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()));
+    }
+    return true;
+}
+
+/* EffectConditionalWhen */
 EffectConditionalWhenImpl::EffectConditionalWhenImpl(size_t index, Condition condition, Effect effect) :
     Base(index),
     m_condition(std::move(condition)),
     m_effect(std::move(effect))
 {
 }
-
-bool EffectConditionalWhenImpl::is_structurally_equivalent_to_impl(const EffectConditionalWhenImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_condition == other.m_condition) && (m_effect == other.m_effect);
-    }
-    return true;
-}
-
-size_t EffectConditionalWhenImpl::hash_impl() const { return HashCombiner()(m_condition, m_effect); }
 
 void EffectConditionalWhenImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -189,5 +187,19 @@ void EffectConditionalWhenImpl::str_impl(std::ostream& out, const FormattingOpti
 const Condition& EffectConditionalWhenImpl::get_condition() const { return m_condition; }
 
 const Effect& EffectConditionalWhenImpl::get_effect() const { return m_effect; }
+
+size_t ShallowHash<EffectConditionalWhenImpl>::operator()(const EffectConditionalWhenImpl& e) const
+{
+    return ShallowHashCombiner()(e.get_condition(), e.get_effect());
+}
+
+bool ShallowEqualTo<EffectConditionalWhenImpl>::operator()(const EffectConditionalWhenImpl& l, const EffectConditionalWhenImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_condition() == r.get_condition()) && (l.get_effect() == r.get_effect());
+    }
+    return true;
+}
 
 }

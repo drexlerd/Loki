@@ -26,23 +26,7 @@
 
 namespace loki
 {
-ParameterImpl::ParameterImpl(size_t index, Variable variable, TypeList types) :
-    Base(index),
-    m_variable(std::move(variable)),
-    m_types(std::move(types))
-{
-}
-
-bool ParameterImpl::is_structurally_equivalent_to_impl(const ParameterImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_variable == other.m_variable) && (get_sorted_vector(m_types) == get_sorted_vector(other.m_types));
-    }
-    return true;
-}
-
-size_t ParameterImpl::hash_impl() const { return HashCombiner()(m_variable, get_sorted_vector(m_types)); }
+ParameterImpl::ParameterImpl(size_t index, Variable variable, TypeList types) : Base(index), m_variable(std::move(variable)), m_types(std::move(types)) {}
 
 void ParameterImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const
 {
@@ -71,6 +55,20 @@ void ParameterImpl::str_impl(std::ostream& out, const FormattingOptions& /*optio
 const Variable& ParameterImpl::get_variable() const { return m_variable; }
 
 const TypeList& ParameterImpl::get_bases() const { return m_types; }
+
+size_t ShallowHash<ParameterImpl>::operator()(const ParameterImpl& e) const
+{
+    return ShallowHashCombiner()(e.get_variable(), get_sorted_vector(e.get_bases()));
+}
+
+bool ShallowEqualTo<ParameterImpl>::operator()(const ParameterImpl& l, const ParameterImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_variable() == r.get_variable()) && (get_sorted_vector(l.get_bases()) == get_sorted_vector(r.get_bases()));
+    }
+    return true;
+}
 
 bool is_specialized_parameter(const Parameter& specialized_parameter, const Parameter& generalized_parameter)
 {

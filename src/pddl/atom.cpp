@@ -27,17 +27,6 @@ namespace loki
 {
 AtomImpl::AtomImpl(size_t index, Predicate predicate, TermList terms) : Base(index), m_predicate(std::move(predicate)), m_terms(std::move(terms)) {}
 
-bool AtomImpl::is_structurally_equivalent_to_impl(const AtomImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_predicate == other.m_predicate) && (m_terms == other.m_terms);
-    }
-    return true;
-}
-
-size_t AtomImpl::hash_impl() const { return HashCombiner()(m_predicate, m_terms); }
-
 void AtomImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
     out << "(" << m_predicate->get_name();
@@ -52,5 +41,16 @@ void AtomImpl::str_impl(std::ostream& out, const FormattingOptions& options) con
 const Predicate& AtomImpl::get_predicate() const { return m_predicate; }
 
 const TermList& AtomImpl::get_terms() const { return m_terms; }
+
+size_t ShallowHash<AtomImpl>::operator()(const AtomImpl& e) const { return ShallowHashCombiner()(e.get_predicate(), e.get_terms()); }
+
+bool ShallowEqualTo<AtomImpl>::operator()(const AtomImpl& l, const AtomImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_predicate() == r.get_predicate()) && (l.get_terms() == r.get_terms());
+    }
+    return true;
+}
 
 }

@@ -64,35 +64,6 @@ ProblemImpl::ProblemImpl(size_t index,
 {
 }
 
-bool ProblemImpl::is_structurally_equivalent_to_impl(const ProblemImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_domain == other.m_domain) && (m_name == other.m_name) && (m_requirements == other.m_requirements)
-               && (get_sorted_vector(m_objects) == get_sorted_vector(other.m_objects))
-               && (get_sorted_vector(m_initial_literals)) == get_sorted_vector(other.m_initial_literals) && (m_goal_condition == other.m_goal_condition)
-               && (m_optimization_metric == other.m_optimization_metric)
-               && (get_sorted_vector(m_derived_predicates) == get_sorted_vector(other.m_derived_predicates))
-               && (get_sorted_vector(m_axioms) == get_sorted_vector(other.m_axioms));
-    }
-    return true;
-}
-
-size_t ProblemImpl::hash_impl() const
-{
-    size_t goal_hash = (m_goal_condition.has_value()) ? HashCombiner()(m_goal_condition.value()) : 0;
-    size_t optimization_hash = (m_optimization_metric.has_value()) ? HashCombiner()(m_optimization_metric.value()) : 0;
-    return HashCombiner()(m_domain,
-                        m_name,
-                        m_requirements,
-                        get_sorted_vector(m_objects),
-                        get_sorted_vector(m_initial_literals),
-                        goal_hash,
-                        optimization_hash,
-                        get_sorted_vector(m_derived_predicates),
-                        get_sorted_vector(m_axioms));
-}
-
 void ProblemImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
     out << string(options.indent, ' ') << "(define (problem " << m_name << ")\n";
@@ -108,7 +79,7 @@ void ProblemImpl::str_impl(std::ostream& out, const FormattingOptions& options) 
     if (!m_objects.empty())
     {
         out << string(nested_options.indent, ' ') << "(:objects ";
-        std::unordered_map<TypeList, ObjectList, Hash<TypeList>> objects_by_types;
+        std::unordered_map<TypeList, ObjectList, ShallowHash<TypeList>> objects_by_types;
         for (const auto& object : m_objects)
         {
             objects_by_types[object->get_bases()].push_back(object);
@@ -228,5 +199,31 @@ const std::optional<Condition>& ProblemImpl::get_goal_condition() const { return
 const std::optional<OptimizationMetric>& ProblemImpl::get_optimization_metric() const { return m_optimization_metric; }
 
 const AxiomList& ProblemImpl::get_axioms() const { return m_axioms; }
+
+size_t ShallowHash<ProblemImpl>::operator()(const ProblemImpl& e) const
+{
+    return ShallowHashCombiner()(e.get_name(),
+                                 e.get_domain(),
+                                 get_sorted_vector(e.get_objects()),
+                                 get_sorted_vector(e.get_derived_predicates()),
+                                 get_sorted_vector(e.get_initial_literals()),
+                                 get_sorted_vector(e.get_numeric_fluents()),
+                                 e.get_goal_condition(),
+                                 e.get_optimization_metric());
+}
+
+bool ShallowEqualTo<ProblemImpl>::operator()(const ProblemImpl& l, const ProblemImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_name() == r.get_name()) && (l.get_domain() == r.get_domain())
+               && (get_sorted_vector(l.get_objects()) == get_sorted_vector(r.get_objects()))
+               && (get_sorted_vector(l.get_derived_predicates()) == get_sorted_vector(r.get_derived_predicates()))
+               && (get_sorted_vector(l.get_initial_literals()) == get_sorted_vector(r.get_initial_literals()))
+               && (get_sorted_vector(l.get_numeric_fluents()) == get_sorted_vector(r.get_numeric_fluents()))
+               && (l.get_goal_condition() == r.get_goal_condition()) && (l.get_optimization_metric() == r.get_optimization_metric());
+    }
+    return true;
+}
 
 }

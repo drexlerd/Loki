@@ -54,20 +54,20 @@ const std::string& to_string(MultiOperatorEnum multi_operator)
 /* FunctionExpressionNumber */
 FunctionExpressionNumberImpl::FunctionExpressionNumberImpl(size_t index, double number) : Base(index), m_number(number) {}
 
-bool FunctionExpressionNumberImpl::is_structurally_equivalent_to_impl(const FunctionExpressionNumberImpl& other) const
-{
-    if (this != &other)
-    {
-        return m_number == other.m_number;
-    }
-    return true;
-}
-
-size_t FunctionExpressionNumberImpl::hash_impl() const { return HashCombiner()(m_number); }
-
 void FunctionExpressionNumberImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const { out << m_number; }
 
 double FunctionExpressionNumberImpl::get_number() const { return m_number; }
+
+size_t ShallowHash<FunctionExpressionNumberImpl>::operator()(const FunctionExpressionNumberImpl& e) const { return ShallowHashCombiner()(e.get_number()); }
+
+bool ShallowEqualTo<FunctionExpressionNumberImpl>::operator()(const FunctionExpressionNumberImpl& l, const FunctionExpressionNumberImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_number() == r.get_number());
+    }
+    return true;
+}
 
 /* FunctionExpressionBinaryOperator */
 FunctionExpressionBinaryOperatorImpl::FunctionExpressionBinaryOperatorImpl(size_t index,
@@ -79,21 +79,6 @@ FunctionExpressionBinaryOperatorImpl::FunctionExpressionBinaryOperatorImpl(size_
     m_left_function_expression(std::move(left_function_expression)),
     m_right_function_expression(std::move(right_function_expression))
 {
-}
-
-bool FunctionExpressionBinaryOperatorImpl::is_structurally_equivalent_to_impl(const FunctionExpressionBinaryOperatorImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_binary_operator == other.m_binary_operator) && (m_left_function_expression == other.m_left_function_expression)
-               && (m_right_function_expression == other.m_right_function_expression);
-    }
-    return true;
-}
-
-size_t FunctionExpressionBinaryOperatorImpl::hash_impl() const
-{
-    return HashCombiner()(m_binary_operator, m_left_function_expression, m_right_function_expression);
 }
 
 void FunctionExpressionBinaryOperatorImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
@@ -111,6 +96,22 @@ const FunctionExpression& FunctionExpressionBinaryOperatorImpl::get_left_functio
 
 const FunctionExpression& FunctionExpressionBinaryOperatorImpl::get_right_function_expression() const { return m_right_function_expression; }
 
+size_t ShallowHash<FunctionExpressionBinaryOperatorImpl>::operator()(const FunctionExpressionBinaryOperatorImpl& e) const
+{
+    return ShallowHashCombiner()(e.get_binary_operator(), e.get_left_function_expression(), e.get_right_function_expression());
+}
+
+bool ShallowEqualTo<FunctionExpressionBinaryOperatorImpl>::operator()(const FunctionExpressionBinaryOperatorImpl& l,
+                                                                      const FunctionExpressionBinaryOperatorImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_binary_operator() == r.get_binary_operator()) && (l.get_left_function_expression() == r.get_left_function_expression())
+               && (l.get_right_function_expression() == r.get_right_function_expression());
+    }
+    return true;
+}
+
 /* FunctionExpressionMultiOperator */
 FunctionExpressionMultiOperatorImpl::FunctionExpressionMultiOperatorImpl(size_t index,
                                                                          MultiOperatorEnum multi_operator,
@@ -119,20 +120,6 @@ FunctionExpressionMultiOperatorImpl::FunctionExpressionMultiOperatorImpl(size_t 
     m_multi_operator(multi_operator),
     m_function_expressions(function_expressions)
 {
-}
-
-bool FunctionExpressionMultiOperatorImpl::is_structurally_equivalent_to_impl(const FunctionExpressionMultiOperatorImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_multi_operator == other.m_multi_operator) && (get_sorted_vector(m_function_expressions) == get_sorted_vector(other.m_function_expressions));
-    }
-    return true;
-}
-
-size_t FunctionExpressionMultiOperatorImpl::hash_impl() const
-{
-    return HashCombiner()(m_multi_operator, get_sorted_vector(m_function_expressions));
 }
 
 void FunctionExpressionMultiOperatorImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
@@ -151,23 +138,28 @@ MultiOperatorEnum FunctionExpressionMultiOperatorImpl::get_multi_operator() cons
 
 const FunctionExpressionList& FunctionExpressionMultiOperatorImpl::get_function_expressions() const { return m_function_expressions; }
 
+size_t ShallowHash<FunctionExpressionMultiOperatorImpl>::operator()(const FunctionExpressionMultiOperatorImpl& e) const
+{
+    return ShallowHashCombiner()(e.get_multi_operator(), get_sorted_vector(e.get_function_expressions()));
+}
+
+bool ShallowEqualTo<FunctionExpressionMultiOperatorImpl>::operator()(const FunctionExpressionMultiOperatorImpl& l,
+                                                                     const FunctionExpressionMultiOperatorImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_multi_operator() == r.get_multi_operator())
+               && (get_sorted_vector(l.get_function_expressions()) == get_sorted_vector(r.get_function_expressions()));
+    }
+    return true;
+}
+
 /* FunctionExpressionMinus */
 FunctionExpressionMinusImpl::FunctionExpressionMinusImpl(size_t index, FunctionExpression function_expression) :
     Base(index),
     m_function_expression(std::move(function_expression))
 {
 }
-
-bool FunctionExpressionMinusImpl::is_structurally_equivalent_to_impl(const FunctionExpressionMinusImpl& other) const
-{
-    if (this != &other)
-    {
-        return m_function_expression == other.m_function_expression;
-    }
-    return true;
-}
-
-size_t FunctionExpressionMinusImpl::hash_impl() const { return HashCombiner()(m_function_expression); }
 
 void FunctionExpressionMinusImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -178,22 +170,39 @@ void FunctionExpressionMinusImpl::str_impl(std::ostream& out, const FormattingOp
 
 const FunctionExpression& FunctionExpressionMinusImpl::get_function_expression() const { return m_function_expression; }
 
-/* FunctionExpressionFunction */
-FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(size_t index, Function function) : Base(index), m_function(std::move(function)) {}
-
-bool FunctionExpressionFunctionImpl::is_structurally_equivalent_to_impl(const FunctionExpressionFunctionImpl& other) const
+size_t ShallowHash<FunctionExpressionMinusImpl>::operator()(const FunctionExpressionMinusImpl& e) const
 {
-    if (this != &other)
+    return ShallowHashCombiner()(e.get_function_expression());
+}
+
+bool ShallowEqualTo<FunctionExpressionMinusImpl>::operator()(const FunctionExpressionMinusImpl& l, const FunctionExpressionMinusImpl& r) const
+{
+    if (&l != &r)
     {
-        return m_function == other.m_function;
+        return (l.get_function_expression() == r.get_function_expression());
     }
     return true;
 }
 
-size_t FunctionExpressionFunctionImpl::hash_impl() const { return HashCombiner()(m_function); }
+/* FunctionExpressionFunction */
+FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(size_t index, Function function) : Base(index), m_function(std::move(function)) {}
 
 void FunctionExpressionFunctionImpl::str_impl(std::ostream& out, const FormattingOptions& options) const { m_function->str(out, options); }
 
 const Function& FunctionExpressionFunctionImpl::get_function() const { return m_function; }
+
+size_t ShallowHash<FunctionExpressionFunctionImpl>::operator()(const FunctionExpressionFunctionImpl& e) const
+{
+    return ShallowHashCombiner()(e.get_function());
+}
+
+bool ShallowEqualTo<FunctionExpressionFunctionImpl>::operator()(const FunctionExpressionFunctionImpl& l, const FunctionExpressionFunctionImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_function() == r.get_function());
+    }
+    return true;
+}
 
 }

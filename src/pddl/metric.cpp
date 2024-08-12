@@ -46,17 +46,6 @@ OptimizationMetricImpl::OptimizationMetricImpl(size_t index, OptimizationMetricE
 {
 }
 
-bool OptimizationMetricImpl::is_structurally_equivalent_to_impl(const OptimizationMetricImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_optimization_metric == other.m_optimization_metric) && (m_function_expression == other.m_function_expression);
-    }
-    return true;
-}
-
-size_t OptimizationMetricImpl::hash_impl() const { return HashCombiner()(m_optimization_metric, m_function_expression); }
-
 void OptimizationMetricImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
     out << "(" << to_string(m_optimization_metric) << " ";
@@ -67,5 +56,19 @@ void OptimizationMetricImpl::str_impl(std::ostream& out, const FormattingOptions
 OptimizationMetricEnum OptimizationMetricImpl::get_optimization_metric() const { return m_optimization_metric; }
 
 const FunctionExpression& OptimizationMetricImpl::get_function_expression() const { return m_function_expression; }
+
+size_t ShallowHash<OptimizationMetricImpl>::operator()(const OptimizationMetricImpl& e) const
+{
+    return ShallowHashCombiner()(e.get_optimization_metric(), e.get_function_expression());
+}
+
+bool ShallowEqualTo<OptimizationMetricImpl>::operator()(const OptimizationMetricImpl& l, const OptimizationMetricImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_optimization_metric() == r.get_optimization_metric()) && (l.get_function_expression() == r.get_function_expression());
+    }
+    return true;
+}
 
 }

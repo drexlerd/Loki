@@ -25,17 +25,6 @@ namespace loki
 {
 LiteralImpl::LiteralImpl(size_t index, bool is_negated, Atom atom) : Base(index), m_is_negated(is_negated), m_atom(std::move(atom)) {}
 
-bool LiteralImpl::is_structurally_equivalent_to_impl(const LiteralImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_is_negated == other.m_is_negated) && (m_atom == other.m_atom);
-    }
-    return true;
-}
-
-size_t LiteralImpl::hash_impl() const { return HashCombiner()(m_is_negated, m_atom); }
-
 void LiteralImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
     if (m_is_negated)
@@ -53,5 +42,16 @@ void LiteralImpl::str_impl(std::ostream& out, const FormattingOptions& options) 
 bool LiteralImpl::is_negated() const { return m_is_negated; }
 
 const Atom& LiteralImpl::get_atom() const { return m_atom; }
+
+size_t ShallowHash<LiteralImpl>::operator()(const LiteralImpl& e) const { return ShallowHashCombiner()(e.is_negated(), e.get_atom()); }
+
+bool ShallowEqualTo<LiteralImpl>::operator()(const LiteralImpl& l, const LiteralImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.is_negated() == r.is_negated()) && (l.get_atom() == r.get_atom());
+    }
+    return true;
+}
 
 }

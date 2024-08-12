@@ -36,10 +36,8 @@ private:
     ConditionLiteralImpl(size_t index, Literal literal);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl, Hash<const ConditionImpl*, true>, EqualTo<const ConditionImpl*, true>>;
+    friend class UniqueValueTypeFactory<ConditionImpl>;
 
-    bool is_structurally_equivalent_to_impl(const ConditionLiteralImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -50,15 +48,15 @@ public:
 };
 
 template<>
-struct ShallowHash<DomainImpl>
+struct ShallowHash<ConditionLiteralImpl>
 {
-    size_t operator()(const DomainImpl& e) const;
+    size_t operator()(const ConditionLiteralImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<DomainImpl>
+struct ShallowEqualTo<ConditionLiteralImpl>
 {
-    bool operator()(const DomainImpl& l, const DomainImpl& r) const;
+    bool operator()(const ConditionLiteralImpl& l, const ConditionLiteralImpl& r) const;
 };
 
 /* And */
@@ -70,10 +68,8 @@ private:
     ConditionAndImpl(size_t index, ConditionList conditions);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl, Hash<const ConditionImpl*, true>, EqualTo<const ConditionImpl*, true>>;
+    friend class UniqueValueTypeFactory<ConditionImpl>;
 
-    bool is_structurally_equivalent_to_impl(const ConditionAndImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -84,15 +80,15 @@ public:
 };
 
 template<>
-struct ShallowHash<DomainImpl>
+struct ShallowHash<ConditionAndImpl>
 {
-    size_t operator()(const DomainImpl& e) const;
+    size_t operator()(const ConditionAndImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<DomainImpl>
+struct ShallowEqualTo<ConditionAndImpl>
 {
-    bool operator()(const DomainImpl& l, const DomainImpl& r) const;
+    bool operator()(const ConditionAndImpl& l, const ConditionAndImpl& r) const;
 };
 
 /* Or */
@@ -104,7 +100,7 @@ private:
     ConditionOrImpl(size_t index, ConditionList conditions);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl, Hash<const ConditionImpl*, true>, EqualTo<const ConditionImpl*, true>>;
+    friend class UniqueValueTypeFactory<ConditionImpl>;
 
     bool is_structurally_equivalent_to_impl(const ConditionOrImpl& other) const;
     size_t hash_impl() const;
@@ -118,15 +114,15 @@ public:
 };
 
 template<>
-struct ShallowHash<DomainImpl>
+struct ShallowHash<ConditionOrImpl>
 {
-    size_t operator()(const DomainImpl& e) const;
+    size_t operator()(const ConditionOrImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<DomainImpl>
+struct ShallowEqualTo<ConditionOrImpl>
 {
-    bool operator()(const DomainImpl& l, const DomainImpl& r) const;
+    bool operator()(const ConditionOrImpl& l, const ConditionOrImpl& r) const;
 };
 
 /* Not */
@@ -138,10 +134,8 @@ private:
     ConditionNotImpl(size_t index, Condition condition);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<ConditionImpl, Hash<const ConditionImpl*, true>, EqualTo<const ConditionImpl*, true>>;
+    friend class UniqueValueTypeFactory<ConditionImpl>;
 
-    bool is_structurally_equivalent_to_impl(const ConditionNotImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -152,15 +146,15 @@ public:
 };
 
 template<>
-struct ShallowHash<DomainImpl>
+struct ShallowHash<ConditionNotImpl>
 {
-    size_t operator()(const DomainImpl& e) const;
+    size_t operator()(const ConditionNotImpl& e) const;
 };
 
 template<>
-struct ShallowEqualTo<DomainImpl>
+struct ShallowEqualTo<ConditionNotImpl>
 {
-    bool operator()(const DomainImpl& l, const DomainImpl& r) const;
+    bool operator()(const ConditionNotImpl& l, const ConditionNotImpl& r) const;
 };
 
 /* Imply */

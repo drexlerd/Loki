@@ -35,11 +35,8 @@ private:
     AtomImpl(size_t index, Predicate predicate, TermList terms);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<AtomImpl, Hash<const AtomImpl*, true>, EqualTo<const AtomImpl*, true>>;
+    friend class UniqueValueTypeFactory<AtomImpl>;
 
-    /// @brief Test for semantic equivalence
-    bool is_structurally_equivalent_to_impl(const AtomImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -48,6 +45,18 @@ private:
 public:
     const Predicate& get_predicate() const;
     const TermList& get_terms() const;
+};
+
+template<>
+struct ShallowHash<AtomImpl>
+{
+    size_t operator()(const AtomImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<AtomImpl>
+{
+    bool operator()(const AtomImpl& l, const AtomImpl& r) const;
 };
 
 }

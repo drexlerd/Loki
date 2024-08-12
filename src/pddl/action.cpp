@@ -89,7 +89,7 @@ bool ShallowEqualTo<ActionImpl>::operator()(const ActionImpl& l, const ActionImp
     if (&l != &r)
     {
         return (l.get_name() == r.get_name()) && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()))
-               && (l.get_condition() == r.get_condition()) && (r.get_effect() == r.get_effect());
+               && (l.get_condition() == r.get_condition()) && (l.get_effect() == r.get_effect());
     }
     return true;
 }

@@ -162,8 +162,6 @@ private:
     // Give access to the constructor.
     friend class UniqueValueTypeFactory<FunctionExpressionImpl>;
 
-    bool is_structurally_equivalent_to_impl(const FunctionExpressionMinusImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.

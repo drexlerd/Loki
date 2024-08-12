@@ -36,7 +36,6 @@ struct ShallowHash
     size_t operator()(const T& element) const { return std::hash<T>()(element); }
 };
 
-template<bool Deref = false>
 struct ShallowHashCombiner
 {
 public:
@@ -59,7 +58,7 @@ public:
 
 /// Spezialization for std::ranges::forward_range.
 template<typename ForwardRange>
-    requires std::ranges::forward_range<ForwardRange>
+requires std::ranges::forward_range<ForwardRange>
 struct ShallowHash<ForwardRange>
 {
     size_t operator()(const ForwardRange& range) const
@@ -75,7 +74,7 @@ struct ShallowHash<ForwardRange>
 
 /// Spezialization for std::variant.
 template<typename Variant>
-    requires IsVariant<Variant>
+requires IsVariant<Variant>
 struct ShallowHash<Variant>
 {
     size_t operator()(const Variant& variant) const

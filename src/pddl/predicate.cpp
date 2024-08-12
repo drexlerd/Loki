@@ -20,8 +20,8 @@
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
-#include "loki/details/utils/hash.hpp"
 #include "loki/details/utils/collections.hpp"
+#include "loki/details/utils/hash.hpp"
 
 #include <memory>
 
@@ -33,17 +33,6 @@ PredicateImpl::PredicateImpl(size_t index, std::string name, ParameterList param
     m_parameters(std::move(parameters))
 {
 }
-
-bool PredicateImpl::is_structurally_equivalent_to_impl(const PredicateImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_name == other.m_name) && (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters));
-    }
-    return true;
-}
-
-size_t PredicateImpl::hash_impl() const { return HashCombiner()(m_name, get_sorted_vector(m_parameters)); }
 
 void PredicateImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -59,5 +48,19 @@ void PredicateImpl::str_impl(std::ostream& out, const FormattingOptions& options
 const std::string& PredicateImpl::get_name() const { return m_name; }
 
 const ParameterList& PredicateImpl::get_parameters() const { return m_parameters; }
+
+size_t ShallowHash<PredicateImpl>::operator()(const PredicateImpl& e) const
+{
+    return ShallowHashCombiner()(e.get_name(), get_sorted_vector(e.get_parameters()));
+}
+
+bool ShallowEqualTo<PredicateImpl>::operator()(const PredicateImpl& l, const PredicateImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_name() == r.get_name()) && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()));
+    }
+    return true;
+}
 
 }

@@ -18,8 +18,8 @@
 #include "loki/details/pddl/function_skeleton.hpp"
 
 #include "loki/details/pddl/parameter.hpp"
-#include "loki/details/utils/hash.hpp"
 #include "loki/details/utils/collections.hpp"
+#include "loki/details/utils/hash.hpp"
 
 namespace loki
 {
@@ -30,17 +30,6 @@ FunctionSkeletonImpl::FunctionSkeletonImpl(size_t index, std::string name, Param
     m_type(std::move(type))
 {
 }
-
-bool FunctionSkeletonImpl::is_structurally_equivalent_to_impl(const FunctionSkeletonImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_name == other.m_name) && (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters)) && (m_type == other.m_type);
-    }
-    return true;
-}
-
-size_t FunctionSkeletonImpl::hash_impl() const { return HashCombiner()(m_name, get_sorted_vector(m_parameters), m_type); }
 
 void FunctionSkeletonImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -58,5 +47,20 @@ const std::string& FunctionSkeletonImpl::get_name() const { return m_name; }
 const ParameterList& FunctionSkeletonImpl::get_parameters() const { return m_parameters; }
 
 const Type& FunctionSkeletonImpl::get_type() const { return m_type; }
+
+size_t ShallowHash<FunctionSkeletonImpl>::operator()(const FunctionSkeletonImpl& e) const
+{
+    return ShallowHashCombiner()(e.get_name(), e.get_type(), get_sorted_vector(e.get_parameters()));
+}
+
+bool ShallowEqualTo<FunctionSkeletonImpl>::operator()(const FunctionSkeletonImpl& l, const FunctionSkeletonImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_name() == r.get_name()) && (l.get_type() == r.get_type())
+               && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()));
+    }
+    return true;
+}
 
 }

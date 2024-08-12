@@ -28,11 +28,7 @@
 
 namespace loki
 {
-AxiomImpl::AxiomImpl(size_t index,
-                     std::string derived_predicate_name,
-                     ParameterList parameters,
-                     Condition condition,
-                     size_t num_parameters_to_ground_head) :
+AxiomImpl::AxiomImpl(size_t index, std::string derived_predicate_name, ParameterList parameters, Condition condition, size_t num_parameters_to_ground_head) :
     Base(index),
     m_derived_predicate_name(std::move(derived_predicate_name)),
     m_parameters(std::move(parameters)),
@@ -40,17 +36,6 @@ AxiomImpl::AxiomImpl(size_t index,
     m_num_parameters_to_ground_head(num_parameters_to_ground_head)
 {
 }
-
-bool AxiomImpl::is_structurally_equivalent_to_impl(const AxiomImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_derived_predicate_name == other.m_derived_predicate_name) && (get_sorted_vector(m_parameters) == get_sorted_vector(other.m_parameters)) && (m_condition == other.m_condition);
-    }
-    return true;
-}
-
-size_t AxiomImpl::hash_impl() const { return HashCombiner()(m_derived_predicate_name, m_derived_predicate_name, get_sorted_vector(m_parameters), m_condition); }
 
 void AxiomImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -74,5 +59,20 @@ const Condition& AxiomImpl::get_condition() const { return m_condition; }
 const ParameterList& AxiomImpl::get_parameters() const { return m_parameters; }
 
 size_t AxiomImpl::get_num_parameters_to_ground_head() const { return m_num_parameters_to_ground_head; }
+
+size_t ShallowHash<AxiomImpl>::operator()(const AxiomImpl& e) const
+{
+    return ShallowHashCombiner()(e.get_derived_predicate_name(), get_sorted_vector(e.get_parameters()), e.get_condition());
+}
+
+bool ShallowEqualTo<AxiomImpl>::operator()(const AxiomImpl& l, const AxiomImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_derived_predicate_name() == r.get_derived_predicate_name())
+               && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters())) && (l.get_condition() == r.get_condition());
+    }
+    return true;
+}
 
 }

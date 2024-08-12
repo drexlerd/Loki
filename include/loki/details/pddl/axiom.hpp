@@ -37,11 +37,8 @@ private:
     AxiomImpl(size_t index, std::string derived_predicate_name, ParameterList parameters, Condition condition, size_t num_parameters_to_ground_head);
 
     // Give access to the constructor.
-    friend class UniqueValueTypeFactory<AxiomImpl, Hash<const AxiomImpl*, true>, EqualTo<const AxiomImpl*, true>>;
+    friend class UniqueValueTypeFactory<AxiomImpl>;
 
-    /// @brief Test for structural equivalence
-    bool is_structurally_equivalent_to_impl(const AxiomImpl& other) const;
-    size_t hash_impl() const;
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
     // Give access to the private interface implementations.
@@ -52,6 +49,18 @@ public:
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
     size_t get_num_parameters_to_ground_head() const;
+};
+
+template<>
+struct ShallowHash<AxiomImpl>
+{
+    size_t operator()(const AxiomImpl& e) const;
+};
+
+template<>
+struct ShallowEqualTo<AxiomImpl>
+{
+    bool operator()(const AxiomImpl& l, const AxiomImpl& r) const;
 };
 
 }

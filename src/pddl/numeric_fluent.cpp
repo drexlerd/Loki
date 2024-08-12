@@ -22,20 +22,7 @@
 
 namespace loki
 {
-NumericFluentImpl::NumericFluentImpl(size_t index, Function function, double number) : Base(index), m_function(std::move(function)), m_number(number)
-{
-}
-
-bool NumericFluentImpl::is_structurally_equivalent_to_impl(const NumericFluentImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_function == other.m_function) && (m_number == other.m_number);
-    }
-    return true;
-}
-
-size_t NumericFluentImpl::hash_impl() const { return HashCombiner()(m_function, m_number); }
+NumericFluentImpl::NumericFluentImpl(size_t index, Function function, double number) : Base(index), m_function(std::move(function)), m_number(number) {}
 
 void NumericFluentImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
 {
@@ -47,5 +34,16 @@ void NumericFluentImpl::str_impl(std::ostream& out, const FormattingOptions& opt
 const Function& NumericFluentImpl::get_function() const { return m_function; }
 
 double NumericFluentImpl::get_number() const { return m_number; }
+
+size_t ShallowHash<NumericFluentImpl>::operator()(const NumericFluentImpl& e) const { return ShallowHashCombiner()(e.get_number(), e.get_function()); }
+
+bool ShallowEqualTo<NumericFluentImpl>::operator()(const NumericFluentImpl& l, const NumericFluentImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_number() == r.get_number()) && (l.get_function() == r.get_function());
+    }
+    return true;
+}
 
 }

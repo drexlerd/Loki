@@ -52,17 +52,6 @@ const std::string& to_string(RequirementEnum requirement)
 
 RequirementsImpl::RequirementsImpl(size_t index, RequirementEnumSet requirements) : Base(index), m_requirements(std::move(requirements)) {}
 
-bool RequirementsImpl::is_structurally_equivalent_to_impl(const RequirementsImpl& other) const
-{
-    if (this != &other)
-    {
-        return (m_requirements == other.m_requirements);
-    }
-    return true;
-}
-
-size_t RequirementsImpl::hash_impl() const { return HashCombiner()(m_requirements); }
-
 void RequirementsImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const
 {
     out << "(:requirements ";
@@ -80,5 +69,16 @@ void RequirementsImpl::str_impl(std::ostream& out, const FormattingOptions& /*op
 bool RequirementsImpl::test(RequirementEnum requirement) const { return m_requirements.count(requirement); }
 
 const RequirementEnumSet& RequirementsImpl::get_requirements() const { return m_requirements; }
+
+size_t ShallowHash<RequirementsImpl>::operator()(const RequirementsImpl& e) const { return ShallowHashCombiner()(e.get_requirements()); }
+
+bool ShallowEqualTo<RequirementsImpl>::operator()(const RequirementsImpl& l, const RequirementsImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_requirements() == r.get_requirements());
+    }
+    return true;
+}
 
 }
