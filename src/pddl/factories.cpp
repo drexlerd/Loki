@@ -19,7 +19,7 @@
 
 namespace loki
 {
-PDDLFactories::PDDLFactories() : m_factories(), m_variadic_factory(VariableFactory()) {}
+PDDLFactories::PDDLFactories() : m_factories(), m_variadic_factory(VariableFactory(16, 16 * 1024)) {}
 
 PDDLFactories::PDDLFactories(PDDLFactories&& other) = default;
 
