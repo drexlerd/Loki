@@ -46,59 +46,50 @@
 namespace loki
 {
 
-// Ensure that specialization is available.
-static_assert(IsShallowHashSpecialized<const VariableImpl*>::value);
-static_assert(IsShallowEqualToSpecialized<const VariableImpl*>::value);
-
+using RequirementsFactory = UniqueValueTypeFactory<RequirementsImpl, ShallowHash<const RequirementsImpl*>, ShallowEqualTo<const RequirementsImpl*>>;
+using TypeFactory = UniqueValueTypeFactory<TypeImpl, ShallowHash<const TypeImpl*>, ShallowEqualTo<const TypeImpl*>>;
 using VariableFactory = UniqueValueTypeFactory<VariableImpl, ShallowHash<const VariableImpl*>, ShallowEqualTo<const VariableImpl*>>;
+using TermFactory = UniqueValueTypeFactory<TermImpl, ShallowHash<const TermImpl*>, ShallowEqualTo<const TermImpl*>>;
+using ObjectFactory = UniqueValueTypeFactory<ObjectImpl, ShallowHash<const ObjectImpl*>, ShallowEqualTo<const ObjectImpl*>>;
+using AtomFactory = UniqueValueTypeFactory<AtomImpl, ShallowHash<const AtomImpl*>, ShallowEqualTo<const AtomImpl*>>;
+using LiteralFactory = UniqueValueTypeFactory<LiteralImpl, ShallowHash<const LiteralImpl*>, ShallowEqualTo<const LiteralImpl*>>;
+using ParameterFactory = UniqueValueTypeFactory<ParameterImpl, ShallowHash<const ParameterImpl*>, ShallowEqualTo<const ParameterImpl*>>;
+using PredicateFactory = UniqueValueTypeFactory<PredicateImpl, ShallowHash<const PredicateImpl*>, ShallowEqualTo<const PredicateImpl*>>;
+using FunctionExpressionFactory =
+    UniqueValueTypeFactory<FunctionExpressionImpl, ShallowHash<const FunctionExpressionImpl*>, ShallowEqualTo<const FunctionExpressionImpl*>>;
+using FunctionFactory = UniqueValueTypeFactory<FunctionImpl, ShallowHash<const FunctionImpl*>, ShallowEqualTo<const FunctionImpl*>>;
+using FunctionSkeletonFactory =
+    UniqueValueTypeFactory<FunctionSkeletonImpl, ShallowHash<const FunctionSkeletonImpl*>, ShallowEqualTo<const FunctionSkeletonImpl*>>;
+using ConditionFactory = UniqueValueTypeFactory<ConditionImpl, ShallowHash<const ConditionImpl*>, ShallowEqualTo<const ConditionImpl*>>;
+using EffectFactory = UniqueValueTypeFactory<EffectImpl, ShallowHash<const EffectImpl*>, ShallowEqualTo<const EffectImpl*>>;
+using ActionFactory = UniqueValueTypeFactory<ActionImpl, ShallowHash<const ActionImpl*>, ShallowEqualTo<const ActionImpl*>>;
+using AxiomFactory = UniqueValueTypeFactory<AxiomImpl, ShallowHash<const AxiomImpl*>, ShallowEqualTo<const AxiomImpl*>>;
+using OptimizationMetricFactory =
+    UniqueValueTypeFactory<OptimizationMetricImpl, ShallowHash<const OptimizationMetricImpl*>, ShallowEqualTo<const OptimizationMetricImpl*>>;
+using NumericFluentFactory = UniqueValueTypeFactory<NumericFluentImpl, ShallowHash<const NumericFluentImpl*>, ShallowEqualTo<const NumericFluentImpl*>>;
+using DomainFactory = UniqueValueTypeFactory<DomainImpl, ShallowHash<const DomainImpl*>, ShallowEqualTo<const DomainImpl*>>;
+using ProblemFactory = UniqueValueTypeFactory<ProblemImpl, ShallowHash<const ProblemImpl*>, ShallowEqualTo<const ProblemImpl*>>;
 
-using VariadicPDDLConstructorFactory = VariadicContainer<VariableFactory>;
-
-template<typename... Ts>
-class VariadicPDDLFactory
-{
-private:
-    std::tuple<UniqueValueTypeFactory<Ts>...> m_factories;
-
-public:
-    VariadicPDDLFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
-        m_factories(std::make_tuple(UniqueValueTypeFactory<Ts>(initial_num_element_per_segment, maximum_num_elements_per_segment)...))
-    {
-    }
-
-    template<typename T>
-    UniqueValueTypeFactory<T>& get()
-    {
-        return std::get<UniqueValueTypeFactory<T>>(m_factories);
-    }
-
-    template<typename T>
-    const UniqueValueTypeFactory<T>& get() const
-    {
-        return std::get<UniqueValueTypeFactory<T>>(m_factories);
-    }
-};
-
-using VariadicPDDLFactories = VariadicPDDLFactory<RequirementsImpl,
-                                                  TypeImpl,
-                                                  VariableImpl,
-                                                  TermImpl,
-                                                  ObjectImpl,
-                                                  AtomImpl,
-                                                  LiteralImpl,
-                                                  ParameterImpl,
-                                                  PredicateImpl,
-                                                  FunctionExpressionImpl,
-                                                  FunctionImpl,
-                                                  FunctionSkeletonImpl,
-                                                  ConditionImpl,
-                                                  EffectImpl,
-                                                  ActionImpl,
-                                                  AxiomImpl,
-                                                  OptimizationMetricImpl,
-                                                  NumericFluentImpl,
-                                                  DomainImpl,
-                                                  ProblemImpl>;
+using VariadicPDDLConstructorFactory = VariadicContainer<RequirementsFactory,  //
+                                                         TypeFactory,
+                                                         VariableFactory,
+                                                         TermFactory,
+                                                         ObjectFactory,
+                                                         AtomFactory,
+                                                         LiteralFactory,
+                                                         ParameterFactory,
+                                                         PredicateFactory,
+                                                         FunctionExpressionFactory,
+                                                         FunctionFactory,
+                                                         FunctionSkeletonFactory,
+                                                         ConditionFactory,
+                                                         EffectFactory,
+                                                         ActionFactory,
+                                                         AxiomFactory,
+                                                         OptimizationMetricFactory,
+                                                         NumericFluentFactory,
+                                                         DomainFactory,
+                                                         ProblemFactory>;
 
 using PDDLPositionCache = PositionCache<RequirementsImpl,
                                         TypeImpl,
@@ -125,9 +116,7 @@ using PDDLPositionCache = PositionCache<RequirementsImpl,
 class PDDLFactories
 {
 private:
-    VariadicPDDLFactories m_factories;
-
-    VariadicPDDLConstructorFactory m_variadic_factory;
+    VariadicPDDLConstructorFactory m_factories;
 
 public:
     PDDLFactories();

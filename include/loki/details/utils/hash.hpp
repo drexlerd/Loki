@@ -31,11 +31,6 @@ namespace loki
 {
 
 template<typename T>
-struct IsShallowHashSpecialized : std::false_type
-{
-};
-
-template<typename T>
 struct ShallowHash
 {
     size_t operator()(const T& element) const { return std::hash<T>()(element); }

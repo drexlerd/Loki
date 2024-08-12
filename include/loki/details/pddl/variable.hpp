@@ -57,15 +57,6 @@ struct ShallowEqualTo<const VariableImpl*>
     bool operator()(const VariableImpl* l, const VariableImpl* r) const;
 };
 
-template<>
-struct IsShallowHashSpecialized<const VariableImpl*> : std::true_type
-{
-};
-template<>
-struct IsShallowEqualToSpecialized<const VariableImpl*> : std::true_type
-{
-};
-
 extern VariableSet collect_free_variables(const loki::ConditionImpl& condition);
 
 }

@@ -25,11 +25,6 @@
 namespace loki
 {
 
-template<typename T>
-struct IsShallowEqualToSpecialized : std::false_type
-{
-};
-
 /// @brief `ShallowEqual` a hasher that should implemented to work in the following context:
 /// any object of a custom type `T` should have nested objects that are unique.
 /// @tparam T the type of the hasher.
