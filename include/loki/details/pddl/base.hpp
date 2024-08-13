@@ -47,10 +47,6 @@ public:
     Base(Base&& other) = default;
     Base& operator=(Base&& other) = default;
 
-    bool operator<(const Base& other) const { return m_index < other.m_index; }
-
-    bool operator>(const Base& other) const { return m_index > other.m_index; }
-
     /// @brief Overload of the output stream insertion operator (operator<<).
     friend std::ostream& operator<<(std::ostream& os, const Base& element)
     {

@@ -18,8 +18,6 @@
 #include "loki/details/pddl/numeric_fluent.hpp"
 
 #include "loki/details/pddl/function.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
 
 namespace loki
 {
@@ -35,16 +33,5 @@ void NumericFluentImpl::str_impl(std::ostream& out, const FormattingOptions& opt
 const Function& NumericFluentImpl::get_function() const { return m_function; }
 
 double NumericFluentImpl::get_number() const { return m_number; }
-
-size_t ShallowHash<const NumericFluentImpl*>::operator()(const NumericFluentImpl* e) const { return ShallowHashCombiner()(e->get_number(), e->get_function()); }
-
-bool ShallowEqualTo<const NumericFluentImpl*>::operator()(const NumericFluentImpl* l, const NumericFluentImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_number() == r->get_number()) && (l->get_function() == r->get_function());
-    }
-    return true;
-}
 
 }

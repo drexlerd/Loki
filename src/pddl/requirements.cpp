@@ -17,9 +17,6 @@
 
 #include "loki/details/pddl/requirements.hpp"
 
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
-
 #include <cassert>
 
 namespace loki
@@ -70,16 +67,5 @@ void RequirementsImpl::str_impl(std::ostream& out, const FormattingOptions& /*op
 bool RequirementsImpl::test(RequirementEnum requirement) const { return m_requirements.count(requirement); }
 
 const RequirementEnumSet& RequirementsImpl::get_requirements() const { return m_requirements; }
-
-size_t ShallowHash<const RequirementsImpl*>::operator()(const RequirementsImpl* e) const { return ShallowHashCombiner()(e->get_requirements()); }
-
-bool ShallowEqualTo<const RequirementsImpl*>::operator()(const RequirementsImpl* l, const RequirementsImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_requirements() == r->get_requirements());
-    }
-    return true;
-}
 
 }

@@ -17,10 +17,6 @@
 
 #include "loki/details/pddl/type.hpp"
 
-#include "loki/details/utils/collections.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
-
 namespace loki
 {
 TypeImpl::TypeImpl(size_t index, std::string name, TypeList bases) : Base(index), m_name(std::move(name)), m_bases(std::move(bases)) {}
@@ -52,17 +48,6 @@ void TypeImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/)
 const std::string& TypeImpl::get_name() const { return m_name; }
 
 const TypeList& TypeImpl::get_bases() const { return m_bases; }
-
-size_t ShallowHash<const TypeImpl*>::operator()(const TypeImpl* e) const { return ShallowHashCombiner()(e->get_name(), get_sorted_vector(e->get_bases())); }
-
-bool ShallowEqualTo<const TypeImpl*>::operator()(const TypeImpl* l, const TypeImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_bases()) == get_sorted_vector(r->get_bases()));
-    }
-    return true;
-}
 
 static void collect_types_from_hierarchy_recursively(const TypeList& types, TypeSet& ref_result)
 {

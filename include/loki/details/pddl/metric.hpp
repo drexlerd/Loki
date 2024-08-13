@@ -55,19 +55,6 @@ public:
     OptimizationMetricEnum get_optimization_metric() const;
     const FunctionExpression& get_function_expression() const;
 };
-
-template<>
-struct ShallowHash<const OptimizationMetricImpl*>
-{
-    size_t operator()(const OptimizationMetricImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const OptimizationMetricImpl*>
-{
-    bool operator()(const OptimizationMetricImpl* l, const OptimizationMetricImpl* r) const;
-};
-
 }
 
 #endif

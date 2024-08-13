@@ -19,9 +19,6 @@
 
 #include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/visitors.hpp"
-#include "loki/details/utils/collections.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
 
 #include <cassert>
 
@@ -57,19 +54,5 @@ void OptimizationMetricImpl::str_impl(std::ostream& out, const FormattingOptions
 OptimizationMetricEnum OptimizationMetricImpl::get_optimization_metric() const { return m_optimization_metric; }
 
 const FunctionExpression& OptimizationMetricImpl::get_function_expression() const { return m_function_expression; }
-
-size_t ShallowHash<const OptimizationMetricImpl*>::operator()(const OptimizationMetricImpl* e) const
-{
-    return ShallowHashCombiner()(e->get_optimization_metric(), e->get_function_expression());
-}
-
-bool ShallowEqualTo<const OptimizationMetricImpl*>::operator()(const OptimizationMetricImpl* l, const OptimizationMetricImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_optimization_metric() == r->get_optimization_metric()) && (l->get_function_expression() == r->get_function_expression());
-    }
-    return true;
-}
 
 }

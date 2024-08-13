@@ -20,8 +20,6 @@
 #include "loki/details/pddl/function_skeleton.hpp"
 #include "loki/details/pddl/term.hpp"
 #include "loki/details/pddl/visitors.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
 
 namespace loki
 {
@@ -54,16 +52,5 @@ void FunctionImpl::str_impl(std::ostream& out, const FormattingOptions& options)
 const FunctionSkeleton& FunctionImpl::get_function_skeleton() const { return m_function_skeleton; }
 
 const TermList& FunctionImpl::get_terms() const { return m_terms; }
-
-size_t ShallowHash<const FunctionImpl*>::operator()(const FunctionImpl* e) const { return ShallowHashCombiner()(e->get_function_skeleton(), e->get_terms()); }
-
-bool ShallowEqualTo<const FunctionImpl*>::operator()(const FunctionImpl* l, const FunctionImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_function_skeleton() == r->get_function_skeleton()) && (l->get_terms() == r->get_terms());
-    }
-    return true;
-}
 
 }

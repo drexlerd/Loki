@@ -51,18 +51,6 @@ public:
     size_t get_num_parameters_to_ground_head() const;
 };
 
-template<>
-struct ShallowHash<const AxiomImpl*>
-{
-    size_t operator()(const AxiomImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const AxiomImpl*>
-{
-    bool operator()(const AxiomImpl* l, const AxiomImpl* r) const;
-};
-
 }
 
 #endif

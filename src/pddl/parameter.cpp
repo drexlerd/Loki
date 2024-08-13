@@ -19,9 +19,6 @@
 
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
-#include "loki/details/utils/collections.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
 
 #include <cassert>
 
@@ -56,20 +53,6 @@ void ParameterImpl::str_impl(std::ostream& out, const FormattingOptions& /*optio
 const Variable& ParameterImpl::get_variable() const { return m_variable; }
 
 const TypeList& ParameterImpl::get_bases() const { return m_types; }
-
-size_t ShallowHash<const ParameterImpl*>::operator()(const ParameterImpl* e) const
-{
-    return ShallowHashCombiner()(e->get_variable(), get_sorted_vector(e->get_bases()));
-}
-
-bool ShallowEqualTo<const ParameterImpl*>::operator()(const ParameterImpl* l, const ParameterImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_variable() == r->get_variable()) && (get_sorted_vector(l->get_bases()) == get_sorted_vector(r->get_bases()));
-    }
-    return true;
-}
 
 bool is_specialized_parameter(const Parameter& specialized_parameter, const Parameter& generalized_parameter)
 {

@@ -36,14 +36,14 @@ namespace loki
 /// uniqueness checks and SegmentedVector for continuous and cache-efficient storage of value types.
 /// @tparam HolderType is the holder value type which can be an std::variant.
 /// Note that using a base class value type will result in object slicing.
-/// @tparam Hash the hash function, default uses `ShallowHash` hasher.
-/// @tparam EqualTo the comparison function, default uses `ShallowEqualTo` comparator.
-template<typename HolderType, typename Hash = ShallowHash<const HolderType*>, typename EqualTo = ShallowEqualTo<const HolderType*>>
+/// @tparam Hash the hash function, default uses `Hasher` hasher.
+/// @tparam KeyEqual the comparison function, default uses `EqualTo` comparator.
+template<typename HolderType, typename Hash = Hasher<const HolderType*>, typename KeyEqual = EqualTo<const HolderType*>>
 class UniqueFactory
 {
 private:
     // We use an unordered_set to test for uniqueness.
-    std::unordered_set<const HolderType*, Hash, EqualTo> m_uniqueness_set;
+    std::unordered_set<const HolderType*, Hash, KeyEqual> m_uniqueness_set;
 
     // We use pre-allocated memory to store objects persistent.
     SegmentedVector<HolderType> m_persistent_vector;
@@ -68,11 +68,11 @@ public:
     UniqueFactory& operator=(UniqueFactory&& other) = default;
 
     /// @brief Returns a pointer to an existing object or creates it before if it does not exist.
-    /// The `SubType` is not allowed to be copieable because `ShallowHash` and `ShallowEqualTo`
+    /// The `SubType` is not allowed to be copieable because `Hasher` and `EqualTo`
     /// is implemented to hash and compare simply the pointers.
-    /// The `HolderType` is allowed to be copieable but `ShallowHash` and `ShallowEqualTo`
+    /// The `HolderType` is allowed to be copieable but `Hasher` and `EqualTo`
     /// will have to take this into account by hashing and comparing the nested `SubType`.
-    /// For example, if `HolderType` is a std::variant, then `ShallowHash` and `ShallowEqual`
+    /// For example, if `HolderType` is a std::variant, then `Hasher` and `ShallowEqual`
     /// will hash or compare the nested `SubType` object.
     template<typename SubType, typename... Args>
     requires(!std::is_copy_constructible_v<SubType>) HolderType const* get_or_create(Args&&... args)

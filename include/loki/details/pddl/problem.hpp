@@ -78,18 +78,6 @@ public:
     const AxiomList& get_axioms() const;
 };
 
-template<>
-struct ShallowHash<const ProblemImpl*>
-{
-    size_t operator()(const ProblemImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const ProblemImpl*>
-{
-    bool operator()(const ProblemImpl* l, const ProblemImpl* r) const;
-};
-
 }
 
 #endif

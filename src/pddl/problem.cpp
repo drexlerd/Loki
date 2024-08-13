@@ -28,7 +28,6 @@
 #include "loki/details/pddl/requirements.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/visitors.hpp"
-#include "loki/details/utils/collections.hpp"
 #include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/hash.hpp"
 
@@ -80,7 +79,7 @@ void ProblemImpl::str_impl(std::ostream& out, const FormattingOptions& options) 
     if (!m_objects.empty())
     {
         out << string(nested_options.indent, ' ') << "(:objects ";
-        std::unordered_map<TypeList, ObjectList, ShallowHash<TypeList>> objects_by_types;
+        std::unordered_map<TypeList, ObjectList, Hasher<TypeList>> objects_by_types;
         for (const auto& object : m_objects)
         {
             objects_by_types[object->get_bases()].push_back(object);
@@ -200,31 +199,5 @@ const std::optional<Condition>& ProblemImpl::get_goal_condition() const { return
 const std::optional<OptimizationMetric>& ProblemImpl::get_optimization_metric() const { return m_optimization_metric; }
 
 const AxiomList& ProblemImpl::get_axioms() const { return m_axioms; }
-
-size_t ShallowHash<const ProblemImpl*>::operator()(const ProblemImpl* e) const
-{
-    return ShallowHashCombiner()(e->get_name(),
-                                 e->get_domain(),
-                                 get_sorted_vector(e->get_objects()),
-                                 get_sorted_vector(e->get_derived_predicates()),
-                                 get_sorted_vector(e->get_initial_literals()),
-                                 get_sorted_vector(e->get_numeric_fluents()),
-                                 e->get_goal_condition(),
-                                 e->get_optimization_metric());
-}
-
-bool ShallowEqualTo<const ProblemImpl*>::operator()(const ProblemImpl* l, const ProblemImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_name() == r->get_name()) && (l->get_domain() == r->get_domain())
-               && (get_sorted_vector(l->get_objects()) == get_sorted_vector(r->get_objects()))
-               && (get_sorted_vector(l->get_derived_predicates()) == get_sorted_vector(r->get_derived_predicates()))
-               && (get_sorted_vector(l->get_initial_literals()) == get_sorted_vector(r->get_initial_literals()))
-               && (get_sorted_vector(l->get_numeric_fluents()) == get_sorted_vector(r->get_numeric_fluents()))
-               && (l->get_goal_condition() == r->get_goal_condition()) && (l->get_optimization_metric() == r->get_optimization_metric());
-    }
-    return true;
-}
 
 }

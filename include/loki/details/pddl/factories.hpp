@@ -46,28 +46,26 @@
 namespace loki
 {
 
-using RequirementsFactory = UniqueFactory<RequirementsImpl, ShallowHash<const RequirementsImpl*>, ShallowEqualTo<const RequirementsImpl*>>;
-using TypeFactory = UniqueFactory<TypeImpl, ShallowHash<const TypeImpl*>, ShallowEqualTo<const TypeImpl*>>;
-using VariableFactory = UniqueFactory<VariableImpl, ShallowHash<const VariableImpl*>, ShallowEqualTo<const VariableImpl*>>;
-using TermFactory = UniqueFactory<TermImpl, ShallowHash<const TermImpl*>, ShallowEqualTo<const TermImpl*>>;
-using ObjectFactory = UniqueFactory<ObjectImpl, ShallowHash<const ObjectImpl*>, ShallowEqualTo<const ObjectImpl*>>;
-using AtomFactory = UniqueFactory<AtomImpl, ShallowHash<const AtomImpl*>, ShallowEqualTo<const AtomImpl*>>;
-using LiteralFactory = UniqueFactory<LiteralImpl, ShallowHash<const LiteralImpl*>, ShallowEqualTo<const LiteralImpl*>>;
-using ParameterFactory = UniqueFactory<ParameterImpl, ShallowHash<const ParameterImpl*>, ShallowEqualTo<const ParameterImpl*>>;
-using PredicateFactory = UniqueFactory<PredicateImpl, ShallowHash<const PredicateImpl*>, ShallowEqualTo<const PredicateImpl*>>;
-using FunctionExpressionFactory =
-    UniqueFactory<FunctionExpressionImpl, ShallowHash<const FunctionExpressionImpl*>, ShallowEqualTo<const FunctionExpressionImpl*>>;
-using FunctionFactory = UniqueFactory<FunctionImpl, ShallowHash<const FunctionImpl*>, ShallowEqualTo<const FunctionImpl*>>;
-using FunctionSkeletonFactory = UniqueFactory<FunctionSkeletonImpl, ShallowHash<const FunctionSkeletonImpl*>, ShallowEqualTo<const FunctionSkeletonImpl*>>;
-using ConditionFactory = UniqueFactory<ConditionImpl, ShallowHash<const ConditionImpl*>, ShallowEqualTo<const ConditionImpl*>>;
-using EffectFactory = UniqueFactory<EffectImpl, ShallowHash<const EffectImpl*>, ShallowEqualTo<const EffectImpl*>>;
-using ActionFactory = UniqueFactory<ActionImpl, ShallowHash<const ActionImpl*>, ShallowEqualTo<const ActionImpl*>>;
-using AxiomFactory = UniqueFactory<AxiomImpl, ShallowHash<const AxiomImpl*>, ShallowEqualTo<const AxiomImpl*>>;
-using OptimizationMetricFactory =
-    UniqueFactory<OptimizationMetricImpl, ShallowHash<const OptimizationMetricImpl*>, ShallowEqualTo<const OptimizationMetricImpl*>>;
-using NumericFluentFactory = UniqueFactory<NumericFluentImpl, ShallowHash<const NumericFluentImpl*>, ShallowEqualTo<const NumericFluentImpl*>>;
-using DomainFactory = UniqueFactory<DomainImpl, ShallowHash<const DomainImpl*>, ShallowEqualTo<const DomainImpl*>>;
-using ProblemFactory = UniqueFactory<ProblemImpl, ShallowHash<const ProblemImpl*>, ShallowEqualTo<const ProblemImpl*>>;
+using RequirementsFactory = UniqueFactory<RequirementsImpl, Hasher<const RequirementsImpl*>, EqualTo<const RequirementsImpl*>>;
+using TypeFactory = UniqueFactory<TypeImpl, Hasher<const TypeImpl*>, EqualTo<const TypeImpl*>>;
+using VariableFactory = UniqueFactory<VariableImpl, Hasher<const VariableImpl*>, EqualTo<const VariableImpl*>>;
+using TermFactory = UniqueFactory<TermImpl, Hasher<const TermImpl*>, EqualTo<const TermImpl*>>;
+using ObjectFactory = UniqueFactory<ObjectImpl, Hasher<const ObjectImpl*>, EqualTo<const ObjectImpl*>>;
+using AtomFactory = UniqueFactory<AtomImpl, Hasher<const AtomImpl*>, EqualTo<const AtomImpl*>>;
+using LiteralFactory = UniqueFactory<LiteralImpl, Hasher<const LiteralImpl*>, EqualTo<const LiteralImpl*>>;
+using ParameterFactory = UniqueFactory<ParameterImpl, Hasher<const ParameterImpl*>, EqualTo<const ParameterImpl*>>;
+using PredicateFactory = UniqueFactory<PredicateImpl, Hasher<const PredicateImpl*>, EqualTo<const PredicateImpl*>>;
+using FunctionExpressionFactory = UniqueFactory<FunctionExpressionImpl, Hasher<const FunctionExpressionImpl*>, EqualTo<const FunctionExpressionImpl*>>;
+using FunctionFactory = UniqueFactory<FunctionImpl, Hasher<const FunctionImpl*>, EqualTo<const FunctionImpl*>>;
+using FunctionSkeletonFactory = UniqueFactory<FunctionSkeletonImpl, Hasher<const FunctionSkeletonImpl*>, EqualTo<const FunctionSkeletonImpl*>>;
+using ConditionFactory = UniqueFactory<ConditionImpl, Hasher<const ConditionImpl*>, EqualTo<const ConditionImpl*>>;
+using EffectFactory = UniqueFactory<EffectImpl, Hasher<const EffectImpl*>, EqualTo<const EffectImpl*>>;
+using ActionFactory = UniqueFactory<ActionImpl, Hasher<const ActionImpl*>, EqualTo<const ActionImpl*>>;
+using AxiomFactory = UniqueFactory<AxiomImpl, Hasher<const AxiomImpl*>, EqualTo<const AxiomImpl*>>;
+using OptimizationMetricFactory = UniqueFactory<OptimizationMetricImpl, Hasher<const OptimizationMetricImpl*>, EqualTo<const OptimizationMetricImpl*>>;
+using NumericFluentFactory = UniqueFactory<NumericFluentImpl, Hasher<const NumericFluentImpl*>, EqualTo<const NumericFluentImpl*>>;
+using DomainFactory = UniqueFactory<DomainImpl, Hasher<const DomainImpl*>, EqualTo<const DomainImpl*>>;
+using ProblemFactory = UniqueFactory<ProblemImpl, Hasher<const ProblemImpl*>, EqualTo<const ProblemImpl*>>;
 
 using VariadicPDDLConstructorFactory = VariadicContainer<RequirementsFactory,
                                                          TypeFactory,

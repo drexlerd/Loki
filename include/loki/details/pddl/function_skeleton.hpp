@@ -49,18 +49,6 @@ public:
     const Type& get_type() const;
 };
 
-template<>
-struct ShallowHash<const FunctionSkeletonImpl*>
-{
-    size_t operator()(const FunctionSkeletonImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const FunctionSkeletonImpl*>
-{
-    bool operator()(const FunctionSkeletonImpl* l, const FunctionSkeletonImpl* r) const;
-};
-
 }
 
 #endif

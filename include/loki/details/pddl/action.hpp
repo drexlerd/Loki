@@ -60,18 +60,6 @@ public:
     const std::optional<Effect>& get_effect() const;
 };
 
-template<>
-struct ShallowHash<const ActionImpl*>
-{
-    size_t operator()(const ActionImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const ActionImpl*>
-{
-    bool operator()(const ActionImpl* l, const ActionImpl* r) const;
-};
-
 }
 
 #endif

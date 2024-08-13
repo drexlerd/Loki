@@ -47,18 +47,6 @@ public:
     const TypeList& get_bases() const;
 };
 
-template<>
-struct ShallowHash<const ObjectImpl*>
-{
-    size_t operator()(const ObjectImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const ObjectImpl*>
-{
-    bool operator()(const ObjectImpl* l, const ObjectImpl* r) const;
-};
-
 }
 
 #endif

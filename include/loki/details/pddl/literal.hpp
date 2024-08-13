@@ -46,19 +46,6 @@ public:
     bool is_negated() const;
     const Atom& get_atom() const;
 };
-
-template<>
-struct ShallowHash<const LiteralImpl*>
-{
-    size_t operator()(const LiteralImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const LiteralImpl*>
-{
-    bool operator()(const LiteralImpl* l, const LiteralImpl* r) const;
-};
-
 }
 
 #endif

@@ -18,9 +18,6 @@
 #include "loki/details/pddl/function_skeleton.hpp"
 
 #include "loki/details/pddl/parameter.hpp"
-#include "loki/details/utils/collections.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
 
 namespace loki
 {
@@ -48,20 +45,5 @@ const std::string& FunctionSkeletonImpl::get_name() const { return m_name; }
 const ParameterList& FunctionSkeletonImpl::get_parameters() const { return m_parameters; }
 
 const Type& FunctionSkeletonImpl::get_type() const { return m_type; }
-
-size_t ShallowHash<const FunctionSkeletonImpl*>::operator()(const FunctionSkeletonImpl* e) const
-{
-    return ShallowHashCombiner()(e->get_name(), e->get_type(), get_sorted_vector(e->get_parameters()));
-}
-
-bool ShallowEqualTo<const FunctionSkeletonImpl*>::operator()(const FunctionSkeletonImpl* l, const FunctionSkeletonImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_name() == r->get_name()) && (l->get_type() == r->get_type())
-               && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
-    }
-    return true;
-}
 
 }

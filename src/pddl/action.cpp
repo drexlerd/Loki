@@ -21,9 +21,6 @@
 #include "loki/details/pddl/effects.hpp"
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/visitors.hpp"
-#include "loki/details/utils/collections.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
 
 namespace loki
 {
@@ -80,18 +77,4 @@ const std::optional<Condition>& ActionImpl::get_condition() const { return m_con
 
 const std::optional<Effect>& ActionImpl::get_effect() const { return m_effect; }
 
-size_t ShallowHash<const ActionImpl*>::operator()(const ActionImpl* e) const
-{
-    return ShallowHashCombiner()(e->get_name(), get_sorted_vector(e->get_parameters()), e->get_condition(), e->get_effect());
-}
-
-bool ShallowEqualTo<const ActionImpl*>::operator()(const ActionImpl* l, const ActionImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()))
-               && (l->get_condition() == r->get_condition()) && (l->get_effect() == r->get_effect());
-    }
-    return true;
-}
 }

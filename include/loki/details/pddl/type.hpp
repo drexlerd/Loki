@@ -47,18 +47,6 @@ public:
     const TypeList& get_bases() const;
 };
 
-template<>
-struct ShallowHash<const TypeImpl*>
-{
-    size_t operator()(const TypeImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const TypeImpl*>
-{
-    bool operator()(const TypeImpl* l, const TypeImpl* r) const;
-};
-
 /// @brief Collects all types from a hierarchy.
 extern TypeSet collect_types_from_hierarchy(const TypeList& types);
 

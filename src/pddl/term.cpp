@@ -19,9 +19,6 @@
 
 #include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/variable.hpp"
-#include "loki/details/utils/collections.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
 
 namespace loki
 {
@@ -33,42 +30,11 @@ void TermObjectImpl::str_impl(std::ostream& out, const FormattingOptions& /*opti
 
 const Object& TermObjectImpl::get_object() const { return m_object; }
 
-size_t ShallowHash<const TermObjectImpl&>::operator()(const TermObjectImpl& e) const { return ShallowHashCombiner()(e.get_object()); }
-
-bool ShallowEqualTo<const TermObjectImpl&>::operator()(const TermObjectImpl& l, const TermObjectImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (l.get_object() == r.get_object());
-    }
-    return true;
-}
-
 /* TermVariableImpl */
 TermVariableImpl::TermVariableImpl(size_t index, Variable variable) : Base(index), m_variable(std::move(variable)) {}
 
 void TermVariableImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const { out << m_variable->get_name(); }
 
 const Variable& TermVariableImpl::get_variable() const { return m_variable; }
-
-size_t ShallowHash<const TermVariableImpl&>::operator()(const TermVariableImpl& e) const { return ShallowHashCombiner()(e.get_variable()); }
-
-bool ShallowEqualTo<const TermVariableImpl&>::operator()(const TermVariableImpl& l, const TermVariableImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (l.get_variable() == r.get_variable());
-    }
-    return true;
-}
-
-/* TermImpl */
-
-size_t ShallowHash<const TermImpl*>::operator()(const TermImpl* e) const
-{
-    return std::visit([](const auto& arg) { return ShallowHash<decltype(arg)>()(arg); }, *e);
-}
-
-bool ShallowEqualTo<const TermImpl*>::operator()(const TermImpl* l, const TermImpl* r) const { return ShallowEqualTo<TermImpl>()(*l, *r); }
 
 }

@@ -49,18 +49,6 @@ public:
     const ParameterList& get_parameters() const;
 };
 
-template<>
-struct ShallowHash<const PredicateImpl*>
-{
-    size_t operator()(const PredicateImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const PredicateImpl*>
-{
-    bool operator()(const PredicateImpl* l, const PredicateImpl* r) const;
-};
-
 }
 
 #endif

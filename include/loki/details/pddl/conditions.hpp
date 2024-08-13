@@ -47,18 +47,6 @@ public:
     const Literal& get_literal() const;
 };
 
-template<>
-struct ShallowHash<const ConditionLiteralImpl&>
-{
-    size_t operator()(const ConditionLiteralImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const ConditionLiteralImpl&>
-{
-    bool operator()(const ConditionLiteralImpl& l, const ConditionLiteralImpl& r) const;
-};
-
 /* And */
 class ConditionAndImpl : public Base<ConditionAndImpl>
 {
@@ -78,18 +66,6 @@ private:
 
 public:
     const ConditionList& get_conditions() const;
-};
-
-template<>
-struct ShallowHash<const ConditionAndImpl&>
-{
-    size_t operator()(const ConditionAndImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const ConditionAndImpl&>
-{
-    bool operator()(const ConditionAndImpl& l, const ConditionAndImpl& r) const;
 };
 
 /* Or */
@@ -115,18 +91,6 @@ public:
     const ConditionList& get_conditions() const;
 };
 
-template<>
-struct ShallowHash<const ConditionOrImpl&>
-{
-    size_t operator()(const ConditionOrImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const ConditionOrImpl&>
-{
-    bool operator()(const ConditionOrImpl& l, const ConditionOrImpl& r) const;
-};
-
 /* Not */
 class ConditionNotImpl : public Base<ConditionNotImpl>
 {
@@ -146,18 +110,6 @@ private:
 
 public:
     const Condition& get_condition() const;
-};
-
-template<>
-struct ShallowHash<const ConditionNotImpl&>
-{
-    size_t operator()(const ConditionNotImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const ConditionNotImpl&>
-{
-    bool operator()(const ConditionNotImpl& l, const ConditionNotImpl& r) const;
 };
 
 /* Imply */
@@ -183,18 +135,6 @@ public:
     const Condition& get_condition_right() const;
 };
 
-template<>
-struct ShallowHash<const ConditionImplyImpl&>
-{
-    size_t operator()(const ConditionImplyImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const ConditionImplyImpl&>
-{
-    bool operator()(const ConditionImplyImpl& l, const ConditionImplyImpl& r) const;
-};
-
 /* Exists */
 class ConditionExistsImpl : public Base<ConditionExistsImpl>
 {
@@ -218,18 +158,6 @@ public:
     const Condition& get_condition() const;
 };
 
-template<>
-struct ShallowHash<const ConditionExistsImpl&>
-{
-    size_t operator()(const ConditionExistsImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const ConditionExistsImpl&>
-{
-    bool operator()(const ConditionExistsImpl& l, const ConditionExistsImpl& r) const;
-};
-
 /* Forall */
 class ConditionForallImpl : public Base<ConditionForallImpl>
 {
@@ -251,32 +179,6 @@ private:
 public:
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
-};
-
-template<>
-struct ShallowHash<const ConditionForallImpl&>
-{
-    size_t operator()(const ConditionForallImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const ConditionForallImpl&>
-{
-    bool operator()(const ConditionForallImpl& l, const ConditionForallImpl& r) const;
-};
-
-/* ConditionImpl */
-
-template<>
-struct ShallowHash<const ConditionImpl*>
-{
-    size_t operator()(const ConditionImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const ConditionImpl*>
-{
-    bool operator()(const ConditionImpl* l, const ConditionImpl* r) const;
 };
 
 }

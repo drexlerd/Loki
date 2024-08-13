@@ -20,9 +20,6 @@
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/visitors.hpp"
-#include "loki/details/utils/collections.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
 
 namespace loki
 {
@@ -33,17 +30,6 @@ ConditionLiteralImpl::ConditionLiteralImpl(size_t index, Literal literal) : Base
 void ConditionLiteralImpl::str_impl(std::ostream& out, const FormattingOptions& options) const { m_literal->str(out, options); }
 
 const Literal& ConditionLiteralImpl::get_literal() const { return m_literal; }
-
-size_t ShallowHash<const ConditionLiteralImpl&>::operator()(const ConditionLiteralImpl& e) const { return ShallowHashCombiner()(e.get_literal()); }
-
-bool ShallowEqualTo<const ConditionLiteralImpl&>::operator()(const ConditionLiteralImpl& l, const ConditionLiteralImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (l.get_literal() == r.get_literal());
-    }
-    return true;
-}
 
 /* And */
 ConditionAndImpl::ConditionAndImpl(size_t index, ConditionList conditions) : Base(index), m_conditions(std::move(conditions)) {}
@@ -62,20 +48,6 @@ void ConditionAndImpl::str_impl(std::ostream& out, const FormattingOptions& opti
 
 const ConditionList& ConditionAndImpl::get_conditions() const { return m_conditions; }
 
-size_t ShallowHash<const ConditionAndImpl&>::operator()(const ConditionAndImpl& e) const
-{
-    return ShallowHashCombiner()(get_sorted_vector(e.get_conditions()));
-}
-
-bool ShallowEqualTo<const ConditionAndImpl&>::operator()(const ConditionAndImpl& l, const ConditionAndImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (get_sorted_vector(l.get_conditions()) == get_sorted_vector(r.get_conditions()));
-    }
-    return true;
-}
-
 /* Or */
 ConditionOrImpl::ConditionOrImpl(size_t index, ConditionList conditions) : Base(index), m_conditions(std::move(conditions)) {}
 
@@ -93,17 +65,6 @@ void ConditionOrImpl::str_impl(std::ostream& out, const FormattingOptions& optio
 
 const ConditionList& ConditionOrImpl::get_conditions() const { return m_conditions; }
 
-size_t ShallowHash<const ConditionOrImpl&>::operator()(const ConditionOrImpl& e) const { return ShallowHashCombiner()(get_sorted_vector(e.get_conditions())); }
-
-bool ShallowEqualTo<const ConditionOrImpl&>::operator()(const ConditionOrImpl& l, const ConditionOrImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (get_sorted_vector(l.get_conditions()) == get_sorted_vector(r.get_conditions()));
-    }
-    return true;
-}
-
 /* Not */
 ConditionNotImpl::ConditionNotImpl(size_t index, Condition condition) : Base(index), m_condition(std::move(condition)) {}
 
@@ -115,17 +76,6 @@ void ConditionNotImpl::str_impl(std::ostream& out, const FormattingOptions& opti
 }
 
 const Condition& ConditionNotImpl::get_condition() const { return m_condition; }
-
-size_t ShallowHash<const ConditionNotImpl&>::operator()(const ConditionNotImpl& e) const { return ShallowHashCombiner()(e.get_condition()); }
-
-bool ShallowEqualTo<const ConditionNotImpl&>::operator()(const ConditionNotImpl& l, const ConditionNotImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (l.get_condition() == r.get_condition());
-    }
-    return true;
-}
 
 /* Imply */
 ConditionImplyImpl::ConditionImplyImpl(size_t index, Condition condition_left, Condition condition_right) :
@@ -147,20 +97,6 @@ void ConditionImplyImpl::str_impl(std::ostream& out, const FormattingOptions& op
 const Condition& ConditionImplyImpl::get_condition_left() const { return m_condition_left; }
 
 const Condition& ConditionImplyImpl::get_condition_right() const { return m_condition_right; }
-
-size_t ShallowHash<const ConditionImplyImpl&>::operator()(const ConditionImplyImpl& e) const
-{
-    return ShallowHashCombiner()(e.get_condition_left(), e.get_condition_right());
-}
-
-bool ShallowEqualTo<const ConditionImplyImpl&>::operator()(const ConditionImplyImpl& l, const ConditionImplyImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (l.get_condition_left() == r.get_condition_left()) && (l.get_condition_left() == r.get_condition_left());
-    }
-    return true;
-}
 
 /* Exists */
 ConditionExistsImpl::ConditionExistsImpl(size_t index, ParameterList parameters, Condition condition) :
@@ -188,20 +124,6 @@ const ParameterList& ConditionExistsImpl::get_parameters() const { return m_para
 
 const Condition& ConditionExistsImpl::get_condition() const { return m_condition; }
 
-size_t ShallowHash<const ConditionExistsImpl&>::operator()(const ConditionExistsImpl& e) const
-{
-    return ShallowHashCombiner()(get_sorted_vector(e.get_parameters()), e.get_condition());
-}
-
-bool ShallowEqualTo<const ConditionExistsImpl&>::operator()(const ConditionExistsImpl& l, const ConditionExistsImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (l.get_condition() == r.get_condition()) && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()));
-    }
-    return true;
-}
-
 /* Forall */
 ConditionForallImpl::ConditionForallImpl(size_t index, ParameterList parameters, Condition condition) :
     Base(index),
@@ -227,28 +149,5 @@ void ConditionForallImpl::str_impl(std::ostream& out, const FormattingOptions& o
 const ParameterList& ConditionForallImpl::get_parameters() const { return m_parameters; }
 
 const Condition& ConditionForallImpl::get_condition() const { return m_condition; }
-
-size_t ShallowHash<const ConditionForallImpl&>::operator()(const ConditionForallImpl& e) const
-{
-    return ShallowHashCombiner()(get_sorted_vector(e.get_parameters()), e.get_condition());
-}
-
-bool ShallowEqualTo<const ConditionForallImpl&>::operator()(const ConditionForallImpl& l, const ConditionForallImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (l.get_condition() == r.get_condition()) && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()));
-    }
-    return true;
-}
-
-/* ConditionImpl */
-
-size_t ShallowHash<const ConditionImpl*>::operator()(const ConditionImpl* e) const
-{
-    return std::visit([](const auto& arg) { return ShallowHash<decltype(arg)>()(arg); }, *e);
-}
-
-bool ShallowEqualTo<const ConditionImpl*>::operator()(const ConditionImpl* l, const ConditionImpl* r) const { return ShallowEqualTo<ConditionImpl>()(*l, *r); }
 
 }

@@ -58,18 +58,6 @@ public:
     const Literal& get_literal() const;
 };
 
-template<>
-struct ShallowHash<const EffectLiteralImpl&>
-{
-    size_t operator()(const EffectLiteralImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const EffectLiteralImpl&>
-{
-    bool operator()(const EffectLiteralImpl& l, const EffectLiteralImpl& r) const;
-};
-
 /* And */
 class EffectAndImpl : public Base<EffectAndImpl>
 {
@@ -89,18 +77,6 @@ private:
 
 public:
     const EffectList& get_effects() const;
-};
-
-template<>
-struct ShallowHash<const EffectAndImpl&>
-{
-    size_t operator()(const EffectAndImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const EffectAndImpl&>
-{
-    bool operator()(const EffectAndImpl& l, const EffectAndImpl& r) const;
 };
 
 /* EffectNumeric */
@@ -128,18 +104,6 @@ public:
     const FunctionExpression& get_function_expression() const;
 };
 
-template<>
-struct ShallowHash<const EffectNumericImpl&>
-{
-    size_t operator()(const EffectNumericImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const EffectNumericImpl&>
-{
-    bool operator()(const EffectNumericImpl& l, const EffectNumericImpl& r) const;
-};
-
 /* ConditionalForall */
 class EffectConditionalForallImpl : public Base<EffectConditionalForallImpl>
 {
@@ -163,18 +127,6 @@ public:
     const Effect& get_effect() const;
 };
 
-template<>
-struct ShallowHash<const EffectConditionalForallImpl&>
-{
-    size_t operator()(const EffectConditionalForallImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const EffectConditionalForallImpl&>
-{
-    bool operator()(const EffectConditionalForallImpl& l, const EffectConditionalForallImpl& r) const;
-};
-
 /* ConditionalWhen */
 class EffectConditionalWhenImpl : public Base<EffectConditionalWhenImpl>
 {
@@ -196,32 +148,6 @@ private:
 public:
     const Condition& get_condition() const;
     const Effect& get_effect() const;
-};
-
-template<>
-struct ShallowHash<const EffectConditionalWhenImpl&>
-{
-    size_t operator()(const EffectConditionalWhenImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const EffectConditionalWhenImpl&>
-{
-    bool operator()(const EffectConditionalWhenImpl& l, const EffectConditionalWhenImpl& r) const;
-};
-
-/* EffectImpl */
-
-template<>
-struct ShallowHash<const EffectImpl*>
-{
-    size_t operator()(const EffectImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const EffectImpl*>
-{
-    bool operator()(const EffectImpl* l, const EffectImpl* r) const;
 };
 
 }

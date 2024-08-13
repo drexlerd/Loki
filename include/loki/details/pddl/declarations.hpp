@@ -38,9 +38,9 @@ using PDDLElement = const T*;
  */
 
 template<typename T>
-struct ShallowHash;
+struct Hasher;
 template<typename T>
-struct ShallowEqualTo;
+struct EqualTo;
 
 template<typename HolderType, typename Hash, typename EqualTo>
 class UniqueFactory;

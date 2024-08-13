@@ -23,9 +23,6 @@
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/predicate.hpp"
 #include "loki/details/pddl/visitors.hpp"
-#include "loki/details/utils/collections.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
 
 namespace loki
 {
@@ -60,20 +57,5 @@ const Condition& AxiomImpl::get_condition() const { return m_condition; }
 const ParameterList& AxiomImpl::get_parameters() const { return m_parameters; }
 
 size_t AxiomImpl::get_num_parameters_to_ground_head() const { return m_num_parameters_to_ground_head; }
-
-size_t ShallowHash<const AxiomImpl*>::operator()(const AxiomImpl* e) const
-{
-    return ShallowHashCombiner()(e->get_derived_predicate_name(), get_sorted_vector(e->get_parameters()), e->get_condition());
-}
-
-bool ShallowEqualTo<const AxiomImpl*>::operator()(const AxiomImpl* l, const AxiomImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_derived_predicate_name() == r->get_derived_predicate_name())
-               && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters())) && (l->get_condition() == r->get_condition());
-    }
-    return true;
-}
 
 }

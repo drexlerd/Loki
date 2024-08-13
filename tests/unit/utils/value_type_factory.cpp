@@ -86,16 +86,16 @@ TEST(LokiTests, UtilsUniqueFactoryTest)
     const auto object_0_1 = factory.get_or_create<ObjectImpl>("object_0", TypeList());
     EXPECT_EQ(factory.size(), 1);
     EXPECT_EQ(object_0_0, object_0_1);
-    EXPECT_EQ(ShallowHash<const ObjectImpl*>()(object_0_0), ShallowHash<const ObjectImpl*>()(object_0_1));
-    EXPECT_TRUE(ShallowEqualTo<const ObjectImpl*>()(object_0_0, object_0_1));
+    EXPECT_EQ(Hasher<const ObjectImpl*>()(object_0_0), Hasher<const ObjectImpl*>()(object_0_1));
+    EXPECT_TRUE(EqualTo<const ObjectImpl*>()(object_0_0, object_0_1));
 
     const auto object_1 = factory.get_or_create<ObjectImpl>("object_1", TypeList());
     EXPECT_EQ(factory.size(), 2);
     EXPECT_NE(object_0_0, object_1);
     EXPECT_EQ(object_1->get_index(), 1);
     EXPECT_EQ(object_1->get_name(), "object_1");
-    EXPECT_NE(ShallowHash<const ObjectImpl*>()(object_0_0), ShallowHash<const ObjectImpl*>()(object_1));
-    EXPECT_FALSE(ShallowEqualTo<const ObjectImpl*>()(object_0_0, object_1));
+    EXPECT_NE(Hasher<const ObjectImpl*>()(object_0_0), Hasher<const ObjectImpl*>()(object_1));
+    EXPECT_FALSE(EqualTo<const ObjectImpl*>()(object_0_0, object_1));
 }
 
 }

@@ -67,18 +67,6 @@ public:
     double get_number() const;
 };
 
-template<>
-struct ShallowHash<const FunctionExpressionNumberImpl&>
-{
-    size_t operator()(const FunctionExpressionNumberImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const FunctionExpressionNumberImpl&>
-{
-    bool operator()(const FunctionExpressionNumberImpl& l, const FunctionExpressionNumberImpl& r) const;
-};
-
 /* FunctionExpressionBinaryOperator */
 class FunctionExpressionBinaryOperatorImpl : public Base<FunctionExpressionBinaryOperatorImpl>
 {
@@ -107,18 +95,6 @@ public:
     const FunctionExpression& get_right_function_expression() const;
 };
 
-template<>
-struct ShallowHash<const FunctionExpressionBinaryOperatorImpl&>
-{
-    size_t operator()(const FunctionExpressionBinaryOperatorImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const FunctionExpressionBinaryOperatorImpl&>
-{
-    bool operator()(const FunctionExpressionBinaryOperatorImpl& l, const FunctionExpressionBinaryOperatorImpl& r) const;
-};
-
 /* FunctionExpressionMultiOperator */
 class FunctionExpressionMultiOperatorImpl : public Base<FunctionExpressionMultiOperatorImpl>
 {
@@ -142,18 +118,6 @@ public:
     const FunctionExpressionList& get_function_expressions() const;
 };
 
-template<>
-struct ShallowHash<const FunctionExpressionMultiOperatorImpl&>
-{
-    size_t operator()(const FunctionExpressionMultiOperatorImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const FunctionExpressionMultiOperatorImpl&>
-{
-    bool operator()(const FunctionExpressionMultiOperatorImpl& l, const FunctionExpressionMultiOperatorImpl& r) const;
-};
-
 /* FunctionExpressionMinus */
 class FunctionExpressionMinusImpl : public Base<FunctionExpressionMinusImpl>
 {
@@ -175,18 +139,6 @@ public:
     const FunctionExpression& get_function_expression() const;
 };
 
-template<>
-struct ShallowHash<const FunctionExpressionMinusImpl&>
-{
-    size_t operator()(const FunctionExpressionMinusImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const FunctionExpressionMinusImpl&>
-{
-    bool operator()(const FunctionExpressionMinusImpl& l, const FunctionExpressionMinusImpl& r) const;
-};
-
 /* FunctionExpressionFunction */
 class FunctionExpressionFunctionImpl : public Base<FunctionExpressionFunctionImpl>
 {
@@ -206,32 +158,6 @@ private:
 
 public:
     const Function& get_function() const;
-};
-
-template<>
-struct ShallowHash<const FunctionExpressionFunctionImpl&>
-{
-    size_t operator()(const FunctionExpressionFunctionImpl& e) const;
-};
-
-template<>
-struct ShallowEqualTo<const FunctionExpressionFunctionImpl&>
-{
-    bool operator()(const FunctionExpressionFunctionImpl& l, const FunctionExpressionFunctionImpl& r) const;
-};
-
-/* FunctionExpressionImpl */
-
-template<>
-struct ShallowHash<const FunctionExpressionImpl*>
-{
-    size_t operator()(const FunctionExpressionImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const FunctionExpressionImpl*>
-{
-    bool operator()(const FunctionExpressionImpl* l, const FunctionExpressionImpl* r) const;
 };
 
 }

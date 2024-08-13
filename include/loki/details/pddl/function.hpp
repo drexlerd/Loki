@@ -47,18 +47,6 @@ public:
     const TermList& get_terms() const;
 };
 
-template<>
-struct ShallowHash<const FunctionImpl*>
-{
-    size_t operator()(const FunctionImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const FunctionImpl*>
-{
-    bool operator()(const FunctionImpl* l, const FunctionImpl* r) const;
-};
-
 }
 
 #endif

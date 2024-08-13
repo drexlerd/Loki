@@ -45,18 +45,6 @@ public:
     const std::string& get_name() const;
 };
 
-template<>
-struct ShallowHash<const VariableImpl*>
-{
-    size_t operator()(const VariableImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const VariableImpl*>
-{
-    bool operator()(const VariableImpl* l, const VariableImpl* r) const;
-};
-
 extern VariableSet collect_free_variables(const loki::ConditionImpl& condition);
 
 }

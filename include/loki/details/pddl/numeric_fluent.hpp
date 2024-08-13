@@ -47,18 +47,6 @@ public:
     double get_number() const;
 };
 
-template<>
-struct ShallowHash<const NumericFluentImpl*>
-{
-    size_t operator()(const NumericFluentImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const NumericFluentImpl*>
-{
-    bool operator()(const NumericFluentImpl* l, const NumericFluentImpl* r) const;
-};
-
 }
 
 #endif

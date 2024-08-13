@@ -22,9 +22,6 @@
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/term.hpp"
-#include "loki/details/utils/collections.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
 
 namespace loki
 {
@@ -33,17 +30,6 @@ VariableImpl::VariableImpl(size_t index, std::string name) : Base(index), m_name
 void VariableImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const { out << m_name; }
 
 const std::string& VariableImpl::get_name() const { return m_name; }
-
-size_t ShallowHash<const VariableImpl*>::operator()(const VariableImpl* e) const { return ShallowHashCombiner()(e->get_name()); }
-
-bool ShallowEqualTo<const VariableImpl*>::operator()(const VariableImpl* l, const VariableImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_name() == r->get_name());
-    }
-    return true;
-}
 
 static void collect_free_variables_recursively(const loki::ConditionImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
 {

@@ -20,9 +20,6 @@
 #include "loki/details/pddl/predicate.hpp"
 #include "loki/details/pddl/term.hpp"
 #include "loki/details/pddl/visitors.hpp"
-#include "loki/details/utils/collections.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
 
 namespace loki
 {
@@ -42,16 +39,5 @@ void AtomImpl::str_impl(std::ostream& out, const FormattingOptions& options) con
 const Predicate& AtomImpl::get_predicate() const { return m_predicate; }
 
 const TermList& AtomImpl::get_terms() const { return m_terms; }
-
-size_t ShallowHash<const AtomImpl*>::operator()(const AtomImpl* e) const { return ShallowHashCombiner()(e->get_predicate(), e->get_terms()); }
-
-bool ShallowEqualTo<const AtomImpl*>::operator()(const AtomImpl* l, const AtomImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_predicate() == r->get_predicate()) && (l->get_terms() == r->get_terms());
-    }
-    return true;
-}
 
 }

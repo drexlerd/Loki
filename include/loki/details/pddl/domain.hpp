@@ -73,18 +73,6 @@ public:
     const AxiomList& get_axioms() const;
 };
 
-template<>
-struct ShallowHash<const DomainImpl*>
-{
-    size_t operator()(const DomainImpl* e) const;
-};
-
-template<>
-struct ShallowEqualTo<const DomainImpl*>
-{
-    bool operator()(const DomainImpl* l, const DomainImpl* r) const;
-};
-
 }
 
 #endif
