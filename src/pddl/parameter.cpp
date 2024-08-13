@@ -26,30 +26,6 @@ namespace loki
 {
 ParameterImpl::ParameterImpl(size_t index, Variable variable, TypeList types) : Base(index), m_variable(std::move(variable)), m_types(std::move(types)) {}
 
-void ParameterImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const
-{
-    out << m_variable->get_name();
-    if (!m_types.empty())
-    {
-        out << " - ";
-        if (m_types.size() > 1)
-        {
-            out << "(either ";
-            for (size_t i = 0; i < m_types.size(); ++i)
-            {
-                if (i != 0)
-                    out << " ";
-                m_types[i]->get_name();
-            }
-            out << ")";
-        }
-        else if (m_types.size() == 1)
-        {
-            out << m_types.front()->get_name();
-        }
-    }
-}
-
 const Variable& ParameterImpl::get_variable() const { return m_variable; }
 
 const TypeList& ParameterImpl::get_bases() const { return m_types; }

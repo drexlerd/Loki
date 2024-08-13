@@ -636,14 +636,14 @@ void DefaultFormatter::write(const RequirementsImpl& element, const DefaultForma
     out << ")";
 }
 
-void DefaultFormatter::write(const TermObjectImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const
+void DefaultFormatter::write(const TermObjectImpl& element, const DefaultFormatterOptions&, std::ostream& out) const
 {
-    write(*element.get_object(), options, out);
+    out << element.get_object()->get_name();
 }
 
-void DefaultFormatter::write(const TermVariableImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const
+void DefaultFormatter::write(const TermVariableImpl& element, const DefaultFormatterOptions&, std::ostream& out) const
 {
-    write(*element.get_variable(), options, out);
+    out << element.get_variable()->get_name();
 }
 
 void DefaultFormatter::write(const TermImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const

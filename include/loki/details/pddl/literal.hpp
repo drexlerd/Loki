@@ -37,11 +37,6 @@ private:
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
 
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<LiteralImpl>;
-
 public:
     bool is_negated() const;
     const Atom& get_atom() const;

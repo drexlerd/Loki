@@ -20,7 +20,6 @@
 #include "loki/details/pddl/conditions.hpp"
 #include "loki/details/pddl/effects.hpp"
 #include "loki/details/pddl/parameter.hpp"
-#include "loki/details/pddl/visitors.hpp"
 
 namespace loki
 {
@@ -37,34 +36,6 @@ ActionImpl::ActionImpl(size_t index,
     m_condition(std::move(condition)),
     m_effect(std::move(effect))
 {
-}
-
-void ActionImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    auto nested_options = FormattingOptions { options.indent + options.add_indent, options.add_indent };
-    out << std::string(options.indent, ' ') << "(:action " << m_name << "\n" << std::string(nested_options.indent, ' ') << ":parameters (";
-    for (size_t i = 0; i < m_parameters.size(); ++i)
-    {
-        if (i != 0)
-            out << " ";
-        m_parameters[i]->str(out, options);
-    }
-    out << ")";
-    out << "\n";
-    out << std::string(nested_options.indent, ' ') << ":conditions ";
-    if (m_condition.has_value())
-        std::visit(StringifyVisitor(out, nested_options), *m_condition.value());
-    else
-        out << "()";
-
-    out << "\n";
-    out << std::string(nested_options.indent, ' ') << ":effects ";
-    if (m_effect.has_value())
-        std::visit(StringifyVisitor(out, nested_options), *m_effect.value());
-    else
-        out << "()";
-
-    out << ")\n";
 }
 
 const std::string& ActionImpl::get_name() const { return m_name; }

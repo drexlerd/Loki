@@ -22,7 +22,6 @@
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/predicate.hpp"
-#include "loki/details/pddl/visitors.hpp"
 
 namespace loki
 {
@@ -33,21 +32,6 @@ AxiomImpl::AxiomImpl(size_t index, std::string derived_predicate_name, Parameter
     m_condition(std::move(condition)),
     m_num_parameters_to_ground_head(num_parameters_to_ground_head)
 {
-}
-
-void AxiomImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    auto nested_options = FormattingOptions { options.indent + options.add_indent, options.add_indent };
-    out << std::string(options.indent, ' ') << "(:derived " << m_derived_predicate_name;
-    for (size_t i = 0; i < m_parameters.size(); ++i)
-    {
-        out << " ";
-        m_parameters[i]->str(out, options);
-    }
-    out << "\n";
-    out << std::string(nested_options.indent, ' ');
-    std::visit(StringifyVisitor(out, nested_options), *m_condition);
-    out << ")\n";
 }
 
 const std::string& AxiomImpl::get_derived_predicate_name() const { return m_derived_predicate_name; }

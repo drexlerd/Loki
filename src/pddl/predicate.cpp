@@ -32,17 +32,6 @@ PredicateImpl::PredicateImpl(size_t index, std::string name, ParameterList param
 {
 }
 
-void PredicateImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << "(" << m_name;
-    for (size_t i = 0; i < m_parameters.size(); ++i)
-    {
-        out << " ";
-        m_parameters[i]->str(out, options);
-    }
-    out << ")";
-}
-
 const std::string& PredicateImpl::get_name() const { return m_name; }
 
 const ParameterList& PredicateImpl::get_parameters() const { return m_parameters; }

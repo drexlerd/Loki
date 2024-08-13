@@ -37,11 +37,6 @@ private:
 
     NumericFluentImpl(size_t index, Function function, double number);
 
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<NumericFluentImpl>;
-
 public:
     const Function& get_function() const;
     double get_number() const;

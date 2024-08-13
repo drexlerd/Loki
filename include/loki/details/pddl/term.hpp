@@ -39,11 +39,6 @@ private:
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
 
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<TermObjectImpl>;
-
 public:
     const Object& get_object() const;
 };
@@ -60,11 +55,6 @@ private:
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
-
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<TermVariableImpl>;
 
 public:
     const Variable& get_variable() const;

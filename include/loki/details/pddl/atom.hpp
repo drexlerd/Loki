@@ -37,11 +37,6 @@ private:
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
 
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<AtomImpl>;
-
 public:
     const Predicate& get_predicate() const;
     const TermList& get_terms() const;

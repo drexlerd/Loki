@@ -29,17 +29,6 @@ FunctionSkeletonImpl::FunctionSkeletonImpl(size_t index, std::string name, Param
 {
 }
 
-void FunctionSkeletonImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << "(" << m_name;
-    for (size_t i = 0; i < m_parameters.size(); ++i)
-    {
-        out << " ";
-        m_parameters[i]->str(out, options);
-    }
-    out << ")";
-}
-
 const std::string& FunctionSkeletonImpl::get_name() const { return m_name; }
 
 const ParameterList& FunctionSkeletonImpl::get_parameters() const { return m_parameters; }

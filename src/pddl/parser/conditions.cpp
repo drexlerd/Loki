@@ -22,7 +22,6 @@
 #include "loki/details/ast/printer.hpp"
 #include "loki/details/pddl/conditions.hpp"
 #include "loki/details/pddl/exceptions.hpp"
-#include "loki/details/pddl/visitors.hpp"
 #include "parameters.hpp"
 #include "reference_utils.hpp"
 

@@ -27,7 +27,6 @@
 #include "loki/details/pddl/predicate.hpp"
 #include "loki/details/pddl/requirements.hpp"
 #include "loki/details/pddl/type.hpp"
-#include "loki/details/pddl/visitors.hpp"
 #include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/hash.hpp"
 
@@ -62,120 +61,6 @@ ProblemImpl::ProblemImpl(size_t index,
     m_optimization_metric(std::move(optimization_metric)),
     m_axioms(std::move(axioms))
 {
-}
-
-void ProblemImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << string(options.indent, ' ') << "(define (problem " << m_name << ")\n";
-    auto nested_options = FormattingOptions { options.indent + options.add_indent, options.add_indent };
-    out << string(nested_options.indent, ' ') << "(:domain " << m_domain->get_name() << ")\n";
-    if (!m_requirements->get_requirements().empty())
-    {
-        out << string(nested_options.indent, ' ');
-        m_requirements->str(out, nested_options);
-        out << "\n";
-    }
-
-    if (!m_objects.empty())
-    {
-        out << string(nested_options.indent, ' ') << "(:objects ";
-        std::unordered_map<TypeList, ObjectList, Hasher<TypeList>> objects_by_types;
-        for (const auto& object : m_objects)
-        {
-            objects_by_types[object->get_bases()].push_back(object);
-        }
-        size_t i = 0;
-        for (const auto& [types, objects] : objects_by_types)
-        {
-            if (i != 0)
-                out << "\n" << string(nested_options.indent, ' ');
-            for (size_t i = 0; i < objects.size(); ++i)
-            {
-                if (i != 0)
-                {
-                    out << " ";
-                }
-                out << objects[i]->get_name();
-            }
-            if (m_requirements->test(RequirementEnum::TYPING))
-            {
-                out << " - ";
-                if (types.size() > 1)
-                {
-                    out << "(either ";
-                    for (size_t i = 0; i < types.size(); ++i)
-                    {
-                        if (i != 0)
-                            out << " ";
-                        types[i]->get_name();
-                    }
-                    out << ")";
-                }
-                else if (types.size() == 1)
-                {
-                    out << types.front()->get_name();
-                }
-            }
-            ++i;
-        }
-        out << ")\n";
-    }
-
-    if (!m_derived_predicates.empty())
-    {
-        out << string(nested_options.indent, ' ') << "(:derived-predicates ";
-        for (size_t i = 0; i < m_derived_predicates.size(); ++i)
-        {
-            if (i != 0)
-                out << " ";
-            m_derived_predicates[i]->str(out, nested_options);
-        }
-        out << ")\n";
-    }
-
-    if (!(m_initial_literals.empty() && m_numeric_fluents.empty()))
-    {
-        out << string(nested_options.indent, ' ') << "(:init ";
-        for (size_t i = 0; i < m_initial_literals.size(); ++i)
-        {
-            if (i != 0)
-                out << " ";
-            m_initial_literals[i]->str(out, nested_options);
-        }
-        for (size_t i = 0; i < m_numeric_fluents.size(); ++i)
-        {
-            out << " ";
-            m_numeric_fluents[i]->str(out, nested_options);
-        }
-    }
-    out << ")\n";
-
-    if (m_goal_condition.has_value())
-    {
-        out << string(nested_options.indent, ' ') << "(:goal ";
-        std::visit(StringifyVisitor(out, options), *m_goal_condition.value());
-        out << ")\n";
-    }
-
-    if (m_optimization_metric.has_value())
-    {
-        out << string(nested_options.indent, ' ') << "(:metric ";
-        m_optimization_metric.value()->str(out, nested_options);
-        out << ")\n";
-    }
-
-    for (const auto& axiom : m_axioms)
-    {
-        axiom->str(out, nested_options);
-    }
-
-    out << string(options.indent, ' ') << ")";
-}
-
-std::ostream& operator<<(std::ostream& os, const ProblemImpl& problem)
-{
-    problem.str(os, FormattingOptions { 0, 4 });
-    return os;
 }
 
 const std::optional<fs::path>& ProblemImpl::get_filepath() const { return m_filepath; }

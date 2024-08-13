@@ -19,22 +19,10 @@
 
 #include "loki/details/pddl/predicate.hpp"
 #include "loki/details/pddl/term.hpp"
-#include "loki/details/pddl/visitors.hpp"
 
 namespace loki
 {
 AtomImpl::AtomImpl(size_t index, Predicate predicate, TermList terms) : Base(index), m_predicate(std::move(predicate)), m_terms(std::move(terms)) {}
-
-void AtomImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << "(" << m_predicate->get_name();
-    for (size_t i = 0; i < m_terms.size(); ++i)
-    {
-        out << " ";
-        std::visit(StringifyVisitor(out, options), *m_terms[i]);
-    }
-    out << ")";
-}
 
 const Predicate& AtomImpl::get_predicate() const { return m_predicate; }
 

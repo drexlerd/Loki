@@ -27,8 +27,6 @@ namespace loki
 {
 VariableImpl::VariableImpl(size_t index, std::string name) : Base(index), m_name(std::move(name)) {}
 
-void VariableImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const { out << m_name; }
-
 const std::string& VariableImpl::get_name() const { return m_name; }
 
 static void collect_free_variables_recursively(const loki::ConditionImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)

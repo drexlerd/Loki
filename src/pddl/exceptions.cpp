@@ -17,14 +17,7 @@
 
 #include "loki/details/pddl/exceptions.hpp"
 
-#include "loki/details/pddl/domain.hpp"
-#include "loki/details/pddl/function.hpp"
-#include "loki/details/pddl/function_skeleton.hpp"
-#include "loki/details/pddl/object.hpp"
-#include "loki/details/pddl/parameter.hpp"
-#include "loki/details/pddl/predicate.hpp"
-#include "loki/details/pddl/type.hpp"
-#include "loki/details/pddl/variable.hpp"
+#include "loki/details/pddl/formatter.hpp"
 
 #include <string>
 
@@ -173,8 +166,8 @@ MultiDefinitionObjectError::MultiDefinitionObjectError(const std::string& name, 
 IllformedFunctionDefinitionMissingValue::IllformedFunctionDefinitionMissingValue(const FunctionSkeleton& function_skeleton,
                                                                                  const Function& values,
                                                                                  const std::string& error_handler_output) :
-    SemanticParserError("The function with name \"" + function_skeleton->str() + "\n misses a value definition in the initial state for arguments \""
-                            + values->str() + "\".",
+    SemanticParserError("The function with name \"" + StreamWriter(*function_skeleton).str()
+                            + "\n misses a value definition in the initial state for arguments \"" + StreamWriter(*values).str() + "\".",
                         error_handler_output)
 {
 }
@@ -182,7 +175,8 @@ IllformedFunctionDefinitionMissingValue::IllformedFunctionDefinitionMissingValue
 IllformedFunctionDefinitionMultipleValues::IllformedFunctionDefinitionMultipleValues(const FunctionSkeleton& function_skeleton,
                                                                                      const Function& ground_function,
                                                                                      const std::string& error_handler_output) :
-    SemanticParserError("The function with name \"" + function_skeleton->str() + "\n has multiple values defined for \"" + ground_function->str() + "\".",
+    SemanticParserError("The function with name \"" + StreamWriter(*function_skeleton).str() + "\n has multiple values defined for \""
+                            + StreamWriter(*ground_function).str() + "\".",
                         error_handler_output)
 {
 }
@@ -191,8 +185,8 @@ IllformedFunctionDefinitionMultipleValues::IllformedFunctionDefinitionMultipleVa
 IncompatibleParameterTypesError::IncompatibleParameterTypesError(const Parameter& specialized_parameter,
                                                                  const Parameter& generalized_parameter,
                                                                  const std::string& error_handler_output) :
-    SemanticParserError("The types of the parameter \""s + specialized_parameter->str() + "\" are incompatible with the types of parameter \""
-                            + generalized_parameter->str() + "\"s",
+    SemanticParserError("The types of the parameter \""s + StreamWriter(*specialized_parameter).str() + "\" are incompatible with the types of parameter \""
+                            + StreamWriter(*generalized_parameter).str() + "\"s",
                         error_handler_output)
 {
 }

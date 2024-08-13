@@ -25,6 +25,7 @@
 #include "literal.hpp"
 #include "loki/details/pddl/action.hpp"
 #include "loki/details/pddl/axiom.hpp"
+#include "loki/details/pddl/formatter.hpp"
 #include "parameters.hpp"
 #include "predicates.hpp"
 #include "reference_utils.hpp"
@@ -67,7 +68,7 @@ Action parse(const ast::Action& node, Context& context)
         {
             if (!context.quiet)
             {
-                std::cout << "Removed unused parameter " << *parameter << " from action " << name << std::endl;
+                std::cout << "Removed unused parameter " << StreamWriter(*parameter) << " from action " << name << std::endl;
             }
         }
     }

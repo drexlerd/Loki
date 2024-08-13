@@ -50,20 +50,6 @@ const std::string& to_string(RequirementEnum requirement)
 
 RequirementsImpl::RequirementsImpl(size_t index, RequirementEnumSet requirements) : Base(index), m_requirements(std::move(requirements)) {}
 
-void RequirementsImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const
-{
-    out << "(:requirements ";
-    int i = 0;
-    for (const auto& requirement : m_requirements)
-    {
-        if (i != 0)
-            out << " ";
-        out << to_string(requirement);
-        ++i;
-    }
-    out << ")";
-}
-
 bool RequirementsImpl::test(RequirementEnum requirement) const { return m_requirements.count(requirement); }
 
 const RequirementEnumSet& RequirementsImpl::get_requirements() const { return m_requirements; }

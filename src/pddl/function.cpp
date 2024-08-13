@@ -19,7 +19,6 @@
 
 #include "loki/details/pddl/function_skeleton.hpp"
 #include "loki/details/pddl/term.hpp"
-#include "loki/details/pddl/visitors.hpp"
 
 namespace loki
 {
@@ -28,25 +27,6 @@ FunctionImpl::FunctionImpl(size_t index, FunctionSkeleton function_skeleton, Ter
     m_function_skeleton(std::move(function_skeleton)),
     m_terms(std::move(terms))
 {
-}
-
-void FunctionImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    if (m_terms.empty())
-    {
-        out << "(" << m_function_skeleton->get_name() << ")";
-    }
-    else
-    {
-        out << "(" << m_function_skeleton->get_name() << "(";
-        for (size_t i = 0; i < m_terms.size(); ++i)
-        {
-            if (i != 0)
-                out << " ";
-            std::visit(StringifyVisitor(out, options), *m_terms[i]);
-        }
-        out << "))";
-    }
 }
 
 const FunctionSkeleton& FunctionImpl::get_function_skeleton() const { return m_function_skeleton; }

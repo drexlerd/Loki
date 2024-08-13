@@ -35,6 +35,7 @@
 #include "loki/details/pddl/error_reporting.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 #include "loki/details/pddl/factories.hpp"
+#include "loki/details/pddl/formatter.hpp"
 #include "loki/details/pddl/function.hpp"
 #include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
@@ -52,7 +53,6 @@
 #include "loki/details/pddl/term.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
-#include "loki/details/pddl/visitors.hpp"
 
 /**
  * Utils
@@ -63,7 +63,6 @@
 #include "loki/details/utils/filesystem.hpp"
 #include "loki/details/utils/hash.hpp"
 #include "loki/details/utils/memory.hpp"
-#include "loki/details/utils/printer.hpp"
 #include "loki/details/utils/segmented_vector.hpp"
 #include "loki/details/utils/unique_factory.hpp"
 

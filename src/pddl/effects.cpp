@@ -22,7 +22,6 @@
 #include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/parameter.hpp"
-#include "loki/details/pddl/visitors.hpp"
 
 #include <cassert>
 
@@ -43,24 +42,10 @@ const std::string& to_string(AssignOperatorEnum assign_operator)
 /* EffectLiteral */
 EffectLiteralImpl::EffectLiteralImpl(size_t index, Literal literal) : Base(index), m_literal(std::move(literal)) {}
 
-void EffectLiteralImpl::str_impl(std::ostream& out, const FormattingOptions& options) const { m_literal->str(out, options); }
-
 const Literal& EffectLiteralImpl::get_literal() const { return m_literal; }
 
 /* EffectAnd */
 EffectAndImpl::EffectAndImpl(size_t index, EffectList effects) : Base(index), m_effects(std::move(effects)) {}
-
-void EffectAndImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << "(and ";
-    for (size_t i = 0; i < m_effects.size(); ++i)
-    {
-        if (i != 0)
-            out << " ";
-        std::visit(StringifyVisitor(out, options), *m_effects[i]);
-    }
-    out << ")";
-}
 
 const EffectList& EffectAndImpl::get_effects() const { return m_effects; }
 
@@ -71,15 +56,6 @@ EffectNumericImpl::EffectNumericImpl(size_t index, AssignOperatorEnum assign_ope
     m_function(std::move(function)),
     m_function_expression(std::move(function_expression))
 {
-}
-
-void EffectNumericImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << "(" << to_string(m_assign_operator) << " ";
-    m_function->str(out, options);
-    out << " ";
-    std::visit(StringifyVisitor(out, options), *m_function_expression);
-    out << ")";
 }
 
 AssignOperatorEnum EffectNumericImpl::get_assign_operator() const { return m_assign_operator; }
@@ -96,20 +72,6 @@ EffectConditionalForallImpl::EffectConditionalForallImpl(size_t index, Parameter
 {
 }
 
-void EffectConditionalForallImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << "(forall (";
-    for (size_t i = 0; i < m_parameters.size(); ++i)
-    {
-        if (i != 0)
-            out << " ";
-        m_parameters[i]->str(out, options);
-    }
-    out << ") ";
-    std::visit(StringifyVisitor(out, options), *m_effect);
-    out << ")";
-}
-
 const ParameterList& EffectConditionalForallImpl::get_parameters() const { return m_parameters; }
 
 const Effect& EffectConditionalForallImpl::get_effect() const { return m_effect; }
@@ -120,15 +82,6 @@ EffectConditionalWhenImpl::EffectConditionalWhenImpl(size_t index, Condition con
     m_condition(std::move(condition)),
     m_effect(std::move(effect))
 {
-}
-
-void EffectConditionalWhenImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << "(when ";
-    std::visit(StringifyVisitor(out, options), *m_condition);
-    out << " ";
-    std::visit(StringifyVisitor(out, options), *m_effect);
-    out << ")";
 }
 
 const Condition& EffectConditionalWhenImpl::get_condition() const { return m_condition; }

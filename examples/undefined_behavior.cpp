@@ -26,7 +26,7 @@ int main()
         // Parse the domain
         auto domain_parser = loki::DomainParser(std::string(DATA_DIR) + "gripper/domain.pddl");
         domain = domain_parser.get_domain();
-        std::cout << *domain << std::endl;
+        std::cout << loki::StreamWriter(*domain) << std::endl;
 
         /* Destructor of DomainParser is called and all domain and problem specific PDDL objects are destroyed. */
     }
@@ -34,7 +34,7 @@ int main()
     std::cout << "Bye ;(" << std::endl;
 
     /* Undefined behavior when accessing the domain, usually the program crashes because memory was overwritten */
-    std::cout << *domain << std::endl;
+    std::cout << loki::StreamWriter(*domain) << std::endl;
 
     return 0;
 }

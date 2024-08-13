@@ -18,7 +18,6 @@
 #include "loki/details/pddl/metric.hpp"
 
 #include "loki/details/pddl/function_expressions.hpp"
-#include "loki/details/pddl/visitors.hpp"
 
 #include <cassert>
 
@@ -42,13 +41,6 @@ OptimizationMetricImpl::OptimizationMetricImpl(size_t index, OptimizationMetricE
     m_optimization_metric(optimization_metric),
     m_function_expression(std::move(function_expression))
 {
-}
-
-void OptimizationMetricImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << "(" << to_string(m_optimization_metric) << " ";
-    std::visit(StringifyVisitor(out, options), *m_function_expression);
-    out << ")";
 }
 
 OptimizationMetricEnum OptimizationMetricImpl::get_optimization_metric() const { return m_optimization_metric; }

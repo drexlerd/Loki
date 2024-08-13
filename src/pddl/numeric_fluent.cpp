@@ -23,13 +23,6 @@ namespace loki
 {
 NumericFluentImpl::NumericFluentImpl(size_t index, Function function, double number) : Base(index), m_function(std::move(function)), m_number(number) {}
 
-void NumericFluentImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << "(= ";
-    m_function->str(out, options);
-    out << " " << m_number << ")";
-}
-
 const Function& NumericFluentImpl::get_function() const { return m_function; }
 
 double NumericFluentImpl::get_number() const { return m_number; }

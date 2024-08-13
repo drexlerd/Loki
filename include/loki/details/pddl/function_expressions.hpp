@@ -58,11 +58,6 @@ private:
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
 
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<FunctionExpressionNumberImpl>;
-
 public:
     double get_number() const;
 };
@@ -84,11 +79,6 @@ private:
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
 
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<FunctionExpressionBinaryOperatorImpl>;
-
 public:
     BinaryOperatorEnum get_binary_operator() const;
     const FunctionExpression& get_left_function_expression() const;
@@ -108,11 +98,6 @@ private:
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
 
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<FunctionExpressionMultiOperatorImpl>;
-
 public:
     MultiOperatorEnum get_multi_operator() const;
     const FunctionExpressionList& get_function_expressions() const;
@@ -130,11 +115,6 @@ private:
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
 
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<FunctionExpressionMinusImpl>;
-
 public:
     const FunctionExpression& get_function_expression() const;
 };
@@ -150,11 +130,6 @@ private:
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
-
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<FunctionExpressionFunctionImpl>;
 
 public:
     const Function& get_function() const;

@@ -23,30 +23,6 @@ namespace loki
 {
 ObjectImpl::ObjectImpl(size_t index, std::string name, TypeList types) : Base(index), m_name(std::move(name)), m_types(std::move(types)) {}
 
-void ObjectImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << m_name;
-    if (!m_types.empty())
-    {
-        out << " - ";
-        if (m_types.size() > 1)
-        {
-            out << "(either ";
-            for (size_t i = 0; i < m_types.size(); ++i)
-            {
-                if (i != 0)
-                    out << " ";
-                m_types[i]->str(out, options);
-            }
-            out << ")";
-        }
-        else if (m_types.size() == 1)
-        {
-            m_types.front()->str(out, options);
-        }
-    }
-}
-
 const std::string& ObjectImpl::get_name() const { return m_name; }
 
 const TypeList& ObjectImpl::get_bases() const { return m_types; }

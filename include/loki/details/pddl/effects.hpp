@@ -49,11 +49,6 @@ private:
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
 
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<EffectLiteralImpl>;
-
 public:
     const Literal& get_literal() const;
 };
@@ -69,11 +64,6 @@ private:
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
-
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<EffectAndImpl>;
 
 public:
     const EffectList& get_effects() const;
@@ -92,11 +82,6 @@ private:
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
-
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<EffectNumericImpl>;
 
 public:
     AssignOperatorEnum get_assign_operator() const;
@@ -117,11 +102,6 @@ private:
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
 
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<EffectConditionalForallImpl>;
-
 public:
     const ParameterList& get_parameters() const;
     const Effect& get_effect() const;
@@ -139,11 +119,6 @@ private:
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
-
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<EffectConditionalWhenImpl>;
 
 public:
     const Condition& get_condition() const;

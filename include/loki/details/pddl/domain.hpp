@@ -56,11 +56,6 @@ private:
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
 
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<DomainImpl>;
-
 public:
     const std::optional<fs::path>& get_filepath() const;
     const std::string& get_name() const;

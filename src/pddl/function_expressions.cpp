@@ -18,7 +18,6 @@
 #include "loki/details/pddl/function_expressions.hpp"
 
 #include "loki/details/pddl/function.hpp"
-#include "loki/details/pddl/visitors.hpp"
 
 #include <cassert>
 
@@ -52,8 +51,6 @@ const std::string& to_string(MultiOperatorEnum multi_operator)
 /* FunctionExpressionNumber */
 FunctionExpressionNumberImpl::FunctionExpressionNumberImpl(size_t index, double number) : Base(index), m_number(number) {}
 
-void FunctionExpressionNumberImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const { out << m_number; }
-
 double FunctionExpressionNumberImpl::get_number() const { return m_number; }
 
 /* FunctionExpressionBinaryOperator */
@@ -66,15 +63,6 @@ FunctionExpressionBinaryOperatorImpl::FunctionExpressionBinaryOperatorImpl(size_
     m_left_function_expression(std::move(left_function_expression)),
     m_right_function_expression(std::move(right_function_expression))
 {
-}
-
-void FunctionExpressionBinaryOperatorImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << "(" << to_string(m_binary_operator) << " ";
-    std::visit(StringifyVisitor(out, options), *m_left_function_expression);
-    out << " ";
-    std::visit(StringifyVisitor(out, options), *m_right_function_expression);
-    out << ")";
 }
 
 BinaryOperatorEnum FunctionExpressionBinaryOperatorImpl::get_binary_operator() const { return m_binary_operator; }
@@ -93,18 +81,6 @@ FunctionExpressionMultiOperatorImpl::FunctionExpressionMultiOperatorImpl(size_t 
 {
 }
 
-void FunctionExpressionMultiOperatorImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << "(" << to_string(m_multi_operator);
-    assert(!m_function_expressions.empty());
-    for (const auto& function_expression : m_function_expressions)
-    {
-        out << " ";
-        std::visit(StringifyVisitor(out, options), *function_expression);
-    }
-    out << ")";
-}
-
 MultiOperatorEnum FunctionExpressionMultiOperatorImpl::get_multi_operator() const { return m_multi_operator; }
 
 const FunctionExpressionList& FunctionExpressionMultiOperatorImpl::get_function_expressions() const { return m_function_expressions; }
@@ -116,19 +92,10 @@ FunctionExpressionMinusImpl::FunctionExpressionMinusImpl(size_t index, FunctionE
 {
 }
 
-void FunctionExpressionMinusImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    out << "(- ";
-    std::visit(StringifyVisitor(out, options), *m_function_expression);
-    out << ")";
-}
-
 const FunctionExpression& FunctionExpressionMinusImpl::get_function_expression() const { return m_function_expression; }
 
 /* FunctionExpressionFunction */
 FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(size_t index, Function function) : Base(index), m_function(std::move(function)) {}
-
-void FunctionExpressionFunctionImpl::str_impl(std::ostream& out, const FormattingOptions& options) const { m_function->str(out, options); }
 
 const Function& FunctionExpressionFunctionImpl::get_function() const { return m_function; }
 

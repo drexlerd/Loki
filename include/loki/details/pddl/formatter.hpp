@@ -18,10 +18,35 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_FORMATTER_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_FORMATTER_HPP_
 
+// StreamWriter needs complete definition
+#include "loki/details/pddl/action.hpp"
+#include "loki/details/pddl/atom.hpp"
+#include "loki/details/pddl/axiom.hpp"
+#include "loki/details/pddl/conditions.hpp"
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/domain.hpp"
+#include "loki/details/pddl/effects.hpp"
+#include "loki/details/pddl/function.hpp"
+#include "loki/details/pddl/function_expressions.hpp"
+#include "loki/details/pddl/function_skeleton.hpp"
+#include "loki/details/pddl/literal.hpp"
+#include "loki/details/pddl/metric.hpp"
+#include "loki/details/pddl/numeric_fluent.hpp"
+#include "loki/details/pddl/object.hpp"
+#include "loki/details/pddl/parameter.hpp"
+#include "loki/details/pddl/position.hpp"
+#include "loki/details/pddl/predicate.hpp"
+#include "loki/details/pddl/problem.hpp"
+#include "loki/details/pddl/requirements.hpp"
+#include "loki/details/pddl/term.hpp"
+#include "loki/details/pddl/type.hpp"
+#include "loki/details/pddl/variable.hpp"
 
+#include <concepts>
 #include <cstddef>
 #include <ostream>
+#include <sstream>
+#include <type_traits>
 
 namespace loki
 {
@@ -79,23 +104,41 @@ public:
 };
 
 /// @brief `Writer` is a utility class to write to a stream using `operator<<`
-template<typename T, typename Formatter = DefaultFormatter>
+template<typename T, typename Formatter = DefaultFormatter, typename FormatterOptions = DefaultFormatterOptions>
 class StreamWriter
 {
 private:
     const T& m_element;
     const Formatter& m_formatter;
+    FormatterOptions m_options;
 
 public:
-    StreamWriter(const T& element, const Formatter& formatter) : m_element(element), m_formatter(formatter) {}
-
-    template<typename T_, typename Formatter_>
-    friend std::ostream& operator<<(std::ostream& out, const StreamWriter<T_, Formatter_>& writer)
+    StreamWriter(const T& element, const Formatter& formatter = Formatter(), const FormatterOptions& options = FormatterOptions()) :
+        m_element(element),
+        m_formatter(formatter),
+        m_options(options)
     {
-        writer.m_formatter.write(writer.m_element, out);
-        return out;
     }
+
+    std::string str() const
+    {
+        std::stringstream ss;
+        m_formatter.write(m_element, m_options, ss);
+        return ss.str();
+    }
+
+    const T& get_element() const { return m_element; }
+    const Formatter& get_formatter() const { return m_formatter; }
+    const FormatterOptions& get_options() const { return m_options; }
 };
+
+// Define the operator<< function outside of the class template
+template<typename T, typename Formatter, typename FormatterOptions>
+std::ostream& operator<<(std::ostream& out, const StreamWriter<T, Formatter, FormatterOptions>& writer)
+{
+    writer.get_formatter().write(writer.get_element(), writer.get_options(), out);
+    return out;
+}
 
 }
 

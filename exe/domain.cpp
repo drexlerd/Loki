@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     // 1. Parse the domain
     const auto domain_parser = loki::DomainParser(domain_file);
     const auto domain = domain_parser.get_domain();
-    std::cout << *domain << std::endl;
+    std::cout << loki::StreamWriter(*domain) << std::endl;
 
     return 0;
 }

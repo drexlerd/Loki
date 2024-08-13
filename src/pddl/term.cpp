@@ -26,14 +26,10 @@ namespace loki
 /* TermObjectImpl */
 TermObjectImpl::TermObjectImpl(size_t index, Object object) : Base(index), m_object(std::move(object)) {}
 
-void TermObjectImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const { out << m_object->get_name(); }
-
 const Object& TermObjectImpl::get_object() const { return m_object; }
 
 /* TermVariableImpl */
 TermVariableImpl::TermVariableImpl(size_t index, Variable variable) : Base(index), m_variable(std::move(variable)) {}
-
-void TermVariableImpl::str_impl(std::ostream& out, const FormattingOptions& /*options*/) const { out << m_variable->get_name(); }
 
 const Variable& TermVariableImpl::get_variable() const { return m_variable; }
 

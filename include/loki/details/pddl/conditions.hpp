@@ -38,11 +38,6 @@ private:
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
 
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<ConditionLiteralImpl>;
-
 public:
     const Literal& get_literal() const;
 };
@@ -58,11 +53,6 @@ private:
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
-
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<ConditionAndImpl>;
 
 public:
     const ConditionList& get_conditions() const;
@@ -80,13 +70,6 @@ private:
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
 
-    bool is_structurally_equivalent_to_impl(const ConditionOrImpl& other) const;
-    size_t hash_impl() const;
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<ConditionOrImpl>;
-
 public:
     const ConditionList& get_conditions() const;
 };
@@ -102,11 +85,6 @@ private:
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
-
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<ConditionNotImpl>;
 
 public:
     const Condition& get_condition() const;
@@ -124,11 +102,6 @@ private:
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
-
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<ConditionImplyImpl>;
 
 public:
     const Condition& get_condition_left() const;
@@ -148,11 +121,6 @@ private:
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
 
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<ConditionExistsImpl>;
-
 public:
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
@@ -170,11 +138,6 @@ private:
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
     friend class UniqueFactory;
-
-    void str_impl(std::ostream& out, const FormattingOptions& options) const;
-
-    // Give access to the private interface implementations.
-    friend class Base<ConditionForallImpl>;
 
 public:
     const ParameterList& get_parameters() const;

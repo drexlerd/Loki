@@ -18,8 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_BASE_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_BASE_HPP_
 
-#include "loki/details/utils/printer.hpp"
-
 #include <algorithm>
 #include <cstddef>
 #include <sstream>
@@ -33,8 +31,6 @@ template<typename Derived>
 class Base
 {
 private:
-    constexpr const auto& self() const { return static_cast<Derived const&>(*this); }
-
     size_t m_index;
 
     explicit Base(size_t index) : m_index(index) {}
@@ -46,25 +42,6 @@ public:
     Base& operator=(const Base& other) = delete;
     Base(Base&& other) = default;
     Base& operator=(Base&& other) = default;
-
-    /// @brief Overload of the output stream insertion operator (operator<<).
-    friend std::ostream& operator<<(std::ostream& os, const Base& element)
-    {
-        os << element.str();
-        return os;
-    }
-
-    /// @brief Compute a string representation of this object.
-    void str(std::ostream& out, const FormattingOptions& options) const { self().str_impl(out, options); }
-
-    /// @brief Compute a string representation of this object.
-    std::string str() const
-    {
-        std::ostringstream out;
-        FormattingOptions options { 0, 4 };
-        str(out, options);
-        return out.str();
-    }
 
     /// @brief Get the index.
     size_t get_index() const { return m_index; }

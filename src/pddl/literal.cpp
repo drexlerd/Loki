@@ -23,20 +23,6 @@ namespace loki
 {
 LiteralImpl::LiteralImpl(size_t index, bool is_negated, Atom atom) : Base(index), m_is_negated(is_negated), m_atom(std::move(atom)) {}
 
-void LiteralImpl::str_impl(std::ostream& out, const FormattingOptions& options) const
-{
-    if (m_is_negated)
-    {
-        out << "(not ";
-        m_atom->str(out, options);
-        out << ")";
-    }
-    else
-    {
-        m_atom->str(out, options);
-    }
-}
-
 bool LiteralImpl::is_negated() const { return m_is_negated; }
 
 const Atom& LiteralImpl::get_atom() const { return m_atom; }
