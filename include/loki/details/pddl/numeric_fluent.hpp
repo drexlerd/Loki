@@ -20,7 +20,6 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/unique_factory.hpp"
 
 #include <string>
 
@@ -33,7 +32,8 @@ private:
     double m_number;
 
     // Give access to the constructor.
-    friend class UniqueFactory<NumericFluentImpl>;
+    template<typename HolderType, typename Hash, typename EqualTo>
+    friend class UniqueFactory;
 
     NumericFluentImpl(size_t index, Function function, double number);
 

@@ -20,7 +20,6 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/unique_factory.hpp"
 
 #include <set>
 #include <string>
@@ -65,7 +64,8 @@ private:
     RequirementsImpl(size_t index, RequirementEnumSet requirements);
 
     // Give access to the constructor.
-    friend class UniqueFactory<RequirementsImpl>;
+    template<typename HolderType, typename Hash, typename EqualTo>
+    friend class UniqueFactory;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 

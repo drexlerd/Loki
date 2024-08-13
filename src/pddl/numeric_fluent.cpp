@@ -18,6 +18,7 @@
 #include "loki/details/pddl/numeric_fluent.hpp"
 
 #include "loki/details/pddl/function.hpp"
+#include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/hash.hpp"
 
 namespace loki

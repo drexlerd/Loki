@@ -20,7 +20,6 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/unique_factory.hpp"
 
 #include <string>
 
@@ -35,7 +34,8 @@ private:
     TypeImpl(size_t index, std::string name, TypeList bases = {});
 
     // Give access to the constructor.
-    friend class UniqueFactory<TypeImpl>;
+    template<typename HolderType, typename Hash, typename EqualTo>
+    friend class UniqueFactory;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 

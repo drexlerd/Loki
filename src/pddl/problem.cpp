@@ -29,6 +29,7 @@
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/visitors.hpp"
 #include "loki/details/utils/collections.hpp"
+#include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/hash.hpp"
 
 #include <iostream>

@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/requirements.hpp"
 
+#include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/hash.hpp"
 
 #include <cassert>

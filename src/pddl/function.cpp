@@ -20,6 +20,7 @@
 #include "loki/details/pddl/function_skeleton.hpp"
 #include "loki/details/pddl/term.hpp"
 #include "loki/details/pddl/visitors.hpp"
+#include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/hash.hpp"
 
 namespace loki

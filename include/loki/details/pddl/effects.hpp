@@ -20,7 +20,6 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/unique_factory.hpp"
 
 #include <string>
 
@@ -47,7 +46,8 @@ private:
     EffectLiteralImpl(size_t index, Literal literal);
 
     // Give access to the constructor.
-    friend class UniqueFactory<EffectImpl>;
+    template<typename HolderType, typename Hash, typename EqualTo>
+    friend class UniqueFactory;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
@@ -79,7 +79,8 @@ private:
     EffectAndImpl(size_t index, EffectList effects);
 
     // Give access to the constructor.
-    friend class UniqueFactory<EffectImpl>;
+    template<typename HolderType, typename Hash, typename EqualTo>
+    friend class UniqueFactory;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
@@ -113,7 +114,8 @@ private:
     EffectNumericImpl(size_t index, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
 
     // Give access to the constructor.
-    friend class UniqueFactory<EffectImpl>;
+    template<typename HolderType, typename Hash, typename EqualTo>
+    friend class UniqueFactory;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
@@ -148,7 +150,8 @@ private:
     EffectConditionalForallImpl(size_t index, ParameterList parameters, Effect effect);
 
     // Give access to the constructor.
-    friend class UniqueFactory<EffectImpl>;
+    template<typename HolderType, typename Hash, typename EqualTo>
+    friend class UniqueFactory;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
@@ -182,7 +185,8 @@ private:
     EffectConditionalWhenImpl(size_t index, Condition condition, Effect effect);
 
     // Give access to the constructor.
-    friend class UniqueFactory<EffectImpl>;
+    template<typename HolderType, typename Hash, typename EqualTo>
+    friend class UniqueFactory;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 

@@ -22,8 +22,10 @@
 #include "loki/details/pddl/function_skeleton.hpp"
 #include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/predicate.hpp"
+#include "loki/details/pddl/requirements.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/utils/collections.hpp"
+#include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/hash.hpp"
 
 #include <iostream>

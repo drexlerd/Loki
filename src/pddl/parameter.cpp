@@ -20,6 +20,7 @@
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
 #include "loki/details/utils/collections.hpp"
+#include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/hash.hpp"
 
 #include <cassert>

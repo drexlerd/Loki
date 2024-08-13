@@ -34,6 +34,18 @@ template<typename T>
 using PDDLElement = const T*;
 
 /**
+ * Utils
+ */
+
+template<typename T>
+struct ShallowHash;
+template<typename T>
+struct ShallowEqualTo;
+
+template<typename HolderType, typename Hash, typename EqualTo>
+class UniqueFactory;
+
+/**
  * Domain
  */
 

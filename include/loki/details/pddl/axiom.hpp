@@ -20,7 +20,6 @@
 
 #include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/unique_factory.hpp"
 
 #include <string>
 
@@ -37,7 +36,8 @@ private:
     AxiomImpl(size_t index, std::string derived_predicate_name, ParameterList parameters, Condition condition, size_t num_parameters_to_ground_head);
 
     // Give access to the constructor.
-    friend class UniqueFactory<AxiomImpl>;
+    template<typename HolderType, typename Hash, typename EqualTo>
+    friend class UniqueFactory;
 
     void str_impl(std::ostream& out, const FormattingOptions& options) const;
 
