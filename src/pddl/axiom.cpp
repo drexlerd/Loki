@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/axiom.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/conditions.hpp"
 #include "loki/details/pddl/effects.hpp"
 #include "loki/details/pddl/literal.hpp"
@@ -43,5 +44,12 @@ const Condition& AxiomImpl::get_condition() const { return m_condition; }
 const ParameterList& AxiomImpl::get_parameters() const { return m_parameters; }
 
 size_t AxiomImpl::get_num_parameters_to_ground_head() const { return m_num_parameters_to_ground_head; }
+
+std::ostream& operator<<(std::ostream& out, const AxiomImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

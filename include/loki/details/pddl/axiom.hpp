@@ -53,6 +53,8 @@ public:
     size_t get_num_parameters_to_ground_head() const;
 };
 
+extern std::ostream& operator<<(std::ostream& out, const AxiomImpl& element);
+
 }
 
 #endif

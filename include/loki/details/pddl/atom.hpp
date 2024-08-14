@@ -49,6 +49,8 @@ public:
     const TermList& get_terms() const;
 };
 
+extern std::ostream& operator<<(std::ostream& out, const AtomImpl& element);
+
 }
 
 #endif

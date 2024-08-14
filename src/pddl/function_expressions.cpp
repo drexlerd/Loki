@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/function_expressions.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/function.hpp"
 
 #include <cassert>
@@ -108,5 +109,47 @@ FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(size_t index, Fun
 size_t FunctionExpressionFunctionImpl::get_index() const { return m_index; }
 
 const Function& FunctionExpressionFunctionImpl::get_function() const { return m_function; }
+
+std::ostream& operator<<(std::ostream& out, const FunctionExpressionNumberImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const FunctionExpressionBinaryOperatorImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const FunctionExpressionMultiOperatorImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const FunctionExpressionMinusImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const FunctionExpressionFunctionImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const FunctionExpressionImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/term.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/variable.hpp"
 
@@ -36,5 +37,26 @@ TermVariableImpl::TermVariableImpl(size_t index, Variable variable) : m_index(in
 size_t TermVariableImpl::get_index() const { return m_index; }
 
 const Variable& TermVariableImpl::get_variable() const { return m_variable; }
+
+std::ostream& operator<<(std::ostream& out, const TermObjectImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const TermVariableImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const TermImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

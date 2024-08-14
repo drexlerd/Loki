@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/action.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/conditions.hpp"
 #include "loki/details/pddl/effects.hpp"
 #include "loki/details/pddl/parameter.hpp"
@@ -49,5 +50,12 @@ const ParameterList& ActionImpl::get_parameters() const { return m_parameters; }
 const std::optional<Condition>& ActionImpl::get_condition() const { return m_condition; }
 
 const std::optional<Effect>& ActionImpl::get_effect() const { return m_effect; }
+
+std::ostream& operator<<(std::ostream& out, const ActionImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

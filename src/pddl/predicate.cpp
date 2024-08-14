@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/predicate.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
@@ -37,5 +38,12 @@ size_t PredicateImpl::get_index() const { return m_index; }
 const std::string& PredicateImpl::get_name() const { return m_name; }
 
 const ParameterList& PredicateImpl::get_parameters() const { return m_parameters; }
+
+std::ostream& operator<<(std::ostream& out, const PredicateImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

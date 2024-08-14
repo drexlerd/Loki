@@ -62,6 +62,8 @@ public:
     const std::optional<Effect>& get_effect() const;
 };
 
+extern std::ostream& operator<<(std::ostream& out, const ActionImpl& element);
+
 }
 
 #endif

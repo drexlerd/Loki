@@ -164,6 +164,13 @@ public:
     const Effect& get_effect() const;
 };
 
+extern std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectAndImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectNumericImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectConditionalForallImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectConditionalWhenImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectImpl& element);
+
 }
 
 #endif

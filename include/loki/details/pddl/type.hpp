@@ -55,6 +55,8 @@ extern TypeSet collect_types_from_hierarchy(const TypeList& types);
 /// @brief Return true iff type is a subtype of or equal to one of the types in parent_types
 extern bool is_subtype_or_equal(const Type& type, const TypeList& parent_types);
 
+extern std::ostream& operator<<(std::ostream& out, const TypeImpl& element);
+
 }
 
 #endif

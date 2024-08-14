@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/parameter.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
 
@@ -42,6 +43,13 @@ bool is_specialized_parameter(const Parameter& specialized_parameter, const Para
         }
     }
     return false;
+}
+
+std::ostream& operator<<(std::ostream& out, const ParameterImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
 }
 
 }

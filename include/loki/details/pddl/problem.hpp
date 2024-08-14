@@ -80,6 +80,8 @@ public:
     const AxiomList& get_axioms() const;
 };
 
+extern std::ostream& operator<<(std::ostream& out, const ProblemImpl& element);
+
 }
 
 #endif

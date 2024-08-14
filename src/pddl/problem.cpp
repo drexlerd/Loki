@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/problem.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/axiom.hpp"
 #include "loki/details/pddl/conditions.hpp"
 #include "loki/details/pddl/domain.hpp"
@@ -86,5 +87,12 @@ const std::optional<Condition>& ProblemImpl::get_goal_condition() const { return
 const std::optional<OptimizationMetric>& ProblemImpl::get_optimization_metric() const { return m_optimization_metric; }
 
 const AxiomList& ProblemImpl::get_axioms() const { return m_axioms; }
+
+std::ostream& operator<<(std::ostream& out, const ProblemImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

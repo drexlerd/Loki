@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/effects.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/conditions.hpp"
 #include "loki/details/pddl/function.hpp"
 #include "loki/details/pddl/function_expressions.hpp"
@@ -97,5 +98,47 @@ size_t EffectConditionalWhenImpl::get_index() const { return m_index; }
 const Condition& EffectConditionalWhenImpl::get_condition() const { return m_condition; }
 
 const Effect& EffectConditionalWhenImpl::get_effect() const { return m_effect; }
+
+std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const EffectAndImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const EffectNumericImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const EffectConditionalForallImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const EffectConditionalWhenImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const EffectImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

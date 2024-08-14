@@ -174,6 +174,13 @@ public:
     const Function& get_function() const;
 };
 
+extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionNumberImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionBinaryOperatorImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionMultiOperatorImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionMinusImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionFunctionImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionImpl& element);
+
 }
 
 #endif

@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/variable.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/atom.hpp"
 #include "loki/details/pddl/conditions.hpp"
 #include "loki/details/pddl/literal.hpp"
@@ -95,6 +96,13 @@ VariableSet collect_free_variables(const ConditionImpl& condition)
     collect_free_variables_recursively(condition, quantified_variables, free_variables);
 
     return free_variables;
+}
+
+std::ostream& operator<<(std::ostream& out, const VariableImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
 }
 
 }

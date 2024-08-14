@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/domain.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/action.hpp"
 #include "loki/details/pddl/axiom.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
@@ -75,5 +76,12 @@ const FunctionSkeletonList& DomainImpl::get_functions() const { return m_functio
 const ActionList& DomainImpl::get_actions() const { return m_actions; }
 
 const AxiomList& DomainImpl::get_axioms() const { return m_axioms; }
+
+std::ostream& operator<<(std::ostream& out, const DomainImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

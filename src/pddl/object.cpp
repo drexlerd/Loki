@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/object.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/type.hpp"
 
 namespace loki

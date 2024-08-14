@@ -18,7 +18,26 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_FORMATTER_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_FORMATTER_HPP_
 
-#include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/action.hpp"
+#include "loki/details/pddl/atom.hpp"
+#include "loki/details/pddl/axiom.hpp"
+#include "loki/details/pddl/conditions.hpp"
+#include "loki/details/pddl/domain.hpp"
+#include "loki/details/pddl/effects.hpp"
+#include "loki/details/pddl/function.hpp"
+#include "loki/details/pddl/function_expressions.hpp"
+#include "loki/details/pddl/function_skeleton.hpp"
+#include "loki/details/pddl/literal.hpp"
+#include "loki/details/pddl/metric.hpp"
+#include "loki/details/pddl/numeric_fluent.hpp"
+#include "loki/details/pddl/object.hpp"
+#include "loki/details/pddl/parameter.hpp"
+#include "loki/details/pddl/predicate.hpp"
+#include "loki/details/pddl/problem.hpp"
+#include "loki/details/pddl/requirements.hpp"
+#include "loki/details/pddl/term.hpp"
+#include "loki/details/pddl/type.hpp"
+#include "loki/details/pddl/variable.hpp"
 
 #include <cstddef>
 #include <ostream>
@@ -77,46 +96,6 @@ public:
     void write(const TypeImpl& element, std::ostream& out);
     void write(const VariableImpl& element, std::ostream& out);
 };
-
-/// @brief Write to a stream.
-extern std::ostream& operator<<(std::ostream& out, const ActionImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const AtomImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const AxiomImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const ConditionLiteralImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const ConditionAndImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const ConditionOrImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const ConditionNotImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const ConditionImplyImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const ConditionExistsImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const ConditionForallImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const ConditionImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const DomainImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const EffectAndImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const EffectNumericImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const EffectConditionalForallImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const EffectConditionalWhenImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const EffectImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionNumberImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionBinaryOperatorImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionMultiOperatorImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionMinusImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionFunctionImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const FunctionSkeletonImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const FunctionImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const LiteralImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const OptimizationMetricImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const NumericFluentImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const ParameterImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const PredicateImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const ProblemImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const RequirementsImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const TermObjectImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const TermVariableImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const TermImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const TypeImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const VariableImpl& element);
 
 }
 

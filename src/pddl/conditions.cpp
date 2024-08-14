@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/conditions.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/parameter.hpp"
 
@@ -93,4 +94,59 @@ const ParameterList& ConditionForallImpl::get_parameters() const { return m_para
 
 const Condition& ConditionForallImpl::get_condition() const { return m_condition; }
 
+std::ostream& operator<<(std::ostream& out, const ConditionLiteralImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const ConditionAndImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const ConditionOrImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const ConditionNotImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const ConditionImplyImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const ConditionExistsImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const ConditionForallImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const ConditionImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 }

@@ -49,6 +49,8 @@ public:
 
 extern VariableSet collect_free_variables(const loki::ConditionImpl& condition);
 
+extern std::ostream& operator<<(std::ostream& out, const VariableImpl& element);
+
 }
 
 #endif

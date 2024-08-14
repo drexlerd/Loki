@@ -49,6 +49,8 @@ public:
     double get_number() const;
 };
 
+extern std::ostream& operator<<(std::ostream& out, const NumericFluentImpl& element);
+
 }
 
 #endif

@@ -17,6 +17,7 @@
 
 #include "structure.hpp"
 
+#include "../formatter.hpp"
 #include "common.hpp"
 #include "conditions.hpp"
 #include "effects.hpp"
@@ -25,7 +26,6 @@
 #include "literal.hpp"
 #include "loki/details/pddl/action.hpp"
 #include "loki/details/pddl/axiom.hpp"
-#include "loki/details/pddl/formatter.hpp"
 #include "parameters.hpp"
 #include "predicates.hpp"
 #include "reference_utils.hpp"

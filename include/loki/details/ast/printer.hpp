@@ -19,7 +19,6 @@
 #define LOKI_INCLUDE_LOKI_AST_PRINTER_HPP_
 
 #include "loki/details/ast/ast.hpp"
-#include "loki/details/pddl/formatter.hpp"
 
 namespace loki
 {

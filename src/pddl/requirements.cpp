@@ -17,6 +17,8 @@
 
 #include "loki/details/pddl/requirements.hpp"
 
+#include "formatter.hpp"
+
 #include <cassert>
 
 namespace loki
@@ -55,5 +57,12 @@ size_t RequirementsImpl::get_index() const { return m_index; }
 bool RequirementsImpl::test(RequirementEnum requirement) const { return m_requirements.count(requirement); }
 
 const RequirementEnumSet& RequirementsImpl::get_requirements() const { return m_requirements; }
+
+std::ostream& operator<<(std::ostream& out, const RequirementsImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

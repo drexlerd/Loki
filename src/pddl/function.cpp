@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/function.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
 #include "loki/details/pddl/term.hpp"
 
@@ -34,5 +35,12 @@ size_t FunctionImpl::get_index() const { return m_index; }
 const FunctionSkeleton& FunctionImpl::get_function_skeleton() const { return m_function_skeleton; }
 
 const TermList& FunctionImpl::get_terms() const { return m_terms; }
+
+std::ostream& operator<<(std::ostream& out, const FunctionImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

@@ -54,6 +54,7 @@ public:
 /// by checking whether the types are compatible
 extern bool is_specialized_parameter(const Parameter& specialized_parameter, const Parameter& generalized_parameter);
 
+extern std::ostream& operator<<(std::ostream& out, const ParameterImpl& element);
 }
 
 #endif

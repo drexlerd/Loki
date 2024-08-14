@@ -48,6 +48,8 @@ public:
     bool is_negated() const;
     const Atom& get_atom() const;
 };
+
+extern std::ostream& operator<<(std::ostream& out, const LiteralImpl& element);
 }
 
 #endif

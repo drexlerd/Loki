@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/literal.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/atom.hpp"
 
 namespace loki
@@ -28,5 +29,12 @@ size_t LiteralImpl::get_index() const { return m_index; }
 bool LiteralImpl::is_negated() const { return m_is_negated; }
 
 const Atom& LiteralImpl::get_atom() const { return m_atom; }
+
+std::ostream& operator<<(std::ostream& out, const LiteralImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

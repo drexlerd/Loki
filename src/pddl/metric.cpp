@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/metric.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/function_expressions.hpp"
 
 #include <cassert>
@@ -48,5 +49,12 @@ size_t OptimizationMetricImpl::get_index() const { return m_index; }
 OptimizationMetricEnum OptimizationMetricImpl::get_optimization_metric() const { return m_optimization_metric; }
 
 const FunctionExpression& OptimizationMetricImpl::get_function_expression() const { return m_function_expression; }
+
+std::ostream& operator<<(std::ostream& out, const OptimizationMetricImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

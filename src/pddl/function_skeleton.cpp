@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/function_skeleton.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/parameter.hpp"
 
 namespace loki
@@ -36,5 +37,12 @@ const std::string& FunctionSkeletonImpl::get_name() const { return m_name; }
 const ParameterList& FunctionSkeletonImpl::get_parameters() const { return m_parameters; }
 
 const Type& FunctionSkeletonImpl::get_type() const { return m_type; }
+
+std::ostream& operator<<(std::ostream& out, const FunctionSkeletonImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

@@ -17,31 +17,12 @@
 
 #include "loki/details/pddl/exceptions.hpp"
 
-#include "loki/details/pddl/action.hpp"
-#include "loki/details/pddl/atom.hpp"
-#include "loki/details/pddl/axiom.hpp"
-#include "loki/details/pddl/conditions.hpp"
-#include "loki/details/pddl/declarations.hpp"
 #include "loki/details/pddl/domain.hpp"
-#include "loki/details/pddl/effects.hpp"
-#include "loki/details/pddl/formatter.hpp"
 #include "loki/details/pddl/function.hpp"
-#include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
-#include "loki/details/pddl/literal.hpp"
-#include "loki/details/pddl/metric.hpp"
-#include "loki/details/pddl/numeric_fluent.hpp"
 #include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/parameter.hpp"
-#include "loki/details/pddl/position.hpp"
-#include "loki/details/pddl/predicate.hpp"
-#include "loki/details/pddl/problem.hpp"
-#include "loki/details/pddl/requirements.hpp"
-#include "loki/details/pddl/term.hpp"
-#include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
 
 #include <string>
 
@@ -191,14 +172,13 @@ IllformedFunctionDefinitionMissingValue::IllformedFunctionDefinitionMissingValue
                                                                                  const Function& values,
                                                                                  const std::string& error_handler_output) :
     SemanticParserError(
-        //[&]()
-        //{
-        //    std::stringstream ss;
-        //    ss << "The function with name \"" << *function_skeleton << "\"\n misses a value definition in the initial state for arguments \"" << *values
-        //       << "\".";
-        //    return ss.str();
-        //}(),
-        "",
+        [&]()
+        {
+            std::stringstream ss;
+            ss << "The function with name \"" << *function_skeleton << "\"\n misses a value definition in the initial state for arguments \"" << *values
+               << "\".";
+            return ss.str();
+        }(),
         error_handler_output)
 {
 }
@@ -207,13 +187,12 @@ IllformedFunctionDefinitionMultipleValues::IllformedFunctionDefinitionMultipleVa
                                                                                      const Function& ground_function,
                                                                                      const std::string& error_handler_output) :
     SemanticParserError(
-        //[&]()
-        //{
-        //    std::stringstream ss;
-        //    ss << "The function with name \"" << *function_skeleton << "\"\n has multiple values defined for \"" << *ground_function << "\".";
-        //    return ss.str();
-        //}(),
-        "",
+        [&]()
+        {
+            std::stringstream ss;
+            ss << "The function with name \"" << *function_skeleton << "\"\n has multiple values defined for \"" << *ground_function << "\".";
+            return ss.str();
+        }(),
         error_handler_output)
 {
 }
@@ -223,14 +202,13 @@ IncompatibleParameterTypesError::IncompatibleParameterTypesError(const Parameter
                                                                  const Parameter& generalized_parameter,
                                                                  const std::string& error_handler_output) :
     SemanticParserError(
-        //[&]()
-        //{
-        //    std::stringstream ss;
-        //    ss << "The types of the parameter \"" << *specialized_parameter << "\" are incompatible with the types of parameter \"" << *generalized_parameter
-        //       << "\".";
-        //    return ss.str();
-        //}(),
-        "",
+        [&]()
+        {
+            std::stringstream ss;
+            ss << "The types of the parameter \"" << *specialized_parameter << "\" are incompatible with the types of parameter \"" << *generalized_parameter
+               << "\".";
+            return ss.str();
+        }(),
         error_handler_output)
 {
 }

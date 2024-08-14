@@ -51,6 +51,8 @@ public:
     const ParameterList& get_parameters() const;
 };
 
+extern std::ostream& operator<<(std::ostream& out, const PredicateImpl& element);
+
 }
 
 #endif

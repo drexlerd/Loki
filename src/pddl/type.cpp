@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
 #include "loki/details/pddl/type.hpp"
+
+#include "formatter.hpp"
 
 namespace loki
 {
@@ -56,4 +57,12 @@ bool is_subtype_or_equal(const Type& type, const TypeList& parent_types)
     }
     return false;
 }
+
+std::ostream& operator<<(std::ostream& out, const TypeImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
 }

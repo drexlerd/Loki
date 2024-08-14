@@ -199,6 +199,15 @@ public:
     const Condition& get_condition() const;
 };
 
+extern std::ostream& operator<<(std::ostream& out, const ConditionLiteralImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionAndImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionOrImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionNotImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionImplyImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionExistsImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionForallImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionImpl& element);
+
 }
 
 #endif

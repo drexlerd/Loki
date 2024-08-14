@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/atom.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/predicate.hpp"
 #include "loki/details/pddl/term.hpp"
 
@@ -29,5 +30,12 @@ size_t AtomImpl::get_index() const { return m_index; }
 const Predicate& AtomImpl::get_predicate() const { return m_predicate; }
 
 const TermList& AtomImpl::get_terms() const { return m_terms; }
+
+std::ostream& operator<<(std::ostream& out, const AtomImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

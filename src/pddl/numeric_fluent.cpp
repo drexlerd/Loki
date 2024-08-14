@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/numeric_fluent.hpp"
 
+#include "formatter.hpp"
 #include "loki/details/pddl/function.hpp"
 
 namespace loki
@@ -28,5 +29,12 @@ size_t NumericFluentImpl::get_index() const { return m_index; }
 const Function& NumericFluentImpl::get_function() const { return m_function; }
 
 double NumericFluentImpl::get_number() const { return m_number; }
+
+std::ostream& operator<<(std::ostream& out, const NumericFluentImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
 
 }

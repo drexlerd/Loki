@@ -57,6 +57,8 @@ public:
     OptimizationMetricEnum get_optimization_metric() const;
     const FunctionExpression& get_function_expression() const;
 };
+
+extern std::ostream& operator<<(std::ostream& out, const OptimizationMetricImpl& element);
 }
 
 #endif

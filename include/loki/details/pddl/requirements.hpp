@@ -80,6 +80,8 @@ public:
     const RequirementEnumSet& get_requirements() const;
 };
 
+extern std::ostream& operator<<(std::ostream& out, const RequirementsImpl& element);
+
 }
 
 #endif

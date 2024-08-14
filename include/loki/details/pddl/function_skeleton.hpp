@@ -51,6 +51,8 @@ public:
     const Type& get_type() const;
 };
 
+extern std::ostream& operator<<(std::ostream& out, const FunctionSkeletonImpl& element);
+
 }
 
 #endif

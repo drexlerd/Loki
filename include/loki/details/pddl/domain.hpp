@@ -75,6 +75,8 @@ public:
     const AxiomList& get_axioms() const;
 };
 
+extern std::ostream& operator<<(std::ostream& out, const DomainImpl& element);
+
 }
 
 #endif
