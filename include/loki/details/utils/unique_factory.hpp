@@ -67,7 +67,7 @@ public:
 
     /// @brief Returns a pointer to an existing object or creates it before if it does not exist.
     template<typename SubType, typename... Args>
-    requires(!std::is_copy_constructible_v<SubType>) HolderType const* get_or_create(Args&&... args)
+    HolderType const* get_or_create(Args&&... args)
     {
         /* Construct and insert the element in persistent memory. */
 
