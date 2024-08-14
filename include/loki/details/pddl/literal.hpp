@@ -19,8 +19,6 @@
 #define LOKI_INCLUDE_LOKI_PDDL_LITERAL_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/equal_to.hpp"
-#include "loki/details/pddl/hash.hpp"
 
 #include <string>
 
@@ -49,18 +47,6 @@ public:
     size_t get_index() const;
     bool is_negated() const;
     const Atom& get_atom() const;
-};
-
-template<>
-struct UniquePDDLHasher<const LiteralImpl*>
-{
-    size_t operator()(const LiteralImpl* e) const;
-};
-
-template<>
-struct UniquePDDLEqualTo<const LiteralImpl*>
-{
-    bool operator()(const LiteralImpl* l, const LiteralImpl* r) const;
 };
 
 extern std::ostream& operator<<(std::ostream& out, const LiteralImpl& element);

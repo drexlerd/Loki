@@ -31,17 +31,6 @@ const Predicate& AtomImpl::get_predicate() const { return m_predicate; }
 
 const TermList& AtomImpl::get_terms() const { return m_terms; }
 
-size_t UniquePDDLHasher<const AtomImpl*>::operator()(const AtomImpl* e) const { return UniquePDDLHashCombiner()(e->get_predicate(), e->get_terms()); }
-
-bool UniquePDDLEqualTo<const AtomImpl*>::operator()(const AtomImpl* l, const AtomImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_predicate() == r->get_predicate()) && (l->get_terms() == r->get_terms());
-    }
-    return true;
-}
-
 std::ostream& operator<<(std::ostream& out, const AtomImpl& element)
 {
     auto formatter = PDDLFormatter();

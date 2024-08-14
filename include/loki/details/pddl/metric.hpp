@@ -19,8 +19,6 @@
 #define LOKI_INCLUDE_LOKI_PDDL_METRIC_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/equal_to.hpp"
-#include "loki/details/pddl/hash.hpp"
 
 #include <string>
 
@@ -58,18 +56,6 @@ public:
     size_t get_index() const;
     OptimizationMetricEnum get_optimization_metric() const;
     const FunctionExpression& get_function_expression() const;
-};
-
-template<>
-struct UniquePDDLHasher<const OptimizationMetricImpl*>
-{
-    size_t operator()(const OptimizationMetricImpl* e) const;
-};
-
-template<>
-struct UniquePDDLEqualTo<const OptimizationMetricImpl*>
-{
-    bool operator()(const OptimizationMetricImpl* l, const OptimizationMetricImpl* r) const;
 };
 
 extern std::ostream& operator<<(std::ostream& out, const OptimizationMetricImpl& element);

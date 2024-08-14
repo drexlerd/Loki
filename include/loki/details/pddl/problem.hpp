@@ -19,8 +19,6 @@
 #define LOKI_INCLUDE_LOKI_PDDL_PROBLEM_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/equal_to.hpp"
-#include "loki/details/pddl/hash.hpp"
 #include "loki/details/utils/filesystem.hpp"
 
 #include <optional>
@@ -80,18 +78,6 @@ public:
     const std::optional<Condition>& get_goal_condition() const;
     const std::optional<OptimizationMetric>& get_optimization_metric() const;
     const AxiomList& get_axioms() const;
-};
-
-template<>
-struct UniquePDDLHasher<const ProblemImpl*>
-{
-    size_t operator()(const ProblemImpl* e) const;
-};
-
-template<>
-struct UniquePDDLEqualTo<const ProblemImpl*>
-{
-    bool operator()(const ProblemImpl* l, const ProblemImpl* r) const;
 };
 
 extern std::ostream& operator<<(std::ostream& out, const ProblemImpl& element);

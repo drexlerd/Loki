@@ -19,8 +19,6 @@
 #define LOKI_INCLUDE_LOKI_PDDL_NUMERIC_FLUENT_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/equal_to.hpp"
-#include "loki/details/pddl/hash.hpp"
 
 #include <string>
 
@@ -49,18 +47,6 @@ public:
     size_t get_index() const;
     const Function& get_function() const;
     double get_number() const;
-};
-
-template<>
-struct UniquePDDLHasher<const NumericFluentImpl*>
-{
-    size_t operator()(const NumericFluentImpl* e) const;
-};
-
-template<>
-struct UniquePDDLEqualTo<const NumericFluentImpl*>
-{
-    bool operator()(const NumericFluentImpl* l, const NumericFluentImpl* r) const;
 };
 
 extern std::ostream& operator<<(std::ostream& out, const NumericFluentImpl& element);

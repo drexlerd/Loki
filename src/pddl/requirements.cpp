@@ -58,17 +58,6 @@ bool RequirementsImpl::test(RequirementEnum requirement) const { return m_requir
 
 const RequirementEnumSet& RequirementsImpl::get_requirements() const { return m_requirements; }
 
-size_t UniquePDDLHasher<const RequirementsImpl*>::operator()(const RequirementsImpl* e) const { return UniquePDDLHashCombiner()(e->get_requirements()); }
-
-bool UniquePDDLEqualTo<const RequirementsImpl*>::operator()(const RequirementsImpl* l, const RequirementsImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_requirements() == r->get_requirements());
-    }
-    return true;
-}
-
 std::ostream& operator<<(std::ostream& out, const RequirementsImpl& element)
 {
     auto formatter = PDDLFormatter();

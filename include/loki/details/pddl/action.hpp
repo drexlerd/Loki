@@ -19,8 +19,6 @@
 #define LOKI_INCLUDE_LOKI_PDDL_ACTION_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/equal_to.hpp"
-#include "loki/details/pddl/hash.hpp"
 
 #include <optional>
 #include <string>
@@ -62,18 +60,6 @@ public:
     const ParameterList& get_parameters() const;
     const std::optional<Condition>& get_condition() const;
     const std::optional<Effect>& get_effect() const;
-};
-
-template<>
-struct UniquePDDLHasher<const ActionImpl*>
-{
-    size_t operator()(const ActionImpl* e) const;
-};
-
-template<>
-struct UniquePDDLEqualTo<const ActionImpl*>
-{
-    bool operator()(const ActionImpl* l, const ActionImpl* r) const;
 };
 
 extern std::ostream& operator<<(std::ostream& out, const ActionImpl& element);

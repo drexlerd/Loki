@@ -19,8 +19,6 @@
 #define LOKI_INCLUDE_LOKI_PDDL_DERIVED_PREDICATE_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/equal_to.hpp"
-#include "loki/details/pddl/hash.hpp"
 
 #include <string>
 
@@ -53,18 +51,6 @@ public:
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
     size_t get_num_parameters_to_ground_head() const;
-};
-
-template<>
-struct UniquePDDLHasher<const AxiomImpl*>
-{
-    size_t operator()(const AxiomImpl* e) const;
-};
-
-template<>
-struct UniquePDDLEqualTo<const AxiomImpl*>
-{
-    bool operator()(const AxiomImpl* l, const AxiomImpl* r) const;
 };
 
 extern std::ostream& operator<<(std::ostream& out, const AxiomImpl& element);

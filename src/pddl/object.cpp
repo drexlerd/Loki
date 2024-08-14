@@ -31,20 +31,6 @@ const std::string& ObjectImpl::get_name() const { return m_name; }
 
 const TypeList& ObjectImpl::get_bases() const { return m_types; }
 
-size_t UniquePDDLHasher<const ObjectImpl*>::operator()(const ObjectImpl* e) const
-{
-    return UniquePDDLHashCombiner()(e->get_name(), get_sorted_vector(e->get_bases()));
-}
-
-bool UniquePDDLEqualTo<const ObjectImpl*>::operator()(const ObjectImpl* l, const ObjectImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_bases()) == get_sorted_vector(r->get_bases()));
-    }
-    return true;
-}
-
 std::ostream& operator<<(std::ostream& out, const ObjectImpl& element)
 {
     auto formatter = PDDLFormatter();

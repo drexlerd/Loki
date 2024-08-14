@@ -17,7 +17,6 @@
 #include "loki/details/pddl/type.hpp"
 
 #include "formatter.hpp"
-#include "loki/details/utils/collections.hpp"
 
 namespace loki
 {
@@ -57,20 +56,6 @@ bool is_subtype_or_equal(const Type& type, const TypeList& parent_types)
         }
     }
     return false;
-}
-
-size_t UniquePDDLHasher<const TypeImpl*>::operator()(const TypeImpl* e) const
-{
-    return UniquePDDLHashCombiner()(e->get_name(), get_sorted_vector(e->get_bases()));
-}
-
-bool UniquePDDLEqualTo<const TypeImpl*>::operator()(const TypeImpl* l, const TypeImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_bases()) == get_sorted_vector(r->get_bases()));
-    }
-    return true;
 }
 
 std::ostream& operator<<(std::ostream& out, const TypeImpl& element)

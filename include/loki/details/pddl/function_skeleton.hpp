@@ -19,8 +19,6 @@
 #define LOKI_INCLUDE_LOKI_PDDL_FUNCTION_SKELETON_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/equal_to.hpp"
-#include "loki/details/pddl/hash.hpp"
 
 #include <string>
 
@@ -51,18 +49,6 @@ public:
     const std::string& get_name() const;
     const ParameterList& get_parameters() const;
     const Type& get_type() const;
-};
-
-template<>
-struct UniquePDDLHasher<const FunctionSkeletonImpl*>
-{
-    size_t operator()(const FunctionSkeletonImpl* e) const;
-};
-
-template<>
-struct UniquePDDLEqualTo<const FunctionSkeletonImpl*>
-{
-    bool operator()(const FunctionSkeletonImpl* l, const FunctionSkeletonImpl* r) const;
 };
 
 extern std::ostream& operator<<(std::ostream& out, const FunctionSkeletonImpl& element);

@@ -37,11 +37,6 @@ using PDDLElement = const T*;
  * Utils
  */
 
-template<typename T>
-struct Hasher;
-template<typename T>
-struct EqualTo;
-
 template<typename HolderType, typename Hash, typename EqualTo>
 class UniqueFactory;
 

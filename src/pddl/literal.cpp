@@ -30,17 +30,6 @@ bool LiteralImpl::is_negated() const { return m_is_negated; }
 
 const Atom& LiteralImpl::get_atom() const { return m_atom; }
 
-size_t UniquePDDLHasher<const LiteralImpl*>::operator()(const LiteralImpl* e) const { return UniquePDDLHashCombiner()(e->is_negated(), e->get_atom()); }
-
-bool UniquePDDLEqualTo<const LiteralImpl*>::operator()(const LiteralImpl* l, const LiteralImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->is_negated() == r->is_negated()) && (l->get_atom() == r->get_atom());
-    }
-    return true;
-}
-
 std::ostream& operator<<(std::ostream& out, const LiteralImpl& element)
 {
     auto formatter = PDDLFormatter();

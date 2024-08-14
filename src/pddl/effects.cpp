@@ -23,7 +23,6 @@
 #include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/parameter.hpp"
-#include "loki/details/utils/collections.hpp"
 
 #include <cassert>
 
@@ -99,78 +98,6 @@ size_t EffectConditionalWhenImpl::get_index() const { return m_index; }
 const Condition& EffectConditionalWhenImpl::get_condition() const { return m_condition; }
 
 const Effect& EffectConditionalWhenImpl::get_effect() const { return m_effect; }
-
-size_t UniquePDDLHasher<const EffectLiteralImpl&>::operator()(const EffectLiteralImpl& e) const { return UniquePDDLHashCombiner()(e.get_literal()); }
-
-size_t UniquePDDLHasher<const EffectAndImpl&>::operator()(const EffectAndImpl& e) const { return UniquePDDLHashCombiner()(get_sorted_vector(e.get_effects())); }
-
-size_t UniquePDDLHasher<const EffectNumericImpl&>::operator()(const EffectNumericImpl& e) const
-{
-    return UniquePDDLHashCombiner()(e.get_assign_operator(), e.get_function(), e.get_function_expression());
-}
-
-size_t UniquePDDLHasher<const EffectConditionalForallImpl&>::operator()(const EffectConditionalForallImpl& e) const
-{
-    return UniquePDDLHashCombiner()(e.get_effect(), get_sorted_vector(e.get_parameters()));
-}
-
-size_t UniquePDDLHasher<const EffectConditionalWhenImpl&>::operator()(const EffectConditionalWhenImpl& e) const
-{
-    return UniquePDDLHashCombiner()(e.get_condition(), e.get_effect());
-}
-
-size_t UniquePDDLHasher<const EffectImpl*>::operator()(const EffectImpl* e) const
-{
-    return std::visit([](const auto& arg) { return UniquePDDLHasher<decltype(arg)>()(arg); }, *e);
-}
-
-bool UniquePDDLEqualTo<const EffectLiteralImpl&>::operator()(const EffectLiteralImpl& l, const EffectLiteralImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (l.get_literal() == r.get_literal());
-    }
-    return true;
-}
-
-bool UniquePDDLEqualTo<const EffectAndImpl&>::operator()(const EffectAndImpl& l, const EffectAndImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (get_sorted_vector(l.get_effects()) == get_sorted_vector(r.get_effects()));
-    }
-    return true;
-}
-
-bool UniquePDDLEqualTo<const EffectNumericImpl&>::operator()(const EffectNumericImpl& l, const EffectNumericImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (l.get_assign_operator() == r.get_assign_operator()) && (l.get_function() == r.get_function())
-               && (l.get_function_expression() == r.get_function_expression());
-    }
-    return true;
-}
-
-bool UniquePDDLEqualTo<const EffectConditionalForallImpl&>::operator()(const EffectConditionalForallImpl& l, const EffectConditionalForallImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (l.get_effect() == r.get_effect()) && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()));
-    }
-    return true;
-}
-
-bool UniquePDDLEqualTo<const EffectConditionalWhenImpl&>::operator()(const EffectConditionalWhenImpl& l, const EffectConditionalWhenImpl& r) const
-{
-    if (&l != &r)
-    {
-        return (l.get_condition() == r.get_condition()) && (l.get_effect() == r.get_effect());
-    }
-    return true;
-}
-
-bool UniquePDDLEqualTo<const EffectImpl*>::operator()(const EffectImpl* l, const EffectImpl* r) const { return UniquePDDLEqualTo<EffectImpl>()(*l, *r); }
 
 std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element)
 {

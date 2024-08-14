@@ -61,5 +61,6 @@
 #include "loki/details/utils/memory.hpp"
 #include "loki/details/utils/segmented_vector.hpp"
 #include "loki/details/utils/unique_factory.hpp"
+#include "loki/details/utils/variadic_container.hpp"
 
 #endif

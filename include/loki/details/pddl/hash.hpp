@@ -30,10 +30,8 @@
 namespace loki
 {
 
-/// @brief `UniquePDDLHasher` is a hasher that should be implemented to work in the context where
-/// all objects of a custom type `T` are uniquely created and uncopieable.
-/// This ensures that pointers can simply be hashed and do not need to be dereferenced.
-/// @tparam T the type of the object to hash.
+/// @brief `UniquePDDLEqualTo` is used to compare newly created PDDL objects for uniqueness.
+/// Since the children are unique, it suffices to create a combined hash from nested pointers.
 template<typename T>
 struct UniquePDDLHasher
 {
@@ -84,6 +82,244 @@ struct UniquePDDLHasher<std::variant<Ts...>>
     {
         return std::visit([](const auto& arg) { return UniquePDDLHasher<decltype(arg)>()(arg); }, variant);
     }
+};
+
+/**
+ * Specializations for PDDL
+ */
+
+template<>
+struct UniquePDDLHasher<const ActionImpl*>
+{
+    size_t operator()(const ActionImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const AtomImpl*>
+{
+    size_t operator()(const AtomImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const AxiomImpl*>
+{
+    size_t operator()(const AxiomImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionLiteralImpl&>
+{
+    size_t operator()(const ConditionLiteralImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionAndImpl&>
+{
+    size_t operator()(const ConditionAndImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionOrImpl&>
+{
+    size_t operator()(const ConditionOrImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionNotImpl&>
+{
+    size_t operator()(const ConditionNotImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionImplyImpl&>
+{
+    size_t operator()(const ConditionImplyImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionExistsImpl&>
+{
+    size_t operator()(const ConditionExistsImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionForallImpl&>
+{
+    size_t operator()(const ConditionForallImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionImpl*>
+{
+    size_t operator()(const ConditionImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const DomainImpl*>
+{
+    size_t operator()(const DomainImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const EffectLiteralImpl&>
+{
+    size_t operator()(const EffectLiteralImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const EffectAndImpl&>
+{
+    size_t operator()(const EffectAndImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const EffectNumericImpl&>
+{
+    size_t operator()(const EffectNumericImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const EffectConditionalForallImpl&>
+{
+    size_t operator()(const EffectConditionalForallImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const EffectConditionalWhenImpl&>
+{
+    size_t operator()(const EffectConditionalWhenImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const EffectImpl*>
+{
+    size_t operator()(const EffectImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const FunctionExpressionNumberImpl&>
+{
+    size_t operator()(const FunctionExpressionNumberImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const FunctionExpressionBinaryOperatorImpl&>
+{
+    size_t operator()(const FunctionExpressionBinaryOperatorImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const FunctionExpressionMultiOperatorImpl&>
+{
+    size_t operator()(const FunctionExpressionMultiOperatorImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const FunctionExpressionMinusImpl&>
+{
+    size_t operator()(const FunctionExpressionMinusImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const FunctionExpressionFunctionImpl&>
+{
+    size_t operator()(const FunctionExpressionFunctionImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const FunctionExpressionImpl*>
+{
+    size_t operator()(const FunctionExpressionImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const FunctionSkeletonImpl*>
+{
+    size_t operator()(const FunctionSkeletonImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const FunctionImpl*>
+{
+    size_t operator()(const FunctionImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const LiteralImpl*>
+{
+    size_t operator()(const LiteralImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const OptimizationMetricImpl*>
+{
+    size_t operator()(const OptimizationMetricImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const NumericFluentImpl*>
+{
+    size_t operator()(const NumericFluentImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ObjectImpl*>
+{
+    size_t operator()(const ObjectImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ParameterImpl*>
+{
+    size_t operator()(const ParameterImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const PredicateImpl*>
+{
+    size_t operator()(const PredicateImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ProblemImpl*>
+{
+    size_t operator()(const ProblemImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const RequirementsImpl*>
+{
+    size_t operator()(const RequirementsImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const TermObjectImpl&>
+{
+    size_t operator()(const TermObjectImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const TermVariableImpl&>
+{
+    size_t operator()(const TermVariableImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const TermImpl*>
+{
+    size_t operator()(const TermImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const TypeImpl*>
+{
+    size_t operator()(const TypeImpl* e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const VariableImpl*>
+{
+    size_t operator()(const VariableImpl* e) const;
 };
 
 }

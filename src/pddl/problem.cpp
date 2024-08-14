@@ -30,7 +30,6 @@
 #include "loki/details/pddl/predicate.hpp"
 #include "loki/details/pddl/requirements.hpp"
 #include "loki/details/pddl/type.hpp"
-#include "loki/details/utils/collections.hpp"
 
 #include <iostream>
 
@@ -88,32 +87,6 @@ const std::optional<Condition>& ProblemImpl::get_goal_condition() const { return
 const std::optional<OptimizationMetric>& ProblemImpl::get_optimization_metric() const { return m_optimization_metric; }
 
 const AxiomList& ProblemImpl::get_axioms() const { return m_axioms; }
-
-size_t UniquePDDLHasher<const ProblemImpl*>::operator()(const ProblemImpl* e) const
-{
-    return UniquePDDLHashCombiner()(e->get_name(),
-                                    e->get_domain(),
-                                    get_sorted_vector(e->get_objects()),
-                                    get_sorted_vector(e->get_derived_predicates()),
-                                    get_sorted_vector(e->get_initial_literals()),
-                                    get_sorted_vector(e->get_numeric_fluents()),
-                                    e->get_goal_condition(),
-                                    e->get_optimization_metric());
-}
-
-bool UniquePDDLEqualTo<const ProblemImpl*>::operator()(const ProblemImpl* l, const ProblemImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_name() == r->get_name()) && (l->get_domain() == r->get_domain())
-               && (get_sorted_vector(l->get_objects()) == get_sorted_vector(r->get_objects()))
-               && (get_sorted_vector(l->get_derived_predicates()) == get_sorted_vector(r->get_derived_predicates()))
-               && (get_sorted_vector(l->get_initial_literals()) == get_sorted_vector(r->get_initial_literals()))
-               && (get_sorted_vector(l->get_numeric_fluents()) == get_sorted_vector(r->get_numeric_fluents()))
-               && (l->get_goal_condition() == r->get_goal_condition()) && (l->get_optimization_metric() == r->get_optimization_metric());
-    }
-    return true;
-}
 
 std::ostream& operator<<(std::ostream& out, const ProblemImpl& element)
 {

@@ -36,20 +36,6 @@ const FunctionSkeleton& FunctionImpl::get_function_skeleton() const { return m_f
 
 const TermList& FunctionImpl::get_terms() const { return m_terms; }
 
-size_t UniquePDDLHasher<const FunctionImpl*>::operator()(const FunctionImpl* e) const
-{
-    return UniquePDDLHashCombiner()(e->get_function_skeleton(), e->get_terms());
-}
-
-bool UniquePDDLEqualTo<const FunctionImpl*>::operator()(const FunctionImpl* l, const FunctionImpl* r) const
-{
-    if (&l != &r)
-    {
-        return (l->get_function_skeleton() == r->get_function_skeleton()) && (l->get_terms() == r->get_terms());
-    }
-    return true;
-}
-
 std::ostream& operator<<(std::ostream& out, const FunctionImpl& element)
 {
     auto formatter = PDDLFormatter();
