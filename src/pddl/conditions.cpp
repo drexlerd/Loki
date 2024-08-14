@@ -24,32 +24,42 @@ namespace loki
 {
 
 /* Literal */
-ConditionLiteralImpl::ConditionLiteralImpl(size_t index, Literal literal) : Base(index), m_literal(std::move(literal)) {}
+ConditionLiteralImpl::ConditionLiteralImpl(size_t index, Literal literal) : m_index(index), m_literal(std::move(literal)) {}
+
+size_t ConditionLiteralImpl::get_index() const { return m_index; }
 
 const Literal& ConditionLiteralImpl::get_literal() const { return m_literal; }
 
 /* And */
-ConditionAndImpl::ConditionAndImpl(size_t index, ConditionList conditions) : Base(index), m_conditions(std::move(conditions)) {}
+ConditionAndImpl::ConditionAndImpl(size_t index, ConditionList conditions) : m_index(index), m_conditions(std::move(conditions)) {}
+
+size_t ConditionAndImpl::get_index() const { return m_index; }
 
 const ConditionList& ConditionAndImpl::get_conditions() const { return m_conditions; }
 
 /* Or */
-ConditionOrImpl::ConditionOrImpl(size_t index, ConditionList conditions) : Base(index), m_conditions(std::move(conditions)) {}
+ConditionOrImpl::ConditionOrImpl(size_t index, ConditionList conditions) : m_index(index), m_conditions(std::move(conditions)) {}
+
+size_t ConditionOrImpl::get_index() const { return m_index; }
 
 const ConditionList& ConditionOrImpl::get_conditions() const { return m_conditions; }
 
 /* Not */
-ConditionNotImpl::ConditionNotImpl(size_t index, Condition condition) : Base(index), m_condition(std::move(condition)) {}
+ConditionNotImpl::ConditionNotImpl(size_t index, Condition condition) : m_index(index), m_condition(std::move(condition)) {}
+
+size_t ConditionNotImpl::get_index() const { return m_index; }
 
 const Condition& ConditionNotImpl::get_condition() const { return m_condition; }
 
 /* Imply */
 ConditionImplyImpl::ConditionImplyImpl(size_t index, Condition condition_left, Condition condition_right) :
-    Base(index),
+    m_index(index),
     m_condition_left(std::move(condition_left)),
     m_condition_right(std::move(condition_right))
 {
 }
+
+size_t ConditionImplyImpl::get_index() const { return m_index; }
 
 const Condition& ConditionImplyImpl::get_condition_left() const { return m_condition_left; }
 
@@ -57,11 +67,13 @@ const Condition& ConditionImplyImpl::get_condition_right() const { return m_cond
 
 /* Exists */
 ConditionExistsImpl::ConditionExistsImpl(size_t index, ParameterList parameters, Condition condition) :
-    Base(index),
+    m_index(index),
     m_parameters(std::move(parameters)),
     m_condition(std::move(condition))
 {
 }
+
+size_t ConditionExistsImpl::get_index() const { return m_index; }
 
 const ParameterList& ConditionExistsImpl::get_parameters() const { return m_parameters; }
 
@@ -69,11 +81,13 @@ const Condition& ConditionExistsImpl::get_condition() const { return m_condition
 
 /* Forall */
 ConditionForallImpl::ConditionForallImpl(size_t index, ParameterList parameters, Condition condition) :
-    Base(index),
+    m_index(index),
     m_parameters(std::move(parameters)),
     m_condition(std::move(condition))
 {
 }
+
+size_t ConditionForallImpl::get_index() const { return m_index; }
 
 const ParameterList& ConditionForallImpl::get_parameters() const { return m_parameters; }
 

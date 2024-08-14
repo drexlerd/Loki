@@ -18,16 +18,16 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_ATOM_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_ATOM_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
 
 namespace loki
 {
-class AtomImpl : public Base<AtomImpl>
+class AtomImpl
 {
 private:
+    size_t m_index;
     Predicate m_predicate;
     TermList m_terms;
 
@@ -38,6 +38,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    AtomImpl(const AtomImpl& other) = delete;
+    AtomImpl& operator=(const AtomImpl& other) = delete;
+    AtomImpl(AtomImpl&& other) = default;
+    AtomImpl& operator=(AtomImpl&& other) = default;
+
+    size_t get_index() const;
     const Predicate& get_predicate() const;
     const TermList& get_terms() const;
 };

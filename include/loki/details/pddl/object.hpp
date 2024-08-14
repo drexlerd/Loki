@@ -18,16 +18,16 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_OBJECT_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_OBJECT_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
 
 namespace loki
 {
-class ObjectImpl : public Base<ObjectImpl>
+class ObjectImpl
 {
 private:
+    size_t m_index;
     std::string m_name;
     TypeList m_types;
 
@@ -38,6 +38,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    ObjectImpl(const ObjectImpl& other) = delete;
+    ObjectImpl& operator=(const ObjectImpl& other) = delete;
+    ObjectImpl(ObjectImpl&& other) = default;
+    ObjectImpl& operator=(ObjectImpl&& other) = default;
+
+    size_t get_index() const;
     const std::string& get_name() const;
     const TypeList& get_bases() const;
 };

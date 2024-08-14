@@ -22,7 +22,9 @@
 
 namespace loki
 {
-AtomImpl::AtomImpl(size_t index, Predicate predicate, TermList terms) : Base(index), m_predicate(std::move(predicate)), m_terms(std::move(terms)) {}
+AtomImpl::AtomImpl(size_t index, Predicate predicate, TermList terms) : m_index(index), m_predicate(std::move(predicate)), m_terms(std::move(terms)) {}
+
+size_t AtomImpl::get_index() const { return m_index; }
 
 const Predicate& AtomImpl::get_predicate() const { return m_predicate; }
 

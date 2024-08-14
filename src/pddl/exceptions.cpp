@@ -17,7 +17,11 @@
 
 #include "loki/details/pddl/exceptions.hpp"
 
+#include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/domain.hpp"
 #include "loki/details/pddl/formatter.hpp"
+#include "loki/details/pddl/object.hpp"
+#include "loki/details/pddl/variable.hpp"
 
 #include <string>
 

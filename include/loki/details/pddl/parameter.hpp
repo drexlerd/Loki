@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_PARAMETER_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_PARAMETER_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
@@ -26,9 +25,10 @@
 namespace loki
 {
 
-class ParameterImpl : public Base<ParameterImpl>
+class ParameterImpl
 {
 private:
+    size_t m_index;
     Variable m_variable;
     TypeList m_types;
 
@@ -39,6 +39,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    ParameterImpl(const ParameterImpl& other) = delete;
+    ParameterImpl& operator=(const ParameterImpl& other) = delete;
+    ParameterImpl(ParameterImpl&& other) = default;
+    ParameterImpl& operator=(ParameterImpl&& other) = default;
+
+    size_t get_index() const;
     const Variable& get_variable() const;
     const TypeList& get_bases() const;
 };

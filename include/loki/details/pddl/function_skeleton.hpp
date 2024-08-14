@@ -18,16 +18,16 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_FUNCTION_SKELETON_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_FUNCTION_SKELETON_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
 
 namespace loki
 {
-class FunctionSkeletonImpl : public Base<FunctionSkeletonImpl>
+class FunctionSkeletonImpl
 {
 private:
+    size_t m_index;
     std::string m_name;
     ParameterList m_parameters;
     Type m_type;
@@ -39,6 +39,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    FunctionSkeletonImpl(const FunctionSkeletonImpl& other) = delete;
+    FunctionSkeletonImpl& operator=(const FunctionSkeletonImpl& other) = delete;
+    FunctionSkeletonImpl(FunctionSkeletonImpl&& other) = default;
+    FunctionSkeletonImpl& operator=(FunctionSkeletonImpl&& other) = default;
+
+    size_t get_index() const;
     const std::string& get_name() const;
     const ParameterList& get_parameters() const;
     const Type& get_type() const;

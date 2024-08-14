@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_CONDITIONS_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_CONDITIONS_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
@@ -27,9 +26,10 @@ namespace loki
 {
 
 /* Literal */
-class ConditionLiteralImpl : public Base<ConditionLiteralImpl>
+class ConditionLiteralImpl
 {
 private:
+    size_t m_index;
     Literal m_literal;
 
     ConditionLiteralImpl(size_t index, Literal literal);
@@ -39,13 +39,21 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    ConditionLiteralImpl(const ConditionLiteralImpl& other) = delete;
+    ConditionLiteralImpl& operator=(const ConditionLiteralImpl& other) = delete;
+    ConditionLiteralImpl(ConditionLiteralImpl&& other) = default;
+    ConditionLiteralImpl& operator=(ConditionLiteralImpl&& other) = default;
+
+    size_t get_index() const;
     const Literal& get_literal() const;
 };
 
 /* And */
-class ConditionAndImpl : public Base<ConditionAndImpl>
+class ConditionAndImpl
 {
 private:
+    size_t m_index;
     ConditionList m_conditions;
 
     ConditionAndImpl(size_t index, ConditionList conditions);
@@ -55,13 +63,21 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    ConditionAndImpl(const ConditionAndImpl& other) = delete;
+    ConditionAndImpl& operator=(const ConditionAndImpl& other) = delete;
+    ConditionAndImpl(ConditionAndImpl&& other) = default;
+    ConditionAndImpl& operator=(ConditionAndImpl&& other) = default;
+
+    size_t get_index() const;
     const ConditionList& get_conditions() const;
 };
 
 /* Or */
-class ConditionOrImpl : public Base<ConditionOrImpl>
+class ConditionOrImpl
 {
 private:
+    size_t m_index;
     ConditionList m_conditions;
 
     ConditionOrImpl(size_t index, ConditionList conditions);
@@ -71,13 +87,21 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    ConditionOrImpl(const ConditionOrImpl& other) = delete;
+    ConditionOrImpl& operator=(const ConditionOrImpl& other) = delete;
+    ConditionOrImpl(ConditionOrImpl&& other) = default;
+    ConditionOrImpl& operator=(ConditionOrImpl&& other) = default;
+
+    size_t get_index() const;
     const ConditionList& get_conditions() const;
 };
 
 /* Not */
-class ConditionNotImpl : public Base<ConditionNotImpl>
+class ConditionNotImpl
 {
 private:
+    size_t m_index;
     Condition m_condition;
 
     ConditionNotImpl(size_t index, Condition condition);
@@ -87,13 +111,21 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    ConditionNotImpl(const ConditionNotImpl& other) = delete;
+    ConditionNotImpl& operator=(const ConditionNotImpl& other) = delete;
+    ConditionNotImpl(ConditionNotImpl&& other) = default;
+    ConditionNotImpl& operator=(ConditionNotImpl&& other) = default;
+
+    size_t get_index() const;
     const Condition& get_condition() const;
 };
 
 /* Imply */
-class ConditionImplyImpl : public Base<ConditionImplyImpl>
+class ConditionImplyImpl
 {
 private:
+    size_t m_index;
     Condition m_condition_left;
     Condition m_condition_right;
 
@@ -104,14 +136,22 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    ConditionImplyImpl(const ConditionImplyImpl& other) = delete;
+    ConditionImplyImpl& operator=(const ConditionImplyImpl& other) = delete;
+    ConditionImplyImpl(ConditionImplyImpl&& other) = default;
+    ConditionImplyImpl& operator=(ConditionImplyImpl&& other) = default;
+
+    size_t get_index() const;
     const Condition& get_condition_left() const;
     const Condition& get_condition_right() const;
 };
 
 /* Exists */
-class ConditionExistsImpl : public Base<ConditionExistsImpl>
+class ConditionExistsImpl
 {
 private:
+    size_t m_index;
     ParameterList m_parameters;
     Condition m_condition;
 
@@ -122,14 +162,22 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    ConditionExistsImpl(const ConditionExistsImpl& other) = delete;
+    ConditionExistsImpl& operator=(const ConditionExistsImpl& other) = delete;
+    ConditionExistsImpl(ConditionExistsImpl&& other) = default;
+    ConditionExistsImpl& operator=(ConditionExistsImpl&& other) = default;
+
+    size_t get_index() const;
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
 };
 
 /* Forall */
-class ConditionForallImpl : public Base<ConditionForallImpl>
+class ConditionForallImpl
 {
 private:
+    size_t m_index;
     ParameterList m_parameters;
     Condition m_condition;
 
@@ -140,6 +188,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    ConditionForallImpl(const ConditionForallImpl& other) = delete;
+    ConditionForallImpl& operator=(const ConditionForallImpl& other) = delete;
+    ConditionForallImpl(ConditionForallImpl&& other) = default;
+    ConditionForallImpl& operator=(ConditionForallImpl&& other) = default;
+
+    size_t get_index() const;
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
 };

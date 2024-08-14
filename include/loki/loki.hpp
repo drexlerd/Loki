@@ -27,7 +27,6 @@
 #include "loki/details/pddl/action.hpp"
 #include "loki/details/pddl/atom.hpp"
 #include "loki/details/pddl/axiom.hpp"
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/conditions.hpp"
 #include "loki/details/pddl/declarations.hpp"
 #include "loki/details/pddl/domain.hpp"

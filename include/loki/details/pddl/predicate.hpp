@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_PREDICATE_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_PREDICATE_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
@@ -27,9 +26,10 @@ namespace loki
 {
 
 // An alternative name is AtomSkeleton
-class PredicateImpl : public Base<PredicateImpl>
+class PredicateImpl
 {
 private:
+    size_t m_index;
     std::string m_name;
     ParameterList m_parameters;
 
@@ -40,6 +40,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    PredicateImpl(const PredicateImpl& other) = delete;
+    PredicateImpl& operator=(const PredicateImpl& other) = delete;
+    PredicateImpl(PredicateImpl&& other) = default;
+    PredicateImpl& operator=(PredicateImpl&& other) = default;
+
+    size_t get_index() const;
     const std::string& get_name() const;
     const ParameterList& get_parameters() const;
 };

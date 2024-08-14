@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_EFFECTS_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_EFFECTS_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
@@ -38,9 +37,10 @@ extern std::unordered_map<AssignOperatorEnum, std::string> assign_operator_enum_
 extern const std::string& to_string(AssignOperatorEnum assign_operator);
 
 /* Literal */
-class EffectLiteralImpl : public Base<EffectLiteralImpl>
+class EffectLiteralImpl
 {
 private:
+    size_t m_index;
     Literal m_literal;
 
     EffectLiteralImpl(size_t index, Literal literal);
@@ -50,13 +50,21 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    EffectLiteralImpl(const EffectLiteralImpl& other) = delete;
+    EffectLiteralImpl& operator=(const EffectLiteralImpl& other) = delete;
+    EffectLiteralImpl(EffectLiteralImpl&& other) = default;
+    EffectLiteralImpl& operator=(EffectLiteralImpl&& other) = default;
+
+    size_t get_index() const;
     const Literal& get_literal() const;
 };
 
 /* And */
-class EffectAndImpl : public Base<EffectAndImpl>
+class EffectAndImpl
 {
 private:
+    size_t m_index;
     EffectList m_effects;
 
     EffectAndImpl(size_t index, EffectList effects);
@@ -66,13 +74,21 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    EffectAndImpl(const EffectAndImpl& other) = delete;
+    EffectAndImpl& operator=(const EffectAndImpl& other) = delete;
+    EffectAndImpl(EffectAndImpl&& other) = default;
+    EffectAndImpl& operator=(EffectAndImpl&& other) = default;
+
+    size_t get_index() const;
     const EffectList& get_effects() const;
 };
 
 /* EffectNumeric */
-class EffectNumericImpl : public Base<EffectNumericImpl>
+class EffectNumericImpl
 {
 private:
+    size_t m_index;
     AssignOperatorEnum m_assign_operator;
     Function m_function;
     FunctionExpression m_function_expression;
@@ -84,15 +100,23 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    EffectNumericImpl(const EffectNumericImpl& other) = delete;
+    EffectNumericImpl& operator=(const EffectNumericImpl& other) = delete;
+    EffectNumericImpl(EffectNumericImpl&& other) = default;
+    EffectNumericImpl& operator=(EffectNumericImpl&& other) = default;
+
+    size_t get_index() const;
     AssignOperatorEnum get_assign_operator() const;
     const Function& get_function() const;
     const FunctionExpression& get_function_expression() const;
 };
 
 /* ConditionalForall */
-class EffectConditionalForallImpl : public Base<EffectConditionalForallImpl>
+class EffectConditionalForallImpl
 {
 private:
+    size_t m_index;
     ParameterList m_parameters;
     Effect m_effect;
 
@@ -103,14 +127,22 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    EffectConditionalForallImpl(const EffectConditionalForallImpl& other) = delete;
+    EffectConditionalForallImpl& operator=(const EffectConditionalForallImpl& other) = delete;
+    EffectConditionalForallImpl(EffectConditionalForallImpl&& other) = default;
+    EffectConditionalForallImpl& operator=(EffectConditionalForallImpl&& other) = default;
+
+    size_t get_index() const;
     const ParameterList& get_parameters() const;
     const Effect& get_effect() const;
 };
 
 /* ConditionalWhen */
-class EffectConditionalWhenImpl : public Base<EffectConditionalWhenImpl>
+class EffectConditionalWhenImpl
 {
 private:
+    size_t m_index;
     Condition m_condition;
     Effect m_effect;
 
@@ -121,6 +153,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    EffectConditionalWhenImpl(const EffectConditionalWhenImpl& other) = delete;
+    EffectConditionalWhenImpl& operator=(const EffectConditionalWhenImpl& other) = delete;
+    EffectConditionalWhenImpl(EffectConditionalWhenImpl&& other) = default;
+    EffectConditionalWhenImpl& operator=(EffectConditionalWhenImpl&& other) = default;
+
+    size_t get_index() const;
     const Condition& get_condition() const;
     const Effect& get_effect() const;
 };

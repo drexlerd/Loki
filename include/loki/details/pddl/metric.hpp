@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_METRIC_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_METRIC_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
@@ -34,9 +33,10 @@ enum class OptimizationMetricEnum
 extern std::unordered_map<OptimizationMetricEnum, std::string> optimization_metric_enum_to_string;
 extern const std::string& to_string(OptimizationMetricEnum optimization_metric);
 
-class OptimizationMetricImpl : public Base<OptimizationMetricImpl>
+class OptimizationMetricImpl
 {
 private:
+    size_t m_index;
     OptimizationMetricEnum m_optimization_metric;
     FunctionExpression m_function_expression;
 
@@ -47,6 +47,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    OptimizationMetricImpl(const OptimizationMetricImpl& other) = delete;
+    OptimizationMetricImpl& operator=(const OptimizationMetricImpl& other) = delete;
+    OptimizationMetricImpl(OptimizationMetricImpl&& other) = default;
+    OptimizationMetricImpl& operator=(OptimizationMetricImpl&& other) = default;
+
+    size_t get_index() const;
     OptimizationMetricEnum get_optimization_metric() const;
     const FunctionExpression& get_function_expression() const;
 };

@@ -19,7 +19,9 @@
 
 namespace loki
 {
-TypeImpl::TypeImpl(size_t index, std::string name, TypeList bases) : Base(index), m_name(std::move(name)), m_bases(std::move(bases)) {}
+TypeImpl::TypeImpl(size_t index, std::string name, TypeList bases) : m_index(index), m_name(std::move(name)), m_bases(std::move(bases)) {}
+
+size_t TypeImpl::get_index() const { return m_index; }
 
 const std::string& TypeImpl::get_name() const { return m_name; }
 

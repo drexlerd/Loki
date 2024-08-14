@@ -25,7 +25,9 @@
 
 namespace loki
 {
-VariableImpl::VariableImpl(size_t index, std::string name) : Base(index), m_name(std::move(name)) {}
+VariableImpl::VariableImpl(size_t index, std::string name) : m_index(index), m_name(std::move(name)) {}
+
+size_t VariableImpl::get_index() const { return m_index; }
 
 const std::string& VariableImpl::get_name() const { return m_name; }
 

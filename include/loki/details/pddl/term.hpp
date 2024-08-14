@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_TERM_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_TERM_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
@@ -28,9 +27,10 @@ namespace loki
 
 /* TermObjectImpl */
 
-class TermObjectImpl : public Base<TermObjectImpl>
+class TermObjectImpl
 {
 private:
+    size_t m_index;
     Object m_object;
 
     TermObjectImpl(size_t index, Object object);
@@ -40,14 +40,22 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    TermObjectImpl(const TermObjectImpl& other) = delete;
+    TermObjectImpl& operator=(const TermObjectImpl& other) = delete;
+    TermObjectImpl(TermObjectImpl&& other) = default;
+    TermObjectImpl& operator=(TermObjectImpl&& other) = default;
+
+    size_t get_index() const;
     const Object& get_object() const;
 };
 
 /* TermVariableImpl */
 
-class TermVariableImpl : public Base<TermVariableImpl>
+class TermVariableImpl
 {
 private:
+    size_t m_index;
     Variable m_variable;
 
     TermVariableImpl(size_t index, Variable variable);
@@ -57,6 +65,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    TermVariableImpl(const TermVariableImpl& other) = delete;
+    TermVariableImpl& operator=(const TermVariableImpl& other) = delete;
+    TermVariableImpl(TermVariableImpl&& other) = default;
+    TermVariableImpl& operator=(TermVariableImpl&& other) = default;
+
+    size_t get_index() const;
     const Variable& get_variable() const;
 };
 

@@ -48,7 +48,7 @@ ProblemImpl::ProblemImpl(size_t index,
                          std::optional<Condition> goal_condition,
                          std::optional<OptimizationMetric> optimization_metric,
                          AxiomList axioms) :
-    Base(index),
+    m_index(index),
     m_filepath(std::move(filepath)),
     m_domain(std::move(domain)),
     m_name(std::move(name)),
@@ -62,6 +62,8 @@ ProblemImpl::ProblemImpl(size_t index,
     m_axioms(std::move(axioms))
 {
 }
+
+size_t ProblemImpl::get_index() const { return m_index; }
 
 const std::optional<fs::path>& ProblemImpl::get_filepath() const { return m_filepath; }
 

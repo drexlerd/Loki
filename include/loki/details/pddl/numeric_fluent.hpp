@@ -18,16 +18,16 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_NUMERIC_FLUENT_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_NUMERIC_FLUENT_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
 
 namespace loki
 {
-class NumericFluentImpl : public Base<NumericFluentImpl>
+class NumericFluentImpl
 {
 private:
+    size_t m_index;
     Function m_function;
     double m_number;
 
@@ -38,6 +38,13 @@ private:
     NumericFluentImpl(size_t index, Function function, double number);
 
 public:
+    // moveable but not copyable
+    NumericFluentImpl(const NumericFluentImpl& other) = delete;
+    NumericFluentImpl& operator=(const NumericFluentImpl& other) = delete;
+    NumericFluentImpl(NumericFluentImpl&& other) = default;
+    NumericFluentImpl& operator=(NumericFluentImpl&& other) = default;
+
+    size_t get_index() const;
     const Function& get_function() const;
     double get_number() const;
 };

@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_DOMAIN_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_DOMAIN_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 #include "loki/details/utils/filesystem.hpp"
 
@@ -28,9 +27,10 @@
 namespace loki
 {
 
-class DomainImpl : public Base<DomainImpl>
+class DomainImpl
 {
 private:
+    size_t m_index;
     std::optional<fs::path> m_filepath;
     std::string m_name;
     Requirements m_requirements;
@@ -57,6 +57,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    DomainImpl(const DomainImpl& other) = delete;
+    DomainImpl& operator=(const DomainImpl& other) = delete;
+    DomainImpl(DomainImpl&& other) = default;
+    DomainImpl& operator=(DomainImpl&& other) = default;
+
+    size_t get_index() const;
     const std::optional<fs::path>& get_filepath() const;
     const std::string& get_name() const;
     const Requirements& get_requirements() const;

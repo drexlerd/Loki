@@ -18,16 +18,16 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_LITERAL_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_LITERAL_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
 
 namespace loki
 {
-class LiteralImpl : public Base<LiteralImpl>
+class LiteralImpl
 {
 private:
+    size_t m_index;
     bool m_is_negated;
     Atom m_atom;
 
@@ -38,6 +38,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    LiteralImpl(const LiteralImpl& other) = delete;
+    LiteralImpl& operator=(const LiteralImpl& other) = delete;
+    LiteralImpl(LiteralImpl&& other) = default;
+    LiteralImpl& operator=(LiteralImpl&& other) = default;
+
+    size_t get_index() const;
     bool is_negated() const;
     const Atom& get_atom() const;
 };

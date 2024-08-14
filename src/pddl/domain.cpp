@@ -43,7 +43,7 @@ DomainImpl::DomainImpl(size_t index,
                        FunctionSkeletonList functions,
                        ActionList actions,
                        AxiomList axioms) :
-    Base(index),
+    m_index(index),
     m_filepath(std::move(filepath)),
     m_name(std::move(name)),
     m_requirements(std::move(requirements)),
@@ -55,6 +55,8 @@ DomainImpl::DomainImpl(size_t index,
     m_axioms(std::move(axioms))
 {
 }
+
+size_t DomainImpl::get_index() const { return m_index; }
 
 const std::optional<fs::path>& DomainImpl::get_filepath() const { return m_filepath; }
 

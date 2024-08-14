@@ -49,7 +49,9 @@ const std::string& to_string(MultiOperatorEnum multi_operator)
 }
 
 /* FunctionExpressionNumber */
-FunctionExpressionNumberImpl::FunctionExpressionNumberImpl(size_t index, double number) : Base(index), m_number(number) {}
+FunctionExpressionNumberImpl::FunctionExpressionNumberImpl(size_t index, double number) : m_index(index), m_number(number) {}
+
+size_t FunctionExpressionNumberImpl::get_index() const { return m_index; }
 
 double FunctionExpressionNumberImpl::get_number() const { return m_number; }
 
@@ -58,12 +60,14 @@ FunctionExpressionBinaryOperatorImpl::FunctionExpressionBinaryOperatorImpl(size_
                                                                            BinaryOperatorEnum binary_operator,
                                                                            FunctionExpression left_function_expression,
                                                                            FunctionExpression right_function_expression) :
-    Base(index),
+    m_index(index),
     m_binary_operator(binary_operator),
     m_left_function_expression(std::move(left_function_expression)),
     m_right_function_expression(std::move(right_function_expression))
 {
 }
+
+size_t FunctionExpressionBinaryOperatorImpl::get_index() const { return m_index; }
 
 BinaryOperatorEnum FunctionExpressionBinaryOperatorImpl::get_binary_operator() const { return m_binary_operator; }
 
@@ -75,11 +79,13 @@ const FunctionExpression& FunctionExpressionBinaryOperatorImpl::get_right_functi
 FunctionExpressionMultiOperatorImpl::FunctionExpressionMultiOperatorImpl(size_t index,
                                                                          MultiOperatorEnum multi_operator,
                                                                          FunctionExpressionList function_expressions) :
-    Base(index),
+    m_index(index),
     m_multi_operator(multi_operator),
     m_function_expressions(function_expressions)
 {
 }
+
+size_t FunctionExpressionMultiOperatorImpl::get_index() const { return m_index; }
 
 MultiOperatorEnum FunctionExpressionMultiOperatorImpl::get_multi_operator() const { return m_multi_operator; }
 
@@ -87,15 +93,19 @@ const FunctionExpressionList& FunctionExpressionMultiOperatorImpl::get_function_
 
 /* FunctionExpressionMinus */
 FunctionExpressionMinusImpl::FunctionExpressionMinusImpl(size_t index, FunctionExpression function_expression) :
-    Base(index),
+    m_index(index),
     m_function_expression(std::move(function_expression))
 {
 }
 
+size_t FunctionExpressionMinusImpl::get_index() const { return m_index; }
+
 const FunctionExpression& FunctionExpressionMinusImpl::get_function_expression() const { return m_function_expression; }
 
 /* FunctionExpressionFunction */
-FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(size_t index, Function function) : Base(index), m_function(std::move(function)) {}
+FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(size_t index, Function function) : m_index(index), m_function(std::move(function)) {}
+
+size_t FunctionExpressionFunctionImpl::get_index() const { return m_index; }
 
 const Function& FunctionExpressionFunctionImpl::get_function() const { return m_function; }
 

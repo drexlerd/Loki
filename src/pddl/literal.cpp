@@ -21,7 +21,9 @@
 
 namespace loki
 {
-LiteralImpl::LiteralImpl(size_t index, bool is_negated, Atom atom) : Base(index), m_is_negated(is_negated), m_atom(std::move(atom)) {}
+LiteralImpl::LiteralImpl(size_t index, bool is_negated, Atom atom) : m_index(index), m_is_negated(is_negated), m_atom(std::move(atom)) {}
+
+size_t LiteralImpl::get_index() const { return m_index; }
 
 bool LiteralImpl::is_negated() const { return m_is_negated; }
 

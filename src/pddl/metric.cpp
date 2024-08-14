@@ -37,11 +37,13 @@ const std::string& to_string(OptimizationMetricEnum optimization_metric)
 }
 
 OptimizationMetricImpl::OptimizationMetricImpl(size_t index, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression) :
-    Base(index),
+    m_index(index),
     m_optimization_metric(optimization_metric),
     m_function_expression(std::move(function_expression))
 {
 }
+
+size_t OptimizationMetricImpl::get_index() const { return m_index; }
 
 OptimizationMetricEnum OptimizationMetricImpl::get_optimization_metric() const { return m_optimization_metric; }
 

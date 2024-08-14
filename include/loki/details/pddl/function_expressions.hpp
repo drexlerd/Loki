@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_FUNCTION_EXPRESSIONS_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_FUNCTION_EXPRESSIONS_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
@@ -47,9 +46,10 @@ extern std::unordered_map<MultiOperatorEnum, std::string> multi_operator_enum_to
 extern const std::string& to_string(MultiOperatorEnum multi_operator);
 
 /* FunctionExpressionNumber */
-class FunctionExpressionNumberImpl : public Base<FunctionExpressionNumberImpl>
+class FunctionExpressionNumberImpl
 {
 private:
+    size_t m_index;
     double m_number;
 
     FunctionExpressionNumberImpl(size_t index, double number);
@@ -59,13 +59,21 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    FunctionExpressionNumberImpl(const FunctionExpressionNumberImpl& other) = delete;
+    FunctionExpressionNumberImpl& operator=(const FunctionExpressionNumberImpl& other) = delete;
+    FunctionExpressionNumberImpl(FunctionExpressionNumberImpl&& other) = default;
+    FunctionExpressionNumberImpl& operator=(FunctionExpressionNumberImpl&& other) = default;
+
+    size_t get_index() const;
     double get_number() const;
 };
 
 /* FunctionExpressionBinaryOperator */
-class FunctionExpressionBinaryOperatorImpl : public Base<FunctionExpressionBinaryOperatorImpl>
+class FunctionExpressionBinaryOperatorImpl
 {
 private:
+    size_t m_index;
     BinaryOperatorEnum m_binary_operator;
     FunctionExpression m_left_function_expression;
     FunctionExpression m_right_function_expression;
@@ -80,15 +88,23 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    FunctionExpressionBinaryOperatorImpl(const FunctionExpressionBinaryOperatorImpl& other) = delete;
+    FunctionExpressionBinaryOperatorImpl& operator=(const FunctionExpressionBinaryOperatorImpl& other) = delete;
+    FunctionExpressionBinaryOperatorImpl(FunctionExpressionBinaryOperatorImpl&& other) = default;
+    FunctionExpressionBinaryOperatorImpl& operator=(FunctionExpressionBinaryOperatorImpl&& other) = default;
+
+    size_t get_index() const;
     BinaryOperatorEnum get_binary_operator() const;
     const FunctionExpression& get_left_function_expression() const;
     const FunctionExpression& get_right_function_expression() const;
 };
 
 /* FunctionExpressionMultiOperator */
-class FunctionExpressionMultiOperatorImpl : public Base<FunctionExpressionMultiOperatorImpl>
+class FunctionExpressionMultiOperatorImpl
 {
 private:
+    size_t m_index;
     MultiOperatorEnum m_multi_operator;
     FunctionExpressionList m_function_expressions;
 
@@ -99,14 +115,22 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    FunctionExpressionMultiOperatorImpl(const FunctionExpressionMultiOperatorImpl& other) = delete;
+    FunctionExpressionMultiOperatorImpl& operator=(const FunctionExpressionMultiOperatorImpl& other) = delete;
+    FunctionExpressionMultiOperatorImpl(FunctionExpressionMultiOperatorImpl&& other) = default;
+    FunctionExpressionMultiOperatorImpl& operator=(FunctionExpressionMultiOperatorImpl&& other) = default;
+
+    size_t get_index() const;
     MultiOperatorEnum get_multi_operator() const;
     const FunctionExpressionList& get_function_expressions() const;
 };
 
 /* FunctionExpressionMinus */
-class FunctionExpressionMinusImpl : public Base<FunctionExpressionMinusImpl>
+class FunctionExpressionMinusImpl
 {
 private:
+    size_t m_index;
     FunctionExpression m_function_expression;
 
     FunctionExpressionMinusImpl(size_t index, FunctionExpression function_expression);
@@ -116,13 +140,21 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    FunctionExpressionMinusImpl(const FunctionExpressionMinusImpl& other) = delete;
+    FunctionExpressionMinusImpl& operator=(const FunctionExpressionMinusImpl& other) = delete;
+    FunctionExpressionMinusImpl(FunctionExpressionMinusImpl&& other) = default;
+    FunctionExpressionMinusImpl& operator=(FunctionExpressionMinusImpl&& other) = default;
+
+    size_t get_index() const;
     const FunctionExpression& get_function_expression() const;
 };
 
 /* FunctionExpressionFunction */
-class FunctionExpressionFunctionImpl : public Base<FunctionExpressionFunctionImpl>
+class FunctionExpressionFunctionImpl
 {
 private:
+    size_t m_index;
     Function m_function;
 
     FunctionExpressionFunctionImpl(size_t index, Function function);
@@ -132,6 +164,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    FunctionExpressionFunctionImpl(const FunctionExpressionFunctionImpl& other) = delete;
+    FunctionExpressionFunctionImpl& operator=(const FunctionExpressionFunctionImpl& other) = delete;
+    FunctionExpressionFunctionImpl(FunctionExpressionFunctionImpl&& other) = default;
+    FunctionExpressionFunctionImpl& operator=(FunctionExpressionFunctionImpl&& other) = default;
+
+    size_t get_index() const;
     const Function& get_function() const;
 };
 

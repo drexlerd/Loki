@@ -29,7 +29,7 @@ ActionImpl::ActionImpl(size_t index,
                        ParameterList parameters,
                        std::optional<Condition> condition,
                        std::optional<Effect> effect) :
-    Base(index),
+    m_index(index),
     m_name(std::move(name)),
     m_original_arity(original_arity),
     m_parameters(std::move(parameters)),
@@ -37,6 +37,8 @@ ActionImpl::ActionImpl(size_t index,
     m_effect(std::move(effect))
 {
 }
+
+size_t ActionImpl::get_index() const { return m_index; }
 
 const std::string& ActionImpl::get_name() const { return m_name; }
 

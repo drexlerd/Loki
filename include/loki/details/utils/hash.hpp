@@ -26,6 +26,7 @@
 #include <functional>
 #include <ranges>
 #include <utility>
+#include <variant>
 
 namespace loki
 {

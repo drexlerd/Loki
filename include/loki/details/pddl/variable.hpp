@@ -18,16 +18,16 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_VARIABLE_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_VARIABLE_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
 
 namespace loki
 {
-class VariableImpl : public Base<VariableImpl>
+class VariableImpl
 {
 private:
+    size_t m_index;
     std::string m_name;
 
     VariableImpl(size_t index, std::string name);
@@ -37,6 +37,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    VariableImpl(const VariableImpl& other) = delete;
+    VariableImpl& operator=(const VariableImpl& other) = delete;
+    VariableImpl(VariableImpl&& other) = default;
+    VariableImpl& operator=(VariableImpl&& other) = default;
+
+    size_t get_index() const;
     const std::string& get_name() const;
 };
 

@@ -18,16 +18,16 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_DERIVED_PREDICATE_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_DERIVED_PREDICATE_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
 
 namespace loki
 {
-class AxiomImpl : public Base<AxiomImpl>
+class AxiomImpl
 {
 private:
+    size_t m_index;
     std::string m_derived_predicate_name;
     ParameterList m_parameters;
     Condition m_condition;
@@ -40,6 +40,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    AxiomImpl(const AxiomImpl& other) = delete;
+    AxiomImpl& operator=(const AxiomImpl& other) = delete;
+    AxiomImpl(AxiomImpl&& other) = default;
+    AxiomImpl& operator=(AxiomImpl&& other) = default;
+
+    size_t get_index() const;
     const std::string& get_derived_predicate_name() const;
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;

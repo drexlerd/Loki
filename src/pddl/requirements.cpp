@@ -48,7 +48,9 @@ const std::string& to_string(RequirementEnum requirement)
     return requirement_enum_to_string.at(requirement);
 }
 
-RequirementsImpl::RequirementsImpl(size_t index, RequirementEnumSet requirements) : Base(index), m_requirements(std::move(requirements)) {}
+RequirementsImpl::RequirementsImpl(size_t index, RequirementEnumSet requirements) : m_index(index), m_requirements(std::move(requirements)) {}
+
+size_t RequirementsImpl::get_index() const { return m_index; }
 
 bool RequirementsImpl::test(RequirementEnum requirement) const { return m_requirements.count(requirement); }
 

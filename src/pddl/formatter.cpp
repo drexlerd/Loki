@@ -677,4 +677,83 @@ void DefaultFormatter::write(const TypeImpl& element, const DefaultFormatterOpti
 
 void DefaultFormatter::write(const VariableImpl& element, const DefaultFormatterOptions&, std::ostream& out) const { out << element.get_name(); }
 
+/**
+ * StreamWriter
+ */
+
+template<typename T, typename Formatter, typename FormatterOptions>
+StreamWriter<T, Formatter, FormatterOptions>::StreamWriter(const T& element, const Formatter& formatter, const FormatterOptions& options) :
+    m_element(element),
+    m_formatter(formatter),
+    m_options(options)
+{
+}
+
+template<typename T, typename Formatter, typename FormatterOptions>
+std::string StreamWriter<T, Formatter, FormatterOptions>::str() const
+{
+    std::stringstream ss;
+    m_formatter.write(m_element, m_options, ss);
+    return ss.str();
+}
+
+template<typename T, typename Formatter, typename FormatterOptions>
+const T& StreamWriter<T, Formatter, FormatterOptions>::get_element() const
+{
+    return m_element;
+}
+
+template<typename T, typename Formatter, typename FormatterOptions>
+const Formatter& StreamWriter<T, Formatter, FormatterOptions>::get_formatter() const
+{
+    return m_formatter;
+}
+
+template<typename T, typename Formatter, typename FormatterOptions>
+const FormatterOptions& StreamWriter<T, Formatter, FormatterOptions>::get_options() const
+{
+    return m_options;
+}
+
+// Explicit instantiation of StreamWriter for each specific type
+template class StreamWriter<ActionImpl>;
+template class StreamWriter<AtomImpl>;
+template class StreamWriter<AxiomImpl>;
+template class StreamWriter<ConditionLiteralImpl>;
+template class StreamWriter<ConditionAndImpl>;
+template class StreamWriter<ConditionOrImpl>;
+template class StreamWriter<ConditionNotImpl>;
+template class StreamWriter<ConditionImplyImpl>;
+template class StreamWriter<ConditionExistsImpl>;
+template class StreamWriter<ConditionForallImpl>;
+template class StreamWriter<ConditionImpl>;
+template class StreamWriter<DomainImpl>;
+template class StreamWriter<EffectLiteralImpl>;
+template class StreamWriter<EffectAndImpl>;
+template class StreamWriter<EffectNumericImpl>;
+template class StreamWriter<EffectConditionalForallImpl>;
+template class StreamWriter<EffectConditionalWhenImpl>;
+template class StreamWriter<EffectImpl>;
+template class StreamWriter<FunctionExpressionNumberImpl>;
+template class StreamWriter<FunctionExpressionBinaryOperatorImpl>;
+template class StreamWriter<FunctionExpressionMultiOperatorImpl>;
+template class StreamWriter<FunctionExpressionMinusImpl>;
+template class StreamWriter<FunctionExpressionFunctionImpl>;
+template class StreamWriter<FunctionExpressionImpl>;
+template class StreamWriter<FunctionSkeletonImpl>;
+template class StreamWriter<FunctionImpl>;
+template class StreamWriter<LiteralImpl>;
+template class StreamWriter<OptimizationMetricImpl>;
+template class StreamWriter<NumericFluentImpl>;
+template class StreamWriter<ObjectImpl>;
+template class StreamWriter<ParameterImpl>;
+template class StreamWriter<PredicateImpl>;
+template class StreamWriter<ProblemImpl>;
+template class StreamWriter<RequirementsImpl>;
+template class StreamWriter<TermObjectImpl>;
+template class StreamWriter<TermVariableImpl>;
+template class StreamWriter<TermImpl>;
+template class StreamWriter<TypeImpl>;
+template class StreamWriter<VariableImpl>;
+
 }

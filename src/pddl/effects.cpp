@@ -40,23 +40,29 @@ const std::string& to_string(AssignOperatorEnum assign_operator)
 }
 
 /* EffectLiteral */
-EffectLiteralImpl::EffectLiteralImpl(size_t index, Literal literal) : Base(index), m_literal(std::move(literal)) {}
+EffectLiteralImpl::EffectLiteralImpl(size_t index, Literal literal) : m_index(index), m_literal(std::move(literal)) {}
+
+size_t EffectLiteralImpl::get_index() const { return m_index; }
 
 const Literal& EffectLiteralImpl::get_literal() const { return m_literal; }
 
 /* EffectAnd */
-EffectAndImpl::EffectAndImpl(size_t index, EffectList effects) : Base(index), m_effects(std::move(effects)) {}
+EffectAndImpl::EffectAndImpl(size_t index, EffectList effects) : m_index(index), m_effects(std::move(effects)) {}
+
+size_t EffectAndImpl::get_index() const { return m_index; }
 
 const EffectList& EffectAndImpl::get_effects() const { return m_effects; }
 
 /* EffectNumeric */
 EffectNumericImpl::EffectNumericImpl(size_t index, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression) :
-    Base(index),
+    m_index(index),
     m_assign_operator(assign_operator),
     m_function(std::move(function)),
     m_function_expression(std::move(function_expression))
 {
 }
+
+size_t EffectNumericImpl::get_index() const { return m_index; }
 
 AssignOperatorEnum EffectNumericImpl::get_assign_operator() const { return m_assign_operator; }
 
@@ -66,11 +72,13 @@ const FunctionExpression& EffectNumericImpl::get_function_expression() const { r
 
 /* ConditionalConditionalForall */
 EffectConditionalForallImpl::EffectConditionalForallImpl(size_t index, ParameterList parameters, Effect effect) :
-    Base(index),
+    m_index(index),
     m_parameters(std::move(parameters)),
     m_effect(std::move(effect))
 {
 }
+
+size_t EffectConditionalForallImpl::get_index() const { return m_index; }
 
 const ParameterList& EffectConditionalForallImpl::get_parameters() const { return m_parameters; }
 
@@ -78,11 +86,13 @@ const Effect& EffectConditionalForallImpl::get_effect() const { return m_effect;
 
 /* EffectConditionalWhen */
 EffectConditionalWhenImpl::EffectConditionalWhenImpl(size_t index, Condition condition, Effect effect) :
-    Base(index),
+    m_index(index),
     m_condition(std::move(condition)),
     m_effect(std::move(effect))
 {
 }
+
+size_t EffectConditionalWhenImpl::get_index() const { return m_index; }
 
 const Condition& EffectConditionalWhenImpl::get_condition() const { return m_condition; }
 

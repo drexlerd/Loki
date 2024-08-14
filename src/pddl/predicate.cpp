@@ -26,11 +26,13 @@
 namespace loki
 {
 PredicateImpl::PredicateImpl(size_t index, std::string name, ParameterList parameters) :
-    Base(index),
+    m_index(index),
     m_name(std::move(name)),
     m_parameters(std::move(parameters))
 {
 }
+
+size_t PredicateImpl::get_index() const { return m_index; }
 
 const std::string& PredicateImpl::get_name() const { return m_name; }
 

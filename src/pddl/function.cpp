@@ -23,11 +23,13 @@
 namespace loki
 {
 FunctionImpl::FunctionImpl(size_t index, FunctionSkeleton function_skeleton, TermList terms) :
-    Base(index),
+    m_index(index),
     m_function_skeleton(std::move(function_skeleton)),
     m_terms(std::move(terms))
 {
 }
+
+size_t FunctionImpl::get_index() const { return m_index; }
 
 const FunctionSkeleton& FunctionImpl::get_function_skeleton() const { return m_function_skeleton; }
 

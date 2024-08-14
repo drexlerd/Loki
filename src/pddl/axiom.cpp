@@ -26,13 +26,15 @@
 namespace loki
 {
 AxiomImpl::AxiomImpl(size_t index, std::string derived_predicate_name, ParameterList parameters, Condition condition, size_t num_parameters_to_ground_head) :
-    Base(index),
+    m_index(index),
     m_derived_predicate_name(std::move(derived_predicate_name)),
     m_parameters(std::move(parameters)),
     m_condition(std::move(condition)),
     m_num_parameters_to_ground_head(num_parameters_to_ground_head)
 {
 }
+
+size_t AxiomImpl::get_index() const { return m_index; }
 
 const std::string& AxiomImpl::get_derived_predicate_name() const { return m_derived_predicate_name; }
 

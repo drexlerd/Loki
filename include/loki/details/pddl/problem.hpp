@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_PROBLEM_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_PROBLEM_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 #include "loki/details/utils/filesystem.hpp"
 
@@ -27,9 +26,10 @@
 
 namespace loki
 {
-class ProblemImpl : public Base<ProblemImpl>
+class ProblemImpl
 {
 private:
+    size_t m_index;
     std::optional<fs::path> m_filepath;
     Domain m_domain;
     std::string m_name;
@@ -60,6 +60,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    ProblemImpl(const ProblemImpl& other) = delete;
+    ProblemImpl& operator=(const ProblemImpl& other) = delete;
+    ProblemImpl(ProblemImpl&& other) = default;
+    ProblemImpl& operator=(ProblemImpl&& other) = default;
+
+    size_t get_index() const;
     const std::optional<fs::path>& get_filepath() const;
     const Domain& get_domain() const;
     const std::string& get_name() const;

@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_ACTION_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_ACTION_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <optional>
@@ -26,9 +25,10 @@
 
 namespace loki
 {
-class ActionImpl : public Base<ActionImpl>
+class ActionImpl
 {
 private:
+    size_t m_index;
     std::string m_name;
     // Indicate the original subseteq of variables before adding parameters during translations
     size_t m_original_arity;
@@ -48,6 +48,13 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    ActionImpl(const ActionImpl& other) = delete;
+    ActionImpl& operator=(const ActionImpl& other) = delete;
+    ActionImpl(ActionImpl&& other) = default;
+    ActionImpl& operator=(ActionImpl&& other) = default;
+
+    size_t get_index() const;
     const std::string& get_name() const;
     size_t get_original_arity() const;
     const ParameterList& get_parameters() const;

@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_REQUIREMENTS_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_REQUIREMENTS_HPP_
 
-#include "loki/details/pddl/base.hpp"
 #include "loki/details/pddl/declarations.hpp"
 
 #include <set>
@@ -56,9 +55,10 @@ using RequirementEnumList = std::vector<RequirementEnum>;
 extern std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string;
 extern const std::string& to_string(RequirementEnum requirement);
 
-class RequirementsImpl : public Base<RequirementsImpl>
+class RequirementsImpl
 {
 private:
+    size_t m_index;
     RequirementEnumSet m_requirements;
 
     RequirementsImpl(size_t index, RequirementEnumSet requirements);
@@ -68,8 +68,15 @@ private:
     friend class UniqueFactory;
 
 public:
+    // moveable but not copyable
+    RequirementsImpl(const RequirementsImpl& other) = delete;
+    RequirementsImpl& operator=(const RequirementsImpl& other) = delete;
+    RequirementsImpl(RequirementsImpl&& other) = default;
+    RequirementsImpl& operator=(RequirementsImpl&& other) = default;
+
     bool test(RequirementEnum requirement) const;
 
+    size_t get_index() const;
     const RequirementEnumSet& get_requirements() const;
 };
 

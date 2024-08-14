@@ -21,7 +21,9 @@
 
 namespace loki
 {
-NumericFluentImpl::NumericFluentImpl(size_t index, Function function, double number) : Base(index), m_function(std::move(function)), m_number(number) {}
+NumericFluentImpl::NumericFluentImpl(size_t index, Function function, double number) : m_index(index), m_function(std::move(function)), m_number(number) {}
+
+size_t NumericFluentImpl::get_index() const { return m_index; }
 
 const Function& NumericFluentImpl::get_function() const { return m_function; }
 
