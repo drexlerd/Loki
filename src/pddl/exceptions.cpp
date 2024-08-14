@@ -24,6 +24,7 @@
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/variable.hpp"
 
+#include <sstream>
 #include <string>
 
 using namespace std::string_literals;
