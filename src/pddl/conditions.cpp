@@ -20,6 +20,7 @@
 #include "formatter.hpp"
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/parameter.hpp"
+#include "loki/details/utils/collections.hpp"
 
 namespace loki
 {
@@ -93,6 +94,108 @@ size_t ConditionForallImpl::get_index() const { return m_index; }
 const ParameterList& ConditionForallImpl::get_parameters() const { return m_parameters; }
 
 const Condition& ConditionForallImpl::get_condition() const { return m_condition; }
+
+size_t UniquePDDLHasher<const ConditionLiteralImpl&>::operator()(const ConditionLiteralImpl& e) const { return UniquePDDLHashCombiner()(e.get_literal()); }
+
+size_t UniquePDDLHasher<const ConditionAndImpl&>::operator()(const ConditionAndImpl& e) const
+{
+    return UniquePDDLHashCombiner()(get_sorted_vector(e.get_conditions()));
+}
+
+size_t UniquePDDLHasher<const ConditionOrImpl&>::operator()(const ConditionOrImpl& e) const
+{
+    return UniquePDDLHashCombiner()(get_sorted_vector(e.get_conditions()));
+}
+
+size_t UniquePDDLHasher<const ConditionNotImpl&>::operator()(const ConditionNotImpl& e) const { return UniquePDDLHashCombiner()(e.get_condition()); }
+
+size_t UniquePDDLHasher<const ConditionImplyImpl&>::operator()(const ConditionImplyImpl& e) const
+{
+    return UniquePDDLHashCombiner()(e.get_condition_left(), e.get_condition_right());
+}
+
+size_t UniquePDDLHasher<const ConditionExistsImpl&>::operator()(const ConditionExistsImpl& e) const
+{
+    return UniquePDDLHashCombiner()(get_sorted_vector(e.get_parameters()), e.get_condition());
+}
+
+size_t UniquePDDLHasher<const ConditionForallImpl&>::operator()(const ConditionForallImpl& e) const
+{
+    return UniquePDDLHashCombiner()(get_sorted_vector(e.get_parameters()), e.get_condition());
+}
+
+size_t UniquePDDLHasher<const ConditionImpl*>::operator()(const ConditionImpl* e) const
+{
+    return std::visit([](const auto& arg) { return UniquePDDLHasher<decltype(arg)>()(arg); }, *e);
+}
+
+bool UniquePDDLEqualTo<const ConditionLiteralImpl&>::operator()(const ConditionLiteralImpl& l, const ConditionLiteralImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_literal() == r.get_literal());
+    }
+    return true;
+}
+
+bool UniquePDDLEqualTo<const ConditionAndImpl&>::operator()(const ConditionAndImpl& l, const ConditionAndImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (get_sorted_vector(l.get_conditions()) == get_sorted_vector(r.get_conditions()));
+    }
+    return true;
+}
+
+bool UniquePDDLEqualTo<const ConditionOrImpl&>::operator()(const ConditionOrImpl& l, const ConditionOrImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (get_sorted_vector(l.get_conditions()) == get_sorted_vector(r.get_conditions()));
+    }
+    return true;
+}
+
+bool UniquePDDLEqualTo<const ConditionNotImpl&>::operator()(const ConditionNotImpl& l, const ConditionNotImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_condition() == r.get_condition());
+    }
+    return true;
+}
+
+bool UniquePDDLEqualTo<const ConditionImplyImpl&>::operator()(const ConditionImplyImpl& l, const ConditionImplyImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_condition_left() == r.get_condition_left()) && (l.get_condition_left() == r.get_condition_left());
+    }
+    return true;
+}
+
+bool UniquePDDLEqualTo<const ConditionExistsImpl&>::operator()(const ConditionExistsImpl& l, const ConditionExistsImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_condition() == r.get_condition()) && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()));
+    }
+    return true;
+}
+
+bool UniquePDDLEqualTo<const ConditionForallImpl&>::operator()(const ConditionForallImpl& l, const ConditionForallImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_condition() == r.get_condition()) && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()));
+    }
+    return true;
+}
+
+bool UniquePDDLEqualTo<const ConditionImpl*>::operator()(const ConditionImpl* l, const ConditionImpl* r) const
+{
+    return UniquePDDLEqualTo<ConditionImpl>()(*l, *r);
+}
 
 std::ostream& operator<<(std::ostream& out, const ConditionLiteralImpl& element)
 {

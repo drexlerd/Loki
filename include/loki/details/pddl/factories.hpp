@@ -25,9 +25,11 @@
 #include "loki/details/pddl/declarations.hpp"
 #include "loki/details/pddl/domain.hpp"
 #include "loki/details/pddl/effects.hpp"
+#include "loki/details/pddl/equal_to.hpp"
 #include "loki/details/pddl/function.hpp"
 #include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
+#include "loki/details/pddl/hash.hpp"
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/metric.hpp"
 #include "loki/details/pddl/numeric_fluent.hpp"
@@ -46,26 +48,29 @@
 namespace loki
 {
 
-using RequirementsFactory = UniqueFactory<RequirementsImpl, Hasher<const RequirementsImpl*>, EqualTo<const RequirementsImpl*>>;
-using TypeFactory = UniqueFactory<TypeImpl, Hasher<const TypeImpl*>, EqualTo<const TypeImpl*>>;
-using VariableFactory = UniqueFactory<VariableImpl, Hasher<const VariableImpl*>, EqualTo<const VariableImpl*>>;
-using TermFactory = UniqueFactory<TermImpl, Hasher<const TermImpl*>, EqualTo<const TermImpl*>>;
-using ObjectFactory = UniqueFactory<ObjectImpl, Hasher<const ObjectImpl*>, EqualTo<const ObjectImpl*>>;
-using AtomFactory = UniqueFactory<AtomImpl, Hasher<const AtomImpl*>, EqualTo<const AtomImpl*>>;
-using LiteralFactory = UniqueFactory<LiteralImpl, Hasher<const LiteralImpl*>, EqualTo<const LiteralImpl*>>;
-using ParameterFactory = UniqueFactory<ParameterImpl, Hasher<const ParameterImpl*>, EqualTo<const ParameterImpl*>>;
-using PredicateFactory = UniqueFactory<PredicateImpl, Hasher<const PredicateImpl*>, EqualTo<const PredicateImpl*>>;
-using FunctionExpressionFactory = UniqueFactory<FunctionExpressionImpl, Hasher<const FunctionExpressionImpl*>, EqualTo<const FunctionExpressionImpl*>>;
-using FunctionFactory = UniqueFactory<FunctionImpl, Hasher<const FunctionImpl*>, EqualTo<const FunctionImpl*>>;
-using FunctionSkeletonFactory = UniqueFactory<FunctionSkeletonImpl, Hasher<const FunctionSkeletonImpl*>, EqualTo<const FunctionSkeletonImpl*>>;
-using ConditionFactory = UniqueFactory<ConditionImpl, Hasher<const ConditionImpl*>, EqualTo<const ConditionImpl*>>;
-using EffectFactory = UniqueFactory<EffectImpl, Hasher<const EffectImpl*>, EqualTo<const EffectImpl*>>;
-using ActionFactory = UniqueFactory<ActionImpl, Hasher<const ActionImpl*>, EqualTo<const ActionImpl*>>;
-using AxiomFactory = UniqueFactory<AxiomImpl, Hasher<const AxiomImpl*>, EqualTo<const AxiomImpl*>>;
-using OptimizationMetricFactory = UniqueFactory<OptimizationMetricImpl, Hasher<const OptimizationMetricImpl*>, EqualTo<const OptimizationMetricImpl*>>;
-using NumericFluentFactory = UniqueFactory<NumericFluentImpl, Hasher<const NumericFluentImpl*>, EqualTo<const NumericFluentImpl*>>;
-using DomainFactory = UniqueFactory<DomainImpl, Hasher<const DomainImpl*>, EqualTo<const DomainImpl*>>;
-using ProblemFactory = UniqueFactory<ProblemImpl, Hasher<const ProblemImpl*>, EqualTo<const ProblemImpl*>>;
+using RequirementsFactory = UniqueFactory<RequirementsImpl, UniquePDDLHasher<const RequirementsImpl*>, UniquePDDLEqualTo<const RequirementsImpl*>>;
+using TypeFactory = UniqueFactory<TypeImpl, UniquePDDLHasher<const TypeImpl*>, UniquePDDLEqualTo<const TypeImpl*>>;
+using VariableFactory = UniqueFactory<VariableImpl, UniquePDDLHasher<const VariableImpl*>, UniquePDDLEqualTo<const VariableImpl*>>;
+using TermFactory = UniqueFactory<TermImpl, UniquePDDLHasher<const TermImpl*>, UniquePDDLEqualTo<const TermImpl*>>;
+using ObjectFactory = UniqueFactory<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>>;
+using AtomFactory = UniqueFactory<AtomImpl, UniquePDDLHasher<const AtomImpl*>, UniquePDDLEqualTo<const AtomImpl*>>;
+using LiteralFactory = UniqueFactory<LiteralImpl, UniquePDDLHasher<const LiteralImpl*>, UniquePDDLEqualTo<const LiteralImpl*>>;
+using ParameterFactory = UniqueFactory<ParameterImpl, UniquePDDLHasher<const ParameterImpl*>, UniquePDDLEqualTo<const ParameterImpl*>>;
+using PredicateFactory = UniqueFactory<PredicateImpl, UniquePDDLHasher<const PredicateImpl*>, UniquePDDLEqualTo<const PredicateImpl*>>;
+using FunctionExpressionFactory =
+    UniqueFactory<FunctionExpressionImpl, UniquePDDLHasher<const FunctionExpressionImpl*>, UniquePDDLEqualTo<const FunctionExpressionImpl*>>;
+using FunctionFactory = UniqueFactory<FunctionImpl, UniquePDDLHasher<const FunctionImpl*>, UniquePDDLEqualTo<const FunctionImpl*>>;
+using FunctionSkeletonFactory =
+    UniqueFactory<FunctionSkeletonImpl, UniquePDDLHasher<const FunctionSkeletonImpl*>, UniquePDDLEqualTo<const FunctionSkeletonImpl*>>;
+using ConditionFactory = UniqueFactory<ConditionImpl, UniquePDDLHasher<const ConditionImpl*>, UniquePDDLEqualTo<const ConditionImpl*>>;
+using EffectFactory = UniqueFactory<EffectImpl, UniquePDDLHasher<const EffectImpl*>, UniquePDDLEqualTo<const EffectImpl*>>;
+using ActionFactory = UniqueFactory<ActionImpl, UniquePDDLHasher<const ActionImpl*>, UniquePDDLEqualTo<const ActionImpl*>>;
+using AxiomFactory = UniqueFactory<AxiomImpl, UniquePDDLHasher<const AxiomImpl*>, UniquePDDLEqualTo<const AxiomImpl*>>;
+using OptimizationMetricFactory =
+    UniqueFactory<OptimizationMetricImpl, UniquePDDLHasher<const OptimizationMetricImpl*>, UniquePDDLEqualTo<const OptimizationMetricImpl*>>;
+using NumericFluentFactory = UniqueFactory<NumericFluentImpl, UniquePDDLHasher<const NumericFluentImpl*>, UniquePDDLEqualTo<const NumericFluentImpl*>>;
+using DomainFactory = UniqueFactory<DomainImpl, UniquePDDLHasher<const DomainImpl*>, UniquePDDLEqualTo<const DomainImpl*>>;
+using ProblemFactory = UniqueFactory<ProblemImpl, UniquePDDLHasher<const ProblemImpl*>, UniquePDDLEqualTo<const ProblemImpl*>>;
 
 using VariadicPDDLConstructorFactory = VariadicContainer<RequirementsFactory,
                                                          TypeFactory,

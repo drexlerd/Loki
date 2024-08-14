@@ -16,6 +16,8 @@
  */
 
 #include <gtest/gtest.h>
+#include <loki/details/pddl/equal_to.hpp>
+#include <loki/details/pddl/hash.hpp>
 #include <loki/details/pddl/object.hpp>
 #include <loki/details/pddl/term.hpp>
 #include <loki/details/pddl/type.hpp>
@@ -27,7 +29,7 @@ namespace loki::domain::tests
 
 TEST(LokiTests, UtilsUniqueFactoryIteratorTest)
 {
-    UniqueFactory<ObjectImpl> factory(2);
+    UniqueFactory<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>> factory(2);
     const auto object_0 = factory.get_or_create<ObjectImpl>("object_0", TypeList());
     const auto object_1 = factory.get_or_create<ObjectImpl>("object_1", TypeList());
     const auto object_2 = factory.get_or_create<ObjectImpl>("object_2", TypeList());
@@ -46,7 +48,7 @@ TEST(LokiTests, UtilsUniqueFactoryIteratorTest)
 
 TEST(LokiTests, UtilsUniqueFactoryIteratorEmptyTest)
 {
-    UniqueFactory<ObjectImpl> factory(4);
+    UniqueFactory<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>> factory(4);
 
     auto objects = ObjectList {};
     for (const auto& object : factory)
@@ -59,8 +61,8 @@ TEST(LokiTests, UtilsUniqueFactoryIteratorEmptyTest)
 
 TEST(LokiTests, UtilsUniqueFactoryVariantTest)
 {
-    UniqueFactory<ObjectImpl> objects(2);
-    UniqueFactory<TermImpl> terms(2);
+    UniqueFactory<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>> objects(2);
+    UniqueFactory<TermImpl, UniquePDDLHasher<const TermImpl*>, UniquePDDLEqualTo<const TermImpl*>> terms(2);
     const auto object_0 = objects.get_or_create<ObjectImpl>("object_0", TypeList());
     const auto object_1 = objects.get_or_create<ObjectImpl>("object_1", TypeList());
 
@@ -74,7 +76,7 @@ TEST(LokiTests, UtilsUniqueFactoryVariantTest)
 
 TEST(LokiTests, UtilsUniqueFactoryTest)
 {
-    UniqueFactory<ObjectImpl> factory(2);
+    UniqueFactory<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>> factory(2);
     EXPECT_EQ(factory.size(), 0);
 
     // Test uniqueness: insert the same element twice
@@ -86,16 +88,16 @@ TEST(LokiTests, UtilsUniqueFactoryTest)
     const auto object_0_1 = factory.get_or_create<ObjectImpl>("object_0", TypeList());
     EXPECT_EQ(factory.size(), 1);
     EXPECT_EQ(object_0_0, object_0_1);
-    EXPECT_EQ(Hasher<const ObjectImpl*>()(object_0_0), Hasher<const ObjectImpl*>()(object_0_1));
-    EXPECT_TRUE(EqualTo<const ObjectImpl*>()(object_0_0, object_0_1));
+    EXPECT_EQ(UniquePDDLHasher<const ObjectImpl*>()(object_0_0), UniquePDDLHasher<const ObjectImpl*>()(object_0_1));
+    EXPECT_TRUE(UniquePDDLEqualTo<const ObjectImpl*>()(object_0_0, object_0_1));
 
     const auto object_1 = factory.get_or_create<ObjectImpl>("object_1", TypeList());
     EXPECT_EQ(factory.size(), 2);
     EXPECT_NE(object_0_0, object_1);
     EXPECT_EQ(object_1->get_index(), 1);
     EXPECT_EQ(object_1->get_name(), "object_1");
-    EXPECT_NE(Hasher<const ObjectImpl*>()(object_0_0), Hasher<const ObjectImpl*>()(object_1));
-    EXPECT_FALSE(EqualTo<const ObjectImpl*>()(object_0_0, object_1));
+    EXPECT_NE(UniquePDDLHasher<const ObjectImpl*>()(object_0_0), UniquePDDLHasher<const ObjectImpl*>()(object_1));
+    EXPECT_FALSE(UniquePDDLEqualTo<const ObjectImpl*>()(object_0_0, object_1));
 }
 
 }

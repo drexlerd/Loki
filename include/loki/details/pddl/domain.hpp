@@ -19,6 +19,8 @@
 #define LOKI_INCLUDE_LOKI_PDDL_DOMAIN_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/equal_to.hpp"
+#include "loki/details/pddl/hash.hpp"
 #include "loki/details/utils/filesystem.hpp"
 
 #include <optional>
@@ -73,6 +75,18 @@ public:
     const FunctionSkeletonList& get_functions() const;
     const ActionList& get_actions() const;
     const AxiomList& get_axioms() const;
+};
+
+template<>
+struct UniquePDDLHasher<const DomainImpl*>
+{
+    size_t operator()(const DomainImpl* e) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const DomainImpl*>
+{
+    bool operator()(const DomainImpl* l, const DomainImpl* r) const;
 };
 
 extern std::ostream& operator<<(std::ostream& out, const DomainImpl& element);

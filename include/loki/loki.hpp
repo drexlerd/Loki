@@ -57,9 +57,7 @@
  */
 
 #include "loki/details/utils/collections.hpp"
-#include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/filesystem.hpp"
-#include "loki/details/utils/hash.hpp"
 #include "loki/details/utils/memory.hpp"
 #include "loki/details/utils/segmented_vector.hpp"
 #include "loki/details/utils/unique_factory.hpp"

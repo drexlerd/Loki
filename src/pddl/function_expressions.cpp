@@ -19,6 +19,7 @@
 
 #include "formatter.hpp"
 #include "loki/details/pddl/function.hpp"
+#include "loki/details/utils/collections.hpp"
 
 #include <cassert>
 
@@ -109,6 +110,91 @@ FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(size_t index, Fun
 size_t FunctionExpressionFunctionImpl::get_index() const { return m_index; }
 
 const Function& FunctionExpressionFunctionImpl::get_function() const { return m_function; }
+
+size_t UniquePDDLHasher<const FunctionExpressionNumberImpl&>::operator()(const FunctionExpressionNumberImpl& e) const
+{
+    return UniquePDDLHashCombiner()(e.get_number());
+}
+
+size_t UniquePDDLHasher<const FunctionExpressionBinaryOperatorImpl&>::operator()(const FunctionExpressionBinaryOperatorImpl& e) const
+{
+    return UniquePDDLHashCombiner()(e.get_binary_operator(), e.get_left_function_expression(), e.get_right_function_expression());
+}
+
+size_t UniquePDDLHasher<const FunctionExpressionMultiOperatorImpl&>::operator()(const FunctionExpressionMultiOperatorImpl& e) const
+{
+    return UniquePDDLHashCombiner()(e.get_multi_operator(), get_sorted_vector(e.get_function_expressions()));
+}
+
+size_t UniquePDDLHasher<const FunctionExpressionMinusImpl&>::operator()(const FunctionExpressionMinusImpl& e) const
+{
+    return UniquePDDLHashCombiner()(e.get_function_expression());
+}
+
+size_t UniquePDDLHasher<const FunctionExpressionFunctionImpl&>::operator()(const FunctionExpressionFunctionImpl& e) const
+{
+    return UniquePDDLHashCombiner()(e.get_function());
+}
+
+size_t UniquePDDLHasher<const FunctionExpressionImpl*>::operator()(const FunctionExpressionImpl* e) const
+{
+    return std::visit([](const auto& arg) { return UniquePDDLHasher<decltype(arg)>()(arg); }, *e);
+}
+
+bool UniquePDDLEqualTo<const FunctionExpressionNumberImpl&>::operator()(const FunctionExpressionNumberImpl& l, const FunctionExpressionNumberImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_number() == r.get_number());
+    }
+    return true;
+}
+
+bool UniquePDDLEqualTo<const FunctionExpressionBinaryOperatorImpl&>::operator()(const FunctionExpressionBinaryOperatorImpl& l,
+                                                                                const FunctionExpressionBinaryOperatorImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_binary_operator() == r.get_binary_operator()) && (l.get_left_function_expression() == r.get_left_function_expression())
+               && (l.get_right_function_expression() == r.get_right_function_expression());
+    }
+    return true;
+}
+
+bool UniquePDDLEqualTo<const FunctionExpressionMultiOperatorImpl&>::operator()(const FunctionExpressionMultiOperatorImpl& l,
+                                                                               const FunctionExpressionMultiOperatorImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_multi_operator() == r.get_multi_operator())
+               && (get_sorted_vector(l.get_function_expressions()) == get_sorted_vector(r.get_function_expressions()));
+    }
+    return true;
+}
+
+bool UniquePDDLEqualTo<const FunctionExpressionMinusImpl&>::operator()(const FunctionExpressionMinusImpl& l, const FunctionExpressionMinusImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_function_expression() == r.get_function_expression());
+    }
+    return true;
+}
+
+bool UniquePDDLEqualTo<const FunctionExpressionFunctionImpl&>::operator()(const FunctionExpressionFunctionImpl& l,
+                                                                          const FunctionExpressionFunctionImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (l.get_function() == r.get_function());
+    }
+    return true;
+}
+
+bool UniquePDDLEqualTo<const FunctionExpressionImpl*>::operator()(const FunctionExpressionImpl* l, const FunctionExpressionImpl* r) const
+{
+    return UniquePDDLEqualTo<FunctionExpressionImpl>()(*l, *r);
+}
 
 std::ostream& operator<<(std::ostream& out, const FunctionExpressionNumberImpl& element)
 {

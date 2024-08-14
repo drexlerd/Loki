@@ -19,6 +19,8 @@
 #define LOKI_INCLUDE_LOKI_PDDL_OBJECT_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/equal_to.hpp"
+#include "loki/details/pddl/hash.hpp"
 
 #include <string>
 
@@ -48,6 +50,20 @@ public:
     const std::string& get_name() const;
     const TypeList& get_bases() const;
 };
+
+template<>
+struct UniquePDDLHasher<const ObjectImpl*>
+{
+    size_t operator()(const ObjectImpl* e) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const ObjectImpl*>
+{
+    bool operator()(const ObjectImpl* l, const ObjectImpl* r) const;
+};
+
+extern std::ostream& operator<<(std::ostream& out, const ObjectImpl& element);
 
 }
 

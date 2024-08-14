@@ -19,6 +19,8 @@
 #define LOKI_INCLUDE_LOKI_PDDL_EFFECTS_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/equal_to.hpp"
+#include "loki/details/pddl/hash.hpp"
 
 #include <string>
 
@@ -162,6 +164,78 @@ public:
     size_t get_index() const;
     const Condition& get_condition() const;
     const Effect& get_effect() const;
+};
+
+template<>
+struct UniquePDDLHasher<const EffectLiteralImpl&>
+{
+    size_t operator()(const EffectLiteralImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const EffectAndImpl&>
+{
+    size_t operator()(const EffectAndImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const EffectNumericImpl&>
+{
+    size_t operator()(const EffectNumericImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const EffectConditionalForallImpl&>
+{
+    size_t operator()(const EffectConditionalForallImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const EffectConditionalWhenImpl&>
+{
+    size_t operator()(const EffectConditionalWhenImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const EffectImpl*>
+{
+    size_t operator()(const EffectImpl* e) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const EffectLiteralImpl&>
+{
+    bool operator()(const EffectLiteralImpl& l, const EffectLiteralImpl& r) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const EffectAndImpl&>
+{
+    bool operator()(const EffectAndImpl& l, const EffectAndImpl& r) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const EffectNumericImpl&>
+{
+    bool operator()(const EffectNumericImpl& l, const EffectNumericImpl& r) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const EffectConditionalForallImpl&>
+{
+    bool operator()(const EffectConditionalForallImpl& l, const EffectConditionalForallImpl& r) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const EffectConditionalWhenImpl&>
+{
+    bool operator()(const EffectConditionalWhenImpl& l, const EffectConditionalWhenImpl& r) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const EffectImpl*>
+{
+    bool operator()(const EffectImpl* l, const EffectImpl* r) const;
 };
 
 extern std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element);

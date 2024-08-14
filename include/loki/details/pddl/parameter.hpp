@@ -19,6 +19,8 @@
 #define LOKI_INCLUDE_LOKI_PDDL_PARAMETER_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/equal_to.hpp"
+#include "loki/details/pddl/hash.hpp"
 
 #include <string>
 
@@ -53,6 +55,18 @@ public:
 /// @brief Return true iff specialized_parameter is a specialized version of generalized_parameter
 /// by checking whether the types are compatible
 extern bool is_specialized_parameter(const Parameter& specialized_parameter, const Parameter& generalized_parameter);
+
+template<>
+struct UniquePDDLHasher<const ParameterImpl*>
+{
+    size_t operator()(const ParameterImpl* e) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const ParameterImpl*>
+{
+    bool operator()(const ParameterImpl* l, const ParameterImpl* r) const;
+};
 
 extern std::ostream& operator<<(std::ostream& out, const ParameterImpl& element);
 }

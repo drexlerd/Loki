@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_PDDL_FORMATTER_HPP_
-#define LOKI_INCLUDE_LOKI_PDDL_FORMATTER_HPP_
+#ifndef LOKI_SRC_LOKI_PDDL_FORMATTER_HPP_
+#define LOKI_SRC_LOKI_PDDL_FORMATTER_HPP_
 
 #include "loki/details/pddl/action.hpp"
 #include "loki/details/pddl/atom.hpp"

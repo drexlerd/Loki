@@ -21,6 +21,7 @@
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
+#include "loki/details/utils/collections.hpp"
 
 #include <memory>
 
@@ -38,6 +39,20 @@ size_t PredicateImpl::get_index() const { return m_index; }
 const std::string& PredicateImpl::get_name() const { return m_name; }
 
 const ParameterList& PredicateImpl::get_parameters() const { return m_parameters; }
+
+size_t UniquePDDLHasher<const PredicateImpl*>::operator()(const PredicateImpl* e) const
+{
+    return UniquePDDLHashCombiner()(e->get_name(), get_sorted_vector(e->get_parameters()));
+}
+
+bool UniquePDDLEqualTo<const PredicateImpl*>::operator()(const PredicateImpl* l, const PredicateImpl* r) const
+{
+    if (&l != &r)
+    {
+        return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
+    }
+    return true;
+}
 
 std::ostream& operator<<(std::ostream& out, const PredicateImpl& element)
 {

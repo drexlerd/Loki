@@ -18,8 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_UTILS_UNIQUE_VALUE_FACTORY_HPP_
 #define LOKI_INCLUDE_LOKI_UTILS_UNIQUE_VALUE_FACTORY_HPP_
 
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
 #include "loki/details/utils/segmented_vector.hpp"
 
 #include <memory>
@@ -36,9 +34,9 @@ namespace loki
 /// uniqueness checks and SegmentedVector for continuous and cache-efficient storage of value types.
 /// @tparam HolderType is the holder value type which can be an std::variant.
 /// Note that using a base class value type will result in object slicing.
-/// @tparam Hash the hash function, default uses `Hasher` hasher.
-/// @tparam KeyEqual the comparison function, default uses `EqualTo` comparator.
-template<typename HolderType, typename Hash = Hasher<const HolderType*>, typename KeyEqual = EqualTo<const HolderType*>>
+/// @tparam Hash the hash function.
+/// @tparam KeyEqual the comparison function.
+template<typename HolderType, typename Hash, typename KeyEqual>
 class UniqueFactory
 {
 private:
@@ -68,12 +66,6 @@ public:
     UniqueFactory& operator=(UniqueFactory&& other) = default;
 
     /// @brief Returns a pointer to an existing object or creates it before if it does not exist.
-    /// The `SubType` is not allowed to be copieable because `Hasher` and `EqualTo`
-    /// is implemented to hash and compare simply the pointers.
-    /// The `HolderType` is allowed to be copieable but `Hasher` and `EqualTo`
-    /// will have to take this into account by hashing and comparing the nested `SubType`.
-    /// For example, if `HolderType` is a std::variant, then `Hasher` and `ShallowEqual`
-    /// will hash or compare the nested `SubType` object.
     template<typename SubType, typename... Args>
     requires(!std::is_copy_constructible_v<SubType>) HolderType const* get_or_create(Args&&... args)
     {

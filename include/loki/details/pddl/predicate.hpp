@@ -19,6 +19,8 @@
 #define LOKI_INCLUDE_LOKI_PDDL_PREDICATE_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/equal_to.hpp"
+#include "loki/details/pddl/hash.hpp"
 
 #include <string>
 
@@ -49,6 +51,18 @@ public:
     size_t get_index() const;
     const std::string& get_name() const;
     const ParameterList& get_parameters() const;
+};
+
+template<>
+struct UniquePDDLHasher<const PredicateImpl*>
+{
+    size_t operator()(const PredicateImpl* e) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const PredicateImpl*>
+{
+    bool operator()(const PredicateImpl* l, const PredicateImpl* r) const;
 };
 
 extern std::ostream& operator<<(std::ostream& out, const PredicateImpl& element);

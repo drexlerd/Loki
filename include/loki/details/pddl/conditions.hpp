@@ -19,6 +19,8 @@
 #define LOKI_INCLUDE_LOKI_PDDL_CONDITIONS_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/equal_to.hpp"
+#include "loki/details/pddl/hash.hpp"
 
 #include <string>
 
@@ -197,6 +199,102 @@ public:
     size_t get_index() const;
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionLiteralImpl&>
+{
+    size_t operator()(const ConditionLiteralImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionAndImpl&>
+{
+    size_t operator()(const ConditionAndImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionOrImpl&>
+{
+    size_t operator()(const ConditionOrImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionNotImpl&>
+{
+    size_t operator()(const ConditionNotImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionImplyImpl&>
+{
+    size_t operator()(const ConditionImplyImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionExistsImpl&>
+{
+    size_t operator()(const ConditionExistsImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionForallImpl&>
+{
+    size_t operator()(const ConditionForallImpl& e) const;
+};
+
+template<>
+struct UniquePDDLHasher<const ConditionImpl*>
+{
+    size_t operator()(const ConditionImpl* e) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const ConditionLiteralImpl&>
+{
+    bool operator()(const ConditionLiteralImpl& l, const ConditionLiteralImpl& r) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const ConditionAndImpl&>
+{
+    bool operator()(const ConditionAndImpl& l, const ConditionAndImpl& r) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const ConditionOrImpl&>
+{
+    bool operator()(const ConditionOrImpl& l, const ConditionOrImpl& r) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const ConditionNotImpl&>
+{
+    bool operator()(const ConditionNotImpl& l, const ConditionNotImpl& r) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const ConditionImplyImpl&>
+{
+    bool operator()(const ConditionImplyImpl& l, const ConditionImplyImpl& r) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const ConditionExistsImpl&>
+{
+    bool operator()(const ConditionExistsImpl& l, const ConditionExistsImpl& r) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const ConditionForallImpl&>
+{
+    bool operator()(const ConditionForallImpl& l, const ConditionForallImpl& r) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const ConditionImpl*>
+{
+    bool operator()(const ConditionImpl* l, const ConditionImpl* r) const;
 };
 
 extern std::ostream& operator<<(std::ostream& out, const ConditionLiteralImpl& element);

@@ -19,6 +19,8 @@
 #define LOKI_INCLUDE_LOKI_PDDL_REQUIREMENTS_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/equal_to.hpp"
+#include "loki/details/pddl/hash.hpp"
 
 #include <set>
 #include <string>
@@ -78,6 +80,18 @@ public:
 
     size_t get_index() const;
     const RequirementEnumSet& get_requirements() const;
+};
+
+template<>
+struct UniquePDDLHasher<const RequirementsImpl*>
+{
+    size_t operator()(const RequirementsImpl* e) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const RequirementsImpl*>
+{
+    bool operator()(const RequirementsImpl* l, const RequirementsImpl* r) const;
 };
 
 extern std::ostream& operator<<(std::ostream& out, const RequirementsImpl& element);

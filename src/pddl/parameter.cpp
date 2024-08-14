@@ -20,6 +20,7 @@
 #include "formatter.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
+#include "loki/details/utils/collections.hpp"
 
 #include <cassert>
 
@@ -43,6 +44,20 @@ bool is_specialized_parameter(const Parameter& specialized_parameter, const Para
         }
     }
     return false;
+}
+
+size_t UniquePDDLHasher<const ParameterImpl*>::operator()(const ParameterImpl* e) const
+{
+    return UniquePDDLHashCombiner()(e->get_variable(), get_sorted_vector(e->get_bases()));
+}
+
+bool UniquePDDLEqualTo<const ParameterImpl*>::operator()(const ParameterImpl* l, const ParameterImpl* r) const
+{
+    if (&l != &r)
+    {
+        return (l->get_variable() == r->get_variable()) && (get_sorted_vector(l->get_bases()) == get_sorted_vector(r->get_bases()));
+    }
+    return true;
 }
 
 std::ostream& operator<<(std::ostream& out, const ParameterImpl& element)

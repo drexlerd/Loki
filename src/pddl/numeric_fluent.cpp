@@ -30,6 +30,20 @@ const Function& NumericFluentImpl::get_function() const { return m_function; }
 
 double NumericFluentImpl::get_number() const { return m_number; }
 
+size_t UniquePDDLHasher<const NumericFluentImpl*>::operator()(const NumericFluentImpl* e) const
+{
+    return UniquePDDLHashCombiner()(e->get_number(), e->get_function());
+}
+
+bool UniquePDDLEqualTo<const NumericFluentImpl*>::operator()(const NumericFluentImpl* l, const NumericFluentImpl* r) const
+{
+    if (&l != &r)
+    {
+        return (l->get_number() == r->get_number()) && (l->get_function() == r->get_function());
+    }
+    return true;
+}
+
 std::ostream& operator<<(std::ostream& out, const NumericFluentImpl& element)
 {
     auto formatter = PDDLFormatter();

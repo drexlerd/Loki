@@ -20,13 +20,14 @@
 #include "formatter.hpp"
 #include "loki/details/pddl/action.hpp"
 #include "loki/details/pddl/axiom.hpp"
+#include "loki/details/pddl/equal_to.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
+#include "loki/details/pddl/hash.hpp"
 #include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/predicate.hpp"
 #include "loki/details/pddl/requirements.hpp"
 #include "loki/details/pddl/type.hpp"
-#include "loki/details/utils/equal_to.hpp"
-#include "loki/details/utils/hash.hpp"
+#include "loki/details/utils/collections.hpp"
 
 #include <iostream>
 
@@ -76,6 +77,33 @@ const FunctionSkeletonList& DomainImpl::get_functions() const { return m_functio
 const ActionList& DomainImpl::get_actions() const { return m_actions; }
 
 const AxiomList& DomainImpl::get_axioms() const { return m_axioms; }
+
+size_t UniquePDDLHasher<const DomainImpl*>::operator()(const DomainImpl* e) const
+{
+    return UniquePDDLHashCombiner()(e->get_name(),
+                                    e->get_requirements(),
+                                    get_sorted_vector(e->get_types()),
+                                    get_sorted_vector(e->get_constants()),
+                                    get_sorted_vector(e->get_predicates()),
+                                    get_sorted_vector(e->get_functions()),
+                                    get_sorted_vector(e->get_actions()),
+                                    get_sorted_vector(e->get_axioms()));
+}
+
+bool UniquePDDLEqualTo<const DomainImpl*>::operator()(const DomainImpl* l, const DomainImpl* r) const
+{
+    if (&l != &r)
+    {
+        return (l->get_name() == r->get_name()) && (l->get_requirements() == r->get_requirements())
+               && (get_sorted_vector(l->get_types()) == get_sorted_vector(r->get_types()))
+               && (get_sorted_vector(l->get_constants()) == get_sorted_vector(r->get_constants()))
+               && (get_sorted_vector(l->get_predicates()) == get_sorted_vector(r->get_predicates()))
+               && (get_sorted_vector(l->get_functions()) == get_sorted_vector(r->get_functions()))
+               && (get_sorted_vector(l->get_actions()) == get_sorted_vector(r->get_actions()))
+               && (get_sorted_vector(l->get_axioms()) == get_sorted_vector(r->get_axioms()));
+    }
+    return true;
+}
 
 std::ostream& operator<<(std::ostream& out, const DomainImpl& element)
 {

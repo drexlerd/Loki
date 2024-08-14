@@ -19,6 +19,8 @@
 #define LOKI_INCLUDE_LOKI_PDDL_TYPE_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/equal_to.hpp"
+#include "loki/details/pddl/hash.hpp"
 
 #include <string>
 
@@ -54,6 +56,18 @@ extern TypeSet collect_types_from_hierarchy(const TypeList& types);
 
 /// @brief Return true iff type is a subtype of or equal to one of the types in parent_types
 extern bool is_subtype_or_equal(const Type& type, const TypeList& parent_types);
+
+template<>
+struct UniquePDDLHasher<const TypeImpl*>
+{
+    size_t operator()(const TypeImpl* e) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const TypeImpl*>
+{
+    bool operator()(const TypeImpl* l, const TypeImpl* r) const;
+};
 
 extern std::ostream& operator<<(std::ostream& out, const TypeImpl& element);
 

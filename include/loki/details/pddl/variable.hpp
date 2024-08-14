@@ -19,6 +19,8 @@
 #define LOKI_INCLUDE_LOKI_PDDL_VARIABLE_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/equal_to.hpp"
+#include "loki/details/pddl/hash.hpp"
 
 #include <string>
 
@@ -48,6 +50,18 @@ public:
 };
 
 extern VariableSet collect_free_variables(const loki::ConditionImpl& condition);
+
+template<>
+struct UniquePDDLHasher<const VariableImpl*>
+{
+    size_t operator()(const VariableImpl* e) const;
+};
+
+template<>
+struct UniquePDDLEqualTo<const VariableImpl*>
+{
+    bool operator()(const VariableImpl* l, const VariableImpl* r) const;
+};
 
 extern std::ostream& operator<<(std::ostream& out, const VariableImpl& element);
 

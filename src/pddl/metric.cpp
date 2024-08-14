@@ -50,6 +50,20 @@ OptimizationMetricEnum OptimizationMetricImpl::get_optimization_metric() const {
 
 const FunctionExpression& OptimizationMetricImpl::get_function_expression() const { return m_function_expression; }
 
+size_t UniquePDDLHasher<const OptimizationMetricImpl*>::operator()(const OptimizationMetricImpl* e) const
+{
+    return UniquePDDLHashCombiner()(e->get_optimization_metric(), e->get_function_expression());
+}
+
+bool UniquePDDLEqualTo<const OptimizationMetricImpl*>::operator()(const OptimizationMetricImpl* l, const OptimizationMetricImpl* r) const
+{
+    if (&l != &r)
+    {
+        return (l->get_optimization_metric() == r->get_optimization_metric()) && (l->get_function_expression() == r->get_function_expression());
+    }
+    return true;
+}
+
 std::ostream& operator<<(std::ostream& out, const OptimizationMetricImpl& element)
 {
     auto formatter = PDDLFormatter();

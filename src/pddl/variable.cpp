@@ -98,6 +98,17 @@ VariableSet collect_free_variables(const ConditionImpl& condition)
     return free_variables;
 }
 
+size_t UniquePDDLHasher<const VariableImpl*>::operator()(const VariableImpl* e) const { return UniquePDDLHashCombiner()(e->get_name()); }
+
+bool UniquePDDLEqualTo<const VariableImpl*>::operator()(const VariableImpl* l, const VariableImpl* r) const
+{
+    if (&l != &r)
+    {
+        return (l->get_name() == r->get_name());
+    }
+    return true;
+}
+
 std::ostream& operator<<(std::ostream& out, const VariableImpl& element)
 {
     auto formatter = PDDLFormatter();
