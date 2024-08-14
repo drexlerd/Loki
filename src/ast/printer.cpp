@@ -80,6 +80,7 @@ std::string parse_text(const ast::RequirementTimedInitialLiterals&, const Defaul
 std::string parse_text(const ast::RequirementPreferences&, const DefaultFormatterOptions&) { return ":preferences"; }
 std::string parse_text(const ast::RequirementConstraints&, const DefaultFormatterOptions&) { return ":constraints"; }
 std::string parse_text(const ast::RequirementActionCosts&, const DefaultFormatterOptions&) { return ":action-costs"; }
+std::string parse_text(const ast::RequirementNonDeterministic&, const DefaultFormatterOptions&) { return ":non-deterministic"; }
 
 std::string parse_text(const ast::Requirement& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
 

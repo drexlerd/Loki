@@ -42,7 +42,8 @@ std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string = { 
                                                                                 { RequirementEnum::TIMED_INITIAL_LITERALS, ":timed-initial-literals" },
                                                                                 { RequirementEnum::PREFERENCES, ":preferences" },
                                                                                 { RequirementEnum::CONSTRAINTS, ":constraints" },
-                                                                                { RequirementEnum::ACTION_COSTS, ":action-costs" } };
+                                                                                { RequirementEnum::ACTION_COSTS, ":action-costs" },
+                                                                                { RequirementEnum::NON_DETERMINISTIC, ":non-deterministic" } };
 
 const std::string& to_string(RequirementEnum requirement)
 {

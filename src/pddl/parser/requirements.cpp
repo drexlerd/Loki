@@ -187,6 +187,13 @@ RequirementEnumSet parse(const ast::RequirementActionCosts&, Context& context)
     return { RequirementEnum::ACTION_COSTS };
 }
 
+RequirementEnumSet parse(const ast::RequirementNonDeterministic&, Context& context)
+{
+    // Track
+    context.references.track(RequirementEnum::NON_DETERMINISTIC);
+    return { RequirementEnum::NON_DETERMINISTIC };
+}
+
 RequirementEnumSet parse(const ast::Requirement& node, Context& context) { return boost::apply_visitor(RequirementVisitor(context), node); }
 
 RequirementVisitor::RequirementVisitor(Context& context_) : context(context_) {}

@@ -61,6 +61,7 @@ struct RequirementTimedInitialLiterals;
 struct RequirementPreferences;
 struct RequirementConstraints;
 struct RequirementActionCosts;
+struct RequirementNonDeterministic;
 struct Requirement;
 
 struct Type;
@@ -341,6 +342,10 @@ struct RequirementActionCosts : x3::position_tagged
 {
 };
 
+struct RequirementNonDeterministic : x3::position_tagged
+{
+};
+
 struct Requirement :
     x3::position_tagged,
     x3::variant<RequirementStrips,
@@ -361,7 +366,8 @@ struct Requirement :
                 RequirementTimedInitialLiterals,
                 RequirementPreferences,
                 RequirementConstraints,
-                RequirementActionCosts>
+                RequirementActionCosts,
+                RequirementNonDeterministic>
 {
     using base_type::base_type;
     using base_type::operator=;

@@ -47,6 +47,7 @@ enum class RequirementEnum
     PREFERENCES,
     CONSTRAINTS,
     ACTION_COSTS,
+    NON_DETERMINISTIC,
 };
 
 using RequirementEnumSet = std::set<RequirementEnum>;
