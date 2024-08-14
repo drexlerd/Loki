@@ -99,6 +99,18 @@ const Condition& EffectConditionalWhenImpl::get_condition() const { return m_con
 
 const Effect& EffectConditionalWhenImpl::get_effect() const { return m_effect; }
 
+/* EffectOneofImpl */
+EffectOneofImpl::EffectOneofImpl(size_t index, EffectList effects) :
+    m_index(index),
+    m_effects(std::move(effects))
+{
+}
+
+size_t EffectOneofImpl::get_index() const { return m_index; }
+
+const EffectList& EffectOneofImpl::get_effects() const { return m_effects; }
+
+
 std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element)
 {
     auto formatter = PDDLFormatter();
@@ -128,6 +140,13 @@ std::ostream& operator<<(std::ostream& out, const EffectConditionalForallImpl& e
 }
 
 std::ostream& operator<<(std::ostream& out, const EffectConditionalWhenImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const EffectOneofImpl& element)
 {
     auto formatter = PDDLFormatter();
     formatter.write(element, out);

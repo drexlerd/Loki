@@ -338,6 +338,18 @@ void PDDLFormatter::write(const EffectConditionalWhenImpl& element, std::ostream
     out << ")";
 }
 
+void PDDLFormatter::write(const EffectOneofImpl& element, std::ostream& out)
+{
+    out << "(oneof ";
+    for (size_t i = 0; i < element.get_effects().size(); ++i)
+    {
+        if (i != 0)
+            out << " ";
+        write(*element.get_effects()[i], out);
+    }
+    out << ")";
+}
+
 void PDDLFormatter::write(const EffectImpl& element, std::ostream& out)
 {
     std::visit([this, &out](const auto& arg) { this->write(arg, out); }, element);

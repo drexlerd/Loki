@@ -191,6 +191,12 @@ struct UniquePDDLHasher<const EffectConditionalWhenImpl&>
 };
 
 template<>
+struct UniquePDDLHasher<const EffectOneofImpl&>
+{
+    size_t operator()(const EffectOneofImpl& e) const;
+};
+
+template<>
 struct UniquePDDLHasher<const EffectImpl*>
 {
     size_t operator()(const EffectImpl* e) const;

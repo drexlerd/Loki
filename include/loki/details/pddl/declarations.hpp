@@ -115,7 +115,9 @@ class EffectConditionalForallImpl;
 using EffectConditionalForall = const EffectConditionalForallImpl*;
 class EffectConditionalWhenImpl;
 using EffectConditionalWhen = const EffectConditionalWhenImpl*;
-using EffectImpl = std::variant<EffectLiteralImpl, EffectAndImpl, EffectNumericImpl, EffectConditionalForallImpl, EffectConditionalWhenImpl>;
+class EffectOneofImpl;
+using EffectOneof = const EffectOneofImpl*;
+using EffectImpl = std::variant<EffectLiteralImpl, EffectAndImpl, EffectNumericImpl, EffectConditionalForallImpl, EffectConditionalWhenImpl, EffectOneofImpl>;
 using Effect = const EffectImpl*;
 using EffectList = std::vector<Effect>;
 

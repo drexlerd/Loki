@@ -166,6 +166,8 @@ public:
 
     Effect get_or_create_effect_conditional_when(Condition condition, Effect effect);
 
+    Effect get_or_create_effect_oneof(EffectList effects);
+
     Action
     get_or_create_action(std::string name, size_t original_arity, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);
 

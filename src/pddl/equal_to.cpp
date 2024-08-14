@@ -201,6 +201,15 @@ bool UniquePDDLEqualTo<const EffectConditionalWhenImpl&>::operator()(const Effec
     return true;
 }
 
+bool UniquePDDLEqualTo<const EffectOneofImpl&>::operator()(const EffectOneofImpl& l, const EffectOneofImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (get_sorted_vector(l.get_effects()) == get_sorted_vector(r.get_effects()));
+    }
+    return true;
+}
+
 bool UniquePDDLEqualTo<const EffectImpl*>::operator()(const EffectImpl* l, const EffectImpl* r) const { return UniquePDDLEqualTo<EffectImpl>()(*l, *r); }
 
 bool UniquePDDLEqualTo<const FunctionExpressionNumberImpl&>::operator()(const FunctionExpressionNumberImpl& l, const FunctionExpressionNumberImpl& r) const

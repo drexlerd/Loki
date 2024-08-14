@@ -164,6 +164,29 @@ public:
     const Effect& get_effect() const;
 };
 
+class EffectOneofImpl
+{
+private:
+    size_t m_index;
+    EffectList m_effects;
+
+    EffectOneofImpl(size_t index, EffectList effects);
+
+    // Give access to the constructor.
+    template<typename HolderType, typename Hash, typename EqualTo>
+    friend class UniqueFactory;
+
+public:
+    // moveable but not copyable
+    EffectOneofImpl(const EffectOneofImpl& other) = delete;
+    EffectOneofImpl& operator=(const EffectOneofImpl& other) = delete;
+    EffectOneofImpl(EffectOneofImpl&& other) = default;
+    EffectOneofImpl& operator=(EffectOneofImpl&& other) = default;
+
+    size_t get_index() const;
+    const EffectList& get_effects() const;
+};
+
 extern std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectAndImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectNumericImpl& element);

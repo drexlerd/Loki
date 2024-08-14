@@ -73,6 +73,7 @@ public:
     void write(const EffectNumericImpl& element, std::ostream& out);
     void write(const EffectConditionalForallImpl& element, std::ostream& out);
     void write(const EffectConditionalWhenImpl& element, std::ostream& out);
+    void write(const EffectOneofImpl& element, std::ostream& out);
     void write(const EffectImpl& element, std::ostream& out);
     void write(const FunctionExpressionNumberImpl& element, std::ostream& out);
     void write(const FunctionExpressionBinaryOperatorImpl& element, std::ostream& out);

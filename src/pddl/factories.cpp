@@ -191,6 +191,11 @@ Effect PDDLFactories::get_or_create_effect_conditional_when(Condition condition,
     return m_factories.get<EffectFactory>().get_or_create<EffectConditionalWhenImpl>(std::move(condition), std::move(effect));
 }
 
+Effect PDDLFactories::get_or_create_effect_oneof(EffectList effects_)
+{
+    return m_factories.get<EffectFactory>().get_or_create<EffectOneofImpl>(std::move(effects_));
+}
+
 Action PDDLFactories::get_or_create_action(std::string name,
                                            size_t original_arity,
                                            ParameterList parameters,
