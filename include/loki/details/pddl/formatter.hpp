@@ -20,94 +20,103 @@
 
 #include "loki/details/pddl/declarations.hpp"
 
-#include <concepts>
 #include <cstddef>
 #include <ostream>
-#include <sstream>
-#include <type_traits>
 
 namespace loki
 {
 
-struct DefaultFormatterOptions
-{
-    // The indentation in the current level.
-    int indent = 0;
-    // The amount of indentation added per nesting
-    int add_indent = 0;
-};
-
-class DefaultFormatter
-{
-public:
-    void write(const ActionImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const AtomImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const AxiomImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const ConditionLiteralImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const ConditionAndImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const ConditionOrImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const ConditionNotImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const ConditionImplyImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const ConditionExistsImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const ConditionForallImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const ConditionImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const DomainImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const EffectLiteralImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const EffectAndImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const EffectNumericImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const EffectConditionalForallImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const EffectConditionalWhenImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const EffectImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const FunctionExpressionNumberImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const FunctionExpressionBinaryOperatorImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const FunctionExpressionMultiOperatorImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const FunctionExpressionMinusImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const FunctionExpressionFunctionImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const FunctionExpressionImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const FunctionSkeletonImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const FunctionImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const LiteralImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const OptimizationMetricImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const NumericFluentImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const ObjectImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const ParameterImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const PredicateImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const ProblemImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const RequirementsImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const TermObjectImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const TermVariableImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const TermImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const TypeImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-    void write(const VariableImpl& element, const DefaultFormatterOptions& options, std::ostream& out) const;
-};
-
-/// @brief `StreamWriter` is a utility class to write to a stream using `operator<<`.
-template<typename T, typename Formatter = DefaultFormatter, typename FormatterOptions = DefaultFormatterOptions>
-requires std::is_default_constructible_v<Formatter> && std::is_default_constructible_v<FormatterOptions>
-class StreamWriter
+class PDDLFormatter
 {
 private:
-    const T& m_element;
-    const Formatter& m_formatter;
-    FormatterOptions m_options;
+    // The indentation in the current level.
+    size_t m_indent = 0;
+    // The amount of indentation added per nesting
+    size_t m_add_indent = 0;
 
 public:
-    StreamWriter(const T& element, const Formatter& formatter = Formatter(), const FormatterOptions& options = FormatterOptions());
+    PDDLFormatter(size_t indent = 0, size_t add_indent = 4);
 
-    std::string str() const;
-
-    const T& get_element() const;
-    const Formatter& get_formatter() const;
-    const FormatterOptions& get_options() const;
+    void write(const ActionImpl& element, std::ostream& out);
+    void write(const AtomImpl& element, std::ostream& out);
+    void write(const AxiomImpl& element, std::ostream& out);
+    void write(const ConditionLiteralImpl& element, std::ostream& out);
+    void write(const ConditionAndImpl& element, std::ostream& out);
+    void write(const ConditionOrImpl& element, std::ostream& out);
+    void write(const ConditionNotImpl& element, std::ostream& out);
+    void write(const ConditionImplyImpl& element, std::ostream& out);
+    void write(const ConditionExistsImpl& element, std::ostream& out);
+    void write(const ConditionForallImpl& element, std::ostream& out);
+    void write(const ConditionImpl& element, std::ostream& out);
+    void write(const DomainImpl& element, std::ostream& out);
+    void write(const EffectLiteralImpl& element, std::ostream& out);
+    void write(const EffectAndImpl& element, std::ostream& out);
+    void write(const EffectNumericImpl& element, std::ostream& out);
+    void write(const EffectConditionalForallImpl& element, std::ostream& out);
+    void write(const EffectConditionalWhenImpl& element, std::ostream& out);
+    void write(const EffectImpl& element, std::ostream& out);
+    void write(const FunctionExpressionNumberImpl& element, std::ostream& out);
+    void write(const FunctionExpressionBinaryOperatorImpl& element, std::ostream& out);
+    void write(const FunctionExpressionMultiOperatorImpl& element, std::ostream& out);
+    void write(const FunctionExpressionMinusImpl& element, std::ostream& out);
+    void write(const FunctionExpressionFunctionImpl& element, std::ostream& out);
+    void write(const FunctionExpressionImpl& element, std::ostream& out);
+    void write(const FunctionSkeletonImpl& element, std::ostream& out);
+    void write(const FunctionImpl& element, std::ostream& out);
+    void write(const LiteralImpl& element, std::ostream& out);
+    void write(const OptimizationMetricImpl& element, std::ostream& out);
+    void write(const NumericFluentImpl& element, std::ostream& out);
+    void write(const ObjectImpl& element, std::ostream& out);
+    void write(const ParameterImpl& element, std::ostream& out);
+    void write(const PredicateImpl& element, std::ostream& out);
+    void write(const ProblemImpl& element, std::ostream& out);
+    void write(const RequirementsImpl& element, std::ostream& out);
+    void write(const TermObjectImpl& element, std::ostream& out);
+    void write(const TermVariableImpl& element, std::ostream& out);
+    void write(const TermImpl& element, std::ostream& out);
+    void write(const TypeImpl& element, std::ostream& out);
+    void write(const VariableImpl& element, std::ostream& out);
 };
 
 /// @brief Write to a stream.
-template<typename T, typename Formatter, typename FormatterOptions>
-std::ostream& operator<<(std::ostream& out, const StreamWriter<T, Formatter, FormatterOptions>& writer)
-{
-    writer.get_formatter().write(writer.get_element(), writer.get_options(), out);
-    return out;
-}
+extern std::ostream& operator<<(std::ostream& out, const ActionImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const AtomImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const AxiomImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionLiteralImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionAndImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionOrImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionNotImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionImplyImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionExistsImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionForallImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const DomainImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectAndImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectNumericImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectConditionalForallImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectConditionalWhenImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionNumberImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionBinaryOperatorImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionMultiOperatorImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionMinusImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionFunctionImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionSkeletonImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const LiteralImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const OptimizationMetricImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const NumericFluentImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ParameterImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const PredicateImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ProblemImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const RequirementsImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const TermObjectImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const TermVariableImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const TermImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const TypeImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const VariableImpl& element);
 
 }
 

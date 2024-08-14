@@ -67,7 +67,7 @@ int main()
     // Parse the domain
     auto domain_parser = loki::DomainParser(std::string(DATA_DIR) + "gripper/domain.pddl");
     const auto domain = domain_parser.get_domain();
-    std::cout << loki::StreamWriter(*domain) << std::endl << std::endl;
+    std::cout << *domain << std::endl << std::endl;
 
     const loki::PDDLPositionCache& position_cache = domain_parser.get_position_cache();
     const loki::PDDLErrorHandler& error_handler = position_cache.get_error_handler();

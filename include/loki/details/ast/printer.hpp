@@ -24,6 +24,14 @@
 namespace loki
 {
 
+struct DefaultFormatterOptions
+{
+    // The indentation in the current level.
+    int indent = 0;
+    // The amount of indentation added per nesting
+    int add_indent = 0;
+};
+
 /**
  * Domain
  */

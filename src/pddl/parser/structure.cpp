@@ -68,7 +68,7 @@ Action parse(const ast::Action& node, Context& context)
         {
             if (!context.quiet)
             {
-                std::cout << "Removed unused parameter " << StreamWriter(*parameter) << " from action " << name << std::endl;
+                std::cout << "Removed unused parameter " << *parameter << " from action " << name << std::endl;
             }
         }
     }
