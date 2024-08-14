@@ -19,8 +19,6 @@
 #define LOKI_INCLUDE_LOKI_PDDL_HASH_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/concepts.hpp"
-#include "loki/details/utils/unique_factory.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -79,11 +77,10 @@ struct UniquePDDLHasher<ForwardRange>
 };
 
 /// Spezialization for std::variant.
-template<typename Variant>
-requires IsVariant<Variant>
-struct UniquePDDLHasher<Variant>
+template<typename... Ts>
+struct UniquePDDLHasher<std::variant<Ts...>>
 {
-    size_t operator()(const Variant& variant) const
+    size_t operator()(const std::variant<Ts...>& variant) const
     {
         return std::visit([](const auto& arg) { return UniquePDDLHasher<decltype(arg)>()(arg); }, variant);
     }

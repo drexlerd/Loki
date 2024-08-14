@@ -19,7 +19,6 @@
 #define LOKI_INCLUDE_LOKI_PDDL_EQUAL_TO_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/utils/concepts.hpp"
 
 #include <functional>
 #include <variant>
