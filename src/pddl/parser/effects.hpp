@@ -48,6 +48,8 @@ struct AssignOperatorVisitor : boost::static_visitor<AssignOperatorEnum>
 /* Effects */
 extern Effect parse(const std::vector<ast::EffectNumericFluentTotalCostOrEffect>& effect_nodes, Context& context);
 extern Effect parse(const std::vector<ast::Effect>& effect_nodes, Context& context);
+extern Effect parse(const ast::EffectRootDeterministic& node, Context& context);
+extern Effect parse(const ast::EffectRootNonDeterministic& node, Context& context);
 extern Effect parse(const ast::EffectRoot& node, Context& context);
 extern Effect parse(const ast::Effect& node, Context& context);
 extern Effect parse(const ast::EffectProductionLiteral& node, Context& context);

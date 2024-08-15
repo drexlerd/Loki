@@ -546,6 +546,15 @@ std::string parse_text(const ast::EffectNumericFluentTotalCostOrEffect& node, co
     return boost::apply_visitor(NodeVisitorPrinter(options), node);
 }
 
+std::string parse_text(const ast::EffectRootDeterministic& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
+
+std::string parse_text(const ast::EffectRootNonDeterministic& node, const DefaultFormatterOptions& options)
+{
+    std::stringstream ss;
+    ss << "(oneof " << parse_text(node.possibilities, options) << ")";
+    return ss.str();
+}
+
 std::string parse_text(const ast::EffectRoot& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
 
 std::string parse_text(const ast::ActionSymbol& node, const DefaultFormatterOptions& options) { return parse_text(node.name, options); }

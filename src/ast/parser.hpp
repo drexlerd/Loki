@@ -172,6 +172,8 @@ struct EffectConditionalForallClass;
 struct EffectConditionalWhenClass;
 struct EffectConditionalClass;
 struct EffectNumericFluentTotalCostOrEffectClass;
+struct EffectRootDeterministicClass;
+struct EffectRootNonDeterministicClass;
 struct EffectRootClass;
 struct ActionSymbolClass;
 struct ActionBodyClass;
@@ -370,6 +372,8 @@ typedef x3::rule<EffectProductionClass, ast::EffectProduction> effect_production
 typedef x3::rule<EffectConditionalForallClass, ast::EffectConditionalForall> effect_conditional_forall_type;
 typedef x3::rule<EffectConditionalWhenClass, ast::EffectConditionalWhen> effect_conditional_when_type;
 typedef x3::rule<EffectConditionalClass, ast::EffectConditional> effect_conditional_type;
+typedef x3::rule<EffectRootDeterministicClass, ast::EffectRootDeterministic> effect_root_deterministic_type;
+typedef x3::rule<EffectRootNonDeterministicClass, ast::EffectRootDeterministic> effect_root_non_deterministic_type;
 typedef x3::rule<EffectRootClass, ast::EffectRoot> effect_root_type;
 typedef x3::rule<EffectNumericFluentTotalCostOrEffectClass, ast::EffectNumericFluentTotalCostOrEffect> effect_numeric_fluent_total_cost_or_effect_type;
 

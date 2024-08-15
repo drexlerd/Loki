@@ -188,6 +188,8 @@ effect_conditional_forall_type const effect_conditional_forall = "effect_conditi
 effect_conditional_when_type const effect_conditional_when = "effect_conditional_when";
 effect_conditional_type const effect_conditional = "effect_conditional";
 effect_numeric_fluent_total_cost_or_effect_type const effect_numeric_fluent_total_cost_or_effect = "effect_numeric_fluent_total_cost_or_effect";
+effect_root_deterministic_type const effect_root_deterministic = "effect_root_deterministic";
+effect_root_non_deterministic_type const effect_root_non_deterministic = "effect_root_non_deterministic";
 effect_root_type const effect_root = "effect_root";
 action_symbol_type const action_symbol = "action_symbol";
 action_body_type const action_body = "action_body";
@@ -395,8 +397,10 @@ const auto assign_operator_def =
 // For action cost effects only
 const auto numeric_term_def = function_expression_number | function_expression_head;
 
-const auto effect_root_def = ((lit('(') >> keyword_lit("and")) > *effect_numeric_fluent_total_cost_or_effect > lit(')')) | effect_conditional
+const auto effect_root_deterministic_def = ((lit('(') >> keyword_lit("and")) > *effect_numeric_fluent_total_cost_or_effect > lit(')')) | effect_conditional
                              | effect_production | effect_production_numeric_fluent_total_cost;
+const auto effect_root_non_deterministic_def = ((lit('(') >> keyword_lit("oneof")) > *effect_root_deterministic > lit(')'));
+const auto effect_root_def = effect_root_deterministic | effect_root_non_deterministic;
 const auto effect_def = ((lit('(') >> keyword_lit("and")) > *effect > lit(')')) | effect_conditional | effect_production;
 const auto effect_numeric_fluent_total_cost_or_effect_def = effect_production_numeric_fluent_total_cost | effect;
 const auto effect_production_literal_def = literal;
@@ -601,6 +605,8 @@ BOOST_SPIRIT_DEFINE(effect,
                     effect_conditional_when,
                     effect_conditional,
                     effect_numeric_fluent_total_cost_or_effect,
+                    effect_root_deterministic,
+                    effect_root_non_deterministic,
                     effect_root,
                     action_symbol,
                     action_body,
@@ -995,6 +1001,12 @@ struct EffectConditionalClass : x3::annotate_on_success
 {
 };
 struct EffectNumericFluentTotalCostOrEffectClass : x3::annotate_on_success
+{
+};
+struct EffectRootDeterministicClass : x3::annotate_on_success
+{
+};
+struct EffectRootNonDeterministicClass : x3::annotate_on_success
 {
 };
 struct EffectRootClass : x3::annotate_on_success

@@ -61,6 +61,19 @@ Effect parse(const std::vector<ast::Effect>& effect_nodes, Context& context)
     return context.factories.get_or_create_effect_and(effect_list);
 }
 
+Effect parse(const ast::EffectRootDeterministic& node, Context& context) { return boost::apply_visitor(EffectVisitor(context), node); }
+
+Effect parse(const ast::EffectRootNonDeterministic& node, Context& context) {
+    test_undefined_requirement(RequirementEnum::NON_DETERMINISTIC, node, context);
+    context.references.untrack(RequirementEnum::NON_DETERMINISTIC);
+    auto effect_list = EffectList();
+    for (const auto& effect_node : node.possibilities)
+    {
+        effect_list.push_back(parse(effect_node, context));
+    }
+    return context.factories.get_or_create_effect_oneof(effect_list);
+}
+
 Effect parse(const ast::EffectRoot& node, Context& context) { return boost::apply_visitor(EffectVisitor(context), node); }
 
 Effect parse(const ast::Effect& node, Context& context) { return boost::apply_visitor(EffectVisitor(context), node); }

@@ -156,6 +156,8 @@ extern std::string parse_text(const ast::EffectConditionalForall& node, const De
 extern std::string parse_text(const ast::EffectConditionalWhen& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::EffectConditional& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::EffectNumericFluentTotalCostOrEffect& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::EffectRootDeterministic& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::EffectRootNonDeterministic& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::EffectRoot& node, const DefaultFormatterOptions& options = {});
 
 extern std::string parse_text(const ast::ActionSymbol& node, const DefaultFormatterOptions& options = {});

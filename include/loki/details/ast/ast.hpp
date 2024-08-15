@@ -157,6 +157,8 @@ struct EffectConditionalForall;
 struct EffectConditionalWhen;
 struct EffectConditional;
 struct EffectNumericFluentTotalCostOrEffect;
+struct EffectRootDeterministic;
+struct EffectRootNonDeterministic;
 struct EffectRoot;
 
 struct ActionSymbol;
@@ -890,9 +892,20 @@ struct EffectNumericFluentTotalCostOrEffect : x3::position_tagged, x3::variant<E
     using base_type::operator=;
 };
 
-struct EffectRoot :
+struct EffectRootDeterministic :
     x3::position_tagged,
     x3::variant<EffectProduction, EffectConditional, EffectProductionNumericFluentTotalCost, std::vector<EffectNumericFluentTotalCostOrEffect>>
+{
+    using base_type::base_type;
+    using base_type::operator=;
+};
+
+struct EffectRootNonDeterministic : x3::position_tagged
+{
+    std::vector<EffectRootDeterministic> possibilities;
+};
+
+struct EffectRoot : x3::position_tagged, x3::variant<EffectRootDeterministic, EffectRootNonDeterministic>
 {
     using base_type::base_type;
     using base_type::operator=;

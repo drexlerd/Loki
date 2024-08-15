@@ -153,6 +153,8 @@ BOOST_SPIRIT_INSTANTIATE(effect_conditional_forall_type, iterator_type, context_
 BOOST_SPIRIT_INSTANTIATE(effect_conditional_when_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(effect_conditional_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(effect_numeric_fluent_total_cost_or_effect_type, iterator_type, context_type)
+BOOST_SPIRIT_INSTANTIATE(effect_root_deterministic_type, iterator_type, context_type)
+BOOST_SPIRIT_INSTANTIATE(effect_root_non_deterministic_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(effect_root_type, iterator_type, context_type)
 
 BOOST_SPIRIT_INSTANTIATE(action_symbol_type, iterator_type, context_type)
