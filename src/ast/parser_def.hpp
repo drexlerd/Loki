@@ -89,6 +89,7 @@ requirement_timed_initial_literals_type const requirement_timed_initial_literals
 requirement_preferences_type const requirement_preferences = "requirement_preferences";
 requirement_constraints_type const requirement_constraints = "requirement_constraints";
 requirement_action_costs_type const requirement_action_costs = "requirement_action_costs";
+requirement_non_deterministic_type const requirement_non_deterministic = "requirement_non_deterministic";
 requirement_type const requirement = "requirement";
 
 type_type const type = "type";
@@ -292,11 +293,12 @@ const auto requirement_timed_initial_literals_def = keyword_lit(":timed-initial-
 const auto requirement_preferences_def = keyword_lit(":preferences") > x3::attr(ast::RequirementPreferences {});
 const auto requirement_constraints_def = keyword_lit(":constraints") > x3::attr(ast::RequirementConstraints {});
 const auto requirement_action_costs_def = keyword_lit(":action-costs") > x3::attr(ast::RequirementActionCosts {});
+const auto requirement_non_deterministic_def = keyword_lit(":non-deterministic") > x3::attr(ast::RequirementNonDeterministic {});
 const auto requirement_def = requirement_strips | requirement_typing | requirement_negative_preconditions | requirement_disjunctive_preconditions
                              | requirement_equality | requirement_existential_preconditions | requirement_universal_preconditions
                              | requirement_quantified_preconditions | requirement_conditional_effects | requirement_fluents | requirement_object_fluents
                              | requirement_numeric_fluents | requirement_adl | requirement_durative_actions | requirement_derived_predicates
-                             | requirement_timed_initial_literals | requirement_preferences | requirement_constraints | requirement_action_costs;
+                             | requirement_timed_initial_literals | requirement_preferences | requirement_constraints | requirement_action_costs | requirement_non_deterministic;
 
 const auto type_def = type_object | type_number | type_either | name;
 const auto type_object_def = keyword_lit("object") > x3::attr(ast::TypeObject {});
@@ -518,6 +520,7 @@ BOOST_SPIRIT_DEFINE(requirement_strips,
                     requirement_preferences,
                     requirement_constraints,
                     requirement_action_costs,
+                    requirement_non_deterministic,
                     requirement)
 
 BOOST_SPIRIT_DEFINE(type,
@@ -736,6 +739,9 @@ struct RequirementConstraintsClass : x3::annotate_on_success
 {
 };
 struct RequirementActionCostsClass : x3::annotate_on_success
+{
+};
+struct RequirementNonDeterministic : x3::annotate_on_success
 {
 };
 struct RequirementClass : x3::annotate_on_success
@@ -1229,6 +1235,7 @@ parser::requirement_timed_initial_literals_type const& requirement_timed_initial
 parser::requirement_preferences_type const& requirement_preferences() { return parser::requirement_preferences; }
 parser::requirement_constraints_type const& requirement_constraints() { return parser::requirement_constraints; }
 parser::requirement_action_costs_type const& requirement_action_costs() { return parser::requirement_action_costs; }
+parser::requirement_non_deterministic_type const& requirement_non_deterministic() { return parser::requirement_non_deterministic; }
 parser::requirement_type const& requirement() { return parser::requirement; }
 
 parser::type_type const& type() { return parser::type; }

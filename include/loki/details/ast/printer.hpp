@@ -61,6 +61,7 @@ extern std::string parse_text(const ast::RequirementTimedInitialLiterals& node, 
 extern std::string parse_text(const ast::RequirementPreferences& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::RequirementConstraints& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::RequirementActionCosts& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::RequirementNonDeterministic& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::Requirement& node, const DefaultFormatterOptions& options = {});
 
 extern std::string parse_text(const ast::Type& node, const DefaultFormatterOptions& options = {});
