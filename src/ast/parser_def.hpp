@@ -1363,6 +1363,8 @@ parser::effect_numeric_fluent_total_cost_or_effect_type const& effect_numeric_fl
 {
     return parser::effect_numeric_fluent_total_cost_or_effect;
 }
+parser::effect_root_deterministic_type const& effect_root_deterministic() { return parser::effect_root_deterministic; }
+parser::effect_root_non_deterministic_type const& effect_root_non_deterministic() { return parser::effect_root_non_deterministic; }
 parser::effect_root_type const& effect_root() { return parser::effect_root; }
 
 parser::action_symbol_type const& action_symbol() { return parser::action_symbol; }

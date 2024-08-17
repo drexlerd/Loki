@@ -375,7 +375,7 @@ typedef x3::rule<EffectConditionalForallClass, ast::EffectConditionalForall> eff
 typedef x3::rule<EffectConditionalWhenClass, ast::EffectConditionalWhen> effect_conditional_when_type;
 typedef x3::rule<EffectConditionalClass, ast::EffectConditional> effect_conditional_type;
 typedef x3::rule<EffectRootDeterministicClass, ast::EffectRootDeterministic> effect_root_deterministic_type;
-typedef x3::rule<EffectRootNonDeterministicClass, ast::EffectRootDeterministic> effect_root_non_deterministic_type;
+typedef x3::rule<EffectRootNonDeterministicClass, ast::EffectRootNonDeterministic> effect_root_non_deterministic_type;
 typedef x3::rule<EffectRootClass, ast::EffectRoot> effect_root_type;
 typedef x3::rule<EffectNumericFluentTotalCostOrEffectClass, ast::EffectNumericFluentTotalCostOrEffect> effect_numeric_fluent_total_cost_or_effect_type;
 
@@ -570,6 +570,8 @@ BOOST_SPIRIT_DECLARE(effect_type,
                      effect_conditional_when_type,
                      effect_conditional_type,
                      effect_numeric_fluent_total_cost_or_effect_type,
+                     effect_root_deterministic_type,
+                     effect_root_non_deterministic_type,
                      effect_root_type,
                      action_symbol_type,
                      action_body_type,
@@ -764,6 +766,8 @@ parser::effect_conditional_forall_type const& effect_conditional_forall();
 parser::effect_conditional_when_type const& effect_conditional_when();
 parser::effect_conditional_type const& effect_conditional();
 parser::effect_numeric_fluent_total_cost_or_effect_type const& effect_numeric_fluent_total_cost_or_effect();
+parser::effect_root_deterministic_type const& effect_root_deterministic();
+parser::effect_root_non_deterministic_type const& effect_root_non_deterministic();
 parser::effect_root_type const& effect_root();
 
 parser::action_symbol_type const& action_symbol();
