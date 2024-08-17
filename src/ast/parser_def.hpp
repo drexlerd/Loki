@@ -402,7 +402,7 @@ const auto numeric_term_def = function_expression_number | function_expression_h
 const auto effect_root_deterministic_def = ((lit('(') >> keyword_lit("and")) > *effect_numeric_fluent_total_cost_or_effect > lit(')')) | effect_conditional
                              | effect_production | effect_production_numeric_fluent_total_cost;
 const auto effect_root_non_deterministic_def = ((lit('(') >> keyword_lit("oneof")) > *effect_root_deterministic > lit(')'));
-const auto effect_root_def = effect_root_deterministic | effect_root_non_deterministic;
+const auto effect_root_def = effect_root_non_deterministic | effect_root_deterministic;
 const auto effect_def = ((lit('(') >> keyword_lit("and")) > *effect > lit(')')) | effect_conditional | effect_production;
 const auto effect_numeric_fluent_total_cost_or_effect_def = effect_production_numeric_fluent_total_cost | effect;
 const auto effect_production_literal_def = literal;
