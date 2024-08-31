@@ -16,6 +16,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <loki/details/pddl/exceptions.hpp>
 #include <loki/details/parser.hpp>
 
 namespace loki::domain::tests
@@ -54,6 +55,12 @@ TEST(LokiTests, ParserNonDeterministicTest)
     const auto problem = problem_parser.get_problem();
     EXPECT_EQ(problem->get_objects().size(), 3);
     EXPECT_EQ(problem->get_initial_literals().size(), 4);
+}
+
+TEST(LokiTests, ParserNonDeterministicMissingRequirementTest)
+{
+    const auto domain_file = fs::path(std::string(DATA_DIR) + "blocks-non-deterministic/domain-missing-requirement.pddl");
+    EXPECT_THROW(DomainParser(domain_file).get_domain(), UndefinedRequirementError);
 }
 
 }
