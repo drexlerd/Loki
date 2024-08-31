@@ -120,6 +120,11 @@ size_t UniquePDDLHasher<const EffectConditionalWhenImpl&>::operator()(const Effe
     return UniquePDDLHashCombiner()(e.get_condition(), e.get_effect());
 }
 
+size_t UniquePDDLHasher<const EffectOneofImpl&>::operator()(const EffectOneofImpl& e) const
+{
+    return UniquePDDLHashCombiner()(get_sorted_vector(e.get_effects()));
+}
+
 size_t UniquePDDLHasher<const EffectImpl*>::operator()(const EffectImpl* e) const
 {
     return std::visit([](const auto& arg) { return UniquePDDLHasher<decltype(arg)>()(arg); }, *e);
