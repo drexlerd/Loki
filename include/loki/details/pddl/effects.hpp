@@ -192,6 +192,7 @@ extern std::ostream& operator<<(std::ostream& out, const EffectAndImpl& element)
 extern std::ostream& operator<<(std::ostream& out, const EffectNumericImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectConditionalForallImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectConditionalWhenImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectOneofImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectImpl& element);
 
 }
