@@ -440,7 +440,7 @@ const auto atomic_formula_of_names_predicate_def = (lit('(') >> predicate) > *na
 const auto atomic_formula_of_names_equality_def = (lit('(') >> lit('=')) > name > name > lit(')');
 const auto atomic_formula_of_names_def = atomic_formula_of_names_equality | atomic_formula_of_names_predicate;
 const auto ground_atom_def = atomic_formula_of_names;
-const auto negated_ground_atom_def = lit('(') >> keyword_lit("not") > atomic_formula_of_names >> lit(')');
+const auto negated_ground_atom_def = lit('(') >> keyword_lit("not") > atomic_formula_of_names > lit(')');
 const auto ground_literal_def = negated_ground_atom | ground_atom;
 
 const auto initial_element_literals_def = ground_literal;
