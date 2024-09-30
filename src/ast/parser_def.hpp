@@ -412,7 +412,7 @@ const auto action_symbol_def = name;
 const auto action_body_def = -(keyword_lit(":precondition") > ((lit('(') >> lit(')')) | precondition_goal_descriptor))
                              > -(keyword_lit(":effect") > ((lit('(') >> lit(')')) | effect_root));
 const auto action_def = (lit('(') >> keyword_lit(":action")) > action_symbol > keyword_lit(":parameters") > lit('(') > typed_list_of_variables > lit(')')
-                        > action_body >> lit(')');
+                        > action_body > lit(')');
 
 const auto axiom_def = (lit('(') >> keyword_lit(":derived")) > atomic_formula_skeleton > goal_descriptor > lit(')');
 
