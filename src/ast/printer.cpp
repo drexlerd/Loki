@@ -522,21 +522,28 @@ std::string parse_text(const ast::EffectProduction& node, const DefaultFormatter
     return boost::apply_visitor(NodeVisitorPrinter(options), node);
 }
 
-std::string parse_text(const ast::EffectConditionalForall& node, const DefaultFormatterOptions& options)
+std::string parse_text(const ast::EffectCompositeForall& node, const DefaultFormatterOptions& options)
 {
     std::stringstream ss;
     ss << "(forall " << parse_text(node.typed_list_of_variables, options) << " " << parse_text(node.effect, options) << ")";
     return ss.str();
 }
 
-std::string parse_text(const ast::EffectConditionalWhen& node, const DefaultFormatterOptions& options)
+std::string parse_text(const ast::EffectCompositeWhen& node, const DefaultFormatterOptions& options)
 {
     std::stringstream ss;
     ss << "(when " << parse_text(node.goal_descriptor, options) << " " << parse_text(node.effect, options) << ")";
     return ss.str();
 }
 
-std::string parse_text(const ast::EffectConditional& node, const DefaultFormatterOptions& options)
+std::string parse_text(const ast::EffectCompositeOneof& node, const DefaultFormatterOptions& options)
+{
+    std::stringstream ss;
+    ss << "(oneof " << parse_text(node.possibilities, options) << ")";
+    return ss.str();
+}
+
+std::string parse_text(const ast::EffectComposite& node, const DefaultFormatterOptions& options)
 {
     return boost::apply_visitor(NodeVisitorPrinter(options), node);
 }
@@ -544,15 +551,6 @@ std::string parse_text(const ast::EffectConditional& node, const DefaultFormatte
 std::string parse_text(const ast::EffectNumericFluentTotalCostOrEffect& node, const DefaultFormatterOptions& options)
 {
     return boost::apply_visitor(NodeVisitorPrinter(options), node);
-}
-
-std::string parse_text(const ast::EffectRootDeterministic& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
-
-std::string parse_text(const ast::EffectRootNonDeterministic& node, const DefaultFormatterOptions& options)
-{
-    std::stringstream ss;
-    ss << "(oneof " << parse_text(node.possibilities, options) << ")";
-    return ss.str();
 }
 
 std::string parse_text(const ast::EffectRoot& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }

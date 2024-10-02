@@ -183,7 +183,7 @@ bool UniquePDDLEqualTo<const EffectNumericImpl&>::operator()(const EffectNumeric
     return true;
 }
 
-bool UniquePDDLEqualTo<const EffectConditionalForallImpl&>::operator()(const EffectConditionalForallImpl& l, const EffectConditionalForallImpl& r) const
+bool UniquePDDLEqualTo<const EffectCompositeForallImpl&>::operator()(const EffectCompositeForallImpl& l, const EffectCompositeForallImpl& r) const
 {
     if (&l != &r)
     {
@@ -192,7 +192,7 @@ bool UniquePDDLEqualTo<const EffectConditionalForallImpl&>::operator()(const Eff
     return true;
 }
 
-bool UniquePDDLEqualTo<const EffectConditionalWhenImpl&>::operator()(const EffectConditionalWhenImpl& l, const EffectConditionalWhenImpl& r) const
+bool UniquePDDLEqualTo<const EffectCompositeWhenImpl&>::operator()(const EffectCompositeWhenImpl& l, const EffectCompositeWhenImpl& r) const
 {
     if (&l != &r)
     {
@@ -201,7 +201,7 @@ bool UniquePDDLEqualTo<const EffectConditionalWhenImpl&>::operator()(const Effec
     return true;
 }
 
-bool UniquePDDLEqualTo<const EffectOneofImpl&>::operator()(const EffectOneofImpl& l, const EffectOneofImpl& r) const
+bool UniquePDDLEqualTo<const EffectCompositeOneofImpl&>::operator()(const EffectCompositeOneofImpl& l, const EffectCompositeOneofImpl& r) const
 {
     if (&l != &r)
     {

@@ -110,17 +110,17 @@ size_t UniquePDDLHasher<const EffectNumericImpl&>::operator()(const EffectNumeri
     return UniquePDDLHashCombiner()(e.get_assign_operator(), e.get_function(), e.get_function_expression());
 }
 
-size_t UniquePDDLHasher<const EffectConditionalForallImpl&>::operator()(const EffectConditionalForallImpl& e) const
+size_t UniquePDDLHasher<const EffectCompositeForallImpl&>::operator()(const EffectCompositeForallImpl& e) const
 {
     return UniquePDDLHashCombiner()(e.get_effect(), get_sorted_vector(e.get_parameters()));
 }
 
-size_t UniquePDDLHasher<const EffectConditionalWhenImpl&>::operator()(const EffectConditionalWhenImpl& e) const
+size_t UniquePDDLHasher<const EffectCompositeWhenImpl&>::operator()(const EffectCompositeWhenImpl& e) const
 {
     return UniquePDDLHashCombiner()(e.get_condition(), e.get_effect());
 }
 
-size_t UniquePDDLHasher<const EffectOneofImpl&>::operator()(const EffectOneofImpl& e) const
+size_t UniquePDDLHasher<const EffectCompositeOneofImpl&>::operator()(const EffectCompositeOneofImpl& e) const
 {
     return UniquePDDLHashCombiner()(get_sorted_vector(e.get_effects()));
 }

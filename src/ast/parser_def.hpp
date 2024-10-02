@@ -185,12 +185,11 @@ effect_production_literal_type const effect_production_literal = "effect_product
 effect_production_numeric_fluent_total_cost_type const effect_production_numeric_fluent_total_cost = "effect_production_numeric_fluent_total_cost";
 effect_production_numeric_fluent_general_type const effect_production_numeric_fluent_general = "effect_production_numeric_fluent_general";
 effect_production_type const effect_production = "effect_production";
-effect_conditional_forall_type const effect_conditional_forall = "effect_conditional_forall";
-effect_conditional_when_type const effect_conditional_when = "effect_conditional_when";
-effect_conditional_type const effect_conditional = "effect_conditional";
+effect_composite_forall_type const effect_composite_forall = "effect_composite_forall";
+effect_composite_when_type const effect_composite_when = "effect_composite_when";
+effect_composite_oneof_type const effect_composite_oneof = "effect_composite_oneof";
+effect_composite_type const effect_composite = "effect_composite";
 effect_numeric_fluent_total_cost_or_effect_type const effect_numeric_fluent_total_cost_or_effect = "effect_numeric_fluent_total_cost_or_effect";
-effect_root_deterministic_type const effect_root_deterministic = "effect_root_deterministic";
-effect_root_non_deterministic_type const effect_root_non_deterministic = "effect_root_non_deterministic";
 effect_root_type const effect_root = "effect_root";
 action_symbol_type const action_symbol = "action_symbol";
 action_body_type const action_body = "action_body";
@@ -399,20 +398,19 @@ const auto assign_operator_def =
 // For action cost effects only
 const auto numeric_term_def = function_expression_number | function_expression_head;
 
-const auto effect_root_deterministic_def = ((lit('(') >> keyword_lit("and")) > *effect_numeric_fluent_total_cost_or_effect > lit(')')) | effect_conditional
+const auto effect_root_def = ((lit('(') >> keyword_lit("and")) > *effect_numeric_fluent_total_cost_or_effect > lit(')')) | effect_composite
                              | effect_production | effect_production_numeric_fluent_total_cost;
-const auto effect_root_non_deterministic_def = ((lit('(') >> keyword_lit("oneof")) > *effect_root_deterministic > lit(')'));
-const auto effect_root_def = effect_root_non_deterministic | effect_root_deterministic;
-const auto effect_def = ((lit('(') >> keyword_lit("and")) > *effect > lit(')')) | effect_conditional | effect_production;
+const auto effect_def = ((lit('(') >> keyword_lit("and")) > *effect > lit(')')) | effect_composite | effect_production;
 const auto effect_numeric_fluent_total_cost_or_effect_def = effect_production_numeric_fluent_total_cost | effect;
 const auto effect_production_literal_def = literal;
 const auto effect_production_numeric_fluent_total_cost_def = (lit('(') >> assign_operator_increase >> lit('(') >> function_symbol_total_cost) > lit(')')
                                                              > numeric_term > lit(')');
 const auto effect_production_numeric_fluent_general_def = (lit('(') >> assign_operator >> function_head >> function_expression) > lit(')');
 const auto effect_production_def = effect_production_numeric_fluent_general | effect_production_literal;
-const auto effect_conditional_forall_def = (lit('(') >> keyword_lit("forall")) > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
-const auto effect_conditional_when_def = (lit('(') >> keyword_lit("when")) > goal_descriptor > effect > lit(')');
-const auto effect_conditional_def = effect_conditional_forall | effect_conditional_when;
+const auto effect_composite_forall_def = (lit('(') >> keyword_lit("forall")) > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
+const auto effect_composite_when_def = (lit('(') >> keyword_lit("when")) > goal_descriptor > effect > lit(')');
+const auto effect_composite_oneof_def = (lit('(') >> keyword_lit("oneof")) > *effect > lit(')');
+const auto effect_composite_def = effect_composite_forall | effect_composite_when | effect_composite_oneof;
 
 const auto action_symbol_def = name;
 const auto action_body_def = -(keyword_lit(":precondition") > ((lit('(') >> lit(')')) | precondition_goal_descriptor))
@@ -604,12 +602,11 @@ BOOST_SPIRIT_DEFINE(effect,
                     effect_production_numeric_fluent_total_cost,
                     effect_production_numeric_fluent_general,
                     effect_production,
-                    effect_conditional_forall,
-                    effect_conditional_when,
-                    effect_conditional,
+                    effect_composite_forall,
+                    effect_composite_when,
+                    effect_composite_oneof,
+                    effect_composite,
                     effect_numeric_fluent_total_cost_or_effect,
-                    effect_root_deterministic,
-                    effect_root_non_deterministic,
                     effect_root,
                     action_symbol,
                     action_body,
@@ -997,22 +994,19 @@ struct EffectProductionNumericFluentGeneralClass : x3::annotate_on_success
 struct EffectProductionClass : x3::annotate_on_success
 {
 };
-struct EffectConditionalForallClass : x3::annotate_on_success
+struct EffectCompositeForallClass : x3::annotate_on_success
 {
 };
-struct EffectConditionalWhenClass : x3::annotate_on_success
+struct EffectCompositeWhenClass : x3::annotate_on_success
 {
 };
-struct EffectConditionalClass : x3::annotate_on_success
+struct EffectCompositeOneofClass : x3::annotate_on_success
+{
+};
+struct EffectCompositeClass : x3::annotate_on_success
 {
 };
 struct EffectNumericFluentTotalCostOrEffectClass : x3::annotate_on_success
-{
-};
-struct EffectRootDeterministicClass : x3::annotate_on_success
-{
-};
-struct EffectRootNonDeterministicClass : x3::annotate_on_success
 {
 };
 struct EffectRootClass : x3::annotate_on_success
@@ -1356,15 +1350,14 @@ parser::effect_production_numeric_fluent_general_type const& effect_production_n
     return parser::effect_production_numeric_fluent_general;
 }
 parser::effect_production_type const& effect_production() { return parser::effect_production; }
-parser::effect_conditional_forall_type const& effect_conditional_forall() { return parser::effect_conditional_forall; }
-parser::effect_conditional_when_type const& effect_conditional_when() { return parser::effect_conditional_when; }
-parser::effect_conditional_type const& effect_conditional() { return parser::effect_conditional; }
+parser::effect_composite_forall_type const& effect_composite_forall() { return parser::effect_composite_forall; }
+parser::effect_composite_when_type const& effect_composite_when() { return parser::effect_composite_when; }
+parser::effect_composite_oneof_type const& effect_composite_oneof() { return parser::effect_composite_oneof; }
+parser::effect_composite_type const& effect_composite() { return parser::effect_composite; }
 parser::effect_numeric_fluent_total_cost_or_effect_type const& effect_numeric_fluent_total_cost_or_effect()
 {
     return parser::effect_numeric_fluent_total_cost_or_effect;
 }
-parser::effect_root_deterministic_type const& effect_root_deterministic() { return parser::effect_root_deterministic; }
-parser::effect_root_non_deterministic_type const& effect_root_non_deterministic() { return parser::effect_root_non_deterministic; }
 parser::effect_root_type const& effect_root() { return parser::effect_root; }
 
 parser::action_symbol_type const& action_symbol() { return parser::action_symbol; }

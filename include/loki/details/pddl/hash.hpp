@@ -179,21 +179,21 @@ struct UniquePDDLHasher<const EffectNumericImpl&>
 };
 
 template<>
-struct UniquePDDLHasher<const EffectConditionalForallImpl&>
+struct UniquePDDLHasher<const EffectCompositeForallImpl&>
 {
-    size_t operator()(const EffectConditionalForallImpl& e) const;
+    size_t operator()(const EffectCompositeForallImpl& e) const;
 };
 
 template<>
-struct UniquePDDLHasher<const EffectConditionalWhenImpl&>
+struct UniquePDDLHasher<const EffectCompositeWhenImpl&>
 {
-    size_t operator()(const EffectConditionalWhenImpl& e) const;
+    size_t operator()(const EffectCompositeWhenImpl& e) const;
 };
 
 template<>
-struct UniquePDDLHasher<const EffectOneofImpl&>
+struct UniquePDDLHasher<const EffectCompositeOneofImpl&>
 {
-    size_t operator()(const EffectOneofImpl& e) const;
+    size_t operator()(const EffectCompositeOneofImpl& e) const;
 };
 
 template<>

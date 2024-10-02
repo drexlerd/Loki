@@ -153,12 +153,11 @@ extern std::string parse_text(const ast::EffectProductionLiteral& node, const De
 extern std::string parse_text(const ast::EffectProductionNumericFluentTotalCost& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::EffectProductionNumericFluentGeneral& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::EffectProduction& node, const DefaultFormatterOptions& options = {});
-extern std::string parse_text(const ast::EffectConditionalForall& node, const DefaultFormatterOptions& options = {});
-extern std::string parse_text(const ast::EffectConditionalWhen& node, const DefaultFormatterOptions& options = {});
-extern std::string parse_text(const ast::EffectConditional& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::EffectCompositeForall& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::EffectCompositeWhen& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::EffectCompositeOneof& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::EffectComposite& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::EffectNumericFluentTotalCostOrEffect& node, const DefaultFormatterOptions& options = {});
-extern std::string parse_text(const ast::EffectRootDeterministic& node, const DefaultFormatterOptions& options = {});
-extern std::string parse_text(const ast::EffectRootNonDeterministic& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::EffectRoot& node, const DefaultFormatterOptions& options = {});
 
 extern std::string parse_text(const ast::ActionSymbol& node, const DefaultFormatterOptions& options = {});

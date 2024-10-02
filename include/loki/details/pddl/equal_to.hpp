@@ -157,21 +157,21 @@ struct UniquePDDLEqualTo<const EffectNumericImpl&>
 };
 
 template<>
-struct UniquePDDLEqualTo<const EffectConditionalForallImpl&>
+struct UniquePDDLEqualTo<const EffectCompositeForallImpl&>
 {
-    bool operator()(const EffectConditionalForallImpl& l, const EffectConditionalForallImpl& r) const;
+    bool operator()(const EffectCompositeForallImpl& l, const EffectCompositeForallImpl& r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const EffectConditionalWhenImpl&>
+struct UniquePDDLEqualTo<const EffectCompositeWhenImpl&>
 {
-    bool operator()(const EffectConditionalWhenImpl& l, const EffectConditionalWhenImpl& r) const;
+    bool operator()(const EffectCompositeWhenImpl& l, const EffectCompositeWhenImpl& r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const EffectOneofImpl&>
+struct UniquePDDLEqualTo<const EffectCompositeOneofImpl&>
 {
-    bool operator()(const EffectOneofImpl& l, const EffectOneofImpl& r) const;
+    bool operator()(const EffectCompositeOneofImpl& l, const EffectCompositeOneofImpl& r) const;
 };
 
 template<>

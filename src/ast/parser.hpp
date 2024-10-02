@@ -169,12 +169,11 @@ struct EffectProductionLiteralClass;
 struct EffectProductionNumericFluentTotalCostClass;
 struct EffectProductionNumericFluentGeneralClass;
 struct EffectProductionClass;
-struct EffectConditionalForallClass;
-struct EffectConditionalWhenClass;
-struct EffectConditionalClass;
+struct EffectCompositeForallClass;
+struct EffectCompositeWhenClass;
+struct EffectCompositeOneofClass;
+struct EffectCompositeClass;
 struct EffectNumericFluentTotalCostOrEffectClass;
-struct EffectRootDeterministicClass;
-struct EffectRootNonDeterministicClass;
 struct EffectRootClass;
 struct ActionSymbolClass;
 struct ActionBodyClass;
@@ -371,11 +370,10 @@ typedef x3::rule<EffectProductionLiteralClass, ast::EffectProductionLiteral> eff
 typedef x3::rule<EffectProductionNumericFluentTotalCostClass, ast::EffectProductionNumericFluentTotalCost> effect_production_numeric_fluent_total_cost_type;
 typedef x3::rule<EffectProductionNumericFluentGeneralClass, ast::EffectProductionNumericFluentGeneral> effect_production_numeric_fluent_general_type;
 typedef x3::rule<EffectProductionClass, ast::EffectProduction> effect_production_type;
-typedef x3::rule<EffectConditionalForallClass, ast::EffectConditionalForall> effect_conditional_forall_type;
-typedef x3::rule<EffectConditionalWhenClass, ast::EffectConditionalWhen> effect_conditional_when_type;
-typedef x3::rule<EffectConditionalClass, ast::EffectConditional> effect_conditional_type;
-typedef x3::rule<EffectRootDeterministicClass, ast::EffectRootDeterministic> effect_root_deterministic_type;
-typedef x3::rule<EffectRootNonDeterministicClass, ast::EffectRootNonDeterministic> effect_root_non_deterministic_type;
+typedef x3::rule<EffectCompositeForallClass, ast::EffectCompositeForall> effect_composite_forall_type;
+typedef x3::rule<EffectCompositeWhenClass, ast::EffectCompositeWhen> effect_composite_when_type;
+typedef x3::rule<EffectCompositeOneofClass, ast::EffectCompositeOneof> effect_composite_oneof_type;
+typedef x3::rule<EffectCompositeClass, ast::EffectComposite> effect_composite_type;
 typedef x3::rule<EffectRootClass, ast::EffectRoot> effect_root_type;
 typedef x3::rule<EffectNumericFluentTotalCostOrEffectClass, ast::EffectNumericFluentTotalCostOrEffect> effect_numeric_fluent_total_cost_or_effect_type;
 
@@ -566,12 +564,11 @@ BOOST_SPIRIT_DECLARE(effect_type,
                      effect_production_numeric_fluent_total_cost_type,
                      effect_production_numeric_fluent_general_type,
                      effect_production_type,
-                     effect_conditional_forall_type,
-                     effect_conditional_when_type,
-                     effect_conditional_type,
+                     effect_composite_forall_type,
+                     effect_composite_when_type,
+                     effect_composite_oneof_type,
+                     effect_composite_type,
                      effect_numeric_fluent_total_cost_or_effect_type,
-                     effect_root_deterministic_type,
-                     effect_root_non_deterministic_type,
                      effect_root_type,
                      action_symbol_type,
                      action_body_type,
@@ -762,12 +759,11 @@ parser::effect_production_literal_type const& effect_production_literal();
 parser::effect_production_numeric_fluent_total_cost_type const& effect_production_numeric_fluent_total_cost();
 parser::effect_production_numeric_fluent_general_type const& effect_production_numeric_fluent_general();
 parser::effect_production_type const& effect_production();
-parser::effect_conditional_forall_type const& effect_conditional_forall();
-parser::effect_conditional_when_type const& effect_conditional_when();
-parser::effect_conditional_type const& effect_conditional();
+parser::effect_composite_forall_type const& effect_omposite_forall();
+parser::effect_composite_when_type const& effect_composite_when();
+parser::effect_composite_oneof_type const& effect_composite_oneof();
+parser::effect_composite_type const& effect_composite();
 parser::effect_numeric_fluent_total_cost_or_effect_type const& effect_numeric_fluent_total_cost_or_effect();
-parser::effect_root_deterministic_type const& effect_root_deterministic();
-parser::effect_root_non_deterministic_type const& effect_root_non_deterministic();
 parser::effect_root_type const& effect_root();
 
 parser::action_symbol_type const& action_symbol();

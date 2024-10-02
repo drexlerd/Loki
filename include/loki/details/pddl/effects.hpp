@@ -112,15 +112,15 @@ public:
     const FunctionExpression& get_function_expression() const;
 };
 
-/* ConditionalForall */
-class EffectConditionalForallImpl
+/* CompositeForall */
+class EffectCompositeForallImpl
 {
 private:
     size_t m_index;
     ParameterList m_parameters;
     Effect m_effect;
 
-    EffectConditionalForallImpl(size_t index, ParameterList parameters, Effect effect);
+    EffectCompositeForallImpl(size_t index, ParameterList parameters, Effect effect);
 
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
@@ -128,25 +128,25 @@ private:
 
 public:
     // moveable but not copyable
-    EffectConditionalForallImpl(const EffectConditionalForallImpl& other) = delete;
-    EffectConditionalForallImpl& operator=(const EffectConditionalForallImpl& other) = delete;
-    EffectConditionalForallImpl(EffectConditionalForallImpl&& other) = default;
-    EffectConditionalForallImpl& operator=(EffectConditionalForallImpl&& other) = default;
+    EffectCompositeForallImpl(const EffectCompositeForallImpl& other) = delete;
+    EffectCompositeForallImpl& operator=(const EffectCompositeForallImpl& other) = delete;
+    EffectCompositeForallImpl(EffectCompositeForallImpl&& other) = default;
+    EffectCompositeForallImpl& operator=(EffectCompositeForallImpl&& other) = default;
 
     size_t get_index() const;
     const ParameterList& get_parameters() const;
     const Effect& get_effect() const;
 };
 
-/* ConditionalWhen */
-class EffectConditionalWhenImpl
+/* CompositeWhen */
+class EffectCompositeWhenImpl
 {
 private:
     size_t m_index;
     Condition m_condition;
     Effect m_effect;
 
-    EffectConditionalWhenImpl(size_t index, Condition condition, Effect effect);
+    EffectCompositeWhenImpl(size_t index, Condition condition, Effect effect);
 
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
@@ -154,23 +154,23 @@ private:
 
 public:
     // moveable but not copyable
-    EffectConditionalWhenImpl(const EffectConditionalWhenImpl& other) = delete;
-    EffectConditionalWhenImpl& operator=(const EffectConditionalWhenImpl& other) = delete;
-    EffectConditionalWhenImpl(EffectConditionalWhenImpl&& other) = default;
-    EffectConditionalWhenImpl& operator=(EffectConditionalWhenImpl&& other) = default;
+    EffectCompositeWhenImpl(const EffectCompositeWhenImpl& other) = delete;
+    EffectCompositeWhenImpl& operator=(const EffectCompositeWhenImpl& other) = delete;
+    EffectCompositeWhenImpl(EffectCompositeWhenImpl&& other) = default;
+    EffectCompositeWhenImpl& operator=(EffectCompositeWhenImpl&& other) = default;
 
     size_t get_index() const;
     const Condition& get_condition() const;
     const Effect& get_effect() const;
 };
 
-class EffectOneofImpl
+class EffectCompositeOneofImpl
 {
 private:
     size_t m_index;
     EffectList m_effects;
 
-    EffectOneofImpl(size_t index, EffectList effects);
+    EffectCompositeOneofImpl(size_t index, EffectList effects);
 
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
@@ -178,10 +178,10 @@ private:
 
 public:
     // moveable but not copyable
-    EffectOneofImpl(const EffectOneofImpl& other) = delete;
-    EffectOneofImpl& operator=(const EffectOneofImpl& other) = delete;
-    EffectOneofImpl(EffectOneofImpl&& other) = default;
-    EffectOneofImpl& operator=(EffectOneofImpl&& other) = default;
+    EffectCompositeOneofImpl(const EffectCompositeOneofImpl& other) = delete;
+    EffectCompositeOneofImpl& operator=(const EffectCompositeOneofImpl& other) = delete;
+    EffectCompositeOneofImpl(EffectCompositeOneofImpl&& other) = default;
+    EffectCompositeOneofImpl& operator=(EffectCompositeOneofImpl&& other) = default;
 
     size_t get_index() const;
     const EffectList& get_effects() const;
@@ -190,9 +190,9 @@ public:
 extern std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectAndImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectNumericImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const EffectConditionalForallImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const EffectConditionalWhenImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const EffectOneofImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectCompositeForallImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectCompositeWhenImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectCompositeOneofImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectImpl& element);
 
 }

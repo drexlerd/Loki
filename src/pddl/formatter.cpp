@@ -315,7 +315,7 @@ void PDDLFormatter::write(const EffectNumericImpl& element, std::ostream& out)
     out << ")";
 }
 
-void PDDLFormatter::write(const EffectConditionalForallImpl& element, std::ostream& out)
+void PDDLFormatter::write(const EffectCompositeForallImpl& element, std::ostream& out)
 {
     out << "(forall (";
     for (size_t i = 0; i < element.get_parameters().size(); ++i)
@@ -329,7 +329,7 @@ void PDDLFormatter::write(const EffectConditionalForallImpl& element, std::ostre
     out << ")";
 }
 
-void PDDLFormatter::write(const EffectConditionalWhenImpl& element, std::ostream& out)
+void PDDLFormatter::write(const EffectCompositeWhenImpl& element, std::ostream& out)
 {
     out << "(when ";
     write(*element.get_condition(), out);
@@ -338,7 +338,7 @@ void PDDLFormatter::write(const EffectConditionalWhenImpl& element, std::ostream
     out << ")";
 }
 
-void PDDLFormatter::write(const EffectOneofImpl& element, std::ostream& out)
+void PDDLFormatter::write(const EffectCompositeOneofImpl& element, std::ostream& out)
 {
     out << "(oneof ";
     for (size_t i = 0; i < element.get_effects().size(); ++i)

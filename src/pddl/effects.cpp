@@ -71,44 +71,44 @@ const Function& EffectNumericImpl::get_function() const { return m_function; }
 
 const FunctionExpression& EffectNumericImpl::get_function_expression() const { return m_function_expression; }
 
-/* ConditionalConditionalForall */
-EffectConditionalForallImpl::EffectConditionalForallImpl(size_t index, ParameterList parameters, Effect effect) :
+/* CompositeForall */
+EffectCompositeForallImpl::EffectCompositeForallImpl(size_t index, ParameterList parameters, Effect effect) :
     m_index(index),
     m_parameters(std::move(parameters)),
     m_effect(std::move(effect))
 {
 }
 
-size_t EffectConditionalForallImpl::get_index() const { return m_index; }
+size_t EffectCompositeForallImpl::get_index() const { return m_index; }
 
-const ParameterList& EffectConditionalForallImpl::get_parameters() const { return m_parameters; }
+const ParameterList& EffectCompositeForallImpl::get_parameters() const { return m_parameters; }
 
-const Effect& EffectConditionalForallImpl::get_effect() const { return m_effect; }
+const Effect& EffectCompositeForallImpl::get_effect() const { return m_effect; }
 
-/* EffectConditionalWhen */
-EffectConditionalWhenImpl::EffectConditionalWhenImpl(size_t index, Condition condition, Effect effect) :
+/* EffectCompositeWhen */
+EffectCompositeWhenImpl::EffectCompositeWhenImpl(size_t index, Condition condition, Effect effect) :
     m_index(index),
     m_condition(std::move(condition)),
     m_effect(std::move(effect))
 {
 }
 
-size_t EffectConditionalWhenImpl::get_index() const { return m_index; }
+size_t EffectCompositeWhenImpl::get_index() const { return m_index; }
 
-const Condition& EffectConditionalWhenImpl::get_condition() const { return m_condition; }
+const Condition& EffectCompositeWhenImpl::get_condition() const { return m_condition; }
 
-const Effect& EffectConditionalWhenImpl::get_effect() const { return m_effect; }
+const Effect& EffectCompositeWhenImpl::get_effect() const { return m_effect; }
 
-/* EffectOneofImpl */
-EffectOneofImpl::EffectOneofImpl(size_t index, EffectList effects) :
+/* EffectCompositeOneofImpl */
+EffectCompositeOneofImpl::EffectCompositeOneofImpl(size_t index, EffectList effects) :
     m_index(index),
     m_effects(std::move(effects))
 {
 }
 
-size_t EffectOneofImpl::get_index() const { return m_index; }
+size_t EffectCompositeOneofImpl::get_index() const { return m_index; }
 
-const EffectList& EffectOneofImpl::get_effects() const { return m_effects; }
+const EffectList& EffectCompositeOneofImpl::get_effects() const { return m_effects; }
 
 
 std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element)
@@ -132,21 +132,21 @@ std::ostream& operator<<(std::ostream& out, const EffectNumericImpl& element)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const EffectConditionalForallImpl& element)
+std::ostream& operator<<(std::ostream& out, const EffectCompositeForallImpl& element)
 {
     auto formatter = PDDLFormatter();
     formatter.write(element, out);
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const EffectConditionalWhenImpl& element)
+std::ostream& operator<<(std::ostream& out, const EffectCompositeWhenImpl& element)
 {
     auto formatter = PDDLFormatter();
     formatter.write(element, out);
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const EffectOneofImpl& element)
+std::ostream& operator<<(std::ostream& out, const EffectCompositeOneofImpl& element)
 {
     auto formatter = PDDLFormatter();
     formatter.write(element, out);

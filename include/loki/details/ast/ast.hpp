@@ -153,12 +153,11 @@ struct EffectProductionLiteral;
 struct EffectProductionNumericFluentTotalCost;
 struct EffectProductionNumericFluentGeneral;
 struct EffectProduction;
-struct EffectConditionalForall;
-struct EffectConditionalWhen;
-struct EffectConditional;
+struct EffectCompositeForall;
+struct EffectCompositeWhen;
+struct EffectCompositeOneof;
+struct EffectComposite;
 struct EffectNumericFluentTotalCostOrEffect;
-struct EffectRootDeterministic;
-struct EffectRootNonDeterministic;
 struct EffectRoot;
 
 struct ActionSymbol;
@@ -830,14 +829,14 @@ struct AssignOperator :
 // <p-effect>
 // struct EffectRoot :
 //    x3::position_tagged,
-//    x3::variant<x3::forward_ast<EffectProduction>, x3::forward_ast<EffectConditional>, x3::forward_ast<EffectProductionNumericFluentTotalCost>>,
+//    x3::variant<x3::forward_ast<EffectProduction>, x3::forward_ast<EffectComposite>, x3::forward_ast<EffectProductionNumericFluentTotalCost>>,
 //    std::vector<x3::variant<EffectProductionNumericFluentTotalCost, Effect>>>
 //{
 //    using base_type::base_type;
 //    using base_type::operator=;
 //};
 
-struct Effect : x3::position_tagged, x3::variant<x3::forward_ast<EffectProduction>, x3::forward_ast<EffectConditional>, std::vector<Effect>>
+struct Effect : x3::position_tagged, x3::variant<x3::forward_ast<EffectProduction>, x3::forward_ast<EffectComposite>, std::vector<Effect>>
 {
     using base_type::base_type;
     using base_type::operator=;
@@ -868,19 +867,24 @@ struct EffectProduction : x3::position_tagged, x3::variant<EffectProductionLiter
     using base_type::operator=;
 };
 
-struct EffectConditionalForall : x3::position_tagged
+struct EffectCompositeForall : x3::position_tagged
 {
     TypedListOfVariables typed_list_of_variables;
     Effect effect;
 };
 
-struct EffectConditionalWhen : x3::position_tagged
+struct EffectCompositeWhen : x3::position_tagged
 {
     GoalDescriptor goal_descriptor;
     Effect effect;
 };
 
-struct EffectConditional : x3::position_tagged, x3::variant<EffectConditionalForall, EffectConditionalWhen>
+struct EffectCompositeOneof : x3::position_tagged
+{
+    std::vector<Effect> possibilities; 
+};
+
+struct EffectComposite : x3::position_tagged, x3::variant<EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof>
 {
     using base_type::base_type;
     using base_type::operator=;
@@ -892,20 +896,9 @@ struct EffectNumericFluentTotalCostOrEffect : x3::position_tagged, x3::variant<E
     using base_type::operator=;
 };
 
-struct EffectRootDeterministic :
+struct EffectRoot:
     x3::position_tagged,
-    x3::variant<EffectProduction, EffectConditional, EffectProductionNumericFluentTotalCost, std::vector<EffectNumericFluentTotalCostOrEffect>>
-{
-    using base_type::base_type;
-    using base_type::operator=;
-};
-
-struct EffectRootNonDeterministic : x3::position_tagged
-{
-    std::vector<EffectRootDeterministic> possibilities;
-};
-
-struct EffectRoot : x3::position_tagged, x3::variant<EffectRootDeterministic, EffectRootNonDeterministic>
+    x3::variant<EffectProduction, EffectComposite, EffectProductionNumericFluentTotalCost, std::vector<EffectNumericFluentTotalCostOrEffect>>
 {
     using base_type::base_type;
     using base_type::operator=;
