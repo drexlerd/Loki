@@ -92,8 +92,9 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::PreconditionGoalDescriptorForall, typed_lis
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectProductionLiteral, literal)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectProductionNumericFluentTotalCost, assign_operator_increase, function_symbol_total_cost, numeric_term)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectProductionNumericFluentGeneral, assign_operator, function_head, function_expression)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectConditionalForall, typed_list_of_variables, effect)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectConditionalWhen, goal_descriptor, effect)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectCompositeForall, typed_list_of_variables, effect)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectCompositeWhen, goal_descriptor, effect)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectCompositeOneof, possibilities)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::ActionSymbol, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::ActionBody, precondition_goal_descriptor, effect)

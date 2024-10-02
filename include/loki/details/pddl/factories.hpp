@@ -162,9 +162,11 @@ public:
 
     Effect get_or_create_effect_numeric(AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
 
-    Effect get_or_create_effect_conditional_forall(ParameterList parameters, Effect effect);
+    Effect get_or_create_effect_composite_forall(ParameterList parameters, Effect effect);
 
-    Effect get_or_create_effect_conditional_when(Condition condition, Effect effect);
+    Effect get_or_create_effect_composite_when(Condition condition, Effect effect);
+
+    Effect get_or_create_effect_composite_oneof(EffectList effects);
 
     Action
     get_or_create_action(std::string name, size_t original_arity, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);

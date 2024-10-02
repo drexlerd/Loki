@@ -36,3 +36,5 @@ build
 *.exe
 *.out
 *.app
+
+dependencies

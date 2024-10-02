@@ -183,7 +183,7 @@ bool UniquePDDLEqualTo<const EffectNumericImpl&>::operator()(const EffectNumeric
     return true;
 }
 
-bool UniquePDDLEqualTo<const EffectConditionalForallImpl&>::operator()(const EffectConditionalForallImpl& l, const EffectConditionalForallImpl& r) const
+bool UniquePDDLEqualTo<const EffectCompositeForallImpl&>::operator()(const EffectCompositeForallImpl& l, const EffectCompositeForallImpl& r) const
 {
     if (&l != &r)
     {
@@ -192,11 +192,20 @@ bool UniquePDDLEqualTo<const EffectConditionalForallImpl&>::operator()(const Eff
     return true;
 }
 
-bool UniquePDDLEqualTo<const EffectConditionalWhenImpl&>::operator()(const EffectConditionalWhenImpl& l, const EffectConditionalWhenImpl& r) const
+bool UniquePDDLEqualTo<const EffectCompositeWhenImpl&>::operator()(const EffectCompositeWhenImpl& l, const EffectCompositeWhenImpl& r) const
 {
     if (&l != &r)
     {
         return (l.get_condition() == r.get_condition()) && (l.get_effect() == r.get_effect());
+    }
+    return true;
+}
+
+bool UniquePDDLEqualTo<const EffectCompositeOneofImpl&>::operator()(const EffectCompositeOneofImpl& l, const EffectCompositeOneofImpl& r) const
+{
+    if (&l != &r)
+    {
+        return (get_sorted_vector(l.get_effects()) == get_sorted_vector(r.get_effects()));
     }
     return true;
 }

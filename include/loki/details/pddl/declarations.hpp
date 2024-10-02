@@ -111,11 +111,13 @@ class EffectAndImpl;
 using EffectAnd = const EffectAndImpl*;
 class EffectNumericImpl;
 using EffectNumeric = const EffectNumericImpl*;
-class EffectConditionalForallImpl;
-using EffectConditionalForall = const EffectConditionalForallImpl*;
-class EffectConditionalWhenImpl;
-using EffectConditionalWhen = const EffectConditionalWhenImpl*;
-using EffectImpl = std::variant<EffectLiteralImpl, EffectAndImpl, EffectNumericImpl, EffectConditionalForallImpl, EffectConditionalWhenImpl>;
+class EffectCompositeForallImpl;
+using EffectCompositeForall = const EffectCompositeForallImpl*;
+class EffectCompositeWhenImpl;
+using EffectCompositeWhen = const EffectCompositeWhenImpl*;
+class EffectCompositeOneofImpl;
+using EffectCompositeOneof = const EffectCompositeOneofImpl*;
+using EffectImpl = std::variant<EffectLiteralImpl, EffectAndImpl, EffectNumericImpl, EffectCompositeForallImpl, EffectCompositeWhenImpl, EffectCompositeOneofImpl>;
 using Effect = const EffectImpl*;
 using EffectList = std::vector<Effect>;
 

@@ -71,8 +71,9 @@ public:
     void write(const EffectLiteralImpl& element, std::ostream& out);
     void write(const EffectAndImpl& element, std::ostream& out);
     void write(const EffectNumericImpl& element, std::ostream& out);
-    void write(const EffectConditionalForallImpl& element, std::ostream& out);
-    void write(const EffectConditionalWhenImpl& element, std::ostream& out);
+    void write(const EffectCompositeForallImpl& element, std::ostream& out);
+    void write(const EffectCompositeWhenImpl& element, std::ostream& out);
+    void write(const EffectCompositeOneofImpl& element, std::ostream& out);
     void write(const EffectImpl& element, std::ostream& out);
     void write(const FunctionExpressionNumberImpl& element, std::ostream& out);
     void write(const FunctionExpressionBinaryOperatorImpl& element, std::ostream& out);

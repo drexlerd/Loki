@@ -54,9 +54,10 @@ extern Effect parse(const ast::EffectProductionLiteral& node, Context& context);
 extern Effect parse(const ast::EffectProductionNumericFluentTotalCost& node, Context& context);
 extern Effect parse(const ast::EffectProductionNumericFluentGeneral& node, Context& context);
 extern Effect parse(const ast::EffectProduction& node, Context& context);
-extern Effect parse(const ast::EffectConditionalForall& node, Context& context);
-extern Effect parse(const ast::EffectConditionalWhen& node, Context& context);
-extern Effect parse(const ast::EffectConditional& node, Context& context);
+extern Effect parse(const ast::EffectCompositeForall& node, Context& context);
+extern Effect parse(const ast::EffectCompositeWhen& node, Context& context);
+extern Effect parse(const ast::EffectCompositeOneof& node, Context& context);
+extern Effect parse(const ast::EffectComposite& node, Context& context);
 
 struct EffectVisitor : boost::static_visitor<Effect>
 {
