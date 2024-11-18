@@ -38,7 +38,7 @@ using PDDLElement = const T*;
  */
 
 template<typename HolderType, typename Hash, typename EqualTo>
-class UniqueFactory;
+class SegmentedRepository;
 
 /**
  * Domain
@@ -117,7 +117,8 @@ class EffectCompositeWhenImpl;
 using EffectCompositeWhen = const EffectCompositeWhenImpl*;
 class EffectCompositeOneofImpl;
 using EffectCompositeOneof = const EffectCompositeOneofImpl*;
-using EffectImpl = std::variant<EffectLiteralImpl, EffectAndImpl, EffectNumericImpl, EffectCompositeForallImpl, EffectCompositeWhenImpl, EffectCompositeOneofImpl>;
+using EffectImpl =
+    std::variant<EffectLiteralImpl, EffectAndImpl, EffectNumericImpl, EffectCompositeForallImpl, EffectCompositeWhenImpl, EffectCompositeOneofImpl>;
 using Effect = const EffectImpl*;
 using EffectList = std::vector<Effect>;
 

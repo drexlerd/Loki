@@ -18,9 +18,9 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_CONTEXT_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_CONTEXT_HPP_
 
-#include "loki/details/pddl/factories.hpp"
 #include "loki/details/pddl/position.hpp"
 #include "loki/details/pddl/reference.hpp"
+#include "loki/details/pddl/repositories.hpp"
 #include "loki/details/pddl/scope.hpp"
 
 namespace loki
@@ -29,7 +29,7 @@ namespace loki
 struct Context
 {
     // For the unique construction of PDDL objects
-    PDDLFactories& factories;
+    PDDLRepositories& factories;
     // For storing the positions in the input PDDL file
     PDDLPositionCache& positions;
     // For referencing to existing bindings
@@ -45,7 +45,7 @@ struct Context
     // For convenience, to avoid an additional parameter during semantic parsing
     Requirements requirements;
 
-    Context(PDDLFactories& factories_, PDDLPositionCache& positions_, ScopeStack& scopes_, bool strict_ = false, bool quiet_ = true) :
+    Context(PDDLRepositories& factories_, PDDLPositionCache& positions_, ScopeStack& scopes_, bool strict_ = false, bool quiet_ = true) :
         factories(factories_),
         positions(positions_),
         scopes(scopes_),

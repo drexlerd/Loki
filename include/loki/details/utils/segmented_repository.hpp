@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_UTILS_UNIQUE_VALUE_FACTORY_HPP_
-#define LOKI_INCLUDE_LOKI_UTILS_UNIQUE_VALUE_FACTORY_HPP_
+#ifndef LOKI_INCLUDE_LOKI_UTILS_SEGMENTED_REPOSITORY_HPP_
+#define LOKI_INCLUDE_LOKI_UTILS_SEGMENTED_REPOSITORY_HPP_
 
 #include "loki/details/utils/segmented_vector.hpp"
 
@@ -37,7 +37,7 @@ namespace loki
 /// @tparam Hash the hash function.
 /// @tparam KeyEqual the comparison function.
 template<typename HolderType, typename Hash, typename KeyEqual>
-class UniqueFactory
+class SegmentedRepository
 {
 private:
     // We use an unordered_set to test for uniqueness.
@@ -50,20 +50,20 @@ private:
     {
         if (pos >= size())
         {
-            throw std::out_of_range("UniqueFactory::range_check: pos (which is " + std::to_string(pos) + ") >= this->size() (which is " + std::to_string(size())
-                                    + ")");
+            throw std::out_of_range("SegmentedRepository::range_check: pos (which is " + std::to_string(pos) + ") >= this->size() (which is "
+                                    + std::to_string(size()) + ")");
         }
     }
 
 public:
-    UniqueFactory(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
+    SegmentedRepository(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
         m_persistent_vector(SegmentedVector<HolderType>(initial_num_element_per_segment, maximum_num_elements_per_segment))
     {
     }
-    UniqueFactory(const UniqueFactory& other) = delete;
-    UniqueFactory& operator=(const UniqueFactory& other) = delete;
-    UniqueFactory(UniqueFactory&& other) = default;
-    UniqueFactory& operator=(UniqueFactory&& other) = default;
+    SegmentedRepository(const SegmentedRepository& other) = delete;
+    SegmentedRepository& operator=(const SegmentedRepository& other) = delete;
+    SegmentedRepository(SegmentedRepository&& other) = default;
+    SegmentedRepository& operator=(SegmentedRepository&& other) = default;
 
     /// @brief Returns a pointer to an existing object or creates it before if it does not exist.
     template<typename SubType, typename... Args>

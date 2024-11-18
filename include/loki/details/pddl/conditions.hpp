@@ -36,7 +36,7 @@ private:
 
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
-    friend class UniqueFactory;
+    friend class SegmentedRepository;
 
 public:
     // moveable but not copyable
@@ -60,7 +60,7 @@ private:
 
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
-    friend class UniqueFactory;
+    friend class SegmentedRepository;
 
 public:
     // moveable but not copyable
@@ -84,7 +84,7 @@ private:
 
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
-    friend class UniqueFactory;
+    friend class SegmentedRepository;
 
 public:
     // moveable but not copyable
@@ -108,7 +108,7 @@ private:
 
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
-    friend class UniqueFactory;
+    friend class SegmentedRepository;
 
 public:
     // moveable but not copyable
@@ -133,7 +133,7 @@ private:
 
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
-    friend class UniqueFactory;
+    friend class SegmentedRepository;
 
 public:
     // moveable but not copyable
@@ -159,7 +159,7 @@ private:
 
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
-    friend class UniqueFactory;
+    friend class SegmentedRepository;
 
 public:
     // moveable but not copyable
@@ -185,7 +185,7 @@ private:
 
     // Give access to the constructor.
     template<typename HolderType, typename Hash, typename EqualTo>
-    friend class UniqueFactory;
+    friend class SegmentedRepository;
 
 public:
     // moveable but not copyable

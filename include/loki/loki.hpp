@@ -33,7 +33,6 @@
 #include "loki/details/pddl/effects.hpp"
 #include "loki/details/pddl/error_reporting.hpp"
 #include "loki/details/pddl/exceptions.hpp"
-#include "loki/details/pddl/factories.hpp"
 #include "loki/details/pddl/function.hpp"
 #include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
@@ -46,6 +45,7 @@
 #include "loki/details/pddl/position.hpp"
 #include "loki/details/pddl/predicate.hpp"
 #include "loki/details/pddl/reference.hpp"
+#include "loki/details/pddl/repositories.hpp"
 #include "loki/details/pddl/requirements.hpp"
 #include "loki/details/pddl/scope.hpp"
 #include "loki/details/pddl/term.hpp"
@@ -59,8 +59,7 @@
 #include "loki/details/utils/collections.hpp"
 #include "loki/details/utils/filesystem.hpp"
 #include "loki/details/utils/memory.hpp"
+#include "loki/details/utils/segmented_repository.hpp"
 #include "loki/details/utils/segmented_vector.hpp"
-#include "loki/details/utils/unique_factory.hpp"
-#include "loki/details/utils/variadic_container.hpp"
 
 #endif

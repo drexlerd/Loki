@@ -32,7 +32,7 @@ private:
     // We need to keep the source in memory for error reporting.
     std::string m_source;
 
-    PDDLFactories m_factories;
+    PDDLRepositories m_repositories;
 
     // The matched positions in the input PDDL file.
     std::unique_ptr<PDDLPositionCache> m_position_cache;
@@ -52,7 +52,7 @@ public:
     DomainParser& operator=(DomainParser&& other) = default;
 
     /// @brief Get factories to create additional PDDL objects.
-    PDDLFactories& get_factories();
+    PDDLRepositories& get_factories();
 
     /// @brief Get position caches to be able to reference back to the input PDDL file.
     const PDDLPositionCache& get_position_cache() const;

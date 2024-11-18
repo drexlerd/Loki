@@ -42,69 +42,72 @@
 #include "loki/details/pddl/term.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
-#include "loki/details/utils/unique_factory.hpp"
-#include "loki/details/utils/variadic_container.hpp"
+#include "loki/details/utils/segmented_repository.hpp"
+
+#include <boost/hana.hpp>
 
 namespace loki
 {
 
-using RequirementsFactory = UniqueFactory<RequirementsImpl, UniquePDDLHasher<const RequirementsImpl*>, UniquePDDLEqualTo<const RequirementsImpl*>>;
-using TypeFactory = UniqueFactory<TypeImpl, UniquePDDLHasher<const TypeImpl*>, UniquePDDLEqualTo<const TypeImpl*>>;
-using VariableFactory = UniqueFactory<VariableImpl, UniquePDDLHasher<const VariableImpl*>, UniquePDDLEqualTo<const VariableImpl*>>;
-using TermFactory = UniqueFactory<TermImpl, UniquePDDLHasher<const TermImpl*>, UniquePDDLEqualTo<const TermImpl*>>;
-using ObjectFactory = UniqueFactory<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>>;
-using AtomFactory = UniqueFactory<AtomImpl, UniquePDDLHasher<const AtomImpl*>, UniquePDDLEqualTo<const AtomImpl*>>;
-using LiteralFactory = UniqueFactory<LiteralImpl, UniquePDDLHasher<const LiteralImpl*>, UniquePDDLEqualTo<const LiteralImpl*>>;
-using ParameterFactory = UniqueFactory<ParameterImpl, UniquePDDLHasher<const ParameterImpl*>, UniquePDDLEqualTo<const ParameterImpl*>>;
-using PredicateFactory = UniqueFactory<PredicateImpl, UniquePDDLHasher<const PredicateImpl*>, UniquePDDLEqualTo<const PredicateImpl*>>;
-using FunctionExpressionFactory =
-    UniqueFactory<FunctionExpressionImpl, UniquePDDLHasher<const FunctionExpressionImpl*>, UniquePDDLEqualTo<const FunctionExpressionImpl*>>;
-using FunctionFactory = UniqueFactory<FunctionImpl, UniquePDDLHasher<const FunctionImpl*>, UniquePDDLEqualTo<const FunctionImpl*>>;
-using FunctionSkeletonFactory =
-    UniqueFactory<FunctionSkeletonImpl, UniquePDDLHasher<const FunctionSkeletonImpl*>, UniquePDDLEqualTo<const FunctionSkeletonImpl*>>;
-using ConditionFactory = UniqueFactory<ConditionImpl, UniquePDDLHasher<const ConditionImpl*>, UniquePDDLEqualTo<const ConditionImpl*>>;
-using EffectFactory = UniqueFactory<EffectImpl, UniquePDDLHasher<const EffectImpl*>, UniquePDDLEqualTo<const EffectImpl*>>;
-using ActionFactory = UniqueFactory<ActionImpl, UniquePDDLHasher<const ActionImpl*>, UniquePDDLEqualTo<const ActionImpl*>>;
-using AxiomFactory = UniqueFactory<AxiomImpl, UniquePDDLHasher<const AxiomImpl*>, UniquePDDLEqualTo<const AxiomImpl*>>;
-using OptimizationMetricFactory =
-    UniqueFactory<OptimizationMetricImpl, UniquePDDLHasher<const OptimizationMetricImpl*>, UniquePDDLEqualTo<const OptimizationMetricImpl*>>;
-using NumericFluentFactory = UniqueFactory<NumericFluentImpl, UniquePDDLHasher<const NumericFluentImpl*>, UniquePDDLEqualTo<const NumericFluentImpl*>>;
-using DomainFactory = UniqueFactory<DomainImpl, UniquePDDLHasher<const DomainImpl*>, UniquePDDLEqualTo<const DomainImpl*>>;
-using ProblemFactory = UniqueFactory<ProblemImpl, UniquePDDLHasher<const ProblemImpl*>, UniquePDDLEqualTo<const ProblemImpl*>>;
+using RequirementsRepository = SegmentedRepository<RequirementsImpl, UniquePDDLHasher<const RequirementsImpl*>, UniquePDDLEqualTo<const RequirementsImpl*>>;
+using TypeRepository = SegmentedRepository<TypeImpl, UniquePDDLHasher<const TypeImpl*>, UniquePDDLEqualTo<const TypeImpl*>>;
+using VariableRepository = SegmentedRepository<VariableImpl, UniquePDDLHasher<const VariableImpl*>, UniquePDDLEqualTo<const VariableImpl*>>;
+using TermRepository = SegmentedRepository<TermImpl, UniquePDDLHasher<const TermImpl*>, UniquePDDLEqualTo<const TermImpl*>>;
+using ObjectRepository = SegmentedRepository<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>>;
+using AtomRepository = SegmentedRepository<AtomImpl, UniquePDDLHasher<const AtomImpl*>, UniquePDDLEqualTo<const AtomImpl*>>;
+using LiteralRepository = SegmentedRepository<LiteralImpl, UniquePDDLHasher<const LiteralImpl*>, UniquePDDLEqualTo<const LiteralImpl*>>;
+using ParameterRepository = SegmentedRepository<ParameterImpl, UniquePDDLHasher<const ParameterImpl*>, UniquePDDLEqualTo<const ParameterImpl*>>;
+using PredicateRepository = SegmentedRepository<PredicateImpl, UniquePDDLHasher<const PredicateImpl*>, UniquePDDLEqualTo<const PredicateImpl*>>;
+using FunctionExpressionRepository =
+    SegmentedRepository<FunctionExpressionImpl, UniquePDDLHasher<const FunctionExpressionImpl*>, UniquePDDLEqualTo<const FunctionExpressionImpl*>>;
+using FunctionRepository = SegmentedRepository<FunctionImpl, UniquePDDLHasher<const FunctionImpl*>, UniquePDDLEqualTo<const FunctionImpl*>>;
+using FunctionSkeletonRepository =
+    SegmentedRepository<FunctionSkeletonImpl, UniquePDDLHasher<const FunctionSkeletonImpl*>, UniquePDDLEqualTo<const FunctionSkeletonImpl*>>;
+using ConditionRepository = SegmentedRepository<ConditionImpl, UniquePDDLHasher<const ConditionImpl*>, UniquePDDLEqualTo<const ConditionImpl*>>;
+using EffectRepository = SegmentedRepository<EffectImpl, UniquePDDLHasher<const EffectImpl*>, UniquePDDLEqualTo<const EffectImpl*>>;
+using ActionRepository = SegmentedRepository<ActionImpl, UniquePDDLHasher<const ActionImpl*>, UniquePDDLEqualTo<const ActionImpl*>>;
+using AxiomRepository = SegmentedRepository<AxiomImpl, UniquePDDLHasher<const AxiomImpl*>, UniquePDDLEqualTo<const AxiomImpl*>>;
+using OptimizationMetricRepository =
+    SegmentedRepository<OptimizationMetricImpl, UniquePDDLHasher<const OptimizationMetricImpl*>, UniquePDDLEqualTo<const OptimizationMetricImpl*>>;
+using NumericFluentRepository = SegmentedRepository<NumericFluentImpl, UniquePDDLHasher<const NumericFluentImpl*>, UniquePDDLEqualTo<const NumericFluentImpl*>>;
+using DomainRepository = SegmentedRepository<DomainImpl, UniquePDDLHasher<const DomainImpl*>, UniquePDDLEqualTo<const DomainImpl*>>;
+using ProblemRepository = SegmentedRepository<ProblemImpl, UniquePDDLHasher<const ProblemImpl*>, UniquePDDLEqualTo<const ProblemImpl*>>;
 
-using VariadicPDDLConstructorFactory = VariadicContainer<RequirementsFactory,
-                                                         TypeFactory,
-                                                         VariableFactory,
-                                                         TermFactory,
-                                                         ObjectFactory,
-                                                         AtomFactory,
-                                                         LiteralFactory,
-                                                         ParameterFactory,
-                                                         PredicateFactory,
-                                                         FunctionExpressionFactory,
-                                                         FunctionFactory,
-                                                         FunctionSkeletonFactory,
-                                                         ConditionFactory,
-                                                         EffectFactory,
-                                                         ActionFactory,
-                                                         AxiomFactory,
-                                                         OptimizationMetricFactory,
-                                                         NumericFluentFactory,
-                                                         DomainFactory,
-                                                         ProblemFactory>;
+using PDDLTypeToRepository = boost::hana::map<boost::hana::pair<boost::hana::type<RequirementsImpl>, RequirementsRepository>,
+                                              boost::hana::pair<boost::hana::type<TypeImpl>, TypeRepository>,
+                                              boost::hana::pair<boost::hana::type<VariableImpl>, VariableRepository>,
+                                              boost::hana::pair<boost::hana::type<TermImpl>, TermRepository>,
+                                              boost::hana::pair<boost::hana::type<ObjectImpl>, ObjectRepository>,
+                                              boost::hana::pair<boost::hana::type<AtomImpl>, AtomRepository>,
+                                              boost::hana::pair<boost::hana::type<LiteralImpl>, LiteralRepository>,
+                                              boost::hana::pair<boost::hana::type<ParameterImpl>, ParameterRepository>,
+                                              boost::hana::pair<boost::hana::type<PredicateImpl>, PredicateRepository>,
+                                              boost::hana::pair<boost::hana::type<FunctionExpressionImpl>, FunctionExpressionRepository>,
+                                              boost::hana::pair<boost::hana::type<FunctionImpl>, FunctionRepository>,
+                                              boost::hana::pair<boost::hana::type<FunctionSkeletonImpl>, FunctionSkeletonRepository>,
+                                              boost::hana::pair<boost::hana::type<ConditionImpl>, ConditionRepository>,
+                                              boost::hana::pair<boost::hana::type<EffectImpl>, EffectRepository>,
+                                              boost::hana::pair<boost::hana::type<ActionImpl>, ActionRepository>,
+                                              boost::hana::pair<boost::hana::type<AxiomImpl>, AxiomRepository>,
+                                              boost::hana::pair<boost::hana::type<OptimizationMetricImpl>, OptimizationMetricRepository>,
+                                              boost::hana::pair<boost::hana::type<NumericFluentImpl>, NumericFluentRepository>,
+                                              boost::hana::pair<boost::hana::type<DomainImpl>, DomainRepository>,
+                                              boost::hana::pair<boost::hana::type<ProblemImpl>, ProblemRepository>>;
+
+extern PDDLTypeToRepository create_default_pddl_type_to_repository();
 
 /// @brief Collection of factories for the unique creation of PDDL objects.
-class PDDLFactories
+class PDDLRepositories
 {
 private:
-    VariadicPDDLConstructorFactory m_factories;
+    PDDLTypeToRepository m_repositories;
 
 public:
-    PDDLFactories();
-    PDDLFactories(const PDDLFactories& other) = delete;
-    PDDLFactories& operator=(const PDDLFactories& other) = delete;
-    PDDLFactories(PDDLFactories&& other);
-    PDDLFactories& operator=(PDDLFactories&& other);
+    PDDLRepositories();
+    PDDLRepositories(const PDDLRepositories& other) = delete;
+    PDDLRepositories& operator=(const PDDLRepositories& other) = delete;
+    PDDLRepositories(PDDLRepositories&& other);
+    PDDLRepositories& operator=(PDDLRepositories&& other);
 
     Requirements get_or_create_requirements(RequirementEnumSet requirement_set);
 
