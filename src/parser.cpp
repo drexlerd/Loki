@@ -95,7 +95,7 @@ DomainParser::DomainParser(const fs::path& filepath, bool strict, bool quiet) :
     }
 }
 
-PDDLRepositories& DomainParser::get_factories() { return m_repositories; }
+PDDLRepositories& DomainParser::get_repositories() { return m_repositories; }
 
 const PDDLPositionCache& DomainParser::get_position_cache() const { return *m_position_cache; }
 

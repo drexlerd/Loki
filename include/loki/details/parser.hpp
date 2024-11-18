@@ -52,7 +52,7 @@ public:
     DomainParser& operator=(DomainParser&& other) = default;
 
     /// @brief Get factories to create additional PDDL objects.
-    PDDLRepositories& get_factories();
+    PDDLRepositories& get_repositories();
 
     /// @brief Get position caches to be able to reference back to the input PDDL file.
     const PDDLPositionCache& get_position_cache() const;
