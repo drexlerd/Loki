@@ -162,7 +162,7 @@ void PDDLFormatter::write(const ConditionForallImpl& element, std::ostream& out)
 
 void PDDLFormatter::write(const ConditionImpl& element, std::ostream& out)
 {
-    std::visit([this, &out](const auto& arg) { this->write(arg, out); }, element);
+    std::visit([this, &out](const auto& arg) { this->write(*arg, out); }, element.get_condition());
 }
 
 void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)

@@ -84,10 +84,7 @@ size_t UniquePDDLHasher<const ConditionForallImpl&>::operator()(const ConditionF
     return UniquePDDLHashCombiner()(get_sorted_vector(e.get_parameters()), e.get_condition());
 }
 
-size_t UniquePDDLHasher<const ConditionImpl*>::operator()(const ConditionImpl* e) const
-{
-    return std::visit([](const auto& arg) { return UniquePDDLHasher<decltype(arg)>()(arg); }, *e);
-}
+size_t UniquePDDLHasher<const ConditionImpl*>::operator()(const ConditionImpl* e) const { return UniquePDDLHashCombiner()(e->get_condition()); }
 
 size_t UniquePDDLHasher<const DomainImpl*>::operator()(const DomainImpl* e) const
 {

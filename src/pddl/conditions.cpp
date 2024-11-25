@@ -94,6 +94,23 @@ const ParameterList& ConditionForallImpl::get_parameters() const { return m_para
 
 const Condition& ConditionForallImpl::get_condition() const { return m_condition; }
 
+/* Condition */
+ConditionImpl::ConditionImpl(
+    size_t index,
+    std::variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall> condition) :
+    m_index(index),
+    m_condition(std::move(condition))
+{
+}
+
+size_t ConditionImpl::get_index() const { return m_index; }
+
+const std::variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall>&
+ConditionImpl::get_condition() const
+{
+    return m_condition;
+}
+
 std::ostream& operator<<(std::ostream& out, const ConditionLiteralImpl& element)
 {
     auto formatter = PDDLFormatter();

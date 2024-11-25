@@ -42,13 +42,13 @@ struct TestUnsupportedAndConditionVisitor
     }
 
     /// @brief For inner nodes we need to recursively call the visitor
-    void operator()(const loki::ConditionOrImpl& node)
+    void operator()(loki::ConditionOr node)
     {
-        for (const auto& child_node : node.get_conditions())
+        for (const auto& child_node : node->get_conditions())
         {
             // We call front() to obtain the first occurence.
             const auto child_position = position_cache.get<loki::ConditionImpl>(child_node).front();
-            std::visit(TestUnsupportedAndConditionVisitor(child_position, position_cache, error_handler), *child_node);
+            std::visit(TestUnsupportedAndConditionVisitor(child_position, position_cache, error_handler), child_node->get_condition());
         }
     }
 
@@ -81,7 +81,7 @@ int main()
         }
         // We call front() to obtain the first occurence.
         auto condition_position = position_cache.get<loki::ConditionImpl>(condition.value()).front();
-        std::visit(TestUnsupportedAndConditionVisitor(condition_position, position_cache, error_handler), *condition.value());
+        std::visit(TestUnsupportedAndConditionVisitor(condition_position, position_cache, error_handler), condition.value()->get_condition());
     }
 
     return 0;

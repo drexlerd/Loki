@@ -137,7 +137,7 @@ bool UniquePDDLEqualTo<const ConditionForallImpl&>::operator()(const ConditionFo
 
 bool UniquePDDLEqualTo<const ConditionImpl*>::operator()(const ConditionImpl* l, const ConditionImpl* r) const
 {
-    return UniquePDDLEqualTo<ConditionImpl>()(*l, *r);
+    return l->get_condition() == r->get_condition();
 }
 
 bool UniquePDDLEqualTo<const DomainImpl*>::operator()(const DomainImpl* l, const DomainImpl* r) const

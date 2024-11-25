@@ -63,6 +63,17 @@ using FunctionExpressionRepository =
 using FunctionRepository = SegmentedRepository<FunctionImpl, UniquePDDLHasher<const FunctionImpl*>, UniquePDDLEqualTo<const FunctionImpl*>>;
 using FunctionSkeletonRepository =
     SegmentedRepository<FunctionSkeletonImpl, UniquePDDLHasher<const FunctionSkeletonImpl*>, UniquePDDLEqualTo<const FunctionSkeletonImpl*>>;
+using ConditionLiteralRepository =
+    SegmentedRepository<ConditionLiteralImpl, UniquePDDLHasher<const ConditionLiteralImpl*>, UniquePDDLEqualTo<const ConditionLiteralImpl*>>;
+using ConditionAndRepository = SegmentedRepository<ConditionAndImpl, UniquePDDLHasher<const ConditionAndImpl*>, UniquePDDLEqualTo<const ConditionAndImpl*>>;
+using ConditionOrRepository = SegmentedRepository<ConditionOrImpl, UniquePDDLHasher<const ConditionOrImpl*>, UniquePDDLEqualTo<const ConditionOrImpl*>>;
+using ConditionNotRepository = SegmentedRepository<ConditionNotImpl, UniquePDDLHasher<const ConditionNotImpl*>, UniquePDDLEqualTo<const ConditionNotImpl*>>;
+using ConditionImplyRepository =
+    SegmentedRepository<ConditionImplyImpl, UniquePDDLHasher<const ConditionImplyImpl*>, UniquePDDLEqualTo<const ConditionImplyImpl*>>;
+using ConditionExistsRepository =
+    SegmentedRepository<ConditionExistsImpl, UniquePDDLHasher<const ConditionExistsImpl*>, UniquePDDLEqualTo<const ConditionExistsImpl*>>;
+using ConditionForallRepository =
+    SegmentedRepository<ConditionForallImpl, UniquePDDLHasher<const ConditionForallImpl*>, UniquePDDLEqualTo<const ConditionForallImpl*>>;
 using ConditionRepository = SegmentedRepository<ConditionImpl, UniquePDDLHasher<const ConditionImpl*>, UniquePDDLEqualTo<const ConditionImpl*>>;
 using EffectRepository = SegmentedRepository<EffectImpl, UniquePDDLHasher<const EffectImpl*>, UniquePDDLEqualTo<const EffectImpl*>>;
 using ActionRepository = SegmentedRepository<ActionImpl, UniquePDDLHasher<const ActionImpl*>, UniquePDDLEqualTo<const ActionImpl*>>;
@@ -85,6 +96,13 @@ using PDDLTypeToRepository = boost::hana::map<boost::hana::pair<boost::hana::typ
                                               boost::hana::pair<boost::hana::type<FunctionExpressionImpl>, FunctionExpressionRepository>,
                                               boost::hana::pair<boost::hana::type<FunctionImpl>, FunctionRepository>,
                                               boost::hana::pair<boost::hana::type<FunctionSkeletonImpl>, FunctionSkeletonRepository>,
+                                              boost::hana::pair<boost::hana::type<ConditionLiteralImpl>, ConditionLiteralRepository>,
+                                              boost::hana::pair<boost::hana::type<ConditionAndImpl>, ConditionAndRepository>,
+                                              boost::hana::pair<boost::hana::type<ConditionOrImpl>, ConditionOrRepository>,
+                                              boost::hana::pair<boost::hana::type<ConditionNotImpl>, ConditionNotRepository>,
+                                              boost::hana::pair<boost::hana::type<ConditionImplyImpl>, ConditionImplyRepository>,
+                                              boost::hana::pair<boost::hana::type<ConditionExistsImpl>, ConditionExistsRepository>,
+                                              boost::hana::pair<boost::hana::type<ConditionForallImpl>, ConditionForallRepository>,
                                               boost::hana::pair<boost::hana::type<ConditionImpl>, ConditionRepository>,
                                               boost::hana::pair<boost::hana::type<EffectImpl>, EffectRepository>,
                                               boost::hana::pair<boost::hana::type<ActionImpl>, ActionRepository>,

@@ -199,6 +199,31 @@ public:
     const Condition& get_condition() const;
 };
 
+/* Condition */
+class ConditionImpl
+{
+private:
+    size_t m_index;
+    std::variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall> m_condition;
+
+    ConditionImpl(size_t index,
+                  std::variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall> condition);
+
+    // Give access to the constructor.
+    template<typename HolderType, typename Hash, typename EqualTo>
+    friend class SegmentedRepository;
+
+public:
+    // moveable but not copyable
+    ConditionImpl(const ConditionImpl& other) = delete;
+    ConditionImpl& operator=(const ConditionImpl& other) = delete;
+    ConditionImpl(ConditionImpl&& other) = default;
+    ConditionImpl& operator=(ConditionImpl&& other) = default;
+
+    size_t get_index() const;
+    const std::variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall>& get_condition() const;
+};
+
 extern std::ostream& operator<<(std::ostream& out, const ConditionLiteralImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const ConditionAndImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const ConditionOrImpl& element);
