@@ -24,33 +24,12 @@
 namespace loki
 {
 
-/* TermObjectImpl */
-TermObjectImpl::TermObjectImpl(size_t index, Object object) : m_index(index), m_object(std::move(object)) {}
+/* TermImpl */
+TermImpl::TermImpl(size_t index, std::variant<Object, Variable> object_or_variable) : m_index(index), m_object_or_variable(std::move(object_or_variable)) {}
 
-size_t TermObjectImpl::get_index() const { return m_index; }
+size_t TermImpl::get_index() const { return m_index; }
 
-const Object& TermObjectImpl::get_object() const { return m_object; }
-
-/* TermVariableImpl */
-TermVariableImpl::TermVariableImpl(size_t index, Variable variable) : m_index(index), m_variable(std::move(variable)) {}
-
-size_t TermVariableImpl::get_index() const { return m_index; }
-
-const Variable& TermVariableImpl::get_variable() const { return m_variable; }
-
-std::ostream& operator<<(std::ostream& out, const TermObjectImpl& element)
-{
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
-    return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const TermVariableImpl& element)
-{
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
-    return out;
-}
+const std::variant<Object, Variable>& TermImpl::get_object_or_variable() const { return m_object_or_variable; }
 
 std::ostream& operator<<(std::ostream& out, const TermImpl& element)
 {

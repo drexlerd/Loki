@@ -277,18 +277,6 @@ struct UniquePDDLEqualTo<const RequirementsImpl*>
 };
 
 template<>
-struct UniquePDDLEqualTo<const TermObjectImpl&>
-{
-    bool operator()(const TermObjectImpl& l, const TermObjectImpl& r) const;
-};
-
-template<>
-struct UniquePDDLEqualTo<const TermVariableImpl&>
-{
-    bool operator()(const TermVariableImpl& l, const TermVariableImpl& r) const;
-};
-
-template<>
 struct UniquePDDLEqualTo<const TermImpl*>
 {
     bool operator()(const TermImpl* l, const TermImpl* r) const;

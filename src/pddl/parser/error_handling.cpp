@@ -252,7 +252,7 @@ void test_nonnegative_number(double number, const Position& position, const Cont
  * Test assignment
  */
 
-static void test_incompatible_grounding(const Parameter& parameter, const Object& object, const Position& position, const Context& context)
+static void test_incompatible_grounding_helper(Parameter parameter, Object object, const Position& position, const Context& context)
 {
     // Object type must match any of those types.
     const auto& parameter_types = TypeSet(parameter->get_bases().begin(), parameter->get_bases().end());
@@ -277,9 +277,9 @@ void test_incompatible_grounding(const ParameterList& parameters, const TermList
 
     for (size_t i = 0; i < parameters.size(); ++i)
     {
-        if (const auto term_object = std::get_if<TermObjectImpl>(terms[i]))
+        if (const auto object = std::get_if<Object>(&terms[i]->get_object_or_variable()))
         {
-            test_incompatible_grounding(parameters[i], term_object->get_object(), positions[i], context);
+            test_incompatible_grounding_helper(parameters[i], *object, positions[i], context);
         }
     }
 }

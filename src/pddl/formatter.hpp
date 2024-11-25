@@ -91,8 +91,6 @@ public:
     void write(const PredicateImpl& element, std::ostream& out);
     void write(const ProblemImpl& element, std::ostream& out);
     void write(const RequirementsImpl& element, std::ostream& out);
-    void write(const TermObjectImpl& element, std::ostream& out);
-    void write(const TermVariableImpl& element, std::ostream& out);
     void write(const TermImpl& element, std::ostream& out);
     void write(const TypeImpl& element, std::ostream& out);
     void write(const VariableImpl& element, std::ostream& out);

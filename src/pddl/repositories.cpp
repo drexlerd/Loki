@@ -67,12 +67,12 @@ Variable PDDLRepositories::get_or_create_variable(std::string name)
 
 Term PDDLRepositories::get_or_create_term_variable(Variable variable)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).template get_or_create<TermVariableImpl>(std::move(variable));
+    return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).template get_or_create<TermImpl>(variable);
 }
 
 Term PDDLRepositories::get_or_create_term_object(Object object)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).template get_or_create<TermObjectImpl>(std::move(object));
+    return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).template get_or_create<TermImpl>(object);
 }
 
 Object PDDLRepositories::get_or_create_object(std::string name, TypeList types)

@@ -635,13 +635,9 @@ void PDDLFormatter::write(const RequirementsImpl& element, std::ostream& out)
     out << ")";
 }
 
-void PDDLFormatter::write(const TermObjectImpl& element, std::ostream& out) { out << element.get_object()->get_name(); }
-
-void PDDLFormatter::write(const TermVariableImpl& element, std::ostream& out) { out << element.get_variable()->get_name(); }
-
 void PDDLFormatter::write(const TermImpl& element, std::ostream& out)
 {
-    std::visit([this, &out](const auto& arg) { this->write(arg, out); }, element);
+    std::visit([this, &out](const auto& arg) { this->write(*arg, out); }, element.get_object_or_variable());
 }
 
 void PDDLFormatter::write(const TypeImpl& element, std::ostream& out)

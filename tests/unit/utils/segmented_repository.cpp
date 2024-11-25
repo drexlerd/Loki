@@ -66,9 +66,9 @@ TEST(LokiTests, UtilsSegmentedRepositoryVariantTest)
     const auto object_0 = objects.get_or_create<ObjectImpl>("object_0", TypeList());
     const auto object_1 = objects.get_or_create<ObjectImpl>("object_1", TypeList());
 
-    const auto term_0_object_0 = terms.get_or_create<TermObjectImpl>(object_0);
-    const auto term_1_object_0 = terms.get_or_create<TermObjectImpl>(object_0);
-    const auto term_2_object_1 = terms.get_or_create<TermObjectImpl>(object_1);
+    const auto term_0_object_0 = terms.get_or_create<TermImpl>(object_0);
+    const auto term_1_object_0 = terms.get_or_create<TermImpl>(object_0);
+    const auto term_2_object_1 = terms.get_or_create<TermImpl>(object_1);
 
     EXPECT_EQ(term_0_object_0, term_1_object_0);
     EXPECT_NE(term_0_object_0, term_2_object_1);

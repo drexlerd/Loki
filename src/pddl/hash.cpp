@@ -211,14 +211,7 @@ size_t UniquePDDLHasher<const ProblemImpl*>::operator()(const ProblemImpl* e) co
 
 size_t UniquePDDLHasher<const RequirementsImpl*>::operator()(const RequirementsImpl* e) const { return UniquePDDLHashCombiner()(e->get_requirements()); }
 
-size_t UniquePDDLHasher<const TermObjectImpl&>::operator()(const TermObjectImpl& e) const { return UniquePDDLHashCombiner()(e.get_object()); }
-
-size_t UniquePDDLHasher<const TermVariableImpl&>::operator()(const TermVariableImpl& e) const { return UniquePDDLHashCombiner()(e.get_variable()); }
-
-size_t UniquePDDLHasher<const TermImpl*>::operator()(const TermImpl* e) const
-{
-    return std::visit([](const auto& arg) { return UniquePDDLHasher<decltype(arg)>()(arg); }, *e);
-}
+size_t UniquePDDLHasher<const TermImpl*>::operator()(const TermImpl* e) const { return UniquePDDLHashCombiner()(e->get_object_or_variable()); }
 
 size_t UniquePDDLHasher<const TypeImpl*>::operator()(const TypeImpl* e) const
 {

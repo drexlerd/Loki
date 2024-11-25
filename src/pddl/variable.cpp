@@ -38,11 +38,11 @@ static void collect_free_variables_recursively(const loki::ConditionImpl& condit
     {
         for (const auto& term : condition_literal->get_literal()->get_atom()->get_terms())
         {
-            if (const auto term_variable = std::get_if<loki::TermVariableImpl>(term))
+            if (const auto variable = std::get_if<Variable>(&term->get_object_or_variable()))
             {
-                if (!ref_quantified_variables.count(term_variable->get_variable()))
+                if (!ref_quantified_variables.count(*variable))
                 {
-                    ref_free_variables.insert(term_variable->get_variable());
+                    ref_free_variables.insert(*variable);
                 }
             }
         }

@@ -62,11 +62,7 @@ using VariableList = std::vector<Variable>;
 using VariableSet = std::unordered_set<Variable>;
 using VariableAssignment = std::unordered_map<Variable, Object>;
 
-class TermObjectImpl;
-using TermObject = const TermObjectImpl*;
-class TermVariableImpl;
-using TermVariable = const TermVariableImpl*;
-using TermImpl = std::variant<TermObjectImpl, TermVariableImpl>;
+class TermImpl;
 using Term = const TermImpl*;
 using TermList = std::vector<Term>;
 
