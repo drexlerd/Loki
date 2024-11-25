@@ -122,10 +122,7 @@ size_t UniquePDDLHasher<const EffectCompositeOneofImpl&>::operator()(const Effec
     return UniquePDDLHashCombiner()(get_sorted_vector(e.get_effects()));
 }
 
-size_t UniquePDDLHasher<const EffectImpl*>::operator()(const EffectImpl* e) const
-{
-    return std::visit([](const auto& arg) { return UniquePDDLHasher<decltype(arg)>()(arg); }, *e);
-}
+size_t UniquePDDLHasher<const EffectImpl*>::operator()(const EffectImpl* e) const { return UniquePDDLHashCombiner()(e->get_effect()); }
 
 size_t UniquePDDLHasher<const FunctionExpressionNumberImpl&>::operator()(const FunctionExpressionNumberImpl& e) const
 {
@@ -154,7 +151,7 @@ size_t UniquePDDLHasher<const FunctionExpressionFunctionImpl&>::operator()(const
 
 size_t UniquePDDLHasher<const FunctionExpressionImpl*>::operator()(const FunctionExpressionImpl* e) const
 {
-    return std::visit([](const auto& arg) { return UniquePDDLHasher<decltype(arg)>()(arg); }, *e);
+    return UniquePDDLHashCombiner()(e->get_function_expression());
 }
 
 size_t UniquePDDLHasher<const FunctionSkeletonImpl*>::operator()(const FunctionSkeletonImpl* e) const

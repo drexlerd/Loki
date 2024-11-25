@@ -30,9 +30,9 @@ namespace loki::domain::tests
 TEST(LokiTests, UtilsSegmentedRepositoryIteratorTest)
 {
     SegmentedRepository<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>> factory(2);
-    const auto object_0 = factory.get_or_create<ObjectImpl>("object_0", TypeList());
-    const auto object_1 = factory.get_or_create<ObjectImpl>("object_1", TypeList());
-    const auto object_2 = factory.get_or_create<ObjectImpl>("object_2", TypeList());
+    const auto object_0 = factory.get_or_create("object_0", TypeList());
+    const auto object_1 = factory.get_or_create("object_1", TypeList());
+    const auto object_2 = factory.get_or_create("object_2", TypeList());
 
     auto objects = ObjectList {};
     for (const auto& object : factory)
@@ -63,12 +63,12 @@ TEST(LokiTests, UtilsSegmentedRepositoryVariantTest)
 {
     SegmentedRepository<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>> objects(2);
     SegmentedRepository<TermImpl, UniquePDDLHasher<const TermImpl*>, UniquePDDLEqualTo<const TermImpl*>> terms(2);
-    const auto object_0 = objects.get_or_create<ObjectImpl>("object_0", TypeList());
-    const auto object_1 = objects.get_or_create<ObjectImpl>("object_1", TypeList());
+    const auto object_0 = objects.get_or_create("object_0", TypeList());
+    const auto object_1 = objects.get_or_create("object_1", TypeList());
 
-    const auto term_0_object_0 = terms.get_or_create<TermImpl>(object_0);
-    const auto term_1_object_0 = terms.get_or_create<TermImpl>(object_0);
-    const auto term_2_object_1 = terms.get_or_create<TermImpl>(object_1);
+    const auto term_0_object_0 = terms.get_or_create(object_0);
+    const auto term_1_object_0 = terms.get_or_create(object_0);
+    const auto term_2_object_1 = terms.get_or_create(object_1);
 
     EXPECT_EQ(term_0_object_0, term_1_object_0);
     EXPECT_NE(term_0_object_0, term_2_object_1);
@@ -80,18 +80,18 @@ TEST(LokiTests, UtilsSegmentedRepositoryTest)
     EXPECT_EQ(factory.size(), 0);
 
     // Test uniqueness: insert the same element twice
-    const auto object_0_0 = factory.get_or_create<ObjectImpl>("object_0", TypeList());
+    const auto object_0_0 = factory.get_or_create("object_0", TypeList());
     EXPECT_EQ(factory.size(), 1);
     EXPECT_EQ(object_0_0->get_index(), 0);
     EXPECT_EQ(object_0_0->get_name(), "object_0");
 
-    const auto object_0_1 = factory.get_or_create<ObjectImpl>("object_0", TypeList());
+    const auto object_0_1 = factory.get_or_create("object_0", TypeList());
     EXPECT_EQ(factory.size(), 1);
     EXPECT_EQ(object_0_0, object_0_1);
     EXPECT_EQ(UniquePDDLHasher<const ObjectImpl*>()(object_0_0), UniquePDDLHasher<const ObjectImpl*>()(object_0_1));
     EXPECT_TRUE(UniquePDDLEqualTo<const ObjectImpl*>()(object_0_0, object_0_1));
 
-    const auto object_1 = factory.get_or_create<ObjectImpl>("object_1", TypeList());
+    const auto object_1 = factory.get_or_create("object_1", TypeList());
     EXPECT_EQ(factory.size(), 2);
     EXPECT_NE(object_0_0, object_1);
     EXPECT_EQ(object_1->get_index(), 1);

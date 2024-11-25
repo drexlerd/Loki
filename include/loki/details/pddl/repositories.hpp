@@ -49,68 +49,87 @@
 namespace loki
 {
 
-using RequirementsRepository = SegmentedRepository<RequirementsImpl, UniquePDDLHasher<const RequirementsImpl*>, UniquePDDLEqualTo<const RequirementsImpl*>>;
-using TypeRepository = SegmentedRepository<TypeImpl, UniquePDDLHasher<const TypeImpl*>, UniquePDDLEqualTo<const TypeImpl*>>;
-using VariableRepository = SegmentedRepository<VariableImpl, UniquePDDLHasher<const VariableImpl*>, UniquePDDLEqualTo<const VariableImpl*>>;
-using TermRepository = SegmentedRepository<TermImpl, UniquePDDLHasher<const TermImpl*>, UniquePDDLEqualTo<const TermImpl*>>;
-using ObjectRepository = SegmentedRepository<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>>;
-using AtomRepository = SegmentedRepository<AtomImpl, UniquePDDLHasher<const AtomImpl*>, UniquePDDLEqualTo<const AtomImpl*>>;
-using LiteralRepository = SegmentedRepository<LiteralImpl, UniquePDDLHasher<const LiteralImpl*>, UniquePDDLEqualTo<const LiteralImpl*>>;
-using ParameterRepository = SegmentedRepository<ParameterImpl, UniquePDDLHasher<const ParameterImpl*>, UniquePDDLEqualTo<const ParameterImpl*>>;
-using PredicateRepository = SegmentedRepository<PredicateImpl, UniquePDDLHasher<const PredicateImpl*>, UniquePDDLEqualTo<const PredicateImpl*>>;
-using FunctionExpressionRepository =
-    SegmentedRepository<FunctionExpressionImpl, UniquePDDLHasher<const FunctionExpressionImpl*>, UniquePDDLEqualTo<const FunctionExpressionImpl*>>;
-using FunctionRepository = SegmentedRepository<FunctionImpl, UniquePDDLHasher<const FunctionImpl*>, UniquePDDLEqualTo<const FunctionImpl*>>;
-using FunctionSkeletonRepository =
-    SegmentedRepository<FunctionSkeletonImpl, UniquePDDLHasher<const FunctionSkeletonImpl*>, UniquePDDLEqualTo<const FunctionSkeletonImpl*>>;
-using ConditionLiteralRepository =
-    SegmentedRepository<ConditionLiteralImpl, UniquePDDLHasher<const ConditionLiteralImpl*>, UniquePDDLEqualTo<const ConditionLiteralImpl*>>;
-using ConditionAndRepository = SegmentedRepository<ConditionAndImpl, UniquePDDLHasher<const ConditionAndImpl*>, UniquePDDLEqualTo<const ConditionAndImpl*>>;
-using ConditionOrRepository = SegmentedRepository<ConditionOrImpl, UniquePDDLHasher<const ConditionOrImpl*>, UniquePDDLEqualTo<const ConditionOrImpl*>>;
-using ConditionNotRepository = SegmentedRepository<ConditionNotImpl, UniquePDDLHasher<const ConditionNotImpl*>, UniquePDDLEqualTo<const ConditionNotImpl*>>;
-using ConditionImplyRepository =
-    SegmentedRepository<ConditionImplyImpl, UniquePDDLHasher<const ConditionImplyImpl*>, UniquePDDLEqualTo<const ConditionImplyImpl*>>;
-using ConditionExistsRepository =
-    SegmentedRepository<ConditionExistsImpl, UniquePDDLHasher<const ConditionExistsImpl*>, UniquePDDLEqualTo<const ConditionExistsImpl*>>;
-using ConditionForallRepository =
-    SegmentedRepository<ConditionForallImpl, UniquePDDLHasher<const ConditionForallImpl*>, UniquePDDLEqualTo<const ConditionForallImpl*>>;
-using ConditionRepository = SegmentedRepository<ConditionImpl, UniquePDDLHasher<const ConditionImpl*>, UniquePDDLEqualTo<const ConditionImpl*>>;
-using EffectRepository = SegmentedRepository<EffectImpl, UniquePDDLHasher<const EffectImpl*>, UniquePDDLEqualTo<const EffectImpl*>>;
-using ActionRepository = SegmentedRepository<ActionImpl, UniquePDDLHasher<const ActionImpl*>, UniquePDDLEqualTo<const ActionImpl*>>;
-using AxiomRepository = SegmentedRepository<AxiomImpl, UniquePDDLHasher<const AxiomImpl*>, UniquePDDLEqualTo<const AxiomImpl*>>;
-using OptimizationMetricRepository =
-    SegmentedRepository<OptimizationMetricImpl, UniquePDDLHasher<const OptimizationMetricImpl*>, UniquePDDLEqualTo<const OptimizationMetricImpl*>>;
-using NumericFluentRepository = SegmentedRepository<NumericFluentImpl, UniquePDDLHasher<const NumericFluentImpl*>, UniquePDDLEqualTo<const NumericFluentImpl*>>;
-using DomainRepository = SegmentedRepository<DomainImpl, UniquePDDLHasher<const DomainImpl*>, UniquePDDLEqualTo<const DomainImpl*>>;
-using ProblemRepository = SegmentedRepository<ProblemImpl, UniquePDDLHasher<const ProblemImpl*>, UniquePDDLEqualTo<const ProblemImpl*>>;
+template<typename T>
+using SegmentedPDDLRepository = SegmentedRepository<T, UniquePDDLHasher<const T*>, UniquePDDLEqualTo<const T*>>;
 
-using PDDLTypeToRepository = boost::hana::map<boost::hana::pair<boost::hana::type<RequirementsImpl>, RequirementsRepository>,
-                                              boost::hana::pair<boost::hana::type<TypeImpl>, TypeRepository>,
-                                              boost::hana::pair<boost::hana::type<VariableImpl>, VariableRepository>,
-                                              boost::hana::pair<boost::hana::type<TermImpl>, TermRepository>,
-                                              boost::hana::pair<boost::hana::type<ObjectImpl>, ObjectRepository>,
-                                              boost::hana::pair<boost::hana::type<AtomImpl>, AtomRepository>,
-                                              boost::hana::pair<boost::hana::type<LiteralImpl>, LiteralRepository>,
-                                              boost::hana::pair<boost::hana::type<ParameterImpl>, ParameterRepository>,
-                                              boost::hana::pair<boost::hana::type<PredicateImpl>, PredicateRepository>,
-                                              boost::hana::pair<boost::hana::type<FunctionExpressionImpl>, FunctionExpressionRepository>,
-                                              boost::hana::pair<boost::hana::type<FunctionImpl>, FunctionRepository>,
-                                              boost::hana::pair<boost::hana::type<FunctionSkeletonImpl>, FunctionSkeletonRepository>,
-                                              boost::hana::pair<boost::hana::type<ConditionLiteralImpl>, ConditionLiteralRepository>,
-                                              boost::hana::pair<boost::hana::type<ConditionAndImpl>, ConditionAndRepository>,
-                                              boost::hana::pair<boost::hana::type<ConditionOrImpl>, ConditionOrRepository>,
-                                              boost::hana::pair<boost::hana::type<ConditionNotImpl>, ConditionNotRepository>,
-                                              boost::hana::pair<boost::hana::type<ConditionImplyImpl>, ConditionImplyRepository>,
-                                              boost::hana::pair<boost::hana::type<ConditionExistsImpl>, ConditionExistsRepository>,
-                                              boost::hana::pair<boost::hana::type<ConditionForallImpl>, ConditionForallRepository>,
-                                              boost::hana::pair<boost::hana::type<ConditionImpl>, ConditionRepository>,
-                                              boost::hana::pair<boost::hana::type<EffectImpl>, EffectRepository>,
-                                              boost::hana::pair<boost::hana::type<ActionImpl>, ActionRepository>,
-                                              boost::hana::pair<boost::hana::type<AxiomImpl>, AxiomRepository>,
-                                              boost::hana::pair<boost::hana::type<OptimizationMetricImpl>, OptimizationMetricRepository>,
-                                              boost::hana::pair<boost::hana::type<NumericFluentImpl>, NumericFluentRepository>,
-                                              boost::hana::pair<boost::hana::type<DomainImpl>, DomainRepository>,
-                                              boost::hana::pair<boost::hana::type<ProblemImpl>, ProblemRepository>>;
+using RequirementsRepository = SegmentedPDDLRepository<RequirementsImpl>;
+using TypeRepository = SegmentedPDDLRepository<TypeImpl>;
+using VariableRepository = SegmentedPDDLRepository<VariableImpl>;
+using TermRepository = SegmentedPDDLRepository<TermImpl>;
+using ObjectRepository = SegmentedPDDLRepository<ObjectImpl>;
+using AtomRepository = SegmentedPDDLRepository<AtomImpl>;
+using LiteralRepository = SegmentedPDDLRepository<LiteralImpl>;
+using ParameterRepository = SegmentedPDDLRepository<ParameterImpl>;
+using PredicateRepository = SegmentedPDDLRepository<PredicateImpl>;
+using FunctionExpressionNumberRepository = SegmentedPDDLRepository<FunctionExpressionNumberImpl>;
+using FunctionExpressionBinaryOperatorRepository = SegmentedPDDLRepository<FunctionExpressionBinaryOperatorImpl>;
+using FunctionExpressionMultiOperatorRepository = SegmentedPDDLRepository<FunctionExpressionMultiOperatorImpl>;
+using FunctionExpressionMinusRepository = SegmentedPDDLRepository<FunctionExpressionMinusImpl>;
+using FunctionExpressionFunctionRepository = SegmentedPDDLRepository<FunctionExpressionFunctionImpl>;
+using FunctionExpressionRepository = SegmentedPDDLRepository<FunctionExpressionImpl>;
+using FunctionRepository = SegmentedPDDLRepository<FunctionImpl>;
+using FunctionSkeletonRepository = SegmentedPDDLRepository<FunctionSkeletonImpl>;
+using ConditionLiteralRepository = SegmentedPDDLRepository<ConditionLiteralImpl>;
+using ConditionAndRepository = SegmentedPDDLRepository<ConditionAndImpl>;
+using ConditionOrRepository = SegmentedPDDLRepository<ConditionOrImpl>;
+using ConditionNotRepository = SegmentedPDDLRepository<ConditionNotImpl>;
+using ConditionImplyRepository = SegmentedPDDLRepository<ConditionImplyImpl>;
+using ConditionExistsRepository = SegmentedPDDLRepository<ConditionExistsImpl>;
+using ConditionForallRepository = SegmentedPDDLRepository<ConditionForallImpl>;
+using ConditionRepository = SegmentedPDDLRepository<ConditionImpl>;
+using EffectLiteralRepository = SegmentedPDDLRepository<EffectLiteralImpl>;
+using EffectAndRepository = SegmentedPDDLRepository<EffectAndImpl>;
+using EffectNumericRepository = SegmentedPDDLRepository<EffectNumericImpl>;
+using EffectCompositeForallRepository = SegmentedPDDLRepository<EffectCompositeForallImpl>;
+using EffectCompositeWhenRepository = SegmentedPDDLRepository<EffectCompositeWhenImpl>;
+using EffectCompositeOneofRepository = SegmentedPDDLRepository<EffectCompositeOneofImpl>;
+using EffectRepository = SegmentedPDDLRepository<EffectImpl>;
+using ActionRepository = SegmentedPDDLRepository<ActionImpl>;
+using AxiomRepository = SegmentedPDDLRepository<AxiomImpl>;
+using OptimizationMetricRepository = SegmentedPDDLRepository<OptimizationMetricImpl>;
+using NumericFluentRepository = SegmentedPDDLRepository<NumericFluentImpl>;
+using DomainRepository = SegmentedPDDLRepository<DomainImpl>;
+using ProblemRepository = SegmentedPDDLRepository<ProblemImpl>;
+
+using PDDLTypeToRepository =
+    boost::hana::map<boost::hana::pair<boost::hana::type<RequirementsImpl>, RequirementsRepository>,
+                     boost::hana::pair<boost::hana::type<TypeImpl>, TypeRepository>,
+                     boost::hana::pair<boost::hana::type<VariableImpl>, VariableRepository>,
+                     boost::hana::pair<boost::hana::type<TermImpl>, TermRepository>,
+                     boost::hana::pair<boost::hana::type<ObjectImpl>, ObjectRepository>,
+                     boost::hana::pair<boost::hana::type<AtomImpl>, AtomRepository>,
+                     boost::hana::pair<boost::hana::type<LiteralImpl>, LiteralRepository>,
+                     boost::hana::pair<boost::hana::type<ParameterImpl>, ParameterRepository>,
+                     boost::hana::pair<boost::hana::type<PredicateImpl>, PredicateRepository>,
+                     boost::hana::pair<boost::hana::type<FunctionExpressionNumberImpl>, FunctionExpressionNumberRepository>,
+                     boost::hana::pair<boost::hana::type<FunctionExpressionBinaryOperatorImpl>, FunctionExpressionBinaryOperatorRepository>,
+                     boost::hana::pair<boost::hana::type<FunctionExpressionMultiOperatorImpl>, FunctionExpressionMultiOperatorRepository>,
+                     boost::hana::pair<boost::hana::type<FunctionExpressionMinusImpl>, FunctionExpressionMinusRepository>,
+                     boost::hana::pair<boost::hana::type<FunctionExpressionFunctionImpl>, FunctionExpressionFunctionRepository>,
+                     boost::hana::pair<boost::hana::type<FunctionExpressionImpl>, FunctionExpressionRepository>,
+                     boost::hana::pair<boost::hana::type<FunctionImpl>, FunctionRepository>,
+                     boost::hana::pair<boost::hana::type<FunctionSkeletonImpl>, FunctionSkeletonRepository>,
+                     boost::hana::pair<boost::hana::type<ConditionLiteralImpl>, ConditionLiteralRepository>,
+                     boost::hana::pair<boost::hana::type<ConditionAndImpl>, ConditionAndRepository>,
+                     boost::hana::pair<boost::hana::type<ConditionOrImpl>, ConditionOrRepository>,
+                     boost::hana::pair<boost::hana::type<ConditionNotImpl>, ConditionNotRepository>,
+                     boost::hana::pair<boost::hana::type<ConditionImplyImpl>, ConditionImplyRepository>,
+                     boost::hana::pair<boost::hana::type<ConditionExistsImpl>, ConditionExistsRepository>,
+                     boost::hana::pair<boost::hana::type<ConditionForallImpl>, ConditionForallRepository>,
+                     boost::hana::pair<boost::hana::type<ConditionImpl>, ConditionRepository>,
+                     boost::hana::pair<boost::hana::type<EffectLiteralImpl>, EffectLiteralRepository>,
+                     boost::hana::pair<boost::hana::type<EffectAndImpl>, EffectAndRepository>,
+                     boost::hana::pair<boost::hana::type<EffectNumericImpl>, EffectNumericRepository>,
+                     boost::hana::pair<boost::hana::type<EffectCompositeForallImpl>, EffectCompositeForallRepository>,
+                     boost::hana::pair<boost::hana::type<EffectCompositeWhenImpl>, EffectCompositeWhenRepository>,
+                     boost::hana::pair<boost::hana::type<EffectCompositeOneofImpl>, EffectCompositeOneofRepository>,
+                     boost::hana::pair<boost::hana::type<EffectImpl>, EffectRepository>,
+                     boost::hana::pair<boost::hana::type<ActionImpl>, ActionRepository>,
+                     boost::hana::pair<boost::hana::type<AxiomImpl>, AxiomRepository>,
+                     boost::hana::pair<boost::hana::type<OptimizationMetricImpl>, OptimizationMetricRepository>,
+                     boost::hana::pair<boost::hana::type<NumericFluentImpl>, NumericFluentRepository>,
+                     boost::hana::pair<boost::hana::type<DomainImpl>, DomainRepository>,
+                     boost::hana::pair<boost::hana::type<ProblemImpl>, ProblemRepository>>;
 
 extern PDDLTypeToRepository create_default_pddl_type_to_repository();
 

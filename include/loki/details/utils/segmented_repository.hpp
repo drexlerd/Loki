@@ -32,19 +32,18 @@ namespace loki
 /// @brief `UniqueFactory` manages unique creation of objects
 /// in a persistent and efficient manner, utilizing a combination of unordered_set for
 /// uniqueness checks and SegmentedVector for continuous and cache-efficient storage of value types.
-/// @tparam HolderType is the holder value type which can be an std::variant.
-/// Note that using a base class value type will result in object slicing.
+/// @tparam T is the type.
 /// @tparam Hash the hash function.
 /// @tparam KeyEqual the comparison function.
-template<typename HolderType, typename Hash, typename KeyEqual>
+template<typename T, typename Hash, typename KeyEqual>
 class SegmentedRepository
 {
 private:
     // We use an unordered_set to test for uniqueness.
-    std::unordered_set<const HolderType*, Hash, KeyEqual> m_uniqueness_set;
+    std::unordered_set<const T*, Hash, KeyEqual> m_uniqueness_set;
 
     // We use pre-allocated memory to store objects persistent.
-    SegmentedVector<HolderType> m_persistent_vector;
+    SegmentedVector<T> m_persistent_vector;
 
     void range_check(size_t pos) const
     {
@@ -57,7 +56,7 @@ private:
 
 public:
     SegmentedRepository(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
-        m_persistent_vector(SegmentedVector<HolderType>(initial_num_element_per_segment, maximum_num_elements_per_segment))
+        m_persistent_vector(SegmentedVector<T>(initial_num_element_per_segment, maximum_num_elements_per_segment))
     {
     }
     SegmentedRepository(const SegmentedRepository& other) = delete;
@@ -66,8 +65,8 @@ public:
     SegmentedRepository& operator=(SegmentedRepository&& other) = default;
 
     /// @brief Returns a pointer to an existing object or creates it before if it does not exist.
-    template<typename SubType, typename... Args>
-    HolderType const* get_or_create(Args&&... args)
+    template<typename... Args>
+    T const* get_or_create(Args&&... args)
     {
         /* Construct and insert the element in persistent memory. */
 
@@ -76,7 +75,7 @@ public:
         assert(index == m_persistent_vector.size());
 
         // Explicitly call the constructor of T to give exclusive access to the factory.
-        const auto* element_ptr = &m_persistent_vector.emplace_back(SubType(index, std::forward<Args>(args)...));
+        const auto* element_ptr = &m_persistent_vector.emplace_back(T(index, std::forward<Args>(args)...));
         // The pointer to the location in persistent memory.
         assert(element_ptr);
 
@@ -105,13 +104,13 @@ public:
      */
 
     /// @brief Returns a pointer to an existing object with the given pos.
-    HolderType const* operator[](size_t pos) const
+    T const* operator[](size_t pos) const
     {
         assert(pos < size());
         return &(m_persistent_vector.at(pos));
     }
 
-    HolderType const* at(size_t pos) const
+    T const* at(size_t pos) const
     {
         range_check(pos);
         return &(m_persistent_vector.at(pos));
@@ -121,7 +120,7 @@ public:
 
     auto end() const { return m_persistent_vector.end(); }
 
-    const SegmentedVector<HolderType>& get_storage() const { return m_persistent_vector; }
+    const SegmentedVector<T>& get_storage() const { return m_persistent_vector; }
 
     /**
      * Capacity

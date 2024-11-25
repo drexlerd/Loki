@@ -100,16 +100,26 @@ const Condition& EffectCompositeWhenImpl::get_condition() const { return m_condi
 const Effect& EffectCompositeWhenImpl::get_effect() const { return m_effect; }
 
 /* EffectCompositeOneofImpl */
-EffectCompositeOneofImpl::EffectCompositeOneofImpl(size_t index, EffectList effects) :
-    m_index(index),
-    m_effects(std::move(effects))
-{
-}
+EffectCompositeOneofImpl::EffectCompositeOneofImpl(size_t index, EffectList effects) : m_index(index), m_effects(std::move(effects)) {}
 
 size_t EffectCompositeOneofImpl::get_index() const { return m_index; }
 
 const EffectList& EffectCompositeOneofImpl::get_effects() const { return m_effects; }
 
+/* EffectImpl */
+EffectImpl::EffectImpl(size_t index,
+                       std::variant<EffectLiteral, EffectAnd, EffectNumeric, EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof> effect) :
+    m_index(index),
+    m_effect(std::move(effect))
+{
+}
+
+size_t EffectImpl::get_index() const { return m_index; }
+
+const std::variant<EffectLiteral, EffectAnd, EffectNumeric, EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof>& EffectImpl::get_effect() const
+{
+    return m_effect;
+}
 
 std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element)
 {

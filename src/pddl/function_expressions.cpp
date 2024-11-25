@@ -110,6 +110,27 @@ size_t FunctionExpressionFunctionImpl::get_index() const { return m_index; }
 
 const Function& FunctionExpressionFunctionImpl::get_function() const { return m_function; }
 
+/* FunctionExpression */
+FunctionExpressionImpl::FunctionExpressionImpl(size_t index,
+                                               std::variant<FunctionExpressionNumber,
+                                                            FunctionExpressionBinaryOperator,
+                                                            FunctionExpressionMultiOperator,
+                                                            FunctionExpressionMinus,
+                                                            FunctionExpressionFunction> function_expression) :
+    m_index(index),
+    m_function_expression(function_expression)
+{
+}
+
+size_t FunctionExpressionImpl::get_index() const { return m_index; }
+
+const std::
+    variant<FunctionExpressionNumber, FunctionExpressionBinaryOperator, FunctionExpressionMultiOperator, FunctionExpressionMinus, FunctionExpressionFunction>&
+    FunctionExpressionImpl::get_function_expression() const
+{
+    return m_function_expression;
+}
+
 std::ostream& operator<<(std::ostream& out, const FunctionExpressionNumberImpl& element)
 {
     auto formatter = PDDLFormatter();

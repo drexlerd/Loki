@@ -113,8 +113,7 @@ class EffectCompositeWhenImpl;
 using EffectCompositeWhen = const EffectCompositeWhenImpl*;
 class EffectCompositeOneofImpl;
 using EffectCompositeOneof = const EffectCompositeOneofImpl*;
-using EffectImpl =
-    std::variant<EffectLiteralImpl, EffectAndImpl, EffectNumericImpl, EffectCompositeForallImpl, EffectCompositeWhenImpl, EffectCompositeOneofImpl>;
+class EffectImpl;
 using Effect = const EffectImpl*;
 using EffectList = std::vector<Effect>;
 
@@ -128,11 +127,7 @@ class FunctionExpressionMinusImpl;
 using FunctionExpressionMinus = const FunctionExpressionMinusImpl*;
 class FunctionExpressionFunctionImpl;
 using FunctionExpressionFunction = const FunctionExpressionFunctionImpl*;
-using FunctionExpressionImpl = std::variant<FunctionExpressionNumberImpl,
-                                            FunctionExpressionBinaryOperatorImpl,
-                                            FunctionExpressionMultiOperatorImpl,
-                                            FunctionExpressionMinusImpl,
-                                            FunctionExpressionFunctionImpl>;
+class FunctionExpressionImpl;
 using FunctionExpression = const FunctionExpressionImpl*;
 using FunctionExpressionList = std::vector<FunctionExpression>;
 

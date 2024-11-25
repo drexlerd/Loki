@@ -352,7 +352,7 @@ void PDDLFormatter::write(const EffectCompositeOneofImpl& element, std::ostream&
 
 void PDDLFormatter::write(const EffectImpl& element, std::ostream& out)
 {
-    std::visit([this, &out](const auto& arg) { this->write(arg, out); }, element);
+    std::visit([this, &out](const auto& arg) { this->write(*arg, out); }, element.get_effect());
 }
 
 void PDDLFormatter::write(const FunctionExpressionNumberImpl& element, std::ostream& out) { out << element.get_number(); }
@@ -389,7 +389,7 @@ void PDDLFormatter::write(const FunctionExpressionFunctionImpl& element, std::os
 
 void PDDLFormatter::write(const FunctionExpressionImpl& element, std::ostream& out)
 {
-    std::visit([this, &out](const auto& arg) { this->write(arg, out); }, element);
+    std::visit([this, &out](const auto& arg) { this->write(*arg, out); }, element.get_function_expression());
 }
 
 void PDDLFormatter::write(const FunctionSkeletonImpl& element, std::ostream& out)

@@ -187,6 +187,30 @@ public:
     const EffectList& get_effects() const;
 };
 
+/* EffectImpl */
+class EffectImpl
+{
+private:
+    size_t m_index;
+    std::variant<EffectLiteral, EffectAnd, EffectNumeric, EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof> m_effect;
+
+    EffectImpl(size_t index, std::variant<EffectLiteral, EffectAnd, EffectNumeric, EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof> effect);
+
+    // Give access to the constructor.
+    template<typename HolderType, typename Hash, typename EqualTo>
+    friend class SegmentedRepository;
+
+public:
+    // moveable but not copyable
+    EffectImpl(const EffectImpl& other) = delete;
+    EffectImpl& operator=(const EffectImpl& other) = delete;
+    EffectImpl(EffectImpl&& other) = default;
+    EffectImpl& operator=(EffectImpl&& other) = default;
+
+    size_t get_index() const;
+    const std::variant<EffectLiteral, EffectAnd, EffectNumeric, EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof>& get_effect() const;
+};
+
 extern std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectAndImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectNumericImpl& element);

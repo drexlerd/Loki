@@ -210,7 +210,7 @@ bool UniquePDDLEqualTo<const EffectCompositeOneofImpl&>::operator()(const Effect
     return true;
 }
 
-bool UniquePDDLEqualTo<const EffectImpl*>::operator()(const EffectImpl* l, const EffectImpl* r) const { return UniquePDDLEqualTo<EffectImpl>()(*l, *r); }
+bool UniquePDDLEqualTo<const EffectImpl*>::operator()(const EffectImpl* l, const EffectImpl* r) const { return l->get_effect() == r->get_effect(); }
 
 bool UniquePDDLEqualTo<const FunctionExpressionNumberImpl&>::operator()(const FunctionExpressionNumberImpl& l, const FunctionExpressionNumberImpl& r) const
 {
@@ -264,7 +264,7 @@ bool UniquePDDLEqualTo<const FunctionExpressionFunctionImpl&>::operator()(const 
 
 bool UniquePDDLEqualTo<const FunctionExpressionImpl*>::operator()(const FunctionExpressionImpl* l, const FunctionExpressionImpl* r) const
 {
-    return UniquePDDLEqualTo<FunctionExpressionImpl>()(*l, *r);
+    return l->get_function_expression() == r->get_function_expression();
 }
 
 bool UniquePDDLEqualTo<const FunctionSkeletonImpl*>::operator()(const FunctionSkeletonImpl* l, const FunctionSkeletonImpl* r) const

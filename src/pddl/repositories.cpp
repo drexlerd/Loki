@@ -22,33 +22,45 @@ namespace loki
 
 PDDLTypeToRepository create_default_pddl_type_to_repository()
 {
-    return boost::hana::make_map(boost::hana::make_pair(boost::hana::type_c<RequirementsImpl>, RequirementsRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<TypeImpl>, TypeRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<VariableImpl>, VariableRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<TermImpl>, TermRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<ObjectImpl>, ObjectRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<AtomImpl>, AtomRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<LiteralImpl>, LiteralRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<ParameterImpl>, ParameterRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<PredicateImpl>, PredicateRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<FunctionExpressionImpl>, FunctionExpressionRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<FunctionImpl>, FunctionRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<FunctionSkeletonImpl>, FunctionSkeletonRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<ConditionLiteralImpl>, ConditionLiteralRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<ConditionAndImpl>, ConditionAndRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<ConditionOrImpl>, ConditionOrRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<ConditionNotImpl>, ConditionNotRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<ConditionImplyImpl>, ConditionImplyRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<ConditionExistsImpl>, ConditionExistsRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<ConditionForallImpl>, ConditionForallRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<ConditionImpl>, ConditionRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<EffectImpl>, EffectRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<ActionImpl>, ActionRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<AxiomImpl>, AxiomRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<OptimizationMetricImpl>, OptimizationMetricRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<NumericFluentImpl>, NumericFluentRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<DomainImpl>, DomainRepository {}),
-                                 boost::hana::make_pair(boost::hana::type_c<ProblemImpl>, ProblemRepository {}));
+    return boost::hana::make_map(
+        boost::hana::make_pair(boost::hana::type_c<RequirementsImpl>, RequirementsRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<TypeImpl>, TypeRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<VariableImpl>, VariableRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<TermImpl>, TermRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ObjectImpl>, ObjectRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<AtomImpl>, AtomRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<LiteralImpl>, LiteralRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ParameterImpl>, ParameterRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<PredicateImpl>, PredicateRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<FunctionExpressionNumberImpl>, FunctionExpressionNumberRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<FunctionExpressionBinaryOperatorImpl>, FunctionExpressionBinaryOperatorRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<FunctionExpressionMultiOperatorImpl>, FunctionExpressionMultiOperatorRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<FunctionExpressionMinusImpl>, FunctionExpressionMinusRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<FunctionExpressionFunctionImpl>, FunctionExpressionFunctionRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<FunctionExpressionImpl>, FunctionExpressionRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<FunctionImpl>, FunctionRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<FunctionSkeletonImpl>, FunctionSkeletonRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ConditionLiteralImpl>, ConditionLiteralRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ConditionAndImpl>, ConditionAndRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ConditionOrImpl>, ConditionOrRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ConditionNotImpl>, ConditionNotRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ConditionImplyImpl>, ConditionImplyRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ConditionExistsImpl>, ConditionExistsRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ConditionForallImpl>, ConditionForallRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ConditionImpl>, ConditionRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<EffectLiteralImpl>, EffectLiteralRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<EffectAndImpl>, EffectAndRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<EffectNumericImpl>, EffectNumericRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<EffectCompositeForallImpl>, EffectCompositeForallRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<EffectCompositeWhenImpl>, EffectCompositeWhenRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<EffectCompositeOneofImpl>, EffectCompositeOneofRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<EffectImpl>, EffectRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ActionImpl>, ActionRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<AxiomImpl>, AxiomRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<OptimizationMetricImpl>, OptimizationMetricRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<NumericFluentImpl>, NumericFluentRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<DomainImpl>, DomainRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ProblemImpl>, ProblemRepository {}));
 }
 
 PDDLRepositories::PDDLRepositories() : m_repositories(create_default_pddl_type_to_repository()) {}
@@ -59,59 +71,58 @@ PDDLRepositories& PDDLRepositories::operator=(PDDLRepositories&& other) = defaul
 
 Requirements PDDLRepositories::get_or_create_requirements(RequirementEnumSet requirement_set)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<RequirementsImpl> {}).template get_or_create<RequirementsImpl>(std::move(requirement_set));
+    return boost::hana::at_key(m_repositories, boost::hana::type<RequirementsImpl> {}).get_or_create(std::move(requirement_set));
 }
 
 Type PDDLRepositories::get_or_create_type(std::string name, TypeList bases)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<TypeImpl> {}).template get_or_create<TypeImpl>(std::move(name), std::move(bases));
+    return boost::hana::at_key(m_repositories, boost::hana::type<TypeImpl> {}).get_or_create(std::move(name), std::move(bases));
 }
 
 Variable PDDLRepositories::get_or_create_variable(std::string name)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<VariableImpl> {}).template get_or_create<VariableImpl>(std::move(name));
+    return boost::hana::at_key(m_repositories, boost::hana::type<VariableImpl> {}).get_or_create(std::move(name));
 }
 
 Term PDDLRepositories::get_or_create_term_variable(Variable variable)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).template get_or_create<TermImpl>(variable);
+    return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).get_or_create(variable);
 }
 
 Term PDDLRepositories::get_or_create_term_object(Object object)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).template get_or_create<TermImpl>(object);
+    return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).get_or_create(object);
 }
 
 Object PDDLRepositories::get_or_create_object(std::string name, TypeList types)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<ObjectImpl> {}).template get_or_create<ObjectImpl>(std::move(name), std::move(types));
+    return boost::hana::at_key(m_repositories, boost::hana::type<ObjectImpl> {}).get_or_create(std::move(name), std::move(types));
 }
 
 Atom PDDLRepositories::get_or_create_atom(Predicate predicate, TermList terms)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<AtomImpl> {}).template get_or_create<AtomImpl>(std::move(predicate), std::move(terms));
+    return boost::hana::at_key(m_repositories, boost::hana::type<AtomImpl> {}).get_or_create(std::move(predicate), std::move(terms));
 }
 
 Literal PDDLRepositories::get_or_create_literal(bool is_negated, Atom atom)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<LiteralImpl> {}).template get_or_create<LiteralImpl>(std::move(is_negated), std::move(atom));
+    return boost::hana::at_key(m_repositories, boost::hana::type<LiteralImpl> {}).get_or_create(std::move(is_negated), std::move(atom));
 }
 
 Parameter PDDLRepositories::get_or_create_parameter(Variable variable, TypeList types)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<ParameterImpl> {})
-        .template get_or_create<ParameterImpl>(std::move(variable), std::move(types));
+    return boost::hana::at_key(m_repositories, boost::hana::type<ParameterImpl> {}).get_or_create(std::move(variable), std::move(types));
 }
 
 Predicate PDDLRepositories::get_or_create_predicate(std::string name, ParameterList parameters)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<PredicateImpl> {})
-        .template get_or_create<PredicateImpl>(std::move(name), std::move(parameters));
+    return boost::hana::at_key(m_repositories, boost::hana::type<PredicateImpl> {}).get_or_create(std::move(name), std::move(parameters));
 }
 
 FunctionExpression PDDLRepositories::get_or_create_function_expression_number(double number)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {}).template get_or_create<FunctionExpressionNumberImpl>(number);
+    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {})
+        .get_or_create(boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionNumberImpl> {}).get_or_create(number));
 }
 
 FunctionExpression PDDLRepositories::get_or_create_function_expression_binary_operator(BinaryOperatorEnum binary_operator,
@@ -119,122 +130,123 @@ FunctionExpression PDDLRepositories::get_or_create_function_expression_binary_op
                                                                                        FunctionExpression right_function_expression)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {})
-        .template get_or_create<FunctionExpressionBinaryOperatorImpl>(binary_operator,
-                                                                      std::move(left_function_expression),
-                                                                      std::move(right_function_expression));
+        .get_or_create(boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionBinaryOperatorImpl> {})
+                           .get_or_create(binary_operator, std::move(left_function_expression), std::move(right_function_expression)));
 }
 
 FunctionExpression PDDLRepositories::get_or_create_function_expression_multi_operator(MultiOperatorEnum multi_operator,
                                                                                       FunctionExpressionList function_expressions_)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {})
-        .template get_or_create<FunctionExpressionMultiOperatorImpl>(multi_operator, std::move(function_expressions_));
+        .get_or_create(boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionMultiOperatorImpl> {})
+                           .get_or_create(multi_operator, std::move(function_expressions_)));
 }
 
 FunctionExpression PDDLRepositories::get_or_create_function_expression_minus(FunctionExpression function_expression)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {})
-        .template get_or_create<FunctionExpressionMinusImpl>(std::move(function_expression));
+        .get_or_create(boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionMinusImpl> {}).get_or_create(std::move(function_expression)));
 }
 
 FunctionExpression PDDLRepositories::get_or_create_function_expression_function(Function function)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {})
-        .template get_or_create<FunctionExpressionFunctionImpl>(std::move(function));
+        .get_or_create(boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionFunctionImpl> {}).get_or_create(std::move(function)));
 }
 
 Function PDDLRepositories::get_or_create_function(FunctionSkeleton function_skeleton, TermList terms)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionImpl> {})
-        .template get_or_create<FunctionImpl>(std::move(function_skeleton), std::move(terms));
+    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionImpl> {}).get_or_create(std::move(function_skeleton), std::move(terms));
 }
 
 FunctionSkeleton PDDLRepositories::get_or_create_function_skeleton(std::string name, ParameterList parameters, Type type)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionSkeletonImpl> {})
-        .template get_or_create<FunctionSkeletonImpl>(std::move(name), std::move(parameters), std::move(type));
+        .get_or_create(std::move(name), std::move(parameters), std::move(type));
 }
 
 Condition PDDLRepositories::get_or_create_condition_literal(Literal literal)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {})
-        .template get_or_create<ConditionImpl>(
-            boost::hana::at_key(m_repositories, boost::hana::type<ConditionLiteralImpl> {}).template get_or_create<ConditionLiteralImpl>(std::move(literal)));
+        .get_or_create(boost::hana::at_key(m_repositories, boost::hana::type<ConditionLiteralImpl> {}).get_or_create(std::move(literal)));
 }
 
 Condition PDDLRepositories::get_or_create_condition_and(ConditionList conditions_)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {})
-        .template get_or_create<ConditionImpl>(
-            boost::hana::at_key(m_repositories, boost::hana::type<ConditionAndImpl> {}).template get_or_create<ConditionAndImpl>(std::move(conditions_)));
+        .get_or_create(boost::hana::at_key(m_repositories, boost::hana::type<ConditionAndImpl> {}).get_or_create(std::move(conditions_)));
 }
 
 Condition PDDLRepositories::get_or_create_condition_or(ConditionList conditions_)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {})
-        .template get_or_create<ConditionImpl>(
-            boost::hana::at_key(m_repositories, boost::hana::type<ConditionOrImpl> {}).template get_or_create<ConditionOrImpl>(std::move(conditions_)));
+        .get_or_create(boost::hana::at_key(m_repositories, boost::hana::type<ConditionOrImpl> {}).get_or_create(std::move(conditions_)));
 }
 
 Condition PDDLRepositories::get_or_create_condition_not(Condition condition)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {})
-        .template get_or_create<ConditionImpl>(
-            boost::hana::at_key(m_repositories, boost::hana::type<ConditionNotImpl> {}).template get_or_create<ConditionNotImpl>(std::move(condition)));
+        .get_or_create(boost::hana::at_key(m_repositories, boost::hana::type<ConditionNotImpl> {}).get_or_create(std::move(condition)));
 }
 
 Condition PDDLRepositories::get_or_create_condition_imply(Condition condition_left, Condition condition_right)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {})
-        .template get_or_create<ConditionImpl>(boost::hana::at_key(m_repositories, boost::hana::type<ConditionImplyImpl> {})
-                                                   .template get_or_create<ConditionImplyImpl>(std::move(condition_left), std::move(condition_right)));
+        .get_or_create(
+            boost::hana::at_key(m_repositories, boost::hana::type<ConditionImplyImpl> {}).get_or_create(std::move(condition_left), std::move(condition_right)));
 }
 
 Condition PDDLRepositories::get_or_create_condition_exists(ParameterList parameters, Condition condition)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {})
-        .template get_or_create<ConditionImpl>(boost::hana::at_key(m_repositories, boost::hana::type<ConditionExistsImpl> {})
-                                                   .template get_or_create<ConditionExistsImpl>(std::move(parameters), std::move(condition)));
+        .get_or_create(
+            boost::hana::at_key(m_repositories, boost::hana::type<ConditionExistsImpl> {}).get_or_create(std::move(parameters), std::move(condition)));
 }
 
 Condition PDDLRepositories::get_or_create_condition_forall(ParameterList parameters, Condition condition)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {})
-        .template get_or_create<ConditionImpl>(boost::hana::at_key(m_repositories, boost::hana::type<ConditionForallImpl> {})
-                                                   .template get_or_create<ConditionForallImpl>(std::move(parameters), std::move(condition)));
+        .get_or_create(
+            boost::hana::at_key(m_repositories, boost::hana::type<ConditionForallImpl> {}).get_or_create(std::move(parameters), std::move(condition)));
 }
 
 Effect PDDLRepositories::get_or_create_effect_literal(Literal literal)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).template get_or_create<EffectLiteralImpl>(std::move(literal));
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {})
+        .get_or_create(boost::hana::at_key(m_repositories, boost::hana::type<EffectLiteralImpl> {}).get_or_create(std::move(literal)));
 }
 
 Effect PDDLRepositories::get_or_create_effect_and(EffectList effects_)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).template get_or_create<EffectAndImpl>(std::move(effects_));
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {})
+        .get_or_create(boost::hana::at_key(m_repositories, boost::hana::type<EffectAndImpl> {}).get_or_create(std::move(effects_)));
 }
 
 Effect PDDLRepositories::get_or_create_effect_numeric(AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {})
-        .template get_or_create<EffectNumericImpl>(std::move(assign_operator), std::move(function), std::move(function_expression));
+        .get_or_create(boost::hana::at_key(m_repositories, boost::hana::type<EffectNumericImpl> {})
+                           .get_or_create(std::move(assign_operator), std::move(function), std::move(function_expression)));
 }
 
 Effect PDDLRepositories::get_or_create_effect_composite_forall(ParameterList parameters, Effect effect)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {})
-        .template get_or_create<EffectCompositeForallImpl>(std::move(parameters), std::move(effect));
+        .get_or_create(
+            boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeForallImpl> {}).get_or_create(std::move(parameters), std::move(effect)));
 }
 
 Effect PDDLRepositories::get_or_create_effect_composite_when(Condition condition, Effect effect)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {})
-        .template get_or_create<EffectCompositeWhenImpl>(std::move(condition), std::move(effect));
+        .get_or_create(
+            boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeWhenImpl> {}).get_or_create(std::move(condition), std::move(effect)));
 }
 
 Effect PDDLRepositories::get_or_create_effect_composite_oneof(EffectList effects_)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).template get_or_create<EffectCompositeOneofImpl>(std::move(effects_));
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {})
+        .get_or_create(boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeOneofImpl> {}).get_or_create(std::move(effects_)));
 }
 
 Action PDDLRepositories::get_or_create_action(std::string name,
@@ -244,7 +256,7 @@ Action PDDLRepositories::get_or_create_action(std::string name,
                                               std::optional<Effect> effect)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ActionImpl> {})
-        .template get_or_create<ActionImpl>(std::move(name), std::move(original_arity), std::move(parameters), std::move(condition), std::move(effect));
+        .get_or_create(std::move(name), std::move(original_arity), std::move(parameters), std::move(condition), std::move(effect));
 }
 
 Axiom PDDLRepositories::get_or_create_axiom(std::string derived_predicate_name,
@@ -253,19 +265,17 @@ Axiom PDDLRepositories::get_or_create_axiom(std::string derived_predicate_name,
                                             size_t num_parameters_to_ground_head)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<AxiomImpl> {})
-        .template get_or_create<AxiomImpl>(std::move(derived_predicate_name), std::move(parameters), std::move(condition), num_parameters_to_ground_head);
+        .get_or_create(std::move(derived_predicate_name), std::move(parameters), std::move(condition), num_parameters_to_ground_head);
 }
 
 OptimizationMetric PDDLRepositories::get_or_create_optimization_metric(OptimizationMetricEnum metric, FunctionExpression function_expression)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<OptimizationMetricImpl> {})
-        .template get_or_create<OptimizationMetricImpl>(std::move(metric), std::move(function_expression));
+    return boost::hana::at_key(m_repositories, boost::hana::type<OptimizationMetricImpl> {}).get_or_create(std::move(metric), std::move(function_expression));
 }
 
 NumericFluent PDDLRepositories::get_or_create_numeric_fluent(Function function, double number)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<NumericFluentImpl> {})
-        .template get_or_create<NumericFluentImpl>(std::move(function), std::move(number));
+    return boost::hana::at_key(m_repositories, boost::hana::type<NumericFluentImpl> {}).get_or_create(std::move(function), std::move(number));
 }
 
 Domain PDDLRepositories::get_or_create_domain(std::optional<fs::path> filepath,
@@ -279,15 +289,15 @@ Domain PDDLRepositories::get_or_create_domain(std::optional<fs::path> filepath,
                                               AxiomList axioms)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<DomainImpl> {})
-        .template get_or_create<DomainImpl>(std::move(filepath),
-                                            std::move(name),
-                                            std::move(requirements),
-                                            std::move(types),
-                                            std::move(constants),
-                                            std::move(predicates),
-                                            std::move(functions),
-                                            std::move(actions),
-                                            std::move(axioms));
+        .get_or_create(std::move(filepath),
+                       std::move(name),
+                       std::move(requirements),
+                       std::move(types),
+                       std::move(constants),
+                       std::move(predicates),
+                       std::move(functions),
+                       std::move(actions),
+                       std::move(axioms));
 }
 
 Problem PDDLRepositories::get_or_create_problem(std::optional<fs::path> filepath,
@@ -303,16 +313,16 @@ Problem PDDLRepositories::get_or_create_problem(std::optional<fs::path> filepath
                                                 AxiomList axioms)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ProblemImpl> {})
-        .template get_or_create<ProblemImpl>(std::move(filepath),
-                                             std::move(domain),
-                                             std::move(name),
-                                             std::move(requirements),
-                                             std::move(objects),
-                                             std::move(derived_predicates),
-                                             std::move(initial_literals),
-                                             std::move(numeric_fluents),
-                                             std::move(goal_condition),
-                                             std::move(optimization_metric),
-                                             std::move(axioms));
+        .get_or_create(std::move(filepath),
+                       std::move(domain),
+                       std::move(name),
+                       std::move(requirements),
+                       std::move(objects),
+                       std::move(derived_predicates),
+                       std::move(initial_literals),
+                       std::move(numeric_fluents),
+                       std::move(goal_condition),
+                       std::move(optimization_metric),
+                       std::move(axioms));
 }
 }
