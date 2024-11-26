@@ -43,7 +43,7 @@ Condition parse(const ast::GoalDescriptor& node, Context& context) { return boos
 
 Condition parse(const ast::GoalDescriptorAtom& node, Context& context)
 {
-    const auto condition = context.factories.get_or_create_condition_literal(parse(node.atom, context));
+    const auto condition = context.factories.get_or_create_condition(context.factories.get_or_create_condition_literal(parse(node.atom, context)));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -53,7 +53,7 @@ Condition parse(const ast::GoalDescriptorLiteral& node, Context& context)
     // requires :negative-preconditions
     test_undefined_requirement(RequirementEnum::NEGATIVE_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::NEGATIVE_PRECONDITIONS);
-    const auto condition = context.factories.get_or_create_condition_literal(parse(node.literal, context));
+    const auto condition = context.factories.get_or_create_condition(context.factories.get_or_create_condition_literal(parse(node.literal, context)));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -61,7 +61,7 @@ Condition parse(const ast::GoalDescriptorLiteral& node, Context& context)
 Condition parse(const ast::GoalDescriptorAnd& node, Context& context)
 {
     auto condition_list = parse(node.goal_descriptors, context);
-    const auto condition = context.factories.get_or_create_condition_and(condition_list);
+    const auto condition = context.factories.get_or_create_condition(context.factories.get_or_create_condition_and(condition_list));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -72,7 +72,7 @@ Condition parse(const ast::GoalDescriptorOr& node, Context& context)
     test_undefined_requirement(RequirementEnum::DISJUNCTIVE_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
     auto condition_list = parse(node.goal_descriptors, context);
-    const auto condition = context.factories.get_or_create_condition_or(condition_list);
+    const auto condition = context.factories.get_or_create_condition(context.factories.get_or_create_condition_or(condition_list));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -83,7 +83,7 @@ Condition parse(const ast::GoalDescriptorNot& node, Context& context)
     test_undefined_requirement(RequirementEnum::NEGATIVE_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::NEGATIVE_PRECONDITIONS);
     auto child_condition = parse(node.goal_descriptor, context);
-    const auto condition = context.factories.get_or_create_condition_not(child_condition);
+    const auto condition = context.factories.get_or_create_condition(context.factories.get_or_create_condition_not(child_condition));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -94,7 +94,7 @@ Condition parse(const ast::GoalDescriptorImply& node, Context& context)
     context.references.untrack(RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
     auto condition_left = parse(node.goal_descriptor_left, context);
     auto condition_right = parse(node.goal_descriptor_right, context);
-    const auto condition = context.factories.get_or_create_condition_imply(condition_left, condition_right);
+    const auto condition = context.factories.get_or_create_condition(context.factories.get_or_create_condition_imply(condition_left, condition_right));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -109,7 +109,7 @@ Condition parse(const ast::GoalDescriptorExists& node, Context& context)
     auto child_condition = parse(node.goal_descriptor, context);
     test_variable_references(parameter_list, context);
     context.scopes.close_scope();
-    auto condition = context.factories.get_or_create_condition_exists(parameter_list, child_condition);
+    auto condition = context.factories.get_or_create_condition(context.factories.get_or_create_condition_exists(parameter_list, child_condition));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -123,7 +123,7 @@ Condition parse_condition_forall(const ast::TypedListOfVariables& parameters_nod
     auto child_condition = parse(condition_node, context);
     test_variable_references(parameter_list, context);
     context.scopes.close_scope();
-    auto condition = context.factories.get_or_create_condition_forall(parameter_list, child_condition);
+    auto condition = context.factories.get_or_create_condition(context.factories.get_or_create_condition_forall(parameter_list, child_condition));
     context.positions.push_back(condition, condition_node);
     return condition;
 }
@@ -153,7 +153,7 @@ Condition parse(const ast::ConstraintGoalDescriptorAnd& node, Context& context)
     {
         condition_list.push_back(parse(child_node, context));
     }
-    const auto condition = context.factories.get_or_create_condition_and(condition_list);
+    const auto condition = context.factories.get_or_create_condition(context.factories.get_or_create_condition_and(condition_list));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -226,7 +226,7 @@ Condition parse(const ast::PreconditionGoalDescriptorAnd& node, Context& context
     {
         condition_list.push_back(parse(child_node, context));
     }
-    const auto condition = context.factories.get_or_create_condition_and(condition_list);
+    const auto condition = context.factories.get_or_create_condition(context.factories.get_or_create_condition_and(condition_list));
     context.positions.push_back(condition, node);
     return condition;
 }

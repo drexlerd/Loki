@@ -46,7 +46,8 @@ OptimizationMetric parse(const ast::MetricSpecificationTotalCost& node, Context&
     const auto optimization = OptimizationMetricEnum::MINIMIZE;
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol_total_cost, context);
     const auto function = context.factories.get_or_create_function(function_skeleton, TermList {});
-    const auto function_expression = context.factories.get_or_create_function_expression_function(function);
+    const auto function_expression =
+        context.factories.get_or_create_function_expression(context.factories.get_or_create_function_expression_function(function));
     return context.factories.get_or_create_optimization_metric(optimization, function_expression);
 }
 

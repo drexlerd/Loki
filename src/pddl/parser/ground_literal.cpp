@@ -35,7 +35,7 @@ Atom parse(const ast::AtomicFormulaOfNamesPredicate& node, Context& context)
     auto positions = PositionList();
     for (const auto& name_node : node.names)
     {
-        term_list.push_back(context.factories.get_or_create_term_object(parse_object_reference(name_node, context)));
+        term_list.push_back(context.factories.get_or_create_term(parse_object_reference(name_node, context)));
         positions.push_back(name_node);
     }
     const auto binding = context.scopes.top().get_predicate(name);
@@ -53,8 +53,8 @@ Atom parse(const ast::AtomicFormulaOfNamesEquality& node, Context& context)
     context.references.untrack(RequirementEnum::EQUALITY);
     assert(context.scopes.top().get_predicate("=").has_value());
     const auto [equal_predicate, _position, _error_handler] = context.scopes.top().get_predicate("=").value();
-    const auto term_left = context.factories.get_or_create_term_object(parse_object_reference(node.name_left, context));
-    const auto term_right = context.factories.get_or_create_term_object(parse_object_reference(node.name_right, context));
+    const auto term_left = context.factories.get_or_create_term(parse_object_reference(node.name_left, context));
+    const auto term_right = context.factories.get_or_create_term(parse_object_reference(node.name_right, context));
     const auto atom = context.factories.get_or_create_atom(equal_predicate, TermList { term_left, term_right });
     context.positions.push_back(atom, node);
     return atom;

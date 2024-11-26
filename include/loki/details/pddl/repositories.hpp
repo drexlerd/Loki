@@ -152,9 +152,9 @@ public:
 
     Variable get_or_create_variable(std::string name);
 
-    Term get_or_create_term_variable(Variable variable);
+    Term get_or_create_term(Variable variable);
 
-    Term get_or_create_term_object(Object object);
+    Term get_or_create_term(Object object);
 
     Object get_or_create_object(std::string name, TypeList types);
 
@@ -166,47 +166,84 @@ public:
 
     Predicate get_or_create_predicate(std::string name, ParameterList parameters);
 
-    FunctionExpression get_or_create_function_expression_number(double number);
+    FunctionExpressionNumber get_or_create_function_expression_number(double number);
 
-    FunctionExpression get_or_create_function_expression_binary_operator(BinaryOperatorEnum binary_operator,
-                                                                         FunctionExpression left_function_expression,
-                                                                         FunctionExpression right_function_expression);
+    FunctionExpressionBinaryOperator get_or_create_function_expression_binary_operator(BinaryOperatorEnum binary_operator,
+                                                                                       FunctionExpression left_function_expression,
+                                                                                       FunctionExpression right_function_expression);
 
-    FunctionExpression get_or_create_function_expression_multi_operator(MultiOperatorEnum multi_operator, FunctionExpressionList function_expressions_);
+    FunctionExpressionMultiOperator get_or_create_function_expression_multi_operator(MultiOperatorEnum multi_operator,
+                                                                                     FunctionExpressionList function_expressions_);
 
-    FunctionExpression get_or_create_function_expression_minus(FunctionExpression function_expression);
+    FunctionExpressionMinus get_or_create_function_expression_minus(FunctionExpression function_expression);
 
-    FunctionExpression get_or_create_function_expression_function(Function function);
+    FunctionExpressionFunction get_or_create_function_expression_function(Function function);
+
+    FunctionExpression get_or_create_function_expression(FunctionExpressionNumber fexpr_number);
+
+    FunctionExpression get_or_create_function_expression(FunctionExpressionBinaryOperator fexpr_binary_op);
+
+    FunctionExpression get_or_create_function_expression(FunctionExpressionMultiOperator fexpr_multi_op);
+
+    FunctionExpression get_or_create_function_expression(FunctionExpressionMinus fexpr_minus);
+
+    FunctionExpression get_or_create_function_expression(FunctionExpressionFunction fexpr_function);
 
     Function get_or_create_function(FunctionSkeleton function_skeleton, TermList terms);
 
     FunctionSkeleton get_or_create_function_skeleton(std::string name, ParameterList parameters, Type type);
 
-    Condition get_or_create_condition_literal(Literal literal);
+    ConditionLiteral get_or_create_condition_literal(Literal literal);
 
-    Condition get_or_create_condition_and(ConditionList conditions_);
+    ConditionAnd get_or_create_condition_and(ConditionList conditions_);
 
-    Condition get_or_create_condition_or(ConditionList conditions_);
+    ConditionOr get_or_create_condition_or(ConditionList conditions_);
 
-    Condition get_or_create_condition_not(Condition condition);
+    ConditionNot get_or_create_condition_not(Condition condition);
 
-    Condition get_or_create_condition_imply(Condition condition_left, Condition condition_right);
+    ConditionImply get_or_create_condition_imply(Condition condition_left, Condition condition_right);
 
-    Condition get_or_create_condition_exists(ParameterList parameters, Condition condition);
+    ConditionExists get_or_create_condition_exists(ParameterList parameters, Condition condition);
 
-    Condition get_or_create_condition_forall(ParameterList parameters, Condition condition);
+    ConditionForall get_or_create_condition_forall(ParameterList parameters, Condition condition);
 
-    Effect get_or_create_effect_literal(Literal literal);
+    Condition get_or_create_condition(ConditionLiteral condition);
 
-    Effect get_or_create_effect_and(EffectList effects);
+    Condition get_or_create_condition(ConditionAnd condition);
 
-    Effect get_or_create_effect_numeric(AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
+    Condition get_or_create_condition(ConditionOr condition);
 
-    Effect get_or_create_effect_composite_forall(ParameterList parameters, Effect effect);
+    Condition get_or_create_condition(ConditionNot condition);
 
-    Effect get_or_create_effect_composite_when(Condition condition, Effect effect);
+    Condition get_or_create_condition(ConditionImply condition);
 
-    Effect get_or_create_effect_composite_oneof(EffectList effects);
+    Condition get_or_create_condition(ConditionExists condition);
+
+    Condition get_or_create_condition(ConditionForall condition);
+
+    EffectLiteral get_or_create_effect_literal(Literal literal);
+
+    EffectAnd get_or_create_effect_and(EffectList effects);
+
+    EffectNumeric get_or_create_effect_numeric(AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
+
+    EffectCompositeForall get_or_create_effect_composite_forall(ParameterList parameters, Effect effect);
+
+    EffectCompositeWhen get_or_create_effect_composite_when(Condition condition, Effect effect);
+
+    EffectCompositeOneof get_or_create_effect_composite_oneof(EffectList effects);
+
+    Effect get_or_create_effect(EffectLiteral effect);
+
+    Effect get_or_create_effect(EffectAnd effect);
+
+    Effect get_or_create_effect(EffectNumeric effect);
+
+    Effect get_or_create_effect(EffectCompositeForall effect);
+
+    Effect get_or_create_effect(EffectCompositeWhen effect);
+
+    Effect get_or_create_effect(EffectCompositeOneof effect);
 
     Action
     get_or_create_action(std::string name, size_t original_arity, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);

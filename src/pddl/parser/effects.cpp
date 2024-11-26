@@ -48,7 +48,7 @@ Effect parse(const std::vector<ast::EffectNumericFluentTotalCostOrEffect>& effec
     {
         effect_list.push_back(boost::apply_visitor(EffectVisitor(context), effect_node));
     }
-    return context.factories.get_or_create_effect_and(effect_list);
+    return context.factories.get_or_create_effect(context.factories.get_or_create_effect_and(effect_list));
 }
 
 Effect parse(const std::vector<ast::Effect>& effect_nodes, Context& context)
@@ -58,7 +58,7 @@ Effect parse(const std::vector<ast::Effect>& effect_nodes, Context& context)
     {
         effect_list.push_back(parse(effect_node, context));
     }
-    return context.factories.get_or_create_effect_and(effect_list);
+    return context.factories.get_or_create_effect(context.factories.get_or_create_effect_and(effect_list));
 }
 
 Effect parse(const ast::EffectRoot& node, Context& context) { return boost::apply_visitor(EffectVisitor(context), node); }
@@ -68,7 +68,7 @@ Effect parse(const ast::Effect& node, Context& context) { return boost::apply_vi
 Effect parse(const ast::EffectProductionLiteral& node, Context& context)
 {
     auto literal = parse(node.literal, context);
-    const auto effect = context.factories.get_or_create_effect_literal(literal);
+    const auto effect = context.factories.get_or_create_effect(context.factories.get_or_create_effect_literal(literal));
 
     context.positions.push_back(effect, node);
     return effect;
@@ -87,7 +87,8 @@ Effect parse(const ast::EffectProductionNumericFluentTotalCost& node, Context& c
     const auto function = context.factories.get_or_create_function(function_skeleton, TermList {});
     context.references.untrack(function->get_function_skeleton());
     const auto function_expression = boost::apply_visitor(FunctionExpressionVisitor(context), node.numeric_term);
-    const auto effect = context.factories.get_or_create_effect_numeric(assign_operator_increase, function, function_expression);
+    const auto effect =
+        context.factories.get_or_create_effect(context.factories.get_or_create_effect_numeric(assign_operator_increase, function, function_expression));
     context.positions.push_back(effect, node);
     return effect;
 }
@@ -100,7 +101,7 @@ Effect parse(const ast::EffectProductionNumericFluentGeneral& node, Context& con
     const auto function = parse(node.function_head, context);
     context.references.untrack(function->get_function_skeleton());
     const auto function_expression = parse(node.function_expression, context);
-    const auto effect = context.factories.get_or_create_effect_numeric(assign_operator, function, function_expression);
+    const auto effect = context.factories.get_or_create_effect(context.factories.get_or_create_effect_numeric(assign_operator, function, function_expression));
     context.positions.push_back(effect, node);
     return effect;
 }
@@ -117,7 +118,7 @@ Effect parse(const ast::EffectCompositeForall& node, Context& context)
     const auto child_effect = parse(node.effect, context);
     test_variable_references(parameter_list, context);
     context.scopes.close_scope();
-    const auto effect = context.factories.get_or_create_effect_composite_forall(parameter_list, child_effect);
+    const auto effect = context.factories.get_or_create_effect(context.factories.get_or_create_effect_composite_forall(parameter_list, child_effect));
     context.positions.push_back(effect, node);
     return effect;
 }
@@ -130,7 +131,7 @@ Effect parse(const ast::EffectCompositeWhen& node, Context& context)
     const auto condition = parse(node.goal_descriptor, context);
     const auto child_effect = parse(node.effect, context);
     context.scopes.close_scope();
-    const auto effect = context.factories.get_or_create_effect_composite_when(condition, child_effect);
+    const auto effect = context.factories.get_or_create_effect(context.factories.get_or_create_effect_composite_when(condition, child_effect));
     context.positions.push_back(effect, node);
     return effect;
 }
@@ -144,7 +145,7 @@ Effect parse(const ast::EffectCompositeOneof& node, Context& context)
     {
         effect_list.push_back(parse(effect_node, context));
     }
-    return context.factories.get_or_create_effect_composite_oneof(effect_list);
+    return context.factories.get_or_create_effect(context.factories.get_or_create_effect_composite_oneof(effect_list));
 }
 
 Effect parse(const ast::EffectComposite& node, Context& context)

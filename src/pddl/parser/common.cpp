@@ -47,7 +47,7 @@ Term TermDeclarationTermVisitor::operator()(const ast::Name& node) const
     // Constant are not tracked and hence must not be untracked.
     const auto binding = context.scopes.top().get_object(constant_name);
     const auto [constant, _position, _error_handler] = binding.value();
-    const auto term = context.factories.get_or_create_term_object(constant);
+    const auto term = context.factories.get_or_create_term(constant);
     context.positions.push_back(term, node);
     return term;
 }
@@ -57,7 +57,7 @@ Term TermDeclarationTermVisitor::operator()(const ast::Variable& node) const
     const auto variable = parse(node, context);
     test_multiple_definition_variable(variable, node, context);
     context.scopes.top().insert_variable(variable->get_name(), variable, node);
-    const auto term = context.factories.get_or_create_term_variable(variable);
+    const auto term = context.factories.get_or_create_term(variable);
     context.positions.push_back(term, node);
     return term;
 }
@@ -71,7 +71,7 @@ Term TermReferenceTermVisitor::operator()(const ast::Name& node) const
     const auto binding = context.scopes.top().get_object(object_name);
     const auto [object, _position, _error_handler] = binding.value();
     context.references.untrack(object);
-    const auto term = context.factories.get_or_create_term_object(object);
+    const auto term = context.factories.get_or_create_term(object);
     context.positions.push_back(term, node);
     return term;
 }
@@ -83,7 +83,7 @@ Term TermReferenceTermVisitor::operator()(const ast::Variable& node) const
     {
         test_undefined_variable(variable, node, context);
     }
-    const auto term = context.factories.get_or_create_term_variable(variable);
+    const auto term = context.factories.get_or_create_term(variable);
     context.positions.push_back(term, node);
     return term;
 }

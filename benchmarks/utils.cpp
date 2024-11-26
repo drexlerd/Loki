@@ -30,9 +30,9 @@ loki::AtomList create_atoms(size_t num_objects, size_t num_predicates, loki::PDD
         {
             for (const auto& object_right : objects)
             {
-                atoms.push_back(factories.get_or_create_atom(
-                    predicate,
-                    loki::TermList { factories.get_or_create_term_object(object_left), factories.get_or_create_term_object(object_right) }));
+                atoms.push_back(
+                    factories.get_or_create_atom(predicate,
+                                                 loki::TermList { factories.get_or_create_term(object_left), factories.get_or_create_term(object_right) }));
             }
         }
     }

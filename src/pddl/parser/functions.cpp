@@ -51,7 +51,7 @@ FunctionExpression parse(const ast::FunctionExpression& node, Context& context) 
 FunctionExpression parse(const ast::FunctionExpressionNumber& node, Context& context)
 {
     const auto number = parse(node.number);
-    const auto function_expression = context.factories.get_or_create_function_expression_number(number);
+    const auto function_expression = context.factories.get_or_create_function_expression(context.factories.get_or_create_function_expression_number(number));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -61,8 +61,8 @@ FunctionExpression parse(const ast::FunctionExpressionBinaryOp& node, Context& c
     const auto binary_operator = boost::apply_visitor(BinaryOperatorVisitor(), node.binary_operator);
     const auto left_function_expression = parse(node.function_expression_left, context);
     const auto right_function_expression = parse(node.function_expression_right, context);
-    const auto function_expression =
-        context.factories.get_or_create_function_expression_binary_operator(binary_operator, left_function_expression, right_function_expression);
+    const auto function_expression = context.factories.get_or_create_function_expression(
+        context.factories.get_or_create_function_expression_binary_operator(binary_operator, left_function_expression, right_function_expression));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -70,7 +70,8 @@ FunctionExpression parse(const ast::FunctionExpressionBinaryOp& node, Context& c
 FunctionExpression parse(const ast::FunctionExpressionMinus& node, Context& context)
 {
     const auto child_function_expression = parse(node.function_expression, context);
-    const auto function_expression = context.factories.get_or_create_function_expression_minus(child_function_expression);
+    const auto function_expression =
+        context.factories.get_or_create_function_expression(context.factories.get_or_create_function_expression_minus(child_function_expression));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -78,7 +79,8 @@ FunctionExpression parse(const ast::FunctionExpressionMinus& node, Context& cont
 FunctionExpression parse(const ast::FunctionExpressionHead node, Context& context)
 {
     const auto function = parse(node.function_head, context);
-    const auto function_expression = context.factories.get_or_create_function_expression_function(function);
+    const auto function_expression =
+        context.factories.get_or_create_function_expression(context.factories.get_or_create_function_expression_function(function));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -201,7 +203,7 @@ FunctionSkeletonListVisitor::FunctionSkeletonListVisitor(Context& context_) : co
 FunctionExpression parse(const ast::MetricFunctionExpressionNumber& node, Context& context)
 {
     const auto number = parse(node.number);
-    const auto function_expression = context.factories.get_or_create_function_expression_number(number);
+    const auto function_expression = context.factories.get_or_create_function_expression(context.factories.get_or_create_function_expression_number(number));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -211,8 +213,8 @@ FunctionExpression parse(const ast::MetricFunctionExpressionBinaryOperator& node
     const auto binary_operator = boost::apply_visitor(BinaryOperatorVisitor(), node.binary_operator);
     const auto left_function_expression = parse(node.metric_function_expression_left, context);
     const auto right_function_expression = parse(node.metric_function_expression_right, context);
-    const auto function_expression =
-        context.factories.get_or_create_function_expression_binary_operator(binary_operator, left_function_expression, right_function_expression);
+    const auto function_expression = context.factories.get_or_create_function_expression(
+        context.factories.get_or_create_function_expression_binary_operator(binary_operator, left_function_expression, right_function_expression));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -228,7 +230,8 @@ FunctionExpression parse(const ast::MetricFunctionExpressionMultiOperator& node,
         const auto next_function_expression = parse(child_node, context);
         function_expressions.push_back(next_function_expression);
     }
-    const auto function_expression = context.factories.get_or_create_function_expression_multi_operator(multi_operator, function_expressions);
+    const auto function_expression = context.factories.get_or_create_function_expression(
+        context.factories.get_or_create_function_expression_multi_operator(multi_operator, function_expressions));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -236,7 +239,8 @@ FunctionExpression parse(const ast::MetricFunctionExpressionMultiOperator& node,
 FunctionExpression parse(const ast::MetricFunctionExpressionMinus& node, Context& context)
 {
     const auto child_function_expression = parse(node.metric_function_expression, context);
-    const auto function_expression = context.factories.get_or_create_function_expression_minus(child_function_expression);
+    const auto function_expression =
+        context.factories.get_or_create_function_expression(context.factories.get_or_create_function_expression_minus(child_function_expression));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -244,7 +248,8 @@ FunctionExpression parse(const ast::MetricFunctionExpressionMinus& node, Context
 FunctionExpression parse(const ast::MetricFunctionExpressionBasicFunctionTerm& node, Context& context)
 {
     const auto function = parse(node.basic_function_term, context);
-    const auto function_expression = context.factories.get_or_create_function_expression_function(function);
+    const auto function_expression =
+        context.factories.get_or_create_function_expression(context.factories.get_or_create_function_expression_function(function));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -273,7 +278,7 @@ Function parse(const ast::BasicFunctionTerm& node, Context& context)
     auto term_list = TermList();
     for (const auto& name_node : node.names)
     {
-        term_list.push_back(context.factories.get_or_create_term_object(parse_object_reference(name_node, context)));
+        term_list.push_back(context.factories.get_or_create_term(parse_object_reference(name_node, context)));
     }
     test_arity_compatibility(function_skeleton->get_parameters().size(), term_list.size(), node, context);
     const auto function = context.factories.get_or_create_function(function_skeleton, term_list);
