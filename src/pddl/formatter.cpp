@@ -81,7 +81,7 @@ void PDDLFormatter::write(const AxiomImpl& element, std::ostream& out)
     }
     out << "\n";
 
-    m_indent -= m_add_indent;
+    m_indent += m_add_indent;
 
     out << std::string(m_indent, ' ');
     write(*element.get_condition(), out);
