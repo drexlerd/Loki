@@ -67,231 +67,231 @@ struct UniquePDDLEqualTo<std::variant<Ts...>>
  */
 
 template<>
-struct UniquePDDLEqualTo<const ActionImpl*>
+struct UniquePDDLEqualTo<Action>
 {
-    bool operator()(const ActionImpl* l, const ActionImpl* r) const;
+    bool operator()(Action l, Action r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const AtomImpl*>
+struct UniquePDDLEqualTo<Atom>
 {
-    bool operator()(const AtomImpl* l, const AtomImpl* r) const;
+    bool operator()(Atom l, Atom r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const AxiomImpl*>
+struct UniquePDDLEqualTo<Axiom>
 {
-    bool operator()(const AxiomImpl* l, const AxiomImpl* r) const;
+    bool operator()(Axiom l, Axiom r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const ConditionLiteralImpl&>
+struct UniquePDDLEqualTo<ConditionLiteral>
 {
-    bool operator()(const ConditionLiteralImpl& l, const ConditionLiteralImpl& r) const;
+    bool operator()(ConditionLiteral l, ConditionLiteral r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const ConditionAndImpl&>
+struct UniquePDDLEqualTo<ConditionAnd>
 {
-    bool operator()(const ConditionAndImpl& l, const ConditionAndImpl& r) const;
+    bool operator()(ConditionAnd l, ConditionAnd r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const ConditionOrImpl&>
+struct UniquePDDLEqualTo<ConditionOr>
 {
-    bool operator()(const ConditionOrImpl& l, const ConditionOrImpl& r) const;
+    bool operator()(ConditionOr l, ConditionOr r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const ConditionNotImpl&>
+struct UniquePDDLEqualTo<ConditionNot>
 {
-    bool operator()(const ConditionNotImpl& l, const ConditionNotImpl& r) const;
+    bool operator()(ConditionNot l, ConditionNot r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const ConditionImplyImpl&>
+struct UniquePDDLEqualTo<ConditionImply>
 {
-    bool operator()(const ConditionImplyImpl& l, const ConditionImplyImpl& r) const;
+    bool operator()(ConditionImply l, ConditionImply r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const ConditionExistsImpl&>
+struct UniquePDDLEqualTo<ConditionExists>
 {
-    bool operator()(const ConditionExistsImpl& l, const ConditionExistsImpl& r) const;
+    bool operator()(ConditionExists l, ConditionExists r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const ConditionForallImpl&>
+struct UniquePDDLEqualTo<ConditionForall>
 {
-    bool operator()(const ConditionForallImpl& l, const ConditionForallImpl& r) const;
+    bool operator()(ConditionForall l, ConditionForall r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const ConditionImpl*>
+struct UniquePDDLEqualTo<Condition>
 {
-    bool operator()(const ConditionImpl* l, const ConditionImpl* r) const;
+    bool operator()(Condition l, Condition r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const DomainImpl*>
+struct UniquePDDLEqualTo<Domain>
 {
-    bool operator()(const DomainImpl* l, const DomainImpl* r) const;
+    bool operator()(Domain l, Domain r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const EffectLiteralImpl&>
+struct UniquePDDLEqualTo<EffectLiteral>
 {
-    bool operator()(const EffectLiteralImpl& l, const EffectLiteralImpl& r) const;
+    bool operator()(EffectLiteral l, EffectLiteral r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const EffectAndImpl&>
+struct UniquePDDLEqualTo<EffectAnd>
 {
-    bool operator()(const EffectAndImpl& l, const EffectAndImpl& r) const;
+    bool operator()(EffectAnd l, EffectAnd r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const EffectNumericImpl&>
+struct UniquePDDLEqualTo<EffectNumeric>
 {
-    bool operator()(const EffectNumericImpl& l, const EffectNumericImpl& r) const;
+    bool operator()(EffectNumeric l, EffectNumeric r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const EffectCompositeForallImpl&>
+struct UniquePDDLEqualTo<EffectCompositeForall>
 {
-    bool operator()(const EffectCompositeForallImpl& l, const EffectCompositeForallImpl& r) const;
+    bool operator()(EffectCompositeForall l, EffectCompositeForall r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const EffectCompositeWhenImpl&>
+struct UniquePDDLEqualTo<EffectCompositeWhen>
 {
-    bool operator()(const EffectCompositeWhenImpl& l, const EffectCompositeWhenImpl& r) const;
+    bool operator()(EffectCompositeWhen l, EffectCompositeWhen r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const EffectCompositeOneofImpl&>
+struct UniquePDDLEqualTo<EffectCompositeOneof>
 {
-    bool operator()(const EffectCompositeOneofImpl& l, const EffectCompositeOneofImpl& r) const;
+    bool operator()(EffectCompositeOneof l, EffectCompositeOneof r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const EffectImpl*>
+struct UniquePDDLEqualTo<Effect>
 {
-    bool operator()(const EffectImpl* l, const EffectImpl* r) const;
+    bool operator()(Effect l, Effect r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const FunctionExpressionNumberImpl&>
+struct UniquePDDLEqualTo<FunctionExpressionNumber>
 {
-    bool operator()(const FunctionExpressionNumberImpl& l, const FunctionExpressionNumberImpl& r) const;
+    bool operator()(FunctionExpressionNumber l, FunctionExpressionNumber r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const FunctionExpressionBinaryOperatorImpl&>
+struct UniquePDDLEqualTo<FunctionExpressionBinaryOperator>
 {
-    bool operator()(const FunctionExpressionBinaryOperatorImpl& l, const FunctionExpressionBinaryOperatorImpl& r) const;
+    bool operator()(FunctionExpressionBinaryOperator l, FunctionExpressionBinaryOperator r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const FunctionExpressionMultiOperatorImpl&>
+struct UniquePDDLEqualTo<FunctionExpressionMultiOperator>
 {
-    bool operator()(const FunctionExpressionMultiOperatorImpl& l, const FunctionExpressionMultiOperatorImpl& r) const;
+    bool operator()(FunctionExpressionMultiOperator l, FunctionExpressionMultiOperator r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const FunctionExpressionMinusImpl&>
+struct UniquePDDLEqualTo<FunctionExpressionMinus>
 {
-    bool operator()(const FunctionExpressionMinusImpl& l, const FunctionExpressionMinusImpl& r) const;
+    bool operator()(FunctionExpressionMinus l, FunctionExpressionMinus r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const FunctionExpressionFunctionImpl&>
+struct UniquePDDLEqualTo<FunctionExpressionFunction>
 {
-    bool operator()(const FunctionExpressionFunctionImpl& l, const FunctionExpressionFunctionImpl& r) const;
+    bool operator()(FunctionExpressionFunction l, FunctionExpressionFunction r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const FunctionExpressionImpl*>
+struct UniquePDDLEqualTo<FunctionExpression>
 {
-    bool operator()(const FunctionExpressionImpl* l, const FunctionExpressionImpl* r) const;
+    bool operator()(FunctionExpression l, FunctionExpression r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const FunctionSkeletonImpl*>
+struct UniquePDDLEqualTo<FunctionSkeleton>
 {
-    bool operator()(const FunctionSkeletonImpl* l, const FunctionSkeletonImpl* r) const;
+    bool operator()(FunctionSkeleton l, FunctionSkeleton r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const FunctionImpl*>
+struct UniquePDDLEqualTo<Function>
 {
-    bool operator()(const FunctionImpl* l, const FunctionImpl* r) const;
+    bool operator()(Function l, Function r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const LiteralImpl*>
+struct UniquePDDLEqualTo<Literal>
 {
-    bool operator()(const LiteralImpl* l, const LiteralImpl* r) const;
+    bool operator()(Literal l, Literal r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const OptimizationMetricImpl*>
+struct UniquePDDLEqualTo<OptimizationMetric>
 {
-    bool operator()(const OptimizationMetricImpl* l, const OptimizationMetricImpl* r) const;
+    bool operator()(OptimizationMetric l, OptimizationMetric r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const NumericFluentImpl*>
+struct UniquePDDLEqualTo<NumericFluent>
 {
-    bool operator()(const NumericFluentImpl* l, const NumericFluentImpl* r) const;
+    bool operator()(NumericFluent l, NumericFluent r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const ObjectImpl*>
+struct UniquePDDLEqualTo<Object>
 {
-    bool operator()(const ObjectImpl* l, const ObjectImpl* r) const;
+    bool operator()(Object l, Object r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const ParameterImpl*>
+struct UniquePDDLEqualTo<Parameter>
 {
-    bool operator()(const ParameterImpl* l, const ParameterImpl* r) const;
+    bool operator()(Parameter l, Parameter r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const PredicateImpl*>
+struct UniquePDDLEqualTo<Predicate>
 {
-    bool operator()(const PredicateImpl* l, const PredicateImpl* r) const;
+    bool operator()(Predicate l, Predicate r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const ProblemImpl*>
+struct UniquePDDLEqualTo<Problem>
 {
-    bool operator()(const ProblemImpl* l, const ProblemImpl* r) const;
+    bool operator()(Problem l, Problem r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const RequirementsImpl*>
+struct UniquePDDLEqualTo<Requirements>
 {
-    bool operator()(const RequirementsImpl* l, const RequirementsImpl* r) const;
+    bool operator()(Requirements l, Requirements r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const TermImpl*>
+struct UniquePDDLEqualTo<Term>
 {
-    bool operator()(const TermImpl* l, const TermImpl* r) const;
+    bool operator()(Term l, Term r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const TypeImpl*>
+struct UniquePDDLEqualTo<Type>
 {
-    bool operator()(const TypeImpl* l, const TypeImpl* r) const;
+    bool operator()(Type l, Type r) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<const VariableImpl*>
+struct UniquePDDLEqualTo<Variable>
 {
-    bool operator()(const VariableImpl* l, const VariableImpl* r) const;
+    bool operator()(Variable l, Variable r) const;
 };
 
 }

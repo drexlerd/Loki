@@ -43,9 +43,9 @@
 
 namespace loki
 {
-bool UniquePDDLEqualTo<const ActionImpl*>::operator()(const ActionImpl* l, const ActionImpl* r) const
+bool UniquePDDLEqualTo<Action>::operator()(Action l, Action r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()))
                && (l->get_condition() == r->get_condition()) && (l->get_effect() == r->get_effect());
@@ -53,18 +53,18 @@ bool UniquePDDLEqualTo<const ActionImpl*>::operator()(const ActionImpl* l, const
     return true;
 }
 
-bool UniquePDDLEqualTo<const AtomImpl*>::operator()(const AtomImpl* l, const AtomImpl* r) const
+bool UniquePDDLEqualTo<Atom>::operator()(Atom l, Atom r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_predicate() == r->get_predicate()) && (l->get_terms() == r->get_terms());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const AxiomImpl*>::operator()(const AxiomImpl* l, const AxiomImpl* r) const
+bool UniquePDDLEqualTo<Axiom>::operator()(Axiom l, Axiom r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_derived_predicate_name() == r->get_derived_predicate_name())
                && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters())) && (l->get_condition() == r->get_condition());
@@ -72,77 +72,74 @@ bool UniquePDDLEqualTo<const AxiomImpl*>::operator()(const AxiomImpl* l, const A
     return true;
 }
 
-bool UniquePDDLEqualTo<const ConditionLiteralImpl&>::operator()(const ConditionLiteralImpl& l, const ConditionLiteralImpl& r) const
+bool UniquePDDLEqualTo<ConditionLiteral>::operator()(ConditionLiteral l, ConditionLiteral r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_literal() == r.get_literal());
+        return (l->get_literal() == r->get_literal());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const ConditionAndImpl&>::operator()(const ConditionAndImpl& l, const ConditionAndImpl& r) const
+bool UniquePDDLEqualTo<ConditionAnd>::operator()(ConditionAnd l, ConditionAnd r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (get_sorted_vector(l.get_conditions()) == get_sorted_vector(r.get_conditions()));
+        return (get_sorted_vector(l->get_conditions()) == get_sorted_vector(r->get_conditions()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const ConditionOrImpl&>::operator()(const ConditionOrImpl& l, const ConditionOrImpl& r) const
+bool UniquePDDLEqualTo<ConditionOr>::operator()(ConditionOr l, ConditionOr r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (get_sorted_vector(l.get_conditions()) == get_sorted_vector(r.get_conditions()));
+        return (get_sorted_vector(l->get_conditions()) == get_sorted_vector(r->get_conditions()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const ConditionNotImpl&>::operator()(const ConditionNotImpl& l, const ConditionNotImpl& r) const
+bool UniquePDDLEqualTo<ConditionNot>::operator()(ConditionNot l, ConditionNot r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_condition() == r.get_condition());
+        return (l->get_condition() == r->get_condition());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const ConditionImplyImpl&>::operator()(const ConditionImplyImpl& l, const ConditionImplyImpl& r) const
+bool UniquePDDLEqualTo<ConditionImply>::operator()(ConditionImply l, ConditionImply r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_condition_left() == r.get_condition_left()) && (l.get_condition_left() == r.get_condition_left());
+        return (l->get_condition_left() == r->get_condition_left()) && (l->get_condition_left() == r->get_condition_left());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const ConditionExistsImpl&>::operator()(const ConditionExistsImpl& l, const ConditionExistsImpl& r) const
+bool UniquePDDLEqualTo<ConditionExists>::operator()(ConditionExists l, ConditionExists r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_condition() == r.get_condition()) && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()));
+        return (l->get_condition() == r->get_condition()) && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const ConditionForallImpl&>::operator()(const ConditionForallImpl& l, const ConditionForallImpl& r) const
+bool UniquePDDLEqualTo<ConditionForall>::operator()(ConditionForall l, ConditionForall r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_condition() == r.get_condition()) && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()));
+        return (l->get_condition() == r->get_condition()) && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const ConditionImpl*>::operator()(const ConditionImpl* l, const ConditionImpl* r) const
-{
-    return l->get_condition() == r->get_condition();
-}
+bool UniquePDDLEqualTo<Condition>::operator()(Condition l, Condition r) const { return l->get_condition() == r->get_condition(); }
 
-bool UniquePDDLEqualTo<const DomainImpl*>::operator()(const DomainImpl* l, const DomainImpl* r) const
+bool UniquePDDLEqualTo<Domain>::operator()(Domain l, Domain r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_name() == r->get_name()) && (l->get_requirements() == r->get_requirements())
                && (get_sorted_vector(l->get_types()) == get_sorted_vector(r->get_types()))
@@ -155,121 +152,118 @@ bool UniquePDDLEqualTo<const DomainImpl*>::operator()(const DomainImpl* l, const
     return true;
 }
 
-bool UniquePDDLEqualTo<const EffectLiteralImpl&>::operator()(const EffectLiteralImpl& l, const EffectLiteralImpl& r) const
+bool UniquePDDLEqualTo<EffectLiteral>::operator()(EffectLiteral l, EffectLiteral r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_literal() == r.get_literal());
+        return (l->get_literal() == r->get_literal());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const EffectAndImpl&>::operator()(const EffectAndImpl& l, const EffectAndImpl& r) const
+bool UniquePDDLEqualTo<EffectAnd>::operator()(EffectAnd l, EffectAnd r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (get_sorted_vector(l.get_effects()) == get_sorted_vector(r.get_effects()));
+        return (get_sorted_vector(l->get_effects()) == get_sorted_vector(r->get_effects()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const EffectNumericImpl&>::operator()(const EffectNumericImpl& l, const EffectNumericImpl& r) const
+bool UniquePDDLEqualTo<EffectNumeric>::operator()(EffectNumeric l, EffectNumeric r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_assign_operator() == r.get_assign_operator()) && (l.get_function() == r.get_function())
-               && (l.get_function_expression() == r.get_function_expression());
+        return (l->get_assign_operator() == r->get_assign_operator()) && (l->get_function() == r->get_function())
+               && (l->get_function_expression() == r->get_function_expression());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const EffectCompositeForallImpl&>::operator()(const EffectCompositeForallImpl& l, const EffectCompositeForallImpl& r) const
+bool UniquePDDLEqualTo<EffectCompositeForall>::operator()(EffectCompositeForall l, EffectCompositeForall r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_effect() == r.get_effect()) && (get_sorted_vector(l.get_parameters()) == get_sorted_vector(r.get_parameters()));
+        return (l->get_effect() == r->get_effect()) && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const EffectCompositeWhenImpl&>::operator()(const EffectCompositeWhenImpl& l, const EffectCompositeWhenImpl& r) const
+bool UniquePDDLEqualTo<EffectCompositeWhen>::operator()(EffectCompositeWhen l, EffectCompositeWhen r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_condition() == r.get_condition()) && (l.get_effect() == r.get_effect());
+        return (l->get_condition() == r->get_condition()) && (l->get_effect() == r->get_effect());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const EffectCompositeOneofImpl&>::operator()(const EffectCompositeOneofImpl& l, const EffectCompositeOneofImpl& r) const
+bool UniquePDDLEqualTo<EffectCompositeOneof>::operator()(EffectCompositeOneof l, EffectCompositeOneof r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (get_sorted_vector(l.get_effects()) == get_sorted_vector(r.get_effects()));
+        return (get_sorted_vector(l->get_effects()) == get_sorted_vector(r->get_effects()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const EffectImpl*>::operator()(const EffectImpl* l, const EffectImpl* r) const { return l->get_effect() == r->get_effect(); }
+bool UniquePDDLEqualTo<Effect>::operator()(Effect l, Effect r) const { return l->get_effect() == r->get_effect(); }
 
-bool UniquePDDLEqualTo<const FunctionExpressionNumberImpl&>::operator()(const FunctionExpressionNumberImpl& l, const FunctionExpressionNumberImpl& r) const
+bool UniquePDDLEqualTo<FunctionExpressionNumber>::operator()(FunctionExpressionNumber l, FunctionExpressionNumber r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_number() == r.get_number());
+        return (l->get_number() == r->get_number());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const FunctionExpressionBinaryOperatorImpl&>::operator()(const FunctionExpressionBinaryOperatorImpl& l,
-                                                                                const FunctionExpressionBinaryOperatorImpl& r) const
+bool UniquePDDLEqualTo<FunctionExpressionBinaryOperator>::operator()(FunctionExpressionBinaryOperator l, FunctionExpressionBinaryOperator r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_binary_operator() == r.get_binary_operator()) && (l.get_left_function_expression() == r.get_left_function_expression())
-               && (l.get_right_function_expression() == r.get_right_function_expression());
+        return (l->get_binary_operator() == r->get_binary_operator()) && (l->get_left_function_expression() == r->get_left_function_expression())
+               && (l->get_right_function_expression() == r->get_right_function_expression());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const FunctionExpressionMultiOperatorImpl&>::operator()(const FunctionExpressionMultiOperatorImpl& l,
-                                                                               const FunctionExpressionMultiOperatorImpl& r) const
+bool UniquePDDLEqualTo<FunctionExpressionMultiOperator>::operator()(FunctionExpressionMultiOperator l, FunctionExpressionMultiOperator r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_multi_operator() == r.get_multi_operator())
-               && (get_sorted_vector(l.get_function_expressions()) == get_sorted_vector(r.get_function_expressions()));
+        return (l->get_multi_operator() == r->get_multi_operator())
+               && (get_sorted_vector(l->get_function_expressions()) == get_sorted_vector(r->get_function_expressions()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const FunctionExpressionMinusImpl&>::operator()(const FunctionExpressionMinusImpl& l, const FunctionExpressionMinusImpl& r) const
+bool UniquePDDLEqualTo<FunctionExpressionMinus>::operator()(FunctionExpressionMinus l, FunctionExpressionMinus r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_function_expression() == r.get_function_expression());
+        return (l->get_function_expression() == r->get_function_expression());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const FunctionExpressionFunctionImpl&>::operator()(const FunctionExpressionFunctionImpl& l,
-                                                                          const FunctionExpressionFunctionImpl& r) const
+bool UniquePDDLEqualTo<FunctionExpressionFunction>::operator()(FunctionExpressionFunction l, FunctionExpressionFunction r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
-        return (l.get_function() == r.get_function());
+        return (l->get_function() == r->get_function());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const FunctionExpressionImpl*>::operator()(const FunctionExpressionImpl* l, const FunctionExpressionImpl* r) const
+bool UniquePDDLEqualTo<FunctionExpression>::operator()(FunctionExpression l, FunctionExpression r) const
 {
     return l->get_function_expression() == r->get_function_expression();
 }
 
-bool UniquePDDLEqualTo<const FunctionSkeletonImpl*>::operator()(const FunctionSkeletonImpl* l, const FunctionSkeletonImpl* r) const
+bool UniquePDDLEqualTo<FunctionSkeleton>::operator()(FunctionSkeleton l, FunctionSkeleton r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_name() == r->get_name()) && (l->get_type() == r->get_type())
                && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
@@ -277,72 +271,72 @@ bool UniquePDDLEqualTo<const FunctionSkeletonImpl*>::operator()(const FunctionSk
     return true;
 }
 
-bool UniquePDDLEqualTo<const FunctionImpl*>::operator()(const FunctionImpl* l, const FunctionImpl* r) const
+bool UniquePDDLEqualTo<Function>::operator()(Function l, Function r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_function_skeleton() == r->get_function_skeleton()) && (l->get_terms() == r->get_terms());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const LiteralImpl*>::operator()(const LiteralImpl* l, const LiteralImpl* r) const
+bool UniquePDDLEqualTo<Literal>::operator()(Literal l, Literal r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->is_negated() == r->is_negated()) && (l->get_atom() == r->get_atom());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const OptimizationMetricImpl*>::operator()(const OptimizationMetricImpl* l, const OptimizationMetricImpl* r) const
+bool UniquePDDLEqualTo<OptimizationMetric>::operator()(OptimizationMetric l, OptimizationMetric r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_optimization_metric() == r->get_optimization_metric()) && (l->get_function_expression() == r->get_function_expression());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const NumericFluentImpl*>::operator()(const NumericFluentImpl* l, const NumericFluentImpl* r) const
+bool UniquePDDLEqualTo<NumericFluent>::operator()(NumericFluent l, NumericFluent r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_number() == r->get_number()) && (l->get_function() == r->get_function());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const ObjectImpl*>::operator()(const ObjectImpl* l, const ObjectImpl* r) const
+bool UniquePDDLEqualTo<Object>::operator()(Object l, Object r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_bases()) == get_sorted_vector(r->get_bases()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const ParameterImpl*>::operator()(const ParameterImpl* l, const ParameterImpl* r) const
+bool UniquePDDLEqualTo<Parameter>::operator()(Parameter l, Parameter r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_variable() == r->get_variable()) && (get_sorted_vector(l->get_bases()) == get_sorted_vector(r->get_bases()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const PredicateImpl*>::operator()(const PredicateImpl* l, const PredicateImpl* r) const
+bool UniquePDDLEqualTo<Predicate>::operator()(Predicate l, Predicate r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const ProblemImpl*>::operator()(const ProblemImpl* l, const ProblemImpl* r) const
+bool UniquePDDLEqualTo<Problem>::operator()(Problem l, Problem r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_name() == r->get_name()) && (l->get_domain() == r->get_domain())
                && (get_sorted_vector(l->get_objects()) == get_sorted_vector(r->get_objects()))
@@ -354,32 +348,29 @@ bool UniquePDDLEqualTo<const ProblemImpl*>::operator()(const ProblemImpl* l, con
     return true;
 }
 
-bool UniquePDDLEqualTo<const RequirementsImpl*>::operator()(const RequirementsImpl* l, const RequirementsImpl* r) const
+bool UniquePDDLEqualTo<Requirements>::operator()(Requirements l, Requirements r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_requirements() == r->get_requirements());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const TermImpl*>::operator()(const TermImpl* l, const TermImpl* r) const
-{
-    return l->get_object_or_variable() == r->get_object_or_variable();
-}
+bool UniquePDDLEqualTo<Term>::operator()(Term l, Term r) const { return l->get_object_or_variable() == r->get_object_or_variable(); }
 
-bool UniquePDDLEqualTo<const TypeImpl*>::operator()(const TypeImpl* l, const TypeImpl* r) const
+bool UniquePDDLEqualTo<Type>::operator()(Type l, Type r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_bases()) == get_sorted_vector(r->get_bases()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<const VariableImpl*>::operator()(const VariableImpl* l, const VariableImpl* r) const
+bool UniquePDDLEqualTo<Variable>::operator()(Variable l, Variable r) const
 {
-    if (&l != &r)
+    if (l != r)
     {
         return (l->get_name() == r->get_name());
     }
