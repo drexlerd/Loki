@@ -150,15 +150,12 @@ struct AssignOperator;
 
 struct Effect;
 struct EffectProductionLiteral;
-struct EffectProductionNumericFluentTotalCost;
-struct EffectProductionNumericFluentGeneral;
+struct EffectProductionNumeric;
 struct EffectProduction;
 struct EffectCompositeForall;
 struct EffectCompositeWhen;
 struct EffectCompositeOneof;
 struct EffectComposite;
-struct EffectNumericFluentTotalCostOrEffect;
-struct EffectRoot;
 
 struct ActionSymbol;
 struct ActionBody;
@@ -826,47 +823,32 @@ struct AssignOperator :
 };
 
 /* <effect> */
-// <p-effect>
-// struct EffectRoot :
-//    x3::position_tagged,
-//    x3::variant<x3::forward_ast<EffectProduction>, x3::forward_ast<EffectComposite>, x3::forward_ast<EffectProductionNumericFluentTotalCost>>,
-//    std::vector<x3::variant<EffectProductionNumericFluentTotalCost, Effect>>>
-//{
-//    using base_type::base_type;
-//    using base_type::operator=;
-//};
-
 struct Effect : x3::position_tagged, x3::variant<x3::forward_ast<EffectProduction>, x3::forward_ast<EffectComposite>, std::vector<Effect>>
 {
     using base_type::base_type;
     using base_type::operator=;
 };
 
+// Production effects
 struct EffectProductionLiteral : x3::position_tagged
 {
     Literal literal;
 };
 
-struct EffectProductionNumericFluentTotalCost : x3::position_tagged
-{
-    AssignOperatorIncrease assign_operator_increase;
-    FunctionSymbol function_symbol_total_cost;
-    FunctionExpression numeric_term;
-};
-
-struct EffectProductionNumericFluentGeneral : x3::position_tagged
+struct EffectProductionNumeric : x3::position_tagged
 {
     AssignOperator assign_operator;
     FunctionHead function_head;
     FunctionExpression function_expression;
 };
 
-struct EffectProduction : x3::position_tagged, x3::variant<EffectProductionLiteral, EffectProductionNumericFluentGeneral>
+struct EffectProduction : x3::position_tagged, x3::variant<EffectProductionLiteral, EffectProductionNumeric>
 {
     using base_type::base_type;
     using base_type::operator=;
 };
 
+// Composite effects
 struct EffectCompositeForall : x3::position_tagged
 {
     TypedListOfVariables typed_list_of_variables;
@@ -881,24 +863,10 @@ struct EffectCompositeWhen : x3::position_tagged
 
 struct EffectCompositeOneof : x3::position_tagged
 {
-    std::vector<Effect> possibilities; 
+    std::vector<Effect> possibilities;
 };
 
 struct EffectComposite : x3::position_tagged, x3::variant<EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof>
-{
-    using base_type::base_type;
-    using base_type::operator=;
-};
-
-struct EffectNumericFluentTotalCostOrEffect : x3::position_tagged, x3::variant<EffectProductionNumericFluentTotalCost, Effect>
-{
-    using base_type::base_type;
-    using base_type::operator=;
-};
-
-struct EffectRoot:
-    x3::position_tagged,
-    x3::variant<EffectProduction, EffectComposite, EffectProductionNumericFluentTotalCost, std::vector<EffectNumericFluentTotalCostOrEffect>>
 {
     using base_type::base_type;
     using base_type::operator=;
@@ -913,7 +881,7 @@ struct ActionSymbol : x3::position_tagged
 struct ActionBody : x3::position_tagged
 {
     boost::optional<PreconditionGoalDescriptor> precondition_goal_descriptor;
-    boost::optional<EffectRoot> effect;
+    boost::optional<Effect> effect;
 };
 
 struct Action : x3::position_tagged

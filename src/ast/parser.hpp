@@ -166,15 +166,12 @@ struct NumericTermClass;
 
 struct EffectClass;
 struct EffectProductionLiteralClass;
-struct EffectProductionNumericFluentTotalCostClass;
-struct EffectProductionNumericFluentGeneralClass;
+struct EffectProductionNumericClass;
 struct EffectProductionClass;
 struct EffectCompositeForallClass;
 struct EffectCompositeWhenClass;
 struct EffectCompositeOneofClass;
 struct EffectCompositeClass;
-struct EffectNumericFluentTotalCostOrEffectClass;
-struct EffectRootClass;
 struct ActionSymbolClass;
 struct ActionBodyClass;
 struct ActionClass;
@@ -367,15 +364,12 @@ typedef x3::rule<NumericTermClass, ast::FunctionExpression> numeric_term_type;
 
 typedef x3::rule<EffectClass, ast::Effect> effect_type;
 typedef x3::rule<EffectProductionLiteralClass, ast::EffectProductionLiteral> effect_production_literal_type;
-typedef x3::rule<EffectProductionNumericFluentTotalCostClass, ast::EffectProductionNumericFluentTotalCost> effect_production_numeric_fluent_total_cost_type;
-typedef x3::rule<EffectProductionNumericFluentGeneralClass, ast::EffectProductionNumericFluentGeneral> effect_production_numeric_fluent_general_type;
+typedef x3::rule<EffectProductionNumericClass, ast::EffectProductionNumeric> effect_production_numeric_type;
 typedef x3::rule<EffectProductionClass, ast::EffectProduction> effect_production_type;
 typedef x3::rule<EffectCompositeForallClass, ast::EffectCompositeForall> effect_composite_forall_type;
 typedef x3::rule<EffectCompositeWhenClass, ast::EffectCompositeWhen> effect_composite_when_type;
 typedef x3::rule<EffectCompositeOneofClass, ast::EffectCompositeOneof> effect_composite_oneof_type;
 typedef x3::rule<EffectCompositeClass, ast::EffectComposite> effect_composite_type;
-typedef x3::rule<EffectRootClass, ast::EffectRoot> effect_root_type;
-typedef x3::rule<EffectNumericFluentTotalCostOrEffectClass, ast::EffectNumericFluentTotalCostOrEffect> effect_numeric_fluent_total_cost_or_effect_type;
 
 typedef x3::rule<ActionSymbolClass, ast::ActionSymbol> action_symbol_type;
 typedef x3::rule<ActionBodyClass, ast::ActionBody> action_body_type;
@@ -561,15 +555,12 @@ BOOST_SPIRIT_DECLARE(numeric_term_type)
 
 BOOST_SPIRIT_DECLARE(effect_type,
                      effect_production_literal_type,
-                     effect_production_numeric_fluent_total_cost_type,
-                     effect_production_numeric_fluent_general_type,
+                     effect_production_numeric_type,
                      effect_production_type,
                      effect_composite_forall_type,
                      effect_composite_when_type,
                      effect_composite_oneof_type,
                      effect_composite_type,
-                     effect_numeric_fluent_total_cost_or_effect_type,
-                     effect_root_type,
                      action_symbol_type,
                      action_body_type,
                      action_type,
@@ -756,15 +747,12 @@ parser::numeric_term_type const& numeric_term();
 
 parser::effect_type const& effect();
 parser::effect_production_literal_type const& effect_production_literal();
-parser::effect_production_numeric_fluent_total_cost_type const& effect_production_numeric_fluent_total_cost();
-parser::effect_production_numeric_fluent_general_type const& effect_production_numeric_fluent_general();
+parser::effect_production_numeric_type const& effect_production_numeric();
 parser::effect_production_type const& effect_production();
-parser::effect_composite_forall_type const& effect_omposite_forall();
+parser::effect_composite_forall_type const& effect_composite_forall();
 parser::effect_composite_when_type const& effect_composite_when();
 parser::effect_composite_oneof_type const& effect_composite_oneof();
 parser::effect_composite_type const& effect_composite();
-parser::effect_numeric_fluent_total_cost_or_effect_type const& effect_numeric_fluent_total_cost_or_effect();
-parser::effect_root_type const& effect_root();
 
 parser::action_symbol_type const& action_symbol();
 parser::action_body_type const& action_body();

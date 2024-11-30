@@ -41,16 +41,6 @@ AssignOperatorEnum parse(const ast::AssignOperatorDecrease&) { return AssignOper
 
 AssignOperatorEnum parse(const ast::AssignOperator& node) { return boost::apply_visitor(AssignOperatorVisitor(), node); }
 
-Effect parse(const std::vector<ast::EffectNumericFluentTotalCostOrEffect>& effect_nodes, Context& context)
-{
-    auto effect_list = EffectList();
-    for (const auto& effect_node : effect_nodes)
-    {
-        effect_list.push_back(boost::apply_visitor(EffectVisitor(context), effect_node));
-    }
-    return context.factories.get_or_create_effect(context.factories.get_or_create_effect_and(effect_list));
-}
-
 Effect parse(const std::vector<ast::Effect>& effect_nodes, Context& context)
 {
     auto effect_list = EffectList();
@@ -60,8 +50,6 @@ Effect parse(const std::vector<ast::Effect>& effect_nodes, Context& context)
     }
     return context.factories.get_or_create_effect(context.factories.get_or_create_effect_and(effect_list));
 }
-
-Effect parse(const ast::EffectRoot& node, Context& context) { return boost::apply_visitor(EffectVisitor(context), node); }
 
 Effect parse(const ast::Effect& node, Context& context) { return boost::apply_visitor(EffectVisitor(context), node); }
 
@@ -74,29 +62,20 @@ Effect parse(const ast::EffectProductionLiteral& node, Context& context)
     return effect;
 }
 
-Effect parse(const ast::EffectProductionNumericFluentTotalCost& node, Context& context)
+Effect parse(const ast::EffectProductionNumeric& node, Context& context)
 {
-    test_undefined_requirement(RequirementEnum::ACTION_COSTS, node, context);
-    context.references.untrack(RequirementEnum::ACTION_COSTS);
-    const auto assign_operator_increase = parse(node.assign_operator_increase);
-    auto function_name = parse(node.function_symbol_total_cost.name);
-    assert(function_name == "total-cost");
-    test_undefined_function_skeleton(function_name, node.function_symbol_total_cost, context);
-    auto binding = context.scopes.top().get_function_skeleton(function_name);
-    const auto [function_skeleton, _position, _error_handler] = binding.value();
-    const auto function = context.factories.get_or_create_function(function_skeleton, TermList {});
-    context.references.untrack(function->get_function_skeleton());
-    const auto function_expression = boost::apply_visitor(FunctionExpressionVisitor(context), node.numeric_term);
-    const auto effect =
-        context.factories.get_or_create_effect(context.factories.get_or_create_effect_numeric(assign_operator_increase, function, function_expression));
-    context.positions.push_back(effect, node);
-    return effect;
-}
-
-Effect parse(const ast::EffectProductionNumericFluentGeneral& node, Context& context)
-{
-    test_undefined_requirement(RequirementEnum::NUMERIC_FLUENTS, node, context);
-    context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
+    // "total-cost" explicitly requires :action-costs to be the specified in the requirements section.
+    if (node.function_head.function_symbol.name.characters == "total-cost")
+    {
+        test_undefined_requirement(RequirementEnum::ACTION_COSTS, node, context);
+        context.references.untrack(RequirementEnum::ACTION_COSTS);
+    }
+    // all remaining function heads require :numeric-fluents to be specified in the requirements section.
+    else
+    {
+        test_undefined_requirement(RequirementEnum::NUMERIC_FLUENTS, node, context);
+        context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
+    }
     const auto assign_operator = parse(node.assign_operator);
     const auto function = parse(node.function_head, context);
     context.references.untrack(function->get_function_skeleton());

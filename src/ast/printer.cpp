@@ -501,15 +501,7 @@ std::string parse_text(const ast::Effect& node, const DefaultFormatterOptions& o
 
 std::string parse_text(const ast::EffectProductionLiteral& node, const DefaultFormatterOptions& options) { return parse_text(node.literal, options); }
 
-std::string parse_text(const ast::EffectProductionNumericFluentTotalCost& node, const DefaultFormatterOptions& options)
-{
-    std::stringstream ss;
-    ss << "(" << parse_text(node.assign_operator_increase, options) << " " << parse_text(node.function_symbol_total_cost, options) << " "
-       << parse_text(node.numeric_term, options) << ")";
-    return ss.str();
-}
-
-std::string parse_text(const ast::EffectProductionNumericFluentGeneral& node, const DefaultFormatterOptions& options)
+std::string parse_text(const ast::EffectProductionNumeric& node, const DefaultFormatterOptions& options)
 {
     std::stringstream ss;
     ss << "(" << parse_text(node.assign_operator, options) << " " << parse_text(node.function_head, options) << " "
@@ -547,13 +539,6 @@ std::string parse_text(const ast::EffectComposite& node, const DefaultFormatterO
 {
     return boost::apply_visitor(NodeVisitorPrinter(options), node);
 }
-
-std::string parse_text(const ast::EffectNumericFluentTotalCostOrEffect& node, const DefaultFormatterOptions& options)
-{
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
-}
-
-std::string parse_text(const ast::EffectRoot& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
 
 std::string parse_text(const ast::ActionSymbol& node, const DefaultFormatterOptions& options) { return parse_text(node.name, options); }
 
