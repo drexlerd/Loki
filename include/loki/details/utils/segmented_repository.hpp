@@ -21,6 +21,7 @@
 #include "loki/details/utils/segmented_vector.hpp"
 
 #include <memory>
+#include <shared_mutex>
 #include <tuple>
 #include <type_traits>
 #include <unordered_set>
@@ -29,7 +30,7 @@
 namespace loki
 {
 
-/// @brief `UniqueFactory` manages unique creation of objects
+/// @brief `SegmentedRepository` is a thread-safe container for managing the unique creation of objects
 /// in a persistent and efficient manner, utilizing a combination of unordered_set for
 /// uniqueness checks and SegmentedVector for continuous and cache-efficient storage of value types.
 /// @tparam T is the type.
@@ -44,6 +45,9 @@ private:
 
     // We use pre-allocated memory to store objects persistent.
     SegmentedVector<T> m_persistent_vector;
+
+    // Mutex for synchronizing write operations
+    mutable std::shared_mutex m_mutex;
 
     void range_check(size_t pos) const
     {
@@ -61,13 +65,33 @@ public:
     }
     SegmentedRepository(const SegmentedRepository& other) = delete;
     SegmentedRepository& operator=(const SegmentedRepository& other) = delete;
-    SegmentedRepository(SegmentedRepository&& other) = default;
-    SegmentedRepository& operator=(SegmentedRepository&& other) = default;
+    SegmentedRepository(SegmentedRepository&& other) noexcept :
+        m_uniqueness_set(std::move(other.m_uniqueness_set)),
+        m_persistent_vector(std::move(other.m_persistent_vector)),
+        m_mutex()  // Create a new mutex for the moved object
+    {
+    }
+
+    SegmentedRepository& operator=(SegmentedRepository&& other) noexcept
+    {
+        if (this != &other)
+        {
+            std::unique_lock lock_this(m_mutex, std::defer_lock);
+            std::unique_lock lock_other(other.m_mutex, std::defer_lock);
+            std::lock(lock_this, lock_other);
+
+            m_uniqueness_set = std::move(other.m_uniqueness_set);
+            m_persistent_vector = std::move(other.m_persistent_vector);
+        }
+        return *this;
+    }
 
     /// @brief Returns a pointer to an existing object or creates it before if it does not exist.
     template<typename... Args>
     T const* get_or_create(Args&&... args)
     {
+        std::unique_lock lock(m_mutex);  // Lock only for writing
+
         /* Construct and insert the element in persistent memory. */
 
         // Ensure that element with identifier i is stored at position i.
@@ -104,29 +128,50 @@ public:
      */
 
     /// @brief Returns a pointer to an existing object with the given pos.
+    // MT: no lock required, because elements are persistent.
     T const* operator[](size_t pos) const
     {
         assert(pos < size());
         return &(m_persistent_vector.at(pos));
     }
 
+    /// @brief Returns a pointer to an existing object with the given pos.
+    /// MT: no lock required, because elements are persistent.
+    /// @param pos
+    /// @return
     T const* at(size_t pos) const
     {
         range_check(pos);
         return &(m_persistent_vector.at(pos));
     }
 
-    auto begin() const { return m_persistent_vector.begin(); }
+    auto begin() const
+    {
+        std::shared_lock lock(m_mutex);
+        return m_persistent_vector.begin();
+    }
 
-    auto end() const { return m_persistent_vector.end(); }
+    auto end() const
+    {
+        std::shared_lock lock(m_mutex);
+        return m_persistent_vector.end();
+    }
 
-    const SegmentedVector<T>& get_storage() const { return m_persistent_vector; }
+    const SegmentedVector<T>& get_storage() const
+    {
+        std::shared_lock lock(m_mutex);
+        return m_persistent_vector;
+    }
 
     /**
      * Capacity
      */
 
-    size_t size() const { return m_persistent_vector.size(); }
+    size_t size() const
+    {
+        std::shared_lock lock(m_mutex);
+        return m_persistent_vector.size();
+    }
 };
 
 }

@@ -178,8 +178,6 @@ assign_operator_increase_type const assign_operator_increase = "assign_operator_
 assign_operator_decrease_type const assign_operator_decrease = "assign_operator_decrease";
 assign_operator_type const assign_operator = "assign_operator";
 
-numeric_term_type const numeric_term = "numeric_term";
-
 effect_type const effect = "effect";
 effect_production_literal_type const effect_production_literal = "effect_production_literal";
 effect_production_numeric_type const effect_production_numeric = "effect_production_numeric";
@@ -393,9 +391,6 @@ const auto assign_operator_decrease_def = keyword_lit("decrease") > x3::attr(ast
 const auto assign_operator_def =
     assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
 
-// For action cost effects only
-const auto numeric_term_def = function_expression_number | function_expression_head;
-
 const auto effect_def = ((lit('(') >> keyword_lit("and")) > *effect > lit(')')) | effect_composite | effect_production;
 const auto effect_production_literal_def = literal;
 const auto effect_production_numeric_def = (lit('(') >> assign_operator >> function_head >> function_expression) > lit(')');
@@ -587,8 +582,6 @@ BOOST_SPIRIT_DEFINE(assign_operator_assign,
                     assign_operator_increase,
                     assign_operator_decrease,
                     assign_operator)
-
-BOOST_SPIRIT_DEFINE(numeric_term)
 
 BOOST_SPIRIT_DEFINE(effect,
                     effect_production_literal,
@@ -965,10 +958,6 @@ struct AssignOperatorClass : x3::annotate_on_success
 {
 };
 
-struct NumericTermClass : x3::annotate_on_success
-{
-};
-
 struct EffectClass : x3::annotate_on_success
 {
 };
@@ -1317,8 +1306,6 @@ parser::assign_operator_scale_down_type const& assign_operator_scale_down() { re
 parser::assign_operator_increase_type const& assign_operator_increase() { return parser::assign_operator_increase; }
 parser::assign_operator_decrease_type const& assign_operator_decrease() { return parser::assign_operator_decrease; }
 parser::assign_operator_type const& assign_operator() { return parser::assign_operator; }
-
-parser::numeric_term_type const& numeric_term() { return parser::numeric_term; }
 
 parser::effect_type const& effect() { return parser::effect; }
 parser::effect_production_literal_type const& effect_production_literal() { return parser::effect_production_literal; }

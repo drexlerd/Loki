@@ -143,8 +143,6 @@ BOOST_SPIRIT_INSTANTIATE(assign_operator_increase_type, iterator_type, context_t
 BOOST_SPIRIT_INSTANTIATE(assign_operator_decrease_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(assign_operator_type, iterator_type, context_type)
 
-BOOST_SPIRIT_INSTANTIATE(numeric_term_type, iterator_type, context_type)
-
 BOOST_SPIRIT_INSTANTIATE(effect_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(effect_production_literal_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(effect_production_numeric_type, iterator_type, context_type)

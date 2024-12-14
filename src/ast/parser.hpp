@@ -162,8 +162,6 @@ struct AssignOperatorIncreaseClass;
 struct AssignOperatorDecreaseClass;
 struct AssignOperatorClass;
 
-struct NumericTermClass;
-
 struct EffectClass;
 struct EffectProductionLiteralClass;
 struct EffectProductionNumericClass;
@@ -360,8 +358,6 @@ typedef x3::rule<AssignOperatorIncreaseClass, ast::AssignOperatorIncrease> assig
 typedef x3::rule<AssignOperatorDecreaseClass, ast::AssignOperatorDecrease> assign_operator_decrease_type;
 typedef x3::rule<AssignOperatorClass, ast::AssignOperator> assign_operator_type;
 
-typedef x3::rule<NumericTermClass, ast::FunctionExpression> numeric_term_type;
-
 typedef x3::rule<EffectClass, ast::Effect> effect_type;
 typedef x3::rule<EffectProductionLiteralClass, ast::EffectProductionLiteral> effect_production_literal_type;
 typedef x3::rule<EffectProductionNumericClass, ast::EffectProductionNumeric> effect_production_numeric_type;
@@ -550,8 +546,6 @@ BOOST_SPIRIT_DECLARE(assign_operator_assign_type,
                      assign_operator_increase_type,
                      assign_operator_decrease_type,
                      assign_operator_type)
-
-BOOST_SPIRIT_DECLARE(numeric_term_type)
 
 BOOST_SPIRIT_DECLARE(effect_type,
                      effect_production_literal_type,
@@ -742,8 +736,6 @@ parser::assign_operator_scale_down_type const& assign_operator_scale_down();
 parser::assign_operator_increase_type const& assign_operator_increase();
 parser::assign_operator_decrease_type const& assign_operator_decrease();
 parser::assign_operator_type const& assign_operator();
-
-parser::numeric_term_type const& numeric_term();
 
 parser::effect_type const& effect();
 parser::effect_production_literal_type const& effect_production_literal();
