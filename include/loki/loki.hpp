@@ -61,6 +61,5 @@
 #include "loki/details/utils/memory.hpp"
 #include "loki/details/utils/segmented_repository.hpp"
 #include "loki/details/utils/segmented_vector.hpp"
-#include "loki/details/utils/robin_hood.h"
 
 #endif
