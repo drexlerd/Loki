@@ -10,7 +10,7 @@ set_target_properties(parsers PROPERTIES OUTPUT_NAME loki_parsers)
 # Create an alias for simpler reference
 add_library(loki::parsers ALIAS parsers)
 
-target_link_libraries(parsers unordered_dense::unordered_dense)
+target_link_libraries(parsers absl::flat_hash_set)
 
 # Use include depending on building or using from installed location
 target_include_directories(parsers

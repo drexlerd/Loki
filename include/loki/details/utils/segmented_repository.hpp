@@ -20,7 +20,7 @@
 
 #include "loki/details/utils/segmented_vector.hpp"
 
-#include <ankerl/unordered_dense.h>
+#include <absl/container/flat_hash_set.h>
 
 #include <memory>
 #include <tuple>
@@ -42,7 +42,7 @@ class SegmentedRepository
 {
 private:
     // We use an unordered_set to test for uniqueness.
-    ankerl::unordered_dense::set<const T*, Hash, KeyEqual> m_uniqueness_set;
+    absl::flat_hash_set<const T*, Hash, KeyEqual> m_uniqueness_set;
 
     // We use pre-allocated memory to store objects persistent.
     SegmentedVector<T> m_persistent_vector;
