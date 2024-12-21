@@ -20,8 +20,9 @@
 
 #include "loki/details/utils/segmented_vector.hpp"
 
+#include "loki/details/utils/robin_hood.h"
+
 #include <memory>
-#include <shared_mutex>
 #include <tuple>
 #include <type_traits>
 #include <unordered_set>
@@ -41,13 +42,10 @@ class SegmentedRepository
 {
 private:
     // We use an unordered_set to test for uniqueness.
-    std::unordered_set<const T*, Hash, KeyEqual> m_uniqueness_set;
+    robin_hood::unordered_set<const T*, Hash, KeyEqual> m_uniqueness_set;
 
     // We use pre-allocated memory to store objects persistent.
     SegmentedVector<T> m_persistent_vector;
-
-    // Mutex for synchronizing write operations
-    mutable std::shared_mutex m_mutex;
 
     void range_check(size_t pos) const
     {
@@ -65,33 +63,13 @@ public:
     }
     SegmentedRepository(const SegmentedRepository& other) = delete;
     SegmentedRepository& operator=(const SegmentedRepository& other) = delete;
-    SegmentedRepository(SegmentedRepository&& other) noexcept :
-        m_uniqueness_set(std::move(other.m_uniqueness_set)),
-        m_persistent_vector(std::move(other.m_persistent_vector)),
-        m_mutex()  // Create a new mutex for the moved object
-    {
-    }
-
-    SegmentedRepository& operator=(SegmentedRepository&& other) noexcept
-    {
-        if (this != &other)
-        {
-            std::unique_lock lock_this(m_mutex, std::defer_lock);
-            std::unique_lock lock_other(other.m_mutex, std::defer_lock);
-            std::lock(lock_this, lock_other);
-
-            m_uniqueness_set = std::move(other.m_uniqueness_set);
-            m_persistent_vector = std::move(other.m_persistent_vector);
-        }
-        return *this;
-    }
+    SegmentedRepository(SegmentedRepository&& other) = default;
+    SegmentedRepository& operator=(SegmentedRepository&& other) = default;
 
     /// @brief Returns a pointer to an existing object or creates it before if it does not exist.
     template<typename... Args>
     T const* get_or_create(Args&&... args)
     {
-        std::unique_lock lock(m_mutex);  // Lock only for writing
-
         /* Construct and insert the element in persistent memory. */
 
         // Ensure that element with identifier i is stored at position i.
@@ -147,19 +125,16 @@ public:
 
     auto begin() const
     {
-        std::shared_lock lock(m_mutex);
         return m_persistent_vector.begin();
     }
 
     auto end() const
     {
-        std::shared_lock lock(m_mutex);
         return m_persistent_vector.end();
     }
 
     const SegmentedVector<T>& get_storage() const
     {
-        std::shared_lock lock(m_mutex);
         return m_persistent_vector;
     }
 
@@ -169,7 +144,6 @@ public:
 
     size_t size() const
     {
-        std::shared_lock lock(m_mutex);
         return m_persistent_vector.size();
     }
 };
