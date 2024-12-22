@@ -41,339 +41,394 @@
 #include "loki/details/pddl/variable.hpp"
 #include "loki/details/utils/collections.hpp"
 
-namespace loki
+bool std::equal_to<loki::ObserverPtr<const loki::ActionImpl>>::operator()(loki::ObserverPtr<const loki::ActionImpl> lhs,
+                                                                          loki::ObserverPtr<const loki::ActionImpl> rhs) const
 {
-bool UniquePDDLEqualTo<Action>::operator()(Action l, Action r) const
-{
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()))
-               && (l->get_condition() == r->get_condition()) && (l->get_effect() == r->get_effect());
+        return (lhs->get_name() == rhs->get_name()) && (loki::get_sorted_vector(lhs->get_parameters()) == loki::get_sorted_vector(rhs->get_parameters()))
+               && (lhs->get_condition() == rhs->get_condition()) && (lhs->get_effect() == rhs->get_effect());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<Atom>::operator()(Atom l, Atom r) const
+bool std::equal_to<loki::ObserverPtr<const loki::AtomImpl>>::operator()(loki::ObserverPtr<const loki::AtomImpl> lhs,
+                                                                        loki::ObserverPtr<const loki::AtomImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_predicate() == r->get_predicate()) && (l->get_terms() == r->get_terms());
+        return (lhs->get_predicate() == rhs->get_predicate()) && (lhs->get_terms() == rhs->get_terms());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<Axiom>::operator()(Axiom l, Axiom r) const
+bool std::equal_to<loki::ObserverPtr<const loki::AxiomImpl>>::operator()(loki::ObserverPtr<const loki::AxiomImpl> lhs,
+                                                                         loki::ObserverPtr<const loki::AxiomImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_derived_predicate_name() == r->get_derived_predicate_name())
-               && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters())) && (l->get_condition() == r->get_condition());
+        return (lhs->get_derived_predicate_name() == rhs->get_derived_predicate_name())
+               && (loki::get_sorted_vector(lhs->get_parameters()) == loki::get_sorted_vector(rhs->get_parameters()))
+               && (lhs->get_condition() == rhs->get_condition());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<ConditionLiteral>::operator()(ConditionLiteral l, ConditionLiteral r) const
+bool std::equal_to<loki::ObserverPtr<const loki::ConditionLiteralImpl>>::operator()(loki::ObserverPtr<const loki::ConditionLiteralImpl> lhs,
+                                                                                    loki::ObserverPtr<const loki::ConditionLiteralImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_literal() == r->get_literal());
+        return (lhs->get_literal() == rhs->get_literal());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<ConditionAnd>::operator()(ConditionAnd l, ConditionAnd r) const
+bool std::equal_to<loki::ObserverPtr<const loki::ConditionAndImpl>>::operator()(loki::ObserverPtr<const loki::ConditionAndImpl> lhs,
+                                                                                loki::ObserverPtr<const loki::ConditionAndImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (get_sorted_vector(l->get_conditions()) == get_sorted_vector(r->get_conditions()));
+        return (loki::get_sorted_vector(lhs->get_conditions()) == loki::get_sorted_vector(rhs->get_conditions()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<ConditionOr>::operator()(ConditionOr l, ConditionOr r) const
+bool std::equal_to<loki::ObserverPtr<const loki::ConditionOrImpl>>::operator()(loki::ObserverPtr<const loki::ConditionOrImpl> lhs,
+                                                                               loki::ObserverPtr<const loki::ConditionOrImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (get_sorted_vector(l->get_conditions()) == get_sorted_vector(r->get_conditions()));
+        return (loki::get_sorted_vector(lhs->get_conditions()) == loki::get_sorted_vector(rhs->get_conditions()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<ConditionNot>::operator()(ConditionNot l, ConditionNot r) const
+bool std::equal_to<loki::ObserverPtr<const loki::ConditionNotImpl>>::operator()(loki::ObserverPtr<const loki::ConditionNotImpl> lhs,
+                                                                                loki::ObserverPtr<const loki::ConditionNotImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_condition() == r->get_condition());
+        return (lhs->get_condition() == rhs->get_condition());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<ConditionImply>::operator()(ConditionImply l, ConditionImply r) const
+bool std::equal_to<loki::ObserverPtr<const loki::ConditionImplyImpl>>::operator()(loki::ObserverPtr<const loki::ConditionImplyImpl> lhs,
+                                                                                  loki::ObserverPtr<const loki::ConditionImplyImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_condition_left() == r->get_condition_left()) && (l->get_condition_left() == r->get_condition_left());
+        return (lhs->get_condition_left() == rhs->get_condition_left()) && (lhs->get_condition_right() == rhs->get_condition_right());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<ConditionExists>::operator()(ConditionExists l, ConditionExists r) const
+bool std::equal_to<loki::ObserverPtr<const loki::ConditionExistsImpl>>::operator()(loki::ObserverPtr<const loki::ConditionExistsImpl> lhs,
+                                                                                   loki::ObserverPtr<const loki::ConditionExistsImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_condition() == r->get_condition()) && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
+        return (lhs->get_condition() == rhs->get_condition())
+               && (loki::get_sorted_vector(lhs->get_parameters()) == loki::get_sorted_vector(rhs->get_parameters()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<ConditionForall>::operator()(ConditionForall l, ConditionForall r) const
+bool std::equal_to<loki::ObserverPtr<const loki::ConditionForallImpl>>::operator()(loki::ObserverPtr<const loki::ConditionForallImpl> lhs,
+                                                                                   loki::ObserverPtr<const loki::ConditionForallImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_condition() == r->get_condition()) && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
+        return (lhs->get_condition() == rhs->get_condition())
+               && (loki::get_sorted_vector(lhs->get_parameters()) == loki::get_sorted_vector(rhs->get_parameters()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<Condition>::operator()(Condition l, Condition r) const { return l->get_condition() == r->get_condition(); }
-
-bool UniquePDDLEqualTo<Domain>::operator()(Domain l, Domain r) const
+bool std::equal_to<loki::ObserverPtr<const loki::ConditionImpl>>::operator()(loki::ObserverPtr<const loki::ConditionImpl> lhs,
+                                                                             loki::ObserverPtr<const loki::ConditionImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_name() == r->get_name()) && (l->get_requirements() == r->get_requirements())
-               && (get_sorted_vector(l->get_types()) == get_sorted_vector(r->get_types()))
-               && (get_sorted_vector(l->get_constants()) == get_sorted_vector(r->get_constants()))
-               && (get_sorted_vector(l->get_predicates()) == get_sorted_vector(r->get_predicates()))
-               && (get_sorted_vector(l->get_functions()) == get_sorted_vector(r->get_functions()))
-               && (get_sorted_vector(l->get_actions()) == get_sorted_vector(r->get_actions()))
-               && (get_sorted_vector(l->get_axioms()) == get_sorted_vector(r->get_axioms()));
+        return (lhs->get_condition() == rhs->get_condition());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<EffectLiteral>::operator()(EffectLiteral l, EffectLiteral r) const
+bool std::equal_to<loki::ObserverPtr<const loki::DomainImpl>>::operator()(loki::ObserverPtr<const loki::DomainImpl> lhs,
+                                                                          loki::ObserverPtr<const loki::DomainImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_literal() == r->get_literal());
+        return (lhs->get_name() == rhs->get_name()) && (lhs->get_requirements() == rhs->get_requirements())
+               && (loki::get_sorted_vector(lhs->get_types()) == loki::get_sorted_vector(rhs->get_types()))
+               && (loki::get_sorted_vector(lhs->get_constants()) == loki::get_sorted_vector(rhs->get_constants()))
+               && (loki::get_sorted_vector(lhs->get_predicates()) == loki::get_sorted_vector(rhs->get_predicates()))
+               && (loki::get_sorted_vector(lhs->get_functions()) == loki::get_sorted_vector(rhs->get_functions()))
+               && (loki::get_sorted_vector(lhs->get_actions()) == loki::get_sorted_vector(rhs->get_actions()))
+               && (loki::get_sorted_vector(lhs->get_axioms()) == loki::get_sorted_vector(rhs->get_axioms()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<EffectAnd>::operator()(EffectAnd l, EffectAnd r) const
+bool std::equal_to<loki::ObserverPtr<const loki::EffectLiteralImpl>>::operator()(loki::ObserverPtr<const loki::EffectLiteralImpl> lhs,
+                                                                                 loki::ObserverPtr<const loki::EffectLiteralImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (get_sorted_vector(l->get_effects()) == get_sorted_vector(r->get_effects()));
+        return (lhs->get_literal() == rhs->get_literal());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<EffectNumeric>::operator()(EffectNumeric l, EffectNumeric r) const
+bool std::equal_to<loki::ObserverPtr<const loki::EffectAndImpl>>::operator()(loki::ObserverPtr<const loki::EffectAndImpl> lhs,
+                                                                             loki::ObserverPtr<const loki::EffectAndImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_assign_operator() == r->get_assign_operator()) && (l->get_function() == r->get_function())
-               && (l->get_function_expression() == r->get_function_expression());
+        return (loki::get_sorted_vector(lhs->get_effects()) == loki::get_sorted_vector(rhs->get_effects()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<EffectCompositeForall>::operator()(EffectCompositeForall l, EffectCompositeForall r) const
+bool std::equal_to<loki::ObserverPtr<const loki::EffectNumericImpl>>::operator()(loki::ObserverPtr<const loki::EffectNumericImpl> lhs,
+                                                                                 loki::ObserverPtr<const loki::EffectNumericImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_effect() == r->get_effect()) && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
+        return (lhs->get_assign_operator() == rhs->get_assign_operator()) && (lhs->get_function() == rhs->get_function())
+               && (lhs->get_function_expression() == rhs->get_function_expression());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<EffectCompositeWhen>::operator()(EffectCompositeWhen l, EffectCompositeWhen r) const
+bool std::equal_to<loki::ObserverPtr<const loki::EffectCompositeForallImpl>>::operator()(loki::ObserverPtr<const loki::EffectCompositeForallImpl> lhs,
+                                                                                         loki::ObserverPtr<const loki::EffectCompositeForallImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_condition() == r->get_condition()) && (l->get_effect() == r->get_effect());
+        return (lhs->get_effect() == rhs->get_effect()) && (loki::get_sorted_vector(lhs->get_parameters()) == loki::get_sorted_vector(rhs->get_parameters()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<EffectCompositeOneof>::operator()(EffectCompositeOneof l, EffectCompositeOneof r) const
+bool std::equal_to<loki::ObserverPtr<const loki::EffectCompositeWhenImpl>>::operator()(loki::ObserverPtr<const loki::EffectCompositeWhenImpl> lhs,
+                                                                                       loki::ObserverPtr<const loki::EffectCompositeWhenImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (get_sorted_vector(l->get_effects()) == get_sorted_vector(r->get_effects()));
+        return (lhs->get_condition() == rhs->get_condition()) && (lhs->get_effect() == rhs->get_effect());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<Effect>::operator()(Effect l, Effect r) const { return l->get_effect() == r->get_effect(); }
-
-bool UniquePDDLEqualTo<FunctionExpressionNumber>::operator()(FunctionExpressionNumber l, FunctionExpressionNumber r) const
+bool std::equal_to<loki::ObserverPtr<const loki::EffectCompositeOneofImpl>>::operator()(loki::ObserverPtr<const loki::EffectCompositeOneofImpl> lhs,
+                                                                                        loki::ObserverPtr<const loki::EffectCompositeOneofImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_number() == r->get_number());
+        return (loki::get_sorted_vector(lhs->get_effects()) == loki::get_sorted_vector(rhs->get_effects()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<FunctionExpressionBinaryOperator>::operator()(FunctionExpressionBinaryOperator l, FunctionExpressionBinaryOperator r) const
+bool std::equal_to<loki::ObserverPtr<const loki::EffectImpl>>::operator()(loki::ObserverPtr<const loki::EffectImpl> lhs,
+                                                                          loki::ObserverPtr<const loki::EffectImpl> rhs) const
 {
-    if (l != r)
+    return lhs->get_effect() == rhs->get_effect();
+}
+
+bool std::equal_to<loki::ObserverPtr<const loki::FunctionExpressionNumberImpl>>::operator()(
+    loki::ObserverPtr<const loki::FunctionExpressionNumberImpl> lhs,
+    loki::ObserverPtr<const loki::FunctionExpressionNumberImpl> rhs) const
+{
+    if (lhs != rhs)
     {
-        return (l->get_binary_operator() == r->get_binary_operator()) && (l->get_left_function_expression() == r->get_left_function_expression())
-               && (l->get_right_function_expression() == r->get_right_function_expression());
+        return (lhs->get_number() == rhs->get_number());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<FunctionExpressionMultiOperator>::operator()(FunctionExpressionMultiOperator l, FunctionExpressionMultiOperator r) const
+bool std::equal_to<loki::ObserverPtr<const loki::FunctionExpressionBinaryOperatorImpl>>::operator()(
+    loki::ObserverPtr<const loki::FunctionExpressionBinaryOperatorImpl> lhs,
+    loki::ObserverPtr<const loki::FunctionExpressionBinaryOperatorImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_multi_operator() == r->get_multi_operator())
-               && (get_sorted_vector(l->get_function_expressions()) == get_sorted_vector(r->get_function_expressions()));
+        return (lhs->get_binary_operator() == rhs->get_binary_operator()) && (lhs->get_left_function_expression() == rhs->get_left_function_expression())
+               && (lhs->get_right_function_expression() == rhs->get_right_function_expression());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<FunctionExpressionMinus>::operator()(FunctionExpressionMinus l, FunctionExpressionMinus r) const
+bool std::equal_to<loki::ObserverPtr<const loki::FunctionExpressionMultiOperatorImpl>>::operator()(
+    loki::ObserverPtr<const loki::FunctionExpressionMultiOperatorImpl> lhs,
+    loki::ObserverPtr<const loki::FunctionExpressionMultiOperatorImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_function_expression() == r->get_function_expression());
+        return (lhs->get_multi_operator() == rhs->get_multi_operator())
+               && (loki::get_sorted_vector(lhs->get_function_expressions()) == loki::get_sorted_vector(rhs->get_function_expressions()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<FunctionExpressionFunction>::operator()(FunctionExpressionFunction l, FunctionExpressionFunction r) const
+bool std::equal_to<loki::ObserverPtr<const loki::FunctionExpressionMinusImpl>>::operator()(loki::ObserverPtr<const loki::FunctionExpressionMinusImpl> lhs,
+                                                                                           loki::ObserverPtr<const loki::FunctionExpressionMinusImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_function() == r->get_function());
+        return (lhs->get_function_expression() == rhs->get_function_expression());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<FunctionExpression>::operator()(FunctionExpression l, FunctionExpression r) const
+bool std::equal_to<loki::ObserverPtr<const loki::FunctionExpressionFunctionImpl>>::operator()(
+    loki::ObserverPtr<const loki::FunctionExpressionFunctionImpl> lhs,
+    loki::ObserverPtr<const loki::FunctionExpressionFunctionImpl> rhs) const
 {
-    return l->get_function_expression() == r->get_function_expression();
-}
-
-bool UniquePDDLEqualTo<FunctionSkeleton>::operator()(FunctionSkeleton l, FunctionSkeleton r) const
-{
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_name() == r->get_name()) && (l->get_type() == r->get_type())
-               && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
+        return (lhs->get_function() == rhs->get_function());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<Function>::operator()(Function l, Function r) const
+bool std::equal_to<loki::ObserverPtr<const loki::FunctionExpressionImpl>>::operator()(loki::ObserverPtr<const loki::FunctionExpressionImpl> lhs,
+                                                                                      loki::ObserverPtr<const loki::FunctionExpressionImpl> rhs) const
 {
-    if (l != r)
+    return lhs->get_function_expression() == rhs->get_function_expression();
+}
+
+bool std::equal_to<loki::ObserverPtr<const loki::FunctionSkeletonImpl>>::operator()(loki::ObserverPtr<const loki::FunctionSkeletonImpl> lhs,
+                                                                                    loki::ObserverPtr<const loki::FunctionSkeletonImpl> rhs) const
+{
+    if (lhs != rhs)
     {
-        return (l->get_function_skeleton() == r->get_function_skeleton()) && (l->get_terms() == r->get_terms());
+        return (lhs->get_name() == rhs->get_name()) && (lhs->get_type() == rhs->get_type())
+               && (loki::get_sorted_vector(lhs->get_parameters()) == loki::get_sorted_vector(rhs->get_parameters()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<Literal>::operator()(Literal l, Literal r) const
+bool std::equal_to<loki::ObserverPtr<const loki::FunctionImpl>>::operator()(loki::ObserverPtr<const loki::FunctionImpl> lhs,
+                                                                            loki::ObserverPtr<const loki::FunctionImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->is_negated() == r->is_negated()) && (l->get_atom() == r->get_atom());
+        return (lhs->get_function_skeleton() == rhs->get_function_skeleton()) && (lhs->get_terms() == rhs->get_terms());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<OptimizationMetric>::operator()(OptimizationMetric l, OptimizationMetric r) const
+bool std::equal_to<loki::ObserverPtr<const loki::LiteralImpl>>::operator()(loki::ObserverPtr<const loki::LiteralImpl> lhs,
+                                                                           loki::ObserverPtr<const loki::LiteralImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_optimization_metric() == r->get_optimization_metric()) && (l->get_function_expression() == r->get_function_expression());
+        return (lhs->is_negated() == rhs->is_negated()) && (lhs->get_atom() == rhs->get_atom());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<NumericFluent>::operator()(NumericFluent l, NumericFluent r) const
+bool std::equal_to<loki::ObserverPtr<const loki::OptimizationMetricImpl>>::operator()(loki::ObserverPtr<const loki::OptimizationMetricImpl> lhs,
+                                                                                      loki::ObserverPtr<const loki::OptimizationMetricImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_number() == r->get_number()) && (l->get_function() == r->get_function());
+        return (lhs->get_optimization_metric() == rhs->get_optimization_metric()) && (lhs->get_function_expression() == rhs->get_function_expression());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<Object>::operator()(Object l, Object r) const
+bool std::equal_to<loki::ObserverPtr<const loki::NumericFluentImpl>>::operator()(loki::ObserverPtr<const loki::NumericFluentImpl> lhs,
+                                                                                 loki::ObserverPtr<const loki::NumericFluentImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_bases()) == get_sorted_vector(r->get_bases()));
+        return (lhs->get_number() == rhs->get_number()) && (lhs->get_function() == rhs->get_function());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<Parameter>::operator()(Parameter l, Parameter r) const
+bool std::equal_to<loki::ObserverPtr<const loki::ObjectImpl>>::operator()(loki::ObserverPtr<const loki::ObjectImpl> lhs,
+                                                                          loki::ObserverPtr<const loki::ObjectImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_variable() == r->get_variable()) && (get_sorted_vector(l->get_bases()) == get_sorted_vector(r->get_bases()));
+        return (lhs->get_name() == rhs->get_name()) && (loki::get_sorted_vector(lhs->get_bases()) == loki::get_sorted_vector(rhs->get_bases()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<Predicate>::operator()(Predicate l, Predicate r) const
+bool std::equal_to<loki::ObserverPtr<const loki::ParameterImpl>>::operator()(loki::ObserverPtr<const loki::ParameterImpl> lhs,
+                                                                             loki::ObserverPtr<const loki::ParameterImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_parameters()) == get_sorted_vector(r->get_parameters()));
+        return (lhs->get_variable() == rhs->get_variable()) && (loki::get_sorted_vector(lhs->get_bases()) == loki::get_sorted_vector(rhs->get_bases()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<Problem>::operator()(Problem l, Problem r) const
+bool std::equal_to<loki::ObserverPtr<const loki::PredicateImpl>>::operator()(loki::ObserverPtr<const loki::PredicateImpl> lhs,
+                                                                             loki::ObserverPtr<const loki::PredicateImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_name() == r->get_name()) && (l->get_domain() == r->get_domain())
-               && (get_sorted_vector(l->get_objects()) == get_sorted_vector(r->get_objects()))
-               && (get_sorted_vector(l->get_derived_predicates()) == get_sorted_vector(r->get_derived_predicates()))
-               && (get_sorted_vector(l->get_initial_literals()) == get_sorted_vector(r->get_initial_literals()))
-               && (get_sorted_vector(l->get_numeric_fluents()) == get_sorted_vector(r->get_numeric_fluents()))
-               && (l->get_goal_condition() == r->get_goal_condition()) && (l->get_optimization_metric() == r->get_optimization_metric());
+        return (lhs->get_name() == rhs->get_name()) && (loki::get_sorted_vector(lhs->get_parameters()) == loki::get_sorted_vector(rhs->get_parameters()));
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<Requirements>::operator()(Requirements l, Requirements r) const
+bool std::equal_to<loki::ObserverPtr<const loki::ProblemImpl>>::operator()(loki::ObserverPtr<const loki::ProblemImpl> lhs,
+                                                                           loki::ObserverPtr<const loki::ProblemImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_requirements() == r->get_requirements());
+        return (lhs->get_name() == rhs->get_name()) && (lhs->get_domain() == rhs->get_domain())
+               && (loki::get_sorted_vector(lhs->get_objects()) == loki::get_sorted_vector(rhs->get_objects()))
+               && (loki::get_sorted_vector(lhs->get_derived_predicates()) == loki::get_sorted_vector(rhs->get_derived_predicates()))
+               && (loki::get_sorted_vector(lhs->get_initial_literals()) == loki::get_sorted_vector(rhs->get_initial_literals()))
+               && (loki::get_sorted_vector(lhs->get_numeric_fluents()) == loki::get_sorted_vector(rhs->get_numeric_fluents()))
+               && (lhs->get_goal_condition() == rhs->get_goal_condition()) && (lhs->get_optimization_metric() == rhs->get_optimization_metric());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<Term>::operator()(Term l, Term r) const { return l->get_object_or_variable() == r->get_object_or_variable(); }
-
-bool UniquePDDLEqualTo<Type>::operator()(Type l, Type r) const
+bool std::equal_to<loki::ObserverPtr<const loki::RequirementsImpl>>::operator()(loki::ObserverPtr<const loki::RequirementsImpl> lhs,
+                                                                                loki::ObserverPtr<const loki::RequirementsImpl> rhs) const
 {
-    if (l != r)
+    if (lhs != rhs)
     {
-        return (l->get_name() == r->get_name()) && (get_sorted_vector(l->get_bases()) == get_sorted_vector(r->get_bases()));
+        return (lhs->get_requirements() == rhs->get_requirements());
     }
     return true;
 }
 
-bool UniquePDDLEqualTo<Variable>::operator()(Variable l, Variable r) const
+bool std::equal_to<loki::ObserverPtr<const loki::TermImpl>>::operator()(loki::ObserverPtr<const loki::TermImpl> lhs,
+                                                                        loki::ObserverPtr<const loki::TermImpl> rhs) const
 {
-    if (l != r)
+    return lhs->get_object_or_variable() == rhs->get_object_or_variable();
+}
+
+bool std::equal_to<loki::ObserverPtr<const loki::TypeImpl>>::operator()(loki::ObserverPtr<const loki::TypeImpl> lhs,
+                                                                        loki::ObserverPtr<const loki::TypeImpl> rhs) const
+{
+    if (lhs != rhs)
     {
-        return (l->get_name() == r->get_name());
+        return (lhs->get_name() == rhs->get_name()) && (loki::get_sorted_vector(lhs->get_bases()) == loki::get_sorted_vector(rhs->get_bases()));
     }
     return true;
 }
+
+bool std::equal_to<loki::ObserverPtr<const loki::VariableImpl>>::operator()(loki::ObserverPtr<const loki::VariableImpl> lhs,
+                                                                            loki::ObserverPtr<const loki::VariableImpl> rhs) const
+{
+    if (lhs != rhs)
+    {
+        return (lhs->get_name() == rhs->get_name());
+    }
+    return true;
 }

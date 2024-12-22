@@ -19,281 +19,240 @@
 #define LOKI_INCLUDE_LOKI_PDDL_EQUAL_TO_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-
-#include <functional>
-#include <variant>
-
-namespace loki
-{
-
-/// @brief `UniquePDDLEqualTo` is used to compare newly created PDDL objects for uniqueness.
-/// Since the children are unique, it suffices to compare nested pointers.
-template<typename T>
-struct UniquePDDLEqualTo
-{
-    bool operator()(const T& l, const T& r) const { return std::equal_to<T>()(l, r); }
-};
-
-/// Spezialization for std::variant.
-template<typename... Ts>
-struct UniquePDDLEqualTo<std::variant<Ts...>>
-{
-    bool operator()(const std::variant<Ts...>& l, const std::variant<Ts...>& r) const
-    {
-        if (l.index() != r.index())
-        {
-            return false;  // Different types held
-        }
-        // Compare the held values, but only if they are of the same type
-        return std::visit(
-            [](const auto& lhs, const auto& rhs) -> bool
-            {
-                if constexpr (std::is_same_v<decltype(lhs), decltype(rhs)>)
-                {
-                    return UniquePDDLEqualTo<decltype(lhs)>()(lhs, rhs);
-                }
-                else
-                {
-                    return false;  // Different types can't be equal
-                }
-            },
-            l,
-            r);
-    }
-};
+#include "loki/details/utils/observer_ptr.hpp"
 
 /**
  * Specializations for PDDL
  */
 
 template<>
-struct UniquePDDLEqualTo<Action>
+struct std::equal_to<loki::ObserverPtr<const loki::ActionImpl>>
 {
-    bool operator()(Action l, Action r) const;
+    bool operator()(loki::ObserverPtr<const loki::ActionImpl> lhs, loki::ObserverPtr<const loki::ActionImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Atom>
+struct std::equal_to<loki::ObserverPtr<const loki::AtomImpl>>
 {
-    bool operator()(Atom l, Atom r) const;
+    bool operator()(loki::ObserverPtr<const loki::AtomImpl> lhs, loki::ObserverPtr<const loki::AtomImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Axiom>
+struct std::equal_to<loki::ObserverPtr<const loki::AxiomImpl>>
 {
-    bool operator()(Axiom l, Axiom r) const;
+    bool operator()(loki::ObserverPtr<const loki::AxiomImpl> lhs, loki::ObserverPtr<const loki::AxiomImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<ConditionLiteral>
+struct std::equal_to<loki::ObserverPtr<const loki::ConditionLiteralImpl>>
 {
-    bool operator()(ConditionLiteral l, ConditionLiteral r) const;
+    bool operator()(loki::ObserverPtr<const loki::ConditionLiteralImpl> lhs, loki::ObserverPtr<const loki::ConditionLiteralImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<ConditionAnd>
+struct std::equal_to<loki::ObserverPtr<const loki::ConditionAndImpl>>
 {
-    bool operator()(ConditionAnd l, ConditionAnd r) const;
+    bool operator()(loki::ObserverPtr<const loki::ConditionAndImpl> lhs, loki::ObserverPtr<const loki::ConditionAndImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<ConditionOr>
+struct std::equal_to<loki::ObserverPtr<const loki::ConditionOrImpl>>
 {
-    bool operator()(ConditionOr l, ConditionOr r) const;
+    bool operator()(loki::ObserverPtr<const loki::ConditionOrImpl> lhs, loki::ObserverPtr<const loki::ConditionOrImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<ConditionNot>
+struct std::equal_to<loki::ObserverPtr<const loki::ConditionNotImpl>>
 {
-    bool operator()(ConditionNot l, ConditionNot r) const;
+    bool operator()(loki::ObserverPtr<const loki::ConditionNotImpl> lhs, loki::ObserverPtr<const loki::ConditionNotImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<ConditionImply>
+struct std::equal_to<loki::ObserverPtr<const loki::ConditionImplyImpl>>
 {
-    bool operator()(ConditionImply l, ConditionImply r) const;
+    bool operator()(loki::ObserverPtr<const loki::ConditionImplyImpl> lhs, loki::ObserverPtr<const loki::ConditionImplyImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<ConditionExists>
+struct std::equal_to<loki::ObserverPtr<const loki::ConditionExistsImpl>>
 {
-    bool operator()(ConditionExists l, ConditionExists r) const;
+    bool operator()(loki::ObserverPtr<const loki::ConditionExistsImpl> lhs, loki::ObserverPtr<const loki::ConditionExistsImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<ConditionForall>
+struct std::equal_to<loki::ObserverPtr<const loki::ConditionForallImpl>>
 {
-    bool operator()(ConditionForall l, ConditionForall r) const;
+    bool operator()(loki::ObserverPtr<const loki::ConditionForallImpl> lhs, loki::ObserverPtr<const loki::ConditionForallImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Condition>
+struct std::equal_to<loki::ObserverPtr<const loki::ConditionImpl>>
 {
-    bool operator()(Condition l, Condition r) const;
+    bool operator()(loki::ObserverPtr<const loki::ConditionImpl> lhs, loki::ObserverPtr<const loki::ConditionImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Domain>
+struct std::equal_to<loki::ObserverPtr<const loki::DomainImpl>>
 {
-    bool operator()(Domain l, Domain r) const;
+    bool operator()(loki::ObserverPtr<const loki::DomainImpl> lhs, loki::ObserverPtr<const loki::DomainImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<EffectLiteral>
+struct std::equal_to<loki::ObserverPtr<const loki::EffectLiteralImpl>>
 {
-    bool operator()(EffectLiteral l, EffectLiteral r) const;
+    bool operator()(loki::ObserverPtr<const loki::EffectLiteralImpl> lhs, loki::ObserverPtr<const loki::EffectLiteralImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<EffectAnd>
+struct std::equal_to<loki::ObserverPtr<const loki::EffectAndImpl>>
 {
-    bool operator()(EffectAnd l, EffectAnd r) const;
+    bool operator()(loki::ObserverPtr<const loki::EffectAndImpl> lhs, loki::ObserverPtr<const loki::EffectAndImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<EffectNumeric>
+struct std::equal_to<loki::ObserverPtr<const loki::EffectNumericImpl>>
 {
-    bool operator()(EffectNumeric l, EffectNumeric r) const;
+    bool operator()(loki::ObserverPtr<const loki::EffectNumericImpl> lhs, loki::ObserverPtr<const loki::EffectNumericImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<EffectCompositeForall>
+struct std::equal_to<loki::ObserverPtr<const loki::EffectCompositeForallImpl>>
 {
-    bool operator()(EffectCompositeForall l, EffectCompositeForall r) const;
+    bool operator()(loki::ObserverPtr<const loki::EffectCompositeForallImpl> lhs, loki::ObserverPtr<const loki::EffectCompositeForallImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<EffectCompositeWhen>
+struct std::equal_to<loki::ObserverPtr<const loki::EffectCompositeWhenImpl>>
 {
-    bool operator()(EffectCompositeWhen l, EffectCompositeWhen r) const;
+    bool operator()(loki::ObserverPtr<const loki::EffectCompositeWhenImpl> lhs, loki::ObserverPtr<const loki::EffectCompositeWhenImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<EffectCompositeOneof>
+struct std::equal_to<loki::ObserverPtr<const loki::EffectCompositeOneofImpl>>
 {
-    bool operator()(EffectCompositeOneof l, EffectCompositeOneof r) const;
+    bool operator()(loki::ObserverPtr<const loki::EffectCompositeOneofImpl> lhs, loki::ObserverPtr<const loki::EffectCompositeOneofImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Effect>
+struct std::equal_to<loki::ObserverPtr<const loki::EffectImpl>>
 {
-    bool operator()(Effect l, Effect r) const;
+    bool operator()(loki::ObserverPtr<const loki::EffectImpl> lhs, loki::ObserverPtr<const loki::EffectImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<FunctionExpressionNumber>
+struct std::equal_to<loki::ObserverPtr<const loki::FunctionExpressionNumberImpl>>
 {
-    bool operator()(FunctionExpressionNumber l, FunctionExpressionNumber r) const;
+    bool operator()(loki::ObserverPtr<const loki::FunctionExpressionNumberImpl> lhs, loki::ObserverPtr<const loki::FunctionExpressionNumberImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<FunctionExpressionBinaryOperator>
+struct std::equal_to<loki::ObserverPtr<const loki::FunctionExpressionBinaryOperatorImpl>>
 {
-    bool operator()(FunctionExpressionBinaryOperator l, FunctionExpressionBinaryOperator r) const;
+    bool operator()(loki::ObserverPtr<const loki::FunctionExpressionBinaryOperatorImpl> lhs,
+                    loki::ObserverPtr<const loki::FunctionExpressionBinaryOperatorImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<FunctionExpressionMultiOperator>
+struct std::equal_to<loki::ObserverPtr<const loki::FunctionExpressionMultiOperatorImpl>>
 {
-    bool operator()(FunctionExpressionMultiOperator l, FunctionExpressionMultiOperator r) const;
+    bool operator()(loki::ObserverPtr<const loki::FunctionExpressionMultiOperatorImpl> lhs,
+                    loki::ObserverPtr<const loki::FunctionExpressionMultiOperatorImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<FunctionExpressionMinus>
+struct std::equal_to<loki::ObserverPtr<const loki::FunctionExpressionMinusImpl>>
 {
-    bool operator()(FunctionExpressionMinus l, FunctionExpressionMinus r) const;
+    bool operator()(loki::ObserverPtr<const loki::FunctionExpressionMinusImpl> lhs, loki::ObserverPtr<const loki::FunctionExpressionMinusImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<FunctionExpressionFunction>
+struct std::equal_to<loki::ObserverPtr<const loki::FunctionExpressionFunctionImpl>>
 {
-    bool operator()(FunctionExpressionFunction l, FunctionExpressionFunction r) const;
+    bool operator()(loki::ObserverPtr<const loki::FunctionExpressionFunctionImpl> lhs, loki::ObserverPtr<const loki::FunctionExpressionFunctionImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<FunctionExpression>
+struct std::equal_to<loki::ObserverPtr<const loki::FunctionExpressionImpl>>
 {
-    bool operator()(FunctionExpression l, FunctionExpression r) const;
+    bool operator()(loki::ObserverPtr<const loki::FunctionExpressionImpl> lhs, loki::ObserverPtr<const loki::FunctionExpressionImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<FunctionSkeleton>
+struct std::equal_to<loki::ObserverPtr<const loki::FunctionSkeletonImpl>>
 {
-    bool operator()(FunctionSkeleton l, FunctionSkeleton r) const;
+    bool operator()(loki::ObserverPtr<const loki::FunctionSkeletonImpl> lhs, loki::ObserverPtr<const loki::FunctionSkeletonImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Function>
+struct std::equal_to<loki::ObserverPtr<const loki::FunctionImpl>>
 {
-    bool operator()(Function l, Function r) const;
+    bool operator()(loki::ObserverPtr<const loki::FunctionImpl> lhs, loki::ObserverPtr<const loki::FunctionImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Literal>
+struct std::equal_to<loki::ObserverPtr<const loki::LiteralImpl>>
 {
-    bool operator()(Literal l, Literal r) const;
+    bool operator()(loki::ObserverPtr<const loki::LiteralImpl> lhs, loki::ObserverPtr<const loki::LiteralImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<OptimizationMetric>
+struct std::equal_to<loki::ObserverPtr<const loki::OptimizationMetricImpl>>
 {
-    bool operator()(OptimizationMetric l, OptimizationMetric r) const;
+    bool operator()(loki::ObserverPtr<const loki::OptimizationMetricImpl> lhs, loki::ObserverPtr<const loki::OptimizationMetricImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<NumericFluent>
+struct std::equal_to<loki::ObserverPtr<const loki::NumericFluentImpl>>
 {
-    bool operator()(NumericFluent l, NumericFluent r) const;
+    bool operator()(loki::ObserverPtr<const loki::NumericFluentImpl> lhs, loki::ObserverPtr<const loki::NumericFluentImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Object>
+struct std::equal_to<loki::ObserverPtr<const loki::ObjectImpl>>
 {
-    bool operator()(Object l, Object r) const;
+    bool operator()(loki::ObserverPtr<const loki::ObjectImpl> lhs, loki::ObserverPtr<const loki::ObjectImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Parameter>
+struct std::equal_to<loki::ObserverPtr<const loki::ParameterImpl>>
 {
-    bool operator()(Parameter l, Parameter r) const;
+    bool operator()(loki::ObserverPtr<const loki::ParameterImpl> lhs, loki::ObserverPtr<const loki::ParameterImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Predicate>
+struct std::equal_to<loki::ObserverPtr<const loki::PredicateImpl>>
 {
-    bool operator()(Predicate l, Predicate r) const;
+    bool operator()(loki::ObserverPtr<const loki::PredicateImpl> lhs, loki::ObserverPtr<const loki::PredicateImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Problem>
+struct std::equal_to<loki::ObserverPtr<const loki::ProblemImpl>>
 {
-    bool operator()(Problem l, Problem r) const;
+    bool operator()(loki::ObserverPtr<const loki::ProblemImpl> lhs, loki::ObserverPtr<const loki::ProblemImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Requirements>
+struct std::equal_to<loki::ObserverPtr<const loki::RequirementsImpl>>
 {
-    bool operator()(Requirements l, Requirements r) const;
+    bool operator()(loki::ObserverPtr<const loki::RequirementsImpl> lhs, loki::ObserverPtr<const loki::RequirementsImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Term>
+struct std::equal_to<loki::ObserverPtr<const loki::TermImpl>>
 {
-    bool operator()(Term l, Term r) const;
+    bool operator()(loki::ObserverPtr<const loki::TermImpl> lhs, loki::ObserverPtr<const loki::TermImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Type>
+struct std::equal_to<loki::ObserverPtr<const loki::TypeImpl>>
 {
-    bool operator()(Type l, Type r) const;
+    bool operator()(loki::ObserverPtr<const loki::TypeImpl> lhs, loki::ObserverPtr<const loki::TypeImpl> rhs) const;
 };
 
 template<>
-struct UniquePDDLEqualTo<Variable>
+struct std::equal_to<loki::ObserverPtr<const loki::VariableImpl>>
 {
-    bool operator()(Variable l, Variable r) const;
+    bool operator()(loki::ObserverPtr<const loki::VariableImpl> lhs, loki::ObserverPtr<const loki::VariableImpl> rhs) const;
 };
-
-}
 
 #endif

@@ -17,8 +17,7 @@
 
 #include "formatter.hpp"
 
-#include "loki/details/pddl/equal_to.hpp"
-#include "loki/details/pddl/hash.hpp"
+#include "loki/details/utils/hash.hpp"
 
 #include <cassert>
 #include <sstream>
@@ -180,7 +179,7 @@ void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)
     if (!element.get_types().empty())
     {
         out << std::string(m_indent, ' ') << "(:types ";
-        std::unordered_map<TypeList, TypeList, UniquePDDLHasher<TypeList>> subtypes_by_parent_types;
+        std::unordered_map<TypeList, TypeList, Hash<TypeList>> subtypes_by_parent_types;
         for (const auto& type : element.get_types())
         {
             // We do not want to print root type "object"
@@ -223,7 +222,7 @@ void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)
     if (!element.get_constants().empty())
     {
         out << std::string(m_indent, ' ') << "(:constants ";
-        std::unordered_map<TypeList, ObjectList, UniquePDDLHasher<TypeList>> constants_by_types;
+        std::unordered_map<TypeList, ObjectList, Hash<TypeList>> constants_by_types;
         for (const auto& constant : element.get_constants())
         {
             constants_by_types[constant->get_bases()].push_back(constant);
@@ -526,7 +525,7 @@ void PDDLFormatter::write(const ProblemImpl& element, std::ostream& out)
     if (!element.get_objects().empty())
     {
         out << std::string(m_indent, ' ') << "(:objects ";
-        std::unordered_map<TypeList, ObjectList, UniquePDDLHasher<TypeList>> objects_by_types;
+        std::unordered_map<TypeList, ObjectList, Hash<TypeList>> objects_by_types;
         for (const auto& object : element.get_objects())
         {
             objects_by_types[object->get_bases()].push_back(object);

@@ -22,6 +22,7 @@
 #include <loki/details/pddl/term.hpp>
 #include <loki/details/pddl/type.hpp>
 #include <loki/details/pddl/variable.hpp>
+#include <loki/details/utils/hash.hpp>
 #include <loki/details/utils/segmented_repository.hpp>
 
 namespace loki::domain::tests
@@ -29,7 +30,7 @@ namespace loki::domain::tests
 
 TEST(LokiTests, UtilsSegmentedRepositoryIteratorTest)
 {
-    SegmentedRepository<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>> factory(2);
+    SegmentedRepository<ObjectImpl> factory(2);
     const auto object_0 = factory.get_or_create("object_0", TypeList());
     const auto object_1 = factory.get_or_create("object_1", TypeList());
     const auto object_2 = factory.get_or_create("object_2", TypeList());
@@ -48,7 +49,7 @@ TEST(LokiTests, UtilsSegmentedRepositoryIteratorTest)
 
 TEST(LokiTests, UtilsSegmentedRepositoryIteratorEmptyTest)
 {
-    SegmentedRepository<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>> factory(4);
+    SegmentedRepository<ObjectImpl> factory(4);
 
     auto objects = ObjectList {};
     for (const auto& object : factory)
@@ -61,8 +62,8 @@ TEST(LokiTests, UtilsSegmentedRepositoryIteratorEmptyTest)
 
 TEST(LokiTests, UtilsSegmentedRepositoryVariantTest)
 {
-    SegmentedRepository<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>> objects(2);
-    SegmentedRepository<TermImpl, UniquePDDLHasher<const TermImpl*>, UniquePDDLEqualTo<const TermImpl*>> terms(2);
+    SegmentedRepository<ObjectImpl> objects(2);
+    SegmentedRepository<TermImpl> terms(2);
     const auto object_0 = objects.get_or_create("object_0", TypeList());
     const auto object_1 = objects.get_or_create("object_1", TypeList());
 
@@ -76,7 +77,7 @@ TEST(LokiTests, UtilsSegmentedRepositoryVariantTest)
 
 TEST(LokiTests, UtilsSegmentedRepositoryTest)
 {
-    SegmentedRepository<ObjectImpl, UniquePDDLHasher<const ObjectImpl*>, UniquePDDLEqualTo<const ObjectImpl*>> factory(2);
+    SegmentedRepository<ObjectImpl> factory(2);
     EXPECT_EQ(factory.size(), 0);
 
     // Test uniqueness: insert the same element twice
@@ -88,16 +89,16 @@ TEST(LokiTests, UtilsSegmentedRepositoryTest)
     const auto object_0_1 = factory.get_or_create("object_0", TypeList());
     EXPECT_EQ(factory.size(), 1);
     EXPECT_EQ(object_0_0, object_0_1);
-    EXPECT_EQ(UniquePDDLHasher<const ObjectImpl*>()(object_0_0), UniquePDDLHasher<const ObjectImpl*>()(object_0_1));
-    EXPECT_TRUE(UniquePDDLEqualTo<const ObjectImpl*>()(object_0_0, object_0_1));
+    EXPECT_EQ(Hash<ObserverPtr<const ObjectImpl>>()(object_0_0), Hash<ObserverPtr<const ObjectImpl>>()(object_0_1));
+    EXPECT_TRUE(std::equal_to<ObserverPtr<const ObjectImpl>>()(object_0_0, object_0_1));
 
     const auto object_1 = factory.get_or_create("object_1", TypeList());
     EXPECT_EQ(factory.size(), 2);
     EXPECT_NE(object_0_0, object_1);
     EXPECT_EQ(object_1->get_index(), 1);
     EXPECT_EQ(object_1->get_name(), "object_1");
-    EXPECT_NE(UniquePDDLHasher<const ObjectImpl*>()(object_0_0), UniquePDDLHasher<const ObjectImpl*>()(object_1));
-    EXPECT_FALSE(UniquePDDLEqualTo<const ObjectImpl*>()(object_0_0, object_1));
+    EXPECT_NE(Hash<ObserverPtr<const ObjectImpl>>()(object_0_0), Hash<ObserverPtr<const ObjectImpl>>()(object_1));
+    EXPECT_FALSE(std::equal_to<ObserverPtr<const ObjectImpl>>()(object_0_0, object_1));
 }
 
 }

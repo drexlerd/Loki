@@ -19,309 +19,238 @@
 #define LOKI_INCLUDE_LOKI_PDDL_HASH_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-
-#include <cstddef>
-#include <cstdint>
-#include <functional>
-#include <ranges>
-#include <utility>
-#include <variant>
-
-namespace loki
-{
-
-/// @brief `UniquePDDLEqualTo` is used to compare newly created PDDL objects for uniqueness.
-/// Since the children are unique, it suffices to create a combined hash from nested pointers.
-template<typename T>
-struct UniquePDDLHasher
-{
-    size_t operator()(const T& element) const { return std::hash<T>()(element); }
-};
-
-struct UniquePDDLHashCombiner
-{
-public:
-    template<typename T>
-    void operator()(size_t& seed, const T& value) const
-    {
-        seed ^= UniquePDDLHasher<T>()(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-    }
-
-    void operator()(size_t& seed, const std::size_t& value) const { seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2); }
-
-    template<typename... Types>
-    size_t operator()(const Types&... args) const
-    {
-        size_t seed = 0;
-        ((*this)(seed, args), ...);
-        return seed;
-    }
-};
-
-/// Spezialization for std::ranges::forward_range.
-template<typename ForwardRange>
-requires std::ranges::forward_range<ForwardRange>
-struct UniquePDDLHasher<ForwardRange>
-{
-    size_t operator()(const ForwardRange& range) const
-    {
-        std::size_t aggregated_hash = 0;
-        for (const auto& item : range)
-        {
-            UniquePDDLHashCombiner()(aggregated_hash, item);
-        }
-        return aggregated_hash;
-    }
-};
-
-/// Spezialization for std::variant.
-template<typename... Ts>
-struct UniquePDDLHasher<std::variant<Ts...>>
-{
-    size_t operator()(const std::variant<Ts...>& variant) const
-    {
-        return std::visit(
-            [](const auto& arg)
-            {
-                using DecayedType = std::decay_t<decltype(arg)>;
-                return UniquePDDLHasher<DecayedType>()(arg);
-            },
-            variant);
-    }
-};
+#include "loki/details/utils/observer_ptr.hpp"
 
 /**
  * Specializations for PDDL
  */
 
 template<>
-struct UniquePDDLHasher<Action>
+struct std::hash<loki::ObserverPtr<const loki::ActionImpl>>
 {
-    size_t operator()(Action e) const;
+    size_t operator()(loki::ObserverPtr<const loki::ActionImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Atom>
+struct std::hash<loki::ObserverPtr<const loki::AtomImpl>>
 {
-    size_t operator()(Atom e) const;
+    size_t operator()(loki::ObserverPtr<const loki::AtomImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Axiom>
+struct std::hash<loki::ObserverPtr<const loki::AxiomImpl>>
 {
-    size_t operator()(Axiom e) const;
+    size_t operator()(loki::ObserverPtr<const loki::AxiomImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<ConditionLiteral>
+struct std::hash<loki::ObserverPtr<const loki::ConditionLiteralImpl>>
 {
-    size_t operator()(ConditionLiteral e) const;
+    size_t operator()(loki::ObserverPtr<const loki::ConditionLiteralImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<ConditionAnd>
+struct std::hash<loki::ObserverPtr<const loki::ConditionAndImpl>>
 {
-    size_t operator()(ConditionAnd e) const;
+    size_t operator()(loki::ObserverPtr<const loki::ConditionAndImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<ConditionOr>
+struct std::hash<loki::ObserverPtr<const loki::ConditionOrImpl>>
 {
-    size_t operator()(ConditionOr e) const;
+    size_t operator()(loki::ObserverPtr<const loki::ConditionOrImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<ConditionNot>
+struct std::hash<loki::ObserverPtr<const loki::ConditionNotImpl>>
 {
-    size_t operator()(ConditionNot e) const;
+    size_t operator()(loki::ObserverPtr<const loki::ConditionNotImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<ConditionImply>
+struct std::hash<loki::ObserverPtr<const loki::ConditionImplyImpl>>
 {
-    size_t operator()(ConditionImply e) const;
+    size_t operator()(loki::ObserverPtr<const loki::ConditionImplyImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<ConditionExists>
+struct std::hash<loki::ObserverPtr<const loki::ConditionExistsImpl>>
 {
-    size_t operator()(ConditionExists e) const;
+    size_t operator()(loki::ObserverPtr<const loki::ConditionExistsImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<ConditionForall>
+struct std::hash<loki::ObserverPtr<const loki::ConditionForallImpl>>
 {
-    size_t operator()(ConditionForall e) const;
+    size_t operator()(loki::ObserverPtr<const loki::ConditionForallImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Condition>
+struct std::hash<loki::ObserverPtr<const loki::ConditionImpl>>
 {
-    size_t operator()(Condition e) const;
+    size_t operator()(loki::ObserverPtr<const loki::ConditionImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Domain>
+struct std::hash<loki::ObserverPtr<const loki::DomainImpl>>
 {
-    size_t operator()(Domain e) const;
+    size_t operator()(loki::ObserverPtr<const loki::DomainImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<EffectLiteral>
+struct std::hash<loki::ObserverPtr<const loki::EffectLiteralImpl>>
 {
-    size_t operator()(EffectLiteral e) const;
+    size_t operator()(loki::ObserverPtr<const loki::EffectLiteralImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<EffectAnd>
+struct std::hash<loki::ObserverPtr<const loki::EffectAndImpl>>
 {
-    size_t operator()(EffectAnd e) const;
+    size_t operator()(loki::ObserverPtr<const loki::EffectAndImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<EffectNumeric>
+struct std::hash<loki::ObserverPtr<const loki::EffectNumericImpl>>
 {
-    size_t operator()(EffectNumeric e) const;
+    size_t operator()(loki::ObserverPtr<const loki::EffectNumericImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<EffectCompositeForall>
+struct std::hash<loki::ObserverPtr<const loki::EffectCompositeForallImpl>>
 {
-    size_t operator()(EffectCompositeForall e) const;
+    size_t operator()(loki::ObserverPtr<const loki::EffectCompositeForallImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<EffectCompositeWhen>
+struct std::hash<loki::ObserverPtr<const loki::EffectCompositeWhenImpl>>
 {
-    size_t operator()(EffectCompositeWhen e) const;
+    size_t operator()(loki::ObserverPtr<const loki::EffectCompositeWhenImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<EffectCompositeOneof>
+struct std::hash<loki::ObserverPtr<const loki::EffectCompositeOneofImpl>>
 {
-    size_t operator()(EffectCompositeOneof e) const;
+    size_t operator()(loki::ObserverPtr<const loki::EffectCompositeOneofImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Effect>
+struct std::hash<loki::ObserverPtr<const loki::EffectImpl>>
 {
-    size_t operator()(Effect e) const;
+    size_t operator()(loki::ObserverPtr<const loki::EffectImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<FunctionExpressionNumber>
+struct std::hash<loki::ObserverPtr<const loki::FunctionExpressionNumberImpl>>
 {
-    size_t operator()(FunctionExpressionNumber e) const;
+    size_t operator()(loki::ObserverPtr<const loki::FunctionExpressionNumberImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<FunctionExpressionBinaryOperator>
+struct std::hash<loki::ObserverPtr<const loki::FunctionExpressionBinaryOperatorImpl>>
 {
-    size_t operator()(FunctionExpressionBinaryOperator e) const;
+    size_t operator()(loki::ObserverPtr<const loki::FunctionExpressionBinaryOperatorImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<FunctionExpressionMultiOperator>
+struct std::hash<loki::ObserverPtr<const loki::FunctionExpressionMultiOperatorImpl>>
 {
-    size_t operator()(FunctionExpressionMultiOperator e) const;
+    size_t operator()(loki::ObserverPtr<const loki::FunctionExpressionMultiOperatorImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<FunctionExpressionMinus>
+struct std::hash<loki::ObserverPtr<const loki::FunctionExpressionMinusImpl>>
 {
-    size_t operator()(FunctionExpressionMinus e) const;
+    size_t operator()(loki::ObserverPtr<const loki::FunctionExpressionMinusImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<FunctionExpressionFunction>
+struct std::hash<loki::ObserverPtr<const loki::FunctionExpressionFunctionImpl>>
 {
-    size_t operator()(FunctionExpressionFunction e) const;
+    size_t operator()(loki::ObserverPtr<const loki::FunctionExpressionFunctionImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<FunctionExpression>
+struct std::hash<loki::ObserverPtr<const loki::FunctionExpressionImpl>>
 {
-    size_t operator()(FunctionExpression e) const;
+    size_t operator()(loki::ObserverPtr<const loki::FunctionExpressionImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<FunctionSkeleton>
+struct std::hash<loki::ObserverPtr<const loki::FunctionSkeletonImpl>>
 {
-    size_t operator()(FunctionSkeleton e) const;
+    size_t operator()(loki::ObserverPtr<const loki::FunctionSkeletonImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Function>
+struct std::hash<loki::ObserverPtr<const loki::FunctionImpl>>
 {
-    size_t operator()(Function e) const;
+    size_t operator()(loki::ObserverPtr<const loki::FunctionImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Literal>
+struct std::hash<loki::ObserverPtr<const loki::LiteralImpl>>
 {
-    size_t operator()(Literal e) const;
+    size_t operator()(loki::ObserverPtr<const loki::LiteralImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<OptimizationMetric>
+struct std::hash<loki::ObserverPtr<const loki::OptimizationMetricImpl>>
 {
-    size_t operator()(OptimizationMetric e) const;
+    size_t operator()(loki::ObserverPtr<const loki::OptimizationMetricImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<NumericFluent>
+struct std::hash<loki::ObserverPtr<const loki::NumericFluentImpl>>
 {
-    size_t operator()(NumericFluent e) const;
+    size_t operator()(loki::ObserverPtr<const loki::NumericFluentImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Object>
+struct std::hash<loki::ObserverPtr<const loki::ObjectImpl>>
 {
-    size_t operator()(Object e) const;
+    size_t operator()(loki::ObserverPtr<const loki::ObjectImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Parameter>
+struct std::hash<loki::ObserverPtr<const loki::ParameterImpl>>
 {
-    size_t operator()(Parameter e) const;
+    size_t operator()(loki::ObserverPtr<const loki::ParameterImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Predicate>
+struct std::hash<loki::ObserverPtr<const loki::PredicateImpl>>
 {
-    size_t operator()(Predicate e) const;
+    size_t operator()(loki::ObserverPtr<const loki::PredicateImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Problem>
+struct std::hash<loki::ObserverPtr<const loki::ProblemImpl>>
 {
-    size_t operator()(Problem e) const;
+    size_t operator()(loki::ObserverPtr<const loki::ProblemImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Requirements>
+struct std::hash<loki::ObserverPtr<const loki::RequirementsImpl>>
 {
-    size_t operator()(Requirements e) const;
+    size_t operator()(loki::ObserverPtr<const loki::RequirementsImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Term>
+struct std::hash<loki::ObserverPtr<const loki::TermImpl>>
 {
-    size_t operator()(Term e) const;
+    size_t operator()(loki::ObserverPtr<const loki::TermImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Type>
+struct std::hash<loki::ObserverPtr<const loki::TypeImpl>>
 {
-    size_t operator()(Type e) const;
+    size_t operator()(loki::ObserverPtr<const loki::TypeImpl> e) const;
 };
 
 template<>
-struct UniquePDDLHasher<Variable>
+struct std::hash<loki::ObserverPtr<const loki::VariableImpl>>
 {
-    size_t operator()(Variable e) const;
+    size_t operator()(loki::ObserverPtr<const loki::VariableImpl> e) const;
 };
-
-}
 
 #endif

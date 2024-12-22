@@ -18,10 +18,10 @@
 #ifndef LOKI_INCLUDE_LOKI_UTILS_SEGMENTED_REPOSITORY_HPP_
 #define LOKI_INCLUDE_LOKI_UTILS_SEGMENTED_REPOSITORY_HPP_
 
+#include "loki/details/utils/observer_ptr.hpp"
 #include "loki/details/utils/segmented_vector.hpp"
 
 #include <absl/container/flat_hash_set.h>
-
 #include <memory>
 #include <tuple>
 #include <type_traits>
@@ -37,12 +37,12 @@ namespace loki
 /// @tparam T is the type.
 /// @tparam Hash the hash function.
 /// @tparam KeyEqual the comparison function.
-template<typename T, typename Hash, typename KeyEqual>
+template<typename T, typename Hash = std::hash<ObserverPtr<const T>>, typename KeyEqual = std::equal_to<ObserverPtr<const T>>>
 class SegmentedRepository
 {
 private:
     // We use an unordered_set to test for uniqueness.
-    absl::flat_hash_set<const T*, Hash, KeyEqual> m_uniqueness_set;
+    absl::flat_hash_set<ObserverPtr<const T>, Hash, KeyEqual> m_uniqueness_set;
 
     // We use pre-allocated memory to store objects persistent.
     SegmentedVector<T> m_persistent_vector;
@@ -77,7 +77,7 @@ public:
         assert(index == m_persistent_vector.size());
 
         // Explicitly call the constructor of T to give exclusive access to the factory.
-        const auto* element_ptr = &m_persistent_vector.emplace_back(T(index, std::forward<Args>(args)...));
+        auto element_ptr = ObserverPtr<const T>(&m_persistent_vector.emplace_back(T(index, std::forward<Args>(args)...)));
         // The pointer to the location in persistent memory.
         assert(element_ptr);
 
@@ -98,7 +98,7 @@ public:
             m_persistent_vector.pop_back();
         }
 
-        return element_ptr;
+        return element_ptr.get();
     }
 
     /**
@@ -123,29 +123,17 @@ public:
         return &(m_persistent_vector.at(pos));
     }
 
-    auto begin() const
-    {
-        return m_persistent_vector.begin();
-    }
+    auto begin() const { return m_persistent_vector.begin(); }
 
-    auto end() const
-    {
-        return m_persistent_vector.end();
-    }
+    auto end() const { return m_persistent_vector.end(); }
 
-    const SegmentedVector<T>& get_storage() const
-    {
-        return m_persistent_vector;
-    }
+    const SegmentedVector<T>& get_storage() const { return m_persistent_vector; }
 
     /**
      * Capacity
      */
 
-    size_t size() const
-    {
-        return m_persistent_vector.size();
-    }
+    size_t size() const { return m_persistent_vector.size(); }
 };
 
 }

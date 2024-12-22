@@ -50,7 +50,7 @@ namespace loki
 {
 
 template<typename T>
-using SegmentedPDDLRepository = SegmentedRepository<T, UniquePDDLHasher<const T*>, UniquePDDLEqualTo<const T*>>;
+using SegmentedPDDLRepository = SegmentedRepository<T>;
 
 using RequirementsRepository = SegmentedPDDLRepository<RequirementsImpl>;
 using TypeRepository = SegmentedPDDLRepository<TypeImpl>;
