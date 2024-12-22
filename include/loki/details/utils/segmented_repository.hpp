@@ -76,29 +76,29 @@ public:
         size_t index = m_uniqueness_set.size();
         assert(index == m_persistent_vector.size());
 
-        // Explicitly call the constructor of T to give exclusive access to the factory.
-        auto element_ptr = ObserverPtr<const T>(&m_persistent_vector.emplace_back(T(index, std::forward<Args>(args)...)));
-        // The pointer to the location in persistent memory.
-        assert(element_ptr);
+        // Create element of type T
+        auto element = T(index, std::forward<Args>(args)...);
 
         /* Test for uniqueness */
-        auto it = m_uniqueness_set.find(element_ptr);
+        auto it = m_uniqueness_set.find(ObserverPtr<const T>(&element));
         if (it == m_uniqueness_set.end())
         {
             /* Element is unique! */
 
-            m_uniqueness_set.emplace(element_ptr);
-        }
-        else
-        {
-            /* Element is not unique! */
+            // Copy element to persistent memory
+            m_persistent_vector.push_back(std::move(element));
 
-            element_ptr = *it;
-            // Remove duplicate from vector
-            m_persistent_vector.pop_back();
+            // Fetch the pointer to persistent element;
+            const auto persistent_addr = &m_persistent_vector.back();
+
+            // Mark the element as not unique.
+            m_uniqueness_set.insert(persistent_addr);
+
+            // Return pointer to persistent element.
+            return persistent_addr;
         }
 
-        return element_ptr.get();
+        return it->get();
     }
 
     /**

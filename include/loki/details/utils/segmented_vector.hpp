@@ -115,15 +115,6 @@ public:
         return element;
     }
 
-    void pop_back()
-    {
-        assert(m_size > 0);
-        auto& segment = m_segments.back();
-        segment.pop_back();
-        m_accessor.pop_back();
-        --m_size;
-    }
-
     /**
      * Accessors
      */
