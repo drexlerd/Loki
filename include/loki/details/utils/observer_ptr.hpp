@@ -40,17 +40,16 @@ public:
     const T& operator*() const { return *ptr; }
     const T* operator->() const { return ptr; }
 
-    // Comparison operators
-    bool operator==(const ObserverPtr& other) const noexcept { return ptr == other.ptr; }
-    bool operator!=(const ObserverPtr& other) const noexcept { return ptr != other.ptr; }
-    bool operator<(const ObserverPtr& other) const noexcept { return ptr < other.ptr; }
-    bool operator<=(const ObserverPtr& other) const noexcept { return ptr <= other.ptr; }
-    bool operator>(const ObserverPtr& other) const noexcept { return ptr > other.ptr; }
-    bool operator>=(const ObserverPtr& other) const noexcept { return ptr >= other.ptr; }
+    // Explicitly delete comparison to require user defined comparisons.
+    bool operator==(const ObserverPtr& other) const noexcept = delete;
+    bool operator!=(const ObserverPtr& other) const noexcept = delete;
+    bool operator<(const ObserverPtr& other) const noexcept = delete;
+    bool operator<=(const ObserverPtr& other) const noexcept = delete;
+    bool operator>(const ObserverPtr& other) const noexcept = delete;
+    bool operator>=(const ObserverPtr& other) const noexcept = delete;
 
-    // nullptr comparisons
-    bool operator==(std::nullptr_t) const noexcept { return ptr == nullptr; }
-    bool operator!=(std::nullptr_t) const noexcept { return ptr != nullptr; }
+    // Explicitly delete raw pointer conversions.
+    operator T*() const = delete;
 
     // Conversion to boolean
     explicit operator bool() const noexcept { return ptr != nullptr; }
