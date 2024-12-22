@@ -34,13 +34,6 @@ template<typename T>
 using PDDLElement = const T*;
 
 /**
- * Utils
- */
-
-template<typename HolderType, typename Hash, typename EqualTo>
-class SegmentedRepository;
-
-/**
  * Domain
  */
 

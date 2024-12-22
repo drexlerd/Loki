@@ -18,13 +18,12 @@
 #ifndef LOKI_INCLUDE_LOKI_UTILS_SEGMENTED_REPOSITORY_HPP_
 #define LOKI_INCLUDE_LOKI_UTILS_SEGMENTED_REPOSITORY_HPP_
 
-#include "loki/details/utils/observer_ptr.hpp"
+#include "loki/details/utils/members_proxy.hpp"
 #include "loki/details/utils/segmented_vector.hpp"
 
 #include <absl/container/flat_hash_set.h>
 #include <memory>
 #include <tuple>
-#include <type_traits>
 #include <unordered_set>
 #include <variant>
 
@@ -37,12 +36,26 @@ namespace loki
 /// @tparam T is the type.
 /// @tparam Hash the hash function.
 /// @tparam KeyEqual the comparison function.
-template<typename T, typename Hash = std::hash<ObserverPtr<const T>>, typename KeyEqual = std::equal_to<ObserverPtr<const T>>>
+template<HasIdentifiableMembers T>
 class SegmentedRepository
 {
 private:
+    // Proxy-based hash and equality functions
+    struct ProxyHash
+    {
+        size_t operator()(const T* ptr) const { return std::hash<loki::IdentifiableMembersProxy<>>(loki::IdentifiableMembersProxy(*ptr)); }
+    };
+
+    struct ProxyEqual
+    {
+        bool operator()(const T* lhs, const T* rhs) const
+        {
+            return std::equal_to<loki::IdentifiableMembersProxy<>>()(loki::IdentifiableMembersProxy(*lhs), loki::IdentifiableMembersProxy(*rhs));
+        }
+    };
+
     // We use an unordered_set to test for uniqueness.
-    absl::flat_hash_set<ObserverPtr<const T>, Hash, KeyEqual> m_uniqueness_set;
+    absl::flat_hash_set<const T*, ProxyHash, ProxyEqual> m_uniqueness_set;
 
     // We use pre-allocated memory to store objects persistent.
     SegmentedVector<T> m_persistent_vector;
@@ -80,7 +93,7 @@ public:
         auto element = T(index, std::forward<Args>(args)...);
 
         /* Test for uniqueness */
-        auto it = m_uniqueness_set.find(ObserverPtr<const T>(&element));
+        auto it = m_uniqueness_set.find(&element);
         if (it == m_uniqueness_set.end())
         {
             /* Element is unique! */
@@ -98,7 +111,7 @@ public:
             return persistent_addr;
         }
 
-        return it->get();
+        return *it;
     }
 
     /**

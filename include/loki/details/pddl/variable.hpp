@@ -21,6 +21,7 @@
 #include "loki/details/pddl/declarations.hpp"
 
 #include <string>
+#include <utility>
 
 namespace loki
 {
@@ -45,6 +46,8 @@ public:
 
     size_t get_index() const;
     const std::string& get_name() const;
+
+    std::tuple<const std::string&> identifiable_members() const { return std::forward_as_tuple(std::as_const(m_name)); }
 };
 
 extern VariableSet collect_free_variables(const loki::ConditionImpl& condition);
