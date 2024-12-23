@@ -173,7 +173,7 @@ struct Hash<std::optional<T>>
  * Definitions
  */
 
-/// @brief Computes that hash for an object and combines it into the seed using Boost's hash combine function.
+/// @brief Computes that hash for and object and combines it into the seed using Boost's hash combine function.
 /// @tparam T is the type of the object.
 /// @param seed is the seed.
 /// @param value is the object.

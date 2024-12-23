@@ -76,8 +76,7 @@ public:
 
     auto identifiable_members() const
     {
-        return std::forward_as_tuple(std::as_const(m_filepath),
-                                     std::as_const(m_name),
+        return std::forward_as_tuple(std::as_const(m_name),
                                      std::as_const(m_requirements),
                                      std::as_const(m_types),
                                      std::as_const(m_constants),
