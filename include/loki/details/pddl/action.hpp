@@ -44,7 +44,7 @@ private:
                std::optional<Effect> effect);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T>
+    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:

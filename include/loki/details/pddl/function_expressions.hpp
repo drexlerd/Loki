@@ -55,7 +55,7 @@ private:
     FunctionExpressionNumberImpl(size_t index, double number);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T>
+    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -86,7 +86,7 @@ private:
                                          FunctionExpression right_function_expression);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T>
+    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -118,7 +118,7 @@ private:
     FunctionExpressionMultiOperatorImpl(size_t index, MultiOperatorEnum multi_operator, FunctionExpressionList function_expressions);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T>
+    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -145,7 +145,7 @@ private:
     FunctionExpressionMinusImpl(size_t index, FunctionExpression function_expression);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T>
+    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -171,7 +171,7 @@ private:
     FunctionExpressionFunctionImpl(size_t index, Function function);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T>
+    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -207,7 +207,7 @@ private:
                                         FunctionExpressionFunction> function_expression);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T>
+    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:

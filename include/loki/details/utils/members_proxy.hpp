@@ -20,6 +20,7 @@
 
 #include "loki/details/utils/concepts.hpp"
 #include "loki/details/utils/hash.hpp"
+#include "loki/details/utils/observer_ptr.hpp"
 
 #include <concepts>
 #include <functional>
@@ -58,6 +59,21 @@ struct std::equal_to<loki::IdentifiableMembersProxy<Ts...>>
     size_t operator()(const loki::IdentifiableMembersProxy<Ts...>& lhs, const loki::IdentifiableMembersProxy<Ts...>& rhs) const
     {
         return lhs.members() == rhs.members();
+    }
+};
+
+template<loki::HasIdentifiableMembers T>
+struct std::hash<loki::ObserverPtr<T>>
+{
+    size_t operator()(loki::ObserverPtr<T> ptr) const { return std::hash<loki::IdentifiableMembersProxy<T>>()(loki::IdentifiableMembersProxy<T>(*ptr)); }
+};
+
+template<loki::HasIdentifiableMembers T>
+struct std::equal_to<loki::ObserverPtr<T>>
+{
+    size_t operator()(loki::ObserverPtr<T> lhs, loki::ObserverPtr<T> rhs) const
+    {
+        return std::equal_to<loki::IdentifiableMembersProxy<T>>()(loki::IdentifiableMembersProxy<T>(*lhs), loki::IdentifiableMembersProxy<T>(*rhs));
     }
 };
 

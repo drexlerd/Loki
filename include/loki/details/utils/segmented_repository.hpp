@@ -36,26 +36,12 @@ namespace loki
 /// @tparam T is the type.
 /// @tparam Hash the hash function.
 /// @tparam KeyEqual the comparison function.
-template<HasIdentifiableMembers T>
+template<HasIdentifiableMembers T, typename Hash = std::hash<loki::ObserverPtr<const T>>, typename EqualTo = std::equal_to<loki::ObserverPtr<const T>>>
 class SegmentedRepository
 {
 private:
-    // Proxy-based hash and equality functions
-    struct ProxyHash
-    {
-        size_t operator()(const T* ptr) const { return std::hash<loki::IdentifiableMembersProxy<T>>()(loki::IdentifiableMembersProxy<T>(*ptr)); }
-    };
-
-    struct ProxyEqual
-    {
-        bool operator()(const T* lhs, const T* rhs) const
-        {
-            return std::equal_to<loki::IdentifiableMembersProxy<T>>()(loki::IdentifiableMembersProxy<T>(*lhs), loki::IdentifiableMembersProxy<T>(*rhs));
-        }
-    };
-
     // We use an unordered_set to test for uniqueness.
-    absl::flat_hash_set<const T*, ProxyHash, ProxyEqual> m_uniqueness_set;
+    absl::flat_hash_set<ObserverPtr<const T>, Hash, EqualTo> m_uniqueness_set;
 
     // We use pre-allocated memory to store objects persistent.
     SegmentedVector<T> m_persistent_vector;
@@ -93,25 +79,25 @@ public:
         auto element = T(index, std::forward<Args>(args)...);
 
         /* Test for uniqueness */
-        auto it = m_uniqueness_set.find(&element);
-        if (it == m_uniqueness_set.end())
+        auto it = m_uniqueness_set.find(ObserverPtr<const T>(&element));
+        if (it != m_uniqueness_set.end())
         {
-            /* Element is unique! */
-
-            // Copy element to persistent memory
-            m_persistent_vector.push_back(std::move(element));
-
-            // Fetch the pointer to persistent element;
-            const auto persistent_addr = &m_persistent_vector.back();
-
-            // Mark the element as not unique.
-            m_uniqueness_set.insert(persistent_addr);
-
-            // Return pointer to persistent element.
-            return persistent_addr;
+            return it->get();
         }
 
-        return *it;
+        /* Element is unique! */
+
+        // Copy element to persistent memory
+        m_persistent_vector.push_back(std::move(element));
+
+        // Fetch the pointer to persistent element;
+        const auto persistent_addr = &m_persistent_vector.back();
+
+        // Mark the element as not unique.
+        m_uniqueness_set.insert(persistent_addr);
+
+        // Return pointer to persistent element.
+        return persistent_addr;
     }
 
     /**

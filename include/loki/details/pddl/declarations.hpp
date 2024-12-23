@@ -35,7 +35,7 @@ namespace loki
 template<typename T>
 using PDDLElement = const T*;
 
-template<HasIdentifiableMembers T>
+template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
 class SegmentedRepository;
 
 /**

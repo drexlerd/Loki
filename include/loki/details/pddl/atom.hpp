@@ -34,7 +34,7 @@ private:
     AtomImpl(size_t index, Predicate predicate, TermList terms);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T>
+    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:

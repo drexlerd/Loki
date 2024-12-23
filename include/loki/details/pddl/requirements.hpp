@@ -65,7 +65,7 @@ private:
     RequirementsImpl(size_t index, RequirementEnumSet requirements);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T>
+    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:

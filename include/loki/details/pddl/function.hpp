@@ -34,7 +34,7 @@ private:
     FunctionImpl(size_t index, FunctionSkeleton function_skeleton, TermList terms);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T>
+    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
