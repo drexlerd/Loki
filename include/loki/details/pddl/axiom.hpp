@@ -36,7 +36,7 @@ private:
     AxiomImpl(size_t index, std::string derived_predicate_name, ParameterList parameters, Condition condition, size_t num_parameters_to_ground_head);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -51,6 +51,14 @@ public:
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
     size_t get_num_parameters_to_ground_head() const;
+
+    auto identifiable_members() const
+    {
+        return std::forward_as_tuple(std::as_const(m_derived_predicate_name),
+                                     std::as_const(m_parameters),
+                                     std::as_const(m_condition),
+                                     std::as_const(m_num_parameters_to_ground_head));
+    }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const AxiomImpl& element);

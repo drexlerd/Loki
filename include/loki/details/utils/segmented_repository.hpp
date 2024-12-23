@@ -30,7 +30,7 @@
 namespace loki
 {
 
-/// @brief `SegmentedRepository` is a thread-safe container for managing the unique creation of objects
+/// @brief `SegmentedRepository` is a container for managing the unique creation of objects
 /// in a persistent and efficient manner, utilizing a combination of unordered_set for
 /// uniqueness checks and SegmentedVector for continuous and cache-efficient storage of value types.
 /// @tparam T is the type.
@@ -43,14 +43,14 @@ private:
     // Proxy-based hash and equality functions
     struct ProxyHash
     {
-        size_t operator()(const T* ptr) const { return std::hash<loki::IdentifiableMembersProxy<>>(loki::IdentifiableMembersProxy(*ptr)); }
+        size_t operator()(const T* ptr) const { return std::hash<loki::IdentifiableMembersProxy<T>>()(loki::IdentifiableMembersProxy<T>(*ptr)); }
     };
 
     struct ProxyEqual
     {
         bool operator()(const T* lhs, const T* rhs) const
         {
-            return std::equal_to<loki::IdentifiableMembersProxy<>>()(loki::IdentifiableMembersProxy(*lhs), loki::IdentifiableMembersProxy(*rhs));
+            return std::equal_to<loki::IdentifiableMembersProxy<T>>()(loki::IdentifiableMembersProxy<T>(*lhs), loki::IdentifiableMembersProxy<T>(*rhs));
         }
     };
 
@@ -119,7 +119,6 @@ public:
      */
 
     /// @brief Returns a pointer to an existing object with the given pos.
-    // MT: no lock required, because elements are persistent.
     T const* operator[](size_t pos) const
     {
         assert(pos < size());
@@ -127,7 +126,6 @@ public:
     }
 
     /// @brief Returns a pointer to an existing object with the given pos.
-    /// MT: no lock required, because elements are persistent.
     /// @param pos
     /// @return
     T const* at(size_t pos) const

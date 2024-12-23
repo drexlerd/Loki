@@ -16,8 +16,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/details/pddl/equal_to.hpp>
-#include <loki/details/pddl/hash.hpp>
 #include <loki/details/pddl/object.hpp>
 #include <loki/details/pddl/term.hpp>
 #include <loki/details/pddl/type.hpp>
@@ -89,16 +87,20 @@ TEST(LokiTests, UtilsSegmentedRepositoryTest)
     const auto object_0_1 = factory.get_or_create("object_0", TypeList());
     EXPECT_EQ(factory.size(), 1);
     EXPECT_EQ(object_0_0, object_0_1);
-    EXPECT_EQ(Hash<ObserverPtr<const ObjectImpl>>()(object_0_0), Hash<ObserverPtr<const ObjectImpl>>()(object_0_1));
-    EXPECT_TRUE(std::equal_to<ObserverPtr<const ObjectImpl>>()(object_0_0, object_0_1));
+    EXPECT_EQ(std::hash<IdentifiableMembersProxy<ObjectImpl>>()(IdentifiableMembersProxy<ObjectImpl>(*object_0_0)),
+              std::hash<IdentifiableMembersProxy<ObjectImpl>>()(IdentifiableMembersProxy<ObjectImpl>(*object_0_1)));
+    EXPECT_TRUE(std::equal_to<IdentifiableMembersProxy<ObjectImpl>>()(IdentifiableMembersProxy<ObjectImpl>(*object_0_0),
+                                                                      IdentifiableMembersProxy<ObjectImpl>(*object_0_1)));
 
     const auto object_1 = factory.get_or_create("object_1", TypeList());
     EXPECT_EQ(factory.size(), 2);
     EXPECT_NE(object_0_0, object_1);
     EXPECT_EQ(object_1->get_index(), 1);
     EXPECT_EQ(object_1->get_name(), "object_1");
-    EXPECT_NE(Hash<ObserverPtr<const ObjectImpl>>()(object_0_0), Hash<ObserverPtr<const ObjectImpl>>()(object_1));
-    EXPECT_FALSE(std::equal_to<ObserverPtr<const ObjectImpl>>()(object_0_0, object_1));
+    EXPECT_NE(std::hash<IdentifiableMembersProxy<ObjectImpl>>()(IdentifiableMembersProxy<ObjectImpl>(*object_0_0)),
+              std::hash<IdentifiableMembersProxy<ObjectImpl>>()(IdentifiableMembersProxy<ObjectImpl>(*object_1)));
+    EXPECT_FALSE(std::equal_to<IdentifiableMembersProxy<ObjectImpl>>()(IdentifiableMembersProxy<ObjectImpl>(*object_0_0),
+                                                                       IdentifiableMembersProxy<ObjectImpl>(*object_1)));
 }
 
 }

@@ -35,7 +35,7 @@ private:
     ConditionLiteralImpl(size_t index, Literal literal);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -47,6 +47,8 @@ public:
 
     size_t get_index() const;
     const Literal& get_literal() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_literal)); }
 };
 
 /* And */
@@ -59,7 +61,7 @@ private:
     ConditionAndImpl(size_t index, ConditionList conditions);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -71,6 +73,8 @@ public:
 
     size_t get_index() const;
     const ConditionList& get_conditions() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_conditions)); }
 };
 
 /* Or */
@@ -83,7 +87,7 @@ private:
     ConditionOrImpl(size_t index, ConditionList conditions);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -95,6 +99,8 @@ public:
 
     size_t get_index() const;
     const ConditionList& get_conditions() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_conditions)); }
 };
 
 /* Not */
@@ -107,7 +113,7 @@ private:
     ConditionNotImpl(size_t index, Condition condition);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -119,6 +125,8 @@ public:
 
     size_t get_index() const;
     const Condition& get_condition() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_condition)); }
 };
 
 /* Imply */
@@ -132,7 +140,7 @@ private:
     ConditionImplyImpl(size_t index, Condition condition_left, Condition condition_right);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -145,6 +153,8 @@ public:
     size_t get_index() const;
     const Condition& get_condition_left() const;
     const Condition& get_condition_right() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_condition_left), std::as_const(m_condition_right)); }
 };
 
 /* Exists */
@@ -158,7 +168,7 @@ private:
     ConditionExistsImpl(size_t index, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -171,6 +181,8 @@ public:
     size_t get_index() const;
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_parameters), std::as_const(m_condition)); }
 };
 
 /* Forall */
@@ -184,7 +196,7 @@ private:
     ConditionForallImpl(size_t index, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -197,6 +209,8 @@ public:
     size_t get_index() const;
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_parameters), std::as_const(m_condition)); }
 };
 
 /* Condition */
@@ -210,7 +224,7 @@ private:
                   std::variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall> condition);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -222,6 +236,8 @@ public:
 
     size_t get_index() const;
     const std::variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall>& get_condition() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_condition)); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const ConditionLiteralImpl& element);

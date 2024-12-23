@@ -35,7 +35,7 @@ private:
     FunctionSkeletonImpl(size_t index, std::string name, ParameterList parameters, Type type);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -49,6 +49,8 @@ public:
     const std::string& get_name() const;
     const ParameterList& get_parameters() const;
     const Type& get_type() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_name), std::as_const(m_parameters), std::as_const(m_type)); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const FunctionSkeletonImpl& element);

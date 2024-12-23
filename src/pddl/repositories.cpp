@@ -17,6 +17,8 @@
 
 #include "loki/details/pddl/repositories.hpp"
 
+#include <algorithm>
+
 namespace loki
 {
 
@@ -76,6 +78,8 @@ Requirements PDDLRepositories::get_or_create_requirements(RequirementEnumSet req
 
 Type PDDLRepositories::get_or_create_type(std::string name, TypeList bases)
 {
+    std::sort(bases.begin(), bases.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
     return boost::hana::at_key(m_repositories, boost::hana::type<TypeImpl> {}).get_or_create(std::move(name), std::move(bases));
 }
 
@@ -93,6 +97,8 @@ Term PDDLRepositories::get_or_create_term(Object object) { return boost::hana::a
 
 Object PDDLRepositories::get_or_create_object(std::string name, TypeList types)
 {
+    std::sort(types.begin(), types.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
     return boost::hana::at_key(m_repositories, boost::hana::type<ObjectImpl> {}).get_or_create(std::move(name), std::move(types));
 }
 
@@ -108,6 +114,8 @@ Literal PDDLRepositories::get_or_create_literal(bool is_negated, Atom atom)
 
 Parameter PDDLRepositories::get_or_create_parameter(Variable variable, TypeList types)
 {
+    std::sort(types.begin(), types.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
     return boost::hana::at_key(m_repositories, boost::hana::type<ParameterImpl> {}).get_or_create(std::move(variable), std::move(types));
 }
 
@@ -132,6 +140,8 @@ FunctionExpressionBinaryOperator PDDLRepositories::get_or_create_function_expres
 FunctionExpressionMultiOperator PDDLRepositories::get_or_create_function_expression_multi_operator(MultiOperatorEnum multi_operator,
                                                                                                    FunctionExpressionList function_expressions_)
 {
+    std::sort(function_expressions_.begin(), function_expressions_.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionMultiOperatorImpl> {})
         .get_or_create(multi_operator, std::move(function_expressions_));
 }
@@ -189,11 +199,15 @@ ConditionLiteral PDDLRepositories::get_or_create_condition_literal(Literal liter
 
 ConditionAnd PDDLRepositories::get_or_create_condition_and(ConditionList conditions_)
 {
+    std::sort(conditions_.begin(), conditions_.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionAndImpl> {}).get_or_create(std::move(conditions_));
 }
 
 ConditionOr PDDLRepositories::get_or_create_condition_or(ConditionList conditions_)
 {
+    std::sort(conditions_.begin(), conditions_.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionOrImpl> {}).get_or_create(std::move(conditions_));
 }
 
@@ -209,11 +223,15 @@ ConditionImply PDDLRepositories::get_or_create_condition_imply(Condition conditi
 
 ConditionExists PDDLRepositories::get_or_create_condition_exists(ParameterList parameters, Condition condition)
 {
+    std::sort(parameters.begin(), parameters.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionExistsImpl> {}).get_or_create(std::move(parameters), std::move(condition));
 }
 
 ConditionForall PDDLRepositories::get_or_create_condition_forall(ParameterList parameters, Condition condition)
 {
+    std::sort(parameters.begin(), parameters.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionForallImpl> {}).get_or_create(std::move(parameters), std::move(condition));
 }
 
@@ -259,6 +277,8 @@ EffectLiteral PDDLRepositories::get_or_create_effect_literal(Literal literal)
 
 EffectAnd PDDLRepositories::get_or_create_effect_and(EffectList effects_)
 {
+    std::sort(effects_.begin(), effects_.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectAndImpl> {}).get_or_create(std::move(effects_));
 }
 
@@ -280,6 +300,8 @@ EffectCompositeWhen PDDLRepositories::get_or_create_effect_composite_when(Condit
 
 EffectCompositeOneof PDDLRepositories::get_or_create_effect_composite_oneof(EffectList effects_)
 {
+    std::sort(effects_.begin(), effects_.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeOneofImpl> {}).get_or_create(std::move(effects_));
 }
 
@@ -313,14 +335,42 @@ Effect PDDLRepositories::get_or_create_effect(EffectCompositeOneof effect)
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
 }
 
+ParameterList sort_structure_parameters(const ParameterList& parameters, size_t original_arity)
+{
+    auto partitioned_parameters = std::vector<std::pair<size_t, Parameter>> {};
+    for (size_t i = 0; i < parameters.size(); ++i)
+    {
+        partitioned_parameters.emplace_back(((i < original_arity) ? 0 : 1), parameters[i]);
+    }
+    std::sort(partitioned_parameters.begin(),
+              partitioned_parameters.end(),
+              [](const auto& lhs, const auto& rhs)
+              {
+                  if (lhs.first == rhs.first)
+                  {
+                      return lhs.second->get_index() < rhs.second->get_index();
+                  }
+                  return lhs.first < rhs.first;
+              });
+    auto sorted_parameters = ParameterList();
+    for (const auto& [partition, parameter] : partitioned_parameters)
+    {
+        sorted_parameters.push_back(parameter);
+    }
+
+    return sorted_parameters;
+}
+
 Action PDDLRepositories::get_or_create_action(std::string name,
                                               size_t original_arity,
                                               ParameterList parameters,
                                               std::optional<Condition> condition,
                                               std::optional<Effect> effect)
 {
+    auto sorted_parameters = sort_structure_parameters(parameters, original_arity);
+
     return boost::hana::at_key(m_repositories, boost::hana::type<ActionImpl> {})
-        .get_or_create(std::move(name), std::move(original_arity), std::move(parameters), std::move(condition), std::move(effect));
+        .get_or_create(std::move(name), std::move(original_arity), std::move(sorted_parameters), std::move(condition), std::move(effect));
 }
 
 Axiom PDDLRepositories::get_or_create_axiom(std::string derived_predicate_name,
@@ -328,8 +378,10 @@ Axiom PDDLRepositories::get_or_create_axiom(std::string derived_predicate_name,
                                             Condition condition,
                                             size_t num_parameters_to_ground_head)
 {
+    auto sorted_parameters = sort_structure_parameters(parameters, num_parameters_to_ground_head);
+
     return boost::hana::at_key(m_repositories, boost::hana::type<AxiomImpl> {})
-        .get_or_create(std::move(derived_predicate_name), std::move(parameters), std::move(condition), num_parameters_to_ground_head);
+        .get_or_create(std::move(derived_predicate_name), std::move(sorted_parameters), std::move(condition), num_parameters_to_ground_head);
 }
 
 OptimizationMetric PDDLRepositories::get_or_create_optimization_metric(OptimizationMetricEnum metric, FunctionExpression function_expression)
@@ -352,6 +404,13 @@ Domain PDDLRepositories::get_or_create_domain(std::optional<fs::path> filepath,
                                               ActionList actions,
                                               AxiomList axioms)
 {
+    std::sort(types.begin(), types.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(constants.begin(), constants.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(predicates.begin(), predicates.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(functions.begin(), functions.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(actions.begin(), actions.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(axioms.begin(), axioms.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
     return boost::hana::at_key(m_repositories, boost::hana::type<DomainImpl> {})
         .get_or_create(std::move(filepath),
                        std::move(name),
@@ -376,6 +435,11 @@ Problem PDDLRepositories::get_or_create_problem(std::optional<fs::path> filepath
                                                 std::optional<OptimizationMetric> optimization_metric,
                                                 AxiomList axioms)
 {
+    std::sort(objects.begin(), objects.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(derived_predicates.begin(), derived_predicates.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(initial_literals.begin(), initial_literals.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(numeric_fluents.begin(), numeric_fluents.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
     return boost::hana::at_key(m_repositories, boost::hana::type<ProblemImpl> {})
         .get_or_create(std::move(filepath),
                        std::move(domain),

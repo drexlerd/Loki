@@ -34,7 +34,7 @@ private:
     AtomImpl(size_t index, Predicate predicate, TermList terms);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -47,6 +47,8 @@ public:
     size_t get_index() const;
     const Predicate& get_predicate() const;
     const TermList& get_terms() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_predicate), std::as_const(m_terms)); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const AtomImpl& element);

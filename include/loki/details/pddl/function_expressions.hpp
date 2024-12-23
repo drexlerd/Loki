@@ -55,7 +55,7 @@ private:
     FunctionExpressionNumberImpl(size_t index, double number);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -67,6 +67,8 @@ public:
 
     size_t get_index() const;
     double get_number() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_number)); }
 };
 
 /* FunctionExpressionBinaryOperator */
@@ -84,7 +86,7 @@ private:
                                          FunctionExpression right_function_expression);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -98,6 +100,11 @@ public:
     BinaryOperatorEnum get_binary_operator() const;
     const FunctionExpression& get_left_function_expression() const;
     const FunctionExpression& get_right_function_expression() const;
+
+    auto identifiable_members() const
+    {
+        return std::forward_as_tuple(std::as_const(m_binary_operator), std::as_const(m_left_function_expression), std::as_const(m_right_function_expression));
+    }
 };
 
 /* FunctionExpressionMultiOperator */
@@ -111,7 +118,7 @@ private:
     FunctionExpressionMultiOperatorImpl(size_t index, MultiOperatorEnum multi_operator, FunctionExpressionList function_expressions);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -124,6 +131,8 @@ public:
     size_t get_index() const;
     MultiOperatorEnum get_multi_operator() const;
     const FunctionExpressionList& get_function_expressions() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_multi_operator), std::as_const(m_function_expressions)); }
 };
 
 /* FunctionExpressionMinus */
@@ -136,7 +145,7 @@ private:
     FunctionExpressionMinusImpl(size_t index, FunctionExpression function_expression);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -148,6 +157,8 @@ public:
 
     size_t get_index() const;
     const FunctionExpression& get_function_expression() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_function_expression)); }
 };
 
 /* FunctionExpressionFunction */
@@ -160,7 +171,7 @@ private:
     FunctionExpressionFunctionImpl(size_t index, Function function);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -172,6 +183,8 @@ public:
 
     size_t get_index() const;
     const Function& get_function() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_function)); }
 };
 
 /* FunctionExpression */
@@ -194,7 +207,7 @@ private:
                                         FunctionExpressionFunction> function_expression);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -211,6 +224,8 @@ public:
                        FunctionExpressionMinus,
                        FunctionExpressionFunction>&
     get_function_expression() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_function_expression)); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionNumberImpl& element);

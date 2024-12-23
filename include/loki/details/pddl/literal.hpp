@@ -34,7 +34,7 @@ private:
     LiteralImpl(size_t index, bool is_negated, Atom atom);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -47,6 +47,8 @@ public:
     size_t get_index() const;
     bool is_negated() const;
     const Atom& get_atom() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_is_negated), std::as_const(m_atom)); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const LiteralImpl& element);

@@ -30,21 +30,18 @@
 namespace loki
 {
 
-template<typename... Ts>
+template<HasIdentifiableMembers T>
 class IdentifiableMembersProxy
 {
 public:
-    explicit IdentifiableMembersProxy(std::tuple<const Ts&...> members) : m_members(std::move(members)) {}
+    using MembersTupleType = decltype(std::declval<T>().identifiable_members());
 
-    template<HasIdentifiableMembers T>
-    explicit IdentifiableMembersProxy(const T& value) : m_members(value.identifiable_members())
-    {
-    }
+    explicit IdentifiableMembersProxy(const T& value) : m_members(value.identifiable_members()) {}
 
     const auto& members() const { return m_members; }
 
 private:
-    std::tuple<const Ts&...> m_members;
+    MembersTupleType m_members;
 };
 
 }

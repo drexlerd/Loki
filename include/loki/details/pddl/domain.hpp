@@ -53,7 +53,7 @@ private:
                AxiomList axioms);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -73,6 +73,19 @@ public:
     const FunctionSkeletonList& get_functions() const;
     const ActionList& get_actions() const;
     const AxiomList& get_axioms() const;
+
+    auto identifiable_members() const
+    {
+        return std::forward_as_tuple(std::as_const(m_filepath),
+                                     std::as_const(m_name),
+                                     std::as_const(m_requirements),
+                                     std::as_const(m_types),
+                                     std::as_const(m_constants),
+                                     std::as_const(m_predicates),
+                                     std::as_const(m_functions),
+                                     std::as_const(m_actions),
+                                     std::as_const(m_axioms));
+    }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const DomainImpl& element);

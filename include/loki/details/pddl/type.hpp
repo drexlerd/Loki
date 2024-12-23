@@ -34,7 +34,7 @@ private:
     TypeImpl(size_t index, std::string name, TypeList bases = {});
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -47,6 +47,8 @@ public:
     size_t get_index() const;
     const std::string& get_name() const;
     const TypeList& get_bases() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_name), std::as_const(m_bases)); }
 };
 
 /// @brief Collects all types from a hierarchy.

@@ -18,6 +18,8 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_DECLARATIONS_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_DECLARATIONS_HPP_
 
+#include "loki/details/utils/concepts.hpp"
+
 #include <cstddef>
 #include <unordered_map>
 #include <unordered_set>
@@ -32,6 +34,9 @@ namespace loki
  */
 template<typename T>
 using PDDLElement = const T*;
+
+template<HasIdentifiableMembers T>
+class SegmentedRepository;
 
 /**
  * Domain

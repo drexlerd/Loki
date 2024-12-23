@@ -36,7 +36,7 @@ private:
     TermImpl(size_t index, std::variant<Object, Variable> object_or_variable);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -48,6 +48,8 @@ public:
 
     size_t get_index() const;
     const std::variant<Object, Variable>& get_object_or_variable() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_object_or_variable)); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const TermImpl& element);

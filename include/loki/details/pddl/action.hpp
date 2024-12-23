@@ -44,7 +44,7 @@ private:
                std::optional<Effect> effect);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -60,6 +60,15 @@ public:
     const ParameterList& get_parameters() const;
     const std::optional<Condition>& get_condition() const;
     const std::optional<Effect>& get_effect() const;
+
+    auto identifiable_members() const
+    {
+        return std::forward_as_tuple(std::as_const(m_name),
+                                     std::as_const(m_original_arity),
+                                     std::as_const(m_parameters),
+                                     std::as_const(m_condition),
+                                     std::as_const(m_effect));
+    }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const ActionImpl& element);

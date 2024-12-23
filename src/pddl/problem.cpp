@@ -21,8 +21,6 @@
 #include "loki/details/pddl/axiom.hpp"
 #include "loki/details/pddl/conditions.hpp"
 #include "loki/details/pddl/domain.hpp"
-#include "loki/details/pddl/equal_to.hpp"
-#include "loki/details/pddl/hash.hpp"
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/metric.hpp"
 #include "loki/details/pddl/numeric_fluent.hpp"

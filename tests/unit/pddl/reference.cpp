@@ -16,8 +16,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/details/pddl/equal_to.hpp>
-#include <loki/details/pddl/hash.hpp>
 #include <loki/details/pddl/object.hpp>
 #include <loki/details/pddl/reference.hpp>
 #include <loki/details/utils/segmented_repository.hpp>

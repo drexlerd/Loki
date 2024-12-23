@@ -18,10 +18,13 @@
 #ifndef LOKI_INCLUDE_LOKI_UTILS_HASH_HPP_
 #define LOKI_INCLUDE_LOKI_UTILS_HASH_HPP_
 
+#include "loki/details/utils/murmurhash3.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <ranges>
+#include <set>
 #include <utility>
 #include <variant>
 
@@ -49,19 +52,38 @@ struct Hash
     size_t operator()(const T& element) const { return std::hash<T>()(element); }
 };
 
-/// @brief Hash specialization for a forward range.
-/// @tparam ForwardRange
-template<std::ranges::input_range R>
-struct Hash<R>
+/// @brief Hash specialization for std::set.
+/// @tparam T
+template<typename T>
+struct Hash<std::set<T>>
 {
-    size_t operator()(const R& range) const
+    size_t operator()(const std::set<T>& set) const
     {
         std::size_t aggregated_hash = 0;
-        for (const auto& item : range)
+        for (const auto& item : set)
         {
             loki::hash_combine(aggregated_hash, item);
         }
         return aggregated_hash;
+    }
+};
+
+/// @brief Hash specialization for std::vector.
+/// @tparam T
+template<typename T>
+struct Hash<std::vector<T>>
+{
+    size_t operator()(const std::vector<T>& vec) const
+    {
+        size_t seed = vec.size();
+        size_t hash[2] = { 0, 0 };
+
+        loki::MurmurHash3_x64_128(vec.data(), vec.size() * sizeof(T), seed, hash);
+
+        loki::hash_combine(seed, hash[0]);
+        loki::hash_combine(seed, hash[1]);
+
+        return seed;
     }
 };
 

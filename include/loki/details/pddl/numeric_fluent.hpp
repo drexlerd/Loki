@@ -32,7 +32,7 @@ private:
     double m_number;
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
     NumericFluentImpl(size_t index, Function function, double number);
@@ -47,6 +47,8 @@ public:
     size_t get_index() const;
     const Function& get_function() const;
     double get_number() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_function), std::as_const(m_number)); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const NumericFluentImpl& element);

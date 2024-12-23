@@ -56,7 +56,7 @@ private:
                 AxiomList axioms);
 
     // Give access to the constructor.
-    template<typename HolderType, typename Hash, typename EqualTo>
+    template<HasIdentifiableMembers T>
     friend class SegmentedRepository;
 
 public:
@@ -78,6 +78,21 @@ public:
     const std::optional<Condition>& get_goal_condition() const;
     const std::optional<OptimizationMetric>& get_optimization_metric() const;
     const AxiomList& get_axioms() const;
+
+    auto identifiable_members() const
+    {
+        return std::forward_as_tuple(std::as_const(m_filepath),
+                                     std::as_const(m_domain),
+                                     std::as_const(m_name),
+                                     std::as_const(m_requirements),
+                                     std::as_const(m_objects),
+                                     std::as_const(m_derived_predicates),
+                                     std::as_const(m_initial_literals),
+                                     std::as_const(m_numeric_fluents),
+                                     std::as_const(m_goal_condition),
+                                     std::as_const(m_optimization_metric),
+                                     std::as_const(m_axioms));
+    }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const ProblemImpl& element);
