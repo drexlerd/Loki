@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1734982811423,
+  "lastUpdate": 1734990713511,
   "repoUrl": "https://github.com/drexlerd/Loki",
   "entries": {
     "Benchmark": [
@@ -18738,6 +18738,84 @@ window.BENCHMARK_DATA = {
             "value": 8825193.265060278,
             "unit": "ns/iter",
             "extra": "iterations: 83\ncpu: 8825001.10843373 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "committer": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "distinct": true,
+          "id": "a029bfdbec56f47b5a611fc26a10012734ada95c",
+          "message": "remove filepath from identifying members",
+          "timestamp": "2024-12-23T22:40:23+01:00",
+          "tree_id": "159b50cfc9979892fd6ee3eb42eed1c104b1c459",
+          "url": "https://github.com/drexlerd/Loki/commit/a029bfdbec56f47b5a611fc26a10012734ada95c"
+        },
+        "date": 1734990712985,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "loki::benchmarks::BM_ConstructAtoms",
+            "value": 37452435.16666758,
+            "unit": "ns/iter",
+            "extra": "iterations: 18\ncpu: 37448983.666666664 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_IterateAtoms/100",
+            "value": 6210.979408548065,
+            "unit": "ns/iter",
+            "extra": "iterations: 119807\ncpu: 6210.407755807258 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_IterateAtoms/1000",
+            "value": 52228.27218815801,
+            "unit": "ns/iter",
+            "extra": "iterations: 9949\ncpu: 52221.90923710925 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_IterateAtoms/10000",
+            "value": 580064.4650205815,
+            "unit": "ns/iter",
+            "extra": "iterations: 1215\ncpu: 580037.7572016461 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_IterateAtoms/100000",
+            "value": 5553295.362204612,
+            "unit": "ns/iter",
+            "extra": "iterations: 127\ncpu: 5552979.251968504 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_RandomlyIterateAtoms/100",
+            "value": 6224.610785953319,
+            "unit": "ns/iter",
+            "extra": "iterations: 112424\ncpu: 6224.07356970042 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_RandomlyIterateAtoms/1000",
+            "value": 55972.88984881896,
+            "unit": "ns/iter",
+            "extra": "iterations: 12501\ncpu: 55968.679625629986 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_RandomlyIterateAtoms/10000",
+            "value": 680548.5396038385,
+            "unit": "ns/iter",
+            "extra": "iterations: 1010\ncpu: 680528.77029703 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_RandomlyIterateAtoms/100000",
+            "value": 10724023.30769306,
+            "unit": "ns/iter",
+            "extra": "iterations: 78\ncpu: 10723181.62820513 ns\nthreads: 1"
           }
         ]
       }
