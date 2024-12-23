@@ -44,8 +44,10 @@ inline void hash_combine(size_t& seed, const Rest&... rest);
 template<typename... Ts>
 inline size_t hash_combine(const Ts&... rest);
 
-/// @brief `UniquePDDLEqualTo` is used to compare newly created PDDL objects for uniqueness.
-/// Since the children are unique, it suffices to create a combined hash from nested pointers.
+/// @brief `Hash` is our custom hasher, like std::hash.
+///
+/// Forwards to std::hash by default.
+/// Specializations can be injected into the namespace.
 template<typename T>
 struct Hash
 {
@@ -53,6 +55,8 @@ struct Hash
 };
 
 /// @brief Hash specialization for std::set.
+///
+/// Combines the hashes of all elements in the set.
 /// @tparam T
 template<typename T>
 struct Hash<std::set<T>>
@@ -69,6 +73,8 @@ struct Hash<std::set<T>>
 };
 
 /// @brief Hash specialization for std::vector.
+///
+/// Combines the hashes of all elements in the vector.
 /// @tparam T
 template<typename T>
 struct Hash<std::vector<T>>
@@ -88,6 +94,8 @@ struct Hash<std::vector<T>>
 };
 
 /// @brief Hash specialization for a pair.
+///
+/// Combines the hashes for first and second.
 /// @tparam T1
 /// @tparam T2
 template<typename T1, typename T2>
@@ -97,6 +105,8 @@ struct Hash<std::pair<T1, T2>>
 };
 
 /// @brief Hash specialization for a tuple.
+///
+/// Combines the hashes of all elements in the tuple.
 /// @tparam ...Ts
 template<typename... Ts>
 struct Hash<std::tuple<Ts...>>
@@ -110,6 +120,8 @@ struct Hash<std::tuple<Ts...>>
 };
 
 /// @brief Hash specialization for a variant.
+///
+/// Hashes the underlying object.
 /// @tparam ...Ts
 template<typename... Ts>
 struct Hash<std::variant<Ts...>>
