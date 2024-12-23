@@ -19,6 +19,7 @@
 #define LOKI_INCLUDE_LOKI_UTILS_SEGMENTED_REPOSITORY_HPP_
 
 #include "loki/details/utils/members_proxy.hpp"
+#include "loki/details/utils/observer_ptr.hpp"
 #include "loki/details/utils/segmented_vector.hpp"
 
 #include <absl/container/flat_hash_set.h>
@@ -30,13 +31,27 @@
 namespace loki
 {
 
-/// @brief `SegmentedRepository` is a container for managing the unique creation of objects
+/// @brief `SegmentedRepository` is a container for managing the unique creation of immutable objects
 /// in a persistent and efficient manner, utilizing a combination of unordered_set for
 /// uniqueness checks and SegmentedVector for continuous and cache-efficient storage of value types.
-/// @tparam T is the type.
-/// @tparam Hash the hash function.
-/// @tparam KeyEqual the comparison function.
-template<typename T, typename Hash = std::hash<loki::ObserverPtr<const T>>, typename EqualTo = std::equal_to<loki::ObserverPtr<const T>>>
+///
+/// The unordered_set's key type is an `ObserverPtr<const T>` that point to the persistent memory.
+/// This has the advantage that the uniqueness map stays small because for each potentially large
+/// object of type T, the unordered_map only has to store a pointer (8 byte).
+/// Alternatively, one could have also used raw pointers directly.
+/// However, using raw pointers is error prone because the STL provides specializations
+/// for raw pointers that are meaningless in our context.
+/// The `ObserverPtr` has explicitly deleted conversions and comparison,
+/// hence requiring users to explicitly specialize std::hash and std::equal_to.
+/// @tparam T is the type of the elements to be stored.
+/// @tparam Hash is the hash function that defaults to the std::hash specialization of `ObserverPtr<const T>`
+/// A user has to explicitly define it. A type that satisfies the concept `HasIdentifiableMembers`
+/// in its intended way will obtain automatically generated std::hash specialization.
+/// @tparam KeyEqual is the comparison function that defaults to the std::equal_to specialization of
+/// `ObserverPtr<const T>`. A user has to explicitly define it. Similarly as for the Hash,
+/// a type that satisfies the concept `HasIdentifiableMembers` in its intended way will obtain
+/// automatically generated std::equal_to specialization.
+template<typename T, typename Hash = std::hash<ObserverPtr<const T>>, typename EqualTo = std::equal_to<ObserverPtr<const T>>>
 class SegmentedRepository
 {
 private:

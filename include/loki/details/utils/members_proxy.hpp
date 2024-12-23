@@ -20,7 +20,6 @@
 
 #include "loki/details/utils/concepts.hpp"
 #include "loki/details/utils/hash.hpp"
-#include "loki/details/utils/observer_ptr.hpp"
 
 #include <concepts>
 #include <functional>
@@ -31,6 +30,10 @@
 namespace loki
 {
 
+/// @brief `IdentifiableMembersProxy` encapsulates the identifiable members of a type T.
+/// Its primary purpose is to allow specialization of std::hash and std::equal_to
+/// to automatically generating hash and comparison operators based on the identifiable members.
+/// @tparam T
 template<HasIdentifiableMembers T>
 class IdentifiableMembersProxy
 {
@@ -47,33 +50,24 @@ private:
 
 }
 
+/// @brief std::hash specialization for an `IdentifiableMembersProxy`
+/// that computes a hash based on all members.
+/// @tparam ...Ts are the types of all members.
 template<typename... Ts>
 struct std::hash<loki::IdentifiableMembersProxy<Ts...>>
 {
     size_t operator()(const loki::IdentifiableMembersProxy<Ts...>& proxy) const { return loki::hash_combine(proxy.members()); }
 };
 
+/// @brief std::equal_to specialization for an `IdentifiableMembersProxy`
+/// that pairwise compares all members.
+/// @tparam ...Ts are the types of all members.
 template<typename... Ts>
 struct std::equal_to<loki::IdentifiableMembersProxy<Ts...>>
 {
     size_t operator()(const loki::IdentifiableMembersProxy<Ts...>& lhs, const loki::IdentifiableMembersProxy<Ts...>& rhs) const
     {
         return lhs.members() == rhs.members();
-    }
-};
-
-template<loki::HasIdentifiableMembers T>
-struct std::hash<loki::ObserverPtr<T>>
-{
-    size_t operator()(loki::ObserverPtr<T> ptr) const { return std::hash<loki::IdentifiableMembersProxy<T>>()(loki::IdentifiableMembersProxy<T>(*ptr)); }
-};
-
-template<loki::HasIdentifiableMembers T>
-struct std::equal_to<loki::ObserverPtr<T>>
-{
-    size_t operator()(loki::ObserverPtr<T> lhs, loki::ObserverPtr<T> rhs) const
-    {
-        return std::equal_to<loki::IdentifiableMembersProxy<T>>()(loki::IdentifiableMembersProxy<T>(*lhs), loki::IdentifiableMembersProxy<T>(*rhs));
     }
 };
 

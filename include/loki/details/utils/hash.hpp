@@ -23,10 +23,12 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
-#include <ranges>
+#include <map>
+#include <optional>
 #include <set>
 #include <utility>
 #include <variant>
+#include <vector>
 
 namespace loki
 {
@@ -72,6 +74,25 @@ struct Hash<std::set<T>>
     }
 };
 
+/// @brief Hash specialization for std::map.
+///
+/// Combines the hashes of all elements in the map.
+/// @tparam K is the key type.
+/// @tparam V is the value type
+template<typename K, typename V>
+struct Hash<std::map<K, V>>
+{
+    size_t operator()(const std::map<K, V>& map) const
+    {
+        std::size_t aggregated_hash = 0;
+        for (const auto& item : map)
+        {
+            loki::hash_combine(aggregated_hash, item);
+        }
+        return aggregated_hash;
+    }
+};
+
 /// @brief Hash specialization for std::vector.
 ///
 /// Combines the hashes of all elements in the vector.
@@ -93,7 +114,7 @@ struct Hash<std::vector<T>>
     }
 };
 
-/// @brief Hash specialization for a pair.
+/// @brief Hash specialization for a std::pair.
 ///
 /// Combines the hashes for first and second.
 /// @tparam T1
@@ -104,7 +125,7 @@ struct Hash<std::pair<T1, T2>>
     size_t operator()(const std::pair<T1, T2>& pair) const { return loki::hash_combine(pair.first, pair.second); }
 };
 
-/// @brief Hash specialization for a tuple.
+/// @brief Hash specialization for a std::tuple.
 ///
 /// Combines the hashes of all elements in the tuple.
 /// @tparam ...Ts
@@ -119,7 +140,7 @@ struct Hash<std::tuple<Ts...>>
     }
 };
 
-/// @brief Hash specialization for a variant.
+/// @brief Hash specialization for a std::variant.
 ///
 /// Hashes the underlying object.
 /// @tparam ...Ts
@@ -138,10 +159,24 @@ struct Hash<std::variant<Ts...>>
     }
 };
 
+/// @brief Hash specialization for an std::optional.
+///
+/// Hashes the underlying object if it exists, otherwise, returns 0.
+/// @tparam T
+template<typename T>
+struct Hash<std::optional<T>>
+{
+    size_t operator()(const std::optional<T>& optional) const { return optional.has_value() ? Hash<T>()(optional.value()) : 0; }
+};
+
 /**
  * Definitions
  */
 
+/// @brief Computes that hash for an object and combines it into the seed using Boost's hash combine function.
+/// @tparam T is the type of the object.
+/// @param seed is the seed.
+/// @param value is the object.
 template<typename T>
 inline void hash_combine(size_t& seed, const T& value)
 {

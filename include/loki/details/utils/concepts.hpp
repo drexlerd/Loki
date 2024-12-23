@@ -29,9 +29,13 @@
 namespace loki
 {
 
+/**
+ * Concept to check whether a type T is a tuple holding only const references.
+ */
+
 // Helper metafunction to check if all elements in a parameter pack are const references
 template<typename... Ts>
-struct are_const_references : std::bool_constant<((std::is_reference_v<Ts> && std::is_const_v<std::remove_reference_t<Ts>>) && ...)>
+struct are_const_references : std::bool_constant<((std::is_reference_v<Ts> && std::is_const_v<std::remove_reference_t<Ts>>) &&...)>
 {
 };
 
@@ -58,10 +62,17 @@ static_assert(!IsTupleOfConstReferences<std::tuple<int&>>);
 static_assert(!IsTupleOfConstReferences<std::tuple<int*>>);
 static_assert(!IsTupleOfConstReferences<std::tuple<const int*>>);
 
+/**
+ * Concept to check whether a type T has a member function to obtain a tuple of const references.
+ *
+ * We use it to automatically generate hash and comparison operators based on the tuple of references.
+ */
+
 template<typename T>
 concept HasIdentifiableMembers = requires(T a) {
-    // Check if `a.members()` exists and returns a std::tuple of const references
-    { a.identifiable_members() } -> IsTupleOfConstReferences;
+    {
+        a.identifiable_members()
+    } -> IsTupleOfConstReferences;
 };
 
 }
