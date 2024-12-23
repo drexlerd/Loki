@@ -35,7 +35,7 @@ private:
     ConditionLiteralImpl(size_t index, Literal literal);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -61,7 +61,7 @@ private:
     ConditionAndImpl(size_t index, ConditionList conditions);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -87,7 +87,7 @@ private:
     ConditionOrImpl(size_t index, ConditionList conditions);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -113,7 +113,7 @@ private:
     ConditionNotImpl(size_t index, Condition condition);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -140,7 +140,7 @@ private:
     ConditionImplyImpl(size_t index, Condition condition_left, Condition condition_right);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -168,7 +168,7 @@ private:
     ConditionExistsImpl(size_t index, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -196,7 +196,7 @@ private:
     ConditionForallImpl(size_t index, ParameterList parameters, Condition condition);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -224,7 +224,7 @@ private:
                   std::variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall> condition);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:

@@ -36,7 +36,7 @@ private:
     AxiomImpl(size_t index, std::string derived_predicate_name, ParameterList parameters, Condition condition, size_t num_parameters_to_ground_head);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:

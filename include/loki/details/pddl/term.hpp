@@ -36,7 +36,7 @@ private:
     TermImpl(size_t index, std::variant<Object, Variable> object_or_variable);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:

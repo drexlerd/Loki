@@ -46,7 +46,7 @@ private:
     EffectLiteralImpl(size_t index, Literal literal);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -72,7 +72,7 @@ private:
     EffectAndImpl(size_t index, EffectList effects);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -100,7 +100,7 @@ private:
     EffectNumericImpl(size_t index, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -132,7 +132,7 @@ private:
     EffectCompositeForallImpl(size_t index, ParameterList parameters, Effect effect);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -160,7 +160,7 @@ private:
     EffectCompositeWhenImpl(size_t index, Condition condition, Effect effect);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -186,7 +186,7 @@ private:
     EffectCompositeOneofImpl(size_t index, EffectList effects);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
@@ -212,7 +212,7 @@ private:
     EffectImpl(size_t index, std::variant<EffectLiteral, EffectAnd, EffectNumeric, EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof> effect);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:

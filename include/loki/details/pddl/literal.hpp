@@ -34,7 +34,7 @@ private:
     LiteralImpl(size_t index, bool is_negated, Atom atom);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:

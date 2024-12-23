@@ -36,7 +36,7 @@ private:
     PredicateImpl(size_t index, std::string name, ParameterList parameters);
 
     // Give access to the constructor.
-    template<HasIdentifiableMembers T, typename Hash, typename EqualTo>
+    template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
 public:
