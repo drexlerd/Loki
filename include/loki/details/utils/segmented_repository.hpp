@@ -36,7 +36,7 @@ namespace loki
 /// @tparam T is the type.
 /// @tparam Hash the hash function.
 /// @tparam KeyEqual the comparison function.
-template<HasIdentifiableMembers T, typename Hash = std::hash<loki::ObserverPtr<const T>>, typename EqualTo = std::equal_to<loki::ObserverPtr<const T>>>
+template<typename T, typename Hash = std::hash<loki::ObserverPtr<const T>>, typename EqualTo = std::equal_to<loki::ObserverPtr<const T>>>
 class SegmentedRepository
 {
 private:
