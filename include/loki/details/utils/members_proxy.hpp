@@ -19,6 +19,7 @@
 #define LOKI_INCLUDE_LOKI_UTILS_MEMBERS_PROXY_HPP_
 
 #include "loki/details/utils/concepts.hpp"
+#include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/hash.hpp"
 
 #include <concepts>
@@ -53,21 +54,23 @@ private:
 /// @brief std::hash specialization for an `IdentifiableMembersProxy`
 /// that computes a hash based on all members.
 /// @tparam ...Ts are the types of all members.
-template<typename... Ts>
-struct std::hash<loki::IdentifiableMembersProxy<Ts...>>
+template<loki::HasIdentifiableMembers T>
+struct std::hash<loki::IdentifiableMembersProxy<T>>
 {
-    size_t operator()(const loki::IdentifiableMembersProxy<Ts...>& proxy) const { return loki::hash_combine(proxy.members()); }
+    size_t operator()(const loki::IdentifiableMembersProxy<T>& proxy) const { return loki::hash_combine(proxy.members()); }
 };
 
 /// @brief std::equal_to specialization for an `IdentifiableMembersProxy`
 /// that pairwise compares all members.
 /// @tparam ...Ts are the types of all members.
-template<typename... Ts>
-struct std::equal_to<loki::IdentifiableMembersProxy<Ts...>>
+template<loki::HasIdentifiableMembers T>
+struct std::equal_to<loki::IdentifiableMembersProxy<T>>
 {
-    size_t operator()(const loki::IdentifiableMembersProxy<Ts...>& lhs, const loki::IdentifiableMembersProxy<Ts...>& rhs) const
+    using MembersTupleType = decltype(std::declval<loki::IdentifiableMembersProxy<T>>().members());
+
+    bool operator()(const loki::IdentifiableMembersProxy<T>& lhs, const loki::IdentifiableMembersProxy<T>& rhs) const
     {
-        return lhs.members() == rhs.members();
+        return loki::EqualTo<MembersTupleType>()(lhs.members(), rhs.members());
     }
 };
 

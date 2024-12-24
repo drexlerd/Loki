@@ -26,6 +26,7 @@
 #include <map>
 #include <optional>
 #include <set>
+#include <span>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -159,7 +160,7 @@ struct Hash<std::variant<Ts...>>
     }
 };
 
-/// @brief Hash specialization for an std::optional.
+/// @brief Hash specialization for a std::optional.
 ///
 /// Hashes the underlying object if it exists, otherwise, returns 0.
 /// @tparam T
@@ -167,6 +168,15 @@ template<typename T>
 struct Hash<std::optional<T>>
 {
     size_t operator()(const std::optional<T>& optional) const { return optional.has_value() ? Hash<T>()(optional.value()) : 0; }
+};
+
+/// @brief Hash specialization for a std::span.
+///
+/// Combines the hashes of the the pointer and size.
+template<typename T>
+struct Hash<std::span<T>>
+{
+    size_t operator()(const std::span<T>& span) const { return loki::hash_combine(span.data(), span.size()); }
 };
 
 /**

@@ -92,7 +92,7 @@ struct std::hash<loki::ObserverPtr<T>>
 template<loki::HasIdentifiableMembers T>
 struct std::equal_to<loki::ObserverPtr<T>>
 {
-    size_t operator()(loki::ObserverPtr<T> lhs, loki::ObserverPtr<T> rhs) const
+    bool operator()(loki::ObserverPtr<T> lhs, loki::ObserverPtr<T> rhs) const
     {
         return std::equal_to<loki::IdentifiableMembersProxy<T>>()(loki::IdentifiableMembersProxy<T>(*lhs), loki::IdentifiableMembersProxy<T>(*rhs));
     }
