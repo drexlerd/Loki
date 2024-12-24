@@ -59,14 +59,35 @@ struct Hash
     size_t operator()(const T& element) const { return std::hash<T>()(element); }
 };
 
+/// @brief Hash specialization for std::array.
+///
+/// Combines the hashes of all elements in the array.
+/// @tparam T
+template<typename T, size_t N>
+struct Hash<std::array<T, N>>
+{
+    size_t operator()(const std::array<T, N>& arr) const
+    {
+        size_t seed = arr.size();
+        size_t hash[2] = { 0, 0 };
+
+        loki::MurmurHash3_x64_128(arr.data(), N * sizeof(T), seed, hash);
+
+        loki::hash_combine(seed, hash[0]);
+        loki::hash_combine(seed, hash[1]);
+
+        return seed;
+    }
+};
+
 /// @brief Hash specialization for std::set.
 ///
 /// Combines the hashes of all elements in the set.
 /// @tparam T
-template<typename T>
-struct Hash<std::set<T>>
+template<typename Key, typename Compare, typename Allocator>
+struct Hash<std::set<Key, Compare, Allocator>>
 {
-    size_t operator()(const std::set<T>& set) const
+    size_t operator()(const std::set<Key, Compare, Allocator>& set) const
     {
         std::size_t aggregated_hash = 0;
         for (const auto& item : set)
@@ -82,10 +103,10 @@ struct Hash<std::set<T>>
 /// Combines the hashes of all elements in the map.
 /// @tparam K is the key type.
 /// @tparam V is the value type
-template<typename K, typename V>
-struct Hash<std::map<K, V>>
+template<typename Key, typename T, typename Compare, typename Allocator>
+struct Hash<std::map<Key, T, Compare, Allocator>>
 {
-    size_t operator()(const std::map<K, V>& map) const
+    size_t operator()(const std::map<Key, T, Compare, Allocator>& map) const
     {
         std::size_t aggregated_hash = 0;
         for (const auto& item : map)
@@ -100,10 +121,10 @@ struct Hash<std::map<K, V>>
 ///
 /// Combines the hashes of all elements in the vector.
 /// @tparam T
-template<typename T>
-struct Hash<std::vector<T>>
+template<typename T, typename Allocator>
+struct Hash<std::vector<T, Allocator>>
 {
-    size_t operator()(const std::vector<T>& vec) const
+    size_t operator()(const std::vector<T, Allocator>& vec) const
     {
         size_t seed = vec.size();
         size_t hash[2] = { 0, 0 };
@@ -169,10 +190,10 @@ struct Hash<std::optional<T>>
 /// @brief Hash specialization for a std::span.
 ///
 /// Combines the hashes of the the pointer and size.
-template<typename T>
-struct Hash<std::span<T>>
+template<typename T, std::size_t Extent>
+struct Hash<std::span<T, Extent>>
 {
-    size_t operator()(const std::span<T>& span) const { return loki::hash_combine(span.data(), span.size()); }
+    size_t operator()(const std::span<T, Extent>& span) const { return loki::hash_combine(span.data(), span.size()); }
 };
 
 /// @brief std::hash specialization for types T that satisfy `HasIdentifiableMembers`.
