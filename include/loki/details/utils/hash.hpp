@@ -152,13 +152,7 @@ struct Hash<std::variant<Ts...>>
 {
     size_t operator()(const std::variant<Ts...>& variant) const
     {
-        return std::visit(
-            [](const auto& arg)
-            {
-                using DecayedType = std::decay_t<decltype(arg)>;
-                return Hash<DecayedType>()(arg);
-            },
-            variant);
+        return std::visit([](const auto& arg) { return Hash<std::remove_cvref_t<decltype(arg)>>()(arg); }, variant);
     }
 };
 
@@ -169,7 +163,7 @@ struct Hash<std::variant<Ts...>>
 template<typename T>
 struct Hash<std::optional<T>>
 {
-    size_t operator()(const std::optional<T>& optional) const { return optional.has_value() ? Hash<T>()(optional.value()) : 0; }
+    size_t operator()(const std::optional<T>& optional) const { return optional.has_value() ? Hash<std::remove_cvref_t<T>>()(optional.value()) : 0; }
 };
 
 /// @brief Hash specialization for a std::span.
@@ -188,7 +182,7 @@ struct Hash<std::span<T>>
 template<typename T>
 struct Hash<ObserverPtr<T>>
 {
-    size_t operator()(ObserverPtr<T> ptr) const { return Hash<T>()(*ptr); }
+    size_t operator()(ObserverPtr<T> ptr) const { return Hash<std::remove_cvref_t<T>>()(*ptr); }
 };
 
 /// @brief std::hash specialization for an `IdentifiableMembersProxy`

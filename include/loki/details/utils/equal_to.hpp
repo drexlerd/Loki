@@ -54,7 +54,7 @@ struct EqualTo<std::span<T>>
 template<typename T>
 struct EqualTo<ObserverPtr<T>>
 {
-    bool operator()(loki::ObserverPtr<T> lhs, loki::ObserverPtr<T> rhs) const { return EqualTo<T>()(*lhs, *rhs); }
+    bool operator()(loki::ObserverPtr<T> lhs, loki::ObserverPtr<T> rhs) const { return EqualTo<std::remove_cvref_t<T>>()(*lhs, *rhs); }
 };
 
 /// @brief EqualTo specialization for an `IdentifiableMembersProxy`
