@@ -18,8 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_UTILS_CONCEPTS_HPP_
 #define LOKI_INCLUDE_LOKI_UTILS_CONCEPTS_HPP_
 
-#include "loki/details/utils/hash.hpp"
-
 #include <concepts>
 #include <functional>
 #include <tuple>

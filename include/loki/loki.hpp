@@ -61,7 +61,6 @@
 #include "loki/details/utils/equal_to.hpp"
 #include "loki/details/utils/filesystem.hpp"
 #include "loki/details/utils/hash.hpp"
-#include "loki/details/utils/members_proxy.hpp"
 #include "loki/details/utils/memory.hpp"
 #include "loki/details/utils/murmurhash3.h"
 #include "loki/details/utils/observer_ptr.hpp"

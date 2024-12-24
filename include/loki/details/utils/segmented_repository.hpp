@@ -18,7 +18,8 @@
 #ifndef LOKI_INCLUDE_LOKI_UTILS_SEGMENTED_REPOSITORY_HPP_
 #define LOKI_INCLUDE_LOKI_UTILS_SEGMENTED_REPOSITORY_HPP_
 
-#include "loki/details/utils/members_proxy.hpp"
+#include "loki/details/utils/equal_to.hpp"
+#include "loki/details/utils/hash.hpp"
 #include "loki/details/utils/observer_ptr.hpp"
 #include "loki/details/utils/segmented_vector.hpp"
 
@@ -51,7 +52,7 @@ namespace loki
 /// `ObserverPtr<const T>`. A user has to explicitly define it. Similarly as for the Hash,
 /// a type that satisfies the concept `HasIdentifiableMembers` in its intended way will obtain
 /// automatically generated std::equal_to specialization.
-template<typename T, typename Hash = std::hash<ObserverPtr<const T>>, typename EqualTo = std::equal_to<ObserverPtr<const T>>>
+template<typename T, typename Hash = Hash<ObserverPtr<const T>>, typename EqualTo = EqualTo<ObserverPtr<const T>>>
 class SegmentedRepository
 {
 private:

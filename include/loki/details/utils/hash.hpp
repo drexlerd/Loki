@@ -18,7 +18,9 @@
 #ifndef LOKI_INCLUDE_LOKI_UTILS_HASH_HPP_
 #define LOKI_INCLUDE_LOKI_UTILS_HASH_HPP_
 
+#include "loki/details/utils/concepts.hpp"
 #include "loki/details/utils/murmurhash3.h"
+#include "loki/details/utils/observer_ptr.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -177,6 +179,25 @@ template<typename T>
 struct Hash<std::span<T>>
 {
     size_t operator()(const std::span<T>& span) const { return loki::hash_combine(span.data(), span.size()); }
+};
+
+/// @brief std::hash specialization for types T that satisfy `HasIdentifiableMembers`.
+/// Dereferences the underlying pointer before forwarding the call to the std::hash
+/// specialization of `IdentifiableMembersProxy` of T to compute a hash based on all members.
+/// @tparam T is the type.
+template<typename T>
+struct Hash<ObserverPtr<T>>
+{
+    size_t operator()(ObserverPtr<T> ptr) const { return Hash<T>()(*ptr); }
+};
+
+/// @brief std::hash specialization for an `IdentifiableMembersProxy`
+/// that computes a hash based on all members.
+/// @tparam ...Ts are the types of all members.
+template<HasIdentifiableMembers T>
+struct Hash<T>
+{
+    size_t operator()(const T& proxy) const { return loki::hash_combine(proxy.identifiable_members()); }
 };
 
 /**

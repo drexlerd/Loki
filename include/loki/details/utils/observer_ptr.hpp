@@ -18,8 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_UTILS_OBSERVER_PTR_HPP_
 #define LOKI_INCLUDE_LOKI_UTILS_OBSERVER_PTR_HPP_
 
-#include "loki/details/utils/members_proxy.hpp"
-
 namespace loki
 {
 
@@ -74,28 +72,5 @@ private:
 };
 
 }
-
-/// @brief std::hash specialization for types T that satisfy `HasIdentifiableMembers`.
-/// Dereferences the underlying pointer before forwarding the call to the std::hash
-/// specialization of `IdentifiableMembersProxy` of T to compute a hash based on all members.
-/// @tparam T is the type.
-template<loki::HasIdentifiableMembers T>
-struct std::hash<loki::ObserverPtr<T>>
-{
-    size_t operator()(loki::ObserverPtr<T> ptr) const { return std::hash<loki::IdentifiableMembersProxy<T>>()(loki::IdentifiableMembersProxy<T>(*ptr)); }
-};
-
-/// @brief std::equal_to specialization for types T that satisfy `HasIdentifiableMembers`.
-/// Dereferences the underlying pointer before forwarding the call to the std::equal_to
-/// specialization of `IdentifiableMemberProxy` of T to pairwise compare all members.
-/// @tparam T is the type.
-template<loki::HasIdentifiableMembers T>
-struct std::equal_to<loki::ObserverPtr<T>>
-{
-    bool operator()(loki::ObserverPtr<T> lhs, loki::ObserverPtr<T> rhs) const
-    {
-        return std::equal_to<loki::IdentifiableMembersProxy<T>>()(loki::IdentifiableMembersProxy<T>(*lhs), loki::IdentifiableMembersProxy<T>(*rhs));
-    }
-};
 
 #endif
