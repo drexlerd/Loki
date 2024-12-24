@@ -31,7 +31,7 @@ namespace loki
 template<typename T>
 struct EqualTo
 {
-    bool operator()(const T& lhs, const T& rhs) { return std::equal_to<T>()(lhs, rhs); }
+    bool operator()(const T& lhs, const T& rhs) const { return std::equal_to<T>()(lhs, rhs); }
 };
 
 /// @brief EqualTo specialization for a std::span.
