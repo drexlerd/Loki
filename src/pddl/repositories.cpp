@@ -335,42 +335,14 @@ Effect PDDLRepositories::get_or_create_effect(EffectCompositeOneof effect)
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
 }
 
-ParameterList sort_structure_parameters(const ParameterList& parameters, size_t original_arity)
-{
-    auto partitioned_parameters = std::vector<std::pair<size_t, Parameter>> {};
-    for (size_t i = 0; i < parameters.size(); ++i)
-    {
-        partitioned_parameters.emplace_back(((i < original_arity) ? 0 : 1), parameters[i]);
-    }
-    std::sort(partitioned_parameters.begin(),
-              partitioned_parameters.end(),
-              [](const auto& lhs, const auto& rhs)
-              {
-                  if (lhs.first == rhs.first)
-                  {
-                      return lhs.second->get_index() < rhs.second->get_index();
-                  }
-                  return lhs.first < rhs.first;
-              });
-    auto sorted_parameters = ParameterList();
-    for (const auto& [partition, parameter] : partitioned_parameters)
-    {
-        sorted_parameters.push_back(parameter);
-    }
-
-    return sorted_parameters;
-}
-
 Action PDDLRepositories::get_or_create_action(std::string name,
                                               size_t original_arity,
                                               ParameterList parameters,
                                               std::optional<Condition> condition,
                                               std::optional<Effect> effect)
 {
-    auto sorted_parameters = sort_structure_parameters(parameters, original_arity);
-
     return boost::hana::at_key(m_repositories, boost::hana::type<ActionImpl> {})
-        .get_or_create(std::move(name), std::move(original_arity), std::move(sorted_parameters), std::move(condition), std::move(effect));
+        .get_or_create(std::move(name), std::move(original_arity), std::move(parameters), std::move(condition), std::move(effect));
 }
 
 Axiom PDDLRepositories::get_or_create_axiom(std::string derived_predicate_name,
@@ -378,10 +350,8 @@ Axiom PDDLRepositories::get_or_create_axiom(std::string derived_predicate_name,
                                             Condition condition,
                                             size_t num_parameters_to_ground_head)
 {
-    auto sorted_parameters = sort_structure_parameters(parameters, num_parameters_to_ground_head);
-
     return boost::hana::at_key(m_repositories, boost::hana::type<AxiomImpl> {})
-        .get_or_create(std::move(derived_predicate_name), std::move(sorted_parameters), std::move(condition), num_parameters_to_ground_head);
+        .get_or_create(std::move(derived_predicate_name), std::move(parameters), std::move(condition), num_parameters_to_ground_head);
 }
 
 OptimizationMetric PDDLRepositories::get_or_create_optimization_metric(OptimizationMetricEnum metric, FunctionExpression function_expression)
