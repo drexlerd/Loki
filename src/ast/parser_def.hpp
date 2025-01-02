@@ -353,7 +353,8 @@ const auto goal_descriptor_not_def = (lit('(') >> keyword_lit("not")) > goal_des
 const auto goal_descriptor_imply_def = (lit('(') >> keyword_lit("imply")) > goal_descriptor > goal_descriptor > lit(')');
 const auto goal_descriptor_exists_def = (lit('(') >> keyword_lit("exists")) > lit('(') > typed_list_of_variables > lit(')') > goal_descriptor > lit(')');
 const auto goal_descriptor_forall_def = (lit('(') >> keyword_lit("forall")) > lit('(') > typed_list_of_variables > lit(')') > goal_descriptor > lit(')');
-const auto goal_descriptor_function_comparison_def = (lit('(') >> binary_comparator) > function_expression > function_expression > lit(')');
+// distinguishing "=" predicate from comparator requires some more backtracking
+const auto goal_descriptor_function_comparison_def = (lit('(') >> binary_comparator) >> function_expression > function_expression > lit(')');
 
 const auto constraint_goal_descriptor_def = constraint_goal_descriptor_and | constraint_goal_descriptor_forall | constraint_goal_descriptor_at_end
                                             | constraint_goal_descriptor_always | constraint_goal_descriptor_sometime | constraint_goal_descriptor_within
