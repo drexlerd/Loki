@@ -66,6 +66,7 @@ public:
     void write(const ConditionImplyImpl& element, std::ostream& out);
     void write(const ConditionExistsImpl& element, std::ostream& out);
     void write(const ConditionForallImpl& element, std::ostream& out);
+    void write(const ConditionFunctionExpressionComparisonImpl& element, std::ostream& out);
     void write(const ConditionImpl& element, std::ostream& out);
     void write(const DomainImpl& element, std::ostream& out);
     void write(const EffectLiteralImpl& element, std::ostream& out);

@@ -159,6 +159,15 @@ void PDDLFormatter::write(const ConditionForallImpl& element, std::ostream& out)
     out << ")";
 }
 
+void PDDLFormatter::write(const ConditionFunctionExpressionComparisonImpl& element, std::ostream& out)
+{
+    out << "(" << to_string(element.get_binary_comparator()) << " ";
+    write(*element.get_function_expression_left(), out);
+    out << " ";
+    write(*element.get_function_expression_right(), out);
+    out << ")";
+}
+
 void PDDLFormatter::write(const ConditionImpl& element, std::ostream& out)
 {
     std::visit([this, &out](const auto& arg) { this->write(*arg, out); }, element.get_condition());

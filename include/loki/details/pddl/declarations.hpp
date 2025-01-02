@@ -96,6 +96,8 @@ class ConditionExistsImpl;
 using ConditionExists = const ConditionExistsImpl*;
 class ConditionForallImpl;
 using ConditionForall = const ConditionForallImpl*;
+class ConditionFunctionExpressionComparisonImpl;
+using ConditionFunctionExpressionComparison = const ConditionFunctionExpressionComparisonImpl*;
 class ConditionImpl;
 using Condition = const ConditionImpl*;
 using ConditionList = std::vector<Condition>;

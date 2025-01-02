@@ -49,6 +49,7 @@ PDDLTypeToRepository create_default_pddl_type_to_repository()
         boost::hana::make_pair(boost::hana::type_c<ConditionImplyImpl>, ConditionImplyRepository {}),
         boost::hana::make_pair(boost::hana::type_c<ConditionExistsImpl>, ConditionExistsRepository {}),
         boost::hana::make_pair(boost::hana::type_c<ConditionForallImpl>, ConditionForallRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ConditionFunctionExpressionComparisonImpl>, ConditionFunctionExpressionComparisonRepository {}),
         boost::hana::make_pair(boost::hana::type_c<ConditionImpl>, ConditionRepository {}),
         boost::hana::make_pair(boost::hana::type_c<EffectLiteralImpl>, EffectLiteralRepository {}),
         boost::hana::make_pair(boost::hana::type_c<EffectAndImpl>, EffectAndRepository {}),
@@ -235,6 +236,14 @@ ConditionForall PDDLRepositories::get_or_create_condition_forall(ParameterList p
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionForallImpl> {}).get_or_create(std::move(parameters), std::move(condition));
 }
 
+ConditionFunctionExpressionComparison PDDLRepositories::get_or_create_condition_function_expression_comparison(BinaryComparatorEnum binary_comparator,
+                                                                                                               FunctionExpression function_expression_left,
+                                                                                                               FunctionExpression function_expression_right)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionFunctionExpressionComparisonImpl> {})
+        .get_or_create(std::move(binary_comparator), std::move(function_expression_left), std::move(function_expression_right));
+}
+
 Condition PDDLRepositories::get_or_create_condition(ConditionLiteral condition)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
@@ -266,6 +275,11 @@ Condition PDDLRepositories::get_or_create_condition(ConditionExists condition)
 }
 
 Condition PDDLRepositories::get_or_create_condition(ConditionForall condition)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
+}
+
+Condition PDDLRepositories::get_or_create_condition(ConditionFunctionExpressionComparison condition)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
 }

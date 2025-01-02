@@ -333,7 +333,7 @@ const auto binary_comparator_equal_def = lit('=') > x3::attr(ast::BinaryComparat
 const auto binary_comparator_greater_equal_def = lit(">=") > x3::attr(ast::BinaryComparatorGreaterEqual {});
 const auto binary_comparator_less_equal_def = lit("<=") > x3::attr(ast::BinaryComparatorLessEqual {});
 const auto binary_comparator_def =
-    binary_comparator_greater | binary_comparator_less | binary_comparator_equal | binary_comparator_greater_equal | binary_comparator_less_equal;
+    binary_comparator_greater_equal | binary_comparator_less_equal | binary_comparator_greater | binary_comparator_less | binary_comparator_equal;
 
 const auto function_head_def = ((lit('(') >> function_symbol > *term) > lit(')')) | (function_symbol > x3::attr(std::vector<ast::Term> {}));
 const auto function_expression_def = function_expression_binary_op | function_expression_minus | function_expression_head | function_expression_number;
@@ -353,7 +353,7 @@ const auto goal_descriptor_not_def = (lit('(') >> keyword_lit("not")) > goal_des
 const auto goal_descriptor_imply_def = (lit('(') >> keyword_lit("imply")) > goal_descriptor > goal_descriptor > lit(')');
 const auto goal_descriptor_exists_def = (lit('(') >> keyword_lit("exists")) > lit('(') > typed_list_of_variables > lit(')') > goal_descriptor > lit(')');
 const auto goal_descriptor_forall_def = (lit('(') >> keyword_lit("forall")) > lit('(') > typed_list_of_variables > lit(')') > goal_descriptor > lit(')');
-const auto goal_descriptor_function_comparison_def = (lit('(') >> binary_comparator) >> function_expression > function_expression > lit(')');
+const auto goal_descriptor_function_comparison_def = (lit('(') >> binary_comparator) > function_expression > function_expression > lit(')');
 
 const auto constraint_goal_descriptor_def = constraint_goal_descriptor_and | constraint_goal_descriptor_forall | constraint_goal_descriptor_at_end
                                             | constraint_goal_descriptor_always | constraint_goal_descriptor_sometime | constraint_goal_descriptor_within

@@ -74,6 +74,7 @@ using ConditionNotRepository = SegmentedPDDLRepository<ConditionNotImpl>;
 using ConditionImplyRepository = SegmentedPDDLRepository<ConditionImplyImpl>;
 using ConditionExistsRepository = SegmentedPDDLRepository<ConditionExistsImpl>;
 using ConditionForallRepository = SegmentedPDDLRepository<ConditionForallImpl>;
+using ConditionFunctionExpressionComparisonRepository = SegmentedPDDLRepository<ConditionFunctionExpressionComparisonImpl>;
 using ConditionRepository = SegmentedPDDLRepository<ConditionImpl>;
 using EffectLiteralRepository = SegmentedPDDLRepository<EffectLiteralImpl>;
 using EffectAndRepository = SegmentedPDDLRepository<EffectAndImpl>;
@@ -114,6 +115,7 @@ using PDDLTypeToRepository =
                      boost::hana::pair<boost::hana::type<ConditionImplyImpl>, ConditionImplyRepository>,
                      boost::hana::pair<boost::hana::type<ConditionExistsImpl>, ConditionExistsRepository>,
                      boost::hana::pair<boost::hana::type<ConditionForallImpl>, ConditionForallRepository>,
+                     boost::hana::pair<boost::hana::type<ConditionFunctionExpressionComparisonImpl>, ConditionFunctionExpressionComparisonRepository>,
                      boost::hana::pair<boost::hana::type<ConditionImpl>, ConditionRepository>,
                      boost::hana::pair<boost::hana::type<EffectLiteralImpl>, EffectLiteralRepository>,
                      boost::hana::pair<boost::hana::type<EffectAndImpl>, EffectAndRepository>,
@@ -205,6 +207,10 @@ public:
 
     ConditionForall get_or_create_condition_forall(ParameterList parameters, Condition condition);
 
+    ConditionFunctionExpressionComparison get_or_create_condition_function_expression_comparison(BinaryComparatorEnum binary_comparator,
+                                                                                                 FunctionExpression function_expression_left,
+                                                                                                 FunctionExpression function_expression_right);
+
     Condition get_or_create_condition(ConditionLiteral condition);
 
     Condition get_or_create_condition(ConditionAnd condition);
@@ -218,6 +224,8 @@ public:
     Condition get_or_create_condition(ConditionExists condition);
 
     Condition get_or_create_condition(ConditionForall condition);
+
+    Condition get_or_create_condition(ConditionFunctionExpressionComparison condition);
 
     EffectLiteral get_or_create_effect_literal(Literal literal);
 

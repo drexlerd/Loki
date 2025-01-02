@@ -19,6 +19,7 @@
 #define LOKI_INCLUDE_LOKI_PDDL_CONDITIONS_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/function_expressions.hpp"
 
 #include <string>
 
@@ -213,15 +214,52 @@ public:
     auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_parameters), std::as_const(m_condition)); }
 };
 
+class ConditionFunctionExpressionComparisonImpl
+{
+private:
+    size_t m_index;
+    BinaryComparatorEnum m_binary_comparator;
+    FunctionExpression m_function_expression_left;
+    FunctionExpression m_function_expression_right;
+
+    ConditionFunctionExpressionComparisonImpl(size_t index,
+                                              BinaryComparatorEnum binary_comparator,
+                                              FunctionExpression function_expression_left,
+                                              FunctionExpression function_expression_right);
+
+    // Give access to the constructor.
+    template<typename T, typename Hash, typename EqualTo>
+    friend class SegmentedRepository;
+
+public:
+    // moveable but not copyable
+    ConditionFunctionExpressionComparisonImpl(const ConditionFunctionExpressionComparisonImpl& other) = delete;
+    ConditionFunctionExpressionComparisonImpl& operator=(const ConditionFunctionExpressionComparisonImpl& other) = delete;
+    ConditionFunctionExpressionComparisonImpl(ConditionFunctionExpressionComparisonImpl&& other) = default;
+    ConditionFunctionExpressionComparisonImpl& operator=(ConditionFunctionExpressionComparisonImpl&& other) = default;
+
+    size_t get_index() const;
+    const BinaryComparatorEnum& get_binary_comparator() const;
+    const FunctionExpression& get_function_expression_left() const;
+    const FunctionExpression& get_function_expression_right() const;
+
+    auto identifiable_members() const
+    {
+        return std::forward_as_tuple(std::as_const(m_binary_comparator), std::as_const(m_function_expression_left), std::as_const(m_function_expression_right));
+    }
+};
+
 /* Condition */
+using ConditionVariant = std::
+    variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall, ConditionFunctionExpressionComparison>;
+
 class ConditionImpl
 {
 private:
     size_t m_index;
-    std::variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall> m_condition;
+    ConditionVariant m_condition;
 
-    ConditionImpl(size_t index,
-                  std::variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall> condition);
+    ConditionImpl(size_t index, ConditionVariant condition);
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -235,7 +273,7 @@ public:
     ConditionImpl& operator=(ConditionImpl&& other) = default;
 
     size_t get_index() const;
-    const std::variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall>& get_condition() const;
+    const ConditionVariant& get_condition() const;
 
     auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_condition)); }
 };
@@ -247,6 +285,7 @@ extern std::ostream& operator<<(std::ostream& out, const ConditionNotImpl& eleme
 extern std::ostream& operator<<(std::ostream& out, const ConditionImplyImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const ConditionExistsImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const ConditionForallImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionFunctionExpressionComparisonImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const ConditionImpl& element);
 
 }

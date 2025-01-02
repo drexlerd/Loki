@@ -25,6 +25,20 @@
 namespace loki
 {
 
+std::unordered_map<BinaryComparatorEnum, std::string> binary_comparator_enum_to_string = {
+    { BinaryComparatorEnum::GREATER, ">" },         //
+    { BinaryComparatorEnum::LESS, "<" },            //
+    { BinaryComparatorEnum::EQUAL, "=" },           //
+    { BinaryComparatorEnum::GREATER_EQUAL, ">=" },  //
+    { BinaryComparatorEnum::LESS_EQUAL, "<=" },
+};
+
+const std::string& to_string(BinaryComparatorEnum binary_comparator)
+{
+    assert(binary_comparator_enum_to_string.count(binary_comparator));
+    return binary_comparator_enum_to_string.at(binary_comparator);
+}
+
 std::unordered_map<BinaryOperatorEnum, std::string> binary_operator_enum_to_string = {
     { BinaryOperatorEnum::MUL, "*" },
     { BinaryOperatorEnum::PLUS, "+" },

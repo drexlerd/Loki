@@ -26,6 +26,17 @@
 namespace loki
 {
 
+/* BinaryComparatorEnum */
+BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorGreater&) const { return BinaryComparatorEnum::GREATER; }
+
+BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorLess&) const { return BinaryComparatorEnum::LESS; }
+
+BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorEqual&) const { return BinaryComparatorEnum::EQUAL; }
+
+BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorGreaterEqual&) const { return BinaryComparatorEnum::GREATER_EQUAL; }
+
+BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorLessEqual&) const { return BinaryComparatorEnum::LESS_EQUAL; }
+
 /* MultiOperator */
 MultiOperatorEnum MultiOperatorVisitor::operator()(const ast::MultiOperatorMul&) const { return MultiOperatorEnum::MUL; }
 
