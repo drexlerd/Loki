@@ -155,6 +155,7 @@ struct EffectProduction;
 struct EffectCompositeForall;
 struct EffectCompositeWhen;
 struct EffectCompositeOneof;
+struct EffectCompositeProbabilistic;
 struct EffectComposite;
 
 struct ActionSymbol;
@@ -186,6 +187,7 @@ struct NegatedAtom;
 struct Literal;
 
 struct InitialElementLiteral;
+struct InitialElementProbabilistic;
 struct InitialElementTimedLiterals;            // :timed-initial-literals
 struct InitialElementNumericFluentsTotalCost;  // :action-costs
 struct InitialElementNumericFluentsGeneral;    // :numeric-fluents
@@ -823,7 +825,9 @@ struct AssignOperator :
 };
 
 /* <effect> */
-struct Effect : x3::position_tagged, x3::variant<x3::forward_ast<EffectProduction>, x3::forward_ast<EffectComposite>, std::vector<Effect>>
+struct Effect :
+    x3::position_tagged,
+    x3::variant<x3::forward_ast<EffectProduction>, x3::forward_ast<EffectComposite>, x3::forward_ast<EffectCompositeProbabilistic>, std::vector<Effect>>
 {
     using base_type::base_type;
     using base_type::operator=;
@@ -864,6 +868,11 @@ struct EffectCompositeWhen : x3::position_tagged
 struct EffectCompositeOneof : x3::position_tagged
 {
     std::vector<Effect> possibilities;
+};
+
+struct EffectCompositeProbabilistic : x3::position_tagged
+{
+    std::vector<std::pair<double, Effect>> possibilities;
 };
 
 struct EffectComposite : x3::position_tagged, x3::variant<EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof>

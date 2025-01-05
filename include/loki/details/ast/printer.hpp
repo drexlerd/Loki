@@ -155,6 +155,7 @@ extern std::string parse_text(const ast::EffectProduction& node, const DefaultFo
 extern std::string parse_text(const ast::EffectCompositeForall& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::EffectCompositeWhen& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::EffectCompositeOneof& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::EffectCompositeProbabilistic& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::EffectComposite& node, const DefaultFormatterOptions& options = {});
 
 extern std::string parse_text(const ast::ActionSymbol& node, const DefaultFormatterOptions& options = {});

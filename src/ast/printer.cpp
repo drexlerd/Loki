@@ -535,6 +535,13 @@ std::string parse_text(const ast::EffectCompositeOneof& node, const DefaultForma
     return ss.str();
 }
 
+std::string parse_text(const ast::EffectCompositeProbabilistic& node, const DefaultFormatterOptions& options)
+{
+    std::stringstream ss;
+    ss << "(probabilistic " << parse_text(node.possibilities, options) << ")";
+    return ss.str();
+}
+
 std::string parse_text(const ast::EffectComposite& node, const DefaultFormatterOptions& options)
 {
     return boost::apply_visitor(NodeVisitorPrinter(options), node);
