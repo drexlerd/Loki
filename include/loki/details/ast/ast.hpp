@@ -1013,6 +1013,11 @@ struct InitialElementLiteral : x3::position_tagged
     GroundLiteral literal;
 };
 
+struct InitialElementProbabilistic : x3::position_tagged
+{
+    std::vector<std::pair<double, GroundLiteral>> distribution;
+};
+
 struct InitialElementTimedLiterals : x3::position_tagged
 {
     Number number;
@@ -1033,7 +1038,11 @@ struct InitialElementNumericFluentsGeneral : x3::position_tagged
 
 struct InitialElement :
     x3::position_tagged,
-    x3::variant<InitialElementLiteral, InitialElementTimedLiterals, InitialElementNumericFluentsTotalCost, InitialElementNumericFluentsGeneral>
+    x3::variant<InitialElementLiteral,
+                InitialElementProbabilistic,
+                InitialElementTimedLiterals,
+                InitialElementNumericFluentsTotalCost,
+                InitialElementNumericFluentsGeneral>
 {
     using base_type::base_type;
     using base_type::operator=;

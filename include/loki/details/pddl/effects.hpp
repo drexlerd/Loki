@@ -202,14 +202,42 @@ public:
     auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_effects)); }
 };
 
+class EffectCompositeProbabilisticImpl
+{
+private:
+    size_t m_index;
+    EffectDistribution m_effect_distribution;
+
+    EffectCompositeProbabilisticImpl(size_t index, EffectDistribution effect_distribution);
+
+    // Give access to the constructor.
+    template<typename T, typename Hash, typename EqualTo>
+    friend class SegmentedRepository;
+
+public:
+    // moveable but not copyable
+    EffectCompositeProbabilisticImpl(const EffectCompositeProbabilisticImpl& other) = delete;
+    EffectCompositeProbabilisticImpl& operator=(const EffectCompositeProbabilisticImpl& other) = delete;
+    EffectCompositeProbabilisticImpl(EffectCompositeProbabilisticImpl&& other) = default;
+    EffectCompositeProbabilisticImpl& operator=(EffectCompositeProbabilisticImpl&& other) = default;
+
+    size_t get_index() const;
+    const EffectDistribution& get_effect_distribution() const;
+
+    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_effect_distribution)); }
+};
+
 /* EffectImpl */
+using EffectVariant =
+    std::variant<EffectLiteral, EffectAnd, EffectNumeric, EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof, EffectCompositeProbabilistic>;
+
 class EffectImpl
 {
 private:
     size_t m_index;
-    std::variant<EffectLiteral, EffectAnd, EffectNumeric, EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof> m_effect;
+    EffectVariant m_effect;
 
-    EffectImpl(size_t index, std::variant<EffectLiteral, EffectAnd, EffectNumeric, EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof> effect);
+    EffectImpl(size_t index, EffectVariant effect);
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -223,7 +251,7 @@ public:
     EffectImpl& operator=(EffectImpl&& other) = default;
 
     size_t get_index() const;
-    const std::variant<EffectLiteral, EffectAnd, EffectNumeric, EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof>& get_effect() const;
+    const EffectVariant& get_effect() const;
 
     auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_effect)); }
 };

@@ -114,9 +114,12 @@ class EffectCompositeWhenImpl;
 using EffectCompositeWhen = const EffectCompositeWhenImpl*;
 class EffectCompositeOneofImpl;
 using EffectCompositeOneof = const EffectCompositeOneofImpl*;
+class EffectCompositeProbabilisticImpl;
+using EffectCompositeProbabilistic = const EffectCompositeProbabilisticImpl*;
 class EffectImpl;
 using Effect = const EffectImpl*;
 using EffectList = std::vector<Effect>;
+using EffectDistribution = std::vector<std::pair<double, Effect>>;
 
 class FunctionExpressionNumberImpl;
 using FunctionExpressionNumber = const FunctionExpressionNumberImpl*;

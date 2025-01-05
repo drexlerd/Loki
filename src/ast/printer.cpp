@@ -221,8 +221,7 @@ std::string parse_text(const ast::AtomicFormulaOfTermsPredicate& node, const Def
 std::string parse_text(const ast::AtomicFormulaOfTermsEquality& node, const DefaultFormatterOptions& options)
 {
     std::stringstream ss;
-    ss << "("
-       << "= " << parse_text(node.term_left, options) << " " << parse_text(node.term_right, options) << ")";
+    ss << "(" << "= " << parse_text(node.term_left, options) << " " << parse_text(node.term_right, options) << ")";
     return ss.str();
 }
 
@@ -538,7 +537,12 @@ std::string parse_text(const ast::EffectCompositeOneof& node, const DefaultForma
 std::string parse_text(const ast::EffectCompositeProbabilistic& node, const DefaultFormatterOptions& options)
 {
     std::stringstream ss;
-    ss << "(probabilistic " << parse_text(node.possibilities, options) << ")";
+    ss << "(probabilistic";
+    for (const auto& [probability, possibility] : node.possibilities)
+    {
+        ss << " " << probability << " " << parse_text(possibility, options);
+    }
+    ss << ")";
     return ss.str();
 }
 
@@ -703,8 +707,7 @@ string parse_text(const ast::AtomicFormulaOfNamesPredicate& node, const DefaultF
 string parse_text(const ast::AtomicFormulaOfNamesEquality& node, const DefaultFormatterOptions& options)
 {
     std::stringstream ss;
-    ss << "("
-       << "= " << parse_text(node.name_left, options) << " " << parse_text(node.name_right, options) << ")";
+    ss << "(" << "= " << parse_text(node.name_left, options) << " " << parse_text(node.name_right, options) << ")";
     return ss.str();
 }
 
@@ -725,6 +728,18 @@ string parse_text(const ast::NegatedGroundAtom& node, const DefaultFormatterOpti
 string parse_text(const ast::GroundLiteral& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
 
 string parse_text(const ast::InitialElementLiteral& node, const DefaultFormatterOptions& options) { return parse_text(node.literal, options); }
+
+std::string parse_text(const ast::InitialElementProbabilistic& node, const DefaultFormatterOptions& options)
+{
+    std::stringstream ss;
+    ss << "(probabilistic";
+    for (const auto& [probability, outcome] : node.distribution)
+    {
+        ss << " " << probability << " " << parse_text(outcome, options);
+    }
+    ss << ")";
+    return ss.str();
+}
 
 string parse_text(const ast::InitialElementTimedLiterals& node, const DefaultFormatterOptions& options)
 {
@@ -789,8 +804,7 @@ string parse_text(const ast::MetricFunctionExpressionTotalTime&, const DefaultFo
 string parse_text(const ast::MetricFunctionExpressionPreferences& node, const DefaultFormatterOptions& options)
 {
     stringstream ss;
-    ss << "("
-       << "is-violated " << parse_text(node.preference_name, options) << ")";
+    ss << "(" << "is-violated " << parse_text(node.preference_name, options) << ")";
     return ss.str();
 }
 

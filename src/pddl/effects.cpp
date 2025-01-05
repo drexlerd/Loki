@@ -106,20 +106,23 @@ size_t EffectCompositeOneofImpl::get_index() const { return m_index; }
 
 const EffectList& EffectCompositeOneofImpl::get_effects() const { return m_effects; }
 
-/* EffectImpl */
-EffectImpl::EffectImpl(size_t index,
-                       std::variant<EffectLiteral, EffectAnd, EffectNumeric, EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof> effect) :
+/* EffectCompositeProbabilisticImpl */
+EffectCompositeProbabilisticImpl::EffectCompositeProbabilisticImpl(size_t index, EffectDistribution effect_distribution) :
     m_index(index),
-    m_effect(std::move(effect))
+    m_effect_distribution(std::move(effect_distribution))
 {
 }
+
+size_t EffectCompositeProbabilisticImpl::get_index() const { return m_index; }
+
+const EffectDistribution& EffectCompositeProbabilisticImpl::get_effect_distribution() const { return m_effect_distribution; }
+
+/* EffectImpl */
+EffectImpl::EffectImpl(size_t index, EffectVariant effect) : m_index(index), m_effect(std::move(effect)) {}
 
 size_t EffectImpl::get_index() const { return m_index; }
 
-const std::variant<EffectLiteral, EffectAnd, EffectNumeric, EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof>& EffectImpl::get_effect() const
-{
-    return m_effect;
-}
+const EffectVariant& EffectImpl::get_effect() const { return m_effect; }
 
 std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element)
 {
