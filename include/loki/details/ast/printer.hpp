@@ -62,6 +62,7 @@ extern std::string parse_text(const ast::RequirementPreferences& node, const Def
 extern std::string parse_text(const ast::RequirementConstraints& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::RequirementActionCosts& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::RequirementNonDeterministic& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::RequirementProbabilisticEffects& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::Requirement& node, const DefaultFormatterOptions& options = {});
 
 extern std::string parse_text(const ast::Type& node, const DefaultFormatterOptions& options = {});
@@ -189,7 +190,6 @@ extern std::string parse_text(const ast::NegatedGroundAtom& node, const DefaultF
 extern std::string parse_text(const ast::GroundLiteral& node, const DefaultFormatterOptions& options = {});
 
 extern std::string parse_text(const ast::InitialElementLiteral& node, const DefaultFormatterOptions& options = {});
-extern std::string parse_text(const ast::InitialElementProbabilistic& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::InitialElementTimedLiterals& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::InitialElementNumericFluentsTotalCost& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::InitialElementNumericFluentsGeneral& node, const DefaultFormatterOptions& options = {});

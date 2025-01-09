@@ -47,6 +47,7 @@ extern RequirementEnumSet parse(const ast::RequirementPreferences& node, Context
 extern RequirementEnumSet parse(const ast::RequirementConstraints& node, Context& context);
 extern RequirementEnumSet parse(const ast::RequirementActionCosts& node, Context& context);
 extern RequirementEnumSet parse(const ast::RequirementNonDeterministic& node, Context& context);
+extern RequirementEnumSet parse(const ast::RequirementProbabilisticEffects& node, Context& context);
 extern RequirementEnumSet parse(const ast::Requirement& node, Context& context);
 
 struct RequirementVisitor : boost::static_visitor<RequirementEnumSet>

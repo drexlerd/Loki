@@ -127,6 +127,19 @@ Effect parse(const ast::EffectCompositeOneof& node, Context& context)
     return context.factories.get_or_create_effect(context.factories.get_or_create_effect_composite_oneof(effect_list));
 }
 
+Effect parse(const ast::EffectCompositeProbabilistic& node, Context& context)
+{
+    test_undefined_requirement(RequirementEnum::NON_DETERMINISTIC, node, context);
+    context.references.untrack(RequirementEnum::NON_DETERMINISTIC);
+
+    auto effect_distribution = EffectDistribution();
+    for (const auto& [probability, effect_node] : node.possibilities)
+    {
+        effect_distribution.emplace_back(probability, parse(effect_node, context));
+    }
+    return context.factories.get_or_create_effect(context.factories.get_or_create_effect_composite_probabilistic(effect_distribution));
+}
+
 Effect parse(const ast::EffectComposite& node, Context& context)
 {
     const auto effect = boost::apply_visitor(EffectVisitor(context), node);

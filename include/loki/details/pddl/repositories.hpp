@@ -82,6 +82,7 @@ using EffectNumericRepository = SegmentedPDDLRepository<EffectNumericImpl>;
 using EffectCompositeForallRepository = SegmentedPDDLRepository<EffectCompositeForallImpl>;
 using EffectCompositeWhenRepository = SegmentedPDDLRepository<EffectCompositeWhenImpl>;
 using EffectCompositeOneofRepository = SegmentedPDDLRepository<EffectCompositeOneofImpl>;
+using EffectCompositeProbabilisticRepository = SegmentedPDDLRepository<EffectCompositeProbabilisticImpl>;
 using EffectRepository = SegmentedPDDLRepository<EffectImpl>;
 using ActionRepository = SegmentedPDDLRepository<ActionImpl>;
 using AxiomRepository = SegmentedPDDLRepository<AxiomImpl>;
@@ -123,6 +124,7 @@ using PDDLTypeToRepository =
                      boost::hana::pair<boost::hana::type<EffectCompositeForallImpl>, EffectCompositeForallRepository>,
                      boost::hana::pair<boost::hana::type<EffectCompositeWhenImpl>, EffectCompositeWhenRepository>,
                      boost::hana::pair<boost::hana::type<EffectCompositeOneofImpl>, EffectCompositeOneofRepository>,
+                     boost::hana::pair<boost::hana::type<EffectCompositeProbabilisticImpl>, EffectCompositeProbabilisticRepository>,
                      boost::hana::pair<boost::hana::type<EffectImpl>, EffectRepository>,
                      boost::hana::pair<boost::hana::type<ActionImpl>, ActionRepository>,
                      boost::hana::pair<boost::hana::type<AxiomImpl>, AxiomRepository>,
@@ -239,6 +241,8 @@ public:
 
     EffectCompositeOneof get_or_create_effect_composite_oneof(EffectList effects);
 
+    EffectCompositeProbabilistic get_or_create_effect_composite_probabilistic(EffectDistribution effects);
+
     Effect get_or_create_effect(EffectLiteral effect);
 
     Effect get_or_create_effect(EffectAnd effect);
@@ -250,6 +254,8 @@ public:
     Effect get_or_create_effect(EffectCompositeWhen effect);
 
     Effect get_or_create_effect(EffectCompositeOneof effect);
+
+    Effect get_or_create_effect(EffectCompositeProbabilistic effect);
 
     Action
     get_or_create_action(std::string name, size_t original_arity, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);

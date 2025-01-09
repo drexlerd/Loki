@@ -90,6 +90,7 @@ requirement_preferences_type const requirement_preferences = "requirement_prefer
 requirement_constraints_type const requirement_constraints = "requirement_constraints";
 requirement_action_costs_type const requirement_action_costs = "requirement_action_costs";
 requirement_non_deterministic_type const requirement_non_deterministic = "requirement_non_deterministic";
+requirement_probabilistic_effects_type const requirement_probabilistic_effects = "requirement_probabilistic_effects";
 requirement_type const requirement = "requirement";
 
 type_type const type = "type";
@@ -185,6 +186,7 @@ effect_production_type const effect_production = "effect_production";
 effect_composite_forall_type const effect_composite_forall = "effect_composite_forall";
 effect_composite_when_type const effect_composite_when = "effect_composite_when";
 effect_composite_oneof_type const effect_composite_oneof = "effect_composite_oneof";
+effect_composite_probabilistic_type const effect_composite_probabilistic = "effect_composite_probabilistic";
 effect_composite_type const effect_composite = "effect_composite";
 action_symbol_type const action_symbol = "action_symbol";
 action_body_type const action_body = "action_body";
@@ -288,12 +290,13 @@ const auto requirement_preferences_def = keyword_lit(":preferences") > x3::attr(
 const auto requirement_constraints_def = keyword_lit(":constraints") > x3::attr(ast::RequirementConstraints {});
 const auto requirement_action_costs_def = keyword_lit(":action-costs") > x3::attr(ast::RequirementActionCosts {});
 const auto requirement_non_deterministic_def = keyword_lit(":non-deterministic") > x3::attr(ast::RequirementNonDeterministic {});
+const auto requirement_probabilistic_effects_def = keyword_lit(":probabilistic-effects") > x3::attr(ast::RequirementProbabilisticEffects {});
 const auto requirement_def = requirement_strips | requirement_typing | requirement_negative_preconditions | requirement_disjunctive_preconditions
                              | requirement_equality | requirement_existential_preconditions | requirement_universal_preconditions
                              | requirement_quantified_preconditions | requirement_conditional_effects | requirement_fluents | requirement_object_fluents
                              | requirement_numeric_fluents | requirement_adl | requirement_durative_actions | requirement_derived_predicates
                              | requirement_timed_initial_literals | requirement_preferences | requirement_constraints | requirement_action_costs
-                             | requirement_non_deterministic;
+                             | requirement_non_deterministic | requirement_probabilistic_effects;
 
 const auto type_def = type_object | type_number | type_either | name;
 const auto type_object_def = keyword_lit("object") > x3::attr(ast::TypeObject {});
@@ -399,6 +402,7 @@ const auto effect_production_def = effect_production_numeric | effect_production
 const auto effect_composite_forall_def = (lit('(') >> keyword_lit("forall")) > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
 const auto effect_composite_when_def = (lit('(') >> keyword_lit("when")) > goal_descriptor > effect > lit(')');
 const auto effect_composite_oneof_def = (lit('(') >> keyword_lit("oneof")) > *effect > lit(')');
+const auto effect_composite_probabilistic_def = (lit('(') >> keyword_lit("probablistic") > *(number > effect) > lit(')'));
 const auto effect_composite_def = effect_composite_forall | effect_composite_when | effect_composite_oneof;
 
 const auto action_symbol_def = name;
@@ -508,6 +512,7 @@ BOOST_SPIRIT_DEFINE(requirement_strips,
                     requirement_constraints,
                     requirement_action_costs,
                     requirement_non_deterministic,
+                    requirement_probabilistic_effects,
                     requirement)
 
 BOOST_SPIRIT_DEFINE(type,
@@ -591,6 +596,7 @@ BOOST_SPIRIT_DEFINE(effect,
                     effect_composite_forall,
                     effect_composite_when,
                     effect_composite_oneof,
+                    effect_composite_probabilistic,
                     effect_composite,
                     action_symbol,
                     action_body,
@@ -723,6 +729,9 @@ struct RequirementActionCostsClass : x3::annotate_on_success
 {
 };
 struct RequirementNonDeterministic : x3::annotate_on_success
+{
+};
+struct RequirementProbabilisticEffectsClass : x3::annotate_on_success
 {
 };
 struct RequirementClass : x3::annotate_on_success
@@ -980,6 +989,9 @@ struct EffectCompositeWhenClass : x3::annotate_on_success
 struct EffectCompositeOneofClass : x3::annotate_on_success
 {
 };
+struct EffectCompositeProbabilisticClass : x3::annotate_on_success
+{
+};
 struct EffectCompositeClass : x3::annotate_on_success
 {
 };
@@ -1201,6 +1213,7 @@ parser::requirement_preferences_type const& requirement_preferences() { return p
 parser::requirement_constraints_type const& requirement_constraints() { return parser::requirement_constraints; }
 parser::requirement_action_costs_type const& requirement_action_costs() { return parser::requirement_action_costs; }
 parser::requirement_non_deterministic_type const& requirement_non_deterministic() { return parser::requirement_non_deterministic; }
+parser::requirement_probabilistic_effects_type const& requirement_probabilistic_effects() { return parser::requirement_probabilistic_effects; }
 parser::requirement_type const& requirement() { return parser::requirement; }
 
 parser::type_type const& type() { return parser::type; }
@@ -1315,6 +1328,7 @@ parser::effect_production_type const& effect_production() { return parser::effec
 parser::effect_composite_forall_type const& effect_composite_forall() { return parser::effect_composite_forall; }
 parser::effect_composite_when_type const& effect_composite_when() { return parser::effect_composite_when; }
 parser::effect_composite_oneof_type const& effect_composite_oneof() { return parser::effect_composite_oneof; }
+parser::effect_composite_probabilistic_type const& effect_composite_probabilistic() { return parser::effect_composite_probabilistic; }
 parser::effect_composite_type const& effect_composite() { return parser::effect_composite; }
 
 parser::action_symbol_type const& action_symbol() { return parser::action_symbol; }

@@ -43,7 +43,8 @@ std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string = { 
                                                                                 { RequirementEnum::PREFERENCES, ":preferences" },
                                                                                 { RequirementEnum::CONSTRAINTS, ":constraints" },
                                                                                 { RequirementEnum::ACTION_COSTS, ":action-costs" },
-                                                                                { RequirementEnum::NON_DETERMINISTIC, ":non-deterministic" } };
+                                                                                { RequirementEnum::NON_DETERMINISTIC, ":non-deterministic" },
+                                                                                { RequirementEnum::PROBABILISTIC, ":probabilistic-effects" } };
 
 const std::string& to_string(RequirementEnum requirement)
 {

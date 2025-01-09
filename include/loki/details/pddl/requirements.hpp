@@ -48,6 +48,7 @@ enum class RequirementEnum
     CONSTRAINTS,
     ACTION_COSTS,
     NON_DETERMINISTIC,
+    PROBABILISTIC,
 };
 
 using RequirementEnumSet = std::set<RequirementEnum>;

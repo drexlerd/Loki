@@ -81,6 +81,7 @@ std::string parse_text(const ast::RequirementPreferences&, const DefaultFormatte
 std::string parse_text(const ast::RequirementConstraints&, const DefaultFormatterOptions&) { return ":constraints"; }
 std::string parse_text(const ast::RequirementActionCosts&, const DefaultFormatterOptions&) { return ":action-costs"; }
 std::string parse_text(const ast::RequirementNonDeterministic&, const DefaultFormatterOptions&) { return ":non-deterministic"; }
+std::string parse_text(const ast::RequirementProbabilisticEffects& node, const DefaultFormatterOptions&) { return ":probablistic-effects"; }
 
 std::string parse_text(const ast::Requirement& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
 
@@ -728,18 +729,6 @@ string parse_text(const ast::NegatedGroundAtom& node, const DefaultFormatterOpti
 string parse_text(const ast::GroundLiteral& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
 
 string parse_text(const ast::InitialElementLiteral& node, const DefaultFormatterOptions& options) { return parse_text(node.literal, options); }
-
-std::string parse_text(const ast::InitialElementProbabilistic& node, const DefaultFormatterOptions& options)
-{
-    std::stringstream ss;
-    ss << "(probabilistic";
-    for (const auto& [probability, outcome] : node.distribution)
-    {
-        ss << " " << probability << " " << parse_text(outcome, options);
-    }
-    ss << ")";
-    return ss.str();
-}
 
 string parse_text(const ast::InitialElementTimedLiterals& node, const DefaultFormatterOptions& options)
 {

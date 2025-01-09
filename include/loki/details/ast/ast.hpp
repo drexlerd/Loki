@@ -62,6 +62,7 @@ struct RequirementPreferences;
 struct RequirementConstraints;
 struct RequirementActionCosts;
 struct RequirementNonDeterministic;
+struct RequirementProbabilisticEffects;
 struct Requirement;
 
 struct Type;
@@ -187,7 +188,6 @@ struct NegatedAtom;
 struct Literal;
 
 struct InitialElementLiteral;
-struct InitialElementProbabilistic;
 struct InitialElementTimedLiterals;            // :timed-initial-literals
 struct InitialElementNumericFluentsTotalCost;  // :action-costs
 struct InitialElementNumericFluentsGeneral;    // :numeric-fluents
@@ -346,6 +346,10 @@ struct RequirementNonDeterministic : x3::position_tagged
 {
 };
 
+struct RequirementProbabilisticEffects : x3::position_tagged
+{
+};
+
 struct Requirement :
     x3::position_tagged,
     x3::variant<RequirementStrips,
@@ -367,8 +371,31 @@ struct Requirement :
                 RequirementPreferences,
                 RequirementConstraints,
                 RequirementActionCosts,
-                RequirementNonDeterministic>
+                RequirementNonDeterministic,
+                RequirementProbabilisticEffects>
 {
+    using base_type = x3::variant<RequirementStrips,
+                                  RequirementTyping,
+                                  RequirementNegativePreconditions,
+                                  RequirementDisjunctivePreconditions,
+                                  RequirementEquality,
+                                  RequirementExistentialPreconditions,
+                                  RequirementUniversalPreconditions,
+                                  RequirementQuantifiedPreconditions,
+                                  RequirementConditionalEffects,
+                                  RequirementFluents,
+                                  RequirementObjectFluents,
+                                  RequirementNumericFluents,
+                                  RequirementAdl,
+                                  RequirementDurativeActions,
+                                  RequirementDerivedPredicates,
+                                  RequirementTimedInitialLiterals,
+                                  RequirementPreferences,
+                                  RequirementConstraints,
+                                  RequirementActionCosts,
+                                  RequirementNonDeterministic,
+                                  RequirementProbabilisticEffects>;
+
     using base_type::base_type;
     using base_type::operator=;
 };
@@ -872,7 +899,7 @@ struct EffectCompositeOneof : x3::position_tagged
 
 struct EffectCompositeProbabilistic : x3::position_tagged
 {
-    std::vector<std::pair<double, Effect>> possibilities;
+    std::vector<std::tuple<double, Effect>> possibilities;
 };
 
 struct EffectComposite : x3::position_tagged, x3::variant<EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof>
@@ -1013,11 +1040,6 @@ struct InitialElementLiteral : x3::position_tagged
     GroundLiteral literal;
 };
 
-struct InitialElementProbabilistic : x3::position_tagged
-{
-    std::vector<std::pair<double, GroundLiteral>> distribution;
-};
-
 struct InitialElementTimedLiterals : x3::position_tagged
 {
     Number number;
@@ -1038,11 +1060,7 @@ struct InitialElementNumericFluentsGeneral : x3::position_tagged
 
 struct InitialElement :
     x3::position_tagged,
-    x3::variant<InitialElementLiteral,
-                InitialElementProbabilistic,
-                InitialElementTimedLiterals,
-                InitialElementNumericFluentsTotalCost,
-                InitialElementNumericFluentsGeneral>
+    x3::variant<InitialElementLiteral, InitialElementTimedLiterals, InitialElementNumericFluentsTotalCost, InitialElementNumericFluentsGeneral>
 {
     using base_type::base_type;
     using base_type::operator=;

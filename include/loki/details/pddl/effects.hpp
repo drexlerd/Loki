@@ -262,6 +262,7 @@ extern std::ostream& operator<<(std::ostream& out, const EffectNumericImpl& elem
 extern std::ostream& operator<<(std::ostream& out, const EffectCompositeForallImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectCompositeWhenImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectCompositeOneofImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const EffectCompositeProbabilisticImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectImpl& element);
 
 }

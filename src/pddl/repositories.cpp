@@ -57,6 +57,7 @@ PDDLTypeToRepository create_default_pddl_type_to_repository()
         boost::hana::make_pair(boost::hana::type_c<EffectCompositeForallImpl>, EffectCompositeForallRepository {}),
         boost::hana::make_pair(boost::hana::type_c<EffectCompositeWhenImpl>, EffectCompositeWhenRepository {}),
         boost::hana::make_pair(boost::hana::type_c<EffectCompositeOneofImpl>, EffectCompositeOneofRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<EffectCompositeProbabilisticImpl>, EffectCompositeProbabilisticRepository {}),
         boost::hana::make_pair(boost::hana::type_c<EffectImpl>, EffectRepository {}),
         boost::hana::make_pair(boost::hana::type_c<ActionImpl>, ActionRepository {}),
         boost::hana::make_pair(boost::hana::type_c<AxiomImpl>, AxiomRepository {}),
@@ -319,6 +320,13 @@ EffectCompositeOneof PDDLRepositories::get_or_create_effect_composite_oneof(Effe
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeOneofImpl> {}).get_or_create(std::move(effects_));
 }
 
+EffectCompositeProbabilistic PDDLRepositories::get_or_create_effect_composite_probabilistic(EffectDistribution effects_)
+{
+    std::sort(effects_.begin(), effects_.end(), [](const auto& lhs, const auto& rhs) { return lhs.second->get_index() < rhs.second->get_index(); });
+
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeProbabilisticImpl> {}).get_or_create(std::move(effects_));
+}
+
 Effect PDDLRepositories::get_or_create_effect(EffectLiteral effect)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
@@ -345,6 +353,11 @@ Effect PDDLRepositories::get_or_create_effect(EffectCompositeWhen effect)
 }
 
 Effect PDDLRepositories::get_or_create_effect(EffectCompositeOneof effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+
+Effect PDDLRepositories::get_or_create_effect(EffectCompositeProbabilistic effect)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
 }

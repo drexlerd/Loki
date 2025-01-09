@@ -194,6 +194,13 @@ RequirementEnumSet parse(const ast::RequirementNonDeterministic&, Context& conte
     return { RequirementEnum::NON_DETERMINISTIC };
 }
 
+RequirementEnumSet parse(const ast::RequirementProbabilisticEffects&, Context& context)
+{
+    // Track
+    context.references.track(RequirementEnum::PROBABILISTIC);
+    return { RequirementEnum::PROBABILISTIC };
+}
+
 RequirementEnumSet parse(const ast::Requirement& node, Context& context) { return boost::apply_visitor(RequirementVisitor(context), node); }
 
 RequirementVisitor::RequirementVisitor(Context& context_) : context(context_) {}

@@ -94,6 +94,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectProductionNumeric, assign_operator, f
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectCompositeForall, typed_list_of_variables, effect)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectCompositeWhen, goal_descriptor, effect)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectCompositeOneof, possibilities)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectCompositeProbabilistic, possibilities)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::ActionSymbol, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::ActionBody, precondition_goal_descriptor, effect)

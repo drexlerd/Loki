@@ -166,6 +166,13 @@ std::ostream& operator<<(std::ostream& out, const EffectCompositeOneofImpl& elem
     return out;
 }
 
+std::ostream& operator<<(std::ostream& out, const EffectCompositeProbabilisticImpl& element)
+{
+    auto formatter = PDDLFormatter();
+    formatter.write(element, out);
+    return out;
+}
+
 std::ostream& operator<<(std::ostream& out, const EffectImpl& element)
 {
     auto formatter = PDDLFormatter();

@@ -54,6 +54,7 @@ extern Effect parse(const ast::EffectProduction& node, Context& context);
 extern Effect parse(const ast::EffectCompositeForall& node, Context& context);
 extern Effect parse(const ast::EffectCompositeWhen& node, Context& context);
 extern Effect parse(const ast::EffectCompositeOneof& node, Context& context);
+extern Effect parse(const ast::EffectCompositeProbabilistic& node, Context& context);
 extern Effect parse(const ast::EffectComposite& node, Context& context);
 
 struct EffectVisitor : boost::static_visitor<Effect>

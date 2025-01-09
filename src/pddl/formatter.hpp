@@ -75,6 +75,7 @@ public:
     void write(const EffectCompositeForallImpl& element, std::ostream& out);
     void write(const EffectCompositeWhenImpl& element, std::ostream& out);
     void write(const EffectCompositeOneofImpl& element, std::ostream& out);
+    void write(const EffectCompositeProbabilisticImpl& element, std::ostream& out);
     void write(const EffectImpl& element, std::ostream& out);
     void write(const FunctionExpressionNumberImpl& element, std::ostream& out);
     void write(const FunctionExpressionBinaryOperatorImpl& element, std::ostream& out);

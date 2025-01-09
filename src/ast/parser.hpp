@@ -76,6 +76,7 @@ struct RequirementPreferencesClass;
 struct RequirementConstraintsClass;
 struct RequirementActionCostsClass;
 struct RequirementNonDeterministicClass;
+struct RequirementProbabilisticEffectsClass;
 struct RequirementClass;
 
 struct TypeClass;
@@ -169,6 +170,7 @@ struct EffectProductionClass;
 struct EffectCompositeForallClass;
 struct EffectCompositeWhenClass;
 struct EffectCompositeOneofClass;
+struct EffectCompositeProbabilisticClass;
 struct EffectCompositeClass;
 struct ActionSymbolClass;
 struct ActionBodyClass;
@@ -270,6 +272,7 @@ typedef x3::rule<RequirementPreferencesClass, ast::RequirementPreferences> requi
 typedef x3::rule<RequirementConstraintsClass, ast::RequirementConstraints> requirement_constraints_type;
 typedef x3::rule<RequirementActionCostsClass, ast::RequirementActionCosts> requirement_action_costs_type;
 typedef x3::rule<RequirementNonDeterministicClass, ast::RequirementNonDeterministic> requirement_non_deterministic_type;
+typedef x3::rule<RequirementProbabilisticEffectsClass, ast::RequirementProbabilisticEffects> requirement_probabilistic_effects_type;
 typedef x3::rule<RequirementClass, ast::Requirement> requirement_type;
 
 typedef x3::rule<TypeClass, ast::Type> type_type;
@@ -365,6 +368,7 @@ typedef x3::rule<EffectProductionClass, ast::EffectProduction> effect_production
 typedef x3::rule<EffectCompositeForallClass, ast::EffectCompositeForall> effect_composite_forall_type;
 typedef x3::rule<EffectCompositeWhenClass, ast::EffectCompositeWhen> effect_composite_when_type;
 typedef x3::rule<EffectCompositeOneofClass, ast::EffectCompositeOneof> effect_composite_oneof_type;
+typedef x3::rule<EffectCompositeProbabilisticClass, ast::EffectCompositeProbabilistic> effect_composite_probabilistic_type;
 typedef x3::rule<EffectCompositeClass, ast::EffectComposite> effect_composite_type;
 
 typedef x3::rule<ActionSymbolClass, ast::ActionSymbol> action_symbol_type;
@@ -465,6 +469,7 @@ BOOST_SPIRIT_DECLARE(requirement_strips_type,
                      requirement_constraints_type,
                      requirement_action_costs_type,
                      requirement_non_deterministic_type,
+                     requirement_probabilistic_effects_type,
                      requirement_type)
 
 BOOST_SPIRIT_DECLARE(type_type,
@@ -554,6 +559,7 @@ BOOST_SPIRIT_DECLARE(effect_type,
                      effect_composite_forall_type,
                      effect_composite_when_type,
                      effect_composite_oneof_type,
+                     effect_composite_probabilistic_type,
                      effect_composite_type,
                      action_symbol_type,
                      action_body_type,
@@ -651,6 +657,7 @@ parser::requirement_preferences_type const& requirement_preferences();
 parser::requirement_constraints_type const& requirement_constraints();
 parser::requirement_action_costs_type const& requirement_action_costs();
 parser::requirement_non_deterministic_type const& requirement_non_deterministic();
+parser::requirement_probabilistic_effects_type const& requirement_probabilistic_effects();
 parser::requirement_type const& requirement();
 
 parser::type_type const& type();
@@ -744,6 +751,7 @@ parser::effect_production_type const& effect_production();
 parser::effect_composite_forall_type const& effect_composite_forall();
 parser::effect_composite_when_type const& effect_composite_when();
 parser::effect_composite_oneof_type const& effect_composite_oneof();
+parser::effect_composite_probabilistic_type const& effect_composite_probabilistic();
 parser::effect_composite_type const& effect_composite();
 
 parser::action_symbol_type const& action_symbol();

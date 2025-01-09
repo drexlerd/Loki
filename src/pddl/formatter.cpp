@@ -358,6 +358,22 @@ void PDDLFormatter::write(const EffectCompositeOneofImpl& element, std::ostream&
     out << ")";
 }
 
+void PDDLFormatter::write(const EffectCompositeProbabilisticImpl& element, std::ostream& out)
+{
+    out << "(probabilistic ";
+    for (size_t i = 0; i < element.get_effect_distribution().size(); ++i)
+    {
+        if (i != 0)
+            out << " ";
+
+        const auto& [probability, possibility] = element.get_effect_distribution()[i];
+
+        out << probability << " ";
+        write(*possibility, out);
+    }
+    out << ")";
+}
+
 void PDDLFormatter::write(const EffectImpl& element, std::ostream& out)
 {
     std::visit([this, &out](const auto& arg) { this->write(*arg, out); }, element.get_effect());

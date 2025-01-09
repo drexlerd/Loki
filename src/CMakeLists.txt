@@ -7,6 +7,12 @@ file(GLOB_RECURSE PUBLIC_HEADER_FILES
 add_library(parsers STATIC ${SRC_FILES} ${PRIVATE_HEADER_FILES} ${PUBLIC_HEADER_FILES})
 set_target_properties(parsers PROPERTIES OUTPUT_NAME loki_parsers)
 
+# Add compile definitions for the parsers target
+target_compile_definitions(parsers PUBLIC
+    BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
+    BOOST_MPL_LIMIT_LIST_SIZE=50
+)
+
 # Create an alias for simpler reference
 add_library(loki::parsers ALIAS parsers)
 
