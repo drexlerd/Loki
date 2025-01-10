@@ -81,7 +81,7 @@ std::string parse_text(const ast::RequirementPreferences&, const DefaultFormatte
 std::string parse_text(const ast::RequirementConstraints&, const DefaultFormatterOptions&) { return ":constraints"; }
 std::string parse_text(const ast::RequirementActionCosts&, const DefaultFormatterOptions&) { return ":action-costs"; }
 std::string parse_text(const ast::RequirementNonDeterministic&, const DefaultFormatterOptions&) { return ":non-deterministic"; }
-std::string parse_text(const ast::RequirementProbabilisticEffects& node, const DefaultFormatterOptions&) { return ":probablistic-effects"; }
+std::string parse_text(const ast::RequirementProbabilisticEffects&, const DefaultFormatterOptions&) { return ":probablistic-effects"; }
 
 std::string parse_text(const ast::Requirement& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
 
@@ -499,6 +499,15 @@ std::string parse_text(const ast::AssignOperator& node, const DefaultFormatterOp
 
 std::string parse_text(const ast::Effect& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
 
+std::string parse_text(const ast::NumberAndEffect& node, const DefaultFormatterOptions& options)
+{
+    std::stringstream ss;
+    parse_text(node.number, options);
+    ss << " ";
+    parse_text(node.effect, options);
+    return ss.str();
+}
+
 std::string parse_text(const ast::EffectProductionLiteral& node, const DefaultFormatterOptions& options) { return parse_text(node.literal, options); }
 
 std::string parse_text(const ast::EffectProductionNumeric& node, const DefaultFormatterOptions& options)
@@ -538,10 +547,12 @@ std::string parse_text(const ast::EffectCompositeOneof& node, const DefaultForma
 std::string parse_text(const ast::EffectCompositeProbabilistic& node, const DefaultFormatterOptions& options)
 {
     std::stringstream ss;
-    ss << "(probabilistic";
-    for (const auto& [probability, possibility] : node.possibilities)
+    ss << "(probabilistic ";
+    for (size_t i = 0; i < node.possibilities.size(); ++i)
     {
-        ss << " " << probability << " " << parse_text(possibility, options);
+        if (i != 0)
+            ss << " ";
+        ss << parse_text(node.possibilities.at(i), options);
     }
     ss << ")";
     return ss.str();
@@ -571,7 +582,7 @@ std::string parse_text(const ast::ActionBody& node, const DefaultFormatterOption
 std::string parse_text(const ast::Action& node, const DefaultFormatterOptions& options)
 {
     std::stringstream ss;
-    ss << std::string(options.indent, ' ') << "(action " << parse_text(node.action_symbol, options) << "\n";
+    ss << std::string(options.indent, ' ') << "(:action " << parse_text(node.action_symbol, options) << "\n";
     DefaultFormatterOptions nested_options { options.indent + options.add_indent, options.add_indent };
     ss << std::string(nested_options.indent, ' ') << ":parameters (" << parse_text(node.typed_list_of_variables, nested_options) << ")\n"
        << parse_text(node.action_body, nested_options) << "\n";
@@ -730,21 +741,14 @@ string parse_text(const ast::GroundLiteral& node, const DefaultFormatterOptions&
 
 string parse_text(const ast::InitialElementLiteral& node, const DefaultFormatterOptions& options) { return parse_text(node.literal, options); }
 
-string parse_text(const ast::InitialElementTimedLiterals& node, const DefaultFormatterOptions& options)
+string parse_text(const ast::InitialElementTimedLiteral& node, const DefaultFormatterOptions& options)
 {
     stringstream ss;
     ss << "(at " << parse_text(node.number, options) << " " << parse_text(node.literal, options) << ")";
     return ss.str();
 }
 
-string parse_text(const ast::InitialElementNumericFluentsTotalCost& node, const DefaultFormatterOptions& options)
-{
-    stringstream ss;
-    ss << "(= " << parse_text(node.function_symbol_total_cost, options) << " " << parse_text(node.number, options) << ")";
-    return ss.str();
-}
-
-string parse_text(const ast::InitialElementNumericFluentsGeneral& node, const DefaultFormatterOptions& options)
+string parse_text(const ast::InitialElementNumericFluent& node, const DefaultFormatterOptions& options)
 {
     stringstream ss;
     ss << "(= " << parse_text(node.basic_function_term, options) << " " << parse_text(node.number, options) << ")";

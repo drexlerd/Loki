@@ -22,6 +22,7 @@
 
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
+#include <boost/fusion/include/std_tuple.hpp>
 
 // We need to tell fusion about our rexpr and rexpr_key_value
 // to make them a first-class fusion citizens
@@ -89,6 +90,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::PreconditionGoalDescriptorAnd, precondition
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::PreconditionGoalDescriptorPreference, preference_name, goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::PreconditionGoalDescriptorForall, typed_list_of_variables, precondition_goal_descriptor)
 
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::NumberAndEffect, number, effect)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectProductionLiteral, literal)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectProductionNumeric, assign_operator, function_head, function_expression)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::EffectCompositeForall, typed_list_of_variables, effect)
@@ -122,9 +124,8 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::GroundAtom, atomic_formula_of_names)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::NegatedGroundAtom, atomic_formula_of_names)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::InitialElementLiteral, literal)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::InitialElementTimedLiterals, number, literal)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::InitialElementNumericFluentsTotalCost, function_symbol_total_cost, number)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::InitialElementNumericFluentsGeneral, basic_function_term, number)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::InitialElementTimedLiteral, number, literal)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::InitialElementNumericFluent, basic_function_term, number)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::MetricFunctionExpressionNumber, number)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::MetricFunctionExpressionBinaryOperator, binary_operator, metric_function_expression_left, metric_function_expression_right)

@@ -180,6 +180,7 @@ assign_operator_decrease_type const assign_operator_decrease = "assign_operator_
 assign_operator_type const assign_operator = "assign_operator";
 
 effect_type const effect = "effect";
+number_and_effect_type const number_and_effect = "number_and_effect";
 effect_production_literal_type const effect_production_literal = "effect_production_literal";
 effect_production_numeric_type const effect_production_numeric = "effect_production_numeric";
 effect_production_type const effect_production = "effect_production";
@@ -216,9 +217,8 @@ negated_ground_atom_type const negated_ground_atom = "negated_ground_atom";
 ground_literal_type const ground_literal = "ground_literal";
 
 initial_element_literals_type const initial_element_literals = "initial_element_literals";
-initial_element_timed_literals_type const initial_element_timed_literals = "initial_element_timed_literals";
-initial_element_numeric_fluents_total_cost_type const initial_element_numeric_fluents_total_cost = "initial_element_numeric_fluents_total_cost";
-initial_element_numeric_fluents_general_type const initial_element_numeric_fluents_general = "initial_element_numeric_fluents_general";
+initial_element_timed_literal_type const initial_element_timed_literal = "initial_element_timed_literal";
+initial_element_numeric_fluent_type const initial_element_numeric_fluent = "initial_element_numeric_fluent";
 initial_element_type const initial_element = "initial_element";
 
 metric_function_expression_type const metric_function_expression = "metric_function_expression";
@@ -309,7 +309,7 @@ const auto typed_list_of_variables_def = typed_list_of_variables_recursively | *
 
 const auto atomic_formula_skeleton_def = lit('(') > predicate > typed_list_of_variables > lit(')');
 
-const auto atomic_function_skeleton_total_cost_def = lit('(') >> function_symbol_total_cost > lit(')');
+const auto atomic_function_skeleton_total_cost_def = (lit('(') >> function_symbol_total_cost) > lit(')');
 const auto atomic_function_skeleton_general_def = lit('(') > function_symbol > typed_list_of_variables > lit(')');
 const auto atomic_function_skeleton_def = atomic_function_skeleton_total_cost | atomic_function_skeleton_general;
 const auto function_typed_list_of_atomic_function_skeletons_recursively_def =
@@ -317,7 +317,7 @@ const auto function_typed_list_of_atomic_function_skeletons_recursively_def =
 const auto function_typed_list_of_atomic_function_skeletons_def = function_typed_list_of_atomic_function_skeletons_recursively | +atomic_function_skeleton;
 
 const auto atomic_formula_of_terms_predicate_def = (lit('(') >> predicate) > *term > lit(')');
-const auto atomic_formula_of_terms_equality_def = (lit('(') >> lit('=')) >> term > term > lit(')');
+const auto atomic_formula_of_terms_equality_def = (lit('(') >> lit('=') >> term) > term > lit(')');
 const auto atomic_formula_of_terms_def = atomic_formula_of_terms_equality | atomic_formula_of_terms_predicate;
 const auto atom_def = atomic_formula_of_terms;
 const auto negated_atom_def = (lit('(') >> keyword_lit("not")) > atomic_formula_of_terms > lit(')');
@@ -338,12 +338,12 @@ const auto binary_comparator_less_equal_def = lit("<=") > x3::attr(ast::BinaryCo
 const auto binary_comparator_def =
     binary_comparator_greater_equal | binary_comparator_less_equal | binary_comparator_greater | binary_comparator_less | binary_comparator_equal;
 
-const auto function_head_def = ((lit('(') >> function_symbol > *term) > lit(')')) | (function_symbol > x3::attr(std::vector<ast::Term> {}));
+const auto function_head_def = ((lit('(') >> function_symbol) > *term) > lit(')') | (function_symbol > x3::attr(std::vector<ast::Term> {}));
 const auto function_expression_def = function_expression_binary_op | function_expression_minus | function_expression_head | function_expression_number;
 const auto function_expression_number_def = number;
 // distinguishing unary from binary minus requires some more backtracking
 const auto function_expression_binary_op_def = (lit('(') >> binary_operator >> function_expression >> function_expression) > lit(')');
-const auto function_expression_minus_def = (lit('(') >> lit('-')) >> function_expression > lit(')');
+const auto function_expression_minus_def = (lit('(') >> lit('-') >> function_expression) > lit(')');
 const auto function_expression_head_def = function_head;
 
 const auto goal_descriptor_def = goal_descriptor_not | goal_descriptor_and | goal_descriptor_or | goal_descriptor_imply | goal_descriptor_exists
@@ -357,7 +357,7 @@ const auto goal_descriptor_imply_def = (lit('(') >> keyword_lit("imply")) > goal
 const auto goal_descriptor_exists_def = (lit('(') >> keyword_lit("exists")) > lit('(') > typed_list_of_variables > lit(')') > goal_descriptor > lit(')');
 const auto goal_descriptor_forall_def = (lit('(') >> keyword_lit("forall")) > lit('(') > typed_list_of_variables > lit(')') > goal_descriptor > lit(')');
 // distinguishing "=" predicate from comparator requires some more backtracking
-const auto goal_descriptor_function_comparison_def = (lit('(') >> binary_comparator) >> function_expression > function_expression > lit(')');
+const auto goal_descriptor_function_comparison_def = (lit('(') >> binary_comparator >> function_expression) > function_expression > lit(')');
 
 const auto constraint_goal_descriptor_def = constraint_goal_descriptor_and | constraint_goal_descriptor_forall | constraint_goal_descriptor_at_end
                                             | constraint_goal_descriptor_always | constraint_goal_descriptor_sometime | constraint_goal_descriptor_within
@@ -396,14 +396,15 @@ const auto assign_operator_def =
     assign_operator_assign | assign_operator_scale_up | assign_operator_scale_down | assign_operator_increase | assign_operator_decrease;
 
 const auto effect_def = ((lit('(') >> keyword_lit("and")) > *effect > lit(')')) | effect_composite | effect_production;
+const auto number_and_effect_def = number > effect;
 const auto effect_production_literal_def = literal;
 const auto effect_production_numeric_def = (lit('(') >> assign_operator >> function_head >> function_expression) > lit(')');
 const auto effect_production_def = effect_production_numeric | effect_production_literal;
 const auto effect_composite_forall_def = (lit('(') >> keyword_lit("forall")) > lit("(") > typed_list_of_variables > lit(')') > effect > lit(')');
 const auto effect_composite_when_def = (lit('(') >> keyword_lit("when")) > goal_descriptor > effect > lit(')');
 const auto effect_composite_oneof_def = (lit('(') >> keyword_lit("oneof")) > *effect > lit(')');
-const auto effect_composite_probabilistic_def = (lit('(') >> keyword_lit("probablistic") > *(number > effect) > lit(')'));
-const auto effect_composite_def = effect_composite_forall | effect_composite_when | effect_composite_oneof;
+const auto effect_composite_probabilistic_def = (lit('(') >> keyword_lit("probablistic") > *number_and_effect > lit(')'));
+const auto effect_composite_def = effect_composite_forall | effect_composite_when | effect_composite_oneof | effect_composite_probabilistic;
 
 const auto action_symbol_def = name;
 const auto action_body_def = -(keyword_lit(":precondition") > ((lit('(') >> lit(')')) | precondition_goal_descriptor))
@@ -441,11 +442,9 @@ const auto negated_ground_atom_def = lit('(') >> keyword_lit("not") > atomic_for
 const auto ground_literal_def = negated_ground_atom | ground_atom;
 
 const auto initial_element_literals_def = ground_literal;
-const auto initial_element_timed_literals_def = (lit('(') >> lit("at") >> number) > ground_literal > lit(')');
-const auto initial_element_numeric_fluents_total_cost_def = (lit('(') >> lit('=') >> lit('(') >> function_symbol_total_cost) > lit(')') > number > lit(')');
-const auto initial_element_numeric_fluents_general_def = (lit('(') >> lit('=') >> basic_function_term) > number > lit(')');
-const auto initial_element_def =
-    initial_element_timed_literals | initial_element_numeric_fluents_total_cost | initial_element_numeric_fluents_general | initial_element_literals;
+const auto initial_element_timed_literal_def = (lit('(') >> lit("at") >> number) > ground_literal > lit(')');
+const auto initial_element_numeric_fluent_def = (lit('(') >> lit('=') >> basic_function_term) > number > lit(')');
+const auto initial_element_def = initial_element_timed_literal | initial_element_numeric_fluent | initial_element_literals;
 
 const auto metric_function_expression_binary_operator_def = (lit('(') >> binary_operator >> metric_function_expression >> metric_function_expression)
                                                             > lit(')');
@@ -463,7 +462,7 @@ const auto metric_function_expression_def = metric_function_expression_binary_op
 const auto optimization_minimize_def = keyword_lit("minimize") > x3::attr(ast::OptimizationMinimize {});
 const auto optimization_maximize_def = keyword_lit("maximize") > x3::attr(ast::OptimizationMaximize {});
 const auto optimization_def = optimization_minimize | optimization_maximize;
-const auto metric_specification_total_cost_def = optimization_minimize >> lit('(') >> function_symbol_total_cost > lit(')');
+const auto metric_specification_total_cost_def = (optimization_minimize >> lit('(') >> function_symbol_total_cost) > lit(')');
 const auto metric_specification_general_def = optimization >> metric_function_expression;
 
 const auto preference_constraint_goal_descriptor_and_def = (lit('(') >> keyword_lit("and")) > *preference_constraint_goal_descriptor > lit(')');
@@ -590,6 +589,7 @@ BOOST_SPIRIT_DEFINE(assign_operator_assign,
                     assign_operator)
 
 BOOST_SPIRIT_DEFINE(effect,
+                    number_and_effect,
                     effect_production_literal,
                     effect_production_numeric,
                     effect_production,
@@ -617,11 +617,7 @@ BOOST_SPIRIT_DEFINE(atomic_formula_of_names_predicate,
                     negated_ground_atom,
                     ground_literal)
 
-BOOST_SPIRIT_DEFINE(initial_element_literals,
-                    initial_element_timed_literals,
-                    initial_element_numeric_fluents_total_cost,
-                    initial_element_numeric_fluents_general,
-                    initial_element)
+BOOST_SPIRIT_DEFINE(initial_element_literals, initial_element_timed_literal, initial_element_numeric_fluent, initial_element)
 
 BOOST_SPIRIT_DEFINE(metric_function_expression,
                     metric_function_expression_number,
@@ -971,6 +967,9 @@ struct AssignOperatorClass : x3::annotate_on_success
 struct EffectClass : x3::annotate_on_success
 {
 };
+struct NumberAndEffectClass : x3::annotate_on_success
+{
+};
 struct EffectProductionLiteralClass : x3::annotate_on_success
 {
 };
@@ -1076,13 +1075,10 @@ struct GroundLiteralClass : x3::annotate_on_success
 struct InitialElementLiteralClass : x3::annotate_on_success
 {
 };
-struct InitialElementTimedLiteralsClass : x3::annotate_on_success
+struct InitialElementTimedLiteralClass : x3::annotate_on_success
 {
 };
-struct InitialElementNumericFluentsTotalCostClass : x3::annotate_on_success
-{
-};
-struct InitialElementNumericFluentsGeneralClass : x3::annotate_on_success
+struct InitialElementNumericFluentClass : x3::annotate_on_success
 {
 };
 struct InitialElementClass : x3::annotate_on_success
@@ -1322,6 +1318,7 @@ parser::assign_operator_decrease_type const& assign_operator_decrease() { return
 parser::assign_operator_type const& assign_operator() { return parser::assign_operator; }
 
 parser::effect_type const& effect() { return parser::effect; }
+parser::number_and_effect_type const& number_and_effect() { return parser::number_and_effect; }
 parser::effect_production_literal_type const& effect_production_literal() { return parser::effect_production_literal; }
 parser::effect_production_numeric_type const& effect_production_numeric() { return parser::effect_production_numeric; }
 parser::effect_production_type const& effect_production() { return parser::effect_production; }
@@ -1359,15 +1356,8 @@ parser::negated_ground_atom_type const& negated_ground_atom() { return parser::n
 parser::ground_literal_type const& ground_literal() { return parser::ground_literal; }
 
 parser::initial_element_literals_type const& initial_element_literals() { return parser::initial_element_literals; }
-parser::initial_element_timed_literals_type const& initial_element_timed_literals() { return parser::initial_element_timed_literals; }
-parser::initial_element_numeric_fluents_total_cost_type const& initial_element_numeric_fluents_total_cost()
-{
-    return parser::initial_element_numeric_fluents_total_cost;
-}
-parser::initial_element_numeric_fluents_general_type const& initial_element_numeric_fluents_general()
-{
-    return parser::initial_element_numeric_fluents_general;
-}
+parser::initial_element_timed_literal_type const& initial_element_timed_literal() { return parser::initial_element_timed_literal; }
+parser::initial_element_numeric_fluent_type const& initial_element_numeric_fluent() { return parser::initial_element_numeric_fluent; }
 parser::initial_element_type const& initial_element() { return parser::initial_element; }
 
 parser::metric_function_expression_type const& metric_function_expression() { return parser::metric_function_expression; }

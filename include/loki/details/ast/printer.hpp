@@ -150,6 +150,7 @@ extern std::string parse_text(const ast::AssignOperatorDecrease& node, const Def
 extern std::string parse_text(const ast::AssignOperator& node, const DefaultFormatterOptions& options = {});
 
 extern std::string parse_text(const ast::Effect& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::NumberAndEffect& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::EffectProductionLiteral& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::EffectProductionNumeric& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::EffectProduction& node, const DefaultFormatterOptions& options = {});
@@ -190,9 +191,8 @@ extern std::string parse_text(const ast::NegatedGroundAtom& node, const DefaultF
 extern std::string parse_text(const ast::GroundLiteral& node, const DefaultFormatterOptions& options = {});
 
 extern std::string parse_text(const ast::InitialElementLiteral& node, const DefaultFormatterOptions& options = {});
-extern std::string parse_text(const ast::InitialElementTimedLiterals& node, const DefaultFormatterOptions& options = {});
-extern std::string parse_text(const ast::InitialElementNumericFluentsTotalCost& node, const DefaultFormatterOptions& options = {});
-extern std::string parse_text(const ast::InitialElementNumericFluentsGeneral& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::InitialElementTimedLiteral& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::InitialElementNumericFluent& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::InitialElement& node, const DefaultFormatterOptions& options = {});
 
 extern std::string parse_text(const ast::MetricFunctionExpression& node, const DefaultFormatterOptions& options = {});

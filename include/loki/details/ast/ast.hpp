@@ -150,6 +150,7 @@ struct AssignOperatorDecrease;
 struct AssignOperator;
 
 struct Effect;
+struct NumberAndEffect;
 struct EffectProductionLiteral;
 struct EffectProductionNumeric;
 struct EffectProduction;
@@ -188,9 +189,8 @@ struct NegatedAtom;
 struct Literal;
 
 struct InitialElementLiteral;
-struct InitialElementTimedLiterals;            // :timed-initial-literals
-struct InitialElementNumericFluentsTotalCost;  // :action-costs
-struct InitialElementNumericFluentsGeneral;    // :numeric-fluents
+struct InitialElementTimedLiteral;   // :timed-initial-literals
+struct InitialElementNumericFluent;  // :numeric-fluents
 struct InitialElement;
 
 struct MetricFunctionExpression;
@@ -852,12 +852,16 @@ struct AssignOperator :
 };
 
 /* <effect> */
-struct Effect :
-    x3::position_tagged,
-    x3::variant<x3::forward_ast<EffectProduction>, x3::forward_ast<EffectComposite>, x3::forward_ast<EffectCompositeProbabilistic>, std::vector<Effect>>
+struct Effect : x3::position_tagged, x3::variant<x3::forward_ast<EffectProduction>, x3::forward_ast<EffectComposite>, std::vector<Effect>>
 {
     using base_type::base_type;
     using base_type::operator=;
+};
+
+struct NumberAndEffect : x3::position_tagged
+{
+    Number number;
+    Effect effect;
 };
 
 // Production effects
@@ -899,10 +903,10 @@ struct EffectCompositeOneof : x3::position_tagged
 
 struct EffectCompositeProbabilistic : x3::position_tagged
 {
-    std::vector<std::tuple<double, Effect>> possibilities;
+    std::vector<NumberAndEffect> possibilities;
 };
 
-struct EffectComposite : x3::position_tagged, x3::variant<EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof>
+struct EffectComposite : x3::position_tagged, x3::variant<EffectCompositeForall, EffectCompositeWhen, EffectCompositeOneof, EffectCompositeProbabilistic>
 {
     using base_type::base_type;
     using base_type::operator=;
@@ -1040,27 +1044,19 @@ struct InitialElementLiteral : x3::position_tagged
     GroundLiteral literal;
 };
 
-struct InitialElementTimedLiterals : x3::position_tagged
+struct InitialElementTimedLiteral : x3::position_tagged
 {
     Number number;
     GroundLiteral literal;
 };
 
-struct InitialElementNumericFluentsTotalCost : x3::position_tagged
-{
-    FunctionSymbol function_symbol_total_cost;
-    Number number;
-};
-
-struct InitialElementNumericFluentsGeneral : x3::position_tagged
+struct InitialElementNumericFluent : x3::position_tagged
 {
     BasicFunctionTerm basic_function_term;
     Number number;
 };
 
-struct InitialElement :
-    x3::position_tagged,
-    x3::variant<InitialElementLiteral, InitialElementTimedLiterals, InitialElementNumericFluentsTotalCost, InitialElementNumericFluentsGeneral>
+struct InitialElement : x3::position_tagged, x3::variant<InitialElementLiteral, InitialElementTimedLiteral, InitialElementNumericFluent>
 {
     using base_type::base_type;
     using base_type::operator=;

@@ -164,6 +164,7 @@ struct AssignOperatorDecreaseClass;
 struct AssignOperatorClass;
 
 struct EffectClass;
+struct NumberAndEffectClass;
 struct EffectProductionLiteralClass;
 struct EffectProductionNumericClass;
 struct EffectProductionClass;
@@ -202,9 +203,8 @@ struct NegatedGroundAtomClass;
 struct GroundLiteralClass;
 
 struct InitialElementLiteralClass;
-struct InitialElementTimedLiteralsClass;
-struct InitialElementNumericFluentsTotalCostClass;
-struct InitialElementNumericFluentsGeneralClass;
+struct InitialElementTimedLiteralClass;
+struct InitialElementNumericFluentClass;
 struct InitialElementClass;
 
 struct MetricFunctionExpressionClass;
@@ -362,6 +362,7 @@ typedef x3::rule<AssignOperatorDecreaseClass, ast::AssignOperatorDecrease> assig
 typedef x3::rule<AssignOperatorClass, ast::AssignOperator> assign_operator_type;
 
 typedef x3::rule<EffectClass, ast::Effect> effect_type;
+typedef x3::rule<NumberAndEffectClass, ast::NumberAndEffect> number_and_effect_type;
 typedef x3::rule<EffectProductionLiteralClass, ast::EffectProductionLiteral> effect_production_literal_type;
 typedef x3::rule<EffectProductionNumericClass, ast::EffectProductionNumeric> effect_production_numeric_type;
 typedef x3::rule<EffectProductionClass, ast::EffectProduction> effect_production_type;
@@ -399,9 +400,8 @@ typedef x3::rule<NegatedGroundAtomClass, ast::NegatedGroundAtom> negated_ground_
 typedef x3::rule<GroundLiteralClass, ast::GroundLiteral> ground_literal_type;
 
 typedef x3::rule<InitialElementLiteralClass, ast::InitialElementLiteral> initial_element_literals_type;
-typedef x3::rule<InitialElementTimedLiteralsClass, ast::InitialElementTimedLiterals> initial_element_timed_literals_type;
-typedef x3::rule<InitialElementNumericFluentsTotalCostClass, ast::InitialElementNumericFluentsTotalCost> initial_element_numeric_fluents_total_cost_type;
-typedef x3::rule<InitialElementNumericFluentsGeneralClass, ast::InitialElementNumericFluentsGeneral> initial_element_numeric_fluents_general_type;
+typedef x3::rule<InitialElementTimedLiteralClass, ast::InitialElementTimedLiteral> initial_element_timed_literal_type;
+typedef x3::rule<InitialElementNumericFluentClass, ast::InitialElementNumericFluent> initial_element_numeric_fluent_type;
 typedef x3::rule<InitialElementClass, ast::InitialElement> initial_element_type;
 
 typedef x3::rule<MetricFunctionExpressionClass, ast::MetricFunctionExpression> metric_function_expression_type;
@@ -553,6 +553,7 @@ BOOST_SPIRIT_DECLARE(assign_operator_assign_type,
                      assign_operator_type)
 
 BOOST_SPIRIT_DECLARE(effect_type,
+                     number_and_effect_type,
                      effect_production_literal_type,
                      effect_production_numeric_type,
                      effect_production_type,
@@ -577,11 +578,7 @@ BOOST_SPIRIT_DECLARE(atomic_formula_of_names_predicate_type,
                      negated_ground_atom_type,
                      ground_literal_type)
 
-BOOST_SPIRIT_DECLARE(initial_element_literals_type,
-                     initial_element_timed_literals_type,
-                     initial_element_numeric_fluents_total_cost_type,
-                     initial_element_numeric_fluents_general_type,
-                     initial_element_type)
+BOOST_SPIRIT_DECLARE(initial_element_literals_type, initial_element_timed_literal_type, initial_element_numeric_fluent_type, initial_element_type)
 
 BOOST_SPIRIT_DECLARE(metric_function_expression_type,
                      metric_function_expression_binary_operator_type,
@@ -745,6 +742,7 @@ parser::assign_operator_decrease_type const& assign_operator_decrease();
 parser::assign_operator_type const& assign_operator();
 
 parser::effect_type const& effect();
+parser::number_and_effect_type const& number_and_effect();
 parser::effect_production_literal_type const& effect_production_literal();
 parser::effect_production_numeric_type const& effect_production_numeric();
 parser::effect_production_type const& effect_production();
@@ -778,9 +776,8 @@ parser::negated_ground_atom_type const& negated_ground_atom();
 parser::ground_literal_type const& ground_literal();
 
 parser::initial_element_literals_type const& initial_element_literals();
-parser::initial_element_timed_literals_type const& initial_element_timed_literals();
-parser::initial_element_numeric_fluents_total_cost_type const& initial_element_numeric_fluents_total_cost();
-parser::initial_element_numeric_fluents_general_type const& initial_element_numeric_fluents_general();
+parser::initial_element_timed_literal_type const& initial_element_timed_literal();
+parser::initial_element_numeric_fluent_type const& initial_element_numeric_fluent();
 parser::initial_element_type const& initial_element();
 
 parser::metric_function_expression_type const& metric_function_expression();

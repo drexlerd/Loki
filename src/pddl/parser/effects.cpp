@@ -133,9 +133,9 @@ Effect parse(const ast::EffectCompositeProbabilistic& node, Context& context)
     context.references.untrack(RequirementEnum::NON_DETERMINISTIC);
 
     auto effect_distribution = EffectDistribution();
-    for (const auto& [probability, effect_node] : node.possibilities)
+    for (const auto& number_and_effect : node.possibilities)
     {
-        effect_distribution.emplace_back(probability, parse(effect_node, context));
+        effect_distribution.emplace_back(parse(number_and_effect.number), parse(number_and_effect.effect, context));
     }
     return context.factories.get_or_create_effect(context.factories.get_or_create_effect_composite_probabilistic(effect_distribution));
 }

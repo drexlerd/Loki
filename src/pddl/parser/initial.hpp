@@ -30,9 +30,8 @@ namespace loki
 extern std::vector<std::variant<Literal, NumericFluent>> parse(const ast::Initial& initial_node, Context& context);
 
 extern std::variant<Literal, NumericFluent> parse(const ast::InitialElementLiteral& node);
-extern std::variant<Literal, NumericFluent> parse(const ast::InitialElementTimedLiterals& node);
-extern std::variant<Literal, NumericFluent> parse(const ast::InitialElementNumericFluentsTotalCost& node);
-extern std::variant<Literal, NumericFluent> parse(const ast::InitialElementNumericFluentsGeneral& node);
+extern std::variant<Literal, NumericFluent> parse(const ast::InitialElementTimedLiteral& node);
+extern std::variant<Literal, NumericFluent> parse(const ast::InitialElementNumericFluent& node);
 
 class InitialElementVisitor : boost::static_visitor<std::variant<Literal, NumericFluent>>
 {
