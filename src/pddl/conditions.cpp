@@ -94,12 +94,12 @@ const ParameterList& ConditionForallImpl::get_parameters() const { return m_para
 
 const Condition& ConditionForallImpl::get_condition() const { return m_condition; }
 
-/* ConditionFunctionExpressionComparison */
+/* ConditionNumericConstraint */
 
-ConditionFunctionExpressionComparisonImpl::ConditionFunctionExpressionComparisonImpl(size_t index,
-                                                                                     BinaryComparatorEnum binary_comparator,
-                                                                                     FunctionExpression function_expression_left,
-                                                                                     FunctionExpression function_expression_right) :
+ConditionNumericConstraintImpl::ConditionNumericConstraintImpl(size_t index,
+                                                               BinaryComparatorEnum binary_comparator,
+                                                               FunctionExpression function_expression_left,
+                                                               FunctionExpression function_expression_right) :
     m_index(index),
     m_binary_comparator(binary_comparator),
     m_function_expression_left(function_expression_left),
@@ -107,13 +107,13 @@ ConditionFunctionExpressionComparisonImpl::ConditionFunctionExpressionComparison
 {
 }
 
-size_t ConditionFunctionExpressionComparisonImpl::get_index() const { return m_index; }
+size_t ConditionNumericConstraintImpl::get_index() const { return m_index; }
 
-const BinaryComparatorEnum& ConditionFunctionExpressionComparisonImpl::get_binary_comparator() const { return m_binary_comparator; }
+const BinaryComparatorEnum& ConditionNumericConstraintImpl::get_binary_comparator() const { return m_binary_comparator; }
 
-const FunctionExpression& ConditionFunctionExpressionComparisonImpl::get_function_expression_left() const { return m_function_expression_left; }
+const FunctionExpression& ConditionNumericConstraintImpl::get_function_expression_left() const { return m_function_expression_left; }
 
-const FunctionExpression& ConditionFunctionExpressionComparisonImpl::get_function_expression_right() const { return m_function_expression_right; }
+const FunctionExpression& ConditionNumericConstraintImpl::get_function_expression_right() const { return m_function_expression_right; }
 
 /* Condition */
 ConditionImpl::ConditionImpl(size_t index, ConditionVariant condition) : m_index(index), m_condition(std::move(condition)) {}
@@ -171,7 +171,7 @@ std::ostream& operator<<(std::ostream& out, const ConditionForallImpl& element)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const ConditionFunctionExpressionComparisonImpl& element)
+std::ostream& operator<<(std::ostream& out, const ConditionNumericConstraintImpl& element)
 {
     auto formatter = PDDLFormatter();
     formatter.write(element, out);

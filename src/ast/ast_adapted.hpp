@@ -116,7 +116,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::Domain, domain_name, requirements, types, c
 /**
  * Problem
  */
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::BasicFunctionTerm, function_symbol, names)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::GroundFunction, function_symbol, names)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::AtomicFormulaOfNamesPredicate, predicate, names)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::AtomicFormulaOfNamesEquality, name_left, name_right)
@@ -125,7 +125,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::NegatedGroundAtom, atomic_formula_of_names)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::InitialElementLiteral, literal)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::InitialElementTimedLiteral, number, literal)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::InitialElementNumericFluent, basic_function_term, number)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::InitialElementFunctionValue, ground_function, number)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::MetricFunctionExpressionNumber, number)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::MetricFunctionExpressionBinaryOperator, binary_operator, metric_function_expression_left, metric_function_expression_right)
@@ -134,7 +134,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::MetricFunctionExpressionMultiOperator,
                           metric_function_expression_first,
                           metric_function_expression_remaining)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::MetricFunctionExpressionMinus, metric_function_expression)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::MetricFunctionExpressionBasicFunctionTerm, basic_function_term)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::MetricFunctionExpressionBasicFunctionTerm, ground_function)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::MetricFunctionExpressionPreferences, preference_name)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::PreferenceConstraintGoalDescriptorAnd, preference_constraint_goal_descriptors)

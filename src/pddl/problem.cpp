@@ -21,9 +21,9 @@
 #include "loki/details/pddl/axiom.hpp"
 #include "loki/details/pddl/conditions.hpp"
 #include "loki/details/pddl/domain.hpp"
+#include "loki/details/pddl/function_value.hpp"
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/metric.hpp"
-#include "loki/details/pddl/numeric_fluent.hpp"
 #include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/predicate.hpp"
 #include "loki/details/pddl/requirements.hpp"
@@ -43,7 +43,7 @@ ProblemImpl::ProblemImpl(size_t index,
                          ObjectList objects,
                          PredicateList derived_predicates,
                          LiteralList initial_literals,
-                         NumericFluentList numeric_fluents,
+                         FunctionValueList function_values,
                          std::optional<Condition> goal_condition,
                          std::optional<OptimizationMetric> optimization_metric,
                          AxiomList axioms) :
@@ -55,7 +55,7 @@ ProblemImpl::ProblemImpl(size_t index,
     m_objects(std::move(objects)),
     m_derived_predicates(std::move(derived_predicates)),
     m_initial_literals(std::move(initial_literals)),
-    m_numeric_fluents(std::move(numeric_fluents)),
+    m_function_values(std::move(function_values)),
     m_goal_condition(std::move(goal_condition)),
     m_optimization_metric(std::move(optimization_metric)),
     m_axioms(std::move(axioms))
@@ -78,7 +78,7 @@ const PredicateList& ProblemImpl::get_derived_predicates() const { return m_deri
 
 const LiteralList& ProblemImpl::get_initial_literals() const { return m_initial_literals; }
 
-const NumericFluentList& ProblemImpl::get_numeric_fluents() const { return m_numeric_fluents; }
+const FunctionValueList& ProblemImpl::get_function_values() const { return m_function_values; }
 
 const std::optional<Condition>& ProblemImpl::get_goal_condition() const { return m_goal_condition; }
 

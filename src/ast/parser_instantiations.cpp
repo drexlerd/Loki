@@ -48,7 +48,7 @@ BOOST_SPIRIT_INSTANTIATE(requirement_quantified_preconditions_type, iterator_typ
 BOOST_SPIRIT_INSTANTIATE(requirement_conditional_effects_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(requirement_fluents_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(requirement_object_fluents_type, iterator_type, context_type)
-BOOST_SPIRIT_INSTANTIATE(requirement_numeric_fluents_type, iterator_type, context_type)
+BOOST_SPIRIT_INSTANTIATE(requirement_function_values_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(requirement_adl_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(requirement_durative_actions_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(requirement_derived_predicates_type, iterator_type, context_type)
@@ -114,7 +114,7 @@ BOOST_SPIRIT_INSTANTIATE(goal_descriptor_not_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(goal_descriptor_imply_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(goal_descriptor_exists_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(goal_descriptor_forall_type, iterator_type, context_type)
-BOOST_SPIRIT_INSTANTIATE(goal_descriptor_function_comparison_type, iterator_type, context_type)
+BOOST_SPIRIT_INSTANTIATE(goal_descriptor_numeric_constraint_type, iterator_type, context_type)
 
 BOOST_SPIRIT_INSTANTIATE(constraint_goal_descriptor_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(constraint_goal_descriptor_and_type, iterator_type, context_type)
@@ -176,7 +176,7 @@ BOOST_SPIRIT_INSTANTIATE(domain_type, iterator_type, context_type)
 /**
  * Problem
  */
-BOOST_SPIRIT_INSTANTIATE(basic_function_term_type, iterator_type, context_type)
+BOOST_SPIRIT_INSTANTIATE(ground_function_type, iterator_type, context_type)
 
 BOOST_SPIRIT_INSTANTIATE(atomic_formula_of_names_predicate_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(atomic_formula_of_names_equality_type, iterator_type, context_type)
@@ -187,7 +187,7 @@ BOOST_SPIRIT_INSTANTIATE(ground_literal_type, iterator_type, context_type)
 
 BOOST_SPIRIT_INSTANTIATE(initial_element_literals_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(initial_element_timed_literal_type, iterator_type, context_type)
-BOOST_SPIRIT_INSTANTIATE(initial_element_numeric_fluent_type, iterator_type, context_type)
+BOOST_SPIRIT_INSTANTIATE(initial_element_function_value_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(initial_element_type, iterator_type, context_type)
 
 BOOST_SPIRIT_INSTANTIATE(metric_function_expression_type, iterator_type, context_type)
@@ -195,7 +195,7 @@ BOOST_SPIRIT_INSTANTIATE(metric_function_expression_number_type, iterator_type, 
 BOOST_SPIRIT_INSTANTIATE(metric_function_expression_binary_operator_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(metric_function_expression_multi_operator_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(metric_function_expression_minus_type, iterator_type, context_type)
-BOOST_SPIRIT_INSTANTIATE(metric_function_expression_basic_function_term_type, iterator_type, context_type)
+BOOST_SPIRIT_INSTANTIATE(metric_function_expression_ground_function_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(metric_function_expression_total_time_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(metric_function_expression_preferences_type, iterator_type, context_type)
 

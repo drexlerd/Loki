@@ -81,7 +81,7 @@ requirement_quantified_preconditions_type const requirement_quantified_precondit
 requirement_conditional_effects_type const requirement_conditional_effects = "requirement_conditional_effects";
 requirement_fluents_type const requirement_fluents = "requirement_fluents";
 requirement_object_fluents_type const requirement_object_fluents = "requirement_object_fluents";
-requirement_numeric_fluents_type const requirement_numeric_fluents = "requirement_numeric_fluents";
+requirement_function_values_type const requirement_function_values = "requirement_function_values";
 requirement_adl_type const requirement_adl = "requirement_adl";
 requirement_durative_actions_type const requirement_durative_actions = "requirement_durative_actions";
 requirement_derived_predicates_type const requirement_derived_predicates = "requirement_derived_predicates";
@@ -149,7 +149,7 @@ goal_descriptor_not_type const goal_descriptor_not = "goal_descriptor_not";
 goal_descriptor_imply_type const goal_descriptor_imply = "goal_descriptor_imply";
 goal_descriptor_exists_type const goal_descriptor_exists = "goal_descriptor_exists";
 goal_descriptor_forall_type const goal_descriptor_forall = "goal_descriptor_forall";
-goal_descriptor_function_comparison_type const goal_descriptor_function_comparison = "goal_descriptor_function_comparison";
+goal_descriptor_numeric_constraint_type const goal_descriptor_numeric_constraint = "goal_descriptor_numeric_constraint";
 
 constraint_goal_descriptor_type const constraint_goal_descriptor = "constraint_goal_descriptor";
 constraint_goal_descriptor_and_type const constraint_goal_descriptor_and = "constraint_goal_descriptor_and";
@@ -207,7 +207,7 @@ domain_type const domain = "domain";
 /**
  * Problem
  */
-basic_function_term_type const basic_function_term = "basic_function_term";
+ground_function_type const ground_function = "ground_function";
 
 atomic_formula_of_names_predicate_type const atomic_formula_of_names_predicate = "atomic_formula_of_names_predicate";
 atomic_formula_of_names_equality_type const atomic_formula_of_names_equality = "atomic_formula_of_names_equality";
@@ -218,7 +218,7 @@ ground_literal_type const ground_literal = "ground_literal";
 
 initial_element_literals_type const initial_element_literals = "initial_element_literals";
 initial_element_timed_literal_type const initial_element_timed_literal = "initial_element_timed_literal";
-initial_element_numeric_fluent_type const initial_element_numeric_fluent = "initial_element_numeric_fluent";
+initial_element_function_value_type const initial_element_function_value = "initial_element_function_value";
 initial_element_type const initial_element = "initial_element";
 
 metric_function_expression_type const metric_function_expression = "metric_function_expression";
@@ -226,7 +226,7 @@ metric_function_expression_binary_operator_type const metric_function_expression
 metric_function_expression_multi_operator_type const metric_function_expression_multi_operator = "metric_function_expression_multi_operator";
 metric_function_expression_minus_type const metric_function_expression_minus = "metric_function_expression_minus";
 metric_function_expression_number_type const metric_function_expression_number = "metric_function_expression_number";
-metric_function_expression_basic_function_term_type const metric_function_expression_basic_function_term = "metric_function_expression_basic_function_term";
+metric_function_expression_ground_function_type const metric_function_expression_ground_function = "metric_function_expression_ground_function";
 metric_function_expression_total_time_type const metric_function_expression_total_time = "metric_function_expression_total_time";
 metric_function_expression_preferences_type const metric_function_expression_preferences = "metric_function_expression_preferences";
 
@@ -281,7 +281,7 @@ const auto requirement_quantified_preconditions_def = keyword_lit(":quantified-p
 const auto requirement_conditional_effects_def = keyword_lit(":conditional-effects") > x3::attr(ast::RequirementConditionalEffects {});
 const auto requirement_fluents_def = keyword_lit(":fluents") >> x3::attr(ast::RequirementFluents {});
 const auto requirement_object_fluents_def = keyword_lit(":object-fluents") > x3::attr(ast::RequirementObjectFluents {});
-const auto requirement_numeric_fluents_def = keyword_lit(":numeric-fluents") > x3::attr(ast::RequirementNumericFluents {});
+const auto requirement_function_values_def = keyword_lit(":numeric-fluents") > x3::attr(ast::RequirementFunctionValues {});
 const auto requirement_adl_def = keyword_lit(":adl") >> x3::attr(ast::RequirementAdl {});
 const auto requirement_durative_actions_def = keyword_lit(":durative-actions") > x3::attr(ast::RequirementDurativeActions {});
 const auto requirement_derived_predicates_def = keyword_lit(":derived-predicates") > x3::attr(ast::RequirementDerivedPredicates {});
@@ -294,7 +294,7 @@ const auto requirement_probabilistic_effects_def = keyword_lit(":probabilistic-e
 const auto requirement_def = requirement_strips | requirement_typing | requirement_negative_preconditions | requirement_disjunctive_preconditions
                              | requirement_equality | requirement_existential_preconditions | requirement_universal_preconditions
                              | requirement_quantified_preconditions | requirement_conditional_effects | requirement_fluents | requirement_object_fluents
-                             | requirement_numeric_fluents | requirement_adl | requirement_durative_actions | requirement_derived_predicates
+                             | requirement_function_values | requirement_adl | requirement_durative_actions | requirement_derived_predicates
                              | requirement_timed_initial_literals | requirement_preferences | requirement_constraints | requirement_action_costs
                              | requirement_non_deterministic | requirement_probabilistic_effects;
 
@@ -347,7 +347,7 @@ const auto function_expression_minus_def = (lit('(') >> lit('-') >> function_exp
 const auto function_expression_head_def = function_head;
 
 const auto goal_descriptor_def = goal_descriptor_not | goal_descriptor_and | goal_descriptor_or | goal_descriptor_imply | goal_descriptor_exists
-                                 | goal_descriptor_forall | goal_descriptor_function_comparison | goal_descriptor_atom | goal_descriptor_literal;
+                                 | goal_descriptor_forall | goal_descriptor_numeric_constraint | goal_descriptor_atom | goal_descriptor_literal;
 const auto goal_descriptor_atom_def = atom;
 const auto goal_descriptor_literal_def = literal;
 const auto goal_descriptor_and_def = (lit('(') >> keyword_lit("and")) > *goal_descriptor > lit(')');
@@ -357,7 +357,7 @@ const auto goal_descriptor_imply_def = (lit('(') >> keyword_lit("imply")) > goal
 const auto goal_descriptor_exists_def = (lit('(') >> keyword_lit("exists")) > lit('(') > typed_list_of_variables > lit(')') > goal_descriptor > lit(')');
 const auto goal_descriptor_forall_def = (lit('(') >> keyword_lit("forall")) > lit('(') > typed_list_of_variables > lit(')') > goal_descriptor > lit(')');
 // distinguishing "=" predicate from comparator requires some more backtracking
-const auto goal_descriptor_function_comparison_def = (lit('(') >> binary_comparator >> function_expression) > function_expression > lit(')');
+const auto goal_descriptor_numeric_constraint_def = (lit('(') >> binary_comparator >> function_expression) > function_expression > lit(')');
 
 const auto constraint_goal_descriptor_def = constraint_goal_descriptor_and | constraint_goal_descriptor_forall | constraint_goal_descriptor_at_end
                                             | constraint_goal_descriptor_always | constraint_goal_descriptor_sometime | constraint_goal_descriptor_within
@@ -432,7 +432,7 @@ const auto domain_def = lit('(') > define_keyword > domain_name > -requirements 
  * Problem
  */
 
-const auto basic_function_term_def = ((lit('(') > function_symbol > *name) > lit(')')) | (function_symbol > x3::attr(std::vector<ast::Name> {}));
+const auto ground_function_def = ((lit('(') > function_symbol > *name) > lit(')')) | (function_symbol > x3::attr(std::vector<ast::Name> {}));
 
 const auto atomic_formula_of_names_predicate_def = (lit('(') >> predicate) > *name > lit(')');
 const auto atomic_formula_of_names_equality_def = (lit('(') >> lit('=')) > name > name > lit(')');
@@ -443,20 +443,20 @@ const auto ground_literal_def = negated_ground_atom | ground_atom;
 
 const auto initial_element_literals_def = ground_literal;
 const auto initial_element_timed_literal_def = (lit('(') >> lit("at") >> number) > ground_literal > lit(')');
-const auto initial_element_numeric_fluent_def = (lit('(') >> lit('=') >> basic_function_term) > number > lit(')');
-const auto initial_element_def = initial_element_timed_literal | initial_element_numeric_fluent | initial_element_literals;
+const auto initial_element_function_value_def = (lit('(') >> lit('=') >> ground_function) > number > lit(')');
+const auto initial_element_def = initial_element_timed_literal | initial_element_function_value | initial_element_literals;
 
 const auto metric_function_expression_binary_operator_def = (lit('(') >> binary_operator >> metric_function_expression >> metric_function_expression)
                                                             > lit(')');
 const auto metric_function_expression_multi_operator_def = (lit('(') >> multi_operator >> metric_function_expression >> +metric_function_expression) > lit(')');
 const auto metric_function_expression_minus_def = (lit('(') >> lit('-')) > metric_function_expression > lit(')');
 const auto metric_function_expression_preferences_def = (lit('(') >> keyword_lit("is-violated")) > preference_name > lit(')');
-const auto metric_function_expression_basic_function_term_def = basic_function_term;
+const auto metric_function_expression_ground_function_def = ground_function;
 const auto metric_function_expression_total_time_def = keyword_lit("total-time") > x3::attr(ast::MetricFunctionExpressionTotalTime {});
 const auto metric_function_expression_number_def = number;
 const auto metric_function_expression_def = metric_function_expression_binary_operator | metric_function_expression_multi_operator
                                             | metric_function_expression_minus | metric_function_expression_preferences
-                                            | metric_function_expression_basic_function_term | metric_function_expression_total_time
+                                            | metric_function_expression_ground_function | metric_function_expression_total_time
                                             | metric_function_expression_number;
 
 const auto optimization_minimize_def = keyword_lit("minimize") > x3::attr(ast::OptimizationMinimize {});
@@ -502,7 +502,7 @@ BOOST_SPIRIT_DEFINE(requirement_strips,
                     requirement_conditional_effects,
                     requirement_fluents,
                     requirement_object_fluents,
-                    requirement_numeric_fluents,
+                    requirement_function_values,
                     requirement_adl,
                     requirement_durative_actions,
                     requirement_derived_predicates,
@@ -558,7 +558,7 @@ BOOST_SPIRIT_DEFINE(goal_descriptor,
                     goal_descriptor_imply,
                     goal_descriptor_exists,
                     goal_descriptor_forall,
-                    goal_descriptor_function_comparison)
+                    goal_descriptor_numeric_constraint)
 
 BOOST_SPIRIT_DEFINE(constraint_goal_descriptor,
                     constraint_goal_descriptor_and,
@@ -608,7 +608,7 @@ BOOST_SPIRIT_DEFINE(define_keyword, domain_keyword, domain_name, requirements, t
 /**
  * Problem
  */
-BOOST_SPIRIT_DEFINE(basic_function_term)
+BOOST_SPIRIT_DEFINE(ground_function)
 
 BOOST_SPIRIT_DEFINE(atomic_formula_of_names_predicate,
                     atomic_formula_of_names_equality,
@@ -617,14 +617,14 @@ BOOST_SPIRIT_DEFINE(atomic_formula_of_names_predicate,
                     negated_ground_atom,
                     ground_literal)
 
-BOOST_SPIRIT_DEFINE(initial_element_literals, initial_element_timed_literal, initial_element_numeric_fluent, initial_element)
+BOOST_SPIRIT_DEFINE(initial_element_literals, initial_element_timed_literal, initial_element_function_value, initial_element)
 
 BOOST_SPIRIT_DEFINE(metric_function_expression,
                     metric_function_expression_number,
                     metric_function_expression_binary_operator,
                     metric_function_expression_multi_operator,
                     metric_function_expression_minus,
-                    metric_function_expression_basic_function_term,
+                    metric_function_expression_ground_function,
                     metric_function_expression_total_time,
                     metric_function_expression_preferences)
 
@@ -1049,7 +1049,7 @@ struct BasicFunctionTermArityGreaterZeroClass : x3::annotate_on_success
 struct BasicFunctionTermArityZeroClass : x3::annotate_on_success
 {
 };
-struct BasicFunctionTermClass : x3::annotate_on_success
+struct GroundFunctionClass : x3::annotate_on_success
 {
 };
 
@@ -1078,7 +1078,7 @@ struct InitialElementLiteralClass : x3::annotate_on_success
 struct InitialElementTimedLiteralClass : x3::annotate_on_success
 {
 };
-struct InitialElementNumericFluentClass : x3::annotate_on_success
+struct InitialElementFunctionValueClass : x3::annotate_on_success
 {
 };
 struct InitialElementClass : x3::annotate_on_success
@@ -1200,7 +1200,7 @@ parser::requirement_quantified_preconditions_type const& requirement_quantified_
 parser::requirement_conditional_effects_type const& requirement_conditional_effects() { return parser::requirement_conditional_effects; }
 parser::requirement_fluents_type const& requirement_fluents() { return parser::requirement_fluents; }
 parser::requirement_object_fluents_type const& requirement_object_fluents() { return parser::requirement_object_fluents; }
-parser::requirement_numeric_fluents_type const& requirement_numeric_fluents() { return parser::requirement_numeric_fluents; }
+parser::requirement_function_values_type const& requirement_function_values() { return parser::requirement_function_values; }
 parser::requirement_adl_type const& requirement_adl() { return parser::requirement_adl; }
 parser::requirement_durative_actions_type const& requirement_durative_actions() { return parser::requirement_durative_actions; }
 parser::requirement_derived_predicates_type const& requirement_derived_predicates() { return parser::requirement_derived_predicates; }
@@ -1272,7 +1272,7 @@ parser::goal_descriptor_not_type const& goal_descriptor_not() { return parser::g
 parser::goal_descriptor_imply_type const& goal_descriptor_imply() { return parser::goal_descriptor_imply; }
 parser::goal_descriptor_exists_type const& goal_descriptor_exists() { return parser::goal_descriptor_exists; }
 parser::goal_descriptor_forall_type const& goal_descriptor_forall() { return parser::goal_descriptor_forall; }
-parser::goal_descriptor_function_comparison_type const& goal_descriptor_function_comparison() { return parser::goal_descriptor_function_comparison; }
+parser::goal_descriptor_numeric_constraint_type const& goal_descriptor_numeric_constraint() { return parser::goal_descriptor_numeric_constraint; }
 
 parser::constraint_goal_descriptor_type const& constraint_goal_descriptor() { return parser::constraint_goal_descriptor; }
 parser::constraint_goal_descriptor_and_type const& constraint_goal_descriptor_and() { return parser::constraint_goal_descriptor_and; }
@@ -1346,7 +1346,7 @@ parser::domain_type const& domain() { return parser::domain; }
 /**
  * Problem
  */
-parser::basic_function_term_type const& basic_function_term() { return parser::basic_function_term; }
+parser::ground_function_type const& ground_function() { return parser::ground_function; }
 
 parser::atomic_formula_of_names_predicate_type const& atomic_formula_of_names_predicate() { return parser::atomic_formula_of_names_predicate; }
 parser::atomic_formula_of_names_equality_type const& atomic_formula_of_names_equality() { return parser::atomic_formula_of_names_equality; }
@@ -1357,7 +1357,7 @@ parser::ground_literal_type const& ground_literal() { return parser::ground_lite
 
 parser::initial_element_literals_type const& initial_element_literals() { return parser::initial_element_literals; }
 parser::initial_element_timed_literal_type const& initial_element_timed_literal() { return parser::initial_element_timed_literal; }
-parser::initial_element_numeric_fluent_type const& initial_element_numeric_fluent() { return parser::initial_element_numeric_fluent; }
+parser::initial_element_function_value_type const& initial_element_function_value() { return parser::initial_element_function_value; }
 parser::initial_element_type const& initial_element() { return parser::initial_element; }
 
 parser::metric_function_expression_type const& metric_function_expression() { return parser::metric_function_expression; }
@@ -1371,9 +1371,9 @@ parser::metric_function_expression_multi_operator_type const& metric_function_ex
     return parser::metric_function_expression_multi_operator;
 }
 parser::metric_function_expression_minus_type const& metric_function_expression_minus() { return parser::metric_function_expression_minus; }
-parser::metric_function_expression_basic_function_term_type const& metric_function_expression_basic_function_term()
+parser::metric_function_expression_ground_function_type const& metric_function_expression_ground_function()
 {
-    return parser::metric_function_expression_basic_function_term;
+    return parser::metric_function_expression_ground_function;
 }
 parser::metric_function_expression_total_time_type const& metric_function_expression_total_time() { return parser::metric_function_expression_total_time; }
 parser::metric_function_expression_preferences_type const& metric_function_expression_preferences() { return parser::metric_function_expression_preferences; }

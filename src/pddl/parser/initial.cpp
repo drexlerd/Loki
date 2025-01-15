@@ -27,12 +27,12 @@
 namespace loki
 {
 
-std::vector<std::variant<Literal, NumericFluent>> parse(const ast::Initial& initial_node, Context& context)
+std::vector<std::variant<Literal, FunctionValue>> parse(const ast::Initial& initial_node, Context& context)
 {
     // TODO: IllformedFunctionDefinitionMissingValue and IllformedFunctionDefinitionMultipleValues using value_definitions.
     std::unordered_map<FunctionSkeleton, std::unordered_set<Function>> value_definitions;
 
-    auto initial_element_list = std::vector<std::variant<Literal, NumericFluent>>();
+    auto initial_element_list = std::vector<std::variant<Literal, FunctionValue>>();
     for (const auto& initial_element : initial_node.initial_elements)
     {
         initial_element_list.push_back(boost::apply_visitor(InitialElementVisitor(context), initial_element));
@@ -40,23 +40,23 @@ std::vector<std::variant<Literal, NumericFluent>> parse(const ast::Initial& init
     return initial_element_list;
 }
 
-std::variant<Literal, NumericFluent> parse(const ast::InitialElementLiteral& node, Context& context) { return parse(node.literal, context); }
+std::variant<Literal, FunctionValue> parse(const ast::InitialElementLiteral& node, Context& context) { return parse(node.literal, context); }
 
-std::variant<Literal, NumericFluent> parse(const ast::InitialElementTimedLiteral& /*node*/, Context& /*context*/)
+std::variant<Literal, FunctionValue> parse(const ast::InitialElementTimedLiteral& /*node*/, Context& /*context*/)
 {
     throw NotImplementedError("InitialElementVisitor::operator()(const ast::InitialElementTimedLiteral& node)");
 }
 
-std::variant<Literal, NumericFluent> parse(const ast::InitialElementNumericFluent& node, Context& context)
+std::variant<Literal, FunctionValue> parse(const ast::InitialElementFunctionValue& node, Context& context)
 {
     test_undefined_requirements(RequirementEnumList { RequirementEnum::ACTION_COSTS, RequirementEnum::NUMERIC_FLUENTS }, node, context);
     context.references.untrack(RequirementEnum::ACTION_COSTS);
     context.references.untrack(RequirementEnum::NUMERIC_FLUENTS);
 
-    const auto basic_function_term = parse(node.basic_function_term, context);
+    const auto ground_function = parse(node.ground_function, context);
     double number = parse(node.number);
     test_nonnegative_number(number, node.number, context);
-    return context.factories.get_or_create_numeric_fluent(basic_function_term, number);
+    return context.factories.get_or_create_function_value(ground_function, number);
 }
 
 InitialElementVisitor::InitialElementVisitor(Context& context_) : context(context_) {}

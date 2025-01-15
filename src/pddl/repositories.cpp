@@ -49,7 +49,7 @@ PDDLTypeToRepository create_default_pddl_type_to_repository()
         boost::hana::make_pair(boost::hana::type_c<ConditionImplyImpl>, ConditionImplyRepository {}),
         boost::hana::make_pair(boost::hana::type_c<ConditionExistsImpl>, ConditionExistsRepository {}),
         boost::hana::make_pair(boost::hana::type_c<ConditionForallImpl>, ConditionForallRepository {}),
-        boost::hana::make_pair(boost::hana::type_c<ConditionFunctionExpressionComparisonImpl>, ConditionFunctionExpressionComparisonRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<ConditionNumericConstraintImpl>, ConditionNumericConstraintRepository {}),
         boost::hana::make_pair(boost::hana::type_c<ConditionImpl>, ConditionRepository {}),
         boost::hana::make_pair(boost::hana::type_c<EffectLiteralImpl>, EffectLiteralRepository {}),
         boost::hana::make_pair(boost::hana::type_c<EffectAndImpl>, EffectAndRepository {}),
@@ -62,7 +62,7 @@ PDDLTypeToRepository create_default_pddl_type_to_repository()
         boost::hana::make_pair(boost::hana::type_c<ActionImpl>, ActionRepository {}),
         boost::hana::make_pair(boost::hana::type_c<AxiomImpl>, AxiomRepository {}),
         boost::hana::make_pair(boost::hana::type_c<OptimizationMetricImpl>, OptimizationMetricRepository {}),
-        boost::hana::make_pair(boost::hana::type_c<NumericFluentImpl>, NumericFluentRepository {}),
+        boost::hana::make_pair(boost::hana::type_c<FunctionValueImpl>, FunctionValueRepository {}),
         boost::hana::make_pair(boost::hana::type_c<DomainImpl>, DomainRepository {}),
         boost::hana::make_pair(boost::hana::type_c<ProblemImpl>, ProblemRepository {}));
 }
@@ -237,11 +237,11 @@ ConditionForall PDDLRepositories::get_or_create_condition_forall(ParameterList p
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionForallImpl> {}).get_or_create(std::move(parameters), std::move(condition));
 }
 
-ConditionFunctionExpressionComparison PDDLRepositories::get_or_create_condition_function_expression_comparison(BinaryComparatorEnum binary_comparator,
-                                                                                                               FunctionExpression function_expression_left,
-                                                                                                               FunctionExpression function_expression_right)
+ConditionNumericConstraint PDDLRepositories::get_or_create_condition_numeric_constraint(BinaryComparatorEnum binary_comparator,
+                                                                                        FunctionExpression function_expression_left,
+                                                                                        FunctionExpression function_expression_right)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionFunctionExpressionComparisonImpl> {})
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionNumericConstraintImpl> {})
         .get_or_create(std::move(binary_comparator), std::move(function_expression_left), std::move(function_expression_right));
 }
 
@@ -280,7 +280,7 @@ Condition PDDLRepositories::get_or_create_condition(ConditionForall condition)
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
 }
 
-Condition PDDLRepositories::get_or_create_condition(ConditionFunctionExpressionComparison condition)
+Condition PDDLRepositories::get_or_create_condition(ConditionNumericConstraint condition)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
 }
@@ -386,9 +386,9 @@ OptimizationMetric PDDLRepositories::get_or_create_optimization_metric(Optimizat
     return boost::hana::at_key(m_repositories, boost::hana::type<OptimizationMetricImpl> {}).get_or_create(std::move(metric), std::move(function_expression));
 }
 
-NumericFluent PDDLRepositories::get_or_create_numeric_fluent(Function function, double number)
+FunctionValue PDDLRepositories::get_or_create_function_value(Function function, double number)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<NumericFluentImpl> {}).get_or_create(std::move(function), std::move(number));
+    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionValueImpl> {}).get_or_create(std::move(function), std::move(number));
 }
 
 Domain PDDLRepositories::get_or_create_domain(std::optional<fs::path> filepath,
@@ -427,7 +427,7 @@ Problem PDDLRepositories::get_or_create_problem(std::optional<fs::path> filepath
                                                 ObjectList objects,
                                                 PredicateList derived_predicates,
                                                 LiteralList initial_literals,
-                                                NumericFluentList numeric_fluents,
+                                                FunctionValueList function_values,
                                                 std::optional<Condition> goal_condition,
                                                 std::optional<OptimizationMetric> optimization_metric,
                                                 AxiomList axioms)
@@ -435,7 +435,7 @@ Problem PDDLRepositories::get_or_create_problem(std::optional<fs::path> filepath
     std::sort(objects.begin(), objects.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
     std::sort(derived_predicates.begin(), derived_predicates.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
     std::sort(initial_literals.begin(), initial_literals.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
-    std::sort(numeric_fluents.begin(), numeric_fluents.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(function_values.begin(), function_values.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
 
     return boost::hana::at_key(m_repositories, boost::hana::type<ProblemImpl> {})
         .get_or_create(std::move(filepath),
@@ -445,7 +445,7 @@ Problem PDDLRepositories::get_or_create_problem(std::optional<fs::path> filepath
                        std::move(objects),
                        std::move(derived_predicates),
                        std::move(initial_literals),
-                       std::move(numeric_fluents),
+                       std::move(function_values),
                        std::move(goal_condition),
                        std::move(optimization_metric),
                        std::move(axioms));

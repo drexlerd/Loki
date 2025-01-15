@@ -38,7 +38,7 @@ extern RequirementEnumSet parse(const ast::RequirementQuantifiedPreconditions& n
 extern RequirementEnumSet parse(const ast::RequirementConditionalEffects& node, Context& context);
 extern RequirementEnumSet parse(const ast::RequirementFluents& node, Context& context);
 extern RequirementEnumSet parse(const ast::RequirementObjectFluents& node, Context& context);
-extern RequirementEnumSet parse(const ast::RequirementNumericFluents& node, Context& context);
+extern RequirementEnumSet parse(const ast::RequirementFunctionValues& node, Context& context);
 extern RequirementEnumSet parse(const ast::RequirementAdl& node, Context& context);
 extern RequirementEnumSet parse(const ast::RequirementDurativeActions& node, Context& context);
 extern RequirementEnumSet parse(const ast::RequirementDerivedPredicates& node, Context& context);

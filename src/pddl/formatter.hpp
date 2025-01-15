@@ -27,9 +27,9 @@
 #include "loki/details/pddl/function.hpp"
 #include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
+#include "loki/details/pddl/function_value.hpp"
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/metric.hpp"
-#include "loki/details/pddl/numeric_fluent.hpp"
 #include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/predicate.hpp"
@@ -66,7 +66,7 @@ public:
     void write(const ConditionImplyImpl& element, std::ostream& out);
     void write(const ConditionExistsImpl& element, std::ostream& out);
     void write(const ConditionForallImpl& element, std::ostream& out);
-    void write(const ConditionFunctionExpressionComparisonImpl& element, std::ostream& out);
+    void write(const ConditionNumericConstraintImpl& element, std::ostream& out);
     void write(const ConditionImpl& element, std::ostream& out);
     void write(const DomainImpl& element, std::ostream& out);
     void write(const EffectLiteralImpl& element, std::ostream& out);
@@ -87,7 +87,7 @@ public:
     void write(const FunctionImpl& element, std::ostream& out);
     void write(const LiteralImpl& element, std::ostream& out);
     void write(const OptimizationMetricImpl& element, std::ostream& out);
-    void write(const NumericFluentImpl& element, std::ostream& out);
+    void write(const FunctionValueImpl& element, std::ostream& out);
     void write(const ObjectImpl& element, std::ostream& out);
     void write(const ParameterImpl& element, std::ostream& out);
     void write(const PredicateImpl& element, std::ostream& out);

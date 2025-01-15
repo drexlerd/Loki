@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_PDDL_NUMERIC_FLUENT_HPP_
-#define LOKI_INCLUDE_LOKI_PDDL_NUMERIC_FLUENT_HPP_
+#ifndef LOKI_INCLUDE_LOKI_PDDL_FUNCTION_VALUE_HPP_
+#define LOKI_INCLUDE_LOKI_PDDL_FUNCTION_VALUE_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
 
@@ -24,7 +24,7 @@
 
 namespace loki
 {
-class NumericFluentImpl
+class FunctionValueImpl
 {
 private:
     size_t m_index;
@@ -35,14 +35,14 @@ private:
     template<typename T, typename Hash, typename EqualTo>
     friend class SegmentedRepository;
 
-    NumericFluentImpl(size_t index, Function function, double number);
+    FunctionValueImpl(size_t index, Function function, double number);
 
 public:
     // moveable but not copyable
-    NumericFluentImpl(const NumericFluentImpl& other) = delete;
-    NumericFluentImpl& operator=(const NumericFluentImpl& other) = delete;
-    NumericFluentImpl(NumericFluentImpl&& other) = default;
-    NumericFluentImpl& operator=(NumericFluentImpl&& other) = default;
+    FunctionValueImpl(const FunctionValueImpl& other) = delete;
+    FunctionValueImpl& operator=(const FunctionValueImpl& other) = delete;
+    FunctionValueImpl(FunctionValueImpl&& other) = default;
+    FunctionValueImpl& operator=(FunctionValueImpl&& other) = default;
 
     size_t get_index() const;
     const Function& get_function() const;
@@ -51,7 +51,7 @@ public:
     auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_function), std::as_const(m_number)); }
 };
 
-extern std::ostream& operator<<(std::ostream& out, const NumericFluentImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const FunctionValueImpl& element);
 
 }
 

@@ -53,7 +53,7 @@ struct RequirementQuantifiedPreconditions;
 struct RequirementConditionalEffects;
 struct RequirementFluents;         // PDDL 3.1 = :object-fluents + :numeric-fluents
 struct RequirementObjectFluents;   // PDDL 3.1
-struct RequirementNumericFluents;  // PDDL 3.1
+struct RequirementFunctionValues;  // PDDL 3.1
 struct RequirementAdl;
 struct RequirementDurativeActions;
 struct RequirementDerivedPredicates;
@@ -179,7 +179,7 @@ struct Domain;
 /**
  * Problem
  */
-struct BasicFunctionTerm;
+struct GroundFunction;
 
 struct AtomicFormulaOfNamesPredicate;
 struct AtomicFormulaOfNamesEquality;  // :equality
@@ -190,7 +190,7 @@ struct Literal;
 
 struct InitialElementLiteral;
 struct InitialElementTimedLiteral;   // :timed-initial-literals
-struct InitialElementNumericFluent;  // :numeric-fluents
+struct InitialElementFunctionValue;  // :numeric-fluents
 struct InitialElement;
 
 struct MetricFunctionExpression;
@@ -310,7 +310,7 @@ struct RequirementObjectFluents : x3::position_tagged
 {
 };
 
-struct RequirementNumericFluents : x3::position_tagged
+struct RequirementFunctionValues : x3::position_tagged
 {
 };
 
@@ -363,7 +363,7 @@ struct Requirement :
                 RequirementConditionalEffects,
                 RequirementFluents,
                 RequirementObjectFluents,
-                RequirementNumericFluents,
+                RequirementFunctionValues,
                 RequirementAdl,
                 RequirementDurativeActions,
                 RequirementDerivedPredicates,
@@ -385,7 +385,7 @@ struct Requirement :
                                   RequirementConditionalEffects,
                                   RequirementFluents,
                                   RequirementObjectFluents,
-                                  RequirementNumericFluents,
+                                  RequirementFunctionValues,
                                   RequirementAdl,
                                   RequirementDurativeActions,
                                   RequirementDerivedPredicates,
@@ -996,8 +996,8 @@ struct Domain : x3::position_tagged
 /**
  * Problem
  */
-/* <basic-function-term> */
-struct BasicFunctionTerm : x3::position_tagged
+
+struct GroundFunction : x3::position_tagged
 {
     FunctionSymbol function_symbol;
     std::vector<Name> names;
@@ -1050,13 +1050,13 @@ struct InitialElementTimedLiteral : x3::position_tagged
     GroundLiteral literal;
 };
 
-struct InitialElementNumericFluent : x3::position_tagged
+struct InitialElementFunctionValue : x3::position_tagged
 {
-    BasicFunctionTerm basic_function_term;
+    GroundFunction ground_function;
     Number number;
 };
 
-struct InitialElement : x3::position_tagged, x3::variant<InitialElementLiteral, InitialElementTimedLiteral, InitialElementNumericFluent>
+struct InitialElement : x3::position_tagged, x3::variant<InitialElementLiteral, InitialElementTimedLiteral, InitialElementFunctionValue>
 {
     using base_type::base_type;
     using base_type::operator=;
@@ -1103,7 +1103,7 @@ struct MetricFunctionExpressionMinus : x3::position_tagged
 
 struct MetricFunctionExpressionBasicFunctionTerm : x3::position_tagged
 {
-    BasicFunctionTerm basic_function_term;
+    GroundFunction ground_function;
 };
 
 struct MetricFunctionExpressionTotalTime : x3::position_tagged

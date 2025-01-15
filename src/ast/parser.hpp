@@ -67,7 +67,7 @@ struct RequirementQuantifiedPreconditionsClass;
 struct RequirementConditionalEffectsClass;
 struct RequirementFluentsClass;
 struct RequirementObjectFluentsClass;
-struct RequirementNumericFluentsClass;
+struct RequirementFunctionValuesClass;
 struct RequirementAdlClass;
 struct RequirementDurativeActionsClass;
 struct RequirementDerivedPredicatesClass;
@@ -193,7 +193,7 @@ struct StructureClass;
  * Problem
  */
 
-struct BasicFunctionTermClass;
+struct GroundFunctionClass;
 
 struct AtomicFormulaOfNamesPredicateClass;
 struct AtomicFormulaOfNamesEqualityClass;
@@ -204,7 +204,7 @@ struct GroundLiteralClass;
 
 struct InitialElementLiteralClass;
 struct InitialElementTimedLiteralClass;
-struct InitialElementNumericFluentClass;
+struct InitialElementFunctionValueClass;
 struct InitialElementClass;
 
 struct MetricFunctionExpressionClass;
@@ -263,7 +263,7 @@ typedef x3::rule<RequirementQuantifiedPreconditionsClass, ast::RequirementQuanti
 typedef x3::rule<RequirementConditionalEffectsClass, ast::RequirementConditionalEffects> requirement_conditional_effects_type;
 typedef x3::rule<RequirementFluentsClass, ast::RequirementFluents> requirement_fluents_type;
 typedef x3::rule<RequirementObjectFluentsClass, ast::RequirementObjectFluents> requirement_object_fluents_type;
-typedef x3::rule<RequirementNumericFluentsClass, ast::RequirementNumericFluents> requirement_numeric_fluents_type;
+typedef x3::rule<RequirementFunctionValuesClass, ast::RequirementFunctionValues> requirement_function_values_type;
 typedef x3::rule<RequirementAdlClass, ast::RequirementAdl> requirement_adl_type;
 typedef x3::rule<RequirementDurativeActionsClass, ast::RequirementDurativeActions> requirement_durative_actions_type;
 typedef x3::rule<RequirementDerivedPredicatesClass, ast::RequirementDerivedPredicates> requirement_derived_predicates_type;
@@ -331,7 +331,7 @@ typedef x3::rule<GoalDescriptorNotClass, ast::GoalDescriptorNot> goal_descriptor
 typedef x3::rule<GoalDescriptorImplyClass, ast::GoalDescriptorImply> goal_descriptor_imply_type;
 typedef x3::rule<GoalDescriptorExistsClass, ast::GoalDescriptorExists> goal_descriptor_exists_type;
 typedef x3::rule<GoalDescriptorForallClass, ast::GoalDescriptorForall> goal_descriptor_forall_type;
-typedef x3::rule<GoalDescriptorFunctionComparisonClass, ast::GoalDescriptorFunctionComparison> goal_descriptor_function_comparison_type;
+typedef x3::rule<GoalDescriptorFunctionComparisonClass, ast::GoalDescriptorFunctionComparison> goal_descriptor_numeric_constraint_type;
 
 typedef x3::rule<ConstraintGoalDescriptorClass, ast::ConstraintGoalDescriptor> constraint_goal_descriptor_type;
 typedef x3::rule<ConstraintGoalDescriptorAndClass, ast::ConstraintGoalDescriptorAnd> constraint_goal_descriptor_and_type;
@@ -390,7 +390,7 @@ typedef x3::rule<StructureClass, ast::Structure> structure_type;
 /**
  * Problem
  */
-typedef x3::rule<BasicFunctionTermClass, ast::BasicFunctionTerm> basic_function_term_type;
+typedef x3::rule<GroundFunctionClass, ast::GroundFunction> ground_function_type;
 
 typedef x3::rule<AtomicFormulaOfNamesPredicateClass, ast::AtomicFormulaOfNamesPredicate> atomic_formula_of_names_predicate_type;
 typedef x3::rule<AtomicFormulaOfNamesEqualityClass, ast::AtomicFormulaOfNamesEquality> atomic_formula_of_names_equality_type;
@@ -401,7 +401,7 @@ typedef x3::rule<GroundLiteralClass, ast::GroundLiteral> ground_literal_type;
 
 typedef x3::rule<InitialElementLiteralClass, ast::InitialElementLiteral> initial_element_literals_type;
 typedef x3::rule<InitialElementTimedLiteralClass, ast::InitialElementTimedLiteral> initial_element_timed_literal_type;
-typedef x3::rule<InitialElementNumericFluentClass, ast::InitialElementNumericFluent> initial_element_numeric_fluent_type;
+typedef x3::rule<InitialElementFunctionValueClass, ast::InitialElementFunctionValue> initial_element_function_value_type;
 typedef x3::rule<InitialElementClass, ast::InitialElement> initial_element_type;
 
 typedef x3::rule<MetricFunctionExpressionClass, ast::MetricFunctionExpression> metric_function_expression_type;
@@ -410,7 +410,7 @@ typedef x3::rule<MetricFunctionExpressionBinaryOperatorClass, ast::MetricFunctio
 typedef x3::rule<MetricFunctionExpressionMultiOperatorClass, ast::MetricFunctionExpressionMultiOperator> metric_function_expression_multi_operator_type;
 typedef x3::rule<MetricFunctionExpressionMinusClass, ast::MetricFunctionExpressionMinus> metric_function_expression_minus_type;
 typedef x3::rule<MetricFunctionExpressionBasicFunctionTermClass, ast::MetricFunctionExpressionBasicFunctionTerm>
-    metric_function_expression_basic_function_term_type;
+    metric_function_expression_ground_function_type;
 typedef x3::rule<MetricFunctionExpressionTotalTimeClass, ast::MetricFunctionExpressionTotalTime> metric_function_expression_total_time_type;
 typedef x3::rule<MetricFunctionExpressionPreferencesClass, ast::MetricFunctionExpressionPreferences> metric_function_expression_preferences_type;
 
@@ -460,7 +460,7 @@ BOOST_SPIRIT_DECLARE(requirement_strips_type,
                      requirement_conditional_effects_type,
                      requirement_fluents_type,
                      requirement_object_fluents_type,
-                     requirement_numeric_fluents_type,
+                     requirement_function_values_type,
                      requirement_adl_type,
                      requirement_durative_actions_type,
                      requirement_derived_predicates_type,
@@ -522,7 +522,7 @@ BOOST_SPIRIT_DECLARE(goal_descriptor_type,
                      goal_descriptor_imply_type,
                      goal_descriptor_exists_type,
                      goal_descriptor_forall_type,
-                     goal_descriptor_function_comparison_type)
+                     goal_descriptor_numeric_constraint_type)
 
 BOOST_SPIRIT_DECLARE(constraint_goal_descriptor_type,
                      constraint_goal_descriptor_and_type,
@@ -569,7 +569,7 @@ BOOST_SPIRIT_DECLARE(effect_type,
 
 BOOST_SPIRIT_DECLARE(domain_name_type, requirements_type, types_type, constants_type, predicates_type, functions_type, constraints_type, structure_type)
 
-BOOST_SPIRIT_DECLARE(basic_function_term_type)
+BOOST_SPIRIT_DECLARE(ground_function_type)
 
 BOOST_SPIRIT_DECLARE(atomic_formula_of_names_predicate_type,
                      atomic_formula_of_names_equality_type,
@@ -578,14 +578,14 @@ BOOST_SPIRIT_DECLARE(atomic_formula_of_names_predicate_type,
                      negated_ground_atom_type,
                      ground_literal_type)
 
-BOOST_SPIRIT_DECLARE(initial_element_literals_type, initial_element_timed_literal_type, initial_element_numeric_fluent_type, initial_element_type)
+BOOST_SPIRIT_DECLARE(initial_element_literals_type, initial_element_timed_literal_type, initial_element_function_value_type, initial_element_type)
 
 BOOST_SPIRIT_DECLARE(metric_function_expression_type,
                      metric_function_expression_binary_operator_type,
                      metric_function_expression_multi_operator_type,
                      metric_function_expression_minus_type,
                      metric_function_expression_number_type,
-                     metric_function_expression_basic_function_term_type,
+                     metric_function_expression_ground_function_type,
                      metric_function_expression_total_time_type,
                      metric_function_expression_preferences_type)
 
@@ -645,7 +645,7 @@ parser::requirement_quantified_preconditions_type const& requirement_quantified_
 parser::requirement_conditional_effects_type const& requirement_conditional_effects();
 parser::requirement_fluents_type const& requirement_fluents();
 parser::requirement_object_fluents_type const& requirement_object_fluents();
-parser::requirement_numeric_fluents_type const& requirement_numeric_fluents();
+parser::requirement_function_values_type const& requirement_function_values();
 parser::requirement_adl_type const& requirement_adl();
 parser::requirement_durative_actions_type const& requirement_durative_actions();
 parser::requirement_derived_predicates_type const& requirement_derived_predicates();
@@ -711,7 +711,7 @@ parser::goal_descriptor_not_type const& goal_descriptor_not();
 parser::goal_descriptor_imply_type const& goal_descriptor_imply();
 parser::goal_descriptor_exists_type const& goal_descriptor_exists();
 parser::goal_descriptor_forall_type const& goal_descriptor_forall();
-parser::goal_descriptor_function_comparison_type const& goal_descriptor_function_comparison();
+parser::goal_descriptor_numeric_constraint_type const& goal_descriptor_numeric_constraint();
 
 parser::constraint_goal_descriptor_type const& constraint_goal_descriptor();
 parser::constraint_goal_descriptor_and_type const& constraint_goal_descriptor_and();
@@ -766,7 +766,7 @@ parser::functions_type const& functions();
 parser::constraints_type const& constraints();
 parser::structure_type const& structure();
 
-parser::basic_function_term_type const& basic_function_term();
+parser::ground_function_type const& ground_function();
 
 parser::atomic_formula_of_names_predicate_type const& atomic_formula_of_names_predicate();
 parser::atomic_formula_of_names_equality_type const& atomic_formula_of_names_equality();
@@ -777,7 +777,7 @@ parser::ground_literal_type const& ground_literal();
 
 parser::initial_element_literals_type const& initial_element_literals();
 parser::initial_element_timed_literal_type const& initial_element_timed_literal();
-parser::initial_element_numeric_fluent_type const& initial_element_numeric_fluent();
+parser::initial_element_function_value_type const& initial_element_function_value();
 parser::initial_element_type const& initial_element();
 
 parser::metric_function_expression_type const& metric_function_expression();
@@ -785,7 +785,7 @@ parser::metric_function_expression_number_type const& metric_function_expression
 parser::metric_function_expression_binary_operator_type const& metric_function_expression_binary_operator();
 parser::metric_function_expression_multi_operator_type const& metric_function_expression_multi_operator();
 parser::metric_function_expression_minus_type const& metric_function_expression_minus();
-parser::metric_function_expression_basic_function_term_type const& metric_function_expression_basic_function_term();
+parser::metric_function_expression_ground_function_type const& metric_function_expression_ground_function();
 parser::metric_function_expression_total_time_type const& metric_function_expression_total_time();
 parser::metric_function_expression_preferences_type const& metric_function_expression_preferences();
 

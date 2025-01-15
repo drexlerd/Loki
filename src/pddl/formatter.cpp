@@ -159,7 +159,7 @@ void PDDLFormatter::write(const ConditionForallImpl& element, std::ostream& out)
     out << ")";
 }
 
-void PDDLFormatter::write(const ConditionFunctionExpressionComparisonImpl& element, std::ostream& out)
+void PDDLFormatter::write(const ConditionNumericConstraintImpl& element, std::ostream& out)
 {
     out << "(" << to_string(element.get_binary_comparator()) << " ";
     write(*element.get_function_expression_left(), out);
@@ -467,7 +467,7 @@ void PDDLFormatter::write(const OptimizationMetricImpl& element, std::ostream& o
     out << ")";
 }
 
-void PDDLFormatter::write(const NumericFluentImpl& element, std::ostream& out)
+void PDDLFormatter::write(const FunctionValueImpl& element, std::ostream& out)
 {
     out << "(= ";
     write(*element.get_function(), out);
@@ -604,7 +604,7 @@ void PDDLFormatter::write(const ProblemImpl& element, std::ostream& out)
         out << ")\n";
     }
 
-    if (!(element.get_initial_literals().empty() && element.get_numeric_fluents().empty()))
+    if (!(element.get_initial_literals().empty() && element.get_function_values().empty()))
     {
         out << std::string(m_indent, ' ') << "(:init ";
         for (size_t i = 0; i < element.get_initial_literals().size(); ++i)
@@ -613,10 +613,10 @@ void PDDLFormatter::write(const ProblemImpl& element, std::ostream& out)
                 out << " ";
             write(*element.get_initial_literals()[i], out);
         }
-        for (size_t i = 0; i < element.get_numeric_fluents().size(); ++i)
+        for (size_t i = 0; i < element.get_function_values().size(); ++i)
         {
             out << " ";
-            write(*element.get_numeric_fluents()[i], out);
+            write(*element.get_function_values()[i], out);
         }
     }
     out << ")\n";

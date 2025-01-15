@@ -148,7 +148,7 @@ Condition parse(const ast::GoalDescriptorFunctionComparison& node, Context& cont
     auto function_expression_left = parse(node.function_expression_left, context);
     auto function_expression_right = parse(node.function_expression_right, context);
     auto condition = context.factories.get_or_create_condition(
-        context.factories.get_or_create_condition_function_expression_comparison(binary_comparator, function_expression_left, function_expression_right));
+        context.factories.get_or_create_condition_numeric_constraint(binary_comparator, function_expression_left, function_expression_right));
     context.positions.push_back(condition, node);
     return condition;
 }

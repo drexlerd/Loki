@@ -96,8 +96,8 @@ class ConditionExistsImpl;
 using ConditionExists = const ConditionExistsImpl*;
 class ConditionForallImpl;
 using ConditionForall = const ConditionForallImpl*;
-class ConditionFunctionExpressionComparisonImpl;
-using ConditionFunctionExpressionComparison = const ConditionFunctionExpressionComparisonImpl*;
+class ConditionNumericConstraintImpl;
+using ConditionNumericConstraint = const ConditionNumericConstraintImpl*;
 class ConditionImpl;
 using Condition = const ConditionImpl*;
 using ConditionList = std::vector<Condition>;
@@ -163,9 +163,9 @@ using DomainList = std::vector<Domain>;
  * Problem
  */
 
-class NumericFluentImpl;
-using NumericFluent = const NumericFluentImpl*;
-using NumericFluentList = std::vector<NumericFluent>;
+class FunctionValueImpl;
+using FunctionValue = const FunctionValueImpl*;
+using FunctionValueList = std::vector<FunctionValue>;
 
 class OptimizationMetricImpl;
 using OptimizationMetric = const OptimizationMetricImpl*;

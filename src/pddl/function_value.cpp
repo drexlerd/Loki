@@ -15,22 +15,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/numeric_fluent.hpp"
-
 #include "formatter.hpp"
 #include "loki/details/pddl/function.hpp"
+#include "loki/details/pddl/function_value.hpp"
 
 namespace loki
 {
-NumericFluentImpl::NumericFluentImpl(size_t index, Function function, double number) : m_index(index), m_function(std::move(function)), m_number(number) {}
+FunctionValueImpl::FunctionValueImpl(size_t index, Function function, double number) : m_index(index), m_function(std::move(function)), m_number(number) {}
 
-size_t NumericFluentImpl::get_index() const { return m_index; }
+size_t FunctionValueImpl::get_index() const { return m_index; }
 
-const Function& NumericFluentImpl::get_function() const { return m_function; }
+const Function& FunctionValueImpl::get_function() const { return m_function; }
 
-double NumericFluentImpl::get_number() const { return m_number; }
+double FunctionValueImpl::get_number() const { return m_number; }
 
-std::ostream& operator<<(std::ostream& out, const NumericFluentImpl& element)
+std::ostream& operator<<(std::ostream& out, const FunctionValueImpl& element)
 {
     auto formatter = PDDLFormatter();
     formatter.write(element, out);

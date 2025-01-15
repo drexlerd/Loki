@@ -72,7 +72,7 @@ std::string parse_text(const ast::RequirementQuantifiedPreconditions&, const Def
 std::string parse_text(const ast::RequirementConditionalEffects&, const DefaultFormatterOptions&) { return ":conditional-effects"; }
 std::string parse_text(const ast::RequirementFluents&, const DefaultFormatterOptions&) { return ":fluents"; }
 std::string parse_text(const ast::RequirementObjectFluents&, const DefaultFormatterOptions&) { return ":object-fluents"; }
-std::string parse_text(const ast::RequirementNumericFluents&, const DefaultFormatterOptions&) { return ":numeric-fluents"; }
+std::string parse_text(const ast::RequirementFunctionValues&, const DefaultFormatterOptions&) { return ":numeric-fluents"; }
 std::string parse_text(const ast::RequirementAdl&, const DefaultFormatterOptions&) { return ":adl"; }
 std::string parse_text(const ast::RequirementDurativeActions&, const DefaultFormatterOptions&) { return ":durative-actions"; }
 std::string parse_text(const ast::RequirementDerivedPredicates&, const DefaultFormatterOptions&) { return ":derived-predicates"; }
@@ -695,7 +695,7 @@ std::string parse_text(const ast::Domain& node, const DefaultFormatterOptions& o
     return ss.str();
 }
 
-string parse_text(const ast::BasicFunctionTerm& node, const DefaultFormatterOptions& options)
+string parse_text(const ast::GroundFunction& node, const DefaultFormatterOptions& options)
 {
     std::stringstream ss;
     if (node.names.size() > 0)
@@ -748,10 +748,10 @@ string parse_text(const ast::InitialElementTimedLiteral& node, const DefaultForm
     return ss.str();
 }
 
-string parse_text(const ast::InitialElementNumericFluent& node, const DefaultFormatterOptions& options)
+string parse_text(const ast::InitialElementFunctionValue& node, const DefaultFormatterOptions& options)
 {
     stringstream ss;
-    ss << "(= " << parse_text(node.basic_function_term, options) << " " << parse_text(node.number, options) << ")";
+    ss << "(= " << parse_text(node.ground_function, options) << " " << parse_text(node.number, options) << ")";
     return ss.str();
 }
 
@@ -789,7 +789,7 @@ string parse_text(const ast::MetricFunctionExpressionMinus& node, const DefaultF
 
 string parse_text(const ast::MetricFunctionExpressionBasicFunctionTerm& node, const DefaultFormatterOptions& options)
 {
-    return parse_text(node.basic_function_term, options);
+    return parse_text(node.ground_function, options);
 }
 
 string parse_text(const ast::MetricFunctionExpressionTotalTime&, const DefaultFormatterOptions&) { return "total-time"; }

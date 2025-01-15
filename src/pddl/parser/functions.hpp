@@ -150,7 +150,7 @@ public:
 };
 
 /* Function */
-extern Function parse(const ast::BasicFunctionTerm& node, Context& context);
+extern Function parse(const ast::GroundFunction& node, Context& context);
 
 }
 

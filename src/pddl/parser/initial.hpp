@@ -27,13 +27,13 @@ namespace loki
 {
 
 /* Init */
-extern std::vector<std::variant<Literal, NumericFluent>> parse(const ast::Initial& initial_node, Context& context);
+extern std::vector<std::variant<Literal, FunctionValue>> parse(const ast::Initial& initial_node, Context& context);
 
-extern std::variant<Literal, NumericFluent> parse(const ast::InitialElementLiteral& node);
-extern std::variant<Literal, NumericFluent> parse(const ast::InitialElementTimedLiteral& node);
-extern std::variant<Literal, NumericFluent> parse(const ast::InitialElementNumericFluent& node);
+extern std::variant<Literal, FunctionValue> parse(const ast::InitialElementLiteral& node);
+extern std::variant<Literal, FunctionValue> parse(const ast::InitialElementTimedLiteral& node);
+extern std::variant<Literal, FunctionValue> parse(const ast::InitialElementFunctionValue& node);
 
-class InitialElementVisitor : boost::static_visitor<std::variant<Literal, NumericFluent>>
+class InitialElementVisitor : boost::static_visitor<std::variant<Literal, FunctionValue>>
 {
 private:
     Context& context;
@@ -42,7 +42,7 @@ public:
     InitialElementVisitor(Context& context_);
 
     template<typename Node>
-    std::variant<Literal, NumericFluent> operator()(const Node& node) const
+    std::variant<Literal, FunctionValue> operator()(const Node& node) const
     {
         return parse(node, context);
     }

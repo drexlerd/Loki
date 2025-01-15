@@ -258,7 +258,7 @@ FunctionExpression parse(const ast::MetricFunctionExpressionMinus& node, Context
 
 FunctionExpression parse(const ast::MetricFunctionExpressionBasicFunctionTerm& node, Context& context)
 {
-    const auto function = parse(node.basic_function_term, context);
+    const auto function = parse(node.ground_function, context);
     const auto function_expression =
         context.factories.get_or_create_function_expression(context.factories.get_or_create_function_expression_function(function));
     context.positions.push_back(function_expression, node);
@@ -283,7 +283,7 @@ FunctionExpression parse(const ast::MetricFunctionExpression& node, Context& con
 MetricFunctionExpressionDeclarationVisitor::MetricFunctionExpressionDeclarationVisitor(Context& context_) : context(context_) {}
 
 /* Function */
-Function parse(const ast::BasicFunctionTerm& node, Context& context)
+Function parse(const ast::GroundFunction& node, Context& context)
 {
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol, context);
     auto term_list = TermList();

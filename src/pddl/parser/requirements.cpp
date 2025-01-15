@@ -104,7 +104,7 @@ RequirementEnumSet parse(const ast::RequirementObjectFluents& node, Context& con
     return { RequirementEnum::OBJECT_FLUENTS };
 }
 
-RequirementEnumSet parse(const ast::RequirementNumericFluents&, Context& context)
+RequirementEnumSet parse(const ast::RequirementFunctionValues&, Context& context)
 {
     // Track
     context.references.track(RequirementEnum::NUMERIC_FLUENTS);

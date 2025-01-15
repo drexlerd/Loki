@@ -37,7 +37,7 @@ private:
     ObjectList m_objects;
     PredicateList m_derived_predicates;
     LiteralList m_initial_literals;
-    NumericFluentList m_numeric_fluents;
+    FunctionValueList m_function_values;
     std::optional<Condition> m_goal_condition;
     std::optional<OptimizationMetric> m_optimization_metric;
     AxiomList m_axioms;
@@ -50,7 +50,7 @@ private:
                 ObjectList objects,
                 PredicateList derived_predicates,
                 LiteralList initial_literals,
-                NumericFluentList numeric_fluents,
+                FunctionValueList function_values,
                 std::optional<Condition> goal_condition,
                 std::optional<OptimizationMetric> optimization_metric,
                 AxiomList axioms);
@@ -74,7 +74,7 @@ public:
     const ObjectList& get_objects() const;
     const PredicateList& get_derived_predicates() const;
     const LiteralList& get_initial_literals() const;
-    const NumericFluentList& get_numeric_fluents() const;
+    const FunctionValueList& get_function_values() const;
     const std::optional<Condition>& get_goal_condition() const;
     const std::optional<OptimizationMetric>& get_optimization_metric() const;
     const AxiomList& get_axioms() const;
@@ -87,7 +87,7 @@ public:
                                      std::as_const(m_objects),
                                      std::as_const(m_derived_predicates),
                                      std::as_const(m_initial_literals),
-                                     std::as_const(m_numeric_fluents),
+                                     std::as_const(m_function_values),
                                      std::as_const(m_goal_condition),
                                      std::as_const(m_optimization_metric),
                                      std::as_const(m_axioms));

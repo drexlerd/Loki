@@ -160,13 +160,13 @@ Problem parse(const fs::path& filepath, const ast::Problem& problem_node, Contex
 
     /* Initial section */
     auto initial_literals = LiteralList();
-    auto numeric_fluents = NumericFluentList();
+    auto function_values = FunctionValueList();
     if (problem_node.initial.has_value())
     {
         const auto initial_elements = parse(problem_node.initial.value(), context);
         for (const auto& initial_element : initial_elements)
         {
-            std::visit(UnpackingVisitor(initial_literals, numeric_fluents), initial_element);
+            std::visit(UnpackingVisitor(initial_literals, function_values), initial_element);
         }
     }
 
@@ -205,7 +205,7 @@ Problem parse(const fs::path& filepath, const ast::Problem& problem_node, Contex
                                                                  objects,
                                                                  derived_predicates,
                                                                  initial_literals,
-                                                                 numeric_fluents,
+                                                                 function_values,
                                                                  goal_condition,
                                                                  optimization_metric,
                                                                  axioms);

@@ -28,9 +28,9 @@
 #include "loki/details/pddl/function.hpp"
 #include "loki/details/pddl/function_expressions.hpp"
 #include "loki/details/pddl/function_skeleton.hpp"
+#include "loki/details/pddl/function_value.hpp"
 #include "loki/details/pddl/literal.hpp"
 #include "loki/details/pddl/metric.hpp"
-#include "loki/details/pddl/numeric_fluent.hpp"
 #include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/position.hpp"
@@ -74,7 +74,7 @@ using ConditionNotRepository = SegmentedPDDLRepository<ConditionNotImpl>;
 using ConditionImplyRepository = SegmentedPDDLRepository<ConditionImplyImpl>;
 using ConditionExistsRepository = SegmentedPDDLRepository<ConditionExistsImpl>;
 using ConditionForallRepository = SegmentedPDDLRepository<ConditionForallImpl>;
-using ConditionFunctionExpressionComparisonRepository = SegmentedPDDLRepository<ConditionFunctionExpressionComparisonImpl>;
+using ConditionNumericConstraintRepository = SegmentedPDDLRepository<ConditionNumericConstraintImpl>;
 using ConditionRepository = SegmentedPDDLRepository<ConditionImpl>;
 using EffectLiteralRepository = SegmentedPDDLRepository<EffectLiteralImpl>;
 using EffectAndRepository = SegmentedPDDLRepository<EffectAndImpl>;
@@ -87,7 +87,7 @@ using EffectRepository = SegmentedPDDLRepository<EffectImpl>;
 using ActionRepository = SegmentedPDDLRepository<ActionImpl>;
 using AxiomRepository = SegmentedPDDLRepository<AxiomImpl>;
 using OptimizationMetricRepository = SegmentedPDDLRepository<OptimizationMetricImpl>;
-using NumericFluentRepository = SegmentedPDDLRepository<NumericFluentImpl>;
+using FunctionValueRepository = SegmentedPDDLRepository<FunctionValueImpl>;
 using DomainRepository = SegmentedPDDLRepository<DomainImpl>;
 using ProblemRepository = SegmentedPDDLRepository<ProblemImpl>;
 
@@ -116,7 +116,7 @@ using PDDLTypeToRepository =
                      boost::hana::pair<boost::hana::type<ConditionImplyImpl>, ConditionImplyRepository>,
                      boost::hana::pair<boost::hana::type<ConditionExistsImpl>, ConditionExistsRepository>,
                      boost::hana::pair<boost::hana::type<ConditionForallImpl>, ConditionForallRepository>,
-                     boost::hana::pair<boost::hana::type<ConditionFunctionExpressionComparisonImpl>, ConditionFunctionExpressionComparisonRepository>,
+                     boost::hana::pair<boost::hana::type<ConditionNumericConstraintImpl>, ConditionNumericConstraintRepository>,
                      boost::hana::pair<boost::hana::type<ConditionImpl>, ConditionRepository>,
                      boost::hana::pair<boost::hana::type<EffectLiteralImpl>, EffectLiteralRepository>,
                      boost::hana::pair<boost::hana::type<EffectAndImpl>, EffectAndRepository>,
@@ -129,7 +129,7 @@ using PDDLTypeToRepository =
                      boost::hana::pair<boost::hana::type<ActionImpl>, ActionRepository>,
                      boost::hana::pair<boost::hana::type<AxiomImpl>, AxiomRepository>,
                      boost::hana::pair<boost::hana::type<OptimizationMetricImpl>, OptimizationMetricRepository>,
-                     boost::hana::pair<boost::hana::type<NumericFluentImpl>, NumericFluentRepository>,
+                     boost::hana::pair<boost::hana::type<FunctionValueImpl>, FunctionValueRepository>,
                      boost::hana::pair<boost::hana::type<DomainImpl>, DomainRepository>,
                      boost::hana::pair<boost::hana::type<ProblemImpl>, ProblemRepository>>;
 
@@ -209,9 +209,9 @@ public:
 
     ConditionForall get_or_create_condition_forall(ParameterList parameters, Condition condition);
 
-    ConditionFunctionExpressionComparison get_or_create_condition_function_expression_comparison(BinaryComparatorEnum binary_comparator,
-                                                                                                 FunctionExpression function_expression_left,
-                                                                                                 FunctionExpression function_expression_right);
+    ConditionNumericConstraint get_or_create_condition_numeric_constraint(BinaryComparatorEnum binary_comparator,
+                                                                          FunctionExpression function_expression_left,
+                                                                          FunctionExpression function_expression_right);
 
     Condition get_or_create_condition(ConditionLiteral condition);
 
@@ -227,7 +227,7 @@ public:
 
     Condition get_or_create_condition(ConditionForall condition);
 
-    Condition get_or_create_condition(ConditionFunctionExpressionComparison condition);
+    Condition get_or_create_condition(ConditionNumericConstraint condition);
 
     EffectLiteral get_or_create_effect_literal(Literal literal);
 
@@ -264,7 +264,7 @@ public:
 
     OptimizationMetric get_or_create_optimization_metric(OptimizationMetricEnum metric, FunctionExpression function_expression);
 
-    NumericFluent get_or_create_numeric_fluent(Function function, double number);
+    FunctionValue get_or_create_function_value(Function function, double number);
 
     Domain get_or_create_domain(std::optional<fs::path> filepath,
                                 std::string name,
@@ -283,7 +283,7 @@ public:
                                   ObjectList objects,
                                   PredicateList derived_predicates,
                                   LiteralList initial_literals,
-                                  NumericFluentList numeric_fluents,
+                                  FunctionValueList function_values,
                                   std::optional<Condition> goal_condition,
                                   std::optional<OptimizationMetric> optimization_metric,
                                   AxiomList axioms);
@@ -307,7 +307,7 @@ using PDDLPositionCache = PositionCache<RequirementsImpl,
                                         ActionImpl,
                                         AxiomImpl,
                                         OptimizationMetricImpl,
-                                        NumericFluentImpl,
+                                        FunctionValueImpl,
                                         DomainImpl,
                                         ProblemImpl>;
 

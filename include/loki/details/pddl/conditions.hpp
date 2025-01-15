@@ -214,7 +214,7 @@ public:
     auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_parameters), std::as_const(m_condition)); }
 };
 
-class ConditionFunctionExpressionComparisonImpl
+class ConditionNumericConstraintImpl
 {
 private:
     size_t m_index;
@@ -222,10 +222,10 @@ private:
     FunctionExpression m_function_expression_left;
     FunctionExpression m_function_expression_right;
 
-    ConditionFunctionExpressionComparisonImpl(size_t index,
-                                              BinaryComparatorEnum binary_comparator,
-                                              FunctionExpression function_expression_left,
-                                              FunctionExpression function_expression_right);
+    ConditionNumericConstraintImpl(size_t index,
+                                   BinaryComparatorEnum binary_comparator,
+                                   FunctionExpression function_expression_left,
+                                   FunctionExpression function_expression_right);
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -233,10 +233,10 @@ private:
 
 public:
     // moveable but not copyable
-    ConditionFunctionExpressionComparisonImpl(const ConditionFunctionExpressionComparisonImpl& other) = delete;
-    ConditionFunctionExpressionComparisonImpl& operator=(const ConditionFunctionExpressionComparisonImpl& other) = delete;
-    ConditionFunctionExpressionComparisonImpl(ConditionFunctionExpressionComparisonImpl&& other) = default;
-    ConditionFunctionExpressionComparisonImpl& operator=(ConditionFunctionExpressionComparisonImpl&& other) = default;
+    ConditionNumericConstraintImpl(const ConditionNumericConstraintImpl& other) = delete;
+    ConditionNumericConstraintImpl& operator=(const ConditionNumericConstraintImpl& other) = delete;
+    ConditionNumericConstraintImpl(ConditionNumericConstraintImpl&& other) = default;
+    ConditionNumericConstraintImpl& operator=(ConditionNumericConstraintImpl&& other) = default;
 
     size_t get_index() const;
     const BinaryComparatorEnum& get_binary_comparator() const;
@@ -250,8 +250,8 @@ public:
 };
 
 /* Condition */
-using ConditionVariant = std::
-    variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall, ConditionFunctionExpressionComparison>;
+using ConditionVariant =
+    std::variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall, ConditionNumericConstraint>;
 
 class ConditionImpl
 {
@@ -285,7 +285,7 @@ extern std::ostream& operator<<(std::ostream& out, const ConditionNotImpl& eleme
 extern std::ostream& operator<<(std::ostream& out, const ConditionImplyImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const ConditionExistsImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const ConditionForallImpl& element);
-extern std::ostream& operator<<(std::ostream& out, const ConditionFunctionExpressionComparisonImpl& element);
+extern std::ostream& operator<<(std::ostream& out, const ConditionNumericConstraintImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const ConditionImpl& element);
 
 }

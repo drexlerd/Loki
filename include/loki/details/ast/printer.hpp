@@ -53,7 +53,7 @@ extern std::string parse_text(const ast::RequirementQuantifiedPreconditions& nod
 extern std::string parse_text(const ast::RequirementConditionalEffects& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::RequirementFluents& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::RequirementObjectFluents& node, const DefaultFormatterOptions& options = {});
-extern std::string parse_text(const ast::RequirementNumericFluents& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::RequirementFunctionValues& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::RequirementAdl& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::RequirementDurativeActions& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::RequirementDerivedPredicates& node, const DefaultFormatterOptions& options = {});
@@ -181,7 +181,7 @@ extern std::string parse_text(const ast::Domain& node, const DefaultFormatterOpt
  */
 
 // create string representations from ast nodes.
-extern std::string parse_text(const ast::BasicFunctionTerm& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::GroundFunction& node, const DefaultFormatterOptions& options = {});
 
 extern std::string parse_text(const ast::AtomicFormulaOfNamesPredicate& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::AtomicFormulaOfNamesEquality& node, const DefaultFormatterOptions& options = {});
@@ -192,7 +192,7 @@ extern std::string parse_text(const ast::GroundLiteral& node, const DefaultForma
 
 extern std::string parse_text(const ast::InitialElementLiteral& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::InitialElementTimedLiteral& node, const DefaultFormatterOptions& options = {});
-extern std::string parse_text(const ast::InitialElementNumericFluent& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::InitialElementFunctionValue& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::InitialElement& node, const DefaultFormatterOptions& options = {});
 
 extern std::string parse_text(const ast::MetricFunctionExpression& node, const DefaultFormatterOptions& options = {});
