@@ -27,50 +27,38 @@
 namespace loki
 {
 
-/**
- * Concept to check whether a type T is a tuple holding only const references.
- */
-
-// Helper metafunction to check if all elements in a parameter pack are const references
-template<typename... Ts>
-struct are_const_references : std::bool_constant<((std::is_reference_v<Ts> && std::is_const_v<std::remove_reference_t<Ts>>) &&...)>
-{
-};
-
-// Specialization for non-tuple types (this will fail SFINAE when the type is not a std::tuple)
 template<typename T, typename = void>
 struct is_tuple_of_const_references : std::false_type
 {
 };
 
-// Specialization for std::tuple
 template<typename... Ts>
-struct is_tuple_of_const_references<std::tuple<Ts...>, std::enable_if_t<are_const_references<Ts...>::value>> : std::true_type
+struct is_tuple_of_const_references<
+    std::tuple<Ts...>,
+    std::enable_if_t<std::conjunction_v<std::bool_constant<std::is_lvalue_reference_v<Ts> && std::is_const_v<std::remove_reference_t<Ts>>>...>>> :
+    std::true_type
 {
 };
 
-// Concept based on the metafunction
 template<typename T>
-concept IsTupleOfConstReferences = is_tuple_of_const_references<T>::value;
+concept IsTupleOfConstRefs = is_tuple_of_const_references<T>::value;
 
-static_assert(IsTupleOfConstReferences<std::tuple<const int&>>);
-static_assert(!IsTupleOfConstReferences<std::tuple<const int>>);
-static_assert(!IsTupleOfConstReferences<std::tuple<int>>);
-static_assert(!IsTupleOfConstReferences<std::tuple<int&>>);
-static_assert(!IsTupleOfConstReferences<std::tuple<int*>>);
-static_assert(!IsTupleOfConstReferences<std::tuple<const int*>>);
+static_assert(IsTupleOfConstRefs<std::tuple<const int&>>);
+static_assert(!IsTupleOfConstRefs<std::tuple<const int>>);
+static_assert(!IsTupleOfConstRefs<std::tuple<int&>>);
+static_assert(!IsTupleOfConstRefs<std::tuple<int>>);
+static_assert(!IsTupleOfConstRefs<const std::tuple<int>>);
+static_assert(!IsTupleOfConstRefs<std::tuple<int>&>);
 
 /**
- * Concept to check whether a type T has a member function to obtain a tuple of const references.
+ * Concept to check whether a type T has a member function that returns `std::tuple<const T1&,...,const TN&>`.
  *
  * We use it to automatically generate hash and comparison operators based on the tuple of references.
  */
 
 template<typename T>
-concept HasIdentifiableMembers = requires(T a) {
-    {
-        a.identifiable_members()
-    } -> IsTupleOfConstReferences;
+concept HasIdentifyingMembers = requires(const T a) {
+    { a.identifying_members() } -> IsTupleOfConstRefs;
 };
 
 }

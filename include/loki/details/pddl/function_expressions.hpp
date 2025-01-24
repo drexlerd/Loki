@@ -80,7 +80,7 @@ public:
     size_t get_index() const;
     double get_number() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_number)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_number)); }
 };
 
 /* FunctionExpressionBinaryOperator */
@@ -113,7 +113,7 @@ public:
     const FunctionExpression& get_left_function_expression() const;
     const FunctionExpression& get_right_function_expression() const;
 
-    auto identifiable_members() const
+    auto identifying_members() const
     {
         return std::forward_as_tuple(std::as_const(m_binary_operator), std::as_const(m_left_function_expression), std::as_const(m_right_function_expression));
     }
@@ -144,7 +144,7 @@ public:
     MultiOperatorEnum get_multi_operator() const;
     const FunctionExpressionList& get_function_expressions() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_multi_operator), std::as_const(m_function_expressions)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_multi_operator), std::as_const(m_function_expressions)); }
 };
 
 /* FunctionExpressionMinus */
@@ -170,7 +170,7 @@ public:
     size_t get_index() const;
     const FunctionExpression& get_function_expression() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_function_expression)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_function_expression)); }
 };
 
 /* FunctionExpressionFunction */
@@ -196,7 +196,7 @@ public:
     size_t get_index() const;
     const Function& get_function() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_function)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_function)); }
 };
 
 /* FunctionExpression */
@@ -237,7 +237,7 @@ public:
                        FunctionExpressionFunction>&
     get_function_expression() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_function_expression)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_function_expression)); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionNumberImpl& element);

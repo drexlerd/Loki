@@ -45,7 +45,7 @@ struct EqualTo
     bool operator()(const T& lhs, const T& rhs) const { return std::equal_to<T>()(lhs, rhs); }
 };
 
-/// @brief EqualTo specialization for types T that satisfy `HasIdentifiableMembers`.
+/// @brief EqualTo specialization for types T that satisfy `HasIdentifyingMembers`.
 /// Dereferences the underlying pointer before forwarding the call to the std::equal_to
 /// specialization of `IdentifiableMemberProxy` of T to pairwise compare all members.
 /// @tparam T is the type.
@@ -58,12 +58,12 @@ struct EqualTo<ObserverPtr<T>>
 /// @brief EqualTo specialization for an `IdentifiableMembersProxy`
 /// that pairwise compares all members.
 /// @tparam ...Ts are the types of all members.
-template<HasIdentifiableMembers T>
+template<HasIdentifyingMembers T>
 struct EqualTo<T>
 {
-    using MembersTupleType = decltype(std::declval<T>().identifiable_members());
+    using MembersTupleType = decltype(std::declval<T>().identifying_members());
 
-    bool operator()(const T& lhs, const T& rhs) const { return EqualTo<MembersTupleType>()(lhs.identifiable_members(), rhs.identifiable_members()); }
+    bool operator()(const T& lhs, const T& rhs) const { return EqualTo<MembersTupleType>()(lhs.identifying_members(), rhs.identifying_members()); }
 };
 
 }

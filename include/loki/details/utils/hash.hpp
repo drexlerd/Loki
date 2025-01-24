@@ -196,7 +196,7 @@ struct Hash<std::span<T, Extent>>
     size_t operator()(const std::span<T, Extent>& span) const { return loki::hash_combine(span.data(), span.size()); }
 };
 
-/// @brief std::hash specialization for types T that satisfy `HasIdentifiableMembers`.
+/// @brief std::hash specialization for types T that satisfy `HasIdentifyingMembers`.
 /// Dereferences the underlying pointer before forwarding the call to the std::hash
 /// specialization of `IdentifiableMembersProxy` of T to compute a hash based on all members.
 /// @tparam T is the type.
@@ -209,10 +209,10 @@ struct Hash<ObserverPtr<T>>
 /// @brief std::hash specialization for an `IdentifiableMembersProxy`
 /// that computes a hash based on all members.
 /// @tparam ...Ts are the types of all members.
-template<HasIdentifiableMembers T>
+template<HasIdentifyingMembers T>
 struct Hash<T>
 {
-    size_t operator()(const T& proxy) const { return loki::hash_combine(proxy.identifiable_members()); }
+    size_t operator()(const T& proxy) const { return loki::hash_combine(proxy.identifying_members()); }
 };
 
 /**

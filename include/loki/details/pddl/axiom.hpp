@@ -52,7 +52,7 @@ public:
     const Condition& get_condition() const;
     size_t get_num_parameters_to_ground_head() const;
 
-    auto identifiable_members() const
+    auto identifying_members() const
     {
         return std::forward_as_tuple(std::as_const(m_derived_predicate_name),
                                      std::as_const(m_parameters),

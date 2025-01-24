@@ -47,7 +47,7 @@ public:
     size_t get_index() const;
     const std::string& get_name() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_name)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_name)); }
 };
 
 extern VariableSet collect_free_variables(const loki::ConditionImpl& condition);

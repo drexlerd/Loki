@@ -49,7 +49,7 @@ public:
     size_t get_index() const;
     const std::variant<Object, Variable>& get_object_or_variable() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_object_or_variable)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_object_or_variable)); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const TermImpl& element);

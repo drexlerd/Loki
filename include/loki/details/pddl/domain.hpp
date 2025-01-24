@@ -74,7 +74,7 @@ public:
     const ActionList& get_actions() const;
     const AxiomList& get_axioms() const;
 
-    auto identifiable_members() const
+    auto identifying_members() const
     {
         return std::forward_as_tuple(std::as_const(m_name),
                                      std::as_const(m_requirements),

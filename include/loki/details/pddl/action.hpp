@@ -61,13 +61,13 @@ public:
     const std::optional<Condition>& get_condition() const;
     const std::optional<Effect>& get_effect() const;
 
-    auto identifiable_members() const
+    auto identifying_members() const
     {
-        return std::forward_as_tuple(std::as_const(m_name),
-                                     std::as_const(m_original_arity),
-                                     std::as_const(m_parameters),
-                                     std::as_const(m_condition),
-                                     std::as_const(m_effect));
+        return std::tie(std::as_const(m_name),
+                        std::as_const(m_original_arity),
+                        std::as_const(m_parameters),
+                        std::as_const(m_condition),
+                        std::as_const(m_effect));
     }
 };
 

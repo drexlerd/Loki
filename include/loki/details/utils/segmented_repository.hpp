@@ -46,11 +46,11 @@ namespace loki
 /// hence requiring users to explicitly specialize std::hash and std::equal_to.
 /// @tparam T is the type of the elements to be stored.
 /// @tparam Hash is the hash function that defaults to the std::hash specialization of `ObserverPtr<const T>`
-/// A user has to explicitly define it. A type that satisfies the concept `HasIdentifiableMembers`
+/// A user has to explicitly define it. A type that satisfies the concept `HasIdentifyingMembers`
 /// in its intended way will obtain automatically generated std::hash specialization.
 /// @tparam KeyEqual is the comparison function that defaults to the std::equal_to specialization of
 /// `ObserverPtr<const T>`. A user has to explicitly define it. Similarly as for the Hash,
-/// a type that satisfies the concept `HasIdentifiableMembers` in its intended way will obtain
+/// a type that satisfies the concept `HasIdentifyingMembers` in its intended way will obtain
 /// automatically generated std::equal_to specialization.
 template<typename T, typename Hash = Hash<ObserverPtr<const T>>, typename EqualTo = EqualTo<ObserverPtr<const T>>>
 class SegmentedRepository

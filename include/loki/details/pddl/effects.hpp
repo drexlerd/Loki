@@ -59,7 +59,7 @@ public:
     size_t get_index() const;
     const Literal& get_literal() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_literal)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_literal)); }
 };
 
 /* And */
@@ -85,7 +85,7 @@ public:
     size_t get_index() const;
     const EffectList& get_effects() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_effects)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_effects)); }
 };
 
 /* EffectNumeric */
@@ -115,7 +115,7 @@ public:
     const Function& get_function() const;
     const FunctionExpression& get_function_expression() const;
 
-    auto identifiable_members() const
+    auto identifying_members() const
     {
         return std::forward_as_tuple(std::as_const(m_assign_operator), std::as_const(m_function), std::as_const(m_function_expression));
     }
@@ -146,7 +146,7 @@ public:
     const ParameterList& get_parameters() const;
     const Effect& get_effect() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_parameters), std::as_const(m_effect)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_parameters), std::as_const(m_effect)); }
 };
 
 /* CompositeWhen */
@@ -174,7 +174,7 @@ public:
     const Condition& get_condition() const;
     const Effect& get_effect() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_condition), std::as_const(m_effect)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_condition), std::as_const(m_effect)); }
 };
 
 class EffectCompositeOneofImpl
@@ -199,7 +199,7 @@ public:
     size_t get_index() const;
     const EffectList& get_effects() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_effects)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_effects)); }
 };
 
 class EffectCompositeProbabilisticImpl
@@ -224,7 +224,7 @@ public:
     size_t get_index() const;
     const EffectDistribution& get_effect_distribution() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_effect_distribution)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_effect_distribution)); }
 };
 
 /* EffectImpl */
@@ -253,7 +253,7 @@ public:
     size_t get_index() const;
     const EffectVariant& get_effect() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_effect)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_effect)); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element);

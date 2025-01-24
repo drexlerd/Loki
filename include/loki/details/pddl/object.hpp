@@ -48,7 +48,7 @@ public:
     const std::string& get_name() const;
     const TypeList& get_bases() const;
 
-    auto identifiable_members() const { return std::forward_as_tuple(std::as_const(m_name), std::as_const(m_types)); }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_name), std::as_const(m_types)); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const ObjectImpl& element);
