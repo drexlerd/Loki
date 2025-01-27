@@ -55,7 +55,10 @@ std::variant<Literal, FunctionValue> parse(const ast::InitialElementFunctionValu
 
     const auto ground_function = parse(node.ground_function, context);
     double number = parse(node.number);
-    test_nonnegative_number(number, node.number, context);
+    if (!context.requirements->test(RequirementEnum::NUMERIC_FLUENTS))
+    {
+        test_nonnegative_number(number, node.number, context);
+    }
     return context.factories.get_or_create_function_value(ground_function, number);
 }
 

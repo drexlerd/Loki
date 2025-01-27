@@ -283,6 +283,7 @@ void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)
                 out << " ";
             write(*element.get_functions()[i], out);
         }
+        out << ")\n";
     }
 
     for (const auto& action : element.get_actions())
@@ -493,7 +494,7 @@ void PDDLFormatter::write(const ObjectImpl& element, std::ostream& out)
         }
         else if (element.get_bases().size() == 1)
         {
-            write(*element.get_bases().front(), out);
+            out << element.get_bases().front()->get_name();
         }
     }
 }
