@@ -26,24 +26,24 @@
 
 namespace loki
 {
-AxiomImpl::AxiomImpl(size_t index, std::string derived_predicate_name, ParameterList parameters, Condition condition, size_t num_parameters_to_ground_head) :
+AxiomImpl::AxiomImpl(size_t index, ParameterList parameters, Predicate derived_predicate, Literal subtyped_literal, Condition condition) :
     m_index(index),
-    m_derived_predicate_name(std::move(derived_predicate_name)),
     m_parameters(std::move(parameters)),
-    m_condition(std::move(condition)),
-    m_num_parameters_to_ground_head(num_parameters_to_ground_head)
+    m_derived_predicate(std::move(derived_predicate)),
+    m_subtyped_literal(std::move(subtyped_literal)),
+    m_condition(std::move(condition))
 {
 }
 
 size_t AxiomImpl::get_index() const { return m_index; }
 
-const std::string& AxiomImpl::get_derived_predicate_name() const { return m_derived_predicate_name; }
-
-const Condition& AxiomImpl::get_condition() const { return m_condition; }
-
 const ParameterList& AxiomImpl::get_parameters() const { return m_parameters; }
 
-size_t AxiomImpl::get_num_parameters_to_ground_head() const { return m_num_parameters_to_ground_head; }
+const Predicate& AxiomImpl::get_derived_predicate() const { return m_derived_predicate; }
+
+const Literal& AxiomImpl::get_subtyped_literal() const { return m_subtyped_literal; }
+
+const Condition& AxiomImpl::get_condition() const { return m_condition; }
 
 std::ostream& operator<<(std::ostream& out, const AxiomImpl& element)
 {

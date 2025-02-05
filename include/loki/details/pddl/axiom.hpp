@@ -28,12 +28,12 @@ class AxiomImpl
 {
 private:
     size_t m_index;
-    std::string m_derived_predicate_name;
     ParameterList m_parameters;
+    Predicate m_derived_predicate;  ///< the predicate from the introduced :derived-predicates section
+    Literal m_subtyped_literal;     ///< the axiom may use subtypes
     Condition m_condition;
-    size_t m_num_parameters_to_ground_head;
 
-    AxiomImpl(size_t index, std::string derived_predicate_name, ParameterList parameters, Condition condition, size_t num_parameters_to_ground_head);
+    AxiomImpl(size_t index, ParameterList parameters, Predicate derived_predicate, Literal subtyped_literal, Condition condition);
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -47,17 +47,17 @@ public:
     AxiomImpl& operator=(AxiomImpl&& other) = default;
 
     size_t get_index() const;
-    const std::string& get_derived_predicate_name() const;
     const ParameterList& get_parameters() const;
+    const Predicate& get_derived_predicate() const;
+    const Literal& get_subtyped_literal() const;
     const Condition& get_condition() const;
-    size_t get_num_parameters_to_ground_head() const;
 
     auto identifying_members() const
     {
-        return std::forward_as_tuple(std::as_const(m_derived_predicate_name),
-                                     std::as_const(m_parameters),
-                                     std::as_const(m_condition),
-                                     std::as_const(m_num_parameters_to_ground_head));
+        return std::forward_as_tuple(std::as_const(m_parameters),
+                                     std::as_const(m_derived_predicate),
+                                     std::as_const(m_subtyped_literal),
+                                     std::as_const(m_condition));
     }
 };
 

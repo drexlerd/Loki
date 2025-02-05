@@ -372,13 +372,10 @@ Action PDDLRepositories::get_or_create_action(std::string name,
         .get_or_create(std::move(name), std::move(original_arity), std::move(parameters), std::move(condition), std::move(effect));
 }
 
-Axiom PDDLRepositories::get_or_create_axiom(std::string derived_predicate_name,
-                                            ParameterList parameters,
-                                            Condition condition,
-                                            size_t num_parameters_to_ground_head)
+Axiom PDDLRepositories::get_or_create_axiom(ParameterList parameters, Predicate derived_predicate, Literal subtyped_literal, Condition condition)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<AxiomImpl> {})
-        .get_or_create(std::move(derived_predicate_name), std::move(parameters), std::move(condition), num_parameters_to_ground_head);
+        .get_or_create(std::move(parameters), derived_predicate, subtyped_literal, condition);
 }
 
 OptimizationMetric PDDLRepositories::get_or_create_optimization_metric(OptimizationMetricEnum metric, FunctionExpression function_expression)
