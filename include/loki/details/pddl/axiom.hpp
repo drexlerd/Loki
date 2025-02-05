@@ -28,12 +28,11 @@ class AxiomImpl
 {
 private:
     size_t m_index;
-    ParameterList m_parameters;
-    Predicate m_derived_predicate;  ///< the predicate from the introduced :derived-predicates section
-    Literal m_subtyped_literal;     ///< the axiom may use subtypes
+    ParameterList m_parameters;  // the updated parameters which might contain subtypes.
+    Literal m_literal;
     Condition m_condition;
 
-    AxiomImpl(size_t index, ParameterList parameters, Predicate derived_predicate, Literal subtyped_literal, Condition condition);
+    AxiomImpl(size_t index, ParameterList parameters, Literal subtyped_literal, Condition condition);
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -48,17 +47,10 @@ public:
 
     size_t get_index() const;
     const ParameterList& get_parameters() const;
-    const Predicate& get_derived_predicate() const;
-    const Literal& get_subtyped_literal() const;
+    const Literal& get_literal() const;
     const Condition& get_condition() const;
 
-    auto identifying_members() const
-    {
-        return std::forward_as_tuple(std::as_const(m_parameters),
-                                     std::as_const(m_derived_predicate),
-                                     std::as_const(m_subtyped_literal),
-                                     std::as_const(m_condition));
-    }
+    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_parameters), std::as_const(m_literal), std::as_const(m_condition)); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const AxiomImpl& element);

@@ -26,11 +26,10 @@
 
 namespace loki
 {
-AxiomImpl::AxiomImpl(size_t index, ParameterList parameters, Predicate derived_predicate, Literal subtyped_literal, Condition condition) :
+AxiomImpl::AxiomImpl(size_t index, ParameterList parameters, Literal literal, Condition condition) :
     m_index(index),
     m_parameters(std::move(parameters)),
-    m_derived_predicate(std::move(derived_predicate)),
-    m_subtyped_literal(std::move(subtyped_literal)),
+    m_literal(std::move(literal)),
     m_condition(std::move(condition))
 {
 }
@@ -39,9 +38,7 @@ size_t AxiomImpl::get_index() const { return m_index; }
 
 const ParameterList& AxiomImpl::get_parameters() const { return m_parameters; }
 
-const Predicate& AxiomImpl::get_derived_predicate() const { return m_derived_predicate; }
-
-const Literal& AxiomImpl::get_subtyped_literal() const { return m_subtyped_literal; }
+const Literal& AxiomImpl::get_literal() const { return m_literal; }
 
 const Condition& AxiomImpl::get_condition() const { return m_condition; }
 

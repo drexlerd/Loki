@@ -260,7 +260,7 @@ public:
     Action
     get_or_create_action(std::string name, size_t original_arity, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);
 
-    Axiom get_or_create_axiom(ParameterList parameters, Predicate derived_predicate, Literal subtyped_literal, Condition condition);
+    Axiom get_or_create_axiom(ParameterList parameters, Literal subtyped_literal, Condition condition);
 
     OptimizationMetric get_or_create_optimization_metric(OptimizationMetricEnum metric, FunctionExpression function_expression);
 

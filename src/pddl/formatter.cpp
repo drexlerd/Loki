@@ -72,8 +72,8 @@ void PDDLFormatter::write(const AtomImpl& element, std::ostream& out)
 
 void PDDLFormatter::write(const AxiomImpl& element, std::ostream& out)
 {
-    out << std::string(m_indent, ' ') << "(:derived " << element.get_derived_predicate()->get_name();
-    for (size_t i = 0; i < element.get_subtyped_literal()->get_atom()->get_terms().size(); ++i)
+    out << std::string(m_indent, ' ') << "(:derived " << element.get_literal()->get_atom()->get_predicate()->get_name();
+    for (size_t i = 0; i < element.get_literal()->get_atom()->get_terms().size(); ++i)
     {
         out << " ";
         write(*element.get_parameters()[i], out);

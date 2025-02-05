@@ -131,7 +131,7 @@ Axiom parse(const ast::Axiom& node, Context& context)
         parameters.push_back(context.factories.get_or_create_parameter(variable, base_types));
     }
 
-    const auto axiom = context.factories.get_or_create_axiom(parameters, predicate, literal, condition);
+    const auto axiom = context.factories.get_or_create_axiom(parameters, literal, condition);
     context.positions.push_back(axiom, node);
     return axiom;
 }
