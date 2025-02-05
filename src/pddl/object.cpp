@@ -34,7 +34,7 @@ const TypeList& ObjectImpl::get_bases() const { return m_types; }
 std::ostream& operator<<(std::ostream& out, const ObjectImpl& element)
 {
     auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    formatter.write_typed(element, out);
     return out;
 }
 

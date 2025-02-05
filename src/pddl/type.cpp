@@ -61,7 +61,7 @@ bool is_subtype_or_equal(const Type& type, const TypeList& parent_types)
 std::ostream& operator<<(std::ostream& out, const TypeImpl& element)
 {
     auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    formatter.write_typed(element, out);
     return out;
 }
 

@@ -88,14 +88,20 @@ public:
     void write(const LiteralImpl& element, std::ostream& out);
     void write(const OptimizationMetricImpl& element, std::ostream& out);
     void write(const FunctionValueImpl& element, std::ostream& out);
-    void write(const ObjectImpl& element, std::ostream& out);
     void write(const ParameterImpl& element, std::ostream& out);
     void write(const PredicateImpl& element, std::ostream& out);
     void write(const ProblemImpl& element, std::ostream& out);
     void write(const RequirementsImpl& element, std::ostream& out);
-    void write(const TermImpl& element, std::ostream& out);
-    void write(const TypeImpl& element, std::ostream& out);
-    void write(const VariableImpl& element, std::ostream& out);
+
+    void write_untyped(const TypeImpl& element, std::ostream& out);
+    void write_untyped(const TermImpl& element, std::ostream& out);
+    void write_untyped(const ObjectImpl& element, std::ostream& out);
+    void write_untyped(const VariableImpl& element, std::ostream& out);
+
+    void write_typed(const TypeImpl& element, std::ostream& out);
+    void write_typed(const TermImpl& element, std::ostream& out);
+    void write_typed(const ObjectImpl& element, std::ostream& out);
+    void write_typed(const VariableImpl& element, std::ostream& out);
 };
 
 }

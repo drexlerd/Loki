@@ -95,6 +95,15 @@ Axiom parse(const ast::Axiom& node, Context& context)
     const auto [predicate, position_, error_handler] = context.scopes.top().get_predicate(predicate_name).value();
     test_arity_compatibility(parameters.size(), predicate->get_parameters().size(), node.atomic_formula_skeleton, context);
 
+    // Turn predicate parameters into terms
+    auto terms = TermList {};
+    for (const auto& parameter : parameters)
+    {
+        terms.push_back(context.factories.get_or_create_term(parameter->get_variable()));
+    }
+
+    const auto literal = context.factories.get_or_create_literal(false, context.factories.get_or_create_atom(predicate, terms));
+
     const auto condition = parse(node.goal_descriptor, context);
 
     context.allow_free_variables = false;
@@ -121,7 +130,8 @@ Axiom parse(const ast::Axiom& node, Context& context)
 
         parameters.push_back(context.factories.get_or_create_parameter(variable, base_types));
     }
-    const auto axiom = context.factories.get_or_create_axiom(predicate_name, parameters, condition, parameters.size());
+
+    const auto axiom = context.factories.get_or_create_axiom(parameters, predicate, literal, condition);
     context.positions.push_back(axiom, node);
     return axiom;
 }

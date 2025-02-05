@@ -101,7 +101,7 @@ VariableSet collect_free_variables(const ConditionImpl& condition)
 std::ostream& operator<<(std::ostream& out, const VariableImpl& element)
 {
     auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    formatter.write_untyped(element, out);  // there is no type
     return out;
 }
 

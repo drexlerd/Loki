@@ -65,15 +65,15 @@ void PDDLFormatter::write(const AtomImpl& element, std::ostream& out)
     for (size_t i = 0; i < element.get_terms().size(); ++i)
     {
         out << " ";
-        write(*element.get_terms()[i], out);
+        write_untyped(*element.get_terms()[i], out);
     }
     out << ")";
 }
 
 void PDDLFormatter::write(const AxiomImpl& element, std::ostream& out)
 {
-    out << std::string(m_indent, ' ') << "(:derived " << element.get_derived_predicate_name();
-    for (size_t i = 0; i < element.get_parameters().size(); ++i)
+    out << std::string(m_indent, ' ') << "(:derived " << element.get_derived_predicate()->get_name();
+    for (size_t i = 0; i < element.get_subtyped_literal()->get_atom()->get_terms().size(); ++i)
     {
         out << " ";
         write(*element.get_parameters()[i], out);
@@ -206,7 +206,8 @@ void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)
             {
                 if (i != 0)
                     out << " ";
-                out << sub_types[i]->get_name();
+
+                write_untyped(*sub_types[i], out);
             }
             out << " - ";
             if (types.size() > 1)
@@ -216,13 +217,13 @@ void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)
                 {
                     if (i != 0)
                         out << " ";
-                    types[i]->get_name();
+                    write_untyped(*types[i], out);
                 }
                 out << ")";
             }
             else if (types.size() == 1)
             {
-                out << types.front()->get_name();
+                write_untyped(*types.front(), out);
             }
             ++i;
         }
@@ -236,30 +237,26 @@ void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)
         {
             constants_by_types[constant->get_bases()].push_back(constant);
         }
-        size_t i = 0;
+        size_t j = 0;
         for (const auto& pair : constants_by_types)
         {
-            if (i != 0)
+            if (j != 0)
                 out << "\n" << std::string(m_indent, ' ');
             const auto& constants = pair.second;
             for (size_t i = 0; i < constants.size(); ++i)
             {
                 if (i != 0)
                     out << " ";
-                write(*constants[i], out);
-            }
-            if (element.get_requirements()->test(RequirementEnum::TYPING))
-            {
-                out << " - ";
-                const auto& types = pair.first;
-                for (size_t i = 0; i < types.size(); ++i)
+                if (i < constants.size() - 1 || !element.get_requirements()->test(RequirementEnum::TYPING))
                 {
-                    if (i != 0)
-                        out << " ";
-                    write(*types[i], out);
+                    write_untyped(*constants[i], out);
+                }
+                else
+                {
+                    write_typed(*constants[i], out);
                 }
             }
-            ++i;
+            ++j;
         }
         out << ")\n";
     }
@@ -441,7 +438,7 @@ void PDDLFormatter::write(const FunctionImpl& element, std::ostream& out)
         {
             if (i != 0)
                 out << " ";
-            write(*element.get_terms()[i], out);
+            write_untyped(*element.get_terms()[i], out);
         }
         out << "))";
     }
@@ -475,30 +472,6 @@ void PDDLFormatter::write(const FunctionValueImpl& element, std::ostream& out)
     out << " " << element.get_number() << ")";
 }
 
-void PDDLFormatter::write(const ObjectImpl& element, std::ostream& out)
-{
-    out << element.get_name();
-    if (!element.get_bases().empty())
-    {
-        out << " - ";
-        if (element.get_bases().size() > 1)
-        {
-            out << "(either ";
-            for (size_t i = 0; i < element.get_bases().size(); ++i)
-            {
-                if (i != 0)
-                    out << " ";
-                write(*element.get_bases()[i], out);
-            }
-            out << ")";
-        }
-        else if (element.get_bases().size() == 1)
-        {
-            out << element.get_bases().front()->get_name();
-        }
-    }
-}
-
 void PDDLFormatter::write(const ParameterImpl& element, std::ostream& out)
 {
     out << element.get_variable()->get_name();
@@ -512,13 +485,13 @@ void PDDLFormatter::write(const ParameterImpl& element, std::ostream& out)
             {
                 if (i != 0)
                     out << " ";
-                out << element.get_bases()[i]->get_name();
+                write_untyped(*element.get_bases()[i], out);
             }
             out << ")";
         }
         else if (element.get_bases().size() == 1)
         {
-            out << element.get_bases().front()->get_name();
+            write_untyped(*element.get_bases().front(), out);
         }
     }
 }
@@ -556,10 +529,10 @@ void PDDLFormatter::write(const ProblemImpl& element, std::ostream& out)
         {
             objects_by_types[object->get_bases()].push_back(object);
         }
-        size_t i = 0;
+        size_t j = 0;
         for (const auto& [types, objects] : objects_by_types)
         {
-            if (i != 0)
+            if (j != 0)
                 out << "\n" << std::string(m_indent, ' ');
             for (size_t i = 0; i < objects.size(); ++i)
             {
@@ -567,28 +540,16 @@ void PDDLFormatter::write(const ProblemImpl& element, std::ostream& out)
                 {
                     out << " ";
                 }
-                out << objects[i]->get_name();
-            }
-            if (element.get_requirements()->test(RequirementEnum::TYPING))
-            {
-                out << " - ";
-                if (types.size() > 1)
+                if (i < objects.size() - 1 || !element.get_domain()->get_requirements()->test(RequirementEnum::TYPING))
                 {
-                    out << "(either ";
-                    for (size_t i = 0; i < types.size(); ++i)
-                    {
-                        if (i != 0)
-                            out << " ";
-                        types[i]->get_name();
-                    }
-                    out << ")";
+                    write_untyped(*objects[i], out);
                 }
-                else if (types.size() == 1)
+                else
                 {
-                    out << types.front()->get_name();
+                    write_typed(*objects[i], out);
                 }
             }
-            ++i;
+            ++j;
         }
         out << ")\n";
     }
@@ -660,12 +621,18 @@ void PDDLFormatter::write(const RequirementsImpl& element, std::ostream& out)
     out << ")";
 }
 
-void PDDLFormatter::write(const TermImpl& element, std::ostream& out)
+void PDDLFormatter::write_untyped(const TypeImpl& element, std::ostream& out) { out << element.get_name(); }
+
+void PDDLFormatter::write_untyped(const TermImpl& element, std::ostream& out)
 {
-    std::visit([this, &out](const auto& arg) { this->write(*arg, out); }, element.get_object_or_variable());
+    std::visit([this, &out](const auto& arg) { this->write_untyped(*arg, out); }, element.get_object_or_variable());
 }
 
-void PDDLFormatter::write(const TypeImpl& element, std::ostream& out)
+void PDDLFormatter::write_untyped(const ObjectImpl& element, std::ostream& out) { out << element.get_name(); }
+
+void PDDLFormatter::write_untyped(const VariableImpl& element, std::ostream& out) { out << element.get_name(); }
+
+void PDDLFormatter::write_typed(const TypeImpl& element, std::ostream& out)
 {
     out << element.get_name();
     if (!element.get_bases().empty())
@@ -678,17 +645,46 @@ void PDDLFormatter::write(const TypeImpl& element, std::ostream& out)
             {
                 if (i != 0)
                     out << " ";
-                out << element.get_bases()[i]->get_name();
+                write_untyped(*element.get_bases()[i], out);
             }
             out << ")";
         }
         else if (element.get_bases().size() == 1)
         {
-            out << element.get_bases().front()->get_name();
+            write_untyped(*element.get_bases().front(), out);
         }
     }
 }
 
-void PDDLFormatter::write(const VariableImpl& element, std::ostream& out) { out << element.get_name(); }
+void PDDLFormatter::write_typed(const TermImpl& element, std::ostream& out)
+{
+    std::visit([this, &out](const auto& arg) { this->write_typed(*arg, out); }, element.get_object_or_variable());
+}
+
+void PDDLFormatter::write_typed(const ObjectImpl& element, std::ostream& out)
+{
+    out << element.get_name();
+    if (!element.get_bases().empty())
+    {
+        out << " - ";
+        if (element.get_bases().size() > 1)
+        {
+            out << "(either ";
+            for (size_t i = 0; i < element.get_bases().size(); ++i)
+            {
+                if (i != 0)
+                    out << " ";
+                write_untyped(*element.get_bases()[i], out);
+            }
+            out << ")";
+        }
+        else if (element.get_bases().size() == 1)
+        {
+            write_untyped(*element.get_bases().front(), out);
+        }
+    }
+}
+
+void PDDLFormatter::write_typed(const VariableImpl& element, std::ostream& out) { out << element.get_name(); }
 
 }

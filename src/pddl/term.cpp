@@ -34,7 +34,7 @@ const std::variant<Object, Variable>& TermImpl::get_object_or_variable() const {
 std::ostream& operator<<(std::ostream& out, const TermImpl& element)
 {
     auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    formatter.write_typed(element, out);
     return out;
 }
 
