@@ -35,9 +35,9 @@ struct is_tuple_of_const_references : std::false_type
 template<typename... Ts>
 struct is_tuple_of_const_references<
     std::tuple<Ts...>,
-    std::enable_if_t<std::conjunction_v<std::bool_constant<(std::is_lvalue_reference_v<Ts> && std::is_const_v<std::remove_reference_t<Ts>>) ||  // const lvalue
-                                                                                                                                                // reference
-                                                           (std::is_pointer_v<Ts>&& std::is_const_v<std::remove_pointer_t<Ts>>)  // pointer to const
+    std::enable_if_t<std::conjunction_v<std::bool_constant<(std::is_lvalue_reference_v<Ts> && std::is_const_v<std::remove_reference_t<Ts>>) ||   // const T&
+                                                           (std::is_lvalue_reference_v<Ts>&& std::is_pointer_v<std::remove_reference_t<Ts>>) ||  // const T*&
+                                                           (std::is_pointer_v<Ts>&& std::is_const_v<std::remove_pointer_t<Ts>>)                  // const T*
                                                            >...>>> : std::true_type
 {
 };
@@ -46,6 +46,7 @@ template<typename T>
 concept IsTupleOfConstRefs = is_tuple_of_const_references<T>::value;
 
 static_assert(IsTupleOfConstRefs<std::tuple<const int&>>);
+static_assert(IsTupleOfConstRefs<std::tuple<const int*&>>);
 static_assert(IsTupleOfConstRefs<std::tuple<const int*>>);
 static_assert(!IsTupleOfConstRefs<std::tuple<int*>>);
 static_assert(!IsTupleOfConstRefs<std::tuple<const int>>);
