@@ -45,6 +45,133 @@ struct EqualTo
     bool operator()(const T& lhs, const T& rhs) const { return std::equal_to<T>()(lhs, rhs); }
 };
 
+template<typename Key, typename Compare, typename Allocator>
+struct EqualTo<std::set<Key, Compare, Allocator>>
+{
+    size_t operator()(const std::set<Key, Compare, Allocator>& lhs, const std::set<Key, Compare, Allocator>& rhs) const
+    {
+        // Check size first
+        if (lhs.size() != rhs.size())
+        {
+            return false;
+        }
+
+        // Compare each element using loki::EqualTo
+        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<Key>());
+    }
+};
+
+template<typename Key, typename T, typename Compare, typename Allocator>
+struct EqualTo<std::map<Key, T, Compare, Allocator>>
+{
+    size_t operator()(const std::map<Key, T, Compare, Allocator>& lhs, const std::map<Key, T, Compare, Allocator>& rhs) const
+    {
+        // Check if sizes are different
+        if (lhs.size() != rhs.size())
+        {
+            return false;
+        }
+
+        std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::pair<Key, T>>());
+    }
+};
+
+template<typename T, typename Allocator>
+struct EqualTo<std::vector<T, Allocator>>
+{
+    size_t operator()(const std::vector<T, Allocator>& lhs, const std::vector<T, Allocator>& rhs) const
+    {
+        // Check size first
+        if (lhs.size() != rhs.size())
+        {
+            return false;
+        }
+
+        // Compare each element using loki::EqualTo
+        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<T>());
+    }
+};
+
+template<typename T1, typename T2>
+struct EqualTo<std::pair<T1, T2>>
+{
+    size_t operator()(const std::pair<T1, T2>& lhs, const std::pair<T1, T2>& rhs) const
+    {
+        return loki::EqualTo<T1>()(lhs.first, rhs.first) && loki::EqualTo<T1>()(lhs.second, rhs.second);
+    }
+};
+
+template<typename... Ts>
+struct EqualTo<std::tuple<Ts...>>
+{
+    size_t operator()(const std::tuple<Ts...>& lhs, const std::tuple<Ts...>& rhs) const
+    {
+        return std::apply([&rhs](const Ts&... lhs_args)
+                          { return std::apply([&lhs_args...](const Ts&... rhs_args) { return (loki::EqualTo<Ts>()(lhs_args, rhs_args) && ...); }, rhs); },
+                          lhs);
+    }
+};
+
+template<typename... Ts>
+struct EqualTo<std::variant<Ts...>>
+{
+    size_t operator()(const std::variant<Ts...>& lhs, const std::variant<Ts...>& rhs) const
+    {
+        return std::visit(
+            [](const auto& l, const auto& r)
+            {
+                // Check if types match
+                if constexpr (std::is_same_v<std::decay_t<decltype(l)>, std::decay_t<decltype(r)>>)
+                {
+                    // Recursively apply loki::EqualTo for matching types
+                    return loki::EqualTo<std::decay_t<decltype(l)>>()(l, r);
+                }
+                // Different types are always unequal
+                return false;
+            },
+            lhs,
+            rhs);
+    }
+};
+
+template<typename T>
+struct EqualTo<std::optional<T>>
+{
+    size_t operator()(const std::optional<T>& lhs, const std::optional<T>& rhs) const
+    {
+        // Check for presence of values
+        if (lhs.has_value() != rhs.has_value())
+        {
+            return false;
+        }
+
+        // If both are empty, they're equal
+        if (!lhs.has_value() && !rhs.has_value())
+        {
+            return true;
+        }
+
+        // Compare the contained values using loki::EqualTo
+        return loki::EqualTo<T>()(lhs.value(), rhs.value());
+    }
+};
+
+template<typename T, std::size_t Extent>
+struct EqualTo<std::span<T, Extent>>
+{
+    size_t operator()(const std::span<T, Extent>& lhs, const std::span<T, Extent>& rhs) const
+    {
+        // Check size first
+        if (lhs.size() != rhs.size())
+        {
+            return false;
+        }
+
+        // Compare each element using loki::EqualTo
+        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<T>());
+    }
+};
+
 /// @brief EqualTo specialization for types T that satisfy `HasIdentifyingMembers`.
 /// Dereferences the underlying pointer before forwarding the call to the std::equal_to
 /// specialization of `IdentifiableMemberProxy` of T to pairwise compare all members.
