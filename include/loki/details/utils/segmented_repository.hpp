@@ -59,14 +59,14 @@ private:
     // We use an unordered_set to test for uniqueness.
     absl::flat_hash_set<ObserverPtr<const T>, Hash, EqualTo> m_uniqueness_set;
 
-    size_t m_index_offset;  ///< Offset the index start.
+    std::vector<const T*> m_external_elements;  ///< Offset the index start.
 
     // We use pre-allocated memory to store objects persistent.
     SegmentedVector<T> m_persistent_vector;
 
     void range_check(size_t pos) const
     {
-        if ((pos - m_index_offset) >= size())
+        if (pos >= size())
         {
             throw std::out_of_range("SegmentedRepository::range_check: pos (which is " + std::to_string(pos) + ") >= this->size() (which is "
                                     + std::to_string(size()) + ")");
@@ -76,7 +76,7 @@ private:
 public:
     SegmentedRepository(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
         m_uniqueness_set(),
-        m_index_offset(0),
+        m_external_elements(),
         m_persistent_vector(SegmentedVector<T>(initial_num_element_per_segment, maximum_num_elements_per_segment))
     {
     }
@@ -85,21 +85,22 @@ public:
     SegmentedRepository(SegmentedRepository&& other) = default;
     SegmentedRepository& operator=(SegmentedRepository&& other) = default;
 
-    void set_index_offset(size_t offset)
+    void set_external_elements(const std::vector<const T*>& external_elements)
     {
         assert(m_uniqueness_set.empty() && m_persistent_vector.empty());
-        m_index_offset = offset;
+        m_external_elements = external_elements;
     }
 
     /// @brief Returns a pointer to an existing object or creates it before if it does not exist.
     template<typename... Args>
     T const* get_or_create(Args&&... args)
     {
+        assert(m_uniqueness_set.size() == m_persistent_vector.size());
+
         /* Construct and insert the element in persistent memory. */
 
         // Ensure that element with identifier i is stored at position i.
-        size_t index = m_uniqueness_set.size() + m_index_offset;
-        assert((index - m_index_offset) == m_persistent_vector.size());
+        size_t index = m_uniqueness_set.size() + m_external_elements.size();
 
         // Create element of type T
         auto element = T(index, std::forward<Args>(args)...);
@@ -133,8 +134,8 @@ public:
     /// @brief Returns a pointer to an existing object with the given pos.
     T const* operator[](size_t pos) const
     {
-        assert(pos - m_index_offset < size());
-        return &(m_persistent_vector.at(pos - m_index_offset));
+        assert(pos < size());
+        return (pos < m_external_elements.size()) ? m_external_elements[pos] : &(m_persistent_vector[pos]);
     }
 
     /// @brief Returns a pointer to an existing object with the given pos.
@@ -143,7 +144,7 @@ public:
     T const* at(size_t pos) const
     {
         range_check(pos);
-        return &(m_persistent_vector.at(pos - m_index_offset));
+        return (pos < m_external_elements.size()) ? m_external_elements.at(pos) : &(m_persistent_vector.at(pos));
     }
 
     auto begin() const { return m_persistent_vector.begin(); }
@@ -156,7 +157,7 @@ public:
      * Capacity
      */
 
-    size_t size() const { return m_persistent_vector.size(); }
+    size_t size() const { return m_persistent_vector.size() + m_external_elements.size(); }
 };
 
 }

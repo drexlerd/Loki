@@ -49,9 +49,9 @@ ProblemBuilder::ProblemBuilder(Domain domain) :
     m_domain_and_problem_axioms()
 {
     // Ensure that we continue the indexings.
-    boost::hana::at_key(m_repositories, boost::hana::type<ObjectImpl> {}).set_index_offset(domain->get_constants().size());
-    boost::hana::at_key(m_repositories, boost::hana::type<PredicateImpl> {}).set_index_offset(domain->get_predicates().size());
-    boost::hana::at_key(m_repositories, boost::hana::type<AxiomImpl> {}).set_index_offset(domain->get_axioms().size());
+    boost::hana::at_key(m_repositories, boost::hana::type<ObjectImpl> {}).set_external_elements(domain->get_constants());
+    boost::hana::at_key(m_repositories, boost::hana::type<PredicateImpl> {}).set_external_elements(domain->get_predicates());
+    boost::hana::at_key(m_repositories, boost::hana::type<AxiomImpl> {}).set_external_elements(domain->get_axioms());
 
     for (const auto& constant : domain->get_constants())
     {
