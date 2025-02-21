@@ -21,26 +21,18 @@
 int main()
 {
     // Parse the domain
-    auto domain_parser = loki::DomainParser(std::string(DATA_DIR) + "gripper/domain.pddl");
-    const auto domain = domain_parser.get_domain();
+    auto parser = loki::Parser(std::string(DATA_DIR) + "gripper/domain.pddl");
+
+    const auto domain = parser.get_domain();
     std::cout << *domain << std::endl;
 
     // Parse first problem
-    const auto problem_parser = loki::ProblemParser(std::string(DATA_DIR) + "gripper/p-2-0.pddl", domain_parser);
-    const auto problem1 = problem_parser.get_problem();
+    const auto problem1 = parser.parse_problem(std::string(DATA_DIR) + "gripper/p-2-0.pddl");
     std::cout << *problem1 << std::endl;
 
-    // Parse second problem where the constants are reordered
-    const auto problem_parser2 = loki::ProblemParser(std::string(DATA_DIR) + "gripper/p-2-1.pddl", domain_parser);
-    const auto problem2 = problem_parser2.get_problem();
+    // Parse second problem
+    const auto problem2 = parser.parse_problem(std::string(DATA_DIR) + "gripper/p-2-1.pddl");
     std::cout << *problem2 << std::endl;
-
-    /* Both problems are structurally equivalent */
-    assert(problem1 == problem2);
-
-    /* Note: since the PDDL objects are shared over the whole class of problems,
-             the idexing scheme is most likely fragmented per problem.
-             (In this specific case, it is not fragmented because both problems are structurally equivalent) */
 
     return 0;
 }

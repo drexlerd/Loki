@@ -21,13 +21,13 @@
 int main()
 {
     // Parse the domain
-    auto domain_parser = loki::DomainParser(std::string(DATA_DIR) + "gripper/domain.pddl");
-    const auto domain = domain_parser.get_domain();
+    auto parser = loki::Parser(std::string(DATA_DIR) + "gripper/domain.pddl");
+
+    const auto domain = parser.get_domain();
     std::cout << *domain << std::endl;
 
     // Parse the problem
-    const auto problem_parser = loki::ProblemParser(std::string(DATA_DIR) + "gripper/p-2-0.pddl", domain_parser);
-    const auto problem = problem_parser.get_problem();
+    const auto problem = parser.parse_problem(std::string(DATA_DIR) + "gripper/p-2-0.pddl");
     std::cout << *problem << std::endl;
 
     return 0;
