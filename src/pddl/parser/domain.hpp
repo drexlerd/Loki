@@ -15,27 +15,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <loki/loki.hpp>
+#ifndef LOKI_SRC_PDDL_PARSER_DOMAIN_HPP_
+#define LOKI_SRC_PDDL_PARSER_DOMAIN_HPP_
 
-int main(int argc, char** argv)
+#include "loki/details/ast/ast.hpp"
+#include "loki/details/pddl/declarations.hpp"
+
+namespace loki
 {
-    if (argc < 3)
-    {
-        std::cout << "Usage: interpreter <domain:str> <problem:str>" << std::endl;
-        return 1;
-    }
-    const auto domain_file = std::string { argv[1] };
-    const auto problem_file = std::string { argv[2] };
-
-    // 1. Parse the domain
-    auto parser = loki::Parser(domain_file);
-    const auto domain = parser.get_domain();
-    std::cout << *domain << std::endl << std::endl;
-
-    // 2. Parse the problem
-    const auto problem = parser.parse_problem(problem_file);
-    std::cout << *problem << std::endl;
-
-    return 0;
+extern void parse(const ast::Domain& node, DomainParsingContext& context);
 }
+
+#endif

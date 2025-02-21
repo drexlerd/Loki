@@ -31,6 +31,8 @@
 #include "loki/details/pddl/scope.hpp"
 #include "loki/details/utils/filesystem.hpp"
 #include "loki/details/utils/memory.hpp"
+#include "parser/domain.hpp"
+#include "parser/problem.hpp"
 
 #include <iostream>
 
@@ -67,7 +69,7 @@ Parser::Parser(const fs::path& domain_filepath, const Options& options) :
 
     auto context = DomainParsingContext(*m_domain_scopes, *m_domain_position_cache, options);
 
-    // TODO
+    parse(node, context);
 
     const auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -98,13 +100,15 @@ Problem Parser::parse_problem(const fs::path& problem_filepath, const Options& o
         throw SyntaxParserError("", x3_error_handler.get_error_stream().str());
     }
 
+    std::cout << parse_text(node) << std::endl;
+
     auto position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, problem_filepath);
     assert(m_domain_scopes->get_stack().size() == 1);
     auto scopes = std::make_unique<ScopeStack>(m_domain_position_cache->get_error_handler(), m_domain_scopes.get());
 
     auto context = ProblemParsingContext(*scopes, *position_cache, m_domain, options);
 
-    // TODO
+    parse(node, context);
 
     const auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);

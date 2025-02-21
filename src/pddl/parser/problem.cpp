@@ -15,27 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <loki/loki.hpp>
+#include "problem.hpp"
 
-int main(int argc, char** argv)
+namespace loki
 {
-    if (argc < 3)
-    {
-        std::cout << "Usage: interpreter <domain:str> <problem:str>" << std::endl;
-        return 1;
-    }
-    const auto domain_file = std::string { argv[1] };
-    const auto problem_file = std::string { argv[2] };
-
-    // 1. Parse the domain
-    auto parser = loki::Parser(domain_file);
-    const auto domain = parser.get_domain();
-    std::cout << *domain << std::endl << std::endl;
-
-    // 2. Parse the problem
-    const auto problem = parser.parse_problem(problem_file);
-    std::cout << *problem << std::endl;
-
-    return 0;
+void parse(const ast::Problem& node, ProblemParsingContext& context) {}
 }

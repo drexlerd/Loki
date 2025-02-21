@@ -192,10 +192,11 @@ using Problem = std::shared_ptr<const ProblemImpl>;
  */
 
 class DomainBuilder;
-class DomainParser;
+struct DomainParsingContext;
 
 class ProblemBuilder;
-class ProblemParser;
+struct ProblemParsingContext;
+
 }
 
 #endif
