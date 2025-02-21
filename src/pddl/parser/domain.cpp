@@ -23,6 +23,7 @@
 #include "loki/details/pddl/exceptions.hpp"
 #include "loki/details/pddl/requirements_enum.hpp"
 #include "loki/details/pddl/scope.hpp"
+#include "predicates.hpp"
 #include "requirements.hpp"
 #include "types.hpp"
 
@@ -73,10 +74,15 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
         types = parse(node.types.value(), context);
     }
     /* Constants section */
-    auto constants = ObjectList();
     if (node.constants.has_value())
     {
-        constants = parse(node.constants.value(), context);
+        parse(node.constants.value(), context);
+    }
+
+    /* Predicates section */
+    if (node.predicates.has_value())
+    {
+        parse(node.predicates.value(), context);
     }
 }
 }

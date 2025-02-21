@@ -24,6 +24,7 @@
 #include "loki/details/pddl/problem_parsing_context.hpp"
 #include "loki/details/pddl/requirements_enum.hpp"
 #include "loki/details/pddl/scope.hpp"
+#include "predicates.hpp"
 #include "requirements.hpp"
 
 namespace loki
@@ -50,5 +51,20 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
     const auto requirements = context.builder.get_or_create_requirements(requirements_set);
     context.builder.get_requirements() = requirements;
     context.requirements = requirements;
+
+    /* Objects section */
+    // auto objects = ObjectList();
+    // if (node.objects.has_value())
+    // {
+    //     objects = parse(node.objects.value(), context);
+    // }
+    // track_object_references(objects, context);
+
+    /* DerivedPredicates section */
+    if (node.derived_predicates.has_value())
+    {
+        parse(node.derived_predicates.value(), context);
+    }
+    // track_predicate_references(derived_predicates, context);
 }
 }
