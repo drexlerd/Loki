@@ -173,6 +173,16 @@ using OptimizationMetric = const OptimizationMetricImpl*;
 class ProblemImpl;
 using Problem = const ProblemImpl*;
 using ProblemList = std::vector<Problem>;
+
+/**
+ * Construction
+ */
+
+class DomainBuilder;
+class DomainParser;
+
+class ProblemBuilder;
+class ProblemParser;
 }
 
 #endif
