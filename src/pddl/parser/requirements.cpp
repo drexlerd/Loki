@@ -17,6 +17,7 @@
 
 #include "requirements.hpp"
 
+#include "loki/details/ast/config.hpp"
 #include "loki/details/pddl/domain_parsing_context.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 #include "loki/details/pddl/problem_parsing_context.hpp"

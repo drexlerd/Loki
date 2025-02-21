@@ -17,11 +17,10 @@
 
 #include "domain.hpp"
 
-#include "common/requirements.hpp"
-#include "loki/details/ast/ast.hpp"
 #include "loki/details/pddl/domain_parsing_context.hpp"
 #include "loki/details/pddl/requirements_enum.hpp"
 #include "loki/details/pddl/scope.hpp"
+#include "requirements.hpp"
 
 namespace loki
 {
@@ -33,6 +32,8 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
         const auto domain_requirements_set = parse(node.requirements.value(), context);
         requirements_set.insert(domain_requirements_set.begin(), domain_requirements_set.end());
     }
-    context.builder.get_requirements() = context.builder.get_or_create_requirements(requirements_set);
+    const auto requirements = context.builder.get_or_create_requirements(requirements_set);
+    context.builder.get_requirements() = requirements;
+    context.requirements = requirements;
 }
 }

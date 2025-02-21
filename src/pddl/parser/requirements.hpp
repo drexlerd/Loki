@@ -15,11 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SRC_PDDL_PARSER_COMMON_REQUIREMENTS_HPP_
-#define LOKI_SRC_PDDL_PARSER_COMMON_REQUIREMENTS_HPP_
+#ifndef LOKI_SRC_PDDL_PARSER_REQUIREMENTS_HPP_
+#define LOKI_SRC_PDDL_PARSER_REQUIREMENTS_HPP_
 
 #include "loki/details/ast/ast.hpp"
-#include "loki/details/ast/config.hpp"
 #include "loki/details/pddl/concepts.hpp"
 #include "loki/details/pddl/reference.hpp"
 

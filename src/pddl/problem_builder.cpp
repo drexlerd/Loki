@@ -134,6 +134,12 @@ Object ProblemBuilder::get_or_create_object(std::string name, TypeList types)
     return boost::hana::at_key(m_repositories, boost::hana::type<ObjectImpl> {}).get_or_create(std::move(name), std::move(types));
 }
 
+Term ProblemBuilder::get_or_create_term(Variable variable)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).get_or_create(variable);
+}
+Term ProblemBuilder::get_or_create_term(Object object) { return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).get_or_create(object); }
+
 Parameter ProblemBuilder::get_or_create_parameter(Variable variable, TypeList types)
 {
     std::sort(types.begin(), types.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });

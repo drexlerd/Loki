@@ -29,6 +29,7 @@ concept ParsingContext = requires(T a) {
     a.positions;
     a.references;
     a.builder;
+    a.requirements;
 };
 
 }

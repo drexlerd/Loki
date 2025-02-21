@@ -66,6 +66,9 @@ public:
 
     Object get_or_create_object(std::string name, TypeList types);
 
+    Term get_or_create_term(Variable variable);
+    Term get_or_create_term(Object object);
+
     Parameter get_or_create_parameter(Variable variable, TypeList types);
 
     Predicate get_or_create_predicate(std::string name, ParameterList parameters);

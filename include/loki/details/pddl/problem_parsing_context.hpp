@@ -38,6 +38,8 @@ struct ProblemParsingContext
 
     ProblemBuilder builder;  ///< Construct the resulting problem while parsing
 
+    Requirements requirements;
+
     ProblemParsingContext(ScopeStack& scopes, PDDLPositionCache& positions, const Domain& domain, const Options& options) :
         scopes(scopes),
         positions(positions),
