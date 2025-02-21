@@ -54,6 +54,7 @@ using TypeSet = std::unordered_set<Type>;
 class ObjectImpl;
 using Object = const ObjectImpl*;
 using ObjectList = std::vector<Object>;
+using ObjectSet = std::unordered_set<Object>;
 
 class VariableImpl;
 using Variable = const VariableImpl*;
@@ -77,10 +78,12 @@ using ParameterAssignment = std::unordered_map<Parameter, Object>;
 class PredicateImpl;
 using Predicate = const PredicateImpl*;
 using PredicateList = std::vector<Predicate>;
+using PredicateSet = std::unordered_set<Predicate>;
 
 class LiteralImpl;
 using Literal = const LiteralImpl*;
 using LiteralList = std::vector<Literal>;
+using LiteralSet = std::unordered_set<Literal>;
 
 class ConditionLiteralImpl;
 using ConditionLiteral = const ConditionLiteralImpl*;
@@ -138,6 +141,7 @@ using FunctionExpressionList = std::vector<FunctionExpression>;
 class FunctionSkeletonImpl;
 using FunctionSkeleton = const FunctionSkeletonImpl*;
 using FunctionSkeletonList = std::vector<FunctionSkeleton>;
+using FunctionSkeletonSet = std::unordered_set<FunctionSkeleton>;
 
 class FunctionImpl;
 using Function = const FunctionImpl*;
@@ -150,10 +154,12 @@ using ConstraintList = std::vector<Constraint>;
 class ActionImpl;
 using Action = const ActionImpl*;
 using ActionList = std::vector<Action>;
+using ActionSet = std::unordered_set<Action>;
 
 class AxiomImpl;
 using Axiom = const AxiomImpl*;
 using AxiomList = std::vector<Axiom>;
+using AxiomSet = std::unordered_set<Axiom>;
 
 class DomainImpl;
 using Domain = const DomainImpl*;
@@ -166,6 +172,7 @@ using DomainList = std::vector<Domain>;
 class FunctionValueImpl;
 using FunctionValue = const FunctionValueImpl*;
 using FunctionValueList = std::vector<FunctionValue>;
+using FunctionValueSet = std::unordered_set<FunctionValue>;
 
 class OptimizationMetricImpl;
 using OptimizationMetric = const OptimizationMetricImpl*;
