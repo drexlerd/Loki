@@ -34,22 +34,15 @@ private:
     HanaProblemRepositories m_repositories;
 
     Domain m_domain;  ///< Immutable planning domain
-
     std::optional<fs::path> m_filepath;
     std::string m_name;
-
     Requirements m_requirements;
-
-    std::unordered_map<std::string, Object> m_objects;
-    std::unordered_map<std::string, Object> m_domain_and_problem_predicates;
-
+    std::unordered_map<std::string, Object> m_domain_and_problem_objects;
+    std::unordered_map<std::string, Predicate> m_domain_and_problem_predicates;
     LiteralSet m_initial_literals;
-    std::unordered_map<Function, double> m_initial_function_values;
-
+    std::unordered_map<Function, FunctionValue> m_initial_function_values;
     std::optional<Condition> m_goal_condition;
-
     std::optional<OptimizationMetric> m_optimization_metric;
-
     AxiomSet m_domain_and_problem_axioms;
 
 public:
@@ -61,13 +54,15 @@ public:
     /// @brief Finalizes the `Problem` and returns it.
     /// The `ProblemBuilder` is in an invalid state afterwards.
     /// @return the resulting `Problem`.
-    Problem get_result();
+    Problem get_result(size_t problem_index);
 
     /**
      * Unique construction.
      */
 
     Requirements get_or_create_requirements(RequirementEnumSet requirements);
+
+    Variable get_or_create_variable(std::string name);
 
     Object get_or_create_object(std::string name, TypeList types);
 
@@ -88,11 +83,11 @@ public:
     FunctionExpressionMinus get_or_create_function_expression_minus(FunctionExpression function_expression);
 
     FunctionExpressionFunction get_or_create_function_expression_function(Function function);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionNumber fexpr_number);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionBinaryOperator fexpr_binary_op);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionMultiOperator fexpr_multi_op);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionMinus fexpr_minus);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionFunction fexpr_function);
+    FunctionExpression get_or_create_function_expression(FunctionExpressionNumber fexpr);
+    FunctionExpression get_or_create_function_expression(FunctionExpressionBinaryOperator fexpr);
+    FunctionExpression get_or_create_function_expression(FunctionExpressionMultiOperator fexpr);
+    FunctionExpression get_or_create_function_expression(FunctionExpressionMinus fexpr);
+    FunctionExpression get_or_create_function_expression(FunctionExpressionFunction fexpr);
     FunctionValue get_or_create_function_value(Function function, double number);
 
     ConditionLiteral get_or_create_condition_literal(Literal literal);
@@ -119,32 +114,19 @@ public:
     Axiom get_or_create_axiom(ParameterList parameters, Literal subtyped_literal, Condition condition);
 
     /**
-     * Problem-specific modifiers.
-     * Return true iff the element was newly inserted into the problem and false otherwise.
+     * Get and modify components of the problem.
      */
 
-    bool set_requirements(Requirements requirements);
-    bool add_object(Object object);
-    bool add_predicate(Predicate predicate);
-    bool add_initial_literal(Literal literal);
-    bool add_initial_function_value(FunctionValue function_value);
-    bool set_goal_condition(Condition condition);
-    bool set_optimization_metric(OptimizationMetric optimization_metric);
-    bool add_axiom(Axiom axiom);
-
-    /**
-     * Problem-specific accessors.
-     * Return true iff the element exist in the problem and false otherwise.
-     */
-
-    bool contains_requirement(RequirementEnum requirement) const;
-    bool contains_object(const std::string& name) const;
-    bool contains_predicate(const std::string& name) const;
-    bool contains_initial_literal(Literal literal) const;
-    bool contains_function_value(Function function) const;
-    bool has_goal_condition() const;
-    bool has_optimization_metric() const;
-    bool has_axiom(Axiom axiom) const;
+    std::optional<fs::path>& get_filepath();
+    std::string& get_name();
+    Requirements& get_requirements();
+    std::unordered_map<std::string, Object>& get_objects();
+    std::unordered_map<std::string, Predicate>& get_predicates();
+    LiteralSet& get_initial_literals();
+    std::unordered_map<Function, FunctionValue>& get_function_values();
+    std::optional<Condition>& get_goal_condition();
+    std::optional<OptimizationMetric>& get_optimization_metric();
+    AxiomSet& get_axioms();
 };
 }
 

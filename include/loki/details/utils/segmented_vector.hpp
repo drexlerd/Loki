@@ -168,6 +168,8 @@ public:
     size_t size() const { return m_size; }
 
     size_t capacity() const { return m_capacity; }
+
+    bool empty() const { return m_size == 0; }
 };
 
 }

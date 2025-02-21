@@ -78,11 +78,11 @@ public:
                                                                                      FunctionExpressionList function_expressions_);
     FunctionExpressionMinus get_or_create_function_expression_minus(FunctionExpression function_expression);
     FunctionExpressionFunction get_or_create_function_expression_function(Function function);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionNumber fexpr_number);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionBinaryOperator fexpr_binary_op);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionMultiOperator fexpr_multi_op);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionMinus fexpr_minus);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionFunction fexpr_function);
+    FunctionExpression get_or_create_function_expression(FunctionExpressionNumber fexpr);
+    FunctionExpression get_or_create_function_expression(FunctionExpressionBinaryOperator fexpr);
+    FunctionExpression get_or_create_function_expression(FunctionExpressionMultiOperator fexpr);
+    FunctionExpression get_or_create_function_expression(FunctionExpressionMinus fexpr);
+    FunctionExpression get_or_create_function_expression(FunctionExpressionFunction fexpr);
 
     Function get_or_create_function(FunctionSkeleton function_skeleton, TermList terms);
 
@@ -129,30 +129,18 @@ public:
     Axiom get_or_create_axiom(ParameterList parameters, Literal subtyped_literal, Condition condition);
 
     /**
-     * Domain-specific modifiers.
-     * Return true iff the element was newly inserted into the domain and false otherwise.
+     * Get and modify components of the domain.
      */
 
-    void set_requirements(Requirements requirements);
-    void insert_type(Type type);
-    void insert_constant(Object constant);
-    void insert_predicate(Predicate predicate);
-    void insert_function_skeleton(FunctionSkeleton function);
-    void insert_action(Action action);
-    void insert_axiom(Axiom axiom);
-
-    /**
-     * Domain-specific accessors.
-     * Return true iff the element exist in the domain and false otherwise.
-     */
-
-    void contains_requirements(RequirementEnum requirement) const;
-    void contains_type(const std::string& name) const;
-    void contains_constant(const std::string& name) const;
-    void contains_predicate(const std::string& name) const;
-    void contains_function_skeleton(const std::string& name) const;
-    void contains_action(Action action) const;
-    void contains_axiom(Axiom axiom) const;
+    std::optional<fs::path>& get_filepath();
+    std::string& get_name();
+    Requirements& get_requirements();
+    std::unordered_map<std::string, Type>& get_types();
+    std::unordered_map<std::string, Object>& get_constants();
+    std::unordered_map<std::string, Predicate>& get_predicates();
+    std::unordered_map<std::string, FunctionSkeleton>& get_function_skeletons();
+    ActionSet& get_actions();
+    AxiomSet& get_axioms();
 };
 }
 
