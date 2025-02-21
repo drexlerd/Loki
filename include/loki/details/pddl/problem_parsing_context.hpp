@@ -20,35 +20,29 @@
 
 #include "loki/details/pddl/domain_parsing_context.hpp"
 #include "loki/details/pddl/parser_options.hpp"
-#include "loki/details/pddl/position.hpp"
+#include "loki/details/pddl/position_cache.hpp"
 #include "loki/details/pddl/problem_builder.hpp"
 #include "loki/details/pddl/reference.hpp"
-#include "loki/details/pddl/repositories.hpp"
-#include "loki/details/pddl/scope.hpp"
 
 namespace loki
 {
 
 struct ProblemParsingContext
 {
-    // For referencing to existing bindings
-    ScopeStack scopes;
-    // For storing the positions in the input PDDL file
-    PDDLPositionCache positions;
-    // For checking that certain PDDL objects were referenced at least once
+    ScopeStack& scopes;
+    PDDLPositionCache& positions;
     ReferencedPDDLObjects references;
-    // Options
+
     Options options;
 
-    ProblemBuilder builder;     ///< Construct the resulting problem while parsing
-    Requirements requirements;  ///< Set this early for convenience
+    ProblemBuilder builder;  ///< Construct the resulting problem while parsing
 
-    ProblemParsingContext(const DomainParsingContext& domain_parsing_context, std::shared_ptr<const Domain> domain, const Options& options_) :
-        scopes(domain_parsing_context.scopes),
-        positions(domain_parsing_context.positions),
-        references(domain_parsing_context.references),
-        options(options_),
-        requirements(nullptr)
+    ProblemParsingContext(ScopeStack& scopes, PDDLPositionCache& positions, std::shared_ptr<const Domain> domain, const Options& options) :
+        scopes(scopes),
+        positions(positions),
+        references(),
+        options(options),
+        builder(domain)
     {
     }
 };

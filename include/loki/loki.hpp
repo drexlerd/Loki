@@ -6,7 +6,7 @@
  */
 
 #include "loki/details/exceptions.hpp"
-#include "loki/details/parser.hpp"
+#include "loki/details/pddl/parser.hpp"
 
 /**
  * AST
@@ -42,7 +42,7 @@
 #include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/parser.hpp"
-#include "loki/details/pddl/position.hpp"
+#include "loki/details/pddl/position_cache.hpp"
 #include "loki/details/pddl/predicate.hpp"
 #include "loki/details/pddl/reference.hpp"
 #include "loki/details/pddl/repositories.hpp"

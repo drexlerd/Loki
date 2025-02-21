@@ -36,17 +36,17 @@ namespace loki
 using position_tagged = boost::spirit::x3::position_tagged;
 
 template<typename Iterator>
-class PDDLErrorHandlerImpl
+class PDDLFileErrorHandlerImpl
 {
 public:
     typedef Iterator iterator_type;
     using position_cache = boost::spirit::x3::position_cache<std::vector<Iterator>>;
 
-    PDDLErrorHandlerImpl(position_cache pos_cache, fs::path file = "", int tabs = 4) : pos_cache(pos_cache), file(file), tabs(tabs) {}
-    PDDLErrorHandlerImpl(const PDDLErrorHandlerImpl& other) = default;
-    PDDLErrorHandlerImpl& operator=(const PDDLErrorHandlerImpl& other) = default;
-    PDDLErrorHandlerImpl(PDDLErrorHandlerImpl&& other) = default;
-    PDDLErrorHandlerImpl& operator=(PDDLErrorHandlerImpl&& other) = default;
+    PDDLFileErrorHandlerImpl(position_cache pos_cache, fs::path file = "", int tabs = 4) : pos_cache(pos_cache), file(file), tabs(tabs) {}
+    PDDLFileErrorHandlerImpl(const PDDLFileErrorHandlerImpl& other) = default;
+    PDDLFileErrorHandlerImpl& operator=(const PDDLFileErrorHandlerImpl& other) = default;
+    PDDLFileErrorHandlerImpl(PDDLFileErrorHandlerImpl&& other) = default;
+    PDDLFileErrorHandlerImpl& operator=(PDDLFileErrorHandlerImpl&& other) = default;
 
     std::string operator()(Iterator err_pos, std::string const& error_message) const;
     std::string operator()(Iterator err_first, Iterator err_last, std::string const& error_message) const;
@@ -71,7 +71,7 @@ private:
 };
 
 template<typename Iterator>
-std::string PDDLErrorHandlerImpl<Iterator>::print_file_line(std::size_t line) const
+std::string PDDLFileErrorHandlerImpl<Iterator>::print_file_line(std::size_t line) const
 {
     std::ostringstream err_out;
     if (file != "")
@@ -88,7 +88,7 @@ std::string PDDLErrorHandlerImpl<Iterator>::print_file_line(std::size_t line) co
 }
 
 template<typename Iterator>
-std::string PDDLErrorHandlerImpl<Iterator>::print_line(Iterator start, Iterator last) const
+std::string PDDLFileErrorHandlerImpl<Iterator>::print_line(Iterator start, Iterator last) const
 {
     std::ostringstream err_out;
     auto end = start;
@@ -107,7 +107,7 @@ std::string PDDLErrorHandlerImpl<Iterator>::print_line(Iterator start, Iterator 
 }
 
 template<typename Iterator>
-std::string PDDLErrorHandlerImpl<Iterator>::print_indicator(Iterator& start, Iterator last, char ind) const
+std::string PDDLFileErrorHandlerImpl<Iterator>::print_indicator(Iterator& start, Iterator last, char ind) const
 {
     std::ostringstream err_out;
     for (; start != last; ++start)
@@ -125,7 +125,7 @@ std::string PDDLErrorHandlerImpl<Iterator>::print_indicator(Iterator& start, Ite
 }
 
 template<class Iterator>
-inline Iterator PDDLErrorHandlerImpl<Iterator>::get_line_start(Iterator first, Iterator pos) const
+inline Iterator PDDLFileErrorHandlerImpl<Iterator>::get_line_start(Iterator first, Iterator pos) const
 {
     Iterator latest = first;
     for (Iterator i = first; i != pos;)
@@ -137,7 +137,7 @@ inline Iterator PDDLErrorHandlerImpl<Iterator>::get_line_start(Iterator first, I
 }
 
 template<typename Iterator>
-std::size_t PDDLErrorHandlerImpl<Iterator>::position(Iterator i) const
+std::size_t PDDLFileErrorHandlerImpl<Iterator>::position(Iterator i) const
 {
     std::size_t line { 1 };
     typename std::iterator_traits<Iterator>::value_type prev { 0 };
@@ -164,7 +164,7 @@ std::size_t PDDLErrorHandlerImpl<Iterator>::position(Iterator i) const
 }
 
 template<typename Iterator>
-std::string PDDLErrorHandlerImpl<Iterator>::operator()(Iterator err_pos, std::string const& error_message) const
+std::string PDDLFileErrorHandlerImpl<Iterator>::operator()(Iterator err_pos, std::string const& error_message) const
 {
     Iterator first = pos_cache.first();
     Iterator last = pos_cache.last();
@@ -181,7 +181,7 @@ std::string PDDLErrorHandlerImpl<Iterator>::operator()(Iterator err_pos, std::st
 }
 
 template<typename Iterator>
-std::string PDDLErrorHandlerImpl<Iterator>::operator()(Iterator err_first, Iterator err_last, std::string const& error_message) const
+std::string PDDLFileErrorHandlerImpl<Iterator>::operator()(Iterator err_first, Iterator err_last, std::string const& error_message) const
 {
     Iterator first = pos_cache.first();
     Iterator last = pos_cache.last();
@@ -198,7 +198,7 @@ std::string PDDLErrorHandlerImpl<Iterator>::operator()(Iterator err_first, Itera
     return err_out.str();
 }
 
-typedef PDDLErrorHandlerImpl<iterator_type> PDDLErrorHandler;
+typedef PDDLFileErrorHandlerImpl<iterator_type> PDDLErrorHandler;
 
 }
 

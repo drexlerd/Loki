@@ -20,11 +20,7 @@
 
 #include "loki/details/ast/config.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/function_skeleton.hpp"
-#include "loki/details/pddl/object.hpp"
-#include "loki/details/pddl/predicate.hpp"
-#include "loki/details/pddl/requirements.hpp"
-#include "loki/details/pddl/variable.hpp"
+#include "loki/details/pddl/requirements_enum.hpp"
 
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <cassert>

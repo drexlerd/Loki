@@ -28,7 +28,7 @@ int main(int argc, char** argv)
     const auto domain_file = std::string { argv[1] };
 
     // 1. Parse the domain
-    const auto domain_parser = loki::DomainParser(domain_file);
+    const auto domain_parser = loki::Parser(domain_file);
     const auto domain = domain_parser.get_domain();
     std::cout << *domain << std::endl;
 

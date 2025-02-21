@@ -32,7 +32,6 @@
 #include "loki/details/pddl/metric.hpp"
 #include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/parameter.hpp"
-#include "loki/details/pddl/position.hpp"
 #include "loki/details/pddl/predicate.hpp"
 #include "loki/details/pddl/requirements.hpp"
 #include "loki/details/pddl/term.hpp"

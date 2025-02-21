@@ -19,43 +19,10 @@
 #define LOKI_INCLUDE_LOKI_PDDL_REQUIREMENTS_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-
-#include <set>
-#include <string>
-#include <unordered_map>
+#include "loki/details/pddl/requirements_enum.hpp"
 
 namespace loki
 {
-enum class RequirementEnum
-{
-    STRIPS,
-    TYPING,
-    NEGATIVE_PRECONDITIONS,
-    DISJUNCTIVE_PRECONDITIONS,
-    EQUALITY,
-    EXISTENTIAL_PRECONDITIONS,
-    UNIVERSAL_PRECONDITIONS,
-    QUANTIFIED_PRECONDITIONS,
-    CONDITIONAL_EFFECTS,
-    FLUENTS,
-    OBJECT_FLUENTS,
-    NUMERIC_FLUENTS,
-    ADL,
-    DURATIVE_ACTIONS,
-    DERIVED_PREDICATES,
-    TIMED_INITIAL_LITERALS,
-    PREFERENCES,
-    CONSTRAINTS,
-    ACTION_COSTS,
-    NON_DETERMINISTIC,
-    PROBABILISTIC,
-};
-
-using RequirementEnumSet = std::set<RequirementEnum>;
-using RequirementEnumList = std::vector<RequirementEnum>;
-
-extern std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string;
-extern const std::string& to_string(RequirementEnum requirement);
 
 class RequirementsImpl
 {

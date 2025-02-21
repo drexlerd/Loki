@@ -21,6 +21,7 @@
 #include "loki/details/ast/ast.hpp"
 #include "loki/details/pddl/declarations.hpp"
 #include "loki/details/pddl/parser_options.hpp"
+#include "loki/details/pddl/position_cache.hpp"
 #include "loki/details/utils/filesystem.hpp"
 
 namespace loki
@@ -31,16 +32,15 @@ class Parser
 public:
     Parser(const fs::path& domain_filepath, const Options& options = Options());
 
-    const Options& get_options() const;
+    std::shared_ptr<const Problem> parse_problem(const fs::path& problem_filepath, const Options& options = Options()) const;
 
-    std::shared_ptr<const Problem> parse_problem(const fs::path& problem_filepath) const;
+    const std::shared_ptr<const Domain>& get_domain() const;
 
 private:
-    Options m_options;
-
-    size_t m_next_problem_index;  ///< assign indices to parsed problems.
-
-    std::shared_ptr<const Domain> m_domain;  ///< the parsed domain
+    std::shared_ptr<const Domain> m_domain;                      ///< The parsed domain
+    std::unique_ptr<PDDLPositionCache> m_domain_position_cache;  ///< The matched positions in the domain PDDL file.
+    std::unique_ptr<ScopeStack> m_domain_scopes;                 ///< The declared domain elements.
+    size_t m_next_problem_index;                                 ///< The index for the next problem.
 };
 
 }
