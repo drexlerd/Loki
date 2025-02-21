@@ -78,7 +78,7 @@ Parser::Parser(const fs::path& domain_filepath, const Options& options) :
     exit(1);
 }
 
-std::shared_ptr<const Problem> Parser::parse_problem(const fs::path& problem_filepath, const Options& options) const
+Problem Parser::parse_problem(const fs::path& problem_filepath, const Options& options) const
 {
     auto source = loki::read_file(problem_filepath);
 
@@ -115,5 +115,5 @@ std::shared_ptr<const Problem> Parser::parse_problem(const fs::path& problem_fil
     exit(1);
 }
 
-const std::shared_ptr<const Domain>& Parser::get_domain() const { return m_domain; }
+const Domain& Parser::get_domain() const { return m_domain; }
 }

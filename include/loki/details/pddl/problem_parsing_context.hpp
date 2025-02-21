@@ -37,7 +37,7 @@ struct ProblemParsingContext
 
     ProblemBuilder builder;  ///< Construct the resulting problem while parsing
 
-    ProblemParsingContext(ScopeStack& scopes, PDDLPositionCache& positions, std::shared_ptr<const Domain> domain, const Options& options) :
+    ProblemParsingContext(ScopeStack& scopes, PDDLPositionCache& positions, const Domain& domain, const Options& options) :
         scopes(scopes),
         positions(positions),
         references(),

@@ -22,6 +22,7 @@
 #include "loki/details/utils/concepts.hpp"
 
 #include <cstddef>
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -169,8 +170,7 @@ using AxiomList = std::vector<Axiom>;
 using AxiomSet = std::unordered_set<Axiom>;
 
 class DomainImpl;
-using Domain = const DomainImpl*;
-using DomainList = std::vector<Domain>;
+using Domain = std::shared_ptr<const DomainImpl>;
 
 /**
  * Problem
@@ -185,8 +185,7 @@ class OptimizationMetricImpl;
 using OptimizationMetric = const OptimizationMetricImpl*;
 
 class ProblemImpl;
-using Problem = const ProblemImpl*;
-using ProblemList = std::vector<Problem>;
+using Problem = std::shared_ptr<const ProblemImpl>;
 
 /**
  * Construction

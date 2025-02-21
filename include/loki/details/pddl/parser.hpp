@@ -32,12 +32,12 @@ class Parser
 public:
     Parser(const fs::path& domain_filepath, const Options& options = Options());
 
-    std::shared_ptr<const Problem> parse_problem(const fs::path& problem_filepath, const Options& options = Options()) const;
+    Problem parse_problem(const fs::path& problem_filepath, const Options& options = Options()) const;
 
-    const std::shared_ptr<const Domain>& get_domain() const;
+    const Domain& get_domain() const;
 
 private:
-    std::shared_ptr<const Domain> m_domain;                      ///< The parsed domain
+    Domain m_domain;                                             ///< The parsed domain
     std::unique_ptr<PDDLPositionCache> m_domain_position_cache;  ///< The matched positions in the domain PDDL file.
     std::unique_ptr<ScopeStack> m_domain_scopes;                 ///< The declared domain elements.
     size_t m_next_problem_index;                                 ///< The index for the next problem.

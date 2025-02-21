@@ -33,7 +33,7 @@ class ProblemBuilder
 private:
     HanaProblemRepositories m_repositories;
 
-    std::shared_ptr<const Domain> m_domain;  ///< Immutable planning domain
+    Domain m_domain;  ///< Immutable planning domain
 
     std::optional<fs::path> m_filepath;
     std::string m_name;
@@ -56,7 +56,7 @@ public:
     /// @brief Create a `ProblemBuilder` for a given `Domain`.
     /// Copies parts elements from the `Domain` into the `HanaProblemRepositories` and problem specific information to ensure indexing schemas.
     /// @param domain
-    explicit ProblemBuilder(std::shared_ptr<const Domain> domain);
+    explicit ProblemBuilder(Domain domain);
 
     /// @brief Finalizes the `Problem` and returns it.
     /// The `ProblemBuilder` is in an invalid state afterwards.
