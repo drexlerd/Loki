@@ -19,8 +19,7 @@ namespace loki
 {
 
 template<typename... Ts>
-PositionCache<Ts...>::PositionCache(const X3ErrorHandler& error_handler, const fs::path& file, int tabs) :
-    m_error_handler(PDDLErrorHandler(error_handler.get_error_handler().get_position_cache(), file, tabs))
+PositionCache<Ts...>::PositionCache()
 {
 }
 
@@ -43,12 +42,6 @@ PositionList PositionCache<Ts...>::get(const PDDLElement<T>& element) const
         return it->second;
     }
     return {};
-}
-
-template<typename... Ts>
-const PDDLErrorHandler& PositionCache<Ts...>::get_error_handler() const
-{
-    return m_error_handler;
 }
 
 }

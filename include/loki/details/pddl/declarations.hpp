@@ -18,6 +18,7 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_DECLARATIONS_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_DECLARATIONS_HPP_
 
+#include "boost/hana.hpp"
 #include "loki/details/utils/concepts.hpp"
 
 #include <cstddef>

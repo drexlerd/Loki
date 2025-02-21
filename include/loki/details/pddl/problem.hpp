@@ -19,6 +19,7 @@
 #define LOKI_INCLUDE_LOKI_PDDL_PROBLEM_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/problem_repositories.hpp"
 #include "loki/details/utils/filesystem.hpp"
 
 #include <optional>
@@ -30,6 +31,7 @@ class ProblemImpl
 {
 private:
     size_t m_index;
+    HanaProblemRepositories m_repositories;
     std::optional<fs::path> m_filepath;
     Domain m_domain;
     std::string m_name;
@@ -42,7 +44,9 @@ private:
     std::optional<OptimizationMetric> m_optimization_metric;
     AxiomList m_axioms;
 
+public:
     ProblemImpl(size_t index,
+                HanaProblemRepositories repositories,
                 std::optional<fs::path> filepath,
                 Domain domain,
                 std::string name,
@@ -55,11 +59,6 @@ private:
                 std::optional<OptimizationMetric> optimization_metric,
                 AxiomList axioms);
 
-    // Give access to the constructor.
-    template<typename T, typename Hash, typename EqualTo>
-    friend class SegmentedRepository;
-
-public:
     // moveable but not copyable
     ProblemImpl(const ProblemImpl& other) = delete;
     ProblemImpl& operator=(const ProblemImpl& other) = delete;

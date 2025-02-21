@@ -43,6 +43,10 @@ public:
     using position_cache = boost::spirit::x3::position_cache<std::vector<Iterator>>;
 
     PDDLErrorHandlerImpl(position_cache pos_cache, fs::path file = "", int tabs = 4) : pos_cache(pos_cache), file(file), tabs(tabs) {}
+    PDDLErrorHandlerImpl(const PDDLErrorHandlerImpl& other) = default;
+    PDDLErrorHandlerImpl& operator=(const PDDLErrorHandlerImpl& other) = default;
+    PDDLErrorHandlerImpl(PDDLErrorHandlerImpl&& other) = default;
+    PDDLErrorHandlerImpl& operator=(PDDLErrorHandlerImpl&& other) = default;
 
     std::string operator()(Iterator err_pos, std::string const& error_message) const;
     std::string operator()(Iterator err_first, Iterator err_last, std::string const& error_message) const;

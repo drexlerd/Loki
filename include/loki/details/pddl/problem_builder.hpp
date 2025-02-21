@@ -19,7 +19,7 @@
 #define LOKI_INCLUDE_LOKI_PDDL_PROBLEM_BUILDER_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/repositories.hpp"
+#include "loki/details/pddl/problem_repositories.hpp"
 #include "loki/details/utils/filesystem.hpp"
 
 #include <optional>
@@ -27,36 +27,6 @@
 
 namespace loki
 {
-
-using HanaProblemRepositories =
-    boost::hana::map<boost::hana::pair<boost::hana::type<RequirementsImpl>, RequirementsRepository>,
-                     boost::hana::pair<boost::hana::type<VariableImpl>, VariableRepository>,
-                     boost::hana::pair<boost::hana::type<TermImpl>, TermRepository>,
-                     boost::hana::pair<boost::hana::type<ObjectImpl>, ObjectRepository>,
-                     boost::hana::pair<boost::hana::type<AtomImpl>, AtomRepository>,
-                     boost::hana::pair<boost::hana::type<LiteralImpl>, LiteralRepository>,
-                     boost::hana::pair<boost::hana::type<ParameterImpl>, ParameterRepository>,
-                     boost::hana::pair<boost::hana::type<PredicateImpl>, PredicateRepository>,
-                     boost::hana::pair<boost::hana::type<FunctionExpressionNumberImpl>, FunctionExpressionNumberRepository>,
-                     boost::hana::pair<boost::hana::type<FunctionExpressionBinaryOperatorImpl>, FunctionExpressionBinaryOperatorRepository>,
-                     boost::hana::pair<boost::hana::type<FunctionExpressionMultiOperatorImpl>, FunctionExpressionMultiOperatorRepository>,
-                     boost::hana::pair<boost::hana::type<FunctionExpressionMinusImpl>, FunctionExpressionMinusRepository>,
-                     boost::hana::pair<boost::hana::type<FunctionExpressionFunctionImpl>, FunctionExpressionFunctionRepository>,
-                     boost::hana::pair<boost::hana::type<FunctionExpressionImpl>, FunctionExpressionRepository>,
-                     boost::hana::pair<boost::hana::type<FunctionImpl>, FunctionRepository>,
-                     boost::hana::pair<boost::hana::type<FunctionSkeletonImpl>, FunctionSkeletonRepository>,
-                     boost::hana::pair<boost::hana::type<ConditionLiteralImpl>, ConditionLiteralRepository>,
-                     boost::hana::pair<boost::hana::type<ConditionAndImpl>, ConditionAndRepository>,
-                     boost::hana::pair<boost::hana::type<ConditionOrImpl>, ConditionOrRepository>,
-                     boost::hana::pair<boost::hana::type<ConditionNotImpl>, ConditionNotRepository>,
-                     boost::hana::pair<boost::hana::type<ConditionImplyImpl>, ConditionImplyRepository>,
-                     boost::hana::pair<boost::hana::type<ConditionExistsImpl>, ConditionExistsRepository>,
-                     boost::hana::pair<boost::hana::type<ConditionForallImpl>, ConditionForallRepository>,
-                     boost::hana::pair<boost::hana::type<ConditionNumericConstraintImpl>, ConditionNumericConstraintRepository>,
-                     boost::hana::pair<boost::hana::type<ConditionImpl>, ConditionRepository>,
-                     boost::hana::pair<boost::hana::type<AxiomImpl>, AxiomRepository>,
-                     boost::hana::pair<boost::hana::type<OptimizationMetricImpl>, OptimizationMetricRepository>,
-                     boost::hana::pair<boost::hana::type<FunctionValueImpl>, FunctionValueRepository>>;
 
 class ProblemBuilder
 {

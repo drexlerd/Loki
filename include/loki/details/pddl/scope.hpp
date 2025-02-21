@@ -45,10 +45,6 @@ namespace loki
 template<typename T>
 using BindingValueType = std::pair<T, std::optional<Position>>;
 
-/// @brief Encapsulates the result of search for a binding with the corresponding ErrorHandler.
-template<typename T>
-using BindingSearchResult = std::tuple<T, std::optional<Position>, const PDDLErrorHandler&>;
-
 /// @brief Datastructure to store bindings of a type T.
 template<typename T>
 using Bindings = std::unordered_map<std::string, BindingValueType<T>>;
@@ -57,7 +53,6 @@ using Bindings = std::unordered_map<std::string, BindingValueType<T>>;
 class Scope
 {
 private:
-    const PDDLErrorHandler& m_error_handler;
     const Scope* m_parent_scope;
 
     Bindings<Type> m_types;
@@ -67,20 +62,26 @@ private:
     Bindings<Predicate> m_predicates;
 
 public:
-    Scope(const PDDLErrorHandler& error_handler, const Scope* parent_scope = nullptr);
+    explicit Scope(const Scope* parent_scope = nullptr);
+    Scope(Bindings<Type> types,
+          Bindings<Object> objects,
+          Bindings<FunctionSkeleton> function_skeletons,
+          Bindings<Variable> variables,
+          Bindings<Predicate> predicates,
+          const Scope* parent_scope = nullptr);
+    Scope(const Scope& other) = default;
+    Scope& operator=(const Scope& other) = default;
+    Scope(Scope&& other) = default;
+    Scope& operator=(Scope&& other) = default;
 
-    // delete copy and move to avoid dangling references.
-    Scope(const Scope& other) = delete;
-    Scope& operator=(const Scope& other) = delete;
-    Scope(Scope&& other) = delete;
-    Scope& operator=(Scope&& other) = delete;
+    std::unique_ptr<Scope> clone(const Scope* parent = nullptr) const;
 
     /// @brief Return a binding if it exists.
-    std::optional<BindingSearchResult<Type>> get_type(const std::string& name) const;
-    std::optional<BindingSearchResult<Object>> get_object(const std::string& name) const;
-    std::optional<BindingSearchResult<FunctionSkeleton>> get_function_skeleton(const std::string& name) const;
-    std::optional<BindingSearchResult<Variable>> get_variable(const std::string& name) const;
-    std::optional<BindingSearchResult<Predicate>> get_predicate(const std::string& name) const;
+    std::optional<BindingValueType<Type>> get_type(const std::string& name) const;
+    std::optional<BindingValueType<Object>> get_object(const std::string& name) const;
+    std::optional<BindingValueType<FunctionSkeleton>> get_function_skeleton(const std::string& name) const;
+    std::optional<BindingValueType<Variable>> get_variable(const std::string& name) const;
+    std::optional<BindingValueType<Predicate>> get_predicate(const std::string& name) const;
 
     /// @brief Insert a binding.
     void insert_type(const std::string& name, const Type& type, const std::optional<Position>& position);
@@ -88,41 +89,36 @@ public:
     void insert_function_skeleton(const std::string& name, const FunctionSkeleton& function_skeleton, const std::optional<Position>& position);
     void insert_variable(const std::string& name, const Variable& variable, const std::optional<Position>& position);
     void insert_predicate(const std::string& name, const Predicate& predicate, const std::optional<Position>& position);
-
-    /// @brief Get the error handler to print an error message.
-    const PDDLErrorHandler& get_error_handler() const;
 };
 
-/// @brief Implements a scoping mechanism to store bindings which are mappings from name to a pointer to a PDDL object
-///        type and a position in the input stream that can be used to construct error messages with the given ErrorHandler.
-///
-///        We use ScopeStacks indicated with surrounding "[.]" to stack scopes indicated with surrounding "(.)" to store bindings.
-///        We initialize the parsing step by creating a ScopeStack with a single scope that we call the global scope.
-///        During parsing we can open and close new scopes but we must ensure that only the single global scope remains.
-///        We can access bindings by calling the get method and the matching binding in the nearest scope is returned.
-///        We can also insert new bindings in the current scope.
-///
-///        During domain file parsing, we have a single scope stack structured as follows:
-///        [ (Domain Scope Global), (Domain Scope Child 1), (Domain Scope Child 2), ... ]
-///
-///        During problem file parsing, we get access to bindings from the domain through additional composition as follows:
-///        [ (Domain Scope Global) ], [ (Problem Scope Global), (Problem Scope Child 1), (Problem Scope Child 2), ... ]
 class ScopeStack
 {
 private:
-    const PDDLErrorHandler& m_error_handler;
-    const ScopeStack* m_parent;
-
     std::deque<std::unique_ptr<Scope>> m_stack;
 
 public:
-    ScopeStack(const PDDLErrorHandler& error_handler, const ScopeStack* parent = nullptr);
-
-    // delete copy and move to avoid dangling references.
-    ScopeStack(const ScopeStack& other) = delete;
-    ScopeStack& operator=(const ScopeStack& other) = delete;
-    ScopeStack(ScopeStack&& other) = delete;
-    ScopeStack& operator=(ScopeStack&& other) = delete;
+    ScopeStack() = default;
+    ScopeStack(const ScopeStack& other) : m_stack()
+    {
+        const Scope* cur = nullptr;
+        for (const auto& scope : other.m_stack)
+        {
+            m_stack.push_back(scope->clone(cur));
+            cur = m_stack.back().get();
+        }
+    }
+    ScopeStack& operator=(const ScopeStack& other)
+    {
+        m_stack.clear();
+        const Scope* cur = nullptr;
+        for (const auto& scope : other.m_stack)
+        {
+            m_stack.push_back(scope->clone(cur));
+            cur = m_stack.back().get();
+        }
+    }
+    ScopeStack(ScopeStack&& other) = default;
+    ScopeStack& operator=(ScopeStack&& other) = default;
 
     /// @brief Inserts a new scope on the top of the stack.
     void open_scope();

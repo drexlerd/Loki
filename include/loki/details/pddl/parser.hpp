@@ -19,14 +19,29 @@
 #define LOKI_INCLUDE_LOKI_PDDL_PARSER_HPP_
 
 #include "loki/details/ast/ast.hpp"
-#include "loki/details/pddl/context.hpp"
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/parser_options.hpp"
+#include "loki/details/utils/filesystem.hpp"
 
 namespace loki
 {
 
-extern Domain parse(const fs::path& filepath, const ast::Domain& domain_node, Context& context);
-extern Problem parse(const fs::path& filepath, const ast::Problem& problem_node, Context& context, const Domain& domain);
+class Parser
+{
+public:
+    Parser(const fs::path& domain_filepath, const Options& options = Options());
+
+    const Options& get_options() const;
+
+    std::shared_ptr<const Problem> parse_problem(const fs::path& problem_filepath) const;
+
+private:
+    Options m_options;
+
+    size_t m_next_problem_index;  ///< assign indices to parsed problems.
+
+    std::shared_ptr<const Domain> m_domain;  ///< the parsed domain
+};
 
 }
 

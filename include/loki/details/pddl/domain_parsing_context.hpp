@@ -15,9 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_PDDL_CONTEXT_HPP_
-#define LOKI_INCLUDE_LOKI_PDDL_CONTEXT_HPP_
+#ifndef LOKI_INCLUDE_LOKI_PDDL_DOMAIN_PARSING_CONTEXT_HPP_
+#define LOKI_INCLUDE_LOKI_PDDL_DOMAIN_PARSING_CONTEXT_HPP_
 
+#include "loki/details/pddl/domain_builder.hpp"
+#include "loki/details/pddl/parser_options.hpp"
 #include "loki/details/pddl/position.hpp"
 #include "loki/details/pddl/reference.hpp"
 #include "loki/details/pddl/repositories.hpp"
@@ -26,38 +28,34 @@
 namespace loki
 {
 
-struct Context
+struct DomainParsingContext
 {
-    // For the unique construction of PDDL objects
-    PDDLRepositories& factories;
-    // For storing the positions in the input PDDL file
-    PDDLPositionCache& positions;
+    // FOr error handling
+    PDDLErrorHandler error_handler;
     // For referencing to existing bindings
-    ScopeStack& scopes;
-    // For strict error checking
-    bool strict;
-    // For printing warnings
-    bool quiet;
-    // Toggle error checks during parsing
-    bool allow_free_variables;
+    ScopeStack scopes;
+    // For storing the positions in the input PDDL file
+    PDDLPositionCache positions;
     // For checking that certain PDDL objects were referenced at least once
     ReferencedPDDLObjects references;
-    // For convenience, to avoid an additional parameter during semantic parsing
+    // Options
+    Options options;
+
+    DomainBuilder builder;
+
     Requirements requirements;
 
-    Context(PDDLRepositories& factories_, PDDLPositionCache& positions_, ScopeStack& scopes_, bool strict_ = false, bool quiet_ = true) :
-        factories(factories_),
-        positions(positions_),
-        scopes(scopes_),
-        strict(strict_),
-        quiet(quiet_),
-        allow_free_variables(false),
-        references(ReferencedPDDLObjects()),
+    DomainParsingContext(X3ErrorHandler& x3_error_handler, const Options& options_) :
+        error_handler(x3_error_handler.get_error_handler().get_position_cache()),
+        scopes(),
+        positions(),
+        references(),
+        options(options_),
+        builder(),
         requirements(nullptr)
     {
     }
 };
-
 }
 
 #endif

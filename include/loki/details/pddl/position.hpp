@@ -37,18 +37,18 @@ class PositionCache
 private:
     std::tuple<PositionMapType<Ts>...> m_positions;
 
-    PDDLErrorHandler m_error_handler;
-
 public:
-    PositionCache(const X3ErrorHandler& error_handler, const fs::path& file, int tabs = 4);
+    PositionCache();
+    PositionCache(const PositionCache& other) = default;
+    PositionCache& operator=(const PositionCache& other) = default;
+    PositionCache(PositionCache&& other) = default;
+    PositionCache& operator=(PositionCache&& other) = default;
 
     template<typename T>
     void push_back(const PDDLElement<T>& element, const Position& position);
 
     template<typename T>
     PositionList get(const PDDLElement<T>& element) const;
-
-    const PDDLErrorHandler& get_error_handler() const;
 };
 
 }

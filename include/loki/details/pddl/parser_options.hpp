@@ -15,20 +15,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "goal.hpp"
-
-#include "conditions.hpp"
-#include "loki/details/pddl/conditions.hpp"
-
-#include <iostream>
+#ifndef LOKI_INCLUDE_LOKI_PDDL_PARSER_OPTIONS_HPP_
+#define LOKI_INCLUDE_LOKI_PDDL_PARSER_OPTIONS_HPP_
 
 namespace loki
 {
-
-Condition parse(const ast::Goal& node, Context& context)
+struct Options
 {
-    const auto condition = parse(node.precondition_goal_descriptor, context);
-    return condition;
+    bool strict;
+    bool quiet;
+    bool allow_free_variables;
+
+    Options() : strict(false), quiet(true), allow_free_variables(false) {}
+};
 }
 
-}
+#endif

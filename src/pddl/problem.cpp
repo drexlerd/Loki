@@ -36,6 +36,7 @@ using namespace std;
 namespace loki
 {
 ProblemImpl::ProblemImpl(size_t index,
+                         HanaProblemRepositories repositories,
                          std::optional<fs::path> filepath,
                          Domain domain,
                          std::string name,
@@ -48,6 +49,7 @@ ProblemImpl::ProblemImpl(size_t index,
                          std::optional<OptimizationMetric> optimization_metric,
                          AxiomList axioms) :
     m_index(index),
+    m_repositories(std::move(repositories)),
     m_filepath(std::move(filepath)),
     m_domain(std::move(domain)),
     m_name(std::move(name)),

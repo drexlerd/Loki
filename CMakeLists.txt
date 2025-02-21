@@ -101,16 +101,16 @@ endif()
 
 add_subdirectory(src)
 
-add_subdirectory(exe)
+# add_subdirectory(exe)
 
-add_subdirectory(examples)
+# add_subdirectory(examples)
 
 if (BUILD_TESTS)
-  add_subdirectory(tests)
+  # add_subdirectory(tests)
 endif()
 
 if (BUILD_BENCHMARKS)
-  add_subdirectory(benchmarks)
+  # add_subdirectory(benchmarks)
 endif()
 
 

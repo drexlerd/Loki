@@ -19,13 +19,32 @@
 
 namespace loki
 {
-Scope::Scope(const PDDLErrorHandler& error_handler, const Scope* parent_scope) : m_error_handler(error_handler), m_parent_scope(parent_scope) {}
+Scope::Scope(const Scope* parent_scope) : m_parent_scope(parent_scope) {}
 
-std::optional<BindingSearchResult<Type>> Scope::get_type(const std::string& name) const
+Scope::Scope(Bindings<Type> types,
+             Bindings<Object> objects,
+             Bindings<FunctionSkeleton> function_skeletons,
+             Bindings<Variable> variables,
+             Bindings<Predicate> predicates,
+             const Scope* parent_scope = nullptr) :
+    m_types(std::move(types)),
+    m_objects(std::move(objects)),
+    m_function_skeletons(std::move(function_skeletons)),
+    m_variables(std::move(variables)),
+    m_predicates(std::move(predicates))
+{
+}
+
+std::unique_ptr<Scope> Scope::clone(const Scope* parent = nullptr) const
+{
+    return std::make_unique<Scope>(Scope(m_types, m_objects, m_function_skeletons, m_variables, m_predicates, parent));
+}
+
+std::optional<BindingValueType<Type>> Scope::get_type(const std::string& name) const
 {
     const auto it = m_types.find(name);
     if (it != m_types.end())
-        return std::make_tuple(it->second.first, it->second.second, std::cref(m_error_handler));
+        return std::make_pair(it->second.first, it->second.second);
     if (m_parent_scope)
     {
         return m_parent_scope->get_type(name);
@@ -33,11 +52,11 @@ std::optional<BindingSearchResult<Type>> Scope::get_type(const std::string& name
     return std::nullopt;
 }
 
-std::optional<BindingSearchResult<Object>> Scope::get_object(const std::string& name) const
+std::optional<BindingValueType<Object>> Scope::get_object(const std::string& name) const
 {
     const auto it = m_objects.find(name);
     if (it != m_objects.end())
-        return std::make_tuple(it->second.first, it->second.second, std::cref(m_error_handler));
+        return it->second;
     if (m_parent_scope)
     {
         return m_parent_scope->get_object(name);
@@ -45,11 +64,11 @@ std::optional<BindingSearchResult<Object>> Scope::get_object(const std::string& 
     return std::nullopt;
 }
 
-std::optional<BindingSearchResult<FunctionSkeleton>> Scope::get_function_skeleton(const std::string& name) const
+std::optional<BindingValueType<FunctionSkeleton>> Scope::get_function_skeleton(const std::string& name) const
 {
     const auto it = m_function_skeletons.find(name);
     if (it != m_function_skeletons.end())
-        return std::make_tuple(it->second.first, it->second.second, std::cref(m_error_handler));
+        return it->second;
     if (m_parent_scope)
     {
         return m_parent_scope->get_function_skeleton(name);
@@ -57,11 +76,11 @@ std::optional<BindingSearchResult<FunctionSkeleton>> Scope::get_function_skeleto
     return std::nullopt;
 }
 
-std::optional<BindingSearchResult<Variable>> Scope::get_variable(const std::string& name) const
+std::optional<BindingValueType<Variable>> Scope::get_variable(const std::string& name) const
 {
     const auto it = m_variables.find(name);
     if (it != m_variables.end())
-        return std::make_tuple(it->second.first, it->second.second, std::cref(m_error_handler));
+        return it->second;
     if (m_parent_scope)
     {
         return m_parent_scope->get_variable(name);
@@ -69,11 +88,11 @@ std::optional<BindingSearchResult<Variable>> Scope::get_variable(const std::stri
     return std::nullopt;
 }
 
-std::optional<BindingSearchResult<Predicate>> Scope::get_predicate(const std::string& name) const
+std::optional<BindingValueType<Predicate>> Scope::get_predicate(const std::string& name) const
 {
     const auto it = m_predicates.find(name);
     if (it != m_predicates.end())
-        return std::make_tuple(it->second.first, it->second.second, std::cref(m_error_handler));
+        return it->second;
     if (m_parent_scope)
     {
         return m_parent_scope->get_predicate(name);
@@ -111,17 +130,7 @@ void Scope::insert_predicate(const std::string& name, const Predicate& element, 
     m_predicates.emplace(name, BindingValueType<Predicate>(element, position));
 }
 
-const PDDLErrorHandler& Scope::get_error_handler() const { return m_error_handler; }
-
-ScopeStack::ScopeStack(const PDDLErrorHandler& error_handler, const ScopeStack* parent) : m_error_handler(error_handler), m_parent(parent) {}
-
-void ScopeStack::open_scope()
-{
-    // Link to parent Scope across parent ScopeStacks.
-    m_stack.push_back(m_stack.empty() ?
-                          (m_parent ? std::make_unique<Scope>(m_error_handler, m_parent->m_stack.back().get()) : std::make_unique<Scope>(m_error_handler)) :
-                          std::make_unique<Scope>(m_error_handler, m_stack.back().get()));
-}
+void ScopeStack::open_scope() { m_stack.push_back(m_stack.empty() ? std::make_unique<Scope>() : std::make_unique<Scope>(m_stack.back().get())); }
 
 void ScopeStack::close_scope()
 {
