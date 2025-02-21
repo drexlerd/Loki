@@ -18,7 +18,6 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_PARSER_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_PARSER_HPP_
 
-#include "loki/details/ast/ast.hpp"
 #include "loki/details/pddl/declarations.hpp"
 #include "loki/details/pddl/parser_options.hpp"
 #include "loki/details/pddl/position_cache.hpp"
@@ -37,10 +36,11 @@ public:
     const Domain& get_domain() const;
 
 private:
-    Domain m_domain;                                             ///< The parsed domain
-    std::unique_ptr<PDDLPositionCache> m_domain_position_cache;  ///< The matched positions in the domain PDDL file.
-    std::unique_ptr<ScopeStack> m_domain_scopes;                 ///< The declared domain elements.
-    size_t m_next_problem_index;                                 ///< The index for the next problem.
+    Domain m_domain;                                                   ///< The parsed domain.
+    std::unique_ptr<FilePositionErrorHandler> m_domain_error_handler;  ///< The error handler.
+    std::unique_ptr<PDDLPositionCache> m_domain_position_cache;        ///< The mapping of pddl elements to positions in the input domain file.
+    std::unique_ptr<ScopeStack> m_domain_scopes;                       ///< The declared domain elements.
+    size_t m_next_problem_index;                                       ///< The index for the next problem.
 };
 
 }

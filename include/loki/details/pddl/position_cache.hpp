@@ -55,10 +55,11 @@ class PositionCache
 private:
     std::tuple<PositionMapType<Ts>...> m_positions;
 
-    FilePositionErrorHandler m_error_handler;
+    // Do we really need error handler here?
+    FilePositionErrorHandler& m_error_handler;
 
 public:
-    explicit PositionCache(FilePositionErrorHandler error_handler);
+    explicit PositionCache(FilePositionErrorHandler& error_handler);
 
     template<typename T>
     void push_back(const PDDLElement<T>& element, const Position& position);
@@ -70,7 +71,7 @@ public:
 };
 
 template<typename... Ts>
-PositionCache<Ts...>::PositionCache(FilePositionErrorHandler error_handler) : m_error_handler(std::move(error_handler))
+PositionCache<Ts...>::PositionCache(FilePositionErrorHandler& error_handler) : m_error_handler(error_handler)
 {
 }
 

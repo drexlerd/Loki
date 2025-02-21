@@ -18,15 +18,24 @@
 #include "domain.hpp"
 
 #include "common.hpp"
+#include "constants.hpp"
 #include "loki/details/pddl/domain_parsing_context.hpp"
+#include "loki/details/pddl/exceptions.hpp"
 #include "loki/details/pddl/requirements_enum.hpp"
 #include "loki/details/pddl/scope.hpp"
 #include "requirements.hpp"
+#include "types.hpp"
 
 namespace loki
 {
 void parse(const ast::Domain& node, DomainParsingContext& context)
 {
+    // Create base types.
+    const auto base_type_object = context.builder.get_or_create_type("object", TypeList());
+    const auto base_type_number = context.builder.get_or_create_type("number", TypeList());
+    context.scopes.top().insert_type("object", base_type_object, {});
+    context.scopes.top().insert_type("number", base_type_number, {});
+
     /* Domain name */
     context.builder.get_name() = parse(node.domain_name.name);
 
@@ -40,5 +49,34 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
     const auto requirements = context.builder.get_or_create_requirements(requirements_set);
     context.builder.get_requirements() = requirements;
     context.requirements = requirements;
+
+    if (context.requirements->test(RequirementEnum::EQUALITY))
+    {
+        // Create equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
+        const auto binary_parameterlist =
+            ParameterList { context.builder.get_or_create_parameter(context.builder.get_or_create_variable("?left_arg"), TypeList { base_type_object }),
+                            context.builder.get_or_create_parameter(context.builder.get_or_create_variable("?right_arg"), TypeList { base_type_object })
+
+            };
+        const auto equal_predicate = context.builder.get_or_create_predicate("=", binary_parameterlist);
+        context.scopes.top().insert_predicate("=", equal_predicate, {});
+    }
+
+    /* Types section */
+    auto types = TypeList();
+    if (node.types.has_value())
+    {
+        if (!context.requirements->test(RequirementEnum::TYPING))
+        {
+            throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.top().get_error_handler()(node.types.value(), ""));
+        }
+        types = parse(node.types.value(), context);
+    }
+    /* Constants section */
+    auto constants = ObjectList();
+    if (node.constants.has_value())
+    {
+        constants = parse(node.constants.value(), context);
+    }
 }
 }

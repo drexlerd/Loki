@@ -63,8 +63,9 @@ Parser::Parser(const fs::path& domain_filepath, const Options& options) :
 
     std::cout << parse_text(node) << std::endl;
 
-    m_domain_position_cache = std::make_unique<PDDLPositionCache>(FilePositionErrorHandler(x3_error_handler.get_position_cache(), domain_filepath, 4));
-    m_domain_scopes = std::make_unique<ScopeStack>(m_domain_position_cache->get_error_handler());
+    m_domain_error_handler = std::make_unique<FilePositionErrorHandler>(x3_error_handler.get_position_cache(), domain_filepath, 4);
+    m_domain_position_cache = std::make_unique<PDDLPositionCache>(*m_domain_error_handler);
+    m_domain_scopes = std::make_unique<ScopeStack>(*m_domain_error_handler);
     m_domain_scopes->open_scope();  ///< open the root scope which should not be closed
 
     auto context = DomainParsingContext(*m_domain_scopes, *m_domain_position_cache, options);
@@ -103,12 +104,13 @@ Problem Parser::parse_problem(const fs::path& problem_filepath, const Options& o
 
     std::cout << parse_text(node) << std::endl;
 
-    auto position_cache = std::make_unique<PDDLPositionCache>(FilePositionErrorHandler(x3_error_handler.get_position_cache(), problem_filepath, 4));
+    auto error_handler = FilePositionErrorHandler(x3_error_handler.get_position_cache(), problem_filepath, 4);
+    auto position_cache = PDDLPositionCache(error_handler);
     assert(m_domain_scopes->get_stack().size() == 1);
-    auto scopes = std::make_unique<ScopeStack>(position_cache->get_error_handler(), m_domain_scopes.get());
-    scopes->open_scope();  ///< open the root scope which should not be closed
+    auto scopes = ScopeStack(error_handler, m_domain_scopes.get());
+    scopes.open_scope();  ///< open the root scope which should not be closed
 
-    auto context = ProblemParsingContext(*scopes, *position_cache, m_domain, options);
+    auto context = ProblemParsingContext(scopes, position_cache, m_domain, options);
 
     parse(node, context);
 

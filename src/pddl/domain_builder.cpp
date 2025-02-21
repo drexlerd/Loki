@@ -91,25 +91,14 @@ Domain DomainBuilder::get_result()
 
 Requirements DomainBuilder::get_or_create_requirements(RequirementEnumSet requirement_set)
 {
-    if (m_requirements)
-    {
-        throw std::runtime_error("DomainBuilder::get_or_create_requirements: requirements were already set.");
-    }
-
-    m_requirements = boost::hana::at_key(m_repositories, boost::hana::type<RequirementsImpl> {}).get_or_create(std::move(requirement_set));
-
-    return m_requirements;
+    return boost::hana::at_key(m_repositories, boost::hana::type<RequirementsImpl> {}).get_or_create(std::move(requirement_set));
 }
 
 Type DomainBuilder::get_or_create_type(std::string name, TypeList bases)
 {
     std::sort(bases.begin(), bases.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
 
-    const auto type = boost::hana::at_key(m_repositories, boost::hana::type<TypeImpl> {}).get_or_create(std::move(name), std::move(bases));
-
-    m_types.emplace(name, type);
-
-    return type;
+    return boost::hana::at_key(m_repositories, boost::hana::type<TypeImpl> {}).get_or_create(std::move(name), std::move(bases));
 }
 
 Variable DomainBuilder::get_or_create_variable(std::string name)
@@ -121,11 +110,7 @@ Object DomainBuilder::get_or_create_object(std::string name, TypeList types)
 {
     std::sort(types.begin(), types.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
 
-    const auto constant = boost::hana::at_key(m_repositories, boost::hana::type<ObjectImpl> {}).get_or_create(std::move(name), std::move(types));
-
-    m_constants.emplace(name, constant);
-
-    return constant;
+    return boost::hana::at_key(m_repositories, boost::hana::type<ObjectImpl> {}).get_or_create(std::move(name), std::move(types));
 }
 
 Term DomainBuilder::get_or_create_term(Variable variable)
@@ -143,11 +128,7 @@ Parameter DomainBuilder::get_or_create_parameter(Variable variable, TypeList typ
 
 Predicate DomainBuilder::get_or_create_predicate(std::string name, ParameterList parameters)
 {
-    const auto predicate = boost::hana::at_key(m_repositories, boost::hana::type<PredicateImpl> {}).get_or_create(std::move(name), std::move(parameters));
-
-    m_predicates.emplace(name, predicate);
-
-    return predicate;
+    return boost::hana::at_key(m_repositories, boost::hana::type<PredicateImpl> {}).get_or_create(std::move(name), std::move(parameters));
 }
 
 Atom DomainBuilder::get_or_create_atom(Predicate predicate, TermList terms)
@@ -215,12 +196,8 @@ Function DomainBuilder::get_or_create_function(FunctionSkeleton function_skeleto
 
 FunctionSkeleton DomainBuilder::get_or_create_function_skeleton(std::string name, ParameterList parameters, Type type)
 {
-    const auto function_skeleton =
-        boost::hana::at_key(m_repositories, boost::hana::type<FunctionSkeletonImpl> {}).get_or_create(std::move(name), std::move(parameters), std::move(type));
-
-    m_functions.emplace(name, function_skeleton);
-
-    return function_skeleton;
+    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionSkeletonImpl> {})
+        .get_or_create(std::move(name), std::move(parameters), std::move(type));
 }
 
 ConditionLiteral DomainBuilder::get_or_create_condition_literal(Literal literal)
@@ -370,21 +347,13 @@ Action DomainBuilder::get_or_create_action(std::string name,
                                            std::optional<Condition> condition,
                                            std::optional<Effect> effect)
 {
-    const auto action = boost::hana::at_key(m_repositories, boost::hana::type<ActionImpl> {})
-                            .get_or_create(std::move(name), std::move(original_arity), std::move(parameters), std::move(condition), std::move(effect));
-
-    m_actions.insert(action);
-
-    return action;
+    return boost::hana::at_key(m_repositories, boost::hana::type<ActionImpl> {})
+        .get_or_create(std::move(name), std::move(original_arity), std::move(parameters), std::move(condition), std::move(effect));
 }
 
 Axiom DomainBuilder::get_or_create_axiom(ParameterList parameters, Literal subtyped_literal, Condition condition)
 {
-    const auto axiom = boost::hana::at_key(m_repositories, boost::hana::type<AxiomImpl> {}).get_or_create(std::move(parameters), subtyped_literal, condition);
-
-    m_axioms.insert(axiom);
-
-    return axiom;
+    return boost::hana::at_key(m_repositories, boost::hana::type<AxiomImpl> {}).get_or_create(std::move(parameters), subtyped_literal, condition);
 }
 
 std::optional<fs::path>& DomainBuilder::get_filepath() { return m_filepath; }
