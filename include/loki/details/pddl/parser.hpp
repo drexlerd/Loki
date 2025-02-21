@@ -32,7 +32,7 @@ class Parser
 public:
     Parser(const fs::path& domain_filepath, const Options& options = Options());
 
-    Problem parse_problem(const fs::path& problem_filepath, const Options& options = Options()) const;
+    Problem parse_problem(const fs::path& problem_filepath, const Options& options = Options());
 
     const Domain& get_domain() const;
 

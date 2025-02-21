@@ -75,6 +75,8 @@ Domain DomainBuilder::get_result()
     std::sort(axioms.begin(), axioms.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
     verify_indexing_scheme(axioms, "DomainBuilder::get_result: axioms must follow and indexing scheme.");
 
+    m_requirements = (m_requirements) ? m_requirements : get_or_create_requirements(RequirementEnumSet { RequirementEnum::STRIPS });
+
     return std::make_shared<const DomainImpl>(std::move(m_repositories),
                                               std::move(m_filepath),
                                               std::move(m_name),

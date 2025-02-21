@@ -100,6 +100,8 @@ Problem ProblemBuilder::get_result(size_t problem_index)
     auto axioms = AxiomList { m_domain_and_problem_axioms.begin(), m_domain_and_problem_axioms.end() };
     std::sort(axioms.begin(), axioms.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
 
+    m_requirements = (m_requirements) ? m_requirements : get_or_create_requirements(RequirementEnumSet { RequirementEnum::STRIPS });
+
     return std::make_shared<const ProblemImpl>(problem_index,
                                                std::move(m_repositories),
                                                std::move(m_filepath),

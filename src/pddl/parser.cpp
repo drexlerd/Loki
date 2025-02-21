@@ -63,6 +63,7 @@ Parser::Parser(const fs::path& domain_filepath, const Options& options) :
 
     m_domain_position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, domain_filepath);
     m_domain_scopes = std::make_unique<ScopeStack>(m_domain_position_cache->get_error_handler());
+    m_domain_scopes->open_scope();  ///< open the root scope which should not be closed
 
     auto context = DomainParsingContext(*m_domain_scopes, *m_domain_position_cache, options);
 
@@ -75,10 +76,10 @@ Parser::Parser(const fs::path& domain_filepath, const Options& options) :
         std::cout << "Finished parsing domain file after " << duration.count() << " milliseconds." << std::endl;
     }
 
-    exit(1);
+    m_domain = context.builder.get_result();
 }
 
-Problem Parser::parse_problem(const fs::path& problem_filepath, const Options& options) const
+Problem Parser::parse_problem(const fs::path& problem_filepath, const Options& options)
 {
     auto source = loki::read_file(problem_filepath);
 
@@ -112,7 +113,7 @@ Problem Parser::parse_problem(const fs::path& problem_filepath, const Options& o
         std::cout << "Finished parsing problem file after " << duration.count() << " milliseconds." << std::endl;
     }
 
-    exit(1);
+    return context.builder.get_result(m_next_problem_index++);
 }
 
 const Domain& Parser::get_domain() const { return m_domain; }

@@ -44,6 +44,7 @@
 #include "loki/details/pddl/parser.hpp"
 #include "loki/details/pddl/position_cache.hpp"
 #include "loki/details/pddl/predicate.hpp"
+#include "loki/details/pddl/problem.hpp"
 #include "loki/details/pddl/reference.hpp"
 #include "loki/details/pddl/repositories.hpp"
 #include "loki/details/pddl/requirements.hpp"

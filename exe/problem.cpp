@@ -29,13 +29,12 @@ int main(int argc, char** argv)
     const auto problem_file = std::string { argv[2] };
 
     // 1. Parse the domain
-    auto domain_parser = loki::DomainParser(domain_file);
-    const auto domain = domain_parser.get_domain();
+    auto parser = loki::Parser(domain_file);
+    const auto domain = parser.get_domain();
     std::cout << *domain << std::endl;
 
     // 2. Parse the problem
-    const auto problem_parser = loki::ProblemParser(problem_file, domain_parser);
-    const auto problem = problem_parser.get_problem();
+    const auto problem = parser.parse_problem(problem_file);
     std::cout << *problem << std::endl;
 
     return 0;
