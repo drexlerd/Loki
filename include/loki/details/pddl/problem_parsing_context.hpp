@@ -18,6 +18,7 @@
 #ifndef LOKI_INCLUDE_LOKI_PDDL_PROBLEM_PARSING_CONTEXT_HPP_
 #define LOKI_INCLUDE_LOKI_PDDL_PROBLEM_PARSING_CONTEXT_HPP_
 
+#include "loki/details/pddl/concepts.hpp"
 #include "loki/details/pddl/domain_parsing_context.hpp"
 #include "loki/details/pddl/parser_options.hpp"
 #include "loki/details/pddl/position_cache.hpp"
@@ -46,6 +47,8 @@ struct ProblemParsingContext
     {
     }
 };
+
+static_assert(ParsingContext<ProblemParsingContext>);
 }
 
 #endif

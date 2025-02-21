@@ -17,7 +17,22 @@
 
 #include "problem.hpp"
 
+#include "common/requirements.hpp"
+#include "loki/details/ast/ast.hpp"
+#include "loki/details/pddl/problem_parsing_context.hpp"
+#include "loki/details/pddl/requirements_enum.hpp"
+#include "loki/details/pddl/scope.hpp"
+
 namespace loki
 {
-void parse(const ast::Problem& node, ProblemParsingContext& context) {}
+void parse(const ast::Problem& node, ProblemParsingContext& context)
+{
+    auto requirements_set = RequirementEnumSet { RequirementEnum::STRIPS };
+    if (node.requirements.has_value())
+    {
+        const auto domain_requirements_set = parse(node.requirements.value(), context);
+        requirements_set.insert(domain_requirements_set.begin(), domain_requirements_set.end());
+    }
+    context.builder.get_requirements() = context.builder.get_or_create_requirements(requirements_set);
+}
 }
