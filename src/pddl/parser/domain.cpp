@@ -76,13 +76,15 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
     /* Constants section */
     if (node.constants.has_value())
     {
-        parse(node.constants.value(), context);
+        const auto constants = parse(node.constants.value(), context);
+        context.builder.get_constants().insert(constants.begin(), constants.end());
     }
 
     /* Predicates section */
     if (node.predicates.has_value())
     {
-        parse(node.predicates.value(), context);
+        const auto predicates = parse(node.predicates.value(), context);
+        context.builder.get_predicates().insert(predicates.begin(), predicates.end());
     }
 }
 }

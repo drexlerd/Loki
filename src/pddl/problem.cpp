@@ -42,12 +42,15 @@ ProblemImpl::ProblemImpl(size_t index,
                          std::string name,
                          Requirements requirements,
                          ObjectList objects,
-                         PredicateList derived_predicates,
+                         ObjectList problem_and_domain_objects,
+                         PredicateList predicates,
+                         PredicateList problem_and_domain_predicates,
                          LiteralList initial_literals,
                          FunctionValueList function_values,
                          std::optional<Condition> goal_condition,
                          std::optional<OptimizationMetric> optimization_metric,
-                         AxiomList axioms) :
+                         AxiomList axioms,
+                         AxiomList problem_and_domain_axioms) :
     m_index(index),
     m_repositories(std::move(repositories)),
     m_filepath(std::move(filepath)),
@@ -55,12 +58,15 @@ ProblemImpl::ProblemImpl(size_t index,
     m_name(std::move(name)),
     m_requirements(std::move(requirements)),
     m_objects(std::move(objects)),
-    m_derived_predicates(std::move(derived_predicates)),
+    m_problem_and_domain_objects(std::move(problem_and_domain_objects)),
+    m_predicates(std::move(predicates)),
+    m_problem_and_domain_predicates(std::move(problem_and_domain_predicates)),
     m_initial_literals(std::move(initial_literals)),
     m_function_values(std::move(function_values)),
     m_goal_condition(std::move(goal_condition)),
     m_optimization_metric(std::move(optimization_metric)),
-    m_axioms(std::move(axioms))
+    m_axioms(std::move(axioms)),
+    m_problem_and_domain_axioms(std::move(problem_and_domain_axioms))
 {
 }
 
@@ -76,7 +82,11 @@ const Requirements& ProblemImpl::get_requirements() const { return m_requirement
 
 const ObjectList& ProblemImpl::get_objects() const { return m_objects; }
 
-const PredicateList& ProblemImpl::get_derived_predicates() const { return m_derived_predicates; }
+const ObjectList& ProblemImpl::get_problem_and_domain_objects() const { return m_problem_and_domain_objects; }
+
+const PredicateList& ProblemImpl::get_predicates() const { return m_predicates; }
+
+const PredicateList& ProblemImpl::get_problem_and_domain_predicates() const { return m_problem_and_domain_predicates; }
 
 const LiteralList& ProblemImpl::get_initial_literals() const { return m_initial_literals; }
 
@@ -87,6 +97,8 @@ const std::optional<Condition>& ProblemImpl::get_goal_condition() const { return
 const std::optional<OptimizationMetric>& ProblemImpl::get_optimization_metric() const { return m_optimization_metric; }
 
 const AxiomList& ProblemImpl::get_axioms() const { return m_axioms; }
+
+const AxiomList& ProblemImpl::get_problem_and_domain_axioms() const { return m_problem_and_domain_axioms; }
 
 std::ostream& operator<<(std::ostream& out, const ProblemImpl& element)
 {

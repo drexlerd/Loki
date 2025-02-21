@@ -37,12 +37,15 @@ private:
     std::string m_name;
     Requirements m_requirements;
     ObjectList m_objects;
-    PredicateList m_derived_predicates;
+    ObjectList m_problem_and_domain_objects;
+    PredicateList m_predicates;
+    PredicateList m_problem_and_domain_predicates;
     LiteralList m_initial_literals;
     FunctionValueList m_function_values;
     std::optional<Condition> m_goal_condition;
     std::optional<OptimizationMetric> m_optimization_metric;
     AxiomList m_axioms;
+    AxiomList m_problem_and_domain_axioms;
 
 public:
     ProblemImpl(size_t index,
@@ -52,12 +55,15 @@ public:
                 std::string name,
                 Requirements requirements,
                 ObjectList objects,
-                PredicateList derived_predicates,
+                ObjectList problem_and_domain_objects,
+                PredicateList predicates,
+                PredicateList problem_and_domain_predicates,
                 LiteralList initial_literals,
                 FunctionValueList function_values,
                 std::optional<Condition> goal_condition,
                 std::optional<OptimizationMetric> optimization_metric,
-                AxiomList axioms);
+                AxiomList axioms,
+                AxiomList problem_and_domain_axioms);
 
     // moveable but not copyable
     ProblemImpl(const ProblemImpl& other) = delete;
@@ -71,12 +77,15 @@ public:
     const std::string& get_name() const;
     const Requirements& get_requirements() const;
     const ObjectList& get_objects() const;
-    const PredicateList& get_derived_predicates() const;
+    const ObjectList& get_problem_and_domain_objects() const;
+    const PredicateList& get_predicates() const;
+    const PredicateList& get_problem_and_domain_predicates() const;
     const LiteralList& get_initial_literals() const;
     const FunctionValueList& get_function_values() const;
     const std::optional<Condition>& get_goal_condition() const;
     const std::optional<OptimizationMetric>& get_optimization_metric() const;
     const AxiomList& get_axioms() const;
+    const AxiomList& get_problem_and_domain_axioms() const;
 
     auto identifying_members() const
     {
@@ -84,7 +93,7 @@ public:
                                      std::as_const(m_name),
                                      std::as_const(m_requirements),
                                      std::as_const(m_objects),
-                                     std::as_const(m_derived_predicates),
+                                     std::as_const(m_predicates),
                                      std::as_const(m_initial_literals),
                                      std::as_const(m_function_values),
                                      std::as_const(m_goal_condition),

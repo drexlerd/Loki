@@ -33,7 +33,6 @@ static void insert_context_information(const Object& constant, const ast::Name& 
 {
     context.positions.push_back(constant, node);
     context.scopes.top().insert_object(constant->get_name(), constant, node);
-    context.builder.get_constants().emplace(constant->get_name(), constant);
 }
 
 static Object parse_constant_definition(const ast::Name& node, const TypeList& types, DomainParsingContext& context)

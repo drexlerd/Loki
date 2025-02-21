@@ -32,7 +32,6 @@ static void insert_context_information(const Predicate& predicate, const ast::Pr
 {
     context.positions.push_back(predicate, node);
     context.scopes.top().insert_predicate(predicate->get_name(), predicate, node);
-    context.builder.get_predicates().emplace(predicate->get_name(), predicate);
 }
 
 template<ParsingContext C>

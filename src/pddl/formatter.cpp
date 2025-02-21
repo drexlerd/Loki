@@ -554,14 +554,14 @@ void PDDLFormatter::write(const ProblemImpl& element, std::ostream& out)
         out << ")\n";
     }
 
-    if (!element.get_derived_predicates().empty())
+    if (!element.get_predicates().empty())
     {
-        out << std::string(m_indent, ' ') << "(:derived-predicates ";
-        for (size_t i = 0; i < element.get_derived_predicates().size(); ++i)
+        out << std::string(m_indent, ' ') << "(:predicates ";
+        for (size_t i = 0; i < element.get_predicates().size(); ++i)
         {
             if (i != 0)
                 out << " ";
-            write(*element.get_derived_predicates()[i], out);
+            write(*element.get_predicates()[i], out);
         }
         out << ")\n";
     }

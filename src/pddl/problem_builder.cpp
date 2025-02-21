@@ -40,64 +40,49 @@ ProblemBuilder::ProblemBuilder(Domain domain) :
     m_filepath(std::nullopt),
     m_name(""),
     m_requirements(nullptr),
-    m_domain_and_problem_objects(),
-    m_domain_and_problem_predicates(),
+    m_objects(),
+    m_predicates(),
     m_initial_literals(),
     m_initial_function_values(),
     m_goal_condition(std::nullopt),
     m_optimization_metric(std::nullopt),
-    m_domain_and_problem_axioms()
+    m_axioms()
 {
     // Ensure that we continue the indexings.
     boost::hana::at_key(m_repositories, boost::hana::type<ObjectImpl> {}).set_external_elements(domain->get_constants());
     boost::hana::at_key(m_repositories, boost::hana::type<PredicateImpl> {}).set_external_elements(domain->get_predicates());
     boost::hana::at_key(m_repositories, boost::hana::type<AxiomImpl> {}).set_external_elements(domain->get_axioms());
-
-    for (const auto& constant : domain->get_constants())
-    {
-        m_domain_and_problem_objects.emplace(constant->get_name(), constant);
-    }
-
-    for (const auto& predicate : domain->get_predicates())
-    {
-        m_domain_and_problem_predicates.emplace(predicate->get_name(), predicate);
-    }
-
-    for (const auto& axiom : domain->get_axioms())
-    {
-        m_domain_and_problem_axioms.emplace(axiom);
-    }
 }
 
 Problem ProblemBuilder::get_result(size_t problem_index)
 {
-    auto objects = ObjectList {};
-    for (const auto& [name, object] : m_domain_and_problem_objects)
-    {
-        objects.push_back(object);
-    }
+    auto problem_and_domain_objects = ObjectList { m_objects.begin(), m_objects.end() };
+    problem_and_domain_objects.insert(problem_and_domain_objects.end(), m_domain->get_constants().begin(), m_domain->get_constants().end());
+    std::sort(problem_and_domain_objects.begin(), problem_and_domain_objects.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+    verify_indexing_scheme(problem_and_domain_objects, "ProblemBuilder::get_result: problem_and_domain_objects must follow and indexing scheme");
+    auto objects = ObjectList { m_objects.begin(), m_objects.end() };
     std::sort(objects.begin(), objects.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
     verify_indexing_scheme(objects, "ProblemBuilder::get_result: objects must follow and indexing scheme");
 
-    auto predicates = PredicateList {};
-    for (const auto& [name, predicate] : m_domain_and_problem_predicates)
-    {
-        predicates.push_back(predicate);
-    }
+    auto problem_and_domain_predicates = PredicateList { m_predicates.begin(), m_predicates.end() };
+    problem_and_domain_predicates.insert(problem_and_domain_predicates.end(), m_domain->get_predicates().begin(), m_domain->get_predicates().end());
+    std::sort(problem_and_domain_predicates.begin(),
+              problem_and_domain_predicates.end(),
+              [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+    verify_indexing_scheme(problem_and_domain_predicates, "ProblemBuilder::get_result: problem_and_domain_predicates must follow and indexing scheme");
+    auto predicates = PredicateList { m_predicates.begin(), m_predicates.end() };
     std::sort(predicates.begin(), predicates.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
     verify_indexing_scheme(predicates, "ProblemBuilder::get_result: predicates must follow and indexing scheme");
 
     auto initial_literals = LiteralList { m_initial_literals.begin(), m_initial_literals.end() };
     std::sort(initial_literals.begin(), initial_literals.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
 
-    auto function_values = FunctionValueList {};
-    for (const auto& [function, function_value] : m_initial_function_values)
-    {
-        function_values.push_back(function_value);
-    }
+    auto function_values = FunctionValueList { m_initial_function_values.begin(), m_initial_function_values.end() };
     std::sort(function_values.begin(), function_values.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
 
-    auto axioms = AxiomList { m_domain_and_problem_axioms.begin(), m_domain_and_problem_axioms.end() };
+    auto problem_and_domain_axioms = AxiomList { m_axioms.begin(), m_axioms.end() };
+    problem_and_domain_axioms.insert(problem_and_domain_axioms.end(), m_domain->get_axioms().begin(), m_domain->get_axioms().end());
+    auto axioms = AxiomList { m_axioms.begin(), m_axioms.end() };
     std::sort(axioms.begin(), axioms.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
 
     m_requirements = (m_requirements) ? m_requirements : get_or_create_requirements(RequirementEnumSet { RequirementEnum::STRIPS });
@@ -109,12 +94,15 @@ Problem ProblemBuilder::get_result(size_t problem_index)
                                                std::move(m_name),
                                                std::move(m_requirements),
                                                std::move(objects),
+                                               std::move(problem_and_domain_objects),
                                                std::move(predicates),
+                                               std::move(problem_and_domain_predicates),
                                                std::move(initial_literals),
                                                std::move(function_values),
                                                std::move(m_goal_condition),
                                                std::move(m_optimization_metric),
-                                               std::move(axioms));
+                                               std::move(axioms),
+                                               std::move(problem_and_domain_axioms));
 }
 
 Requirements ProblemBuilder::get_or_create_requirements(RequirementEnumSet requirements)
@@ -306,11 +294,11 @@ const Domain& ProblemBuilder::get_domain() const { return m_domain; }
 std::optional<fs::path>& ProblemBuilder::get_filepath() { return m_filepath; }
 std::string& ProblemBuilder::get_name() { return m_name; }
 Requirements& ProblemBuilder::get_requirements() { return m_requirements; }
-std::unordered_map<std::string, Object>& ProblemBuilder::get_objects() { return m_domain_and_problem_objects; }
-std::unordered_map<std::string, Predicate>& ProblemBuilder::get_predicates() { return m_domain_and_problem_predicates; }
+ObjectSet& ProblemBuilder::get_objects() { return m_objects; }
+PredicateSet& ProblemBuilder::get_predicates() { return m_predicates; }
 LiteralSet& ProblemBuilder::get_initial_literals() { return m_initial_literals; }
-std::unordered_map<Function, FunctionValue>& ProblemBuilder::get_function_values() { return m_initial_function_values; }
+FunctionValueSet& ProblemBuilder::get_function_values() { return m_initial_function_values; }
 std::optional<Condition>& ProblemBuilder::get_goal_condition() { return m_goal_condition; }
 std::optional<OptimizationMetric>& ProblemBuilder::get_optimization_metric() { return m_optimization_metric; }
-AxiomSet& ProblemBuilder::get_axioms() { return m_domain_and_problem_axioms; }
+AxiomSet& ProblemBuilder::get_axioms() { return m_axioms; }
 }

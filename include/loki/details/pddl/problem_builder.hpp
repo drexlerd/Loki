@@ -37,13 +37,13 @@ private:
     std::optional<fs::path> m_filepath;
     std::string m_name;
     Requirements m_requirements;
-    std::unordered_map<std::string, Object> m_domain_and_problem_objects;
-    std::unordered_map<std::string, Predicate> m_domain_and_problem_predicates;
+    ObjectSet m_objects;
+    PredicateSet m_predicates;
     LiteralSet m_initial_literals;
-    std::unordered_map<Function, FunctionValue> m_initial_function_values;
+    FunctionValueSet m_initial_function_values;
     std::optional<Condition> m_goal_condition;
     std::optional<OptimizationMetric> m_optimization_metric;
-    AxiomSet m_domain_and_problem_axioms;
+    AxiomSet m_axioms;
 
 public:
     /// @brief Create a `ProblemBuilder` for a given `Domain`.
@@ -124,10 +124,10 @@ public:
     std::optional<fs::path>& get_filepath();
     std::string& get_name();
     Requirements& get_requirements();
-    std::unordered_map<std::string, Object>& get_objects();
-    std::unordered_map<std::string, Predicate>& get_predicates();
+    ObjectSet& get_objects();
+    PredicateSet& get_predicates();
     LiteralSet& get_initial_literals();
-    std::unordered_map<Function, FunctionValue>& get_function_values();
+    FunctionValueSet& get_function_values();
     std::optional<Condition>& get_goal_condition();
     std::optional<OptimizationMetric>& get_optimization_metric();
     AxiomSet& get_axioms();

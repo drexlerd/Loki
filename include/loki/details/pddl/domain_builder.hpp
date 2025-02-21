@@ -36,10 +36,10 @@ private:
     std::optional<fs::path> m_filepath;
     std::string m_name;
     Requirements m_requirements;
-    std::unordered_map<std::string, Type> m_types;
-    std::unordered_map<std::string, Object> m_constants;
-    std::unordered_map<std::string, Predicate> m_predicates;
-    std::unordered_map<std::string, FunctionSkeleton> m_functions;
+    TypeSet m_types;
+    ObjectSet m_constants;
+    PredicateSet m_predicates;
+    FunctionSkeletonSet m_functions;
     ActionSet m_actions;
     AxiomSet m_axioms;
 
@@ -135,10 +135,10 @@ public:
     std::optional<fs::path>& get_filepath();
     std::string& get_name();
     Requirements& get_requirements();
-    std::unordered_map<std::string, Type>& get_types();
-    std::unordered_map<std::string, Object>& get_constants();
-    std::unordered_map<std::string, Predicate>& get_predicates();
-    std::unordered_map<std::string, FunctionSkeleton>& get_function_skeletons();
+    TypeSet& get_types();
+    ObjectSet& get_constants();
+    PredicateSet& get_predicates();
+    FunctionSkeletonSet& get_function_skeletons();
     ActionSet& get_actions();
     AxiomSet& get_axioms();
 };

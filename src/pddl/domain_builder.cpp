@@ -35,35 +35,19 @@ static void verify_indexing_scheme(const std::vector<const T*>& elements, const 
 
 Domain DomainBuilder::get_result()
 {
-    auto types = TypeList {};
-    for (const auto& [name, type] : m_types)
-    {
-        types.push_back(type);
-    }
+    auto types = TypeList { m_types.begin(), m_types.end() };
     std::sort(types.begin(), types.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
     verify_indexing_scheme(types, "DomainBuilder::get_result: types must follow and indexing scheme");
 
-    auto constants = ObjectList {};
-    for (const auto& [name, constant] : m_constants)
-    {
-        constants.push_back(constant);
-    }
+    auto constants = ObjectList { m_constants.begin(), m_constants.end() };
     std::sort(constants.begin(), constants.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
     verify_indexing_scheme(constants, "DomainBuilder::get_result: constants must follow and indexing scheme.");
 
-    auto predicates = PredicateList {};
-    for (const auto& [name, predicate] : m_predicates)
-    {
-        predicates.push_back(predicate);
-    }
+    auto predicates = PredicateList { m_predicates.begin(), m_predicates.end() };
     std::sort(predicates.begin(), predicates.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
     verify_indexing_scheme(predicates, "DomainBuilder::get_result: predicates must follow and indexing scheme.");
 
-    auto functions = FunctionSkeletonList {};
-    for (const auto& [name, function] : m_functions)
-    {
-        functions.push_back(function);
-    }
+    auto functions = FunctionSkeletonList { m_functions.begin(), m_functions.end() };
     std::sort(functions.begin(), functions.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
     verify_indexing_scheme(functions, "DomainBuilder::get_result: functions must follow and indexing scheme.");
 
@@ -359,10 +343,10 @@ Axiom DomainBuilder::get_or_create_axiom(ParameterList parameters, Literal subty
 std::optional<fs::path>& DomainBuilder::get_filepath() { return m_filepath; }
 std::string& DomainBuilder::get_name() { return m_name; }
 Requirements& DomainBuilder::get_requirements() { return m_requirements; }
-std::unordered_map<std::string, Type>& DomainBuilder::get_types() { return m_types; }
-std::unordered_map<std::string, Object>& DomainBuilder::get_constants() { return m_constants; }
-std::unordered_map<std::string, Predicate>& DomainBuilder::get_predicates() { return m_predicates; }
-std::unordered_map<std::string, FunctionSkeleton>& DomainBuilder::get_function_skeletons() { return m_functions; }
+TypeSet& DomainBuilder::get_types() { return m_types; }
+ObjectSet& DomainBuilder::get_constants() { return m_constants; }
+PredicateSet& DomainBuilder::get_predicates() { return m_predicates; }
+FunctionSkeletonSet& DomainBuilder::get_function_skeletons() { return m_functions; }
 ActionSet& DomainBuilder::get_actions() { return m_actions; }
 AxiomSet& DomainBuilder::get_axioms() { return m_axioms; }
 }
