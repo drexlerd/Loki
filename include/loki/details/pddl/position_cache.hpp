@@ -19,7 +19,6 @@
 #define LOKI_INCLUDE_LOKI_PDDL_POSITION_CACHE_HPP_
 
 #include "loki/details/ast/config.hpp"
-#include "loki/details/ast/error_reporting.hpp"
 #include "loki/details/pddl/action.hpp"
 #include "loki/details/pddl/atom.hpp"
 #include "loki/details/pddl/axiom.hpp"
@@ -56,10 +55,10 @@ class PositionCache
 private:
     std::tuple<PositionMapType<Ts>...> m_positions;
 
-    PDDLErrorHandler m_error_handler;
+    FilePositionErrorHandler m_error_handler;
 
 public:
-    PositionCache(const X3ErrorHandler& error_handler, const fs::path& file, int tabs = 4);
+    explicit PositionCache(FilePositionErrorHandler error_handler);
 
     template<typename T>
     void push_back(const PDDLElement<T>& element, const Position& position);
@@ -67,12 +66,11 @@ public:
     template<typename T>
     PositionList get(const PDDLElement<T>& element) const;
 
-    const PDDLErrorHandler& get_error_handler() const;
+    const FilePositionErrorHandler& get_error_handler() const;
 };
 
 template<typename... Ts>
-PositionCache<Ts...>::PositionCache(const X3ErrorHandler& error_handler, const fs::path& file, int tabs) :
-    m_error_handler(PDDLErrorHandler(error_handler.get_error_handler().get_position_cache(), file, tabs))
+PositionCache<Ts...>::PositionCache(FilePositionErrorHandler error_handler) : m_error_handler(std::move(error_handler))
 {
 }
 
@@ -98,7 +96,7 @@ PositionList PositionCache<Ts...>::get(const PDDLElement<T>& element) const
 }
 
 template<typename... Ts>
-const PDDLErrorHandler& PositionCache<Ts...>::get_error_handler() const
+const FilePositionErrorHandler& PositionCache<Ts...>::get_error_handler() const
 {
     return m_error_handler;
 }

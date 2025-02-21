@@ -18,7 +18,6 @@
 #include "loki/details/pddl/parser.hpp"
 
 #include "loki/details/ast/ast.hpp"
-#include "loki/details/ast/error_reporting.hpp"
 #include "loki/details/ast/parser.hpp"
 #include "loki/details/ast/parser_wrapper.hpp"
 #include "loki/details/ast/printer.hpp"
@@ -54,16 +53,17 @@ Parser::Parser(const fs::path& domain_filepath, const Options& options) :
 
     /* Parse the AST */
     auto node = ast::Domain();
-    auto x3_error_handler = X3ErrorHandler(source.begin(), source.end(), domain_filepath);
-    bool success = parse_ast(source, domain(), node, x3_error_handler.get_error_handler());
+    auto error_stream = std::ostringstream {};
+    auto x3_error_handler = error_handler_type(source.begin(), source.end(), error_stream, domain_filepath);
+    bool success = parse_ast(source, domain(), node, x3_error_handler);
     if (!success)
     {
-        throw SyntaxParserError("", x3_error_handler.get_error_stream().str());
+        throw SyntaxParserError("", error_stream.str());
     }
 
     std::cout << parse_text(node) << std::endl;
 
-    m_domain_position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, domain_filepath);
+    m_domain_position_cache = std::make_unique<PDDLPositionCache>(FilePositionErrorHandler(x3_error_handler.get_position_cache(), domain_filepath, 4));
     m_domain_scopes = std::make_unique<ScopeStack>(m_domain_position_cache->get_error_handler());
     m_domain_scopes->open_scope();  ///< open the root scope which should not be closed
 
@@ -93,18 +93,20 @@ Problem Parser::parse_problem(const fs::path& problem_filepath, const Options& o
 
     /* Parse the AST */
     auto node = ast::Problem();
-    auto x3_error_handler = X3ErrorHandler(source.begin(), source.end(), problem_filepath);
-    bool success = parse_ast(source, problem(), node, x3_error_handler.get_error_handler());
+    auto error_stream = std::ostringstream {};
+    auto x3_error_handler = error_handler_type(source.begin(), source.end(), error_stream, problem_filepath);
+    bool success = parse_ast(source, problem(), node, x3_error_handler);
     if (!success)
     {
-        throw SyntaxParserError("", x3_error_handler.get_error_stream().str());
+        throw SyntaxParserError("", error_stream.str());
     }
 
     std::cout << parse_text(node) << std::endl;
 
-    auto position_cache = std::make_unique<PDDLPositionCache>(x3_error_handler, problem_filepath);
+    auto position_cache = std::make_unique<PDDLPositionCache>(FilePositionErrorHandler(x3_error_handler.get_position_cache(), problem_filepath, 4));
     assert(m_domain_scopes->get_stack().size() == 1);
-    auto scopes = std::make_unique<ScopeStack>(m_domain_position_cache->get_error_handler(), m_domain_scopes.get());
+    auto scopes = std::make_unique<ScopeStack>(position_cache->get_error_handler(), m_domain_scopes.get());
+    scopes->open_scope();  ///< open the root scope which should not be closed
 
     auto context = ProblemParsingContext(*scopes, *position_cache, m_domain, options);
 

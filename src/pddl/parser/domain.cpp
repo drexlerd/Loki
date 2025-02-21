@@ -17,6 +17,7 @@
 
 #include "domain.hpp"
 
+#include "common.hpp"
 #include "loki/details/pddl/domain_parsing_context.hpp"
 #include "loki/details/pddl/requirements_enum.hpp"
 #include "loki/details/pddl/scope.hpp"
@@ -26,6 +27,10 @@ namespace loki
 {
 void parse(const ast::Domain& node, DomainParsingContext& context)
 {
+    /* Domain name */
+    context.builder.get_name() = parse(node.domain_name.name);
+
+    /* Requirements */
     auto requirements_set = RequirementEnumSet { RequirementEnum::STRIPS };
     if (node.requirements.has_value())
     {

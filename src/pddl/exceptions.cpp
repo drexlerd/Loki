@@ -229,7 +229,7 @@ IncompatibleVariableGroundingError::IncompatibleVariableGroundingError(const Obj
 }
 
 MismatchedDomainError::MismatchedDomainError(const Domain& domain, const std::string& domain_name, const std::string& error_handler_output) :
-    SemanticParserError("Mismatched domain names \"" + domain->get_name() + "!=" + domain_name + ".", error_handler_output)
+    SemanticParserError("Mismatched domain names \"" + domain->get_name() + " != " + domain_name + ".", error_handler_output)
 {
 }
 

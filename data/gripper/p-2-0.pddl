@@ -2,7 +2,7 @@
 
 
 (define (problem gripper-2)
-(:domain gripper-strips)
+(:domain gripper-stips)
 (:objects  left right ball1 ball2)
 (:init
 (room rooma)

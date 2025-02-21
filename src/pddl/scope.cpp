@@ -19,7 +19,7 @@
 
 namespace loki
 {
-Scope::Scope(const PDDLErrorHandler& error_handler, const Scope* parent_scope) : m_error_handler(error_handler), m_parent_scope(parent_scope) {}
+Scope::Scope(const FilePositionErrorHandler& error_handler, const Scope* parent_scope) : m_error_handler(error_handler), m_parent_scope(parent_scope) {}
 
 std::optional<BindingSearchResult<Type>> Scope::get_type(const std::string& name) const
 {
@@ -111,9 +111,9 @@ void Scope::insert_predicate(const std::string& name, const Predicate& element, 
     m_predicates.emplace(name, BindingValueType<Predicate>(element, position));
 }
 
-const PDDLErrorHandler& Scope::get_error_handler() const { return m_error_handler; }
+const FilePositionErrorHandler& Scope::get_error_handler() const { return m_error_handler; }
 
-ScopeStack::ScopeStack(const PDDLErrorHandler& error_handler, const ScopeStack* parent) : m_error_handler(error_handler), m_parent(parent) {}
+ScopeStack::ScopeStack(const FilePositionErrorHandler& error_handler, const ScopeStack* parent) : m_error_handler(error_handler), m_parent(parent) {}
 
 void ScopeStack::open_scope()
 {

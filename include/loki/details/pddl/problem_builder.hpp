@@ -120,6 +120,7 @@ public:
      * Get and modify components of the problem.
      */
 
+    const Domain& get_domain() const;  ///< Modifying domain is prohibitted!
     std::optional<fs::path>& get_filepath();
     std::string& get_name();
     Requirements& get_requirements();

@@ -17,6 +17,10 @@
 
 #include "problem.hpp"
 
+#include "common.hpp"
+#include "error_handling.hpp"
+#include "loki/details/pddl/domain.hpp"
+#include "loki/details/pddl/exceptions.hpp"
 #include "loki/details/pddl/problem_parsing_context.hpp"
 #include "loki/details/pddl/requirements_enum.hpp"
 #include "loki/details/pddl/scope.hpp"
@@ -26,6 +30,17 @@ namespace loki
 {
 void parse(const ast::Problem& node, ProblemParsingContext& context)
 {
+    /* Domain name */
+    const auto domain_name = parse(node.domain_name.name);
+    if (domain_name != context.builder.get_domain()->get_name())
+    {
+        throw MismatchedDomainError(context.builder.get_domain(), domain_name, context.scopes.top().get_error_handler()(node.domain_name, ""));
+    }
+
+    /* Problem name */
+    context.builder.get_name() = parse(node.problem_name.name);
+
+    /* Requirements */
     auto requirements_set = RequirementEnumSet { RequirementEnum::STRIPS };
     if (node.requirements.has_value())
     {

@@ -15,7 +15,6 @@
 #include "loki/details/ast/ast.hpp"
 #include "loki/details/ast/config.hpp"
 #include "loki/details/ast/error_handler.hpp"
-#include "loki/details/ast/error_reporting.hpp"
 #include "loki/details/ast/parser.hpp"
 #include "loki/details/ast/parser_wrapper.hpp"
 #include "loki/details/ast/printer.hpp"

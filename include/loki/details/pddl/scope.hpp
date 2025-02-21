@@ -47,7 +47,7 @@ using BindingValueType = std::pair<T, std::optional<Position>>;
 
 /// @brief Encapsulates the result of search for a binding with the corresponding ErrorHandler.
 template<typename T>
-using BindingSearchResult = std::tuple<T, std::optional<Position>, const PDDLErrorHandler&>;
+using BindingSearchResult = std::tuple<T, std::optional<Position>, const FilePositionErrorHandler&>;
 
 /// @brief Datastructure to store bindings of a type T.
 template<typename T>
@@ -57,7 +57,7 @@ using Bindings = std::unordered_map<std::string, BindingValueType<T>>;
 class Scope
 {
 private:
-    const PDDLErrorHandler& m_error_handler;
+    const FilePositionErrorHandler& m_error_handler;
     const Scope* m_parent_scope;
 
     Bindings<Type> m_types;
@@ -67,7 +67,7 @@ private:
     Bindings<Predicate> m_predicates;
 
 public:
-    Scope(const PDDLErrorHandler& error_handler, const Scope* parent_scope = nullptr);
+    Scope(const FilePositionErrorHandler& error_handler, const Scope* parent_scope = nullptr);
 
     // delete copy and move to avoid dangling references.
     Scope(const Scope& other) = delete;
@@ -90,7 +90,7 @@ public:
     void insert_predicate(const std::string& name, const Predicate& predicate, const std::optional<Position>& position);
 
     /// @brief Get the error handler to print an error message.
-    const PDDLErrorHandler& get_error_handler() const;
+    const FilePositionErrorHandler& get_error_handler() const;
 };
 
 /// @brief Implements a scoping mechanism to store bindings which are mappings from name to a pointer to a PDDL object
@@ -110,13 +110,13 @@ public:
 class ScopeStack
 {
 private:
-    const PDDLErrorHandler& m_error_handler;
+    const FilePositionErrorHandler& m_error_handler;
     const ScopeStack* m_parent;
 
     std::deque<std::unique_ptr<Scope>> m_stack;
 
 public:
-    ScopeStack(const PDDLErrorHandler& error_handler, const ScopeStack* parent = nullptr);
+    ScopeStack(const FilePositionErrorHandler& error_handler, const ScopeStack* parent = nullptr);
 
     // delete copy and move to avoid dangling references.
     ScopeStack(const ScopeStack& other) = delete;

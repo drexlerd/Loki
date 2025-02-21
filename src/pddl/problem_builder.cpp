@@ -302,6 +302,7 @@ Axiom ProblemBuilder::get_or_create_axiom(ParameterList parameters, Literal subt
     return boost::hana::at_key(m_repositories, boost::hana::type<AxiomImpl> {}).get_or_create(std::move(parameters), subtyped_literal, condition);
 }
 
+const Domain& ProblemBuilder::get_domain() const { return m_domain; }
 std::optional<fs::path>& ProblemBuilder::get_filepath() { return m_filepath; }
 std::string& ProblemBuilder::get_name() { return m_name; }
 Requirements& ProblemBuilder::get_requirements() { return m_requirements; }
