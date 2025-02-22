@@ -54,7 +54,7 @@ template<ParsingContext C>
 Term TermDeclarationTermVisitor<C>::operator()(const ast::Name& node) const
 {
     const auto constant_name = parse(node);
-    test_undefined_constant(constant_name, node, context);  // TODO must be undefined object!
+    test_undefined_object(constant_name, node, context);  // TODO must be undefined object!
     // Constant are not tracked and hence must not be untracked.
     const auto binding = context.scopes.top().get_object(constant_name);
     const auto [constant, _position, _error_handler] = binding.value();
@@ -86,7 +86,7 @@ template<ParsingContext C>
 Term TermReferenceTermVisitor<C>::operator()(const ast::Name& node) const
 {
     const auto object_name = parse(node);
-    test_undefined_constant(object_name, node, context);
+    test_undefined_object(object_name, node, context);
     const auto binding = context.scopes.top().get_object(object_name);
     const auto [object, _position, _error_handler] = binding.value();
     context.references.untrack(object);

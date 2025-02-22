@@ -19,11 +19,13 @@
 
 #include "common.hpp"
 #include "constants.hpp"
+#include "functions.hpp"
 #include "loki/details/pddl/domain_parsing_context.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 #include "loki/details/pddl/requirements_enum.hpp"
 #include "loki/details/pddl/scope.hpp"
 #include "predicates.hpp"
+#include "reference_utils.hpp"
 #include "requirements.hpp"
 #include "types.hpp"
 
@@ -61,6 +63,7 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
             };
         const auto equal_predicate = context.builder.get_or_create_predicate("=", binary_parameterlist);
         context.scopes.top().insert_predicate("=", equal_predicate, {});
+        context.builder.get_predicates().insert(equal_predicate);
     }
 
     /* Types section */
@@ -78,6 +81,7 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
     {
         const auto constants = parse(node.constants.value(), context);
         context.builder.get_constants().insert(constants.begin(), constants.end());
+        track_object_references(constants, context);
     }
 
     /* Predicates section */
@@ -85,6 +89,14 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
     {
         const auto predicates = parse(node.predicates.value(), context);
         context.builder.get_predicates().insert(predicates.begin(), predicates.end());
+        track_predicate_references(predicates, context);
+    }
+    auto function_skeletons = FunctionSkeletonList();
+    if (node.functions.has_value())
+    {
+        const auto function_skeletons = parse(node.functions.value(), context);
+        context.builder.get_function_skeletons().insert(function_skeletons.begin(), function_skeletons.end());
+        track_function_skeleton_references(function_skeletons, context);
     }
 }
 }

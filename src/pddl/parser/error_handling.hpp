@@ -41,9 +41,6 @@ extern void test_undefined_requirements(RequirementEnumList requirements, const 
  */
 
 template<ParsingContext C>
-extern void test_undefined_constant(const std::string& constant_name, const Position& position, const C& context);
-
-template<ParsingContext C>
 extern void test_undefined_object(const std::string& object_name, const Position& position, const C& context);
 
 template<ParsingContext C>
@@ -64,9 +61,6 @@ extern void test_undefined_type(const std::string& type_name, const Position& po
 
 template<ParsingContext C>
 extern void test_multiple_definition_variable(const Variable& variable, const Position& position, const C& context);
-
-template<ParsingContext C>
-extern void test_multiple_definition_constant(const Object& constant, const Position& node, const C& context);
 
 template<ParsingContext C>
 extern void test_multiple_definition_object(const Object& object, const Position& node, const C& context);

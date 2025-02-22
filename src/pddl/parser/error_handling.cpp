@@ -69,19 +69,6 @@ template void test_undefined_requirements(RequirementEnumList requirements, cons
  */
 
 template<ParsingContext C>
-void test_undefined_constant(const std::string& constant_name, const Position& position, const C& context)
-{
-    const auto binding = context.scopes.top().get_object(constant_name);
-    if (!binding.has_value())
-    {
-        throw UndefinedConstantError(constant_name, context.scopes.top().get_error_handler()(position, ""));
-    }
-}
-
-template void test_undefined_constant(const std::string& constant_name, const Position& position, const DomainParsingContext& context);
-template void test_undefined_constant(const std::string& constant_name, const Position& position, const ProblemParsingContext& context);
-
-template<ParsingContext C>
 void test_undefined_object(const std::string& object_name, const Position& position, const C& context)
 {
     const auto binding = context.scopes.top().get_object(object_name);
@@ -166,27 +153,6 @@ void test_multiple_definition_variable(const Variable& variable, const Position&
 
 template void test_multiple_definition_variable(const Variable& variable, const Position& position, const DomainParsingContext& context);
 template void test_multiple_definition_variable(const Variable& variable, const Position& position, const ProblemParsingContext& context);
-
-template<ParsingContext C>
-void test_multiple_definition_constant(const Object& constant, const Position& node, const C& context)
-{
-    const auto constant_name = constant->get_name();
-    const auto binding = context.scopes.top().get_object(constant_name);
-    if (binding.has_value())
-    {
-        const auto message_1 = context.scopes.top().get_error_handler()(node, "Defined here:");
-        auto message_2 = std::string("");
-        const auto [_object, position, error_handler] = binding.value();
-        if (position.has_value())
-        {
-            message_2 = error_handler(position.value(), "First defined here:");
-        }
-        throw MultiDefinitionConstantError(constant_name, message_1 + message_2);
-    }
-}
-
-template void test_multiple_definition_constant(const Object& constant, const Position& node, const DomainParsingContext& context);
-template void test_multiple_definition_constant(const Object& constant, const Position& node, const ProblemParsingContext& context);
 
 template<ParsingContext C>
 void test_multiple_definition_object(const Object& object, const Position& node, const C& context)

@@ -19,6 +19,8 @@
 
 #include "common.hpp"
 #include "error_handling.hpp"
+#include "initial.hpp"
+#include "literal.hpp"
 #include "loki/details/pddl/domain.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 #include "loki/details/pddl/problem_parsing_context.hpp"
@@ -26,7 +28,9 @@
 #include "loki/details/pddl/scope.hpp"
 #include "objects.hpp"
 #include "predicates.hpp"
+#include "reference_utils.hpp"
 #include "requirements.hpp"
+#include "unpacking_visitor.hpp"
 
 namespace loki
 {
@@ -58,14 +62,29 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
     {
         const auto objects = parse(node.objects.value(), context);
         context.builder.get_objects().insert(objects.begin(), objects.end());
+        track_object_references(objects, context);
     }
-    // track_object_references(objects, context);
 
-    /* DerivedPredicates section */
+    /* Predicates section */
     if (node.derived_predicates.has_value())
     {
-        parse(node.derived_predicates.value(), context);
+        const auto predicates = parse(node.derived_predicates.value(), context);
+        context.builder.get_predicates().insert(predicates.begin(), predicates.end());
+        track_predicate_references(predicates, context);
     }
-    // track_predicate_references(derived_predicates, context);
+
+    /* Initial section */
+    if (node.initial.has_value())
+    {
+        auto initial_literals = LiteralList();
+        auto function_values = FunctionValueList();
+        const auto initial_elements = parse(node.initial.value(), context);
+        for (const auto& initial_element : initial_elements)
+        {
+            std::visit(UnpackingVisitor(initial_literals, function_values), initial_element);
+        }
+        context.builder.get_initial_literals().insert(initial_literals.begin(), initial_literals.end());
+        context.builder.get_function_values().insert(function_values.begin(), function_values.end());
+    }
 }
 }
