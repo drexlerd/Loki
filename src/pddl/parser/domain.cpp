@@ -19,6 +19,7 @@
 
 #include "common.hpp"
 #include "constants.hpp"
+#include "error_handling.hpp"
 #include "functions.hpp"
 #include "loki/details/pddl/domain_parsing_context.hpp"
 #include "loki/details/pddl/exceptions.hpp"
@@ -27,7 +28,9 @@
 #include "predicates.hpp"
 #include "reference_utils.hpp"
 #include "requirements.hpp"
+#include "structure.hpp"
 #include "types.hpp"
+#include "unpacking_visitor.hpp"
 
 namespace loki
 {
@@ -85,18 +88,34 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
     }
 
     /* Predicates section */
+    auto predicates = PredicateList {};
     if (node.predicates.has_value())
     {
-        const auto predicates = parse(node.predicates.value(), context);
+        predicates = parse(node.predicates.value(), context);
         context.builder.get_predicates().insert(predicates.begin(), predicates.end());
         track_predicate_references(predicates, context);
     }
     auto function_skeletons = FunctionSkeletonList();
     if (node.functions.has_value())
     {
-        const auto function_skeletons = parse(node.functions.value(), context);
+        function_skeletons = parse(node.functions.value(), context);
         context.builder.get_function_skeletons().insert(function_skeletons.begin(), function_skeletons.end());
         track_function_skeleton_references(function_skeletons, context);
     }
+
+    /* Structure section */
+    for (const auto& structure_node : node.structures)
+    {
+        auto axioms = AxiomList();
+        auto actions = ActionList();
+        auto variant = parse(structure_node, context);
+        std::visit(UnpackingVisitor(actions, axioms), variant);
+        context.builder.get_actions().insert(actions.begin(), actions.end());
+        context.builder.get_axioms().insert(axioms.begin(), axioms.end());
+    }
+
+    // Check references
+    test_predicate_references(predicates, context);
+    test_function_skeleton_references(function_skeletons, context);
 }
 }

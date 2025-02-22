@@ -21,7 +21,10 @@
 int main()
 {
     // Parse the domain
-    auto parser = loki::Parser(std::string(DATA_DIR) + "gripper/domain.pddl");
+    auto options = loki::Options();
+    options.quiet = true;
+    options.strict = false;
+    auto parser = loki::Parser(std::string(DATA_DIR) + "gripper/domain.pddl", options);
 
     const auto domain = parser.get_domain();
     std::cout << *domain << std::endl;

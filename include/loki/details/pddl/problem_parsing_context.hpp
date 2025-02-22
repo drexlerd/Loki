@@ -40,12 +40,16 @@ struct ProblemParsingContext
 
     Requirements requirements;
 
+    bool ignore_free_variables;  ///< We must allow free variables in axioms.
+
     ProblemParsingContext(ScopeStack& scopes, PDDLPositionCache& positions, const Domain& domain, const Options& options) :
         scopes(scopes),
         positions(positions),
         references(),
         options(options),
-        builder(domain)
+        builder(domain),
+        requirements(nullptr),
+        ignore_free_variables(false)
     {
     }
 };

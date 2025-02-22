@@ -15,26 +15,33 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <loki/loki.hpp>
+#ifndef LOKI_SRC_PDDL_PARSER_STRUCTURE_HPP_
+#define LOKI_SRC_PDDL_PARSER_STRUCTURE_HPP_
 
-int main(int argc, char** argv)
+#include "loki/details/ast/ast.hpp"
+#include "loki/details/pddl/concepts.hpp"
+#include "loki/details/pddl/declarations.hpp"
+
+#include <variant>
+
+namespace loki
 {
-    if (argc < 2)
-    {
-        std::cout << "Usage: interpreter <domain:str>" << std::endl;
-        return 1;
-    }
-    const auto domain_file = std::string { argv[1] };
 
-    auto options = loki::Options();
-    options.quiet = false;
-    options.strict = true;
+template<ParsingContext C>
+struct StructureVisitor : boost::static_visitor<std::variant<Axiom, Action>>
+{
+    C& context;
 
-    // 1. Parse the domain
-    const auto domain_parser = loki::Parser(domain_file, options);
-    const auto domain = domain_parser.get_domain();
-    std::cout << *domain << std::endl;
+    StructureVisitor(C& context_);
 
-    return 0;
+    std::variant<Axiom, Action> operator()(const ast::Action& node);
+
+    std::variant<Axiom, Action> operator()(const ast::Axiom& node);
+};
+
+template<ParsingContext C>
+extern std::variant<Axiom, Action> parse(const ast::Structure& node, C& context);
+
 }
+
+#endif

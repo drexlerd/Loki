@@ -282,15 +282,89 @@ Condition ProblemBuilder::get_or_create_condition(ConditionNumericConstraint con
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
 }
 
-OptimizationMetric ProblemBuilder::get_or_create_optimization_metric(OptimizationMetricEnum optimization_metric, FunctionExpression function_expression)
+EffectLiteral ProblemBuilder::get_or_create_effect_literal(Literal literal)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<OptimizationMetricImpl> {})
-        .get_or_create(std::move(optimization_metric), std::move(function_expression));
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectLiteralImpl> {}).get_or_create(std::move(literal));
+}
+EffectAnd ProblemBuilder::get_or_create_effect_and(EffectList effects)
+{
+    std::sort(effects.begin(), effects.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectAndImpl> {}).get_or_create(std::move(effects));
+}
+EffectNumeric ProblemBuilder::get_or_create_effect_numeric(AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectNumericImpl> {})
+        .get_or_create(std::move(assign_operator), std::move(function), std::move(function_expression));
+}
+EffectCompositeForall ProblemBuilder::get_or_create_effect_composite_forall(ParameterList parameters, Effect effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeForallImpl> {}).get_or_create(std::move(parameters), std::move(effect));
+}
+EffectCompositeWhen ProblemBuilder::get_or_create_effect_composite_when(Condition condition, Effect effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeWhenImpl> {}).get_or_create(std::move(condition), std::move(effect));
+}
+EffectCompositeOneof ProblemBuilder::get_or_create_effect_composite_oneof(EffectList effects)
+{
+    std::sort(effects.begin(), effects.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeOneofImpl> {}).get_or_create(std::move(effects));
+}
+EffectCompositeProbabilistic ProblemBuilder::get_or_create_effect_composite_probabilistic(EffectDistribution effects)
+{
+    std::sort(effects.begin(), effects.end(), [](const auto& lhs, const auto& rhs) { return lhs.second->get_index() < rhs.second->get_index(); });
+
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeProbabilisticImpl> {}).get_or_create(std::move(effects));
+}
+Effect ProblemBuilder::get_or_create_effect(EffectLiteral effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+Effect ProblemBuilder::get_or_create_effect(EffectAnd effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+Effect ProblemBuilder::get_or_create_effect(EffectNumeric effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+Effect ProblemBuilder::get_or_create_effect(EffectCompositeForall effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+Effect ProblemBuilder::get_or_create_effect(EffectCompositeWhen effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+Effect ProblemBuilder::get_or_create_effect(EffectCompositeOneof effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+Effect ProblemBuilder::get_or_create_effect(EffectCompositeProbabilistic effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+
+Action ProblemBuilder::get_or_create_action(std::string name,
+                                            size_t original_arity,
+                                            ParameterList parameters,
+                                            std::optional<Condition> condition,
+                                            std::optional<Effect> effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<ActionImpl> {})
+        .get_or_create(std::move(name), std::move(original_arity), std::move(parameters), std::move(condition), std::move(effect));
 }
 
 Axiom ProblemBuilder::get_or_create_axiom(ParameterList parameters, Literal subtyped_literal, Condition condition)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<AxiomImpl> {}).get_or_create(std::move(parameters), subtyped_literal, condition);
+}
+
+OptimizationMetric ProblemBuilder::get_or_create_optimization_metric(OptimizationMetricEnum optimization_metric, FunctionExpression function_expression)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<OptimizationMetricImpl> {})
+        .get_or_create(std::move(optimization_metric), std::move(function_expression));
 }
 
 const Domain& ProblemBuilder::get_domain() const { return m_domain; }

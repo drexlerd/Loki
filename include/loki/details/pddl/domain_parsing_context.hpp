@@ -39,13 +39,16 @@ struct DomainParsingContext
 
     Requirements requirements;
 
-    DomainParsingContext(ScopeStack& scopes, PDDLPositionCache& positions, const Options& options_) :
+    bool ignore_free_variables;  ///< We must allow free variables in axioms.
+
+    DomainParsingContext(ScopeStack& scopes, PDDLPositionCache& positions, const Options& options) :
         scopes(scopes),
         positions(positions),
         references(),
-        options(options_),
+        options(options),
         builder(),
-        requirements(nullptr)
+        requirements(nullptr),
+        ignore_free_variables(false)
     {
     }
 };

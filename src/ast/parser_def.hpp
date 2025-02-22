@@ -484,7 +484,7 @@ const auto problem_constraints_def = (lit('(') >> keyword_lit(":constraints")) >
 const auto metric_specification_def = (lit('(') >> keyword_lit(":metric")) > (metric_specification_total_cost | metric_specification_general) > lit(')');
 
 const auto problem_def = lit('(') > define_keyword > problem_name > problem_domain_name > -requirements > -objects > -predicates > -initial > -goal
-                         > -problem_constraints > -metric_specification > -(*axiom) > lit(')');
+                         > -problem_constraints > -metric_specification > *structure > lit(')');
 
 /**
  * Domain

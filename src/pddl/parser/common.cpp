@@ -99,7 +99,7 @@ template<ParsingContext C>
 Term TermReferenceTermVisitor<C>::operator()(const ast::Variable& node) const
 {
     const auto variable = parse(node, context);
-    if (!context.options.allow_free_variables)
+    if (!context.ignore_free_variables)
     {
         test_undefined_variable(variable, node, context);
     }

@@ -162,6 +162,6 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::Problem,
                           goal,
                           constraints,
                           metric_specification,
-                          axioms)
+                          structures)
 
 #endif

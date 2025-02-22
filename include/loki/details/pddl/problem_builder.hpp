@@ -113,9 +113,27 @@ public:
     Condition get_or_create_condition(ConditionForall condition);
     Condition get_or_create_condition(ConditionNumericConstraint condition);
 
-    OptimizationMetric get_or_create_optimization_metric(OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
+    EffectLiteral get_or_create_effect_literal(Literal literal);
+    EffectAnd get_or_create_effect_and(EffectList effects);
+    EffectNumeric get_or_create_effect_numeric(AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
+    EffectCompositeForall get_or_create_effect_composite_forall(ParameterList parameters, Effect effect);
+    EffectCompositeWhen get_or_create_effect_composite_when(Condition condition, Effect effect);
+    EffectCompositeOneof get_or_create_effect_composite_oneof(EffectList effects);
+    EffectCompositeProbabilistic get_or_create_effect_composite_probabilistic(EffectDistribution effects);
+    Effect get_or_create_effect(EffectLiteral effect);
+    Effect get_or_create_effect(EffectAnd effect);
+    Effect get_or_create_effect(EffectNumeric effect);
+    Effect get_or_create_effect(EffectCompositeForall effect);
+    Effect get_or_create_effect(EffectCompositeWhen effect);
+    Effect get_or_create_effect(EffectCompositeOneof effect);
+    Effect get_or_create_effect(EffectCompositeProbabilistic effect);
+
+    Action
+    get_or_create_action(std::string name, size_t original_arity, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);
 
     Axiom get_or_create_axiom(ParameterList parameters, Literal subtyped_literal, Condition condition);
+
+    OptimizationMetric get_or_create_optimization_metric(OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
 
     /**
      * Get and modify components of the problem.

@@ -32,6 +32,7 @@
 #include "predicates.hpp"
 #include "reference_utils.hpp"
 #include "requirements.hpp"
+#include "structure.hpp"
 #include "unpacking_visitor.hpp"
 
 namespace loki
@@ -94,6 +95,16 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
     {
         const auto goal_condition = parse(node.goal.value(), context);
         context.builder.get_goal_condition() = goal_condition;
+    }
+
+    /* Structure section */
+    for (const auto& structure_node : node.structures)
+    {
+        auto axioms = AxiomList();
+        auto actions = ActionList();
+        auto variant = parse(structure_node, context);
+        std::visit(UnpackingVisitor(actions, axioms), variant);
+        context.builder.get_axioms().insert(axioms.begin(), axioms.end());
     }
 }
 }

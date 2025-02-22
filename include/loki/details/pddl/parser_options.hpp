@@ -24,9 +24,8 @@ struct Options
 {
     bool strict;
     bool quiet;
-    bool allow_free_variables;
 
-    Options() : strict(false), quiet(true), allow_free_variables(false) {}
+    Options() : strict(false), quiet(true) {}
 };
 }
 

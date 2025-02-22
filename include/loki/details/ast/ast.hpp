@@ -1224,7 +1224,7 @@ struct Problem : x3::position_tagged
     boost::optional<Goal> goal;
     boost::optional<ProblemConstraints> constraints;
     boost::optional<MetricSpecification> metric_specification;
-    boost::optional<std::vector<Axiom>> axioms;
+    std::vector<Structure> structures;
 };
 }
 
