@@ -23,7 +23,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, PddlReferenceTest)
+TEST(LokiTests, LokiPddlReferenceTest)
 {
     SegmentedRepository<ObjectImpl> factory(2);
     const auto object_0 = factory.get_or_create("object_0", TypeList());

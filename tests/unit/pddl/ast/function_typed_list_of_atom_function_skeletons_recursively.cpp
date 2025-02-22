@@ -25,7 +25,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, PddlAstFunctionTypedListOfAtomicFunctionSkeletonsRecursivelyTest)
+TEST(LokiTests, LokiPddlAstFunctionTypedListOfAtomicFunctionSkeletonsRecursivelyTest)
 {
     ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively ast;
 

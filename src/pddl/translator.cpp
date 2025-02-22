@@ -17,6 +17,7 @@
 
 #include "loki/details/pddl/translator.hpp"
 
+#include "translator/remove_types.hpp"
 #include "translator/to_negation_normal_form.hpp"
 
 namespace loki
@@ -31,9 +32,12 @@ DomainTranslationResult::DomainTranslationResult(Domain original_domain, Domain 
 DomainTranslationResult translate(const Domain& domain)
 {
     auto to_negation_normal_form_translator = ToNegationNormalFormTranslator();
-
     auto builder = DomainBuilder();
     auto translated_domain = to_negation_normal_form_translator.translate_level_0(domain, builder);
+
+    auto remove_types_translator = RemoveTypesTranslator();
+    builder = DomainBuilder();
+    translated_domain = remove_types_translator.translate_level_0(translated_domain, builder);
 
     return DomainTranslationResult(domain, translated_domain);
 }

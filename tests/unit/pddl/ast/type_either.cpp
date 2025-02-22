@@ -25,7 +25,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, PddlAstTypeEitherTest)
+TEST(LokiTests, LokiPddlAstTypeEitherTest)
 {
     ast::TypeEither ast;
 

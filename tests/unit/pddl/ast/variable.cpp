@@ -25,7 +25,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, PddlAstVariableTest)
+TEST(LokiTests, LokiPddlAstVariableTest)
 {
     ast::Variable ast;
 

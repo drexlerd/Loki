@@ -25,7 +25,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, PddlAstFunctionSymbolTotalCostTest)
+TEST(LokiTests, LokiPddlAstFunctionSymbolTotalCostTest)
 {
     ast::FunctionSymbol ast;
 

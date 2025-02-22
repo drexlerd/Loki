@@ -357,9 +357,9 @@ protected:
                                                               this->translate_level_0(metric->get_function_expression(), repositories));
     }
 
-    auto translate_level_1(const Domain& domain, DomainBuilder& builder) { return self().translate_level_2(domain, builder); }
+    Domain translate_level_1(const Domain& domain, DomainBuilder& builder) { return self().translate_level_2(domain, builder); }
 
-    auto translate_level_2(const Domain& domain, DomainBuilder& builder)
+    Domain translate_level_2(const Domain& domain, DomainBuilder& builder)
     {
         auto& repositories = builder.get_repositories();
 
@@ -376,9 +376,9 @@ protected:
         return builder.get_result();
     }
 
-    auto translate_level_1(const Problem& problem, ProblemBuilder& builder) { return self().translate_level_2(problem, builder); }
+    Problem translate_level_1(const Problem& problem, ProblemBuilder& builder) { return self().translate_level_2(problem, builder); }
 
-    auto translate_level_2(const Problem& problem, ProblemBuilder& builder)
+    Problem translate_level_2(const Problem& problem, ProblemBuilder& builder)
     {
         auto& repositories = builder.get_repositories();
 

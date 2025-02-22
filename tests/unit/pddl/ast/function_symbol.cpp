@@ -25,7 +25,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, PddlAstFunctionSymbolTest)
+TEST(LokiTests, LokiPddlAstFunctionSymbolTest)
 {
     // A function symbol is just a name
     ast::FunctionSymbol ast;

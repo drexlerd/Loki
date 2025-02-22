@@ -25,7 +25,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, PddlAstPredicateTest)
+TEST(LokiTests, LokiPddlAstPredicateTest)
 {
     // A predicate is just a name
     ast::Predicate ast;

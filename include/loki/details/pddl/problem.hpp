@@ -72,6 +72,7 @@ public:
     ProblemImpl& operator=(ProblemImpl&& other) = default;
 
     size_t get_index() const;
+    const Repositories& get_repositories() const;
     const std::optional<fs::path>& get_filepath() const;
     const Domain& get_domain() const;
     const std::string& get_name() const;

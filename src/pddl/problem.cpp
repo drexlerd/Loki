@@ -72,6 +72,8 @@ ProblemImpl::ProblemImpl(size_t index,
 
 size_t ProblemImpl::get_index() const { return m_index; }
 
+const Repositories& ProblemImpl::get_repositories() const { return m_repositories; }
+
 const std::optional<fs::path>& ProblemImpl::get_filepath() const { return m_filepath; }
 
 const Domain& ProblemImpl::get_domain() const { return m_domain; }

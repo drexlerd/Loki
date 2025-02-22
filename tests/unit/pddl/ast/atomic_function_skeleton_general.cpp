@@ -25,7 +25,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, PddlAstAtomicFunctionSkeletonGeneralTest)
+TEST(LokiTests, LokiPddlAstAtomicFunctionSkeletonGeneralTest)
 {
     ast::AtomicFunctionSkeletonGeneral ast;
 

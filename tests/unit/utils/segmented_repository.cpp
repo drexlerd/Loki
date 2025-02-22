@@ -27,7 +27,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, UtilsSegmentedRepositoryIteratorTest)
+TEST(LokiTests, LokiUtilsSegmentedRepositoryIteratorTest)
 {
     SegmentedRepository<ObjectImpl> factory(2);
     const auto object_0 = factory.get_or_create("object_0", TypeList());

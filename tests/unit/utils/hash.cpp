@@ -23,7 +23,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, UtilsHashTest)
+TEST(LokiTests, LokiUtilsHashTest)
 {
     struct NumericConstraintSplitDistribution
     {

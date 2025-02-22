@@ -21,7 +21,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, UtilsSegmentedVectorTest)
+TEST(LokiTests, LokiUtilsSegmentedVectorTest)
 {
     SegmentedVector<int> vec(1);
     EXPECT_EQ(vec.size(), 0);

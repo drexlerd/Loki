@@ -25,7 +25,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, PddlAstAtomicFormulaSkeletonTest)
+TEST(LokiTests, LokiPddlAstAtomicFormulaSkeletonTest)
 {
     ast::AtomicFormulaSkeleton ast;
 

@@ -25,7 +25,7 @@
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, PddlAstTypedListOfNamesRecursivelyTest)
+TEST(LokiTests, LokiPddlAstTypedListOfNamesRecursivelyTest)
 {
     ast::TypedListOfNamesRecursively ast;
 
