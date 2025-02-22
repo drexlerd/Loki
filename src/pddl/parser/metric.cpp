@@ -18,6 +18,7 @@
 #include "metric.hpp"
 
 #include "common.hpp"
+#include "enums.hpp"
 #include "functions.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 #include "loki/details/pddl/problem_parsing_context.hpp"
@@ -27,19 +28,6 @@ using namespace std;
 
 namespace loki
 {
-
-/* OptimizationMetricEnum */
-
-OptimizationDeclarationVisitor::OptimizationDeclarationVisitor(ProblemParsingContext& context) : context(context) {}
-
-OptimizationMetricEnum OptimizationDeclarationVisitor::operator()(const ast::OptimizationMinimize& /*node*/) const { return OptimizationMetricEnum::MINIMIZE; }
-
-OptimizationMetricEnum OptimizationDeclarationVisitor::operator()(const ast::OptimizationMaximize& /*node*/) const { return OptimizationMetricEnum::MAXIMIZE; }
-
-OptimizationMetricEnum parse(const ast::Optimization& node, ProblemParsingContext& context)
-{
-    return boost::apply_visitor(OptimizationDeclarationVisitor(context), node);
-}
 
 /* OptimizationMetric */
 MetricSpecificationDeclarationVisitor::MetricSpecificationDeclarationVisitor(ProblemParsingContext& context_) : context(context_) {}

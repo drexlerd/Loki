@@ -21,25 +21,11 @@
 #include "loki/details/ast/ast.hpp"
 #include "loki/details/pddl/concepts.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/effects.hpp"
 
 #include <variant>
 
 namespace loki
 {
-
-/* AssignOperator */
-
-struct AssignOperatorVisitor : boost::static_visitor<AssignOperatorEnum>
-{
-    AssignOperatorEnum operator()(const ast::AssignOperatorAssign& node) const;
-    AssignOperatorEnum operator()(const ast::AssignOperatorScaleUp& node) const;
-    AssignOperatorEnum operator()(const ast::AssignOperatorScaleDown& node) const;
-    AssignOperatorEnum operator()(const ast::AssignOperatorIncrease& node) const;
-    AssignOperatorEnum operator()(const ast::AssignOperatorDecrease& node) const;
-};
-
-extern AssignOperatorEnum parse(const ast::AssignOperator& node);
 
 /* Effects */
 

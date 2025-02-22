@@ -19,6 +19,7 @@
 
 #include "common.hpp"
 #include "conditions.hpp"
+#include "enums.hpp"
 #include "error_handling.hpp"
 #include "functions.hpp"
 #include "literal.hpp"
@@ -31,22 +32,6 @@
 
 namespace loki
 {
-
-/**
- * AssignOperatorEnum
- */
-
-AssignOperatorEnum AssignOperatorVisitor::operator()(const ast::AssignOperatorAssign&) const { return AssignOperatorEnum::ASSIGN; }
-
-AssignOperatorEnum AssignOperatorVisitor::operator()(const ast::AssignOperatorScaleUp&) const { return AssignOperatorEnum::SCALE_UP; }
-
-AssignOperatorEnum AssignOperatorVisitor::operator()(const ast::AssignOperatorScaleDown&) const { return AssignOperatorEnum::SCALE_DOWN; }
-
-AssignOperatorEnum AssignOperatorVisitor::operator()(const ast::AssignOperatorIncrease&) const { return AssignOperatorEnum::INCREASE; }
-
-AssignOperatorEnum AssignOperatorVisitor::operator()(const ast::AssignOperatorDecrease&) const { return AssignOperatorEnum::DECREASE; }
-
-AssignOperatorEnum parse(const ast::AssignOperator& node) { return boost::apply_visitor(AssignOperatorVisitor(), node); }
 
 /**
  * Effect

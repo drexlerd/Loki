@@ -18,6 +18,7 @@
 #include "functions.hpp"
 
 #include "common.hpp"
+#include "enums.hpp"
 #include "error_handling.hpp"
 #include "loki/details/pddl/domain_parsing_context.hpp"
 #include "loki/details/pddl/exceptions.hpp"
@@ -31,36 +32,6 @@
 
 namespace loki
 {
-
-/* BinaryComparatorEnum */
-BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorGreater&) const { return BinaryComparatorEnum::GREATER; }
-
-BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorLess&) const { return BinaryComparatorEnum::LESS; }
-
-BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorEqual&) const { return BinaryComparatorEnum::EQUAL; }
-
-BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorGreaterEqual&) const { return BinaryComparatorEnum::GREATER_EQUAL; }
-
-BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorLessEqual&) const { return BinaryComparatorEnum::LESS_EQUAL; }
-
-/* MultiOperator */
-MultiOperatorEnum MultiOperatorVisitor::operator()(const ast::MultiOperatorMul&) const { return MultiOperatorEnum::MUL; }
-
-MultiOperatorEnum MultiOperatorVisitor::operator()(const ast::MultiOperatorPlus&) const { return MultiOperatorEnum::PLUS; }
-
-/* BinaryOperator */
-BinaryOperatorEnum MultiToBinaryOperatorVisitor::operator()(const ast::MultiOperatorMul&) const { return BinaryOperatorEnum::MUL; }
-
-BinaryOperatorEnum MultiToBinaryOperatorVisitor::operator()(const ast::MultiOperatorPlus&) const { return BinaryOperatorEnum::PLUS; }
-
-BinaryOperatorEnum BinaryOperatorVisitor::operator()(const ast::BinaryOperatorDiv&) const { return BinaryOperatorEnum::DIV; }
-
-BinaryOperatorEnum BinaryOperatorVisitor::operator()(const ast::BinaryOperatorMinus&) const { return BinaryOperatorEnum::MINUS; }
-
-BinaryOperatorEnum BinaryOperatorVisitor::operator()(const ast::MultiOperator& node) const
-{
-    return boost::apply_visitor(MultiToBinaryOperatorVisitor(), node);
-}
 
 /* FunctionExpression */
 template<ParsingContext C>

@@ -17,6 +17,7 @@
 
 #include "conditions.hpp"
 
+#include "enums.hpp"
 #include "error_handling.hpp"
 #include "functions.hpp"
 #include "literal.hpp"

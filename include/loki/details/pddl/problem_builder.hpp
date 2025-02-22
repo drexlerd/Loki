@@ -38,12 +38,12 @@ private:
     std::string m_name;
     Requirements m_requirements;
     ObjectSet m_objects;
-    PredicateSet m_predicates;
+    PredicateSet m_predicates;  ///< Translation might introduce additional derived predicates.
     LiteralSet m_initial_literals;
     FunctionValueSet m_initial_function_values;
     std::optional<Condition> m_goal_condition;
     std::optional<OptimizationMetric> m_optimization_metric;
-    AxiomSet m_axioms;
+    AxiomSet m_axioms;  ///< Translation might introduce axioms.
 
 public:
     /// @brief Create a `ProblemBuilder` for a given `Domain`.

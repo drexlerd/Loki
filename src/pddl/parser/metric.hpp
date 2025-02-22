@@ -20,24 +20,9 @@
 
 #include "loki/details/ast/ast.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/metric.hpp"
 
 namespace loki
 {
-
-/* OptimizationMetricEnum */
-
-struct OptimizationDeclarationVisitor : boost::static_visitor<OptimizationMetricEnum>
-{
-    ProblemParsingContext& context;
-
-    OptimizationDeclarationVisitor(ProblemParsingContext& context);
-
-    OptimizationMetricEnum operator()(const ast::OptimizationMinimize& node) const;
-    OptimizationMetricEnum operator()(const ast::OptimizationMaximize& node) const;
-};
-
-extern OptimizationMetricEnum parse(const ast::Optimization& node, ProblemParsingContext& context);
 
 /* OptimizationMetric */
 

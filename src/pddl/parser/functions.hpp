@@ -27,36 +27,6 @@
 
 namespace loki
 {
-/* BinaryComparator */
-struct BinaryComparatorVisitor : boost::static_visitor<BinaryComparatorEnum>
-{
-    BinaryComparatorEnum operator()(const ast::BinaryComparatorGreater& node) const;
-    BinaryComparatorEnum operator()(const ast::BinaryComparatorLess& node) const;
-    BinaryComparatorEnum operator()(const ast::BinaryComparatorEqual& node) const;
-    BinaryComparatorEnum operator()(const ast::BinaryComparatorGreaterEqual& node) const;
-    BinaryComparatorEnum operator()(const ast::BinaryComparatorLessEqual& node) const;
-};
-
-/* MultiOperator */
-struct MultiOperatorVisitor : boost::static_visitor<MultiOperatorEnum>
-{
-    MultiOperatorEnum operator()(const ast::MultiOperatorMul& node) const;
-    MultiOperatorEnum operator()(const ast::MultiOperatorPlus& node) const;
-};
-
-/* BinaryOperator */
-struct MultiToBinaryOperatorVisitor : boost::static_visitor<BinaryOperatorEnum>
-{
-    BinaryOperatorEnum operator()(const ast::MultiOperatorMul& node) const;
-    BinaryOperatorEnum operator()(const ast::MultiOperatorPlus& node) const;
-};
-
-struct BinaryOperatorVisitor : boost::static_visitor<BinaryOperatorEnum>
-{
-    BinaryOperatorEnum operator()(const ast::BinaryOperatorDiv& node) const;
-    BinaryOperatorEnum operator()(const ast::BinaryOperatorMinus& node) const;
-    BinaryOperatorEnum operator()(const ast::MultiOperator& node) const;
-};
 
 /* FunctionExpression */
 
