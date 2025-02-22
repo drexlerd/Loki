@@ -58,13 +58,13 @@ class SegmentedRepository
 private:
     /* Internal elements.*/
     // We use an unordered_set to test for uniqueness.
-    absl::flat_hash_set<ObserverPtr<const T>, Hash, EqualTo> m_internal_uniqueness_set;
+    absl::flat_hash_set<ObserverPtr<const T>, Hash, EqualTo> m_uniqueness_set;
     // We use pre-allocated memory to store objects persistent.
-    SegmentedVector<T> m_internal_persistent_vector;
+    SegmentedVector<T> m_persistent_vector;
 
     /* External elements. */
-    absl::flat_hash_set<ObserverPtr<const T>, Hash, EqualTo> m_external_uniqueness_set;
-    std::vector<const T*> m_external_persistent_vector;  ///< Offset the index start.
+    const SegmentedRepository* m_parent;
+    size_t m_num_parent_elements;
 
     void range_check(size_t pos) const
     {
@@ -75,12 +75,21 @@ private:
         }
     }
 
+    T const* find(ObserverPtr<const T> element_ptr) const
+    {
+        if (auto it = m_uniqueness_set.find(element_ptr); it != m_uniqueness_set.end())
+        {
+            return it->get();
+        }
+        return nullptr;
+    }
+
 public:
     SegmentedRepository(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
-        m_internal_uniqueness_set(),
-        m_internal_persistent_vector(SegmentedVector<T>(initial_num_element_per_segment, maximum_num_elements_per_segment)),
-        m_external_uniqueness_set(),
-        m_external_persistent_vector()
+        m_uniqueness_set(),
+        m_persistent_vector(SegmentedVector<T>(initial_num_element_per_segment, maximum_num_elements_per_segment)),
+        m_parent(nullptr),
+        m_num_parent_elements(0)
     {
     }
     SegmentedRepository(const SegmentedRepository& other) = delete;
@@ -88,52 +97,51 @@ public:
     SegmentedRepository(SegmentedRepository&& other) = default;
     SegmentedRepository& operator=(SegmentedRepository&& other) = default;
 
-    void set_external_elements(const std::vector<const T*>& external_elements)
+    void set_parent(const SegmentedRepository& parent)
     {
-        assert(m_internal_uniqueness_set.empty() && m_internal_persistent_vector.empty());
-        m_external_uniqueness_set.insert(external_elements.begin(), external_elements.end());
-        m_external_persistent_vector = external_elements;
+        assert(m_uniqueness_set.empty() && m_persistent_vector.empty());
+        m_parent = &parent;
+        m_num_parent_elements = m_parent->size();
     }
 
     /// @brief Returns a pointer to an existing object or creates it before if it does not exist.
     template<typename... Args>
     T const* get_or_create(Args&&... args)
     {
-        assert(m_internal_uniqueness_set.size() == m_internal_persistent_vector.size());
+        assert(m_uniqueness_set.size() == m_persistent_vector.size());
 
         /* Construct and insert the element in persistent memory. */
 
         // Ensure that element with identifier i is stored at position i.
-        size_t index = m_internal_uniqueness_set.size() + m_external_persistent_vector.size();
+        size_t index = m_uniqueness_set.size() + m_num_parent_elements;
+
+        assert((m_parent ? m_parent->size() : 0) == m_num_parent_elements);
 
         // Create element of type T
         auto element = T(index, std::forward<Args>(args)...);
         auto element_ptr = ObserverPtr<const T>(&element);
 
-        /* Test for external uniqueness. */
-        auto it_extern = m_external_uniqueness_set.find(element_ptr);
-        if (it_extern != m_external_uniqueness_set.end())
+        /* Test for uniqueness. */
+        if (auto result = find(element_ptr))
         {
-            return it_extern->get();
+            return result;
         }
 
-        /* Test for internal uniqueness. */
-        auto it_intern = m_internal_uniqueness_set.find(element_ptr);
-        if (it_intern != m_internal_uniqueness_set.end())
+        if (auto result = (m_parent ? m_parent->find(element_ptr) : nullptr))
         {
-            return it_intern->get();
+            return result;
         }
 
         /* Element is unique! */
 
         // Copy element to persistent memory
-        m_internal_persistent_vector.push_back(std::move(element));
+        m_persistent_vector.push_back(std::move(element));
 
         // Fetch the pointer to persistent element;
-        const auto persistent_addr = &m_internal_persistent_vector.back();
+        const auto persistent_addr = &m_persistent_vector.back();
 
         // Mark the element as not unique.
-        m_internal_uniqueness_set.insert(persistent_addr);
+        m_uniqueness_set.insert(persistent_addr);
 
         // Return pointer to persistent element.
         return persistent_addr;
@@ -147,7 +155,7 @@ public:
     T const* operator[](size_t pos) const
     {
         assert(pos < size());
-        return (pos < m_external_persistent_vector.size()) ? m_external_persistent_vector[pos] : &(m_internal_persistent_vector[pos]);
+        return (pos < m_num_parent_elements) ? m_parent[pos] : &(m_persistent_vector[pos]);
     }
 
     /// @brief Returns a pointer to an existing object with the given pos.
@@ -156,24 +164,20 @@ public:
     T const* at(size_t pos) const
     {
         range_check(pos);
-        return (pos < m_external_persistent_vector.size()) ? m_external_persistent_vector.at(pos) : &(m_internal_persistent_vector.at(pos));
+        return (pos < m_num_parent_elements) ? m_parent->at(pos) : &(m_persistent_vector.at(pos));
     }
 
-    auto begin() const { return m_internal_persistent_vector.begin(); }
+    auto begin() const { return m_persistent_vector.begin(); }
 
-    auto end() const { return m_internal_persistent_vector.end(); }
+    auto end() const { return m_persistent_vector.end(); }
 
-    const SegmentedVector<T>& get_storage() const { return m_internal_persistent_vector; }
-
-    /// @brief Get a flat vector representation of all elements.
-    /// We use it to set the external elements in another repository.
-    std::vector<const T*> get_vector() const { return std::vector<const T*>(m_internal_persistent_vector.begin(), m_internal_persistent_vector.end()); }
+    const SegmentedVector<T>& get_storage() const { return m_persistent_vector; }
 
     /**
      * Capacity
      */
 
-    size_t size() const { return m_internal_persistent_vector.size() + m_external_persistent_vector.size(); }
+    size_t size() const { return m_persistent_vector.size() + m_num_parent_elements; }
 };
 
 }

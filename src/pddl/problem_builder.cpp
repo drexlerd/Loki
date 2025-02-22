@@ -55,7 +55,7 @@ ProblemBuilder::ProblemBuilder(Domain domain) :
                               auto key = boost::hana::first(pair);
                               auto& value = boost::hana::second(pair);
 
-                              value.set_external_elements(boost::hana::at_key(domain->get_repositories().get_hana_repositories(), key).get_vector());
+                              value.set_parent(boost::hana::at_key(domain->get_repositories().get_hana_repositories(), key));
                           });
 }
 
