@@ -164,6 +164,9 @@ public:
     auto end() const { return m_internal_persistent_vector.end(); }
 
     const SegmentedVector<T>& get_storage() const { return m_internal_persistent_vector; }
+
+    /// @brief Get a flat vector representation of all elements.
+    /// We use it to set the external elements in another repository.
     std::vector<const T*> get_vector() const { return std::vector<const T*>(m_internal_persistent_vector.begin(), m_internal_persistent_vector.end()); }
 
     /**

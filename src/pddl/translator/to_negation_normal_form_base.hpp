@@ -39,6 +39,53 @@ protected:
     // Provide default implementations
     using RecursiveCachedBaseTranslator<ToNegationNormalFormTranslatorBase<Derived>>::prepare_level_2;
     using RecursiveCachedBaseTranslator<ToNegationNormalFormTranslatorBase<Derived>>::translate_level_2;
+
+    /**
+     * Translate
+     */
+
+    /**
+     * Eliminate implication
+     *
+     * 1. A -> B   =>  not A or B
+     * 2. A <-> B  =>  (not A or B) and (A or not B)
+     */
+    Condition translate_level_2(ConditionImply condition);
+    /**
+     * Push negation inwards.
+     *
+     * 3. not (A or B)    =>  not A and not B
+     * 4. not (A and B)   =>  not A or not B
+     * 5. not (not A)     =>  A
+     * 6. not exists x A  =>  forall x not A
+     * 7. not forall x A  =>  exists x not A
+     * 8. not (A -> B)    =>  not (not A or B)  =>  A and not B
+     */
+    Condition translate_level_2(ConditionNot condition);
+    /**
+     * Flatten conjunctions.
+     *
+     * 9. A and (B and C)  =>  A and B and C
+     */
+    Condition translate_level_2(ConditionAnd condition);
+    /**
+     * Flatten disjunctions.
+     *
+     * 10. A or (B or C)  =>  A or B or C
+     */
+    Condition translate_level_2(ConditionOr condition);
+    /**
+     * Flatten existential quantifiers.
+     *
+     * 11. exists(vars1, exists(vars2, A))  =>  exists(vars1+vars2, A)
+     */
+    Condition translate_level_2(ConditionExists condition);
+    /**
+     * Flatten universal quantifiers.
+     *
+     * 12. forall(vars1, forall(vars2, A))  =>  forall(vars1+vars2, A)
+     */
+    Condition translate_level_2(ConditionForall condition);
 };
 }
 

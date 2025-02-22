@@ -49,7 +49,11 @@ ProblemBuilder::ProblemBuilder(Domain domain) :
     m_optimization_metric(std::nullopt),
     m_axioms()
 {
-    /* Copy all elements in the domain as external elements to ensure that we dont instantiate new ones. */
+    /* Copy all elements from the domain repositories as external elements into the problem repositories.
+       To retrieve syntactically equivalent ones from the domain, we use canonical representations for
+       Type, Predicate, FunctionSkeleton, Object and all of its nested elements.
+       For Condition, FunctionExpression, and Effect we do not yet have a canonical representation, meaning that there can be semantic duplicates.
+    */
     boost::hana::for_each(m_repositories.get_hana_repositories(),
                           [&](auto&& pair)
                           {
