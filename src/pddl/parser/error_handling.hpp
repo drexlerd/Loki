@@ -21,7 +21,6 @@
 #include "loki/details/ast/config.hpp"
 #include "loki/details/pddl/concepts.hpp"
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/requirements_enum.hpp"
 
 namespace loki

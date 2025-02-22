@@ -24,6 +24,7 @@
 #include "loki/details/pddl/problem_parsing_context.hpp"
 #include "loki/details/pddl/requirements_enum.hpp"
 #include "loki/details/pddl/scope.hpp"
+#include "objects.hpp"
 #include "predicates.hpp"
 #include "requirements.hpp"
 
@@ -53,11 +54,11 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
     context.requirements = requirements;
 
     /* Objects section */
-    // auto objects = ObjectList();
-    // if (node.objects.has_value())
-    // {
-    //     objects = parse(node.objects.value(), context);
-    // }
+    if (node.objects.has_value())
+    {
+        const auto objects = parse(node.objects.value(), context);
+        context.builder.get_objects().insert(objects.begin(), objects.end());
+    }
     // track_object_references(objects, context);
 
     /* DerivedPredicates section */

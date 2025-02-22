@@ -92,6 +92,7 @@ public:
     FunctionExpression get_or_create_function_expression(FunctionExpressionMinus fexpr);
     FunctionExpression get_or_create_function_expression(FunctionExpressionFunction fexpr);
     FunctionValue get_or_create_function_value(Function function, double number);
+    Function get_or_create_function(FunctionSkeleton function_skeleton, TermList terms);
 
     ConditionLiteral get_or_create_condition_literal(Literal literal);
     ConditionAnd get_or_create_condition_and(ConditionList conditions_);

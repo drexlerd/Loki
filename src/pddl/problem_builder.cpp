@@ -62,7 +62,6 @@ Problem ProblemBuilder::get_result(size_t problem_index)
     verify_indexing_scheme(problem_and_domain_objects, "ProblemBuilder::get_result: problem_and_domain_objects must follow and indexing scheme");
     auto objects = ObjectList { m_objects.begin(), m_objects.end() };
     std::sort(objects.begin(), objects.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
-    verify_indexing_scheme(objects, "ProblemBuilder::get_result: objects must follow and indexing scheme");
 
     auto problem_and_domain_predicates = PredicateList { m_predicates.begin(), m_predicates.end() };
     problem_and_domain_predicates.insert(problem_and_domain_predicates.end(), m_domain->get_predicates().begin(), m_domain->get_predicates().end());
@@ -72,7 +71,6 @@ Problem ProblemBuilder::get_result(size_t problem_index)
     verify_indexing_scheme(problem_and_domain_predicates, "ProblemBuilder::get_result: problem_and_domain_predicates must follow and indexing scheme");
     auto predicates = PredicateList { m_predicates.begin(), m_predicates.end() };
     std::sort(predicates.begin(), predicates.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
-    verify_indexing_scheme(predicates, "ProblemBuilder::get_result: predicates must follow and indexing scheme");
 
     auto initial_literals = LiteralList { m_initial_literals.begin(), m_initial_literals.end() };
     std::sort(initial_literals.begin(), initial_literals.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
@@ -201,6 +199,11 @@ FunctionExpression ProblemBuilder::get_or_create_function_expression(FunctionExp
 FunctionValue ProblemBuilder::get_or_create_function_value(Function function, double number)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionValueImpl> {}).get_or_create(std::move(function), std::move(number));
+}
+
+Function ProblemBuilder::get_or_create_function(FunctionSkeleton function_skeleton, TermList terms)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionImpl> {}).get_or_create(std::move(function_skeleton), std::move(terms));
 }
 
 ConditionLiteral ProblemBuilder::get_or_create_condition_literal(Literal literal)

@@ -20,6 +20,7 @@
 #include "loki/details/ast/ast.hpp"
 #include "loki/details/pddl/domain_parsing_context.hpp"
 #include "loki/details/pddl/exceptions.hpp"
+#include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/problem_parsing_context.hpp"
 #include "loki/details/pddl/scope.hpp"
 #include "loki/details/pddl/type.hpp"

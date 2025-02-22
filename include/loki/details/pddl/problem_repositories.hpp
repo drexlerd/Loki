@@ -41,7 +41,6 @@ using HanaProblemRepositories =
                      boost::hana::pair<boost::hana::type<FunctionExpressionFunctionImpl>, FunctionExpressionFunctionRepository>,
                      boost::hana::pair<boost::hana::type<FunctionExpressionImpl>, FunctionExpressionRepository>,
                      boost::hana::pair<boost::hana::type<FunctionImpl>, FunctionRepository>,
-                     boost::hana::pair<boost::hana::type<FunctionSkeletonImpl>, FunctionSkeletonRepository>,
                      boost::hana::pair<boost::hana::type<ConditionLiteralImpl>, ConditionLiteralRepository>,
                      boost::hana::pair<boost::hana::type<ConditionAndImpl>, ConditionAndRepository>,
                      boost::hana::pair<boost::hana::type<ConditionOrImpl>, ConditionOrRepository>,
