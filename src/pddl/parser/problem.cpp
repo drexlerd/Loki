@@ -18,7 +18,9 @@
 #include "problem.hpp"
 
 #include "common.hpp"
+#include "conditions.hpp"
 #include "error_handling.hpp"
+#include "goal.hpp"
 #include "initial.hpp"
 #include "literal.hpp"
 #include "loki/details/pddl/domain.hpp"
@@ -85,6 +87,13 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
         }
         context.builder.get_initial_literals().insert(initial_literals.begin(), initial_literals.end());
         context.builder.get_function_values().insert(function_values.begin(), function_values.end());
+    }
+
+    /* Goal section */
+    if (node.goal.has_value())
+    {
+        const auto goal_condition = parse(node.goal.value(), context);
+        context.builder.get_goal_condition() = goal_condition;
     }
 }
 }

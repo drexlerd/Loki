@@ -24,6 +24,7 @@
 #include "literal.hpp"
 #include "loki/details/pddl/exceptions.hpp"
 #include "loki/details/pddl/problem_parsing_context.hpp"
+#include "loki/details/pddl/scope.hpp"
 
 namespace loki
 {
