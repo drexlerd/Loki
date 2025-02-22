@@ -82,7 +82,7 @@ public:
                                                                                        FunctionExpression left_function_expression,
                                                                                        FunctionExpression right_function_expression);
     FunctionExpressionMultiOperator get_or_create_function_expression_multi_operator(MultiOperatorEnum multi_operator,
-                                                                                     FunctionExpressionList function_expressions_);
+                                                                                     FunctionExpressionList function_expressions);
     FunctionExpressionMinus get_or_create_function_expression_minus(FunctionExpression function_expression);
 
     FunctionExpressionFunction get_or_create_function_expression_function(Function function);
@@ -95,8 +95,8 @@ public:
     Function get_or_create_function(FunctionSkeleton function_skeleton, TermList terms);
 
     ConditionLiteral get_or_create_condition_literal(Literal literal);
-    ConditionAnd get_or_create_condition_and(ConditionList conditions_);
-    ConditionOr get_or_create_condition_or(ConditionList conditions_);
+    ConditionAnd get_or_create_condition_and(ConditionList conditions);
+    ConditionOr get_or_create_condition_or(ConditionList conditions);
     ConditionNot get_or_create_condition_not(Condition condition);
     ConditionImply get_or_create_condition_imply(Condition condition_left, Condition condition_right);
     ConditionExists get_or_create_condition_exists(ParameterList parameters, Condition condition);

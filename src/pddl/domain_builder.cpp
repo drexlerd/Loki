@@ -137,12 +137,12 @@ FunctionExpressionBinaryOperator DomainBuilder::get_or_create_function_expressio
         .get_or_create(binary_operator, std::move(left_function_expression), std::move(right_function_expression));
 }
 FunctionExpressionMultiOperator DomainBuilder::get_or_create_function_expression_multi_operator(MultiOperatorEnum multi_operator,
-                                                                                                FunctionExpressionList function_expressions_)
+                                                                                                FunctionExpressionList function_expressions)
 {
-    std::sort(function_expressions_.begin(), function_expressions_.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(function_expressions.begin(), function_expressions.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
 
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionMultiOperatorImpl> {})
-        .get_or_create(multi_operator, std::move(function_expressions_));
+        .get_or_create(multi_operator, std::move(function_expressions));
 }
 FunctionExpressionMinus DomainBuilder::get_or_create_function_expression_minus(FunctionExpression function_expression)
 {
@@ -188,17 +188,17 @@ ConditionLiteral DomainBuilder::get_or_create_condition_literal(Literal literal)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionLiteralImpl> {}).get_or_create(std::move(literal));
 }
-ConditionAnd DomainBuilder::get_or_create_condition_and(ConditionList conditions_)
+ConditionAnd DomainBuilder::get_or_create_condition_and(ConditionList conditions)
 {
-    std::sort(conditions_.begin(), conditions_.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(conditions.begin(), conditions.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
 
-    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionAndImpl> {}).get_or_create(std::move(conditions_));
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionAndImpl> {}).get_or_create(std::move(conditions));
 }
-ConditionOr DomainBuilder::get_or_create_condition_or(ConditionList conditions_)
+ConditionOr DomainBuilder::get_or_create_condition_or(ConditionList conditions)
 {
-    std::sort(conditions_.begin(), conditions_.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(conditions.begin(), conditions.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
 
-    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionOrImpl> {}).get_or_create(std::move(conditions_));
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionOrImpl> {}).get_or_create(std::move(conditions));
 }
 ConditionNot DomainBuilder::get_or_create_condition_not(Condition condition)
 {
