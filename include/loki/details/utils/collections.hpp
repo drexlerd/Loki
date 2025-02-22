@@ -25,17 +25,31 @@
 namespace loki
 {
 
-/// @brief Returns the sorted vector
-/// @tparam T
-/// @param vec
-/// @return
-template<typename Collection>
-boost::container::small_vector<typename Collection::value_type, 100> get_sorted_vector(const Collection& collection)
+/// @brief Check whether all elements in the vector are unique.
+/// @tparam T the vector value type.
+/// @param vec the vector.
+/// @return true iff all element in the vector are unique, i.e., do not occur more than once, and false otherwise.
+template<typename T, typename Hash = loki::Hash<T>>
+bool is_all_unique(const std::vector<T>& vec)
 {
-    boost::container::small_vector<typename Collection::value_type, 100> result(collection.begin(), collection.end());
-    std::sort(result.begin(), result.end());
-    return result;
+    auto set = std::unordered_set<T, Hash>(vec.begin(), vec.end());
+    return vec.size() == set.size();
 }
+
+/// @brief Uniquify elements in a vector of elements.
+template<typename T, typename Hash = loki::Hash<T>>
+extern std::vector<T> uniquify_elements(const std::vector<T>& vec)
+{
+    std::unordered_set<T, Hash> set(vec.begin(), vec.end());
+    return std::vector<T>(set.begin(), set.end());
+}
+
+template<typename Container>
+inline bool is_within_bounds(const Container& container, size_t index)
+{
+    return index < container.size();
+}
+
 }
 
 #endif

@@ -196,6 +196,8 @@ struct DomainParsingContext;
 class ProblemBuilder;
 struct ProblemParsingContext;
 
+class Repositories;
+
 }
 
 #endif

@@ -26,11 +26,10 @@ namespace loki
 
 /// @brief `ITranslator` is the base class for translators.
 ///
-/// We implement a four-level CRTP-based class hierarchy.
+/// We implement a three-level CRTP-based class hierarchy.
 /// At level 0, we have the `ITranslator` interface.
 /// At level 1, we have base translators that provide translation functionality that is shared among domain and problem.
-/// At level 3, we have concrete translators that provide translation functionality that is shared among domain and problem.
-/// At level 4, we have domain and problem specific translators that provide their specific translation steps.
+/// At level 2, we have concrete translators that provide translation functionality that is shared among domain and problem.
 /// @tparam Derived
 template<typename Derived>
 class ITranslator

@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 {
     if (argc < 3)
     {
-        std::cout << "Usage: interpreter <domain:str> <problem:str>" << std::endl;
+        std::cout << "Usage: ./loki <domain:str> <problem:str>" << std::endl;
         return 1;
     }
     const auto domain_file = std::string { argv[1] };
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     const auto domain_translation_result = loki::translate(domain);
     std::cout << *domain_translation_result.get_translated_domain() << std::endl;
 
-    // 4. Translate the problem
+    // 4. Translate the problem, throws an error if the problem is not defined over the original domain.
     const auto translated_problem = loki::translate(problem, domain_translation_result);
     std::cout << *translated_problem << std::endl;
 
