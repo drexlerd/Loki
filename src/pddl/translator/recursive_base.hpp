@@ -19,6 +19,10 @@
 #define LOKI_SRC_PDDL_TRANSLATOR_RECURSIVE_BASE_HPP_
 
 #include "interface.hpp"
+#include "loki/details/pddl/domain.hpp"
+#include "loki/details/pddl/domain_builder.hpp"
+#include "loki/details/pddl/problem.hpp"
+#include "loki/details/pddl/problem_builder.hpp"
 
 namespace loki
 {
@@ -56,6 +60,123 @@ protected:
         self().prepare_level_2(element);
     }
 
+    void prepare_level_2(loki::Requirements requirements) {}
+    void prepare_level_2(loki::Type type) { this->prepare_level_0(type->get_bases()); }
+    void prepare_level_2(loki::Object object) { this->prepare_level_0(object->get_bases()); }
+    void prepare_level_2(loki::Variable variable) {}
+    void prepare_level_2(loki::Term term)
+    {
+        std::visit([this](auto&& arg) { return this->prepare_level_0(arg); }, term->get_object_or_variable());
+    }
+    void prepare_level_2(loki::Parameter parameter) { this->prepare_level_0(parameter->get_variable()); }
+    void prepare_level_2(loki::Predicate predicate) { this->prepare_level_0(predicate->get_parameters()); }
+    void prepare_level_2(loki::Atom atom)
+    {
+        this->prepare_level_0(atom->get_predicate());
+        this->prepare_level_0(atom->get_terms());
+    }
+    void prepare_level_2(loki::Literal literal) { this->prepare_level_0(literal->get_atom()); }
+    void prepare_level_2(loki::FunctionValue function_value) { this->prepare_level_0(function_value->get_function()); }
+    void prepare_level_2(loki::ConditionLiteral condition) { this->prepare_level_0(condition->get_literal()); }
+    void prepare_level_2(loki::ConditionAnd condition) { this->prepare_level_0(condition->get_conditions()); }
+    void prepare_level_2(loki::ConditionOr condition) { this->prepare_level_0(condition->get_conditions()); }
+    void prepare_level_2(loki::ConditionNot condition) { this->prepare_level_0(condition->get_condition()); }
+    void prepare_level_2(loki::ConditionImply condition)
+    {
+        this->prepare_level_0(condition->get_condition_left());
+        this->prepare_level_0(condition->get_condition_right());
+    }
+    void prepare_level_2(loki::ConditionExists condition)
+    {
+        this->prepare_level_0(condition->get_parameters());
+        this->prepare_level_0(condition->get_condition());
+    }
+    void prepare_level_2(loki::ConditionForall condition)
+    {
+        this->prepare_level_0(condition->get_parameters());
+        this->prepare_level_0(condition->get_condition());
+    }
+    void prepare_level_2(loki::ConditionNumericConstraint condition)
+    {
+        this->prepare_level_0(condition->get_function_expression_left());
+        this->prepare_level_0(condition->get_function_expression_right());
+    }
+    void prepare_level_2(loki::Condition condition)
+    {
+        std::visit([this](auto&& arg) { return this->prepare_level_0(arg); }, condition->get_condition());
+    }
+    void prepare_level_2(loki::EffectLiteral effect) { this->prepare_level_0(effect->get_literal()); }
+    void prepare_level_2(loki::EffectAnd effect) { this->prepare_level_0(effect->get_effects()); }
+    void prepare_level_2(loki::EffectNumeric effect)
+    {
+        this->prepare_level_0(effect->get_function());
+        this->prepare_level_0(effect->get_function_expression());
+    }
+    void prepare_level_2(loki::EffectCompositeForall effect)
+    {
+        this->prepare_level_0(effect->get_parameters());
+        this->prepare_level_0(effect->get_effect());
+    }
+    void prepare_level_2(loki::EffectCompositeWhen effect)
+    {
+        this->prepare_level_0(effect->get_condition());
+        this->prepare_level_0(effect->get_effect());
+    }
+    void prepare_level_2(loki::EffectCompositeOneof effect) { this->prepare_level_0(effect->get_effects()); }
+    void prepare_level_2(loki::EffectCompositeProbabilistic effect)
+    {
+        for (const auto& [probability, effect] : effect->get_effect_distribution())
+        {
+            this->prepare_level_0(effect);
+        }
+    }
+    void prepare_level_2(loki::Effect effect)
+    {
+        std::visit([this](auto&& arg) { return this->prepare_level_0(arg); }, effect->get_effect());
+    }
+    void prepare_level_2(loki::FunctionExpressionNumber function_expression) {}
+    void prepare_level_2(loki::FunctionExpressionBinaryOperator function_expression)
+    {
+        this->prepare_level_0(function_expression->get_left_function_expression());
+        this->prepare_level_0(function_expression->get_right_function_expression());
+    }
+    void prepare_level_2(loki::FunctionExpressionMultiOperator function_expression) { this->prepare_level_0(function_expression->get_function_expressions()); }
+    void prepare_level_2(loki::FunctionExpressionMinus function_expression) { this->prepare_level_0(function_expression->get_function_expression()); }
+    void prepare_level_2(loki::FunctionExpressionFunction function_expression) { this->prepare_level_0(function_expression->get_function()); }
+    void prepare_level_2(loki::FunctionExpression function_expression)
+    {
+        std::visit([this](auto&& arg) { return this->prepare_level_0(arg); }, function_expression->get_function_expression());
+    }
+    void prepare_level_2(loki::FunctionSkeleton function_skeleton)
+    {
+        this->prepare_level_0(function_skeleton->get_parameters());
+        this->prepare_level_0(function_skeleton->get_type());
+    }
+    void prepare_level_2(loki::Function function)
+    {
+        this->prepare_level_0(function->get_function_skeleton());
+        this->prepare_level_0(function->get_terms());
+    }
+    void prepare_level_2(loki::Action action)
+    {
+        this->prepare_level_0(action->get_parameters());
+        if (action->get_condition().has_value())
+        {
+            this->prepare_level_0(action->get_condition().value());
+        }
+        if (action->get_effect().has_value())
+        {
+            this->prepare_level_0(action->get_effect().value());
+        }
+    }
+    void prepare_level_2(loki::Axiom axiom)
+    {
+        this->prepare_level_0(axiom->get_parameters());
+        this->prepare_level_0(axiom->get_literal());
+        this->prepare_level_0(axiom->get_condition());
+    }
+    void prepare_level_2(loki::OptimizationMetric metric) { this->prepare_level_0(metric->get_function_expression()); }
+
     ///////////////////////////////////////////////////////
     /// Translate
     ///////////////////////////////////////////////////////
@@ -84,6 +205,41 @@ protected:
     auto translate_level_1(const T& element)
     {
         return self().translate_level_2(element);
+    }
+
+    auto translate_level_1(const Domain& domain, DomainBuilder& builder) { return self().translate_level_2(domain, builder); }
+
+    auto translate_level_2(const Domain& domain, DomainBuilder& builder)
+    {
+        builder.get_name() = domain->get_name();
+        builder.get_filepath() = domain->get_filepath();
+        builder.get_requirements() = this->translate_level_0(domain->get_requirements(), builder);
+        builder.get_types() = this->translate_level_0(domain->get_types(), builder);
+        builder.get_constants() = this->translate_level_0(domain->get_constants(), builder);
+        builder.get_predicates() = this->translate_level_0(domain->get_predicates(), builder);
+        builder.get_function_skeletons() = this->translate_level_0(domain->get_functions(), builder);
+        builder.get_actions() = this->translate_level_0(domain->get_actions(), builder);
+        builder.get_axioms() = this->translate_level_0(domain->get_axioms(), builder);
+
+        return builder.get_result();
+    }
+
+    auto translate_level_1(const Problem& problem, ProblemBuilder& builder) { return self().translate_level_2(problem, builder); }
+
+    auto translate_level_2(const Problem& problem, ProblemBuilder& builder)
+    {
+        builder.get_filepath() = problem->get_filepath();
+        builder.get_name() = problem->get_name();
+        builder.get_requirements() = this->translate_level_0(problem->get_requirements(), builder);
+        builder.get_objects() = this->translate_level_0(problem->get_objects(), builder);
+        builder.get_predicates() = this->translate_level_0(problem->get_predicates(), builder);
+        builder.get_initial_literals() = this->translate_level_0(problem->get_initial_literals(), builder);
+        builder.get_function_values() = this->translate_level_0(problem->get_function_values(), builder);
+        builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition(), builder);
+        builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric(), builder);
+        builder.get_axioms() = this->translate_level_0(problem->get_axioms(), builder);
+
+        return builder.get_result(problem->get_index());
     }
 };
 }

@@ -29,12 +29,8 @@ private:
     friend class ToNegationNormalFormTranslatorBase<DomainToNegationNormalFormTranslator>;
 
     // Provide default implementations
-    using ToNegationNormalFormTranslatorBase<DomainToNegationNormalFormTranslator>::prepare_level_3;
-    using ToNegationNormalFormTranslatorBase<DomainToNegationNormalFormTranslator>::translate_level_3;
-
-    void prepare_level_3(const Domain& domain) {}
-
-    Domain translate_level_3(const Domain& domain) { return domain; }
+    using ToNegationNormalFormTranslatorBase<DomainToNegationNormalFormTranslator>::prepare_level_2;
+    using ToNegationNormalFormTranslatorBase<DomainToNegationNormalFormTranslator>::translate_level_2;
 };
 }
 

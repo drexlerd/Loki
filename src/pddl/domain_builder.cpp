@@ -340,6 +340,7 @@ Axiom DomainBuilder::get_or_create_axiom(ParameterList parameters, Literal subty
     return boost::hana::at_key(m_repositories, boost::hana::type<AxiomImpl> {}).get_or_create(std::move(parameters), subtyped_literal, condition);
 }
 
+HanaRepositories& DomainBuilder::get_repositories() { return m_repositories; }
 std::optional<fs::path>& DomainBuilder::get_filepath() { return m_filepath; }
 std::string& DomainBuilder::get_name() { return m_name; }
 Requirements& DomainBuilder::get_requirements() { return m_requirements; }

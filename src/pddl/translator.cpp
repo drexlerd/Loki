@@ -23,7 +23,9 @@
 namespace loki
 {
 
-DomainTranslationResult::DomainTranslationResult(Domain original_domain, Domain domain) : original_domain(std::move(original_domain)), domain(std::move(domain))
+DomainTranslationResult::DomainTranslationResult(Domain original_domain, Domain translated_domain) :
+    original_domain(std::move(original_domain)),
+    translated_domain(std::move(translated_domain))
 {
 }
 
@@ -31,13 +33,33 @@ DomainTranslationResult translate(const Domain& domain)
 {
     auto to_negation_normal_form_translator = DomainToNegationNormalFormTranslator();
 
-    to_negation_normal_form_translator.translate_level_0(domain);
+    auto builder = DomainBuilder();
+    auto translated_domain = to_negation_normal_form_translator.translate_level_0(domain, builder);
 
-    return DomainTranslationResult(domain, domain);
+    return DomainTranslationResult(domain, translated_domain);
 }
 
-ProblemTranslationResult::ProblemTranslationResult(Problem problem) : problem(std::move(problem)) {}
+const Domain& DomainTranslationResult::get_original_domain() const { return original_domain; }
 
-ProblemTranslationResult translate(const Problem& problem, const DomainTranslationResult& result) { return ProblemTranslationResult(problem); }
+const Domain& DomainTranslationResult::get_translated_domain() const { return translated_domain; }
+
+ProblemTranslationResult::ProblemTranslationResult(Problem translated_problem) : translated_problem(std::move(translated_problem)) {}
+
+const Problem& ProblemTranslationResult::get_translated_problem() const { return translated_problem; }
+
+ProblemTranslationResult translate(const Problem& problem, const DomainTranslationResult& result)
+{
+    if (result.get_original_domain() != problem->get_domain())
+    {
+        throw std::runtime_error("ITranslator::translate_level_0: domain in problem must match original domain in DomainTranslationResult.");
+    }
+
+    auto to_negation_normal_form_translator = ProblemToNegationNormalFormTranslator(result);
+
+    auto builder = ProblemBuilder(result.get_translated_domain());
+    auto translated_problem = to_negation_normal_form_translator.translate_level_0(problem, builder);
+
+    return ProblemTranslationResult(translated_problem);
+}
 
 }

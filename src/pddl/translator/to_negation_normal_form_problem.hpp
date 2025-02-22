@@ -27,15 +27,19 @@ namespace loki
 class ProblemToNegationNormalFormTranslator : public ToNegationNormalFormTranslatorBase<ProblemToNegationNormalFormTranslator>
 {
 private:
+    const DomainTranslationResult& m_domain_translation_result;
+
     friend class ToNegationNormalFormTranslatorBase<ProblemToNegationNormalFormTranslator>;
 
     // Provide default implementations
-    using ToNegationNormalFormTranslatorBase<ProblemToNegationNormalFormTranslator>::prepare_level_3;
-    using ToNegationNormalFormTranslatorBase<ProblemToNegationNormalFormTranslator>::translate_level_3;
+    using ToNegationNormalFormTranslatorBase<ProblemToNegationNormalFormTranslator>::prepare_level_2;
+    using ToNegationNormalFormTranslatorBase<ProblemToNegationNormalFormTranslator>::translate_level_2;
 
-    void prepare_level_3(const Problem& problem) {}
-
-    Problem translate_level_3(const Problem& problem) { return problem; }
+public:
+    explicit ProblemToNegationNormalFormTranslator(const DomainTranslationResult& domain_translation_result) :
+        m_domain_translation_result(domain_translation_result)
+    {
+    }
 };
 }
 

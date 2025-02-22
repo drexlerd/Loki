@@ -44,6 +44,7 @@ private:
     AxiomSet m_axioms;
 
 public:
+    /// @brief Create an empty builder.
     DomainBuilder() = default;
 
     /// @brief Finalizes the `Domain` and returns it.
@@ -132,6 +133,7 @@ public:
      * Get and modify components of the domain.
      */
 
+    HanaRepositories& get_repositories();
     std::optional<fs::path>& get_filepath();
     std::string& get_name();
     Requirements& get_requirements();

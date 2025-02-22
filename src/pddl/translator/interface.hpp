@@ -19,6 +19,7 @@
 #define LOKI_SRC_PDDL_TRANSLATOR_INTERFACE_HPP_
 
 #include "loki/details/pddl/concepts.hpp"
+#include "loki/details/pddl/problem.hpp"
 
 namespace loki
 {
@@ -47,21 +48,30 @@ public:
     /// Prepare
     ///////////////////////////////////////////////////////
 
-    template<typename T>
-    auto prepare_level_0(const T& element)
+    template<typename T, typename Builder>
+    auto prepare_level_0(const T& element, Builder& builder)
     {
-        self().prepare_level_1(element);
+        self().prepare_level_1(element, builder);
     }
 
     ///////////////////////////////////////////////////////
     /// Translate
     ///////////////////////////////////////////////////////
 
-    template<typename T>
-    auto translate_level_0(const T& element)
+    template<typename T, typename Builder>
+    auto translate_level_0(const T& element, Builder& builder)
     {
-        return self().translate_level_1(element);
+        return self().translate_level_1(element, builder);
     }
+
+    /**
+     * For domain and problem we provide specialized functions since they are treated fundamentally different,
+     * i.e., there is no entry in the HanaRepositories and we need to pass additional information to create default behaviors.
+     */
+
+    auto translate_level_0(const Domain& domain, DomainBuilder& builder) { return self().translate_level_1(domain, builder); }
+
+    auto translate_level_0(const Problem& problem, ProblemBuilder& builder) { return self().translate_level_1(problem, builder); }
 };
 }
 

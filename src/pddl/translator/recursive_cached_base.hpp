@@ -20,6 +20,10 @@
 
 #include "interface.hpp"
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/domain.hpp"
+#include "loki/details/pddl/domain_builder.hpp"
+#include "loki/details/pddl/problem.hpp"
+#include "loki/details/pddl/problem_builder.hpp"
 
 namespace loki
 {
@@ -85,20 +89,20 @@ protected:
     /// Prepare
     ///////////////////////////////////////////////////////
 
-    template<std::ranges::forward_range Range>
-    void prepare_level_1(const Range& range)
+    template<std::ranges::forward_range Range, typename Builder>
+    void prepare_level_1(const Range& range, Builder& builder)
     {
-        self().prepare_level_2(range);
+        self().prepare_level_2(range, builder);
     }
-    template<std::ranges::forward_range Range>
-    void prepare_level_2(const Range& range)
+    template<std::ranges::forward_range Range, typename Builder>
+    void prepare_level_2(const Range& range, Builder& builder)
     {
-        std::ranges::for_each(range, [this](auto&& arg) { this->prepare_level_0(arg); });
+        std::ranges::for_each(range, [&](auto&& arg) { this->prepare_level_0(arg, builder); });
     }
-    template<typename T>
-    void prepare_level_1(const T& element)
+    template<typename T, typename Builder>
+    void prepare_level_1(const T& element, Builder& builder)
     {
-        self().prepare_level_2(element);
+        self().prepare_level_2(element, builder);
     }
 
     ///////////////////////////////////////////////////////
@@ -125,14 +129,14 @@ protected:
         return translated;
     }
     /// @brief Translate a container of elements into a container of elements.
-    template<IsBackInsertibleRange Range>
-    auto translate_level_1(const Range& input)
+    template<IsBackInsertibleRange Range, typename Builder>
+    auto translate_level_1(const Range& input, Builder& builder)
     {
-        return self().translate_level_2(input);
+        return self().translate_level_2(input, builder);
     }
     /// @brief Translate a container of elements into a container of elements.
-    template<IsBackInsertibleRange Range>
-    auto translate_level_2(const Range& input)
+    template<IsBackInsertibleRange Range, typename Builder>
+    auto translate_level_2(const Range& input, Builder& builder)
     {
         std::remove_cvref_t<Range> output;
 
@@ -141,21 +145,58 @@ protected:
             output.reserve(std::ranges::size(input));
         }
 
-        std::ranges::transform(input, std::back_inserter(output), [this](auto&& arg) { return this->translate_level_0(arg); });
+        std::ranges::transform(input, std::back_inserter(output), [&](auto&& arg) { return this->translate_level_0(arg, builder); });
 
         return output;
     }
-    template<typename T>
-    auto translate_level_1(const T& element)
+    template<typename T, typename Builder>
+    auto translate_level_1(const T& element, Builder& builder)
     {
         return cached_translate_level_2(element,
                                         boost::hana::at_key(m_cache, boost::hana::type<T> {}),
-                                        [this](auto&& arg) { return self().translate_level_2(arg); });
+                                        [&](auto&& arg) { return self().translate_level_2(arg, builder); });
     }
 
-    // Cannot cache domain or problem!
-    auto translate_level_1(const Domain& domain) { return self().translate_level_2(domain); }
-    auto translate_level_1(const Problem& problem) { return self().translate_level_2(problem); }
+    template<typename Builder>
+    loki::Requirements translate_level_2(loki::Requirements requirements, Builder& builder)
+    {
+        return builder.get_or_create_requirements(requirements->get_requirements());
+    }
+
+    auto translate_level_1(const Domain& domain, DomainBuilder& builder) { return self().translate_level_2(domain, builder); }
+
+    auto translate_level_2(const Domain& domain, DomainBuilder& builder)
+    {
+        builder.get_name() = domain->get_name();
+        builder.get_filepath() = domain->get_filepath();
+        builder.get_requirements() = this->translate_level_0(domain->get_requirements(), builder);
+        // builder.get_types() = this->translate_level_0(domain->get_types(), builder);
+        // builder.get_constants() = this->translate_level_0(domain->get_constants(), builder);
+        // builder.get_predicates() = this->translate_level_0(domain->get_predicates(), builder);
+        // builder.get_function_skeletons() = this->translate_level_0(domain->get_functions(), builder);
+        // builder.get_actions() = this->translate_level_0(domain->get_actions(), builder);
+        // builder.get_axioms() = this->translate_level_0(domain->get_axioms(), builder);
+
+        return builder.get_result();
+    }
+
+    auto translate_level_1(const Problem& problem, ProblemBuilder& builder) { return self().translate_level_2(problem, builder); }
+
+    auto translate_level_2(const Problem& problem, ProblemBuilder& builder)
+    {
+        builder.get_filepath() = problem->get_filepath();
+        builder.get_name() = problem->get_name();
+        builder.get_requirements() = this->translate_level_0(problem->get_requirements(), builder);
+        // builder.get_objects() = this->translate_level_0(problem->get_objects(), builder);
+        // builder.get_predicates() = this->translate_level_0(problem->get_predicates(), builder);
+        // builder.get_initial_literals() = this->translate_level_0(problem->get_initial_literals(), builder);
+        // builder.get_function_values() = this->translate_level_0(problem->get_function_values(), builder);
+        // builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition(), builder);
+        // builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric(), builder);
+        // builder.get_axioms() = this->translate_level_0(problem->get_axioms(), builder);
+
+        return builder.get_result(problem->get_index());
+    }
 };
 }
 

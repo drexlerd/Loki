@@ -191,6 +191,13 @@ struct DomainParsingContext;
 class ProblemBuilder;
 struct ProblemParsingContext;
 
+/**
+ * Translation
+ */
+
+class DomainTranslationResult;
+class ProblemTranslationResult;
+
 }
 
 #endif

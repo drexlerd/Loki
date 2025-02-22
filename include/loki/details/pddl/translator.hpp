@@ -28,12 +28,15 @@ class DomainTranslationResult
 private:
     Domain original_domain;  ///< use it to check that a problem can be translated with this result.
 
-    Domain domain;
+    Domain translated_domain;
 
     // TODO: add more if needed
 
 public:
-    DomainTranslationResult(Domain original_domain, Domain domain);
+    DomainTranslationResult(Domain original_domain, Domain translated_domain);
+
+    const Domain& get_original_domain() const;
+    const Domain& get_translated_domain() const;
 };
 
 extern DomainTranslationResult translate(const Domain& domain);
@@ -41,10 +44,12 @@ extern DomainTranslationResult translate(const Domain& domain);
 class ProblemTranslationResult
 {
 private:
-    Problem problem;
+    Problem translated_problem;
 
 public:
     explicit ProblemTranslationResult(Problem problem);
+
+    const Problem& get_translated_problem() const;
 };
 
 extern ProblemTranslationResult translate(const Problem& problem, const DomainTranslationResult& result);

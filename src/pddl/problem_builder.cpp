@@ -19,6 +19,7 @@
 
 #include "loki/details/pddl/domain.hpp"
 #include "loki/details/pddl/problem.hpp"
+#include "loki/details/pddl/translator.hpp"
 
 namespace loki
 {
