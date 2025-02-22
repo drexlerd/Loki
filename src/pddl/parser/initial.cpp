@@ -61,7 +61,7 @@ std::variant<Literal, FunctionValue> parse(const ast::InitialElementFunctionValu
     {
         test_nonnegative_number(number, node.number, context);
     }
-    return context.builder.get_or_create_function_value(ground_function, number);
+    return context.builder.get_repositories().get_or_create_function_value(ground_function, number);
 }
 
 InitialElementVisitor::InitialElementVisitor(ProblemParsingContext& context_) : context(context_) {}

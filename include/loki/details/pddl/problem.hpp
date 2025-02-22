@@ -31,7 +31,7 @@ class ProblemImpl
 {
 private:
     size_t m_index;
-    HanaRepositories m_repositories;
+    Repositories m_repositories;
     std::optional<fs::path> m_filepath;
     Domain m_domain;
     std::string m_name;
@@ -49,7 +49,7 @@ private:
 
 public:
     ProblemImpl(size_t index,
-                HanaRepositories repositories,
+                Repositories repositories,
                 std::optional<fs::path> filepath,
                 Domain domain,
                 std::string name,

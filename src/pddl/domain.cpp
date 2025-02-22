@@ -32,7 +32,7 @@ using namespace std;
 
 namespace loki
 {
-DomainImpl::DomainImpl(HanaRepositories repositories,
+DomainImpl::DomainImpl(Repositories repositories,
                        std::optional<fs::path> filepath,
                        std::string name,
                        Requirements requirements,
@@ -54,6 +54,8 @@ DomainImpl::DomainImpl(HanaRepositories repositories,
     m_axioms(std::move(axioms))
 {
 }
+
+const Repositories& DomainImpl::get_repositories() const { return m_repositories; }
 
 const std::optional<fs::path>& DomainImpl::get_filepath() const { return m_filepath; }
 

@@ -89,20 +89,20 @@ protected:
     /// Prepare
     ///////////////////////////////////////////////////////
 
-    template<std::ranges::forward_range Range, typename Builder>
-    void prepare_level_1(const Range& range, Builder& builder)
+    template<std::ranges::forward_range Range>
+    void prepare_level_1(const Range& range)
     {
-        self().prepare_level_2(range, builder);
+        self().prepare_level_2(range);
     }
-    template<std::ranges::forward_range Range, typename Builder>
-    void prepare_level_2(const Range& range, Builder& builder)
+    template<std::ranges::forward_range Range>
+    void prepare_level_2(const Range& range)
     {
-        std::ranges::for_each(range, [&](auto&& arg) { this->prepare_level_0(arg, builder); });
+        std::ranges::for_each(range, [&](auto&& arg) { this->prepare_level_0(arg); });
     }
-    template<typename T, typename Builder>
-    void prepare_level_1(const T& element, Builder& builder)
+    template<typename T>
+    void prepare_level_1(const T& element)
     {
-        self().prepare_level_2(element, builder);
+        self().prepare_level_2(element);
     }
 
     ///////////////////////////////////////////////////////
@@ -160,7 +160,250 @@ protected:
     template<typename Builder>
     loki::Requirements translate_level_2(loki::Requirements requirements, Builder& builder)
     {
-        return builder.get_or_create_requirements(requirements->get_requirements());
+        return builder.get_repositories().get_or_create_requirements(requirements->get_requirements());
+    }
+    template<typename Builder>
+    loki::Type translate_level_2(loki::Type type, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_type(type->get_name(), this->translate_level_0(type->get_bases(), builder));
+    }
+    template<>
+    loki::Type translate_level_2(loki::Type type, ProblemBuilder& builder)
+    {
+        return builder.get_repositories().get_or_create_type(type->get_name(), this->translate_level_0(type->get_bases(), builder));
+    }
+    template<typename Builder>
+    loki::Object translate_level_2(loki::Object object, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_object(object->get_name(), this->translate_level_0(object->get_bases(), builder));
+    }
+    template<typename Builder>
+    loki::Variable translate_level_2(loki::Variable variable, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_variable(variable->get_name());
+    }
+    template<typename Builder>
+    loki::Term translate_level_2(loki::Term term, Builder& builder)
+    {
+        return std::visit([&](auto&& arg) -> loki::Term { return builder.get_repositories().get_or_create_term(this->translate_level_0(arg, builder)); },
+                          term->get_object_or_variable());
+    }
+    template<typename Builder>
+    loki::Parameter translate_level_2(loki::Parameter parameter, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_parameter(this->translate_level_0(parameter->get_variable(), builder),
+                                                                  this->translate_level_0(parameter->get_bases(), builder));
+    }
+    template<typename Builder>
+    loki::Predicate translate_level_2(loki::Predicate predicate, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_predicate(predicate->get_name(), this->translate_level_0(predicate->get_parameters(), builder));
+    }
+    template<typename Builder>
+    loki::Atom translate_level_2(loki::Atom atom, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_atom(this->translate_level_0(atom->get_predicate(), builder),
+                                                             this->translate_level_0(atom->get_terms(), builder));
+    }
+    template<typename Builder>
+    loki::Literal translate_level_2(loki::Literal literal, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_literal(literal->is_negated(), this->translate_level_0(literal->get_atom(), builder));
+    }
+    template<typename Builder>
+    loki::FunctionValue translate_level_2(loki::FunctionValue function_value, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_function_value(this->translate_level_0(function_value->get_function(), builder),
+                                                                       function_value->get_number());
+    }
+    template<typename Builder>
+    loki::Condition translate_level_2(loki::ConditionLiteral condition, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_condition(
+            builder.get_repositories().get_or_create_condition_literal(this->translate_level_0(condition->get_literal(), builder)));
+    }
+    template<typename Builder>
+    loki::Condition translate_level_2(loki::ConditionAnd condition, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_condition(
+            builder.get_repositories().get_or_create_condition_and(this->translate_level_0(condition->get_conditions(), builder)));
+    }
+    template<typename Builder>
+    loki::Condition translate_level_2(loki::ConditionOr condition, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_condition(
+            builder.get_repositories().get_or_create_condition_or(this->translate_level_0(condition->get_conditions(), builder)));
+    }
+    template<typename Builder>
+    loki::Condition translate_level_2(loki::ConditionNot condition, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_condition(
+            builder.get_repositories().get_or_create_condition_not(this->translate_level_0(condition->get_condition(), builder)));
+    }
+    template<typename Builder>
+    loki::Condition translate_level_2(loki::ConditionImply condition, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_condition(
+            builder.get_repositories().get_or_create_condition_imply(this->translate_level_0(condition->get_condition_left(), builder),
+                                                                     this->translate_level_0(condition->get_condition_right(), builder)));
+    }
+    template<typename Builder>
+    loki::Condition translate_level_2(loki::ConditionExists condition, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_condition(
+            builder.get_repositories().get_or_create_condition_exists(this->translate_level_0(condition->get_parameters(), builder),
+                                                                      this->translate_level_0(condition->get_condition(), builder)));
+    }
+    template<typename Builder>
+    loki::Condition translate_level_2(loki::ConditionForall condition, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_condition(
+            builder.get_repositories().get_or_create_condition_forall(this->translate_level_0(condition->get_parameters(), builder),
+                                                                      this->translate_level_0(condition->get_condition(), builder)));
+    }
+    template<typename Builder>
+    loki::Condition translate_level_2(loki::ConditionNumericConstraint condition, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_condition(builder.get_repositories().get_or_create_condition_numeric_constraint(
+            condition->get_binary_comparator(),
+            this->translate_level_0(condition->get_function_expression_left(), builder),
+            this->translate_level_0(condition->get_function_expression_right(), builder)));
+    }
+    template<typename Builder>
+    loki::Condition translate_level_2(loki::Condition condition, Builder& builder)
+    {
+        return std::visit([&](auto&& arg) -> loki::Condition { return this->translate_level_0(arg, builder); }, condition->get_condition());
+    }
+    template<typename Builder>
+    loki::Effect translate_level_2(loki::EffectLiteral effect, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_effect(
+            builder.get_repositories().get_or_create_effect_literal(this->translate_level_0(effect->get_literal(), builder)));
+    }
+    template<typename Builder>
+    loki::Effect translate_level_2(loki::EffectAnd effect, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_effect(
+            builder.get_repositories().get_or_create_effect_and(this->translate_level_0(effect->get_effects(), builder)));
+    }
+    template<typename Builder>
+    loki::Effect translate_level_2(loki::EffectNumeric effect, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_effect(
+            builder.get_repositories().get_or_create_effect_numeric(effect->get_assign_operator(),
+                                                                    this->translate_level_0(effect->get_function(), builder),
+                                                                    this->translate_level_0(effect->get_function_expression(), builder)));
+    }
+    template<typename Builder>
+    loki::Effect translate_level_2(loki::EffectCompositeForall effect, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_effect(
+            builder.get_repositories().get_or_create_effect_composite_forall(this->translate_level_0(effect->get_parameters(), builder),
+                                                                             this->translate_level_0(effect->get_effect(), builder)));
+    }
+    template<typename Builder>
+    loki::Effect translate_level_2(loki::EffectCompositeWhen effect, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_effect(
+            builder.get_repositories().get_or_create_effect_composite_when(this->translate_level_0(effect->get_condition(), builder),
+                                                                           this->translate_level_0(effect->get_effect(), builder)));
+    }
+    template<typename Builder>
+    loki::Effect translate_level_2(loki::EffectCompositeOneof effect, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_effect(
+            builder.get_repositories().get_or_create_effect_composite_oneof(this->translate_level_0(effect->get_effects(), builder)));
+    }
+    template<typename Builder>
+    loki::Effect translate_level_2(loki::EffectCompositeProbabilistic effect, Builder& builder)
+    {
+        auto distribution = loki::EffectDistribution();
+        for (const auto& [probability, effect] : effect->get_effect_distribution())
+        {
+            distribution.emplace_back(probability, this->translate_level_0(effect, builder));
+        }
+        return builder.get_repositories().get_or_create_effect(builder.get_repositories().get_or_create_effect_composite_probabilistic(distribution));
+    }
+    template<typename Builder>
+    loki::Effect translate_level_2(loki::Effect effect, Builder& builder)
+    {
+        return std::visit([&](auto&& arg) -> loki::Effect { return this->translate_level_0(arg, builder); }, effect->get_effect());
+    }
+    template<typename Builder>
+    loki::FunctionExpression translate_level_2(loki::FunctionExpressionNumber function_expression, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_function_expression(
+            builder.get_repositories().get_or_create_function_expression_number(function_expression->get_number()));
+    }
+    template<typename Builder>
+    loki::FunctionExpression translate_level_2(loki::FunctionExpressionBinaryOperator function_expression, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_function_expression(builder.get_repositories().get_or_create_function_expression_binary_operator(
+            function_expression->get_binary_operator(),
+            this->translate_level_0(function_expression->get_left_function_expression(), builder),
+            this->translate_level_0(function_expression->get_right_function_expression(), builder)));
+    }
+    template<typename Builder>
+    loki::FunctionExpression translate_level_2(loki::FunctionExpressionMultiOperator function_expression, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_function_expression(builder.get_repositories().get_or_create_function_expression_multi_operator(
+            function_expression->get_multi_operator(),
+            this->translate_level_0(function_expression->get_function_expressions(), builder)));
+    }
+    template<typename Builder>
+    loki::FunctionExpression translate_level_2(loki::FunctionExpressionMinus function_expression, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_function_expression(builder.get_repositories().get_or_create_function_expression_minus(
+            this->translate_level_0(function_expression->get_function_expression(), builder)));
+    }
+    template<typename Builder>
+    loki::FunctionExpression translate_level_2(loki::FunctionExpressionFunction function_expression, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_function_expression(
+            builder.get_repositories().get_or_create_function_expression_function(this->translate_level_0(function_expression->get_function(), builder)));
+    }
+    template<typename Builder>
+    loki::FunctionExpression translate_level_2(loki::FunctionExpression function_expression, Builder& builder)
+    {
+        return std::visit([&](auto&& arg) -> loki::FunctionExpression { return this->translate_level_0(arg, builder); },
+                          function_expression->get_function_expression());
+    }
+    template<typename Builder>
+    loki::FunctionSkeleton translate_level_2(loki::FunctionSkeleton function_skeleton, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_function_skeleton(function_skeleton->get_name(),
+                                                                          this->translate_level_0(function_skeleton->get_parameters(), builder),
+                                                                          this->translate_level_0(function_skeleton->get_type(), builder));
+    }
+    template<typename Builder>
+    loki::Function translate_level_2(loki::Function function, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_function(this->translate_level_0(function->get_function_skeleton(), builder),
+                                                                 this->translate_level_0(function->get_terms(), builder));
+    }
+    template<typename Builder>
+    loki::Action translate_level_2(loki::Action action, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_action(
+            action->get_name(),
+            action->get_original_arity(),
+            this->translate_level_0(action->get_parameters(), builder),
+            (action->get_condition().has_value() ? std::optional<loki::Condition>(this->translate_level_0(action->get_condition().value(), builder)) :
+                                                   std::nullopt),
+            (action->get_effect().has_value() ? std::optional<loki::Effect>(this->translate_level_0(action->get_effect().value(), builder)) : std::nullopt));
+    }
+    template<typename Builder>
+    loki::Axiom translate_level_2(loki::Axiom axiom, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_axiom(this->translate_level_0(axiom->get_parameters(), builder),
+                                                              this->translate_level_0(axiom->get_literal(), builder),
+                                                              this->translate_level_0(axiom->get_condition(), builder));
+    }
+    template<typename Builder>
+    loki::OptimizationMetric translate_level_2(loki::OptimizationMetric metric, Builder& builder)
+    {
+        return builder.get_repositories().get_or_create_optimization_metric(metric->get_optimization_metric(),
+                                                                            this->translate_level_0(metric->get_function_expression(), builder));
     }
 
     auto translate_level_1(const Domain& domain, DomainBuilder& builder) { return self().translate_level_2(domain, builder); }
@@ -170,12 +413,12 @@ protected:
         builder.get_name() = domain->get_name();
         builder.get_filepath() = domain->get_filepath();
         builder.get_requirements() = this->translate_level_0(domain->get_requirements(), builder);
-        // builder.get_types() = this->translate_level_0(domain->get_types(), builder);
-        // builder.get_constants() = this->translate_level_0(domain->get_constants(), builder);
-        // builder.get_predicates() = this->translate_level_0(domain->get_predicates(), builder);
-        // builder.get_function_skeletons() = this->translate_level_0(domain->get_functions(), builder);
-        // builder.get_actions() = this->translate_level_0(domain->get_actions(), builder);
-        // builder.get_axioms() = this->translate_level_0(domain->get_axioms(), builder);
+        builder.get_types() = this->translate_level_0(domain->get_types(), builder);
+        builder.get_constants() = this->translate_level_0(domain->get_constants(), builder);
+        builder.get_predicates() = this->translate_level_0(domain->get_predicates(), builder);
+        builder.get_function_skeletons() = this->translate_level_0(domain->get_functions(), builder);
+        builder.get_actions() = this->translate_level_0(domain->get_actions(), builder);
+        builder.get_axioms() = this->translate_level_0(domain->get_axioms(), builder);
 
         return builder.get_result();
     }
@@ -187,13 +430,15 @@ protected:
         builder.get_filepath() = problem->get_filepath();
         builder.get_name() = problem->get_name();
         builder.get_requirements() = this->translate_level_0(problem->get_requirements(), builder);
-        // builder.get_objects() = this->translate_level_0(problem->get_objects(), builder);
-        // builder.get_predicates() = this->translate_level_0(problem->get_predicates(), builder);
-        // builder.get_initial_literals() = this->translate_level_0(problem->get_initial_literals(), builder);
-        // builder.get_function_values() = this->translate_level_0(problem->get_function_values(), builder);
-        // builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition(), builder);
-        // builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric(), builder);
-        // builder.get_axioms() = this->translate_level_0(problem->get_axioms(), builder);
+        builder.get_objects() = this->translate_level_0(problem->get_objects(), builder);
+        builder.get_predicates() = this->translate_level_0(problem->get_predicates(), builder);
+        builder.get_initial_literals() = this->translate_level_0(problem->get_initial_literals(), builder);
+        builder.get_function_values() = this->translate_level_0(problem->get_function_values(), builder);
+        if (problem->get_goal_condition().has_value())
+            builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition().value(), builder);
+        if (problem->get_optimization_metric().has_value())
+            builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric().value(), builder);
+        builder.get_axioms() = this->translate_level_0(problem->get_axioms(), builder);
 
         return builder.get_result(problem->get_index());
     }

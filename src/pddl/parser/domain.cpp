@@ -37,8 +37,8 @@ namespace loki
 void parse(const ast::Domain& node, DomainParsingContext& context)
 {
     // Create base types.
-    const auto base_type_object = context.builder.get_or_create_type("object", TypeList());
-    const auto base_type_number = context.builder.get_or_create_type("number", TypeList());
+    const auto base_type_object = context.builder.get_repositories().get_or_create_type("object", TypeList());
+    const auto base_type_number = context.builder.get_repositories().get_or_create_type("number", TypeList());
     context.scopes.top().insert_type("object", base_type_object, {});
     context.scopes.top().insert_type("number", base_type_number, {});
 
@@ -52,7 +52,7 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
         const auto domain_requirements_set = parse(node.requirements.value(), context);
         requirements_set.insert(domain_requirements_set.begin(), domain_requirements_set.end());
     }
-    const auto requirements = context.builder.get_or_create_requirements(requirements_set);
+    const auto requirements = context.builder.get_repositories().get_or_create_requirements(requirements_set);
     context.builder.get_requirements() = requirements;
     context.requirements = requirements;
 
@@ -70,7 +70,7 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
     if (node.constants.has_value())
     {
         const auto constants = parse(node.constants.value(), context);
-        context.builder.get_constants().insert(constants.begin(), constants.end());
+        context.builder.get_constants().insert(context.builder.get_constants().end(), constants.begin(), constants.end());
         track_object_references(constants, context);
     }
 
@@ -79,20 +79,22 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
     if (node.predicates.has_value())
     {
         predicates = parse(node.predicates.value(), context);
-        context.builder.get_predicates().insert(predicates.begin(), predicates.end());
+        context.builder.get_predicates().insert(context.builder.get_predicates().end(), predicates.begin(), predicates.end());
         track_predicate_references(predicates, context);
     }
     if (context.requirements->test(RequirementEnum::EQUALITY))
     {
         // Create equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
         const auto binary_parameterlist =
-            ParameterList { context.builder.get_or_create_parameter(context.builder.get_or_create_variable("?lhs"), TypeList { base_type_object }),
-                            context.builder.get_or_create_parameter(context.builder.get_or_create_variable("?rhs"), TypeList { base_type_object })
+            ParameterList { context.builder.get_repositories().get_or_create_parameter(context.builder.get_repositories().get_or_create_variable("?lhs"),
+                                                                                       TypeList { base_type_object }),
+                            context.builder.get_repositories().get_or_create_parameter(context.builder.get_repositories().get_or_create_variable("?rhs"),
+                                                                                       TypeList { base_type_object })
 
             };
-        const auto equal_predicate = context.builder.get_or_create_predicate("=", binary_parameterlist);
+        const auto equal_predicate = context.builder.get_repositories().get_or_create_predicate("=", binary_parameterlist);
         context.scopes.top().insert_predicate("=", equal_predicate, {});
-        context.builder.get_predicates().insert(equal_predicate);
+        context.builder.get_predicates().push_back(equal_predicate);
     }
 
     /* Functions section */
@@ -100,7 +102,7 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
     if (node.functions.has_value())
     {
         function_skeletons = parse(node.functions.value(), context);
-        context.builder.get_function_skeletons().insert(function_skeletons.begin(), function_skeletons.end());
+        context.builder.get_function_skeletons().insert(context.builder.get_function_skeletons().end(), function_skeletons.begin(), function_skeletons.end());
         track_function_skeleton_references(function_skeletons, context);
     }
 
@@ -111,8 +113,8 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
         auto actions = ActionList();
         auto variant = parse(structure_node, context);
         std::visit(UnpackingVisitor(actions, axioms), variant);
-        context.builder.get_actions().insert(actions.begin(), actions.end());
-        context.builder.get_axioms().insert(axioms.begin(), axioms.end());
+        context.builder.get_actions().insert(context.builder.get_actions().end(), actions.begin(), actions.end());
+        context.builder.get_axioms().insert(context.builder.get_axioms().end(), axioms.begin(), axioms.end());
     }
 
     // Check references

@@ -37,14 +37,14 @@ Atom parse(const ast::AtomicFormulaOfNamesPredicate& node, ProblemParsingContext
     auto positions = PositionList();
     for (const auto& name_node : node.names)
     {
-        term_list.push_back(context.builder.get_or_create_term(parse_object_reference(name_node, context)));
+        term_list.push_back(context.builder.get_repositories().get_or_create_term(parse_object_reference(name_node, context)));
         positions.push_back(name_node);
     }
     const auto binding = context.scopes.top().get_predicate(name);
     const auto [predicate, _position, _error_handler] = binding.value();
     test_arity_compatibility(predicate->get_parameters().size(), term_list.size(), node, context);
     test_incompatible_grounding(predicate->get_parameters(), term_list, positions, context);
-    const auto atom = context.builder.get_or_create_atom(predicate, term_list);
+    const auto atom = context.builder.get_repositories().get_or_create_atom(predicate, term_list);
     context.positions.push_back(atom, node);
     return atom;
 }
@@ -55,9 +55,9 @@ Atom parse(const ast::AtomicFormulaOfNamesEquality& node, ProblemParsingContext&
     context.references.untrack(RequirementEnum::EQUALITY);
     assert(context.scopes.top().get_predicate("=").has_value());
     const auto [equal_predicate, _position, _error_handler] = context.scopes.top().get_predicate("=").value();
-    const auto term_left = context.builder.get_or_create_term(parse_object_reference(node.name_left, context));
-    const auto term_right = context.builder.get_or_create_term(parse_object_reference(node.name_right, context));
-    const auto atom = context.builder.get_or_create_atom(equal_predicate, TermList { term_left, term_right });
+    const auto term_left = context.builder.get_repositories().get_or_create_term(parse_object_reference(node.name_left, context));
+    const auto term_right = context.builder.get_repositories().get_or_create_term(parse_object_reference(node.name_right, context));
+    const auto atom = context.builder.get_repositories().get_or_create_atom(equal_predicate, TermList { term_left, term_right });
     context.positions.push_back(atom, node);
     return atom;
 }
@@ -72,14 +72,14 @@ GroundAtomicFormulaOfNamesVisitor::GroundAtomicFormulaOfNamesVisitor(ProblemPars
 /* Literal */
 Literal parse(const ast::GroundAtom& node, ProblemParsingContext& context)
 {
-    const auto literal = context.builder.get_or_create_literal(false, parse(node.atomic_formula_of_names, context));
+    const auto literal = context.builder.get_repositories().get_or_create_literal(false, parse(node.atomic_formula_of_names, context));
     context.positions.push_back(literal, node);
     return literal;
 }
 
 Literal parse(const ast::NegatedGroundAtom& node, ProblemParsingContext& context)
 {
-    const auto literal = context.builder.get_or_create_literal(true, parse(node.atomic_formula_of_names, context));
+    const auto literal = context.builder.get_repositories().get_or_create_literal(true, parse(node.atomic_formula_of_names, context));
     context.positions.push_back(literal, node);
     return literal;
 }

@@ -50,7 +50,7 @@ Effect EffectVisitor<C>::operator()(const std::vector<ast::Effect>& effect_nodes
     {
         effect_list.push_back(this->operator()(effect_node));
     }
-    return context.builder.get_or_create_effect(context.builder.get_or_create_effect_and(effect_list));
+    return context.builder.get_repositories().get_or_create_effect(context.builder.get_repositories().get_or_create_effect_and(effect_list));
 }
 
 template<ParsingContext C>
@@ -63,7 +63,7 @@ template<ParsingContext C>
 Effect EffectVisitor<C>::operator()(const ast::EffectProductionLiteral& node)
 {
     auto literal = parse(node.literal, context);
-    const auto effect = context.builder.get_or_create_effect(context.builder.get_or_create_effect_literal(literal));
+    const auto effect = context.builder.get_repositories().get_or_create_effect(context.builder.get_repositories().get_or_create_effect_literal(literal));
 
     context.positions.push_back(effect, node);
     return effect;
@@ -89,7 +89,8 @@ Effect EffectVisitor<C>::operator()(const ast::EffectProductionNumeric& node)
     context.references.untrack(function->get_function_skeleton());
     auto fexpr_visitor = FunctionExpressionVisitor(context);
     const auto function_expression = boost::apply_visitor(fexpr_visitor, node.function_expression);
-    const auto effect = context.builder.get_or_create_effect(context.builder.get_or_create_effect_numeric(assign_operator, function, function_expression));
+    const auto effect = context.builder.get_repositories().get_or_create_effect(
+        context.builder.get_repositories().get_or_create_effect_numeric(assign_operator, function, function_expression));
     context.positions.push_back(effect, node);
     return effect;
 }
@@ -113,7 +114,8 @@ Effect EffectVisitor<C>::operator()(const ast::EffectCompositeForall& node)
     const auto child_effect = this->operator()(node.effect);
     test_variable_references(parameter_list, context);
     context.scopes.close_scope();
-    const auto effect = context.builder.get_or_create_effect(context.builder.get_or_create_effect_composite_forall(parameter_list, child_effect));
+    const auto effect = context.builder.get_repositories().get_or_create_effect(
+        context.builder.get_repositories().get_or_create_effect_composite_forall(parameter_list, child_effect));
     context.positions.push_back(effect, node);
     return effect;
 }
@@ -127,7 +129,8 @@ Effect EffectVisitor<C>::operator()(const ast::EffectCompositeWhen& node)
     const auto condition = parse(node.goal_descriptor, context);
     const auto child_effect = this->operator()(node.effect);
     context.scopes.close_scope();
-    const auto effect = context.builder.get_or_create_effect(context.builder.get_or_create_effect_composite_when(condition, child_effect));
+    const auto effect = context.builder.get_repositories().get_or_create_effect(
+        context.builder.get_repositories().get_or_create_effect_composite_when(condition, child_effect));
     context.positions.push_back(effect, node);
     return effect;
 }
@@ -142,7 +145,7 @@ Effect EffectVisitor<C>::operator()(const ast::EffectCompositeOneof& node)
     {
         effect_list.push_back(this->operator()(effect_node));
     }
-    return context.builder.get_or_create_effect(context.builder.get_or_create_effect_composite_oneof(effect_list));
+    return context.builder.get_repositories().get_or_create_effect(context.builder.get_repositories().get_or_create_effect_composite_oneof(effect_list));
 }
 
 template<ParsingContext C>
@@ -156,7 +159,8 @@ Effect EffectVisitor<C>::operator()(const ast::EffectCompositeProbabilistic& nod
     {
         effect_distribution.emplace_back(parse(number_and_effect.number), this->operator()(number_and_effect.effect));
     }
-    return context.builder.get_or_create_effect(context.builder.get_or_create_effect_composite_probabilistic(effect_distribution));
+    return context.builder.get_repositories().get_or_create_effect(
+        context.builder.get_repositories().get_or_create_effect_composite_probabilistic(effect_distribution));
 }
 
 template<ParsingContext C>

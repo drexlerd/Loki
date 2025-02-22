@@ -42,7 +42,7 @@ static Predicate parse_predicate_definition(const ast::AtomicFormulaSkeleton& no
     const auto parameters = boost::apply_visitor(parameter_list_visitor, node.typed_list_of_variables);
     context.scopes.close_scope();
     const auto predicate_name = parse(node.predicate.name);
-    const auto predicate = context.builder.get_or_create_predicate(predicate_name, parameters);
+    const auto predicate = context.builder.get_repositories().get_or_create_predicate(predicate_name, parameters);
     test_multiple_definition_predicate(predicate, node.predicate, context);
     insert_context_information(predicate, node.predicate, context);
     return predicate;

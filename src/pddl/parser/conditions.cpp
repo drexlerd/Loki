@@ -47,7 +47,8 @@ Condition ConditionVisitor<C>::operator()(const ast::GoalDescriptor& node)
 template<ParsingContext C>
 Condition ConditionVisitor<C>::operator()(const ast::GoalDescriptorAtom& node)
 {
-    const auto condition = context.builder.get_or_create_condition(context.builder.get_or_create_condition_literal(parse(node.atom, context)));
+    const auto condition = context.builder.get_repositories().get_or_create_condition(
+        context.builder.get_repositories().get_or_create_condition_literal(parse(node.atom, context)));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -58,7 +59,8 @@ Condition ConditionVisitor<C>::operator()(const ast::GoalDescriptorLiteral& node
     // requires :negative-preconditions
     test_undefined_requirement(RequirementEnum::NEGATIVE_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::NEGATIVE_PRECONDITIONS);
-    const auto condition = context.builder.get_or_create_condition(context.builder.get_or_create_condition_literal(parse(node.literal, context)));
+    const auto condition = context.builder.get_repositories().get_or_create_condition(
+        context.builder.get_repositories().get_or_create_condition_literal(parse(node.literal, context)));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -71,7 +73,8 @@ Condition ConditionVisitor<C>::operator()(const ast::GoalDescriptorAnd& node)
     {
         condition_list.push_back(this->operator()(child_node));
     }
-    const auto condition = context.builder.get_or_create_condition(context.builder.get_or_create_condition_and(condition_list));
+    const auto condition =
+        context.builder.get_repositories().get_or_create_condition(context.builder.get_repositories().get_or_create_condition_and(condition_list));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -87,7 +90,8 @@ Condition ConditionVisitor<C>::operator()(const ast::GoalDescriptorOr& node)
     {
         condition_list.push_back(this->operator()(child_node));
     }
-    const auto condition = context.builder.get_or_create_condition(context.builder.get_or_create_condition_or(condition_list));
+    const auto condition =
+        context.builder.get_repositories().get_or_create_condition(context.builder.get_repositories().get_or_create_condition_or(condition_list));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -99,7 +103,8 @@ Condition ConditionVisitor<C>::operator()(const ast::GoalDescriptorNot& node)
     test_undefined_requirement(RequirementEnum::NEGATIVE_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::NEGATIVE_PRECONDITIONS);
     auto child_condition = this->operator()(node.goal_descriptor);
-    const auto condition = context.builder.get_or_create_condition(context.builder.get_or_create_condition_not(child_condition));
+    const auto condition =
+        context.builder.get_repositories().get_or_create_condition(context.builder.get_repositories().get_or_create_condition_not(child_condition));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -111,7 +116,8 @@ Condition ConditionVisitor<C>::operator()(const ast::GoalDescriptorImply& node)
     context.references.untrack(RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
     auto condition_left = this->operator()(node.goal_descriptor_left);
     auto condition_right = this->operator()(node.goal_descriptor_right);
-    const auto condition = context.builder.get_or_create_condition(context.builder.get_or_create_condition_imply(condition_left, condition_right));
+    const auto condition = context.builder.get_repositories().get_or_create_condition(
+        context.builder.get_repositories().get_or_create_condition_imply(condition_left, condition_right));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -128,7 +134,8 @@ Condition ConditionVisitor<C>::operator()(const ast::GoalDescriptorExists& node)
     auto child_condition = this->operator()(node.goal_descriptor);
     test_variable_references(parameter_list, context);
     context.scopes.close_scope();
-    auto condition = context.builder.get_or_create_condition(context.builder.get_or_create_condition_exists(parameter_list, child_condition));
+    auto condition = context.builder.get_repositories().get_or_create_condition(
+        context.builder.get_repositories().get_or_create_condition_exists(parameter_list, child_condition));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -144,7 +151,8 @@ static Condition parse_condition_forall(const ast::TypedListOfVariables& paramet
     auto child_condition = boost::apply_visitor(condition_visitor, condition_node);
     test_variable_references(parameter_list, context);
     context.scopes.close_scope();
-    auto condition = context.builder.get_or_create_condition(context.builder.get_or_create_condition_forall(parameter_list, child_condition));
+    auto condition = context.builder.get_repositories().get_or_create_condition(
+        context.builder.get_repositories().get_or_create_condition_forall(parameter_list, child_condition));
     context.positions.push_back(condition, condition_node);
     return condition;
 }
@@ -170,8 +178,8 @@ Condition ConditionVisitor<C>::operator()(const ast::GoalDescriptorFunctionCompa
     auto fexpr_visitor = FunctionExpressionVisitor(context);
     auto function_expression_left = boost::apply_visitor(fexpr_visitor, node.function_expression_left);
     auto function_expression_right = boost::apply_visitor(fexpr_visitor, node.function_expression_right);
-    auto condition = context.builder.get_or_create_condition(
-        context.builder.get_or_create_condition_numeric_constraint(binary_comparator, function_expression_left, function_expression_right));
+    auto condition = context.builder.get_repositories().get_or_create_condition(
+        context.builder.get_repositories().get_or_create_condition_numeric_constraint(binary_comparator, function_expression_left, function_expression_right));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -190,7 +198,8 @@ Condition ConditionVisitor<C>::operator()(const ast::ConstraintGoalDescriptorAnd
     {
         condition_list.push_back(this->operator()(child_node));
     }
-    const auto condition = context.builder.get_or_create_condition(context.builder.get_or_create_condition_and(condition_list));
+    const auto condition =
+        context.builder.get_repositories().get_or_create_condition(context.builder.get_repositories().get_or_create_condition_and(condition_list));
     context.positions.push_back(condition, node);
     return condition;
 }
@@ -283,7 +292,8 @@ Condition ConditionVisitor<C>::operator()(const ast::PreconditionGoalDescriptorA
     {
         condition_list.push_back(this->operator()(child_node));
     }
-    const auto condition = context.builder.get_or_create_condition(context.builder.get_or_create_condition_and(condition_list));
+    const auto condition =
+        context.builder.get_repositories().get_or_create_condition(context.builder.get_repositories().get_or_create_condition_and(condition_list));
     context.positions.push_back(condition, node);
     return condition;
 }

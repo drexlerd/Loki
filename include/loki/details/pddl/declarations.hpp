@@ -52,11 +52,13 @@ class TypeImpl;
 using Type = const TypeImpl*;
 using TypeList = std::vector<Type>;
 using TypeSet = std::unordered_set<Type>;
+using TypeMap = std::unordered_map<Type, Type>;
 
 class ObjectImpl;
 using Object = const ObjectImpl*;
 using ObjectList = std::vector<Object>;
 using ObjectSet = std::unordered_set<Object>;
+using ObjectMap = std::unordered_map<Object, Object>;
 
 class VariableImpl;
 using Variable = const VariableImpl*;
@@ -81,6 +83,7 @@ class PredicateImpl;
 using Predicate = const PredicateImpl*;
 using PredicateList = std::vector<Predicate>;
 using PredicateSet = std::unordered_set<Predicate>;
+using PredicateMap = std::unordered_map<Predicate, Predicate>;
 
 class LiteralImpl;
 using Literal = const LiteralImpl*;
@@ -144,6 +147,7 @@ class FunctionSkeletonImpl;
 using FunctionSkeleton = const FunctionSkeletonImpl*;
 using FunctionSkeletonList = std::vector<FunctionSkeleton>;
 using FunctionSkeletonSet = std::unordered_set<FunctionSkeleton>;
+using FunctionSkeletonMap = std::unordered_map<FunctionSkeleton, FunctionSkeleton>;
 
 class FunctionImpl;
 using Function = const FunctionImpl*;
@@ -180,6 +184,7 @@ using OptimizationMetric = const OptimizationMetricImpl*;
 
 class ProblemImpl;
 using Problem = std::shared_ptr<const ProblemImpl>;
+using ProblemList = std::vector<Problem>;
 
 /**
  * Construction
@@ -190,13 +195,6 @@ struct DomainParsingContext;
 
 class ProblemBuilder;
 struct ProblemParsingContext;
-
-/**
- * Translation
- */
-
-class DomainTranslationResult;
-class ProblemTranslationResult;
 
 }
 

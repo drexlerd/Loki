@@ -53,7 +53,7 @@ static void insert_context_information(const Object& object, const ast::Name& no
 
 static Object parse_object_definition(const ast::Name& name_node, const TypeList& type_list, ProblemParsingContext& context)
 {
-    const auto object = context.builder.get_or_create_object(parse(name_node), type_list);
+    const auto object = context.builder.get_repositories().get_or_create_object(parse(name_node), type_list);
     test_multiple_definition_object(object, name_node, context);
     insert_context_information(object, name_node, context);
     return object;

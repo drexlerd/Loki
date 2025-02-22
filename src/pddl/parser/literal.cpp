@@ -55,7 +55,7 @@ Atom parse(const ast::AtomicFormulaOfTermsPredicate& node, C& context)
     test_arity_compatibility(predicate->get_parameters().size(), term_list.size(), node, context);
     test_incompatible_grounding(predicate->get_parameters(), term_list, positions, context);
     context.references.untrack(predicate);
-    const auto atom = context.builder.get_or_create_atom(predicate, term_list);
+    const auto atom = context.builder.get_repositories().get_or_create_atom(predicate, term_list);
     context.positions.push_back(atom, node);
     return atom;
 }
@@ -72,7 +72,7 @@ Atom parse(const ast::AtomicFormulaOfTermsEquality& node, C& context)
     const auto [equal_predicate, _position, _error_handler] = context.scopes.top().get_predicate("=").value();
     auto left_term = boost::apply_visitor(TermReferenceTermVisitor(context), node.term_left);
     auto right_term = boost::apply_visitor(TermReferenceTermVisitor(context), node.term_right);
-    const auto atom = context.builder.get_or_create_atom(equal_predicate, TermList { left_term, right_term });
+    const auto atom = context.builder.get_repositories().get_or_create_atom(equal_predicate, TermList { left_term, right_term });
     context.positions.push_back(atom, node);
     return atom;
 }
@@ -102,7 +102,7 @@ template struct LiteralVisitor<ProblemParsingContext>;
 template<ParsingContext C>
 Literal parse(const ast::Atom& node, C& context)
 {
-    const auto literal = context.builder.get_or_create_literal(false, parse(node.atomic_formula_of_terms, context));
+    const auto literal = context.builder.get_repositories().get_or_create_literal(false, parse(node.atomic_formula_of_terms, context));
     context.positions.push_back(literal, node);
     return literal;
 }
@@ -113,7 +113,7 @@ template Literal parse(const ast::Atom& node, ProblemParsingContext& context);
 template<ParsingContext C>
 Literal parse(const ast::NegatedAtom& node, C& context)
 {
-    const auto literal = context.builder.get_or_create_literal(true, parse(node.atomic_formula_of_terms, context));
+    const auto literal = context.builder.get_repositories().get_or_create_literal(true, parse(node.atomic_formula_of_terms, context));
     context.positions.push_back(literal, node);
     return literal;
 }

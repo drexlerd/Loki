@@ -21,385 +21,290 @@
 
 namespace loki
 {
-/*
-PDDLRepositories::PDDLRepositories() : m_repositories(create_default_pddl_type_to_repository()) {}
 
-PDDLRepositories::PDDLRepositories(PDDLRepositories&& other) = default;
+HanaRepositories& Repositories::get_hana_repositories() { return m_repositories; }
+const HanaRepositories& Repositories::get_hana_repositories() const { return m_repositories; }
 
-PDDLRepositories& PDDLRepositories::operator=(PDDLRepositories&& other) = default;
-
-Requirements PDDLRepositories::get_or_create_requirements(RequirementEnumSet requirement_set)
+Requirements Repositories::get_or_create_requirements(RequirementEnumSet requirement_set)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<RequirementsImpl> {}).get_or_create(std::move(requirement_set));
 }
 
-Type PDDLRepositories::get_or_create_type(std::string name, TypeList bases)
+Type Repositories::get_or_create_type(std::string name, TypeList bases)
 {
-    std::sort(bases.begin(), bases.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(bases.begin(), bases.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_name() < rhs->get_name(); });
 
     return boost::hana::at_key(m_repositories, boost::hana::type<TypeImpl> {}).get_or_create(std::move(name), std::move(bases));
 }
 
-Variable PDDLRepositories::get_or_create_variable(std::string name)
+Variable Repositories::get_or_create_variable(std::string name)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<VariableImpl> {}).get_or_create(std::move(name));
 }
 
-Term PDDLRepositories::get_or_create_term(Variable variable)
+Object Repositories::get_or_create_object(std::string name, TypeList types)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).get_or_create(variable);
-}
-
-Term PDDLRepositories::get_or_create_term(Object object) { return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).get_or_create(object); }
-
-Object PDDLRepositories::get_or_create_object(std::string name, TypeList types)
-{
-    std::sort(types.begin(), types.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(types.begin(), types.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_name() < rhs->get_name(); });
 
     return boost::hana::at_key(m_repositories, boost::hana::type<ObjectImpl> {}).get_or_create(std::move(name), std::move(types));
 }
 
-Atom PDDLRepositories::get_or_create_atom(Predicate predicate, TermList terms)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<AtomImpl> {}).get_or_create(std::move(predicate), std::move(terms));
-}
+Term Repositories::get_or_create_term(Variable variable) { return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).get_or_create(variable); }
+Term Repositories::get_or_create_term(Object object) { return boost::hana::at_key(m_repositories, boost::hana::type<TermImpl> {}).get_or_create(object); }
 
-Literal PDDLRepositories::get_or_create_literal(bool is_negated, Atom atom)
+Parameter Repositories::get_or_create_parameter(Variable variable, TypeList types)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<LiteralImpl> {}).get_or_create(std::move(is_negated), std::move(atom));
-}
-
-Parameter PDDLRepositories::get_or_create_parameter(Variable variable, TypeList types)
-{
-    std::sort(types.begin(), types.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(types.begin(), types.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_name() < rhs->get_name(); });
 
     return boost::hana::at_key(m_repositories, boost::hana::type<ParameterImpl> {}).get_or_create(std::move(variable), std::move(types));
 }
 
-Predicate PDDLRepositories::get_or_create_predicate(std::string name, ParameterList parameters)
+Predicate Repositories::get_or_create_predicate(std::string name, ParameterList parameters)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<PredicateImpl> {}).get_or_create(std::move(name), std::move(parameters));
 }
 
-FunctionExpressionNumber PDDLRepositories::get_or_create_function_expression_number(double number)
+Atom Repositories::get_or_create_atom(Predicate predicate, TermList terms)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<AtomImpl> {}).get_or_create(std::move(predicate), std::move(terms));
+}
+
+Literal Repositories::get_or_create_literal(bool is_negated, Atom atom)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<LiteralImpl> {}).get_or_create(std::move(is_negated), std::move(atom));
+}
+
+FunctionExpressionNumber Repositories::get_or_create_function_expression_number(double number)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionNumberImpl> {}).get_or_create(number);
 }
-
-FunctionExpressionBinaryOperator PDDLRepositories::get_or_create_function_expression_binary_operator(BinaryOperatorEnum binary_operator,
-                                                                                                     FunctionExpression left_function_expression,
-                                                                                                     FunctionExpression right_function_expression)
+FunctionExpressionBinaryOperator Repositories::get_or_create_function_expression_binary_operator(BinaryOperatorEnum binary_operator,
+                                                                                                 FunctionExpression left_function_expression,
+                                                                                                 FunctionExpression right_function_expression)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionBinaryOperatorImpl> {})
         .get_or_create(binary_operator, std::move(left_function_expression), std::move(right_function_expression));
 }
-
-FunctionExpressionMultiOperator PDDLRepositories::get_or_create_function_expression_multi_operator(MultiOperatorEnum multi_operator,
-                                                                                                   FunctionExpressionList function_expressions_)
+FunctionExpressionMultiOperator Repositories::get_or_create_function_expression_multi_operator(MultiOperatorEnum multi_operator,
+                                                                                               FunctionExpressionList function_expressions)
 {
-    std::sort(function_expressions_.begin(), function_expressions_.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    // TODO: do we need a canonical sort here? I guess duplicates do not hurt here
+    std::sort(function_expressions.begin(), function_expressions.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
 
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionMultiOperatorImpl> {})
-        .get_or_create(multi_operator, std::move(function_expressions_));
+        .get_or_create(multi_operator, std::move(function_expressions));
 }
-
-FunctionExpressionMinus PDDLRepositories::get_or_create_function_expression_minus(FunctionExpression function_expression)
+FunctionExpressionMinus Repositories::get_or_create_function_expression_minus(FunctionExpression function_expression)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionMinusImpl> {}).get_or_create(std::move(function_expression));
 }
-
-FunctionExpressionFunction PDDLRepositories::get_or_create_function_expression_function(Function function)
+FunctionExpressionFunction Repositories::get_or_create_function_expression_function(Function function)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionFunctionImpl> {}).get_or_create(std::move(function));
 }
-
-FunctionExpression PDDLRepositories::get_or_create_function_expression(FunctionExpressionNumber fexpr_number)
+FunctionExpression Repositories::get_or_create_function_expression(FunctionExpressionNumber fexpr)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {}).get_or_create(fexpr_number);
+    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {}).get_or_create(fexpr);
+}
+FunctionExpression Repositories::get_or_create_function_expression(FunctionExpressionBinaryOperator fexpr)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {}).get_or_create(fexpr);
+}
+FunctionExpression Repositories::get_or_create_function_expression(FunctionExpressionMultiOperator fexpr)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {}).get_or_create(fexpr);
+}
+FunctionExpression Repositories::get_or_create_function_expression(FunctionExpressionMinus fexpr)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {}).get_or_create(fexpr);
+}
+FunctionExpression Repositories::get_or_create_function_expression(FunctionExpressionFunction fexpr)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {}).get_or_create(fexpr);
 }
 
-FunctionExpression PDDLRepositories::get_or_create_function_expression(FunctionExpressionBinaryOperator fexpr_binary_op)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {}).get_or_create(fexpr_binary_op);
-}
-
-FunctionExpression PDDLRepositories::get_or_create_function_expression(FunctionExpressionMultiOperator fexpr_multi_op)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {}).get_or_create(fexpr_multi_op);
-}
-
-FunctionExpression PDDLRepositories::get_or_create_function_expression(FunctionExpressionMinus fexpr_minus)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {}).get_or_create(fexpr_minus);
-}
-
-FunctionExpression PDDLRepositories::get_or_create_function_expression(FunctionExpressionFunction fexpr_function)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionExpressionImpl> {}).get_or_create(fexpr_function);
-}
-
-Function PDDLRepositories::get_or_create_function(FunctionSkeleton function_skeleton, TermList terms)
+Function Repositories::get_or_create_function(FunctionSkeleton function_skeleton, TermList terms)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionImpl> {}).get_or_create(std::move(function_skeleton), std::move(terms));
 }
 
-FunctionSkeleton PDDLRepositories::get_or_create_function_skeleton(std::string name, ParameterList parameters, Type type)
+FunctionValue Repositories::get_or_create_function_value(Function function, double number)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionValueImpl> {}).get_or_create(std::move(function), std::move(number));
+}
+
+FunctionSkeleton Repositories::get_or_create_function_skeleton(std::string name, ParameterList parameters, Type type)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<FunctionSkeletonImpl> {})
         .get_or_create(std::move(name), std::move(parameters), std::move(type));
 }
 
-ConditionLiteral PDDLRepositories::get_or_create_condition_literal(Literal literal)
+ConditionLiteral Repositories::get_or_create_condition_literal(Literal literal)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionLiteralImpl> {}).get_or_create(std::move(literal));
 }
-
-ConditionAnd PDDLRepositories::get_or_create_condition_and(ConditionList conditions_)
+ConditionAnd Repositories::get_or_create_condition_and(ConditionList conditions)
 {
-    std::sort(conditions_.begin(), conditions_.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    // TODO: do we need a canonical sort here? I guess duplicates do not hurt here
+    std::sort(conditions.begin(), conditions.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
 
-    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionAndImpl> {}).get_or_create(std::move(conditions_));
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionAndImpl> {}).get_or_create(std::move(conditions));
 }
-
-ConditionOr PDDLRepositories::get_or_create_condition_or(ConditionList conditions_)
+ConditionOr Repositories::get_or_create_condition_or(ConditionList conditions)
 {
-    std::sort(conditions_.begin(), conditions_.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    // TODO: do we need a canonical sort here? I guess duplicates do not hurt here
+    std::sort(conditions.begin(), conditions.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
 
-    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionOrImpl> {}).get_or_create(std::move(conditions_));
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionOrImpl> {}).get_or_create(std::move(conditions));
 }
-
-ConditionNot PDDLRepositories::get_or_create_condition_not(Condition condition)
+ConditionNot Repositories::get_or_create_condition_not(Condition condition)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionNotImpl> {}).get_or_create(std::move(condition));
 }
-
-ConditionImply PDDLRepositories::get_or_create_condition_imply(Condition condition_left, Condition condition_right)
+ConditionImply Repositories::get_or_create_condition_imply(Condition condition_left, Condition condition_right)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImplyImpl> {}).get_or_create(std::move(condition_left), std::move(condition_right));
 }
-
-ConditionExists PDDLRepositories::get_or_create_condition_exists(ParameterList parameters, Condition condition)
+ConditionExists Repositories::get_or_create_condition_exists(ParameterList parameters, Condition condition)
 {
+    // TODO: do we need a canonical sort here? I guess duplicates do not hurt here
     std::sort(parameters.begin(), parameters.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
 
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionExistsImpl> {}).get_or_create(std::move(parameters), std::move(condition));
 }
 
-ConditionForall PDDLRepositories::get_or_create_condition_forall(ParameterList parameters, Condition condition)
+ConditionForall Repositories::get_or_create_condition_forall(ParameterList parameters, Condition condition)
 {
+    // TODO: do we need a canonical sort here? I guess duplicates do not hurt here
     std::sort(parameters.begin(), parameters.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
 
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionForallImpl> {}).get_or_create(std::move(parameters), std::move(condition));
 }
-
-ConditionNumericConstraint PDDLRepositories::get_or_create_condition_numeric_constraint(BinaryComparatorEnum binary_comparator,
-                                                                                        FunctionExpression function_expression_left,
-                                                                                        FunctionExpression function_expression_right)
+ConditionNumericConstraint Repositories::get_or_create_condition_numeric_constraint(BinaryComparatorEnum binary_comparator,
+                                                                                    FunctionExpression function_expression_left,
+                                                                                    FunctionExpression function_expression_right)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionNumericConstraintImpl> {})
         .get_or_create(std::move(binary_comparator), std::move(function_expression_left), std::move(function_expression_right));
 }
-
-Condition PDDLRepositories::get_or_create_condition(ConditionLiteral condition)
+Condition Repositories::get_or_create_condition(ConditionLiteral condition)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
+}
+Condition Repositories::get_or_create_condition(ConditionAnd condition)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
+}
+Condition Repositories::get_or_create_condition(ConditionOr condition)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
+}
+Condition Repositories::get_or_create_condition(ConditionNot condition)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
+}
+Condition Repositories::get_or_create_condition(ConditionImply condition)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
+}
+Condition Repositories::get_or_create_condition(ConditionExists condition)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
+}
+Condition Repositories::get_or_create_condition(ConditionForall condition)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
+}
+Condition Repositories::get_or_create_condition(ConditionNumericConstraint condition)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
 }
 
-Condition PDDLRepositories::get_or_create_condition(ConditionAnd condition)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
-}
-
-Condition PDDLRepositories::get_or_create_condition(ConditionOr condition)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
-}
-
-Condition PDDLRepositories::get_or_create_condition(ConditionNot condition)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
-}
-
-Condition PDDLRepositories::get_or_create_condition(ConditionImply condition)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
-}
-
-Condition PDDLRepositories::get_or_create_condition(ConditionExists condition)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
-}
-
-Condition PDDLRepositories::get_or_create_condition(ConditionForall condition)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
-}
-
-Condition PDDLRepositories::get_or_create_condition(ConditionNumericConstraint condition)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImpl> {}).get_or_create(condition);
-}
-
-EffectLiteral PDDLRepositories::get_or_create_effect_literal(Literal literal)
+EffectLiteral Repositories::get_or_create_effect_literal(Literal literal)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectLiteralImpl> {}).get_or_create(std::move(literal));
 }
-
-EffectAnd PDDLRepositories::get_or_create_effect_and(EffectList effects_)
+EffectAnd Repositories::get_or_create_effect_and(EffectList effects)
 {
-    std::sort(effects_.begin(), effects_.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    // TODO: do we need a canonical sort here? I guess duplicates do not hurt here
+    std::sort(effects.begin(), effects.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
 
-    return boost::hana::at_key(m_repositories, boost::hana::type<EffectAndImpl> {}).get_or_create(std::move(effects_));
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectAndImpl> {}).get_or_create(std::move(effects));
 }
-
-EffectNumeric PDDLRepositories::get_or_create_effect_numeric(AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression)
+EffectNumeric Repositories::get_or_create_effect_numeric(AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectNumericImpl> {})
         .get_or_create(std::move(assign_operator), std::move(function), std::move(function_expression));
 }
-
-EffectCompositeForall PDDLRepositories::get_or_create_effect_composite_forall(ParameterList parameters, Effect effect)
+EffectCompositeForall Repositories::get_or_create_effect_composite_forall(ParameterList parameters, Effect effect)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeForallImpl> {}).get_or_create(std::move(parameters), std::move(effect));
 }
-
-EffectCompositeWhen PDDLRepositories::get_or_create_effect_composite_when(Condition condition, Effect effect)
+EffectCompositeWhen Repositories::get_or_create_effect_composite_when(Condition condition, Effect effect)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeWhenImpl> {}).get_or_create(std::move(condition), std::move(effect));
 }
-
-EffectCompositeOneof PDDLRepositories::get_or_create_effect_composite_oneof(EffectList effects_)
+EffectCompositeOneof Repositories::get_or_create_effect_composite_oneof(EffectList effects)
 {
-    std::sort(effects_.begin(), effects_.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
+    // TODO: do we need a canonical sort here? I guess duplicates do not hurt here
+    std::sort(effects.begin(), effects.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
 
-    return boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeOneofImpl> {}).get_or_create(std::move(effects_));
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeOneofImpl> {}).get_or_create(std::move(effects));
 }
-
-EffectCompositeProbabilistic PDDLRepositories::get_or_create_effect_composite_probabilistic(EffectDistribution effects_)
+EffectCompositeProbabilistic Repositories::get_or_create_effect_composite_probabilistic(EffectDistribution effects)
 {
-    std::sort(effects_.begin(), effects_.end(), [](const auto& lhs, const auto& rhs) { return lhs.second->get_index() < rhs.second->get_index(); });
+    // TODO: do we need a canonical sort here? I guess duplicates do not hurt here
+    std::sort(effects.begin(), effects.end(), [](const auto& lhs, const auto& rhs) { return lhs.second->get_index() < rhs.second->get_index(); });
 
-    return boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeProbabilisticImpl> {}).get_or_create(std::move(effects_));
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectCompositeProbabilisticImpl> {}).get_or_create(std::move(effects));
 }
-
-Effect PDDLRepositories::get_or_create_effect(EffectLiteral effect)
+Effect Repositories::get_or_create_effect(EffectLiteral effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+Effect Repositories::get_or_create_effect(EffectAnd effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+Effect Repositories::get_or_create_effect(EffectNumeric effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+Effect Repositories::get_or_create_effect(EffectCompositeForall effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+Effect Repositories::get_or_create_effect(EffectCompositeWhen effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+Effect Repositories::get_or_create_effect(EffectCompositeOneof effect)
+{
+    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
+}
+Effect Repositories::get_or_create_effect(EffectCompositeProbabilistic effect)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
 }
 
-Effect PDDLRepositories::get_or_create_effect(EffectAnd effect)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
-}
-
-Effect PDDLRepositories::get_or_create_effect(EffectNumeric effect)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
-}
-
-Effect PDDLRepositories::get_or_create_effect(EffectCompositeForall effect)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
-}
-
-Effect PDDLRepositories::get_or_create_effect(EffectCompositeWhen effect)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
-}
-
-Effect PDDLRepositories::get_or_create_effect(EffectCompositeOneof effect)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
-}
-
-Effect PDDLRepositories::get_or_create_effect(EffectCompositeProbabilistic effect)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<EffectImpl> {}).get_or_create(effect);
-}
-
-Action PDDLRepositories::get_or_create_action(std::string name,
-                                              size_t original_arity,
-                                              ParameterList parameters,
-                                              std::optional<Condition> condition,
-                                              std::optional<Effect> effect)
+Action Repositories::get_or_create_action(std::string name,
+                                          size_t original_arity,
+                                          ParameterList parameters,
+                                          std::optional<Condition> condition,
+                                          std::optional<Effect> effect)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ActionImpl> {})
         .get_or_create(std::move(name), std::move(original_arity), std::move(parameters), std::move(condition), std::move(effect));
 }
 
-Axiom PDDLRepositories::get_or_create_axiom(ParameterList parameters, Literal subtyped_literal, Condition condition)
+Axiom Repositories::get_or_create_axiom(ParameterList parameters, Literal subtyped_literal, Condition condition)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<AxiomImpl> {}).get_or_create(std::move(parameters), subtyped_literal, condition);
 }
 
-OptimizationMetric PDDLRepositories::get_or_create_optimization_metric(OptimizationMetricEnum metric, FunctionExpression function_expression)
+OptimizationMetric Repositories::get_or_create_optimization_metric(OptimizationMetricEnum optimization_metric, FunctionExpression function_expression)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<OptimizationMetricImpl> {}).get_or_create(std::move(metric), std::move(function_expression));
+    return boost::hana::at_key(m_repositories, boost::hana::type<OptimizationMetricImpl> {})
+        .get_or_create(std::move(optimization_metric), std::move(function_expression));
 }
-
-FunctionValue PDDLRepositories::get_or_create_function_value(Function function, double number)
-{
-    return boost::hana::at_key(m_repositories, boost::hana::type<FunctionValueImpl> {}).get_or_create(std::move(function), std::move(number));
-}
-
-Domain PDDLRepositories::get_or_create_domain(std::optional<fs::path> filepath,
-                                              std::string name,
-                                              Requirements requirements,
-                                              TypeList types,
-                                              ObjectList constants,
-                                              PredicateList predicates,
-                                              FunctionSkeletonList functions,
-                                              ActionList actions,
-                                              AxiomList axioms)
-{
-    std::sort(types.begin(), types.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
-    std::sort(constants.begin(), constants.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
-    std::sort(predicates.begin(), predicates.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
-    std::sort(functions.begin(), functions.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
-    std::sort(actions.begin(), actions.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
-    std::sort(axioms.begin(), axioms.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
-
-    return boost::hana::at_key(m_repositories, boost::hana::type<DomainImpl> {})
-        .get_or_create(std::move(filepath),
-                       std::move(name),
-                       std::move(requirements),
-                       std::move(types),
-                       std::move(constants),
-                       std::move(predicates),
-                       std::move(functions),
-                       std::move(actions),
-                       std::move(axioms));
-}
-
-Problem PDDLRepositories::get_or_create_problem(std::optional<fs::path> filepath,
-                                                Domain domain,
-                                                std::string name,
-                                                Requirements requirements,
-                                                ObjectList objects,
-                                                PredicateList derived_predicates,
-                                                LiteralList initial_literals,
-                                                FunctionValueList function_values,
-                                                std::optional<Condition> goal_condition,
-                                                std::optional<OptimizationMetric> optimization_metric,
-                                                AxiomList axioms)
-{
-    std::sort(objects.begin(), objects.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
-    std::sort(derived_predicates.begin(), derived_predicates.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
-    std::sort(initial_literals.begin(), initial_literals.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
-    std::sort(function_values.begin(), function_values.end(), [](const auto& lhs, const auto& rhs) { return lhs->get_index() < rhs->get_index(); });
-
-    return boost::hana::at_key(m_repositories, boost::hana::type<ProblemImpl> {})
-        .get_or_create(std::move(filepath),
-                       std::move(domain),
-                       std::move(name),
-                       std::move(requirements),
-                       std::move(objects),
-                       std::move(derived_predicates),
-                       std::move(initial_literals),
-                       std::move(function_values),
-                       std::move(goal_condition),
-                       std::move(optimization_metric),
-                       std::move(axioms));
-}
-*/
 }

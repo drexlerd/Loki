@@ -36,9 +36,10 @@ OptimizationMetric MetricSpecificationDeclarationVisitor::operator()(const ast::
 {
     const auto optimization = OptimizationMetricEnum::MINIMIZE;
     const auto function_skeleton = parse_function_skeleton_reference(node.function_symbol_total_cost, context);
-    const auto function = context.builder.get_or_create_function(function_skeleton, TermList {});
-    const auto function_expression = context.builder.get_or_create_function_expression(context.builder.get_or_create_function_expression_function(function));
-    return context.builder.get_or_create_optimization_metric(optimization, function_expression);
+    const auto function = context.builder.get_repositories().get_or_create_function(function_skeleton, TermList {});
+    const auto function_expression = context.builder.get_repositories().get_or_create_function_expression(
+        context.builder.get_repositories().get_or_create_function_expression_function(function));
+    return context.builder.get_repositories().get_or_create_optimization_metric(optimization, function_expression);
 }
 
 OptimizationMetric MetricSpecificationDeclarationVisitor::operator()(const ast::MetricSpecificationGeneral& node)
@@ -46,7 +47,7 @@ OptimizationMetric MetricSpecificationDeclarationVisitor::operator()(const ast::
     const auto optimization = parse(node.optimization, context);
     auto metric_fexpr_visitor = MetricFunctionExpressionDeclarationVisitor(context);
     const auto function_expression = boost::apply_visitor(metric_fexpr_visitor, node.metric_function_expression);
-    return context.builder.get_or_create_optimization_metric(optimization, function_expression);
+    return context.builder.get_repositories().get_or_create_optimization_metric(optimization, function_expression);
 }
 
 OptimizationMetric parse(const ast::MetricSpecification& node, ProblemParsingContext& context)

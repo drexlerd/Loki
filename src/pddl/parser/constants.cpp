@@ -37,7 +37,7 @@ static void insert_context_information(const Object& constant, const ast::Name& 
 
 static Object parse_constant_definition(const ast::Name& node, const TypeList& types, DomainParsingContext& context)
 {
-    const auto constant = context.builder.get_or_create_object(parse(node), types);
+    const auto constant = context.builder.get_repositories().get_or_create_object(parse(node), types);
     test_multiple_definition_object(constant, node, context);
     insert_context_information(constant, node, context);
     return constant;

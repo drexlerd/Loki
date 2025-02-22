@@ -86,7 +86,7 @@ std::variant<Axiom, Action> StructureVisitor<C>::operator()(const ast::Action& n
     }
     context.scopes.close_scope();
 
-    const auto action = context.builder.get_or_create_action(name, used_parameters.size(), used_parameters, condition, effect);
+    const auto action = context.builder.get_repositories().get_or_create_action(name, used_parameters.size(), used_parameters, condition, effect);
     context.positions.push_back(action, node);
     return action;
 }
@@ -113,10 +113,11 @@ std::variant<Axiom, Action> StructureVisitor<C>::operator()(const ast::Axiom& no
     auto terms = TermList {};
     for (const auto& parameter : parameter_list)
     {
-        terms.push_back(context.builder.get_or_create_term(parameter->get_variable()));
+        terms.push_back(context.builder.get_repositories().get_or_create_term(parameter->get_variable()));
     }
 
-    const auto literal = context.builder.get_or_create_literal(false, context.builder.get_or_create_atom(predicate, terms));
+    const auto literal =
+        context.builder.get_repositories().get_or_create_literal(false, context.builder.get_repositories().get_or_create_atom(predicate, terms));
 
     const auto condition = parse(node.goal_descriptor, context);
 
@@ -144,10 +145,10 @@ std::variant<Axiom, Action> StructureVisitor<C>::operator()(const ast::Axiom& no
     {
         const auto base_types = TypeList { type };
 
-        parameter_list.push_back(context.builder.get_or_create_parameter(variable, base_types));
+        parameter_list.push_back(context.builder.get_repositories().get_or_create_parameter(variable, base_types));
     }
 
-    const auto axiom = context.builder.get_or_create_axiom(parameter_list, literal, condition);
+    const auto axiom = context.builder.get_repositories().get_or_create_axiom(parameter_list, literal, condition);
     context.positions.push_back(axiom, node);
     return axiom;
 }

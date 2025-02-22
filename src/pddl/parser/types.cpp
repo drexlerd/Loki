@@ -262,7 +262,7 @@ TypeList parse(const ast::Types& types_node, DomainParsingContext& context)
             {
                 base_types.push_back(instantiated_types.at(base_type_name));
             }
-            auto instantiated_type = context.builder.get_or_create_type(type_name, base_types);
+            auto instantiated_type = context.builder.get_repositories().get_or_create_type(type_name, base_types);
 
             instantiated_types.emplace(type_name, instantiated_type);
         }

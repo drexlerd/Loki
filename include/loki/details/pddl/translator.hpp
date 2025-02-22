@@ -30,8 +30,6 @@ private:
 
     Domain translated_domain;
 
-    // TODO: add more if needed
-
 public:
     DomainTranslationResult(Domain original_domain, Domain translated_domain);
 

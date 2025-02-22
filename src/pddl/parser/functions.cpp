@@ -50,7 +50,8 @@ template<ParsingContext C>
 FunctionExpression FunctionExpressionVisitor<C>::operator()(const ast::FunctionExpressionNumber& node)
 {
     const auto number = parse(node.number);
-    const auto function_expression = context.builder.get_or_create_function_expression(context.builder.get_or_create_function_expression_number(number));
+    const auto function_expression = context.builder.get_repositories().get_or_create_function_expression(
+        context.builder.get_repositories().get_or_create_function_expression_number(number));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -61,8 +62,10 @@ FunctionExpression FunctionExpressionVisitor<C>::operator()(const ast::FunctionE
     const auto binary_operator = boost::apply_visitor(BinaryOperatorVisitor(), node.binary_operator);
     const auto left_function_expression = this->operator()(node.function_expression_left);
     const auto right_function_expression = this->operator()(node.function_expression_right);
-    const auto function_expression = context.builder.get_or_create_function_expression(
-        context.builder.get_or_create_function_expression_binary_operator(binary_operator, left_function_expression, right_function_expression));
+    const auto function_expression = context.builder.get_repositories().get_or_create_function_expression(
+        context.builder.get_repositories().get_or_create_function_expression_binary_operator(binary_operator,
+                                                                                             left_function_expression,
+                                                                                             right_function_expression));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -71,8 +74,8 @@ template<ParsingContext C>
 FunctionExpression FunctionExpressionVisitor<C>::operator()(const ast::FunctionExpressionMinus& node)
 {
     const auto child_function_expression = this->operator()(node.function_expression);
-    const auto function_expression =
-        context.builder.get_or_create_function_expression(context.builder.get_or_create_function_expression_minus(child_function_expression));
+    const auto function_expression = context.builder.get_repositories().get_or_create_function_expression(
+        context.builder.get_repositories().get_or_create_function_expression_minus(child_function_expression));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -81,7 +84,8 @@ template<ParsingContext C>
 FunctionExpression FunctionExpressionVisitor<C>::operator()(const ast::FunctionExpressionHead node)
 {
     const auto function = parse(node.function_head, context);
-    const auto function_expression = context.builder.get_or_create_function_expression(context.builder.get_or_create_function_expression_function(function));
+    const auto function_expression = context.builder.get_repositories().get_or_create_function_expression(
+        context.builder.get_repositories().get_or_create_function_expression_function(function));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -102,7 +106,7 @@ Function parse(const ast::FunctionHead& node, C& context)
         term_list.push_back(boost::apply_visitor(visitor, term_node));
     }
     test_arity_compatibility(function_skeleton->get_parameters().size(), term_list.size(), node, context);
-    const auto function = context.builder.get_or_create_function(function_skeleton, term_list);
+    const auto function = context.builder.get_repositories().get_or_create_function(function_skeleton, term_list);
     context.positions.push_back(function, node);
     context.references.untrack(function->get_function_skeleton());
     return function;
@@ -143,7 +147,7 @@ FunctionSkeleton AtomicFunctionSkeletonVisitor::operator()(const ast::AtomicFunc
     assert(context.scopes.top().get_type("number").has_value());
     const auto [type, _position, _error_handler] = context.scopes.top().get_type("number").value();
     auto function_name = parse(node.function_symbol.name);
-    auto function_skeleton = context.builder.get_or_create_function_skeleton(function_name, ParameterList {}, type);
+    auto function_skeleton = context.builder.get_repositories().get_or_create_function_skeleton(function_name, ParameterList {}, type);
 
     test_multiple_definition_function_skeleton(function_skeleton, node.function_symbol.name, context);
     insert_context_information(function_skeleton, node.function_symbol.name, context);
@@ -165,7 +169,7 @@ FunctionSkeleton AtomicFunctionSkeletonVisitor::operator()(const ast::AtomicFunc
     assert(context.scopes.top().get_type("number").has_value());
     const auto [type, _position, _error_handler] = context.scopes.top().get_type("number").value();
     auto function_name = parse(node.function_symbol.name);
-    auto function_skeleton = context.builder.get_or_create_function_skeleton(function_name, function_parameters, type);
+    auto function_skeleton = context.builder.get_repositories().get_or_create_function_skeleton(function_name, function_parameters, type);
 
     test_multiple_definition_function_skeleton(function_skeleton, node.function_symbol.name, context);
     insert_context_information(function_skeleton, node.function_symbol.name, context);
@@ -226,7 +230,8 @@ MetricFunctionExpressionDeclarationVisitor::MetricFunctionExpressionDeclarationV
 FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const ast::MetricFunctionExpressionNumber& node)
 {
     const auto number = parse(node.number);
-    const auto function_expression = context.builder.get_or_create_function_expression(context.builder.get_or_create_function_expression_number(number));
+    const auto function_expression = context.builder.get_repositories().get_or_create_function_expression(
+        context.builder.get_repositories().get_or_create_function_expression_number(number));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -236,8 +241,10 @@ FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const 
     const auto binary_operator = boost::apply_visitor(BinaryOperatorVisitor(), node.binary_operator);
     const auto left_function_expression = this->operator()(node.metric_function_expression_left);
     const auto right_function_expression = this->operator()(node.metric_function_expression_right);
-    const auto function_expression = context.builder.get_or_create_function_expression(
-        context.builder.get_or_create_function_expression_binary_operator(binary_operator, left_function_expression, right_function_expression));
+    const auto function_expression = context.builder.get_repositories().get_or_create_function_expression(
+        context.builder.get_repositories().get_or_create_function_expression_binary_operator(binary_operator,
+                                                                                             left_function_expression,
+                                                                                             right_function_expression));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -253,8 +260,8 @@ FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const 
         const auto next_function_expression = this->operator()(child_node);
         function_expressions.push_back(next_function_expression);
     }
-    const auto function_expression = context.builder.get_or_create_function_expression(
-        context.builder.get_or_create_function_expression_multi_operator(multi_operator, function_expressions));
+    const auto function_expression = context.builder.get_repositories().get_or_create_function_expression(
+        context.builder.get_repositories().get_or_create_function_expression_multi_operator(multi_operator, function_expressions));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -262,8 +269,8 @@ FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const 
 FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const ast::MetricFunctionExpressionMinus& node)
 {
     const auto child_function_expression = this->operator()(node.metric_function_expression);
-    const auto function_expression =
-        context.builder.get_or_create_function_expression(context.builder.get_or_create_function_expression_minus(child_function_expression));
+    const auto function_expression = context.builder.get_repositories().get_or_create_function_expression(
+        context.builder.get_repositories().get_or_create_function_expression_minus(child_function_expression));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -271,7 +278,8 @@ FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const 
 FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const ast::MetricFunctionExpressionBasicFunctionTerm& node)
 {
     const auto function = parse(node.ground_function, context);
-    const auto function_expression = context.builder.get_or_create_function_expression(context.builder.get_or_create_function_expression_function(function));
+    const auto function_expression = context.builder.get_repositories().get_or_create_function_expression(
+        context.builder.get_repositories().get_or_create_function_expression_function(function));
     context.positions.push_back(function_expression, node);
     return function_expression;
 }
@@ -298,10 +306,10 @@ Function parse(const ast::GroundFunction& node, ProblemParsingContext& context)
     auto term_list = TermList();
     for (const auto& name_node : node.names)
     {
-        term_list.push_back(context.builder.get_or_create_term(parse_object_reference(name_node, context)));
+        term_list.push_back(context.builder.get_repositories().get_or_create_term(parse_object_reference(name_node, context)));
     }
     test_arity_compatibility(function_skeleton->get_parameters().size(), term_list.size(), node, context);
-    const auto function = context.builder.get_or_create_function(function_skeleton, term_list);
+    const auto function = context.builder.get_repositories().get_or_create_function(function_skeleton, term_list);
     context.positions.push_back(function, node);
     return function;
 }

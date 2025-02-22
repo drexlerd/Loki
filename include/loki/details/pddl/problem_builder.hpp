@@ -31,19 +31,19 @@ namespace loki
 class ProblemBuilder
 {
 private:
-    HanaRepositories m_repositories;
+    Repositories m_repositories;
 
     Domain m_domain;  ///< Immutable planning domain
     std::optional<fs::path> m_filepath;
     std::string m_name;
     Requirements m_requirements;
-    ObjectSet m_objects;
-    PredicateSet m_predicates;  ///< Translation might introduce additional derived predicates.
-    LiteralSet m_initial_literals;
-    FunctionValueSet m_initial_function_values;
+    ObjectList m_objects;
+    PredicateList m_predicates;  ///< Translation might introduce additional derived predicates.
+    LiteralList m_initial_literals;
+    FunctionValueList m_initial_function_values;
     std::optional<Condition> m_goal_condition;
     std::optional<OptimizationMetric> m_optimization_metric;
-    AxiomSet m_axioms;  ///< Translation might introduce axioms.
+    AxiomList m_axioms;  ///< Translation might introduce axioms.
 
 public:
     /// @brief Create a `ProblemBuilder` for a given `Domain`.
@@ -57,100 +57,24 @@ public:
     Problem get_result(size_t problem_index);
 
     /**
-     * Unique construction.
-     */
-
-    Requirements get_or_create_requirements(RequirementEnumSet requirements);
-
-    Variable get_or_create_variable(std::string name);
-
-    Object get_or_create_object(std::string name, TypeList types);
-
-    Term get_or_create_term(Variable variable);
-    Term get_or_create_term(Object object);
-
-    Parameter get_or_create_parameter(Variable variable, TypeList types);
-
-    Predicate get_or_create_predicate(std::string name, ParameterList parameters);
-
-    Atom get_or_create_atom(Predicate predicate, TermList terms);
-
-    Literal get_or_create_literal(bool is_negated, Atom atom);
-
-    FunctionExpressionNumber get_or_create_function_expression_number(double number);
-    FunctionExpressionBinaryOperator get_or_create_function_expression_binary_operator(BinaryOperatorEnum binary_operator,
-                                                                                       FunctionExpression left_function_expression,
-                                                                                       FunctionExpression right_function_expression);
-    FunctionExpressionMultiOperator get_or_create_function_expression_multi_operator(MultiOperatorEnum multi_operator,
-                                                                                     FunctionExpressionList function_expressions);
-    FunctionExpressionMinus get_or_create_function_expression_minus(FunctionExpression function_expression);
-
-    FunctionExpressionFunction get_or_create_function_expression_function(Function function);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionNumber fexpr);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionBinaryOperator fexpr);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionMultiOperator fexpr);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionMinus fexpr);
-    FunctionExpression get_or_create_function_expression(FunctionExpressionFunction fexpr);
-    FunctionValue get_or_create_function_value(Function function, double number);
-    Function get_or_create_function(FunctionSkeleton function_skeleton, TermList terms);
-
-    ConditionLiteral get_or_create_condition_literal(Literal literal);
-    ConditionAnd get_or_create_condition_and(ConditionList conditions);
-    ConditionOr get_or_create_condition_or(ConditionList conditions);
-    ConditionNot get_or_create_condition_not(Condition condition);
-    ConditionImply get_or_create_condition_imply(Condition condition_left, Condition condition_right);
-    ConditionExists get_or_create_condition_exists(ParameterList parameters, Condition condition);
-    ConditionForall get_or_create_condition_forall(ParameterList parameters, Condition condition);
-    ConditionNumericConstraint get_or_create_condition_numeric_constraint(BinaryComparatorEnum binary_comparator,
-                                                                          FunctionExpression function_expression_left,
-                                                                          FunctionExpression function_expression_right);
-    Condition get_or_create_condition(ConditionLiteral condition);
-    Condition get_or_create_condition(ConditionAnd condition);
-    Condition get_or_create_condition(ConditionOr condition);
-    Condition get_or_create_condition(ConditionNot condition);
-    Condition get_or_create_condition(ConditionImply condition);
-    Condition get_or_create_condition(ConditionExists condition);
-    Condition get_or_create_condition(ConditionForall condition);
-    Condition get_or_create_condition(ConditionNumericConstraint condition);
-
-    EffectLiteral get_or_create_effect_literal(Literal literal);
-    EffectAnd get_or_create_effect_and(EffectList effects);
-    EffectNumeric get_or_create_effect_numeric(AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
-    EffectCompositeForall get_or_create_effect_composite_forall(ParameterList parameters, Effect effect);
-    EffectCompositeWhen get_or_create_effect_composite_when(Condition condition, Effect effect);
-    EffectCompositeOneof get_or_create_effect_composite_oneof(EffectList effects);
-    EffectCompositeProbabilistic get_or_create_effect_composite_probabilistic(EffectDistribution effects);
-    Effect get_or_create_effect(EffectLiteral effect);
-    Effect get_or_create_effect(EffectAnd effect);
-    Effect get_or_create_effect(EffectNumeric effect);
-    Effect get_or_create_effect(EffectCompositeForall effect);
-    Effect get_or_create_effect(EffectCompositeWhen effect);
-    Effect get_or_create_effect(EffectCompositeOneof effect);
-    Effect get_or_create_effect(EffectCompositeProbabilistic effect);
-
-    Action
-    get_or_create_action(std::string name, size_t original_arity, ParameterList parameters, std::optional<Condition> condition, std::optional<Effect> effect);
-
-    Axiom get_or_create_axiom(ParameterList parameters, Literal subtyped_literal, Condition condition);
-
-    OptimizationMetric get_or_create_optimization_metric(OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
-
-    /**
      * Get and modify components of the problem.
      */
 
+    Repositories& get_repositories();
     const Domain& get_domain() const;  ///< Modifying domain is prohibitted!
     std::optional<fs::path>& get_filepath();
     std::string& get_name();
     Requirements& get_requirements();
-    ObjectSet& get_objects();
-    PredicateSet& get_predicates();
-    LiteralSet& get_initial_literals();
-    FunctionValueSet& get_function_values();
+    ObjectList& get_objects();
+    PredicateList& get_predicates();
+    LiteralList& get_initial_literals();
+    FunctionValueList& get_function_values();
     std::optional<Condition>& get_goal_condition();
     std::optional<OptimizationMetric>& get_optimization_metric();
-    AxiomSet& get_axioms();
+    AxiomList& get_axioms();
 };
+
+using ProblemBuilderList = std::vector<ProblemBuilder>;
 }
 
 #endif

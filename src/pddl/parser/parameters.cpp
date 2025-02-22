@@ -35,7 +35,7 @@ static Parameter parse_parameter_definition(const ast::Variable& variable_node, 
     const auto variable = parse(variable_node, context);
     test_multiple_definition_variable(variable, variable_node, context);
     context.scopes.top().insert_variable(variable->get_name(), variable, variable_node);
-    const auto parameter = context.builder.get_or_create_parameter(variable, type_list);
+    const auto parameter = context.builder.get_repositories().get_or_create_parameter(variable, type_list);
     context.positions.push_back(parameter, variable_node);
     return parameter;
 }

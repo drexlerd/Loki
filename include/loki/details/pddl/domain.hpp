@@ -31,7 +31,7 @@ namespace loki
 class DomainImpl
 {
 private:
-    HanaRepositories m_repositories;
+    Repositories m_repositories;
     std::optional<fs::path> m_filepath;
     std::string m_name;
     Requirements m_requirements;
@@ -43,7 +43,7 @@ private:
     AxiomList m_axioms;
 
 public:
-    DomainImpl(HanaRepositories repositories,
+    DomainImpl(Repositories repositories,
                std::optional<fs::path> filepath,
                std::string name,
                Requirements requirements,
@@ -60,6 +60,7 @@ public:
     DomainImpl(DomainImpl&& other) = default;
     DomainImpl& operator=(DomainImpl&& other) = default;
 
+    const Repositories& get_repositories() const;
     const std::optional<fs::path>& get_filepath() const;
     const std::string& get_name() const;
     const Requirements& get_requirements() const;
