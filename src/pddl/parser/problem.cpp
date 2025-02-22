@@ -28,6 +28,7 @@
 #include "loki/details/pddl/problem_parsing_context.hpp"
 #include "loki/details/pddl/requirements_enum.hpp"
 #include "loki/details/pddl/scope.hpp"
+#include "metric.hpp"
 #include "objects.hpp"
 #include "predicates.hpp"
 #include "reference_utils.hpp"
@@ -61,17 +62,19 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
     context.requirements = requirements;
 
     /* Objects section */
+    auto objects = ObjectList {};
     if (node.objects.has_value())
     {
-        const auto objects = parse(node.objects.value(), context);
+        objects = parse(node.objects.value(), context);
         context.builder.get_objects().insert(objects.begin(), objects.end());
         track_object_references(objects, context);
     }
 
     /* Predicates section */
+    auto predicates = PredicateList {};
     if (node.derived_predicates.has_value())
     {
-        const auto predicates = parse(node.derived_predicates.value(), context);
+        predicates = parse(node.derived_predicates.value(), context);
         context.builder.get_predicates().insert(predicates.begin(), predicates.end());
         track_predicate_references(predicates, context);
     }
@@ -97,6 +100,12 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
         context.builder.get_goal_condition() = goal_condition;
     }
 
+    /* Metric section */
+    if (node.metric_specification.has_value())
+    {
+        context.builder.get_optimization_metric() = parse(node.metric_specification.value(), context);
+    }
+
     /* Structure section */
     for (const auto& structure_node : node.structures)
     {
@@ -106,5 +115,9 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
         std::visit(UnpackingVisitor(actions, axioms), variant);
         context.builder.get_axioms().insert(axioms.begin(), axioms.end());
     }
+
+    // Check references
+    test_object_references(objects, context);
+    test_predicate_references(predicates, context);
 }
 }
