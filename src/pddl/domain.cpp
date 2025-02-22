@@ -32,7 +32,7 @@ using namespace std;
 
 namespace loki
 {
-DomainImpl::DomainImpl(HanaDomainRepositories repositories,
+DomainImpl::DomainImpl(HanaRepositories repositories,
                        std::optional<fs::path> filepath,
                        std::string name,
                        Requirements requirements,

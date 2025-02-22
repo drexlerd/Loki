@@ -19,7 +19,7 @@
 #define LOKI_INCLUDE_LOKI_PDDL_DOMAIN_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/domain_repositories.hpp"
+#include "loki/details/pddl/repositories.hpp"
 #include "loki/details/utils/filesystem.hpp"
 
 #include <optional>
@@ -31,7 +31,7 @@ namespace loki
 class DomainImpl
 {
 private:
-    HanaDomainRepositories m_repositories;
+    HanaRepositories m_repositories;
     std::optional<fs::path> m_filepath;
     std::string m_name;
     Requirements m_requirements;
@@ -43,7 +43,7 @@ private:
     AxiomList m_axioms;
 
 public:
-    DomainImpl(HanaDomainRepositories repositories,
+    DomainImpl(HanaRepositories repositories,
                std::optional<fs::path> filepath,
                std::string name,
                Requirements requirements,

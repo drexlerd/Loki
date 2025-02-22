@@ -19,7 +19,7 @@
 #define LOKI_INCLUDE_LOKI_PDDL_PROBLEM_BUILDER_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/problem_repositories.hpp"
+#include "loki/details/pddl/repositories.hpp"
 #include "loki/details/utils/filesystem.hpp"
 
 #include <optional>
@@ -31,7 +31,7 @@ namespace loki
 class ProblemBuilder
 {
 private:
-    HanaProblemRepositories m_repositories;
+    HanaRepositories m_repositories;
 
     Domain m_domain;  ///< Immutable planning domain
     std::optional<fs::path> m_filepath;
@@ -47,7 +47,7 @@ private:
 
 public:
     /// @brief Create a `ProblemBuilder` for a given `Domain`.
-    /// Copies parts elements from the `Domain` into the `HanaProblemRepositories` and problem specific information to ensure indexing schemas.
+    /// Copies parts elements from the `Domain` into the `HanaRepositories` and problem specific information to ensure indexing schemas.
     /// @param domain
     explicit ProblemBuilder(Domain domain);
 

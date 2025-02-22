@@ -19,7 +19,7 @@
 #define LOKI_INCLUDE_LOKI_PDDL_PROBLEM_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/problem_repositories.hpp"
+#include "loki/details/pddl/repositories.hpp"
 #include "loki/details/utils/filesystem.hpp"
 
 #include <optional>
@@ -31,7 +31,7 @@ class ProblemImpl
 {
 private:
     size_t m_index;
-    HanaProblemRepositories m_repositories;
+    HanaRepositories m_repositories;
     std::optional<fs::path> m_filepath;
     Domain m_domain;
     std::string m_name;
@@ -49,7 +49,7 @@ private:
 
 public:
     ProblemImpl(size_t index,
-                HanaProblemRepositories repositories,
+                HanaRepositories repositories,
                 std::optional<fs::path> filepath,
                 Domain domain,
                 std::string name,
