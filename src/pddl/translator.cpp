@@ -17,8 +17,7 @@
 
 #include "loki/details/pddl/translator.hpp"
 
-#include "translator/to_negation_normal_form_domain.hpp"
-#include "translator/to_negation_normal_form_problem.hpp"
+#include "translator/to_negation_normal_form.hpp"
 
 namespace loki
 {
@@ -31,7 +30,7 @@ DomainTranslationResult::DomainTranslationResult(Domain original_domain, Domain 
 
 DomainTranslationResult translate(const Domain& domain)
 {
-    auto to_negation_normal_form_translator = DomainToNegationNormalFormTranslator();
+    auto to_negation_normal_form_translator = ToNegationNormalFormTranslator();
 
     auto builder = DomainBuilder();
     auto translated_domain = to_negation_normal_form_translator.translate_level_0(domain, builder);
@@ -43,23 +42,19 @@ const Domain& DomainTranslationResult::get_original_domain() const { return orig
 
 const Domain& DomainTranslationResult::get_translated_domain() const { return translated_domain; }
 
-ProblemTranslationResult::ProblemTranslationResult(Problem translated_problem) : translated_problem(std::move(translated_problem)) {}
-
-const Problem& ProblemTranslationResult::get_translated_problem() const { return translated_problem; }
-
-ProblemTranslationResult translate(const Problem& problem, const DomainTranslationResult& result)
+Problem translate(const Problem& problem, const DomainTranslationResult& result)
 {
     if (result.get_original_domain() != problem->get_domain())
     {
-        throw std::runtime_error("ITranslator::translate_level_0: domain in problem must match original domain in DomainTranslationResult.");
+        throw std::runtime_error("translate(problem, result): domain in problem must match original domain in DomainTranslationResult.");
     }
 
-    auto to_negation_normal_form_translator = ProblemToNegationNormalFormTranslator(result);
+    auto to_negation_normal_form_translator = ToNegationNormalFormTranslator();
 
     auto builder = ProblemBuilder(result.get_translated_domain());
     auto translated_problem = to_negation_normal_form_translator.translate_level_0(problem, builder);
 
-    return ProblemTranslationResult(translated_problem);
+    return translated_problem;
 }
 
 }

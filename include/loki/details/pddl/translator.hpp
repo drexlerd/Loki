@@ -39,18 +39,7 @@ public:
 
 extern DomainTranslationResult translate(const Domain& domain);
 
-class ProblemTranslationResult
-{
-private:
-    Problem translated_problem;
-
-public:
-    explicit ProblemTranslationResult(Problem problem);
-
-    const Problem& get_translated_problem() const;
-};
-
-extern ProblemTranslationResult translate(const Problem& problem, const DomainTranslationResult& result);
+extern Problem translate(const Problem& problem, const DomainTranslationResult& result);
 
 }
 

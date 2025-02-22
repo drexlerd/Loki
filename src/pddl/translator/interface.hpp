@@ -58,10 +58,10 @@ public:
     /// Translate
     ///////////////////////////////////////////////////////
 
-    template<typename T, typename Builder>
-    auto translate_level_0(const T& element, Builder& builder)
+    template<typename T>
+    auto translate_level_0(const T& element, Repositories& repositories)
     {
-        return self().translate_level_1(element, builder);
+        return self().translate_level_1(element, repositories);
     }
 
     /**

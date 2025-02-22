@@ -103,8 +103,6 @@ add_subdirectory(src)
 
 add_subdirectory(exe)
 
-add_subdirectory(examples)
-
 if (BUILD_TESTS)
   add_subdirectory(tests)
 endif()

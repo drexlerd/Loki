@@ -15,23 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SRC_PDDL_TRANSLATOR_TO_NEGATION_NORMAL_FORM_DOMAIN_HPP_
-#define LOKI_SRC_PDDL_TRANSLATOR_TO_NEGATION_NORMAL_FORM_DOMAIN_HPP_
-
-#include "loki/details/pddl/domain.hpp"
-#include "to_negation_normal_form_base.hpp"
+#include "to_negation_normal_form.hpp"
 
 namespace loki
 {
-class DomainToNegationNormalFormTranslator : public ToNegationNormalFormTranslatorBase<DomainToNegationNormalFormTranslator>
-{
-private:
-    friend class ToNegationNormalFormTranslatorBase<DomainToNegationNormalFormTranslator>;
 
-    // Provide default implementations
-    using ToNegationNormalFormTranslatorBase<DomainToNegationNormalFormTranslator>::prepare_level_2;
-    using ToNegationNormalFormTranslatorBase<DomainToNegationNormalFormTranslator>::translate_level_2;
-};
 }
-
-#endif
