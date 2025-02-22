@@ -19,6 +19,8 @@
 #define LOKI_DETAILS_PDDL_CONCEPTS_HPP_
 
 #include <concepts>
+#include <ranges>
+#include <type_traits>
 
 namespace loki
 {
@@ -31,6 +33,14 @@ concept ParsingContext = requires(T a) {
     a.builder;
     a.requirements;
 };
+
+template<typename T>
+concept IsBackInsertibleRange = std::ranges::forward_range<T> &&                       // Must be a forward range
+                                std::default_initializable<std::remove_cvref_t<T>> &&  // Must be default-constructible
+                                requires(std::remove_cvref_t<T> container, std::ranges::range_value_t<T> value) {
+                                    std::back_inserter(container);           // Must support std::back_inserter
+                                    *std::back_inserter(container) = value;  // Must support inserting values
+                                };
 
 }
 

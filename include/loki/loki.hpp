@@ -49,6 +49,7 @@
 #include "loki/details/pddl/requirements.hpp"
 #include "loki/details/pddl/scope.hpp"
 #include "loki/details/pddl/term.hpp"
+#include "loki/details/pddl/translator.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
 

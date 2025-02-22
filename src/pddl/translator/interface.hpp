@@ -18,14 +18,17 @@
 #ifndef LOKI_SRC_PDDL_TRANSLATOR_INTERFACE_HPP_
 #define LOKI_SRC_PDDL_TRANSLATOR_INTERFACE_HPP_
 
+#include "loki/details/pddl/concepts.hpp"
+
 namespace loki
 {
 
 /// @brief `ITranslator` is the base class for translators.
 ///
-/// We implement a three-level CRTP-based class hierarchy.
+/// We implement a four-level CRTP-based class hierarchy.
 /// The first level is the `ITranslator` interface.
 /// The second level are base translators that provide translation functionality that is shared among domain and problem.
+/// The third level are concrete translators that provide translation functionality that is shared among domain and problem.
 /// The third level are domain and problem specific translators that provide their specific translation steps.
 /// @tparam Derived
 template<typename Derived>
@@ -40,18 +43,24 @@ private:
     constexpr auto& self() { return static_cast<Derived&>(*this); }
 
 public:
-    /// @brief Traverse recusively and collect information.
+    ///////////////////////////////////////////////////////
+    /// Prepare
+    ///////////////////////////////////////////////////////
+
     template<typename T>
-    auto prepare(const T& element)
+    auto prepare_level_0(const T& element)
     {
-        self().prepare_base(element);
+        self().prepare_level_1(element);
     }
 
-    /// @brief Translate recursively.
+    ///////////////////////////////////////////////////////
+    /// Translate
+    ///////////////////////////////////////////////////////
+
     template<typename T>
-    auto translate(const T& element)
+    auto translate_level_0(const T& element)
     {
-        return self().translate_base(element);
+        return self().translate_level_1(element);
     }
 };
 }
