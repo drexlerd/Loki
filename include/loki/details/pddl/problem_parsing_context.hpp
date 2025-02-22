@@ -24,6 +24,7 @@
 #include "loki/details/pddl/position_cache.hpp"
 #include "loki/details/pddl/problem_builder.hpp"
 #include "loki/details/pddl/reference.hpp"
+#include "loki/details/pddl/scope.hpp"
 
 namespace loki
 {

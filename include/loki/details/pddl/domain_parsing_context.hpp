@@ -23,6 +23,7 @@
 #include "loki/details/pddl/parser_options.hpp"
 #include "loki/details/pddl/position_cache.hpp"
 #include "loki/details/pddl/reference.hpp"
+#include "loki/details/pddl/scope.hpp"
 
 namespace loki
 {

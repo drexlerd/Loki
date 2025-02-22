@@ -21,7 +21,10 @@
 #include "loki/details/pddl/declarations.hpp"
 #include "loki/details/pddl/parser_options.hpp"
 #include "loki/details/pddl/position_cache.hpp"
+#include "loki/details/pddl/scope.hpp"
 #include "loki/details/utils/filesystem.hpp"
+
+#include <memory>
 
 namespace loki
 {

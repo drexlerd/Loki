@@ -56,19 +56,6 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
     context.builder.get_requirements() = requirements;
     context.requirements = requirements;
 
-    if (context.requirements->test(RequirementEnum::EQUALITY))
-    {
-        // Create equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
-        const auto binary_parameterlist =
-            ParameterList { context.builder.get_or_create_parameter(context.builder.get_or_create_variable("?left_arg"), TypeList { base_type_object }),
-                            context.builder.get_or_create_parameter(context.builder.get_or_create_variable("?right_arg"), TypeList { base_type_object })
-
-            };
-        const auto equal_predicate = context.builder.get_or_create_predicate("=", binary_parameterlist);
-        context.scopes.top().insert_predicate("=", equal_predicate, {});
-        context.builder.get_predicates().insert(equal_predicate);
-    }
-
     /* Types section */
     auto types = TypeList();
     if (node.types.has_value())
@@ -95,6 +82,20 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
         context.builder.get_predicates().insert(predicates.begin(), predicates.end());
         track_predicate_references(predicates, context);
     }
+    if (context.requirements->test(RequirementEnum::EQUALITY))
+    {
+        // Create equal predicate with name "=" and two parameters "?left_arg" and "?right_arg"
+        const auto binary_parameterlist =
+            ParameterList { context.builder.get_or_create_parameter(context.builder.get_or_create_variable("?lhs"), TypeList { base_type_object }),
+                            context.builder.get_or_create_parameter(context.builder.get_or_create_variable("?rhs"), TypeList { base_type_object })
+
+            };
+        const auto equal_predicate = context.builder.get_or_create_predicate("=", binary_parameterlist);
+        context.scopes.top().insert_predicate("=", equal_predicate, {});
+        context.builder.get_predicates().insert(equal_predicate);
+    }
+
+    /* Functions section */
     auto function_skeletons = FunctionSkeletonList();
     if (node.functions.has_value())
     {

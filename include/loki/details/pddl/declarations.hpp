@@ -33,12 +33,6 @@ namespace loki
 {
 
 /**
- * Parsing
- */
-
-class ScopeStack;
-
-/**
  * Common
  */
 template<typename T>

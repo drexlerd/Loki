@@ -54,9 +54,11 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
     auto requirements_set = RequirementEnumSet { RequirementEnum::STRIPS };
     if (node.requirements.has_value())
     {
-        const auto domain_requirements_set = parse(node.requirements.value(), context);
-        requirements_set.insert(domain_requirements_set.begin(), domain_requirements_set.end());
+        const auto problem_requirements_set = parse(node.requirements.value(), context);
+        requirements_set.insert(problem_requirements_set.begin(), problem_requirements_set.end());
     }
+    const auto domain_requirements_set = context.builder.get_domain()->get_requirements()->get_requirements();
+    requirements_set.insert(domain_requirements_set.begin(), domain_requirements_set.end());
     const auto requirements = context.builder.get_or_create_requirements(requirements_set);
     context.builder.get_requirements() = requirements;
     context.requirements = requirements;
