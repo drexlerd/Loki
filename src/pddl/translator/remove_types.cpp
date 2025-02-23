@@ -265,53 +265,52 @@ Domain RemoveTypesTranslator::translate_level_2(const Domain& domain, DomainBuil
     return builder.get_result();
 }
 
-/*
 Problem RemoveTypesTranslator::translate_level_2(const Problem& problem, ProblemBuilder& builder)
 {
+    auto& repositories = builder.get_repositories();
+
+    builder.get_filepath() = problem->get_filepath();
+    builder.get_name() = problem->get_name();
+
     // Remove :typing requirement
     auto requirements_enum_set = problem->get_requirements()->get_requirements();
     requirements_enum_set.erase(RequirementEnum::TYPING);
-    auto translated_requirements = repositories.get_or_create_requirements(requirements_enum_set);
+    builder.get_requirements() = repositories.get_or_create_requirements(requirements_enum_set);
 
     // Make objects untyped
-    auto translated_objects = ObjectList {};
-    translated_objects.reserve(problem->get_objects().size());
-    auto additional_initial_literals = LiteralList {};
     for (const auto& object : problem->get_objects())
     {
-        auto translated_object = typed_object_to_untyped_object(object, repositories);
+        builder.get_objects().push_back(typed_object_to_untyped_object(object, repositories));
         auto additional_literals = typed_object_to_literals(object, repositories, this->m_type_to_predicates);
-        translated_objects.push_back(translated_object);
-        additional_initial_literals.insert(additional_initial_literals.end(), additional_literals.begin(), additional_literals.end());
+        builder.get_initial_literals().insert(builder.get_initial_literals().end(), additional_literals.begin(), additional_literals.end());
     }
-
     // Make constants untyped
     for (const auto& object : problem->get_domain()->get_constants())
     {
         auto additional_literals = typed_object_to_literals(object, repositories, this->m_type_to_predicates);
-        additional_initial_literals.insert(additional_initial_literals.end(), additional_literals.begin(), additional_literals.end());
+        builder.get_initial_literals().insert(builder.get_initial_literals().end(), additional_literals.begin(), additional_literals.end());
     }
 
-    // Translate other initial literals and add additional literals
-    auto translated_initial_literals = this->translate_level_0(problem->get_initial_literals());
-    translated_initial_literals.insert(translated_initial_literals.end(), additional_initial_literals.begin(), additional_initial_literals.end());
+    const auto translated_predicates = this->translate_level_0(problem->get_predicates(), repositories);
+    builder.get_predicates().insert(builder.get_predicates().end(), translated_predicates.begin(), translated_predicates.end());
 
-    auto translated_problem = repositories.get_or_create_problem(
-        problem->get_filepath(),
-        this->translate_level_0(problem->get_domain()),
-        problem->get_name(),
-        translated_requirements,
-        translated_objects,
-        this->translate_level_0(problem->get_derived_predicates()),
-        translated_initial_literals,
-        this->translate_level_0(problem->get_function_values()),
-        (problem->get_goal_condition().has_value() ? std::optional<Condition>(this->translate_level_0(problem->get_goal_condition().value())) : std::nullopt),
-        (problem->get_optimization_metric().has_value() ?
-             std::optional<OptimizationMetric>(this->translate_level_0(problem->get_optimization_metric().value())) :
-             std::nullopt),
-        this->translate_level_0(problem->get_axioms()));
-    return translated_problem;
+    // Translate other initial literals and add additional literals
+    const auto translated_initial_literals = this->translate_level_0(problem->get_initial_literals(), repositories);
+    builder.get_initial_literals().insert(builder.get_initial_literals().end(), translated_initial_literals.begin(), translated_initial_literals.end());
+
+    const auto translated_function_values = this->translate_level_0(problem->get_function_values(), repositories);
+    builder.get_function_values().insert(builder.get_function_values().end(), translated_function_values.begin(), translated_function_values.end());
+
+    if (problem->get_goal_condition().has_value())
+        builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition().value(), repositories);
+
+    if (problem->get_optimization_metric().has_value())
+        builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric().value(), repositories);
+
+    const auto translated_axioms = this->translate_level_0(problem->get_axioms(), repositories);
+    builder.get_axioms().insert(builder.get_axioms().end(), translated_axioms.begin(), translated_axioms.end());
+
+    return builder.get_result(problem->get_index());
 }
-*/
 
 }

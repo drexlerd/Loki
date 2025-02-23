@@ -48,7 +48,7 @@ private:
     Action translate_level_2(Action action, Repositories& repositories);
     Axiom translate_level_2(Axiom axiom, Repositories& repositories);
     Domain translate_level_2(const Domain& domain, DomainBuilder& builder);
-    // Problem translate_level_2(const Problem& problem, ProblemBuilder& builder);
+    Problem translate_level_2(const Problem& problem, ProblemBuilder& builder);
 };
 
 }

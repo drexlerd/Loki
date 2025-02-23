@@ -26,7 +26,7 @@ namespace loki
 class DomainTranslationResult
 {
 private:
-    Domain original_domain;  ///< use it to check that a problem can be translated with this result.
+    Domain original_domain;  ///< used to check that a problem can be translated with this result.
 
     Domain translated_domain;
 

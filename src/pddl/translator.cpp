@@ -54,9 +54,12 @@ Problem translate(const Problem& problem, const DomainTranslationResult& result)
     }
 
     auto to_negation_normal_form_translator = ToNegationNormalFormTranslator();
-
     auto builder = ProblemBuilder(result.get_translated_domain());
     auto translated_problem = to_negation_normal_form_translator.translate_level_0(problem, builder);
+
+    auto remove_types_translator = RemoveTypesTranslator();
+    builder = ProblemBuilder(result.get_translated_domain());
+    translated_problem = remove_types_translator.translate_level_0(translated_problem, builder);
 
     return translated_problem;
 }

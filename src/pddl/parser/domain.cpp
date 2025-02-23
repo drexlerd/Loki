@@ -65,6 +65,7 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
             throw UndefinedRequirementError(RequirementEnum::TYPING, context.scopes.top().get_error_handler()(node.types.value(), ""));
         }
         types = parse(node.types.value(), context);
+        context.builder.get_types().insert(context.builder.get_types().end(), types.begin(), types.end());
     }
     /* Constants section */
     if (node.constants.has_value())
