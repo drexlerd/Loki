@@ -104,13 +104,13 @@ const AxiomList& ProblemImpl::get_problem_and_domain_axioms() const { return m_p
 
 std::ostream& operator<<(std::ostream& out, const ProblemImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, Problem element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 

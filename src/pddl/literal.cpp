@@ -32,13 +32,13 @@ const Atom& LiteralImpl::get_atom() const { return m_atom; }
 
 std::ostream& operator<<(std::ostream& out, const LiteralImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, Literal element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 

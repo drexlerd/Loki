@@ -32,13 +32,13 @@ double FunctionValueImpl::get_number() const { return m_number; }
 
 std::ostream& operator<<(std::ostream& out, const FunctionValueImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, FunctionValue element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 

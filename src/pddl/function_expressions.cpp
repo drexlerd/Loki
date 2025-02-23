@@ -147,73 +147,73 @@ const std::
 
 std::ostream& operator<<(std::ostream& out, const FunctionExpressionNumberImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const FunctionExpressionBinaryOperatorImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const FunctionExpressionMultiOperatorImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const FunctionExpressionMinusImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const FunctionExpressionFunctionImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const FunctionExpressionImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, FunctionExpressionNumber element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, FunctionExpressionBinaryOperator element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, FunctionExpressionMultiOperator element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, FunctionExpressionMinus element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, FunctionExpressionFunction element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, FunctionExpression element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 

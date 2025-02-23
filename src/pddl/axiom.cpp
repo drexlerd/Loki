@@ -44,13 +44,13 @@ const Condition& AxiomImpl::get_condition() const { return m_condition; }
 
 std::ostream& operator<<(std::ostream& out, const AxiomImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, Axiom element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 

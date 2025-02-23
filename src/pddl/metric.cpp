@@ -52,13 +52,13 @@ const FunctionExpression& OptimizationMetricImpl::get_function_expression() cons
 
 std::ostream& operator<<(std::ostream& out, const OptimizationMetricImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, OptimizationMetric element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 

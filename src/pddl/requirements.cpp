@@ -32,13 +32,13 @@ const RequirementEnumSet& RequirementsImpl::get_requirements() const { return m_
 
 std::ostream& operator<<(std::ostream& out, const RequirementsImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, Requirements element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 

@@ -100,13 +100,13 @@ VariableSet collect_free_variables(const ConditionImpl& condition)
 
 std::ostream& operator<<(std::ostream& out, const VariableImpl& element)
 {
-    write_typed<StringTag>(element, out);
+    write_typed(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, Variable element)
 {
-    write_typed<AddressTag>(*element, out);
+    write_typed(*element, AddressFormatter(), out);
     return out;
 }
 

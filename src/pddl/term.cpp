@@ -33,13 +33,13 @@ const std::variant<Object, Variable>& TermImpl::get_object_or_variable() const {
 
 std::ostream& operator<<(std::ostream& out, const TermImpl& element)
 {
-    write_typed<StringTag>(element, out);
+    write_typed(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, Term element)
 {
-    write_typed<AddressTag>(*element, out);
+    write_typed(*element, AddressFormatter(), out);
     return out;
 }
 

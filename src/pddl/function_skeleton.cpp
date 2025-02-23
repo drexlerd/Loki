@@ -40,13 +40,13 @@ const Type& FunctionSkeletonImpl::get_type() const { return m_type; }
 
 std::ostream& operator<<(std::ostream& out, const FunctionSkeletonImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, FunctionSkeleton element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 

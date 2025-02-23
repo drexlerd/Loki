@@ -33,13 +33,13 @@ const TermList& AtomImpl::get_terms() const { return m_terms; }
 
 std::ostream& operator<<(std::ostream& out, const AtomImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, Atom element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 

@@ -38,13 +38,13 @@ const TermList& FunctionImpl::get_terms() const { return m_terms; }
 
 std::ostream& operator<<(std::ostream& out, const FunctionImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, Function element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 

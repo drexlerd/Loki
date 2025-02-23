@@ -77,13 +77,13 @@ const AxiomList& DomainImpl::get_axioms() const { return m_axioms; }
 
 std::ostream& operator<<(std::ostream& out, const DomainImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, Domain element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 

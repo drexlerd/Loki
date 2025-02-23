@@ -53,13 +53,13 @@ const std::optional<Effect>& ActionImpl::get_effect() const { return m_effect; }
 
 std::ostream& operator<<(std::ostream& out, const ActionImpl& element)
 {
-    write<StringTag>(element, out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, Action element)
 {
-    write<AddressTag>(*element, out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 
