@@ -1,6 +1,6 @@
 # Loki
 
-Loki is a C++20 library for syntactic and semantic parsing of PDDL files.
+Loki is a C++20 library for syntactic and semantic parsing and translation of PDDL files. Loki separates the parsing and translation of domain and problem files, allowing users to effectively work with collection of problems.
 
 ## Supported PDDL Requirements
 
@@ -13,18 +13,12 @@ Loki is a C++20 library for syntactic and semantic parsing of PDDL files.
 - [x] :universal-preconditions
 - [x] :quantified-preconditions
 - [x] :conditional-effects
-- [ ] :fluents
 - [x] :numeric-fluents
-- [ ] :object-fluents
 - [x] :adl
-- [ ] :durative-actions
 - [x] :derived-predicates
-- [ ] :timed-initial-literals
-- [ ] :preferences
-- [ ] :constraints
 - [x] :action-costs
-- [x] :non-deterministic
-- [x] :probabilistic-effects
+- [x] :non-deterministic (unsupported in the translator)
+- [x] :probabilistic-effects (unsupported in the translator)
 
 
 ## Dependencies

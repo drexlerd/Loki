@@ -18,6 +18,7 @@
 #include "loki/details/pddl/translator.hpp"
 
 #include "translator/remove_types.hpp"
+#include "translator/remove_universal_quantifiers.hpp"
 #include "translator/rename_quantified_variables.hpp"
 #include "translator/simplify_goal.hpp"
 #include "translator/to_negation_normal_form.hpp"
@@ -53,6 +54,16 @@ DomainTranslationResult translate(const Domain& domain)
     auto rename_quantified_variables_translator = RenameQuantifiedVariablesTranslator();
     builder = DomainBuilder();
     translated_domain = rename_quantified_variables_translator.translate_level_0(translated_domain, builder);
+
+    std::cout << "RenameQuantifiedVariablesTranslator result: " << std::endl;
+    std::cout << translated_domain << std::endl;
+
+    auto remove_universal_quantifiers_translator = RemoveUniversalQuantifiersTranslator();
+    builder = DomainBuilder();
+    translated_domain = remove_universal_quantifiers_translator.translate_level_0(translated_domain, builder);
+
+    std::cout << "RemoveUniversalQuantifiersTranslator result: " << std::endl;
+    std::cout << translated_domain << std::endl;
 
     return DomainTranslationResult(domain, translated_domain);
 }
