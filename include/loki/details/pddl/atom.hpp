@@ -53,6 +53,8 @@ public:
 
 extern std::ostream& operator<<(std::ostream& out, const AtomImpl& element);
 
+extern std::ostream& operator<<(std::ostream& out, Atom element);
+
 }
 
 #endif

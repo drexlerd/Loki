@@ -100,8 +100,13 @@ VariableSet collect_free_variables(const ConditionImpl& condition)
 
 std::ostream& operator<<(std::ostream& out, const VariableImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write_untyped(element, out);  // there is no type
+    write_typed<StringTag>(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, Variable element)
+{
+    write_typed<AddressTag>(*element, out);
     return out;
 }
 

@@ -32,8 +32,13 @@ const RequirementEnumSet& RequirementsImpl::get_requirements() const { return m_
 
 std::ostream& operator<<(std::ostream& out, const RequirementsImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, Requirements element)
+{
+    write<AddressTag>(*element, out);
     return out;
 }
 

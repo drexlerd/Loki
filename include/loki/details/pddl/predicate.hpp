@@ -55,6 +55,8 @@ public:
 
 extern std::ostream& operator<<(std::ostream& out, const PredicateImpl& element);
 
+extern std::ostream& operator<<(std::ostream& out, Predicate element);
+
 }
 
 #endif

@@ -15,9 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "loki/details/pddl/function_value.hpp"
+
 #include "formatter.hpp"
 #include "loki/details/pddl/function.hpp"
-#include "loki/details/pddl/function_value.hpp"
 
 namespace loki
 {
@@ -31,8 +32,13 @@ double FunctionValueImpl::get_number() const { return m_number; }
 
 std::ostream& operator<<(std::ostream& out, const FunctionValueImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, FunctionValue element)
+{
+    write<AddressTag>(*element, out);
     return out;
 }
 

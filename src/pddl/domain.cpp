@@ -77,8 +77,13 @@ const AxiomList& DomainImpl::get_axioms() const { return m_axioms; }
 
 std::ostream& operator<<(std::ostream& out, const DomainImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, Domain element)
+{
+    write<AddressTag>(*element, out);
     return out;
 }
 

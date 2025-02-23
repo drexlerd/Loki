@@ -60,8 +60,13 @@ bool is_subtype_or_equal(const Type& type, const TypeList& parent_types)
 
 std::ostream& operator<<(std::ostream& out, const TypeImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write_typed(element, out);
+    write_typed<StringTag>(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, Type element)
+{
+    write_typed<AddressTag>(*element, out);
     return out;
 }
 

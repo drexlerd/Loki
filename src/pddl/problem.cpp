@@ -104,8 +104,13 @@ const AxiomList& ProblemImpl::get_problem_and_domain_axioms() const { return m_p
 
 std::ostream& operator<<(std::ostream& out, const ProblemImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, Problem element)
+{
+    write<AddressTag>(*element, out);
     return out;
 }
 

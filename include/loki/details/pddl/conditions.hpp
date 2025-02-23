@@ -288,6 +288,16 @@ extern std::ostream& operator<<(std::ostream& out, const ConditionForallImpl& el
 extern std::ostream& operator<<(std::ostream& out, const ConditionNumericConstraintImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const ConditionImpl& element);
 
+extern std::ostream& operator<<(std::ostream& out, ConditionLiteral element);
+extern std::ostream& operator<<(std::ostream& out, ConditionAnd element);
+extern std::ostream& operator<<(std::ostream& out, ConditionOr element);
+extern std::ostream& operator<<(std::ostream& out, ConditionNot element);
+extern std::ostream& operator<<(std::ostream& out, ConditionImply element);
+extern std::ostream& operator<<(std::ostream& out, ConditionExists element);
+extern std::ostream& operator<<(std::ostream& out, ConditionForall element);
+extern std::ostream& operator<<(std::ostream& out, ConditionNumericConstraint element);
+extern std::ostream& operator<<(std::ostream& out, Condition element);
+
 }
 
 #endif

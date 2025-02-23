@@ -265,6 +265,15 @@ extern std::ostream& operator<<(std::ostream& out, const EffectCompositeOneofImp
 extern std::ostream& operator<<(std::ostream& out, const EffectCompositeProbabilisticImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const EffectImpl& element);
 
+extern std::ostream& operator<<(std::ostream& out, EffectLiteral element);
+extern std::ostream& operator<<(std::ostream& out, EffectAnd element);
+extern std::ostream& operator<<(std::ostream& out, EffectNumeric element);
+extern std::ostream& operator<<(std::ostream& out, EffectCompositeForall element);
+extern std::ostream& operator<<(std::ostream& out, EffectCompositeWhen element);
+extern std::ostream& operator<<(std::ostream& out, EffectCompositeOneof element);
+extern std::ostream& operator<<(std::ostream& out, EffectCompositeProbabilistic element);
+extern std::ostream& operator<<(std::ostream& out, Effect element);
+
 }
 
 #endif

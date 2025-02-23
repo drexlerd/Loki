@@ -33,8 +33,13 @@ const TypeList& ObjectImpl::get_bases() const { return m_types; }
 
 std::ostream& operator<<(std::ostream& out, const ObjectImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write_typed(element, out);
+    write_typed<StringTag>(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, Object element)
+{
+    write_typed<AddressTag>(*element, out);
     return out;
 }
 

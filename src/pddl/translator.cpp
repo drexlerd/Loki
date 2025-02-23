@@ -18,6 +18,7 @@
 #include "loki/details/pddl/translator.hpp"
 
 #include "translator/remove_types.hpp"
+#include "translator/rename_quantified_variables.hpp"
 #include "translator/to_negation_normal_form.hpp"
 
 namespace loki
@@ -38,6 +39,12 @@ DomainTranslationResult translate(const Domain& domain)
     auto remove_types_translator = RemoveTypesTranslator();
     builder = DomainBuilder();
     translated_domain = remove_types_translator.translate_level_0(translated_domain, builder);
+
+    std::cout << translated_domain << std::endl;
+
+    auto rename_quantified_variables_translator = RenameQuantifiedVariablesTranslator();
+    builder = DomainBuilder();
+    translated_domain = rename_quantified_variables_translator.translate_level_0(translated_domain, builder);
 
     return DomainTranslationResult(domain, translated_domain);
 }
@@ -60,6 +67,10 @@ Problem translate(const Problem& problem, const DomainTranslationResult& result)
     auto remove_types_translator = RemoveTypesTranslator();
     builder = ProblemBuilder(result.get_translated_domain());
     translated_problem = remove_types_translator.translate_level_0(translated_problem, builder);
+
+    auto rename_quantified_variables_translator = RenameQuantifiedVariablesTranslator();
+    builder = ProblemBuilder(result.get_translated_domain());
+    translated_problem = rename_quantified_variables_translator.translate_level_0(translated_problem, builder);
 
     return translated_problem;
 }

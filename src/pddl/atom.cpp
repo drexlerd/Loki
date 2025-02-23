@@ -33,8 +33,13 @@ const TermList& AtomImpl::get_terms() const { return m_terms; }
 
 std::ostream& operator<<(std::ostream& out, const AtomImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, Atom element)
+{
+    write<AddressTag>(*element, out);
     return out;
 }
 

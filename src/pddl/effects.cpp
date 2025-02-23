@@ -126,57 +126,97 @@ const EffectVariant& EffectImpl::get_effect() const { return m_effect; }
 
 std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const EffectAndImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const EffectNumericImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const EffectCompositeForallImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const EffectCompositeWhenImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const EffectCompositeOneofImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const EffectCompositeProbabilisticImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const EffectImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, EffectLiteral element)
+{
+    write<AddressTag>(*element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, EffectAnd element)
+{
+    write<AddressTag>(*element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, EffectNumeric element)
+{
+    write<AddressTag>(*element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, EffectCompositeForall element)
+{
+    write<AddressTag>(*element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, EffectCompositeWhen element)
+{
+    write<AddressTag>(*element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, EffectCompositeOneof element)
+{
+    write<AddressTag>(*element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, EffectCompositeProbabilistic element)
+{
+    write<AddressTag>(*element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, Effect element)
+{
+    write<AddressTag>(*element, out);
     return out;
 }
 

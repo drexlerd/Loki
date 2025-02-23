@@ -39,70 +39,113 @@
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
 
+#include <concepts>
 #include <cstddef>
 #include <ostream>
 
 namespace loki
 {
 
-class PDDLFormatter
+struct StringTag
 {
-private:
-    // The indentation in the current level.
-    size_t m_indent = 0;
-    // The amount of indentation added per nesting
-    size_t m_add_indent = 0;
-
-public:
-    PDDLFormatter(size_t indent = 0, size_t add_indent = 4);
-
-    void write(const ActionImpl& element, std::ostream& out);
-    void write(const AtomImpl& element, std::ostream& out);
-    void write(const AxiomImpl& element, std::ostream& out);
-    void write(const ConditionLiteralImpl& element, std::ostream& out);
-    void write(const ConditionAndImpl& element, std::ostream& out);
-    void write(const ConditionOrImpl& element, std::ostream& out);
-    void write(const ConditionNotImpl& element, std::ostream& out);
-    void write(const ConditionImplyImpl& element, std::ostream& out);
-    void write(const ConditionExistsImpl& element, std::ostream& out);
-    void write(const ConditionForallImpl& element, std::ostream& out);
-    void write(const ConditionNumericConstraintImpl& element, std::ostream& out);
-    void write(const ConditionImpl& element, std::ostream& out);
-    void write(const DomainImpl& element, std::ostream& out);
-    void write(const EffectLiteralImpl& element, std::ostream& out);
-    void write(const EffectAndImpl& element, std::ostream& out);
-    void write(const EffectNumericImpl& element, std::ostream& out);
-    void write(const EffectCompositeForallImpl& element, std::ostream& out);
-    void write(const EffectCompositeWhenImpl& element, std::ostream& out);
-    void write(const EffectCompositeOneofImpl& element, std::ostream& out);
-    void write(const EffectCompositeProbabilisticImpl& element, std::ostream& out);
-    void write(const EffectImpl& element, std::ostream& out);
-    void write(const FunctionExpressionNumberImpl& element, std::ostream& out);
-    void write(const FunctionExpressionBinaryOperatorImpl& element, std::ostream& out);
-    void write(const FunctionExpressionMultiOperatorImpl& element, std::ostream& out);
-    void write(const FunctionExpressionMinusImpl& element, std::ostream& out);
-    void write(const FunctionExpressionFunctionImpl& element, std::ostream& out);
-    void write(const FunctionExpressionImpl& element, std::ostream& out);
-    void write(const FunctionSkeletonImpl& element, std::ostream& out);
-    void write(const FunctionImpl& element, std::ostream& out);
-    void write(const LiteralImpl& element, std::ostream& out);
-    void write(const OptimizationMetricImpl& element, std::ostream& out);
-    void write(const FunctionValueImpl& element, std::ostream& out);
-    void write(const ParameterImpl& element, std::ostream& out);
-    void write(const PredicateImpl& element, std::ostream& out);
-    void write(const ProblemImpl& element, std::ostream& out);
-    void write(const RequirementsImpl& element, std::ostream& out);
-
-    void write_untyped(const TypeImpl& element, std::ostream& out);
-    void write_untyped(const TermImpl& element, std::ostream& out);
-    void write_untyped(const ObjectImpl& element, std::ostream& out);
-    void write_untyped(const VariableImpl& element, std::ostream& out);
-
-    void write_typed(const TypeImpl& element, std::ostream& out);
-    void write_typed(const TermImpl& element, std::ostream& out);
-    void write_typed(const ObjectImpl& element, std::ostream& out);
-    void write_typed(const VariableImpl& element, std::ostream& out);
 };
+struct AddressTag
+{
+};
+
+template<typename T>
+concept StringOrAddress = std::same_as<T, StringTag> || std::same_as<T, AddressTag>;
+
+template<StringOrAddress T>
+void write(const ActionImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const AtomImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const AxiomImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const ConditionLiteralImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const ConditionAndImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const ConditionOrImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const ConditionNotImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const ConditionImplyImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const ConditionExistsImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const ConditionForallImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const ConditionNumericConstraintImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const ConditionImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const DomainImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const EffectLiteralImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const EffectAndImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const EffectNumericImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const EffectCompositeForallImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const EffectCompositeWhenImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const EffectCompositeOneofImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const EffectCompositeProbabilisticImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const EffectImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const FunctionExpressionNumberImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const FunctionExpressionBinaryOperatorImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const FunctionExpressionMultiOperatorImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const FunctionExpressionMinusImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const FunctionExpressionFunctionImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const FunctionExpressionImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const FunctionSkeletonImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const FunctionImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const LiteralImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const OptimizationMetricImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const FunctionValueImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const ParameterImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const PredicateImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const ProblemImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write(const RequirementsImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+
+template<StringOrAddress T>
+void write_untyped(const TypeImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write_untyped(const TermImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write_untyped(const ObjectImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write_untyped(const VariableImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+
+template<StringOrAddress T>
+void write_typed(const TypeImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write_typed(const TermImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write_typed(const ObjectImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
+template<StringOrAddress T>
+void write_typed(const VariableImpl& element, std::ostream& out, size_t indent = 0, size_t add_indent = 4);
 
 }
 

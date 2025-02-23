@@ -48,8 +48,13 @@ bool is_specialized_parameter(const Parameter& specialized_parameter, const Para
 
 std::ostream& operator<<(std::ostream& out, const ParameterImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, Parameter element)
+{
+    write<AddressTag>(*element, out);
     return out;
 }
 

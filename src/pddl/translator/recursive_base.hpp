@@ -206,6 +206,205 @@ protected:
     {
         return self().translate_level_2(element, repositories);
     }
+    loki::Requirements translate_level_2(loki::Requirements requirements, Repositories& repositories)
+    {
+        return repositories.get_or_create_requirements(requirements->get_requirements());
+    }
+    loki::Type translate_level_2(loki::Type type, Repositories& repositories)
+    {
+        return repositories.get_or_create_type(type->get_name(), this->translate_level_0(type->get_bases(), repositories));
+    }
+    loki::Object translate_level_2(loki::Object object, Repositories& repositories)
+    {
+        return repositories.get_or_create_object(object->get_name(), this->translate_level_0(object->get_bases(), repositories));
+    }
+    loki::Variable translate_level_2(loki::Variable variable, Repositories& repositories) { return repositories.get_or_create_variable(variable->get_name()); }
+    loki::Term translate_level_2(loki::Term term, Repositories& repositories)
+    {
+        return std::visit([&](auto&& arg) -> loki::Term { return repositories.get_or_create_term(this->translate_level_0(arg, repositories)); },
+                          term->get_object_or_variable());
+    }
+    loki::Parameter translate_level_2(loki::Parameter parameter, Repositories& repositories)
+    {
+        return repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories),
+                                                    this->translate_level_0(parameter->get_bases(), repositories));
+    }
+    loki::Predicate translate_level_2(loki::Predicate predicate, Repositories& repositories)
+    {
+        return repositories.get_or_create_predicate(predicate->get_name(), this->translate_level_0(predicate->get_parameters(), repositories));
+    }
+    loki::Atom translate_level_2(loki::Atom atom, Repositories& repositories)
+    {
+        return repositories.get_or_create_atom(this->translate_level_0(atom->get_predicate(), repositories),
+                                               this->translate_level_0(atom->get_terms(), repositories));
+    }
+    loki::Literal translate_level_2(loki::Literal literal, Repositories& repositories)
+    {
+        return repositories.get_or_create_literal(literal->is_negated(), this->translate_level_0(literal->get_atom(), repositories));
+    }
+    loki::FunctionValue translate_level_2(loki::FunctionValue function_value, Repositories& repositories)
+    {
+        return repositories.get_or_create_function_value(this->translate_level_0(function_value->get_function(), repositories), function_value->get_number());
+    }
+    loki::Condition translate_level_2(loki::ConditionLiteral condition, Repositories& repositories)
+    {
+        return repositories.get_or_create_condition(
+            repositories.get_or_create_condition_literal(this->translate_level_0(condition->get_literal(), repositories)));
+    }
+    loki::Condition translate_level_2(loki::ConditionAnd condition, Repositories& repositories)
+    {
+        return repositories.get_or_create_condition(
+            repositories.get_or_create_condition_and(this->translate_level_0(condition->get_conditions(), repositories)));
+    }
+    loki::Condition translate_level_2(loki::ConditionOr condition, Repositories& repositories)
+    {
+        return repositories.get_or_create_condition(
+            repositories.get_or_create_condition_or(this->translate_level_0(condition->get_conditions(), repositories)));
+    }
+    loki::Condition translate_level_2(loki::ConditionNot condition, Repositories& repositories)
+    {
+        return repositories.get_or_create_condition(
+            repositories.get_or_create_condition_not(this->translate_level_0(condition->get_condition(), repositories)));
+    }
+    loki::Condition translate_level_2(loki::ConditionImply condition, Repositories& repositories)
+    {
+        return repositories.get_or_create_condition(
+            repositories.get_or_create_condition_imply(this->translate_level_0(condition->get_condition_left(), repositories),
+                                                       this->translate_level_0(condition->get_condition_right(), repositories)));
+    }
+    loki::Condition translate_level_2(loki::ConditionExists condition, Repositories& repositories)
+    {
+        return repositories.get_or_create_condition(
+            repositories.get_or_create_condition_exists(this->translate_level_0(condition->get_parameters(), repositories),
+                                                        this->translate_level_0(condition->get_condition(), repositories)));
+    }
+    loki::Condition translate_level_2(loki::ConditionForall condition, Repositories& repositories)
+    {
+        return repositories.get_or_create_condition(
+            repositories.get_or_create_condition_forall(this->translate_level_0(condition->get_parameters(), repositories),
+                                                        this->translate_level_0(condition->get_condition(), repositories)));
+    }
+    loki::Condition translate_level_2(loki::ConditionNumericConstraint condition, Repositories& repositories)
+    {
+        return repositories.get_or_create_condition(
+            repositories.get_or_create_condition_numeric_constraint(condition->get_binary_comparator(),
+                                                                    this->translate_level_0(condition->get_function_expression_left(), repositories),
+                                                                    this->translate_level_0(condition->get_function_expression_right(), repositories)));
+    }
+    loki::Condition translate_level_2(loki::Condition condition, Repositories& repositories)
+    {
+        return std::visit([&](auto&& arg) -> loki::Condition { return this->translate_level_0(arg, repositories); }, condition->get_condition());
+    }
+    loki::Effect translate_level_2(loki::EffectLiteral effect, Repositories& repositories)
+    {
+        return repositories.get_or_create_effect(repositories.get_or_create_effect_literal(this->translate_level_0(effect->get_literal(), repositories)));
+    }
+    loki::Effect translate_level_2(loki::EffectAnd effect, Repositories& repositories)
+    {
+        return repositories.get_or_create_effect(repositories.get_or_create_effect_and(this->translate_level_0(effect->get_effects(), repositories)));
+    }
+    loki::Effect translate_level_2(loki::EffectNumeric effect, Repositories& repositories)
+    {
+        return repositories.get_or_create_effect(
+            repositories.get_or_create_effect_numeric(effect->get_assign_operator(),
+                                                      this->translate_level_0(effect->get_function(), repositories),
+                                                      this->translate_level_0(effect->get_function_expression(), repositories)));
+    }
+    loki::Effect translate_level_2(loki::EffectCompositeForall effect, Repositories& repositories)
+    {
+        return repositories.get_or_create_effect(
+            repositories.get_or_create_effect_composite_forall(this->translate_level_0(effect->get_parameters(), repositories),
+                                                               this->translate_level_0(effect->get_effect(), repositories)));
+    }
+    loki::Effect translate_level_2(loki::EffectCompositeWhen effect, Repositories& repositories)
+    {
+        return repositories.get_or_create_effect(
+            repositories.get_or_create_effect_composite_when(this->translate_level_0(effect->get_condition(), repositories),
+                                                             this->translate_level_0(effect->get_effect(), repositories)));
+    }
+    loki::Effect translate_level_2(loki::EffectCompositeOneof effect, Repositories& repositories)
+    {
+        return repositories.get_or_create_effect(
+            repositories.get_or_create_effect_composite_oneof(this->translate_level_0(effect->get_effects(), repositories)));
+    }
+    loki::Effect translate_level_2(loki::EffectCompositeProbabilistic effect, Repositories& repositories)
+    {
+        auto distribution = loki::EffectDistribution();
+        for (const auto& [probability, effect] : effect->get_effect_distribution())
+        {
+            distribution.emplace_back(probability, this->translate_level_0(effect, repositories));
+        }
+        return repositories.get_or_create_effect(repositories.get_or_create_effect_composite_probabilistic(distribution));
+    }
+    loki::Effect translate_level_2(loki::Effect effect, Repositories& repositories)
+    {
+        return std::visit([&](auto&& arg) -> loki::Effect { return this->translate_level_0(arg, repositories); }, effect->get_effect());
+    }
+    loki::FunctionExpression translate_level_2(loki::FunctionExpressionNumber function_expression, Repositories& repositories)
+    {
+        return repositories.get_or_create_function_expression(repositories.get_or_create_function_expression_number(function_expression->get_number()));
+    }
+    loki::FunctionExpression translate_level_2(loki::FunctionExpressionBinaryOperator function_expression, Repositories& repositories)
+    {
+        return repositories.get_or_create_function_expression(repositories.get_or_create_function_expression_binary_operator(
+            function_expression->get_binary_operator(),
+            this->translate_level_0(function_expression->get_left_function_expression(), repositories),
+            this->translate_level_0(function_expression->get_right_function_expression(), repositories)));
+    }
+    loki::FunctionExpression translate_level_2(loki::FunctionExpressionMultiOperator function_expression, Repositories& repositories)
+    {
+        return repositories.get_or_create_function_expression(repositories.get_or_create_function_expression_multi_operator(
+            function_expression->get_multi_operator(),
+            this->translate_level_0(function_expression->get_function_expressions(), repositories)));
+    }
+    loki::FunctionExpression translate_level_2(loki::FunctionExpressionMinus function_expression, Repositories& repositories)
+    {
+        return repositories.get_or_create_function_expression(
+            repositories.get_or_create_function_expression_minus(this->translate_level_0(function_expression->get_function_expression(), repositories)));
+    }
+    loki::FunctionExpression translate_level_2(loki::FunctionExpressionFunction function_expression, Repositories& repositories)
+    {
+        return repositories.get_or_create_function_expression(
+            repositories.get_or_create_function_expression_function(this->translate_level_0(function_expression->get_function(), repositories)));
+    }
+    loki::FunctionExpression translate_level_2(loki::FunctionExpression function_expression, Repositories& repositories)
+    {
+        return std::visit([&](auto&& arg) -> loki::FunctionExpression { return this->translate_level_0(arg, repositories); },
+                          function_expression->get_function_expression());
+    }
+    loki::FunctionSkeleton translate_level_2(loki::FunctionSkeleton function_skeleton, Repositories& repositories)
+    {
+        return repositories.get_or_create_function_skeleton(function_skeleton->get_name(),
+                                                            this->translate_level_0(function_skeleton->get_parameters(), repositories),
+                                                            this->translate_level_0(function_skeleton->get_type(), repositories));
+    }
+    loki::Function translate_level_2(loki::Function function, Repositories& repositories)
+    {
+        return repositories.get_or_create_function(this->translate_level_0(function->get_function_skeleton(), repositories),
+                                                   this->translate_level_0(function->get_terms(), repositories));
+    }
+    loki::Action translate_level_2(loki::Action action, Repositories& repositories)
+    {
+        return repositories.get_or_create_action(
+            action->get_name(),
+            action->get_original_arity(),
+            this->translate_level_0(action->get_parameters(), repositories),
+            (action->get_condition().has_value() ? std::optional<loki::Condition>(this->translate_level_0(action->get_condition().value(), repositories)) :
+                                                   std::nullopt),
+            (action->get_effect().has_value() ? std::optional<loki::Effect>(this->translate_level_0(action->get_effect().value(), repositories)) :
+                                                std::nullopt));
+    }
+    loki::Axiom translate_level_2(loki::Axiom axiom, Repositories& repositories)
+    {
+        return repositories.get_or_create_axiom(this->translate_level_0(axiom->get_parameters(), repositories),
+                                                this->translate_level_0(axiom->get_literal(), repositories),
+                                                this->translate_level_0(axiom->get_condition(), repositories));
+    }
+    loki::OptimizationMetric translate_level_2(loki::OptimizationMetric metric, Repositories& repositories)
+    {
+        return repositories.get_or_create_optimization_metric(metric->get_optimization_metric(),
+                                                              this->translate_level_0(metric->get_function_expression(), repositories));
+    }
 
     auto translate_level_1(const Domain& domain, DomainBuilder& builder) { return self().translate_level_2(domain, builder); }
 

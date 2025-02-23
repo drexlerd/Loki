@@ -54,6 +54,7 @@ public:
 
 extern std::ostream& operator<<(std::ostream& out, const TermImpl& element);
 
+extern std::ostream& operator<<(std::ostream& out, Term element);
 }
 
 #endif

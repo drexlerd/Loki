@@ -53,8 +53,13 @@ const std::optional<Effect>& ActionImpl::get_effect() const { return m_effect; }
 
 std::ostream& operator<<(std::ostream& out, const ActionImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, Action element)
+{
+    write<AddressTag>(*element, out);
     return out;
 }
 

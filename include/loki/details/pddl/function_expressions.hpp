@@ -247,6 +247,13 @@ extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionMinus
 extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionFunctionImpl& element);
 extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionImpl& element);
 
+extern std::ostream& operator<<(std::ostream& out, FunctionExpressionNumber element);
+extern std::ostream& operator<<(std::ostream& out, FunctionExpressionBinaryOperator element);
+extern std::ostream& operator<<(std::ostream& out, FunctionExpressionMultiOperator element);
+extern std::ostream& operator<<(std::ostream& out, FunctionExpressionMinus element);
+extern std::ostream& operator<<(std::ostream& out, FunctionExpressionFunction element);
+extern std::ostream& operator<<(std::ostream& out, FunctionExpression element);
+
 }
 
 #endif

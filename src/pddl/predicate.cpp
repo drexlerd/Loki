@@ -42,8 +42,13 @@ const ParameterList& PredicateImpl::get_parameters() const { return m_parameters
 
 std::ostream& operator<<(std::ostream& out, const PredicateImpl& element)
 {
-    auto formatter = PDDLFormatter();
-    formatter.write(element, out);
+    write<StringTag>(element, out);
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, Predicate element)
+{
+    write<AddressTag>(*element, out);
     return out;
 }
 

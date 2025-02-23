@@ -52,6 +52,8 @@ public:
 };
 
 extern std::ostream& operator<<(std::ostream& out, const LiteralImpl& element);
+
+extern std::ostream& operator<<(std::ostream& out, Literal element);
 }
 
 #endif

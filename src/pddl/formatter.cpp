@@ -25,169 +25,301 @@
 namespace loki
 {
 
-PDDLFormatter::PDDLFormatter(size_t indent, size_t add_indent) : m_indent(indent), m_add_indent(add_indent) {}
+/**
+ * Explicit templates
+ */
 
-void PDDLFormatter::write(const ActionImpl& element, std::ostream& out)
+template<>
+void write_untyped<AddressTag>(const TypeImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
-    out << std::string(m_indent, ' ') << "(:action " << element.get_name() << "\n";
+    out << reinterpret_cast<uintptr_t>(&element);
+}
 
-    m_indent += m_add_indent;
+template<>
+void write_untyped<AddressTag>(const ObjectImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    out << reinterpret_cast<uintptr_t>(&element);
+}
 
-    out << std::string(m_indent, ' ') << ":parameters (";
+template<>
+void write_untyped<AddressTag>(const VariableImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    out << reinterpret_cast<uintptr_t>(&element);
+}
+
+template<>
+void write_typed<AddressTag>(const TypeImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    out << reinterpret_cast<uintptr_t>(&element);
+    if (!element.get_bases().empty())
+    {
+        out << " - ";
+        if (element.get_bases().size() > 1)
+        {
+            out << "(either ";
+            for (size_t i = 0; i < element.get_bases().size(); ++i)
+            {
+                if (i != 0)
+                    out << " ";
+                write_untyped<AddressTag>(*element.get_bases()[i], out, indent, add_indent);
+            }
+            out << ")";
+        }
+        else if (element.get_bases().size() == 1)
+        {
+            write_untyped<AddressTag>(*element.get_bases().front(), out, indent, add_indent);
+        }
+    }
+}
+
+template<>
+void write_typed<AddressTag>(const ObjectImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    out << reinterpret_cast<uintptr_t>(&element);
+    if (!element.get_bases().empty())
+    {
+        out << " - ";
+        if (element.get_bases().size() > 1)
+        {
+            out << "(either ";
+            for (size_t i = 0; i < element.get_bases().size(); ++i)
+            {
+                if (i != 0)
+                    out << " ";
+                write_untyped<AddressTag>(*element.get_bases()[i], out, indent, add_indent);
+            }
+            out << ")";
+        }
+        else if (element.get_bases().size() == 1)
+        {
+            write_untyped<AddressTag>(*element.get_bases().front(), out, indent, add_indent);
+        }
+    }
+}
+
+template<>
+void write_typed<AddressTag>(const VariableImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    out << reinterpret_cast<uintptr_t>(&element);
+}
+
+/**
+ * Generic templates
+ */
+
+template<StringOrAddress T>
+void write(const ActionImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    out << std::string(indent, ' ') << "(:action " << element.get_name() << "\n";
+
+    indent += add_indent;
+
+    out << std::string(indent, ' ') << ":parameters (";
     for (size_t i = 0; i < element.get_parameters().size(); ++i)
     {
         if (i != 0)
             out << " ";
-        write(*element.get_parameters()[i], out);
+        write<T>(*element.get_parameters()[i], out, indent, add_indent);
     }
     out << ")";
     out << "\n";
-    out << std::string(m_indent, ' ') << ":conditions ";
+    out << std::string(indent, ' ') << ":conditions ";
     if (element.get_condition().has_value())
-        write(*element.get_condition().value(), out);
+        write<T>(*element.get_condition().value(), out, indent, add_indent);
     else
         out << "()";
 
     out << "\n";
-    out << std::string(m_indent, ' ') << ":effects ";
+    out << std::string(indent, ' ') << ":effects ";
     if (element.get_effect().has_value())
-        write(*element.get_effect().value(), out);
+        write<T>(*element.get_effect().value(), out, indent, add_indent);
     else
         out << "()";
     out << ")\n";
 
-    m_indent -= m_add_indent;
+    indent -= add_indent;
 }
 
-void PDDLFormatter::write(const AtomImpl& element, std::ostream& out)
+template void write<StringTag>(const ActionImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const ActionImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const AtomImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(" << element.get_predicate()->get_name();
     for (size_t i = 0; i < element.get_terms().size(); ++i)
     {
         out << " ";
-        write_untyped(*element.get_terms()[i], out);
+        write_untyped<T>(*element.get_terms()[i], out, indent, add_indent);
     }
     out << ")";
 }
 
-void PDDLFormatter::write(const AxiomImpl& element, std::ostream& out)
+template void write<StringTag>(const AtomImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const AtomImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const AxiomImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
-    out << std::string(m_indent, ' ') << "(:derived " << element.get_literal()->get_atom()->get_predicate()->get_name();
+    out << std::string(indent, ' ') << "(:derived " << element.get_literal()->get_atom()->get_predicate()->get_name();
     for (size_t i = 0; i < element.get_literal()->get_atom()->get_terms().size(); ++i)
     {
         out << " ";
-        write(*element.get_parameters()[i], out);
+        write<T>(*element.get_parameters()[i], out, indent, add_indent);
     }
     out << "\n";
 
-    m_indent += m_add_indent;
+    indent += add_indent;
 
-    out << std::string(m_indent, ' ');
-    write(*element.get_condition(), out);
+    out << std::string(indent, ' ');
+    write<T>(*element.get_condition(), out, indent, add_indent);
     out << ")\n";
 
-    m_indent -= m_add_indent;
+    indent -= add_indent;
 }
 
-void PDDLFormatter::write(const ConditionLiteralImpl& element, std::ostream& out) { write(*element.get_literal(), out); }
+template void write<StringTag>(const AxiomImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const AxiomImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
-void PDDLFormatter::write(const ConditionAndImpl& element, std::ostream& out)
+template<StringOrAddress T>
+void write(const ConditionLiteralImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    write<T>(*element.get_literal(), out, indent, add_indent);
+}
+
+template void write<StringTag>(const ConditionLiteralImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const ConditionLiteralImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const ConditionAndImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(and ";
     for (size_t i = 0; i < element.get_conditions().size(); ++i)
     {
         if (i != 0)
             out << " ";
-        write(*element.get_conditions()[i], out);
+        write<T>(*element.get_conditions()[i], out, indent, add_indent);
     }
     out << ")";
 }
 
-void PDDLFormatter::write(const ConditionOrImpl& element, std::ostream& out)
+template void write<StringTag>(const ConditionAndImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const ConditionAndImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const ConditionOrImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(or ";
     for (size_t i = 0; i < element.get_conditions().size(); ++i)
     {
         if (i != 0)
             out << " ";
-        write(*element.get_conditions()[i], out);
+        write<T>(*element.get_conditions()[i], out, indent, add_indent);
     }
     out << ")";
 }
 
-void PDDLFormatter::write(const ConditionNotImpl& element, std::ostream& out)
+template void write<StringTag>(const ConditionOrImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const ConditionOrImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const ConditionNotImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(not ";
-    write(*element.get_condition(), out);
+    write<T>(*element.get_condition(), out, indent, add_indent);
     out << ")";
 }
 
-void PDDLFormatter::write(const ConditionImplyImpl& element, std::ostream& out)
+template void write<StringTag>(const ConditionNotImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const ConditionNotImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const ConditionImplyImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(imply ";
-    write(*element.get_condition_left(), out);
+    write<T>(*element.get_condition_left(), out, indent, add_indent);
     out << " ";
-    write(*element.get_condition_right(), out);
+    write<T>(*element.get_condition_right(), out, indent, add_indent);
     out << ")";
 }
 
-void PDDLFormatter::write(const ConditionExistsImpl& element, std::ostream& out)
+template void write<StringTag>(const ConditionImplyImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const ConditionImplyImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const ConditionExistsImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(exists (";
     for (size_t i = 0; i < element.get_parameters().size(); ++i)
     {
         if (i != 0)
             out << " ";
-        write(*element.get_parameters()[i], out);
+        write<T>(*element.get_parameters()[i], out, indent, add_indent);
     }
     out << ") ";
-    write(*element.get_condition(), out);
+    write<T>(*element.get_condition(), out, indent, add_indent);
     out << ")";
 }
 
-void PDDLFormatter::write(const ConditionForallImpl& element, std::ostream& out)
+template void write<StringTag>(const ConditionExistsImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const ConditionExistsImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const ConditionForallImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(forall (";
     for (size_t i = 0; i < element.get_parameters().size(); ++i)
     {
         if (i != 0)
             out << " ";
-        write(*element.get_parameters()[i], out);
+        write<T>(*element.get_parameters()[i], out, indent, add_indent);
     }
     out << ") ";
-    write(*element.get_condition(), out);
+    write<T>(*element.get_condition(), out, indent, add_indent);
     out << ")";
 }
 
-void PDDLFormatter::write(const ConditionNumericConstraintImpl& element, std::ostream& out)
+template void write<StringTag>(const ConditionForallImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const ConditionForallImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const ConditionNumericConstraintImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(" << to_string(element.get_binary_comparator()) << " ";
-    write(*element.get_function_expression_left(), out);
+    write<T>(*element.get_function_expression_left(), out, indent, add_indent);
     out << " ";
-    write(*element.get_function_expression_right(), out);
+    write<T>(*element.get_function_expression_right(), out, indent, add_indent);
     out << ")";
 }
 
-void PDDLFormatter::write(const ConditionImpl& element, std::ostream& out)
+template void write<StringTag>(const ConditionNumericConstraintImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const ConditionNumericConstraintImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const ConditionImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
-    std::visit([this, &out](const auto& arg) { this->write(*arg, out); }, element.get_condition());
+    std::visit([&](const auto& arg) { write<T>(*arg, out, indent, add_indent); }, element.get_condition());
 }
 
-void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)
-{
-    out << std::string(m_indent, ' ') << "(define (domain " << element.get_name() << ")\n";
+template void write<StringTag>(const ConditionImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const ConditionImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
-    m_indent += m_add_indent;
+template<StringOrAddress T>
+void write(const DomainImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    out << std::string(indent, ' ') << "(define (domain " << element.get_name() << ")\n";
+
+    indent += add_indent;
 
     if (!element.get_requirements()->get_requirements().empty())
     {
-        out << std::string(m_indent, ' ');
-        write(*element.get_requirements(), out);
+        out << std::string(indent, ' ');
+        write<T>(*element.get_requirements(), out, indent, add_indent);
         out << "\n";
     }
     if (!element.get_types().empty())
     {
-        out << std::string(m_indent, ' ') << "(:types ";
+        out << std::string(indent, ' ') << "(:types ";
         std::unordered_map<TypeList, TypeList, Hash<TypeList>> subtypes_by_parent_types;
         for (const auto& type : element.get_types())
         {
@@ -201,13 +333,13 @@ void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)
         for (const auto& [types, sub_types] : subtypes_by_parent_types)
         {
             if (i != 0)
-                out << "\n" << std::string(m_indent, ' ');
+                out << "\n" << std::string(indent, ' ');
             for (size_t i = 0; i < sub_types.size(); ++i)
             {
                 if (i != 0)
                     out << " ";
 
-                write_untyped(*sub_types[i], out);
+                write_untyped<T>(*sub_types[i], out, indent, add_indent);
             }
             out << " - ";
             if (types.size() > 1)
@@ -217,13 +349,13 @@ void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)
                 {
                     if (i != 0)
                         out << " ";
-                    write_untyped(*types[i], out);
+                    write_untyped<T>(*types[i], out, indent, add_indent);
                 }
                 out << ")";
             }
             else if (types.size() == 1)
             {
-                write_untyped(*types.front(), out);
+                write_untyped<T>(*types.front(), out, indent, add_indent);
             }
             ++i;
         }
@@ -231,7 +363,7 @@ void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)
     }
     if (!element.get_constants().empty())
     {
-        out << std::string(m_indent, ' ') << "(:constants ";
+        out << std::string(indent, ' ') << "(:constants ";
         std::unordered_map<TypeList, ObjectList, Hash<TypeList>> constants_by_types;
         for (const auto& constant : element.get_constants())
         {
@@ -241,7 +373,7 @@ void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)
         for (const auto& pair : constants_by_types)
         {
             if (j != 0)
-                out << "\n" << std::string(m_indent, ' ');
+                out << "\n" << std::string(indent, ' ');
             const auto& constants = pair.second;
             for (size_t i = 0; i < constants.size(); ++i)
             {
@@ -249,11 +381,11 @@ void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)
                     out << " ";
                 if (i < constants.size() - 1 || !element.get_requirements()->test(RequirementEnum::TYPING))
                 {
-                    write_untyped(*constants[i], out);
+                    write_untyped<T>(*constants[i], out, indent, add_indent);
                 }
                 else
                 {
-                    write_typed(*constants[i], out);
+                    write_typed<T>(*constants[i], out, indent, add_indent);
                 }
             }
             ++j;
@@ -262,101 +394,132 @@ void PDDLFormatter::write(const DomainImpl& element, std::ostream& out)
     }
     if (!element.get_predicates().empty())
     {
-        out << std::string(m_indent, ' ') << "(:predicates ";
+        out << std::string(indent, ' ') << "(:predicates ";
         for (size_t i = 0; i < element.get_predicates().size(); ++i)
         {
             if (i != 0)
                 out << " ";
-            write(*element.get_predicates()[i], out);
+            write<T>(*element.get_predicates()[i], out, indent, add_indent);
         }
         out << ")\n";
     }
     if (!element.get_functions().empty())
     {
-        out << std::string(m_indent, ' ') << "(:functions ";
+        out << std::string(indent, ' ') << "(:functions ";
         for (size_t i = 0; i < element.get_functions().size(); ++i)
         {
             if (i != 0)
                 out << " ";
-            write(*element.get_functions()[i], out);
+            write<T>(*element.get_functions()[i], out, indent, add_indent);
         }
         out << ")\n";
     }
 
     for (const auto& action : element.get_actions())
     {
-        write(*action, out);
+        write<T>(*action, out, indent, add_indent);
     }
 
     for (const auto& axiom : element.get_axioms())
     {
-        write(*axiom, out);
+        write<T>(*axiom, out, indent, add_indent);
     }
 
-    m_indent -= m_add_indent;
+    indent -= add_indent;
 
-    out << std::string(m_indent, ' ') << ")";
+    out << std::string(indent, ' ') << ")";
 }
 
-void PDDLFormatter::write(const EffectLiteralImpl& element, std::ostream& out) { write(*element.get_literal(), out); }
+template void write<StringTag>(const DomainImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const DomainImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
-void PDDLFormatter::write(const EffectAndImpl& element, std::ostream& out)
+template<StringOrAddress T>
+void write(const EffectLiteralImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    write<T>(*element.get_literal(), out, indent, add_indent);
+}
+
+template void write<StringTag>(const EffectLiteralImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const EffectLiteralImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const EffectAndImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(and ";
     for (size_t i = 0; i < element.get_effects().size(); ++i)
     {
         if (i != 0)
             out << " ";
-        write(*element.get_effects()[i], out);
+        write<T>(*element.get_effects()[i], out, indent, add_indent);
     }
     out << ")";
 }
 
-void PDDLFormatter::write(const EffectNumericImpl& element, std::ostream& out)
+template void write<StringTag>(const EffectAndImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const EffectAndImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const EffectNumericImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(" << to_string(element.get_assign_operator()) << " ";
-    write(*element.get_function(), out);
+    write<T>(*element.get_function(), out, indent, add_indent);
     out << " ";
-    write(*element.get_function_expression(), out);
+    write<T>(*element.get_function_expression(), out, indent, add_indent);
     out << ")";
 }
 
-void PDDLFormatter::write(const EffectCompositeForallImpl& element, std::ostream& out)
+template void write<StringTag>(const EffectNumericImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const EffectNumericImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const EffectCompositeForallImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(forall (";
     for (size_t i = 0; i < element.get_parameters().size(); ++i)
     {
         if (i != 0)
             out << " ";
-        write(*element.get_parameters()[i], out);
+        write<T>(*element.get_parameters()[i], out, indent, add_indent);
     }
     out << ") ";
-    write(*element.get_effect(), out);
+    write<T>(*element.get_effect(), out, indent, add_indent);
     out << ")";
 }
 
-void PDDLFormatter::write(const EffectCompositeWhenImpl& element, std::ostream& out)
+template void write<StringTag>(const EffectCompositeForallImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const EffectCompositeForallImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const EffectCompositeWhenImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(when ";
-    write(*element.get_condition(), out);
+    write<T>(*element.get_condition(), out, indent, add_indent);
     out << " ";
-    write(*element.get_effect(), out);
+    write<T>(*element.get_effect(), out, indent, add_indent);
     out << ")";
 }
 
-void PDDLFormatter::write(const EffectCompositeOneofImpl& element, std::ostream& out)
+template void write<StringTag>(const EffectCompositeWhenImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const EffectCompositeWhenImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const EffectCompositeOneofImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(oneof ";
     for (size_t i = 0; i < element.get_effects().size(); ++i)
     {
         if (i != 0)
             out << " ";
-        write(*element.get_effects()[i], out);
+        write<T>(*element.get_effects()[i], out, indent, add_indent);
     }
     out << ")";
 }
 
-void PDDLFormatter::write(const EffectCompositeProbabilisticImpl& element, std::ostream& out)
+template void write<StringTag>(const EffectCompositeOneofImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const EffectCompositeOneofImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const EffectCompositeProbabilisticImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(probabilistic ";
     for (size_t i = 0; i < element.get_effect_distribution().size(); ++i)
@@ -367,65 +530,107 @@ void PDDLFormatter::write(const EffectCompositeProbabilisticImpl& element, std::
         const auto& [probability, possibility] = element.get_effect_distribution()[i];
 
         out << probability << " ";
-        write(*possibility, out);
+        write<T>(*possibility, out, indent, add_indent);
     }
     out << ")";
 }
 
-void PDDLFormatter::write(const EffectImpl& element, std::ostream& out)
+template void write<StringTag>(const EffectCompositeProbabilisticImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const EffectCompositeProbabilisticImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const EffectImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
-    std::visit([this, &out](const auto& arg) { this->write(*arg, out); }, element.get_effect());
+    std::visit([&](const auto& arg) { write<T>(*arg, out, indent, add_indent); }, element.get_effect());
 }
 
-void PDDLFormatter::write(const FunctionExpressionNumberImpl& element, std::ostream& out) { out << element.get_number(); }
+template void write<StringTag>(const EffectImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const EffectImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
-void PDDLFormatter::write(const FunctionExpressionBinaryOperatorImpl& element, std::ostream& out)
+template<StringOrAddress T>
+void write(const FunctionExpressionNumberImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    out << element.get_number();
+}
+
+template void write<StringTag>(const FunctionExpressionNumberImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const FunctionExpressionNumberImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const FunctionExpressionBinaryOperatorImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(" << to_string(element.get_binary_operator()) << " ";
-    write(*element.get_left_function_expression(), out);
+    write<T>(*element.get_left_function_expression(), out, indent, add_indent);
     out << " ";
-    write(*element.get_right_function_expression(), out);
+    write<T>(*element.get_right_function_expression(), out, indent, add_indent);
     out << ")";
 }
 
-void PDDLFormatter::write(const FunctionExpressionMultiOperatorImpl& element, std::ostream& out)
+template void write<StringTag>(const FunctionExpressionBinaryOperatorImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const FunctionExpressionBinaryOperatorImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const FunctionExpressionMultiOperatorImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(" << to_string(element.get_multi_operator());
     assert(!element.get_function_expressions().empty());
     for (const auto& function_expression : element.get_function_expressions())
     {
         out << " ";
-        write(*function_expression, out);
+        write<T>(*function_expression, out, indent, add_indent);
     }
     out << ")";
 }
 
-void PDDLFormatter::write(const FunctionExpressionMinusImpl& element, std::ostream& out)
+template void write<StringTag>(const FunctionExpressionMultiOperatorImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const FunctionExpressionMultiOperatorImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const FunctionExpressionMinusImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(- ";
-    write(*element.get_function_expression(), out);
+    write<T>(*element.get_function_expression(), out, indent, add_indent);
     out << ")";
 }
 
-void PDDLFormatter::write(const FunctionExpressionFunctionImpl& element, std::ostream& out) { write(*element.get_function(), out); }
+template void write<StringTag>(const FunctionExpressionMinusImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const FunctionExpressionMinusImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
-void PDDLFormatter::write(const FunctionExpressionImpl& element, std::ostream& out)
+template<StringOrAddress T>
+void write(const FunctionExpressionFunctionImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
-    std::visit([this, &out](const auto& arg) { this->write(*arg, out); }, element.get_function_expression());
+    write<T>(*element.get_function(), out, indent, add_indent);
 }
 
-void PDDLFormatter::write(const FunctionSkeletonImpl& element, std::ostream& out)
+template void write<StringTag>(const FunctionExpressionFunctionImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const FunctionExpressionFunctionImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const FunctionExpressionImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    std::visit([&](const auto& arg) { write<T>(*arg, out, indent, add_indent); }, element.get_function_expression());
+}
+
+template void write<StringTag>(const FunctionExpressionImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const FunctionExpressionImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const FunctionSkeletonImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(" << element.get_name();
     for (size_t i = 0; i < element.get_parameters().size(); ++i)
     {
         out << " ";
-        write(*element.get_parameters()[i], out);
+        write<T>(*element.get_parameters()[i], out, indent, add_indent);
     }
     out << ")";
 }
 
-void PDDLFormatter::write(const FunctionImpl& element, std::ostream& out)
+template void write<StringTag>(const FunctionSkeletonImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const FunctionSkeletonImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const FunctionImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     if (element.get_terms().empty())
     {
@@ -438,43 +643,59 @@ void PDDLFormatter::write(const FunctionImpl& element, std::ostream& out)
         {
             if (i != 0)
                 out << " ";
-            write_untyped(*element.get_terms()[i], out);
+            write_untyped<T>(*element.get_terms()[i], out, indent, add_indent);
         }
         out << "))";
     }
 }
 
-void PDDLFormatter::write(const LiteralImpl& element, std::ostream& out)
+template void write<StringTag>(const FunctionImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const FunctionImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const LiteralImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     if (element.is_negated())
     {
         out << "(not ";
-        write(*element.get_atom(), out);
+        write<T>(*element.get_atom(), out, indent, add_indent);
         out << ")";
     }
     else
     {
-        write(*element.get_atom(), out);
+        write<T>(*element.get_atom(), out, indent, add_indent);
     }
 }
 
-void PDDLFormatter::write(const OptimizationMetricImpl& element, std::ostream& out)
+template void write<StringTag>(const LiteralImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const LiteralImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const OptimizationMetricImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(" << to_string(element.get_optimization_metric()) << " ";
-    write(*element.get_function_expression(), out);
+    write<T>(*element.get_function_expression(), out, indent, add_indent);
     out << ")";
 }
 
-void PDDLFormatter::write(const FunctionValueImpl& element, std::ostream& out)
+template void write<StringTag>(const OptimizationMetricImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const OptimizationMetricImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const FunctionValueImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(= ";
-    write(*element.get_function(), out);
+    write<T>(*element.get_function(), out, indent, add_indent);
     out << " " << element.get_number() << ")";
 }
 
-void PDDLFormatter::write(const ParameterImpl& element, std::ostream& out)
+template void write<StringTag>(const FunctionValueImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const FunctionValueImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const ParameterImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
-    out << element.get_variable()->get_name();
+    write_untyped<T>(*element.get_variable(), out, indent, add_indent);
     if (!element.get_bases().empty())
     {
         out << " - ";
@@ -485,45 +706,53 @@ void PDDLFormatter::write(const ParameterImpl& element, std::ostream& out)
             {
                 if (i != 0)
                     out << " ";
-                write_untyped(*element.get_bases()[i], out);
+                write_untyped<T>(*element.get_bases()[i], out, indent, add_indent);
             }
             out << ")";
         }
         else if (element.get_bases().size() == 1)
         {
-            write_untyped(*element.get_bases().front(), out);
+            write_untyped<T>(*element.get_bases().front(), out, indent, add_indent);
         }
     }
 }
 
-void PDDLFormatter::write(const PredicateImpl& element, std::ostream& out)
+template void write<StringTag>(const ParameterImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const ParameterImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const PredicateImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(" << element.get_name();
     for (size_t i = 0; i < element.get_parameters().size(); ++i)
     {
         out << " ";
-        write(*element.get_parameters()[i], out);
+        write<T>(*element.get_parameters()[i], out, indent, add_indent);
     }
     out << ")";
 }
 
-void PDDLFormatter::write(const ProblemImpl& element, std::ostream& out)
+template void write<StringTag>(const PredicateImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const PredicateImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const ProblemImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
-    out << std::string(m_indent, ' ') << "(define (problem " << element.get_name() << ")\n";
+    out << std::string(indent, ' ') << "(define (problem " << element.get_name() << ")\n";
 
-    m_indent += m_add_indent;
+    indent += add_indent;
 
-    out << std::string(m_indent, ' ') << "(:domain " << element.get_domain()->get_name() << ")\n";
+    out << std::string(indent, ' ') << "(:domain " << element.get_domain()->get_name() << ")\n";
     if (!element.get_requirements()->get_requirements().empty())
     {
-        out << std::string(m_indent, ' ');
-        write(*element.get_requirements(), out);
+        out << std::string(indent, ' ');
+        write<T>(*element.get_requirements(), out, indent, add_indent);
         out << "\n";
     }
 
     if (!element.get_objects().empty())
     {
-        out << std::string(m_indent, ' ') << "(:objects ";
+        out << std::string(indent, ' ') << "(:objects ";
         std::unordered_map<TypeList, ObjectList, Hash<TypeList>> objects_by_types;
         for (const auto& object : element.get_objects())
         {
@@ -533,7 +762,7 @@ void PDDLFormatter::write(const ProblemImpl& element, std::ostream& out)
         for (const auto& [types, objects] : objects_by_types)
         {
             if (j != 0)
-                out << "\n" << std::string(m_indent, ' ');
+                out << "\n" << std::string(indent, ' ');
             for (size_t i = 0; i < objects.size(); ++i)
             {
                 if (i != 0)
@@ -542,11 +771,11 @@ void PDDLFormatter::write(const ProblemImpl& element, std::ostream& out)
                 }
                 if (i < objects.size() - 1 || !element.get_domain()->get_requirements()->test(RequirementEnum::TYPING))
                 {
-                    write_untyped(*objects[i], out);
+                    write_untyped<T>(*objects[i], out, indent, add_indent);
                 }
                 else
                 {
-                    write_typed(*objects[i], out);
+                    write_typed<T>(*objects[i], out, indent, add_indent);
                 }
             }
             ++j;
@@ -556,58 +785,62 @@ void PDDLFormatter::write(const ProblemImpl& element, std::ostream& out)
 
     if (!element.get_predicates().empty())
     {
-        out << std::string(m_indent, ' ') << "(:predicates ";
+        out << std::string(indent, ' ') << "(:predicates ";
         for (size_t i = 0; i < element.get_predicates().size(); ++i)
         {
             if (i != 0)
                 out << " ";
-            write(*element.get_predicates()[i], out);
+            write<T>(*element.get_predicates()[i], out, indent, add_indent);
         }
         out << ")\n";
     }
 
     if (!(element.get_initial_literals().empty() && element.get_function_values().empty()))
     {
-        out << std::string(m_indent, ' ') << "(:init ";
+        out << std::string(indent, ' ') << "(:init ";
         for (size_t i = 0; i < element.get_initial_literals().size(); ++i)
         {
             if (i != 0)
                 out << " ";
-            write(*element.get_initial_literals()[i], out);
+            write<T>(*element.get_initial_literals()[i], out, indent, add_indent);
         }
         for (size_t i = 0; i < element.get_function_values().size(); ++i)
         {
             out << " ";
-            write(*element.get_function_values()[i], out);
+            write<T>(*element.get_function_values()[i], out, indent, add_indent);
         }
     }
     out << ")\n";
 
     if (element.get_goal_condition().has_value())
     {
-        out << std::string(m_indent, ' ') << "(:goal ";
-        write(*element.get_goal_condition().value(), out);
+        out << std::string(indent, ' ') << "(:goal ";
+        write<T>(*element.get_goal_condition().value(), out, indent, add_indent);
         out << ")\n";
     }
 
     if (element.get_optimization_metric().has_value())
     {
-        out << std::string(m_indent, ' ') << "(:metric ";
-        write(*element.get_optimization_metric().value(), out);
+        out << std::string(indent, ' ') << "(:metric ";
+        write<T>(*element.get_optimization_metric().value(), out, indent, add_indent);
         out << ")\n";
     }
 
     for (const auto& axiom : element.get_axioms())
     {
-        write(*axiom, out);
+        write<T>(*axiom, out, indent, add_indent);
     }
 
-    m_indent -= m_add_indent;
+    indent -= add_indent;
 
-    out << std::string(m_indent, ' ') << ")";
+    out << std::string(indent, ' ') << ")";
 }
 
-void PDDLFormatter::write(const RequirementsImpl& element, std::ostream& out)
+template void write<StringTag>(const ProblemImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const ProblemImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write(const RequirementsImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << "(:requirements ";
     int i = 0;
@@ -621,18 +854,44 @@ void PDDLFormatter::write(const RequirementsImpl& element, std::ostream& out)
     out << ")";
 }
 
-void PDDLFormatter::write_untyped(const TypeImpl& element, std::ostream& out) { out << element.get_name(); }
+template void write<StringTag>(const RequirementsImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write<AddressTag>(const RequirementsImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
-void PDDLFormatter::write_untyped(const TermImpl& element, std::ostream& out)
+template<StringOrAddress T>
+void write_untyped(const TypeImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
-    std::visit([this, &out](const auto& arg) { this->write_untyped(*arg, out); }, element.get_object_or_variable());
+    out << element.get_name();
 }
 
-void PDDLFormatter::write_untyped(const ObjectImpl& element, std::ostream& out) { out << element.get_name(); }
+template void write_untyped<StringTag>(const TypeImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
-void PDDLFormatter::write_untyped(const VariableImpl& element, std::ostream& out) { out << element.get_name(); }
+template<StringOrAddress T>
+void write_untyped(const TermImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    std::visit([&](const auto& arg) { write_untyped<T>(*arg, out, indent, add_indent); }, element.get_object_or_variable());
+}
 
-void PDDLFormatter::write_typed(const TypeImpl& element, std::ostream& out)
+template void write_untyped<StringTag>(const TermImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write_untyped<AddressTag>(const TermImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write_untyped(const ObjectImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    out << element.get_name();
+}
+
+template void write_untyped<StringTag>(const ObjectImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write_untyped(const VariableImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    out << element.get_name();
+}
+
+template void write_untyped<StringTag>(const VariableImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write_typed(const TypeImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << element.get_name();
     if (!element.get_bases().empty())
@@ -645,23 +904,30 @@ void PDDLFormatter::write_typed(const TypeImpl& element, std::ostream& out)
             {
                 if (i != 0)
                     out << " ";
-                write_untyped(*element.get_bases()[i], out);
+                write_untyped<T>(*element.get_bases()[i], out, indent, add_indent);
             }
             out << ")";
         }
         else if (element.get_bases().size() == 1)
         {
-            write_untyped(*element.get_bases().front(), out);
+            write_untyped<T>(*element.get_bases().front(), out, indent, add_indent);
         }
     }
 }
 
-void PDDLFormatter::write_typed(const TermImpl& element, std::ostream& out)
+template void write_typed<StringTag>(const TypeImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write_typed(const TermImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
-    std::visit([this, &out](const auto& arg) { this->write_typed(*arg, out); }, element.get_object_or_variable());
+    std::visit([&](const auto& arg) { write_typed<T>(*arg, out, indent, add_indent); }, element.get_object_or_variable());
 }
 
-void PDDLFormatter::write_typed(const ObjectImpl& element, std::ostream& out)
+template void write_typed<StringTag>(const TermImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+template void write_typed<AddressTag>(const TermImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write_typed(const ObjectImpl& element, std::ostream& out, size_t indent, size_t add_indent)
 {
     out << element.get_name();
     if (!element.get_bases().empty())
@@ -674,17 +940,25 @@ void PDDLFormatter::write_typed(const ObjectImpl& element, std::ostream& out)
             {
                 if (i != 0)
                     out << " ";
-                write_untyped(*element.get_bases()[i], out);
+                write_untyped<T>(*element.get_bases()[i], out, indent, add_indent);
             }
             out << ")";
         }
         else if (element.get_bases().size() == 1)
         {
-            write_untyped(*element.get_bases().front(), out);
+            write_untyped<T>(*element.get_bases().front(), out, indent, add_indent);
         }
     }
 }
 
-void PDDLFormatter::write_typed(const VariableImpl& element, std::ostream& out) { out << element.get_name(); }
+template void write_typed<StringTag>(const ObjectImpl& element, std::ostream& out, size_t indent, size_t add_indent);
+
+template<StringOrAddress T>
+void write_typed(const VariableImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+{
+    out << element.get_name();
+}
+
+template void write_typed<StringTag>(const VariableImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
 }

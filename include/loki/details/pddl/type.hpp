@@ -59,6 +59,7 @@ extern bool is_subtype_or_equal(const Type& type, const TypeList& parent_types);
 
 extern std::ostream& operator<<(std::ostream& out, const TypeImpl& element);
 
+extern std::ostream& operator<<(std::ostream& out, Type element);
 }
 
 #endif
