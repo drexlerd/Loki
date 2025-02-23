@@ -18,6 +18,7 @@
 #include "loki/details/pddl/domain_builder.hpp"
 
 #include "loki/details/pddl/domain.hpp"
+#include "loki/details/utils/collections.hpp"
 
 namespace loki
 {
@@ -35,6 +36,7 @@ static void verify_indexing_scheme(const std::vector<const T*>& elements, const 
 
 Domain DomainBuilder::get_result()
 {
+    m_types = uniquify_elements(m_types);  ///< We explicitly add "object" and "number" which may result in duplicates, so we filter them out.
     std::sort(m_types.begin(), m_types.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
     verify_indexing_scheme(m_types, "DomainBuilder::get_result: types must follow and indexing scheme");
 

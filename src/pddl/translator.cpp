@@ -32,14 +32,21 @@ DomainTranslationResult::DomainTranslationResult(Domain original_domain, Domain 
 
 DomainTranslationResult translate(const Domain& domain)
 {
+    std::cout << "Given domain" << std::endl;
+    std::cout << domain << std::endl;
+
     auto to_negation_normal_form_translator = ToNegationNormalFormTranslator();
     auto builder = DomainBuilder();
     auto translated_domain = to_negation_normal_form_translator.translate_level_0(domain, builder);
+
+    std::cout << "ToNegationNormalFormTranslator result:" << std::endl;
+    std::cout << translated_domain << std::endl;
 
     auto remove_types_translator = RemoveTypesTranslator();
     builder = DomainBuilder();
     translated_domain = remove_types_translator.translate_level_0(translated_domain, builder);
 
+    std::cout << "RemoveTypesTranslator result:" << std::endl;
     std::cout << translated_domain << std::endl;
 
     auto rename_quantified_variables_translator = RenameQuantifiedVariablesTranslator();

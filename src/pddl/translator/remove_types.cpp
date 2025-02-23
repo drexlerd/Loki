@@ -84,11 +84,6 @@ static LiteralList typed_object_to_literals(Object object, Repositories& reposit
     return additional_literals;
 }
 
-static Parameter typed_parameter_to_untyped_parameter(Parameter parameter, Repositories& repositories)
-{
-    return repositories.get_or_create_parameter(parameter->get_variable(), TypeList {});
-}
-
 static ConditionList
 typed_parameter_to_condition_literals(Parameter parameter, Repositories& repositories, std::unordered_map<Type, Predicate>& type_to_predicate_mapper)
 {
@@ -109,7 +104,7 @@ Object RemoveTypesTranslator::translate_level_2(Object object, Repositories& rep
 
 Parameter RemoveTypesTranslator::translate_level_2(Parameter parameter, Repositories& repositories)
 {
-    return typed_parameter_to_untyped_parameter(parameter, repositories);
+    return repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {});
 }
 
 Condition RemoveTypesTranslator::translate_level_2(ConditionExists condition, Repositories& repositories)
@@ -119,7 +114,7 @@ Condition RemoveTypesTranslator::translate_level_2(ConditionExists condition, Re
 
     // Translate condition
     auto conditions = ConditionList {};
-    for (const auto& parameter : condition->get_parameters())
+    for (const auto& parameter : translated_parameters)
     {
         auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, this->m_type_to_predicates);
         conditions.insert(conditions.end(), additional_conditions.begin(), additional_conditions.end());
@@ -138,7 +133,7 @@ Condition RemoveTypesTranslator::translate_level_2(ConditionForall condition, Re
 
     // Translate condition
     auto conditions = ConditionList {};
-    for (const auto& parameter : condition->get_parameters())
+    for (const auto& parameter : translated_parameters)
     {
         auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, this->m_type_to_predicates);
         conditions.insert(conditions.end(), additional_conditions.begin(), additional_conditions.end());
@@ -157,7 +152,7 @@ Effect RemoveTypesTranslator::translate_level_2(EffectCompositeForall effect, Re
 
     // Translate condition
     auto conditions = ConditionList {};
-    for (const auto& parameter : effect->get_parameters())
+    for (const auto& parameter : translated_parameters)
     {
         auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, this->m_type_to_predicates);
         conditions.insert(conditions.end(), additional_conditions.begin(), additional_conditions.end());
@@ -179,7 +174,7 @@ Axiom RemoveTypesTranslator::translate_level_2(Axiom axiom, Repositories& reposi
 
     // Translate condition
     auto conditions = ConditionList {};
-    for (const auto& parameter : axiom->get_parameters())
+    for (const auto& parameter : translated_parameters)
     {
         auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, this->m_type_to_predicates);
         conditions.insert(conditions.end(), additional_conditions.begin(), additional_conditions.end());
@@ -200,7 +195,7 @@ Action RemoveTypesTranslator::translate_level_2(Action action, Repositories& rep
 
     // Translate condition
     auto conditions = ConditionList {};
-    for (const auto& parameter : action->get_parameters())
+    for (const auto& parameter : translated_parameters)
     {
         auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, this->m_type_to_predicates);
         conditions.insert(conditions.end(), additional_conditions.begin(), additional_conditions.end());

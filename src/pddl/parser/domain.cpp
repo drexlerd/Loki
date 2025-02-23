@@ -41,6 +41,8 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
     const auto base_type_number = context.builder.get_repositories().get_or_create_type("number", TypeList());
     context.scopes.top().insert_type("object", base_type_object, {});
     context.scopes.top().insert_type("number", base_type_number, {});
+    context.builder.get_types().push_back(base_type_object);
+    context.builder.get_types().push_back(base_type_number);
 
     /* Domain name */
     context.builder.get_name() = parse(node.domain_name.name);
