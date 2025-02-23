@@ -79,21 +79,26 @@ Condition RemoveUniversalQuantifiersTranslator::translate_level_2(ConditionExist
 
 Condition RemoveUniversalQuantifiersTranslator::translate_level_2(ConditionForall condition, Repositories& repositories)
 {
-    const auto& scope = m_scopes.open_scope(condition->get_parameters());
+    const auto translated_condition_parameters = this->translate_level_0(condition->get_parameters(), repositories);
+
+    const auto& scope = m_scopes.open_scope(translated_condition_parameters);
 
     // Free(exists(vars, phi)) become parameters. We obtain their types from the parameters in the parent scope.
     auto translated_head_parameters = ParameterList {};
     auto translated_terms = TermList {};
 
     // Note: free variable is not translated for
-    for (const auto free_variable : collect_free_variables(
-             *repositories.get_or_create_condition(repositories.get_or_create_condition_forall(condition->get_parameters(), condition->get_condition()))))
-    {
-        const auto optional_parameter = scope.get_parameter(free_variable);
-        assert(optional_parameter.has_value());
+    const auto free_variables_set = collect_free_variables(
+        *repositories.get_or_create_condition(repositories.get_or_create_condition_forall(condition->get_parameters(), condition->get_condition())));
+    const auto free_variables_vec = VariableList { free_variables_set.begin(), free_variables_set.end() };
+    const auto translated_free_variables = this->translate_level_0(free_variables_vec, repositories);
 
-        const auto translated_free_variable = this->translate_level_0(free_variable, repositories);
-        const auto translated_bases = this->translate_level_0(optional_parameter.value()->get_bases(), repositories);
+    for (const auto translated_free_variable : translated_free_variables)
+    {
+        const auto translated_optional_parameter = scope.get_parameter(translated_free_variable);
+        assert(translated_optional_parameter.has_value());  // types might be empty if translated away
+
+        const auto translated_bases = translated_optional_parameter.value()->get_bases();
 
         const auto parameter = repositories.get_or_create_parameter(translated_free_variable, translated_bases);
         translated_head_parameters.push_back(parameter);
@@ -101,7 +106,6 @@ Condition RemoveUniversalQuantifiersTranslator::translate_level_2(ConditionForal
     }
     // Important: all other parameters are appended to the axiom parameters
     auto translated_axiom_parameters = translated_head_parameters;
-    const auto translated_condition_parameters = this->translate_level_0(condition->get_parameters(), repositories);
     translated_axiom_parameters.insert(translated_axiom_parameters.end(), translated_condition_parameters.begin(), translated_condition_parameters.end());
     translated_head_parameters.shrink_to_fit();
     translated_axiom_parameters.shrink_to_fit();
@@ -136,16 +140,14 @@ Condition RemoveUniversalQuantifiersTranslator::translate_level_2(ConditionForal
 
 Action RemoveUniversalQuantifiersTranslator::translate_level_2(Action action, Repositories& repositories)
 {
-    this->m_scopes.open_scope(action->get_parameters());
+    auto translated_parameters = translate_level_0(action->get_parameters(), repositories);
 
-    // Translate condition and effect
+    this->m_scopes.open_scope(translated_parameters);
+
     auto translated_condition =
         (action->get_condition().has_value() ? std::optional<Condition>(translate_level_0(action->get_condition().value(), repositories)) : std::nullopt);
     auto translated_effect =
         (action->get_effect().has_value() ? std::optional<Effect>(translate_level_0(action->get_effect().value(), repositories)) : std::nullopt);
-
-    // Turn free variables into parameters
-    auto translated_parameters = translate_level_0(action->get_parameters(), repositories);
 
     auto translated_action =
         repositories.get_or_create_action(action->get_name(), action->get_original_arity(), translated_parameters, translated_condition, translated_effect);
@@ -157,14 +159,12 @@ Action RemoveUniversalQuantifiersTranslator::translate_level_2(Action action, Re
 
 Axiom RemoveUniversalQuantifiersTranslator::translate_level_2(Axiom axiom, Repositories& repositories)
 {
-    this->m_scopes.open_scope(axiom->get_parameters());
+    auto translated_parameters = translate_level_0(axiom->get_parameters(), repositories);
 
-    // Translate condition and literal
+    this->m_scopes.open_scope(translated_parameters);
+
     auto translated_literal = translate_level_0(axiom->get_literal(), repositories);
     auto translated_condition = translate_level_0(axiom->get_condition(), repositories);
-
-    // Turn free variables into parameters
-    auto translated_parameters = translate_level_0(axiom->get_parameters(), repositories);
 
     auto translated_axiom = repositories.get_or_create_axiom(translated_parameters, translated_literal, translated_condition);
 
