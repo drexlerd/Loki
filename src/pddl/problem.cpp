@@ -62,7 +62,7 @@ ProblemImpl::ProblemImpl(size_t index,
     m_predicates(std::move(predicates)),
     m_problem_and_domain_predicates(std::move(problem_and_domain_predicates)),
     m_initial_literals(std::move(initial_literals)),
-    m_function_values(std::move(function_values)),
+    m_initial_function_values(std::move(function_values)),
     m_goal_condition(std::move(goal_condition)),
     m_optimization_metric(std::move(optimization_metric)),
     m_axioms(std::move(axioms)),
@@ -92,7 +92,7 @@ const PredicateList& ProblemImpl::get_problem_and_domain_predicates() const { re
 
 const LiteralList& ProblemImpl::get_initial_literals() const { return m_initial_literals; }
 
-const FunctionValueList& ProblemImpl::get_function_values() const { return m_function_values; }
+const FunctionValueList& ProblemImpl::get_initial_function_values() const { return m_initial_function_values; }
 
 const std::optional<Condition>& ProblemImpl::get_goal_condition() const { return m_goal_condition; }
 

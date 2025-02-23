@@ -38,7 +38,7 @@ private:
     TypeList m_types;
     ObjectList m_constants;
     PredicateList m_predicates;
-    FunctionSkeletonList m_functions;
+    FunctionSkeletonList m_function_skeletons;
     ActionList m_actions;
     AxiomList m_axioms;
 
@@ -49,7 +49,7 @@ private:
                TypeList types,
                ObjectList constants,
                PredicateList predicates,
-               FunctionSkeletonList functions,
+               FunctionSkeletonList function_skeletons,
                ActionList actions,
                AxiomList axioms);
 
@@ -69,7 +69,7 @@ public:
     const TypeList& get_types() const;
     const ObjectList& get_constants() const;
     const PredicateList& get_predicates() const;
-    const FunctionSkeletonList& get_functions() const;
+    const FunctionSkeletonList& get_function_skeletons() const;
     const ActionList& get_actions() const;
     const AxiomList& get_axioms() const;
 
@@ -80,7 +80,7 @@ public:
                                      std::as_const(m_types),
                                      std::as_const(m_constants),
                                      std::as_const(m_predicates),
-                                     std::as_const(m_functions),
+                                     std::as_const(m_function_skeletons),
                                      std::as_const(m_actions),
                                      std::as_const(m_axioms));
     }

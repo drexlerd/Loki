@@ -49,7 +49,7 @@ DomainImpl::DomainImpl(Repositories repositories,
     m_types(std::move(types)),
     m_constants(std::move(constants)),
     m_predicates(std::move(predicates)),
-    m_functions(std::move(functions)),
+    m_function_skeletons(std::move(functions)),
     m_actions(std::move(actions)),
     m_axioms(std::move(axioms))
 {
@@ -69,7 +69,7 @@ const ObjectList& DomainImpl::get_constants() const { return m_constants; }
 
 const PredicateList& DomainImpl::get_predicates() const { return m_predicates; }
 
-const FunctionSkeletonList& DomainImpl::get_functions() const { return m_functions; }
+const FunctionSkeletonList& DomainImpl::get_function_skeletons() const { return m_function_skeletons; }
 
 const ActionList& DomainImpl::get_actions() const { return m_actions; }
 

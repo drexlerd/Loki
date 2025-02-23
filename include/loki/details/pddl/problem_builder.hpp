@@ -75,7 +75,7 @@ public:
     ObjectList& get_objects();
     PredicateList& get_predicates();
     LiteralList& get_initial_literals();
-    FunctionValueList& get_function_values();
+    FunctionValueList& get_initial_function_values();
     std::optional<Condition>& get_goal_condition();
     std::optional<OptimizationMetric>& get_optimization_metric();
     AxiomList& get_axioms();

@@ -230,7 +230,7 @@ Domain RemoveTypesTranslator::translate_level_2(const Domain& domain, DomainBuil
     builder.get_predicates().insert(builder.get_predicates().end(), translated_predicates.begin(), translated_predicates.end());
 
     // Translate function skeletons
-    const auto translated_function_skeletons = this->translate_level_0(domain->get_functions(), repositories);
+    const auto translated_function_skeletons = this->translate_level_0(domain->get_function_skeletons(), repositories);
     builder.get_function_skeletons().insert(builder.get_function_skeletons().end(), translated_function_skeletons.begin(), translated_function_skeletons.end());
 
     // Translate actions
@@ -283,8 +283,10 @@ Problem RemoveTypesTranslator::translate_level_2(const Problem& problem, Problem
     const auto translated_initial_literals = this->translate_level_0(problem->get_initial_literals(), repositories);
     builder.get_initial_literals().insert(builder.get_initial_literals().end(), translated_initial_literals.begin(), translated_initial_literals.end());
 
-    const auto translated_function_values = this->translate_level_0(problem->get_function_values(), repositories);
-    builder.get_function_values().insert(builder.get_function_values().end(), translated_function_values.begin(), translated_function_values.end());
+    const auto translated_function_values = this->translate_level_0(problem->get_initial_function_values(), repositories);
+    builder.get_initial_function_values().insert(builder.get_initial_function_values().end(),
+                                                 translated_function_values.begin(),
+                                                 translated_function_values.end());
 
     if (problem->get_goal_condition().has_value())
         builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition().value(), repositories);

@@ -97,7 +97,7 @@ TEST(LokiTests, LokiPddlTranslatorTest)
     {
         // Check that problem does not introduce function skeleton with same name as function skeleton in domain.
         auto domain_function_skeletons = std::unordered_map<std::string, FunctionSkeleton> {};
-        for (const auto& function_skeleton : translated_domain->get_functions())
+        for (const auto& function_skeleton : translated_domain->get_function_skeletons())
         {
             domain_function_skeletons.emplace(function_skeleton->get_name(), function_skeleton);
         }
@@ -110,6 +110,18 @@ TEST(LokiTests, LokiPddlTranslatorTest)
             {
                 EXPECT_EQ(function_skeleton, domain_function_skeletons.at(function_skeleton->get_name()));
             }
+        }
+    }
+
+    {
+        // Check that all constants and objects are untyped
+        for (const auto& constant : domain->get_constants())
+        {
+            EXPECT_EQ(constant->get_bases().size(), 0);
+        }
+        for (const auto& object : problem->get_objects())
+        {
+            EXPECT_EQ(object->get_bases().size(), 0);
         }
     }
 }

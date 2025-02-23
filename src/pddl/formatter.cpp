@@ -30,19 +30,19 @@ namespace loki
  */
 
 template<>
-void write_untyped<AddressTag>(const TypeImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+void write_untyped<AddressTag>(const TypeImpl& element, std::ostream& out, size_t, size_t)
 {
     out << reinterpret_cast<uintptr_t>(&element);
 }
 
 template<>
-void write_untyped<AddressTag>(const ObjectImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+void write_untyped<AddressTag>(const ObjectImpl& element, std::ostream& out, size_t, size_t)
 {
     out << reinterpret_cast<uintptr_t>(&element);
 }
 
 template<>
-void write_untyped<AddressTag>(const VariableImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+void write_untyped<AddressTag>(const VariableImpl& element, std::ostream& out, size_t, size_t)
 {
     out << reinterpret_cast<uintptr_t>(&element);
 }
@@ -98,7 +98,7 @@ void write_typed<AddressTag>(const ObjectImpl& element, std::ostream& out, size_
 }
 
 template<>
-void write_typed<AddressTag>(const VariableImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+void write_typed<AddressTag>(const VariableImpl& element, std::ostream& out, size_t, size_t)
 {
     out << reinterpret_cast<uintptr_t>(&element);
 }
@@ -403,14 +403,14 @@ void write(const DomainImpl& element, std::ostream& out, size_t indent, size_t a
         }
         out << ")\n";
     }
-    if (!element.get_functions().empty())
+    if (!element.get_function_skeletons().empty())
     {
         out << std::string(indent, ' ') << "(:functions ";
-        for (size_t i = 0; i < element.get_functions().size(); ++i)
+        for (size_t i = 0; i < element.get_function_skeletons().size(); ++i)
         {
             if (i != 0)
                 out << " ";
-            write<T>(*element.get_functions()[i], out, indent, add_indent);
+            write<T>(*element.get_function_skeletons()[i], out, indent, add_indent);
         }
         out << ")\n";
     }
@@ -548,7 +548,7 @@ template void write<StringTag>(const EffectImpl& element, std::ostream& out, siz
 template void write<AddressTag>(const EffectImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
 template<StringOrAddress T>
-void write(const FunctionExpressionNumberImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+void write(const FunctionExpressionNumberImpl& element, std::ostream& out, size_t, size_t)
 {
     out << element.get_number();
 }
@@ -795,7 +795,7 @@ void write(const ProblemImpl& element, std::ostream& out, size_t indent, size_t 
         out << ")\n";
     }
 
-    if (!(element.get_initial_literals().empty() && element.get_function_values().empty()))
+    if (!(element.get_initial_literals().empty() && element.get_initial_function_values().empty()))
     {
         out << std::string(indent, ' ') << "(:init ";
         for (size_t i = 0; i < element.get_initial_literals().size(); ++i)
@@ -804,10 +804,10 @@ void write(const ProblemImpl& element, std::ostream& out, size_t indent, size_t 
                 out << " ";
             write<T>(*element.get_initial_literals()[i], out, indent, add_indent);
         }
-        for (size_t i = 0; i < element.get_function_values().size(); ++i)
+        for (size_t i = 0; i < element.get_initial_function_values().size(); ++i)
         {
             out << " ";
-            write<T>(*element.get_function_values()[i], out, indent, add_indent);
+            write<T>(*element.get_initial_function_values()[i], out, indent, add_indent);
         }
     }
     out << ")\n";
@@ -840,7 +840,7 @@ template void write<StringTag>(const ProblemImpl& element, std::ostream& out, si
 template void write<AddressTag>(const ProblemImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
 template<StringOrAddress T>
-void write(const RequirementsImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+void write(const RequirementsImpl& element, std::ostream& out, size_t, size_t)
 {
     out << "(:requirements ";
     int i = 0;
@@ -858,7 +858,7 @@ template void write<StringTag>(const RequirementsImpl& element, std::ostream& ou
 template void write<AddressTag>(const RequirementsImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
 template<StringOrAddress T>
-void write_untyped(const TypeImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+void write_untyped(const TypeImpl& element, std::ostream& out, size_t, size_t)
 {
     out << element.get_name();
 }
@@ -875,7 +875,7 @@ template void write_untyped<StringTag>(const TermImpl& element, std::ostream& ou
 template void write_untyped<AddressTag>(const TermImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
 template<StringOrAddress T>
-void write_untyped(const ObjectImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+void write_untyped(const ObjectImpl& element, std::ostream& out, size_t, size_t)
 {
     out << element.get_name();
 }
@@ -883,7 +883,7 @@ void write_untyped(const ObjectImpl& element, std::ostream& out, size_t indent, 
 template void write_untyped<StringTag>(const ObjectImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
 template<StringOrAddress T>
-void write_untyped(const VariableImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+void write_untyped(const VariableImpl& element, std::ostream& out, size_t, size_t)
 {
     out << element.get_name();
 }
@@ -954,7 +954,7 @@ void write_typed(const ObjectImpl& element, std::ostream& out, size_t indent, si
 template void write_typed<StringTag>(const ObjectImpl& element, std::ostream& out, size_t indent, size_t add_indent);
 
 template<StringOrAddress T>
-void write_typed(const VariableImpl& element, std::ostream& out, size_t indent, size_t add_indent)
+void write_typed(const VariableImpl& element, std::ostream& out, size_t, size_t)
 {
     out << element.get_name();
 }

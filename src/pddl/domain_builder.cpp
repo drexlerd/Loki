@@ -46,8 +46,8 @@ Domain DomainBuilder::get_result()
     std::sort(m_predicates.begin(), m_predicates.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
     verify_indexing_scheme(m_predicates, "DomainBuilder::get_result: predicates must follow and indexing scheme.");
 
-    std::sort(m_functions.begin(), m_functions.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
-    verify_indexing_scheme(m_functions, "DomainBuilder::get_result: functions must follow and indexing scheme.");
+    std::sort(m_function_skeletons.begin(), m_function_skeletons.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+    verify_indexing_scheme(m_function_skeletons, "DomainBuilder::get_result: functions must follow and indexing scheme.");
 
     std::sort(m_actions.begin(), m_actions.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
     verify_indexing_scheme(m_actions, "DomainBuilder::get_result: actions must follow and indexing scheme.");
@@ -64,7 +64,7 @@ Domain DomainBuilder::get_result()
                                                             std::move(m_types),
                                                             std::move(m_constants),
                                                             std::move(m_predicates),
-                                                            std::move(m_functions),
+                                                            std::move(m_function_skeletons),
                                                             std::move(m_actions),
                                                             std::move(m_axioms)));
 }
@@ -76,7 +76,7 @@ Requirements& DomainBuilder::get_requirements() { return m_requirements; }
 TypeList& DomainBuilder::get_types() { return m_types; }
 ObjectList& DomainBuilder::get_constants() { return m_constants; }
 PredicateList& DomainBuilder::get_predicates() { return m_predicates; }
-FunctionSkeletonList& DomainBuilder::get_function_skeletons() { return m_functions; }
+FunctionSkeletonList& DomainBuilder::get_function_skeletons() { return m_function_skeletons; }
 ActionList& DomainBuilder::get_actions() { return m_actions; }
 AxiomList& DomainBuilder::get_axioms() { return m_axioms; }
 }

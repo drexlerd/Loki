@@ -39,7 +39,7 @@ private:
     TypeList m_types;
     ObjectList m_constants;
     PredicateList m_predicates;
-    FunctionSkeletonList m_functions;
+    FunctionSkeletonList m_function_skeletons;
     ActionList m_actions;
     AxiomList m_axioms;
 

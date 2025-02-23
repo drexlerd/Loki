@@ -93,7 +93,7 @@ Domain InitializeMetricTranslator::translate_level_2(const Domain& domain, Domai
     auto& repositories = builder.get_repositories();
 
     /* Initialize total-cost function skeleton */
-    auto translated_function_skeletons = this->translate_level_0(domain->get_functions(), repositories);
+    auto translated_function_skeletons = this->translate_level_0(domain->get_function_skeletons(), repositories);
     translated_function_skeletons.push_back(get_or_create_total_cost_function_skeleton(repositories));
 
     builder.get_name() = domain->get_name();
@@ -120,7 +120,7 @@ Problem InitializeMetricTranslator::translate_level_2(const Problem& problem, Pr
     auto& repositories = builder.get_repositories();
 
     /* Initialize initial total-cost function value. */
-    auto translated_initial_function_values = this->translate_level_0(problem->get_function_values(), repositories);
+    auto translated_initial_function_values = this->translate_level_0(problem->get_initial_function_values(), repositories);
     if (!problem->get_optimization_metric().has_value())
     {
         translated_initial_function_values.push_back(get_or_create_initial_total_cost_function_value(repositories));
@@ -141,9 +141,9 @@ Problem InitializeMetricTranslator::translate_level_2(const Problem& problem, Pr
     const auto translated_initial_literals = this->translate_level_0(problem->get_initial_literals(), repositories);
     builder.get_initial_literals().insert(builder.get_initial_literals().end(), translated_initial_literals.begin(), translated_initial_literals.end());
 
-    builder.get_function_values().insert(builder.get_function_values().end(),
-                                         translated_initial_function_values.begin(),
-                                         translated_initial_function_values.end());
+    builder.get_initial_function_values().insert(builder.get_initial_function_values().end(),
+                                                 translated_initial_function_values.begin(),
+                                                 translated_initial_function_values.end());
     if (problem->get_goal_condition().has_value())
         builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition().value(), repositories);
 

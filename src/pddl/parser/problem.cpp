@@ -92,7 +92,9 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
             std::visit(UnpackingVisitor(initial_literals, function_values), initial_element);
         }
         context.builder.get_initial_literals().insert(context.builder.get_initial_literals().end(), initial_literals.begin(), initial_literals.end());
-        context.builder.get_function_values().insert(context.builder.get_function_values().end(), function_values.begin(), function_values.end());
+        context.builder.get_initial_function_values().insert(context.builder.get_initial_function_values().end(),
+                                                             function_values.begin(),
+                                                             function_values.end());
     }
 
     /* Goal section */

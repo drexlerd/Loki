@@ -89,7 +89,7 @@ Problem Parser::parse_problem(const fs::path& problem_filepath, const Options& o
     const auto start = std::chrono::high_resolution_clock::now();
     if (!options.quiet)
     {
-        std::cout << "Started parsing domain file: " << problem_filepath << std::endl;
+        std::cout << "Started parsing problem file: " << problem_filepath << std::endl;
     }
 
     /* Parse the AST */

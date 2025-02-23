@@ -40,7 +40,7 @@ Problem InitializeEqualityTranslator::translate_level_2(const Problem& problem, 
         }
     }
 
-    if (!m_equality_predicate)
+    if (problem->get_requirements()->test(RequirementEnum::EQUALITY) && !m_equality_predicate)
     {
         throw std::runtime_error(
             "InitializeEqualityTranslator::translate_level_2(problem, builder): Expected equality predicate to be declared in the domain.");
@@ -73,10 +73,10 @@ Problem InitializeEqualityTranslator::translate_level_2(const Problem& problem, 
     builder.get_predicates().insert(builder.get_predicates().end(), translated_predicates.begin(), translated_predicates.end());
 
     builder.get_initial_literals().insert(builder.get_initial_literals().end(), translated_initial_literals.begin(), translated_initial_literals.end());
-    const auto translated_initial_function_values = this->translate_level_0(problem->get_function_values(), repositories);
-    builder.get_function_values().insert(builder.get_function_values().end(),
-                                         translated_initial_function_values.begin(),
-                                         translated_initial_function_values.end());
+    const auto translated_initial_function_values = this->translate_level_0(problem->get_initial_function_values(), repositories);
+    builder.get_initial_function_values().insert(builder.get_initial_function_values().end(),
+                                                 translated_initial_function_values.begin(),
+                                                 translated_initial_function_values.end());
     if (problem->get_goal_condition().has_value())
         builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition().value(), repositories);
     if (problem->get_optimization_metric().has_value())

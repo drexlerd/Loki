@@ -112,7 +112,7 @@ Requirements& ProblemBuilder::get_requirements() { return m_requirements; }
 ObjectList& ProblemBuilder::get_objects() { return m_objects; }
 PredicateList& ProblemBuilder::get_predicates() { return m_predicates; }
 LiteralList& ProblemBuilder::get_initial_literals() { return m_initial_literals; }
-FunctionValueList& ProblemBuilder::get_function_values() { return m_initial_function_values; }
+FunctionValueList& ProblemBuilder::get_initial_function_values() { return m_initial_function_values; }
 std::optional<Condition>& ProblemBuilder::get_goal_condition() { return m_goal_condition; }
 std::optional<OptimizationMetric>& ProblemBuilder::get_optimization_metric() { return m_optimization_metric; }
 AxiomList& ProblemBuilder::get_axioms() { return m_axioms; }
