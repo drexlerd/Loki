@@ -49,12 +49,6 @@ static TypeList collect_types_from_type_hierarchy(const TypeList& type_list)
 
 static Predicate type_to_predicate(Type type, Repositories& repositories, std::unordered_map<Type, Predicate>& type_to_predicate_mapper)
 {
-    auto it = type_to_predicate_mapper.find(type);
-    if (it != type_to_predicate_mapper.end())
-    {
-        return it->second;
-    }
-
     auto predicate =
         repositories.get_or_create_predicate(type->get_name(),
                                              ParameterList { repositories.get_or_create_parameter(repositories.get_or_create_variable("?arg"), TypeList {}) });
@@ -91,10 +85,11 @@ typed_parameter_to_condition_literals(Parameter parameter, Repositories& reposit
     auto types = collect_types_from_type_hierarchy(parameter->get_bases());
     for (const auto& type : types)
     {
-        auto condition = repositories.get_or_create_condition(repositories.get_or_create_condition_literal(
-            repositories.get_or_create_literal(false,
-                                               repositories.get_or_create_atom(type_to_predicate(type, repositories, type_to_predicate_mapper),
-                                                                               TermList { repositories.get_or_create_term(parameter->get_variable()) }))));
+        auto condition = repositories.get_or_create_condition(repositories.get_or_create_condition_literal(repositories.get_or_create_literal(
+            false,
+            repositories.get_or_create_atom(
+                type_to_predicate(type, repositories, type_to_predicate_mapper),
+                TermList { repositories.get_or_create_term(repositories.get_or_create_variable(parameter->get_variable()->get_name())) }))));
         conditions.push_back(condition);
     }
     return conditions;
@@ -102,45 +97,40 @@ typed_parameter_to_condition_literals(Parameter parameter, Repositories& reposit
 
 Object RemoveTypesTranslator::translate_level_2(Object object, Repositories& repositories) { return typed_object_to_untyped_object(object, repositories); }
 
-Parameter RemoveTypesTranslator::translate_level_2(Parameter parameter, Repositories& repositories)
-{
-    return repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {});
-}
-
 Condition RemoveTypesTranslator::translate_level_2(ConditionExists condition, Repositories& repositories)
 {
     // Translate parameters
-    auto translated_parameters = this->translate_level_0(condition->get_parameters(), repositories);
+    auto translated_parameters = ParameterList {};
+    auto translated_part_conditions = ConditionList {};
+    for (const auto& parameter : condition->get_parameters())
+    {
+        translated_parameters.push_back(repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {}));
+        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, m_type_to_predicates);
+        translated_part_conditions.insert(translated_part_conditions.end(), additional_conditions.begin(), additional_conditions.end());
+    }
 
     // Translate condition
-    auto conditions = ConditionList {};
-    for (const auto& parameter : translated_parameters)
-    {
-        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, this->m_type_to_predicates);
-        conditions.insert(conditions.end(), additional_conditions.begin(), additional_conditions.end());
-    }
-    conditions.push_back(this->translate_level_0(condition->get_condition(), repositories));
+    translated_part_conditions.push_back(this->translate_level_0(condition->get_condition(), repositories));
+    auto translated_condition = repositories.get_or_create_condition(repositories.get_or_create_condition_and(translated_part_conditions));
 
-    return repositories.get_or_create_condition(
-        repositories.get_or_create_condition_exists(translated_parameters,
-                                                    repositories.get_or_create_condition(repositories.get_or_create_condition_and(conditions))));
+    return repositories.get_or_create_condition(repositories.get_or_create_condition_exists(translated_parameters, translated_condition));
 }
 
 Condition RemoveTypesTranslator::translate_level_2(ConditionForall condition, Repositories& repositories)
 {
     // Translate parameters
-    auto translated_parameters = this->translate_level_0(condition->get_parameters(), repositories);
+    auto translated_parameters = ParameterList {};
+    auto translated_part_conditions = ConditionList {};
+    for (const auto& parameter : condition->get_parameters())
+    {
+        translated_parameters.push_back(repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {}));
+        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, m_type_to_predicates);
+        translated_part_conditions.insert(translated_part_conditions.end(), additional_conditions.begin(), additional_conditions.end());
+    }
 
     // Translate condition
-    auto conditions = ConditionList {};
-    for (const auto& parameter : translated_parameters)
-    {
-        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, this->m_type_to_predicates);
-        conditions.insert(conditions.end(), additional_conditions.begin(), additional_conditions.end());
-    }
-    conditions.push_back(this->translate_level_0(condition->get_condition(), repositories));
-
-    auto translated_condition = repositories.get_or_create_condition(repositories.get_or_create_condition_and(conditions));
+    translated_part_conditions.push_back(this->translate_level_0(condition->get_condition(), repositories));
+    auto translated_condition = repositories.get_or_create_condition(repositories.get_or_create_condition_and(translated_part_conditions));
 
     return repositories.get_or_create_condition(repositories.get_or_create_condition_forall(translated_parameters, translated_condition));
 }
@@ -148,16 +138,17 @@ Condition RemoveTypesTranslator::translate_level_2(ConditionForall condition, Re
 Effect RemoveTypesTranslator::translate_level_2(EffectCompositeForall effect, Repositories& repositories)
 {
     // Translate parameters
-    auto translated_parameters = this->translate_level_0(effect->get_parameters(), repositories);
-
-    // Translate condition
-    auto conditions = ConditionList {};
-    for (const auto& parameter : translated_parameters)
+    auto translated_parameters = ParameterList {};
+    auto translated_part_conditions = ConditionList {};
+    for (const auto& parameter : effect->get_parameters())
     {
-        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, this->m_type_to_predicates);
-        conditions.insert(conditions.end(), additional_conditions.begin(), additional_conditions.end());
+        translated_parameters.push_back(repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {}));
+        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, m_type_to_predicates);
+        translated_part_conditions.insert(translated_part_conditions.end(), additional_conditions.begin(), additional_conditions.end());
     }
-    auto translated_condition = repositories.get_or_create_condition(repositories.get_or_create_condition_and(conditions));
+
+    // Instantiate a condition to use in "when"
+    auto translated_condition = repositories.get_or_create_condition(repositories.get_or_create_condition_and(translated_part_conditions));
 
     // Translate effect
     auto translated_effect = this->translate_level_0(effect->get_effect(), repositories);
@@ -170,17 +161,18 @@ Effect RemoveTypesTranslator::translate_level_2(EffectCompositeForall effect, Re
 Axiom RemoveTypesTranslator::translate_level_2(Axiom axiom, Repositories& repositories)
 {
     // Translate parameters
-    auto translated_parameters = this->translate_level_0(axiom->get_parameters(), repositories);
-
-    // Translate condition
-    auto conditions = ConditionList {};
-    for (const auto& parameter : translated_parameters)
+    auto translated_parameters = ParameterList {};
+    auto translated_part_conditions = ConditionList {};
+    for (const auto& parameter : axiom->get_parameters())
     {
-        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, this->m_type_to_predicates);
-        conditions.insert(conditions.end(), additional_conditions.begin(), additional_conditions.end());
+        translated_parameters.push_back(repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {}));
+        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, m_type_to_predicates);
+        translated_part_conditions.insert(translated_part_conditions.end(), additional_conditions.begin(), additional_conditions.end());
     }
-    conditions.push_back(this->translate_level_0(axiom->get_condition(), repositories));
-    auto translated_condition = repositories.get_or_create_condition(repositories.get_or_create_condition_and(conditions));
+    translated_part_conditions.push_back(this->translate_level_0(axiom->get_condition(), repositories));
+
+    // Instantiate the condition
+    auto translated_condition = repositories.get_or_create_condition(repositories.get_or_create_condition_and(translated_part_conditions));
 
     // Translate effect
     auto translated_literal = this->translate_level_0(axiom->get_literal(), repositories);
@@ -191,22 +183,22 @@ Axiom RemoveTypesTranslator::translate_level_2(Axiom axiom, Repositories& reposi
 Action RemoveTypesTranslator::translate_level_2(Action action, Repositories& repositories)
 {
     // Translate parameters
-    auto translated_parameters = this->translate_level_0(action->get_parameters(), repositories);
-
-    // Translate condition
-    auto conditions = ConditionList {};
-    for (const auto& parameter : translated_parameters)
+    auto translated_parameters = ParameterList {};
+    auto translated_part_conditions = ConditionList {};
+    for (const auto& parameter : action->get_parameters())
     {
-        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, this->m_type_to_predicates);
-        conditions.insert(conditions.end(), additional_conditions.begin(), additional_conditions.end());
+        translated_parameters.push_back(repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {}));
+        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories, m_type_to_predicates);
+        translated_part_conditions.insert(translated_part_conditions.end(), additional_conditions.begin(), additional_conditions.end());
     }
     if (action->get_condition().has_value())
     {
-        conditions.push_back(this->translate_level_0(action->get_condition().value(), repositories));
+        translated_part_conditions.push_back(this->translate_level_0(action->get_condition().value(), repositories));
     }
-    auto translated_condition = conditions.empty() ?
-                                    std::nullopt :
-                                    std::optional<Condition>(repositories.get_or_create_condition(repositories.get_or_create_condition_and(conditions)));
+    auto translated_condition =
+        translated_part_conditions.empty() ?
+            std::nullopt :
+            std::optional<Condition>(repositories.get_or_create_condition(repositories.get_or_create_condition_and(translated_part_conditions)));
     auto translated_effect =
         action->get_effect().has_value() ? std::optional<Effect>(this->translate_level_0(action->get_effect().value(), repositories)) : std::nullopt;
 
@@ -252,8 +244,6 @@ Domain RemoveTypesTranslator::translate_level_2(const Domain& domain, DomainBuil
     // All types that were encountered during translation are now part of m_type_to_predicates
     for (const auto& [type, predicate] : m_type_to_predicates)
     {
-        translated_predicates.push_back(predicate);
-
         builder.get_predicates().push_back(predicate);
     }
 
@@ -276,13 +266,13 @@ Problem RemoveTypesTranslator::translate_level_2(const Problem& problem, Problem
     for (const auto& object : problem->get_objects())
     {
         builder.get_objects().push_back(typed_object_to_untyped_object(object, repositories));
-        auto additional_literals = typed_object_to_literals(object, repositories, this->m_type_to_predicates);
+        auto additional_literals = typed_object_to_literals(object, repositories, m_type_to_predicates);
         builder.get_initial_literals().insert(builder.get_initial_literals().end(), additional_literals.begin(), additional_literals.end());
     }
     // Make constants untyped
     for (const auto& object : problem->get_domain()->get_constants())
     {
-        auto additional_literals = typed_object_to_literals(object, repositories, this->m_type_to_predicates);
+        auto additional_literals = typed_object_to_literals(object, repositories, m_type_to_predicates);
         builder.get_initial_literals().insert(builder.get_initial_literals().end(), additional_literals.begin(), additional_literals.end());
     }
 
@@ -304,6 +294,8 @@ Problem RemoveTypesTranslator::translate_level_2(const Problem& problem, Problem
 
     const auto translated_axioms = this->translate_level_0(problem->get_axioms(), repositories);
     builder.get_axioms().insert(builder.get_axioms().end(), translated_axioms.begin(), translated_axioms.end());
+
+    // Types are define in the domain and copied into ProblemBuilder during its contruction
 
     return builder.get_result(problem->get_index());
 }

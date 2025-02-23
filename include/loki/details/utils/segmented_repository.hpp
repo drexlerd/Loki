@@ -155,7 +155,7 @@ public:
     T const* operator[](size_t pos) const
     {
         assert(pos < size());
-        return (pos < m_num_parent_elements) ? m_parent[pos] : &(m_persistent_vector[pos]);
+        return (pos < m_num_parent_elements) ? m_parent[pos] : &(m_persistent_vector[pos - m_num_parent_elements]);
     }
 
     /// @brief Returns a pointer to an existing object with the given pos.
@@ -164,7 +164,7 @@ public:
     T const* at(size_t pos) const
     {
         range_check(pos);
-        return (pos < m_num_parent_elements) ? m_parent->at(pos) : &(m_persistent_vector.at(pos));
+        return (pos < m_num_parent_elements) ? m_parent->at(pos) : &(m_persistent_vector.at(pos - m_num_parent_elements));
     }
 
     auto begin() const { return m_persistent_vector.begin(); }

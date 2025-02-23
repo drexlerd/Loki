@@ -39,7 +39,6 @@ Variable RenameQuantifiedVariablesTranslator::translate_level_2(Variable variabl
     if (m_renaming_enabled)
     {
         /* If variable is not quantified, then we have a bug somewhere. */
-        std::cout << variable << " " << *variable << std::endl;
         assert(m_num_quantifications.contains(variable));
 
         return repositories.get_or_create_variable(variable->get_name() + "_" + std::to_string(variable->get_index()) + "_"
@@ -81,7 +80,6 @@ Action RenameQuantifiedVariablesTranslator::translate_level_2(Action action, Rep
 {
     // Clear quantifications as we enter a new top-level scope.
     m_num_quantifications.clear();
-    std::cout << action->get_name() << std::endl;
     increment_num_quantifications(action->get_parameters(), m_num_quantifications);
 
     const auto translated_parameters = this->translate_level_0(action->get_parameters(), repositories);

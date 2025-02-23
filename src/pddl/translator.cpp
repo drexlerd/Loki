@@ -19,6 +19,7 @@
 
 #include "translator/remove_types.hpp"
 #include "translator/rename_quantified_variables.hpp"
+#include "translator/simplify_goal.hpp"
 #include "translator/to_negation_normal_form.hpp"
 
 namespace loki
@@ -78,6 +79,10 @@ Problem translate(const Problem& problem, const DomainTranslationResult& result)
     auto rename_quantified_variables_translator = RenameQuantifiedVariablesTranslator();
     builder = ProblemBuilder(result.get_translated_domain());
     translated_problem = rename_quantified_variables_translator.translate_level_0(translated_problem, builder);
+
+    auto simplify_goal_translator = SimplifyGoalTranslator();
+    builder = ProblemBuilder(result.get_translated_domain());
+    translated_problem = simplify_goal_translator.translate_level_0(translated_problem, builder);
 
     return translated_problem;
 }

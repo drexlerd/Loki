@@ -10,45 +10,41 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
+ *<
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SRC_PDDL_TRANSLATOR_REMOVE_TYPES_HPP_
-#define LOKI_SRC_PDDL_TRANSLATOR_REMOVE_TYPES_HPP_
+#ifndef LOKI_SRC_PDDL_TRANSLATOR_SIMPLIFY_GOAL_HPP_
+#define LOKI_SRC_PDDL_TRANSLATOR_SIMPLIFY_GOAL_HPP_
 
 #include "recursive_cached_base.hpp"
 
 namespace loki
 {
+
 /**
- * Compile away types.
+ * Introduce an axiom for complicated goals, i.e., goals that are not conjunctions of literals.
  */
-class RemoveTypesTranslator : public RecursiveCachedBaseTranslator<RemoveTypesTranslator>
+class SimplifyGoalTranslator : public RecursiveCachedBaseTranslator<SimplifyGoalTranslator>
 {
 private:
     /* Implement RecursiveCachedBaseTranslator interface. */
-    friend class RecursiveCachedBaseTranslator<RemoveTypesTranslator>;
+    friend class RecursiveCachedBaseTranslator<SimplifyGoalTranslator>;
 
     // Provide default implementations
+    using RecursiveCachedBaseTranslator::prepare_level_2;
     using RecursiveCachedBaseTranslator::translate_level_2;
 
-    // Collect predicates that encode types
-    std::unordered_map<Type, Predicate> m_type_to_predicates;
+    Condition simplify_goal_condition(Condition goal_condition,
+                                      Repositories& repositories,
+                                      PredicateList& instantiated_predicates,
+                                      AxiomList& instantiated_axioms,
+                                      size_t& next_axiom_index,
+                                      std::unordered_set<std::string>& problem_and_domain_predicate_names);
 
-    /**
-     * Translate
-     */
-    Object translate_level_2(Object object, Repositories& repositories);
-    Condition translate_level_2(ConditionExists condition, Repositories& repositories);
-    Condition translate_level_2(ConditionForall condition, Repositories& repositories);
-    Effect translate_level_2(EffectCompositeForall effect, Repositories& repositories);
-    Action translate_level_2(Action action, Repositories& repositories);
-    Axiom translate_level_2(Axiom axiom, Repositories& repositories);
-    Domain translate_level_2(const Domain& domain, DomainBuilder& builder);
     Problem translate_level_2(const Problem& problem, ProblemBuilder& builder);
 };
-
 }
+
 #endif
