@@ -35,19 +35,19 @@ int main(int argc, char** argv)
     // 1. Parse the domain
     auto parser = loki::Parser(domain_file, options);
     const auto domain = parser.get_domain();
-    // std::cout << *domain << std::endl << std::endl;
+    std::cout << *domain << std::endl << std::endl;
 
     // 2. Parse the problem
     const auto problem = parser.parse_problem(problem_file, options);
-    // std::cout << *problem << std::endl;
+    std::cout << *problem << std::endl;
 
     // 3. Translate the domain
     const auto domain_translation_result = loki::translate(domain);
-    // std::cout << *domain_translation_result.get_translated_domain() << std::endl;
+    std::cout << *domain_translation_result.get_translated_domain() << std::endl;
 
     // 4. Translate the problem, throws an error if the problem is not defined over the original domain.
     const auto translated_problem = loki::translate(problem, domain_translation_result);
-    // std::cout << *translated_problem << std::endl;
+    std::cout << *translated_problem << std::endl;
 
     return 0;
 }
