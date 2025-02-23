@@ -57,16 +57,16 @@ Domain DomainBuilder::get_result()
 
     m_requirements = (m_requirements) ? m_requirements : m_repositories.get_or_create_requirements(RequirementEnumSet { RequirementEnum::STRIPS });
 
-    return std::make_shared<const DomainImpl>(std::move(m_repositories),
-                                              std::move(m_filepath),
-                                              std::move(m_name),
-                                              std::move(m_requirements),
-                                              std::move(m_types),
-                                              std::move(m_constants),
-                                              std::move(m_predicates),
-                                              std::move(m_functions),
-                                              std::move(m_actions),
-                                              std::move(m_axioms));
+    return std::shared_ptr<const DomainImpl>(new DomainImpl(std::move(m_repositories),
+                                                            std::move(m_filepath),
+                                                            std::move(m_name),
+                                                            std::move(m_requirements),
+                                                            std::move(m_types),
+                                                            std::move(m_constants),
+                                                            std::move(m_predicates),
+                                                            std::move(m_functions),
+                                                            std::move(m_actions),
+                                                            std::move(m_axioms)));
 }
 
 Repositories& DomainBuilder::get_repositories() { return m_repositories; }

@@ -47,7 +47,6 @@ private:
     AxiomList m_axioms;
     AxiomList m_problem_and_domain_axioms;
 
-public:
     ProblemImpl(size_t index,
                 Repositories repositories,
                 std::optional<fs::path> filepath,
@@ -65,6 +64,9 @@ public:
                 AxiomList axioms,
                 AxiomList problem_and_domain_axioms);
 
+    friend class ProblemBuilder;
+
+public:
     // moveable but not copyable
     ProblemImpl(const ProblemImpl& other) = delete;
     ProblemImpl& operator=(const ProblemImpl& other) = delete;

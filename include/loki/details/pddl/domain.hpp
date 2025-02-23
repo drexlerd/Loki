@@ -42,7 +42,6 @@ private:
     ActionList m_actions;
     AxiomList m_axioms;
 
-public:
     DomainImpl(Repositories repositories,
                std::optional<fs::path> filepath,
                std::string name,
@@ -54,6 +53,9 @@ public:
                ActionList actions,
                AxiomList axioms);
 
+    friend class DomainBuilder;
+
+public:
     // moveable but not copyable
     DomainImpl(const DomainImpl& other) = delete;
     DomainImpl& operator=(const DomainImpl& other) = delete;

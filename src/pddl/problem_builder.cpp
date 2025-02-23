@@ -86,22 +86,22 @@ Problem ProblemBuilder::get_result(size_t problem_index)
 
     m_requirements = (m_requirements) ? m_requirements : m_repositories.get_or_create_requirements(RequirementEnumSet { RequirementEnum::STRIPS });
 
-    return std::make_shared<const ProblemImpl>(problem_index,
-                                               std::move(m_repositories),
-                                               std::move(m_filepath),
-                                               std::move(m_domain),
-                                               std::move(m_name),
-                                               std::move(m_requirements),
-                                               std::move(m_objects),
-                                               std::move(problem_and_domain_objects),
-                                               std::move(m_predicates),
-                                               std::move(problem_and_domain_predicates),
-                                               std::move(m_initial_literals),
-                                               std::move(m_initial_function_values),
-                                               std::move(m_goal_condition),
-                                               std::move(m_optimization_metric),
-                                               std::move(m_axioms),
-                                               std::move(problem_and_domain_axioms));
+    return std::shared_ptr<ProblemImpl>(new ProblemImpl(problem_index,
+                                                        std::move(m_repositories),
+                                                        std::move(m_filepath),
+                                                        std::move(m_domain),
+                                                        std::move(m_name),
+                                                        std::move(m_requirements),
+                                                        std::move(m_objects),
+                                                        std::move(problem_and_domain_objects),
+                                                        std::move(m_predicates),
+                                                        std::move(problem_and_domain_predicates),
+                                                        std::move(m_initial_literals),
+                                                        std::move(m_initial_function_values),
+                                                        std::move(m_goal_condition),
+                                                        std::move(m_optimization_metric),
+                                                        std::move(m_axioms),
+                                                        std::move(problem_and_domain_axioms)));
 }
 
 Repositories& ProblemBuilder::get_repositories() { return m_repositories; }
