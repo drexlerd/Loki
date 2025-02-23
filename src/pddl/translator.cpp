@@ -21,6 +21,7 @@
 #include "translator/remove_universal_quantifiers.hpp"
 #include "translator/rename_quantified_variables.hpp"
 #include "translator/simplify_goal.hpp"
+#include "translator/to_disjunctive_normal_form.hpp"
 #include "translator/to_negation_normal_form.hpp"
 
 namespace loki
@@ -65,6 +66,17 @@ DomainTranslationResult translate(const Domain& domain)
     std::cout << "RemoveUniversalQuantifiersTranslator result: " << std::endl;
     std::cout << translated_domain << std::endl;
 
+    auto to_negation_normal_form_translator2 = ToNegationNormalFormTranslator();
+    builder = DomainBuilder();
+    translated_domain = to_negation_normal_form_translator2.translate_level_0(translated_domain, builder);
+
+    // auto to_disjunctive_normal_form_translator = ToDisjunctiveNormalFormTranslator();
+    // builder = DomainBuilder();
+    // translated_domain = to_disjunctive_normal_form_translator.translate_level_0(translated_domain, builder);
+
+    // std::cout << "ToDisjunctiveNormalFormTranslator result: " << std::endl;
+    // std::cout << translated_domain << std::endl;
+
     return DomainTranslationResult(domain, translated_domain);
 }
 
@@ -94,6 +106,10 @@ Problem translate(const Problem& problem, const DomainTranslationResult& result)
     auto simplify_goal_translator = SimplifyGoalTranslator();
     builder = ProblemBuilder(result.get_translated_domain());
     translated_problem = simplify_goal_translator.translate_level_0(translated_problem, builder);
+
+    auto remove_universal_quantifiers_translator = RemoveUniversalQuantifiersTranslator();
+    builder = ProblemBuilder(result.get_translated_domain());
+    translated_problem = remove_universal_quantifiers_translator.translate_level_0(translated_problem, builder);
 
     return translated_problem;
 }

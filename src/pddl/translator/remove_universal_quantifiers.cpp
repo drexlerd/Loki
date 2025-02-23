@@ -82,50 +82,56 @@ Condition RemoveUniversalQuantifiersTranslator::translate_level_2(ConditionForal
     const auto& scope = m_scopes.open_scope(condition->get_parameters());
 
     // Free(exists(vars, phi)) become parameters. We obtain their types from the parameters in the parent scope.
-    auto head_parameters = ParameterList {};
-    auto terms = TermList {};
+    auto translated_head_parameters = ParameterList {};
+    auto translated_terms = TermList {};
+
+    // Note: free variable is not translated for
     for (const auto free_variable : collect_free_variables(
              *repositories.get_or_create_condition(repositories.get_or_create_condition_forall(condition->get_parameters(), condition->get_condition()))))
     {
         const auto optional_parameter = scope.get_parameter(free_variable);
         assert(optional_parameter.has_value());
-        const auto parameter = repositories.get_or_create_parameter(free_variable, optional_parameter.value()->get_bases());
-        head_parameters.push_back(parameter);
-        terms.push_back(repositories.get_or_create_term(free_variable));
+
+        const auto translated_free_variable = this->translate_level_0(free_variable, repositories);
+        const auto translated_bases = this->translate_level_0(optional_parameter.value()->get_bases(), repositories);
+
+        const auto parameter = repositories.get_or_create_parameter(translated_free_variable, translated_bases);
+        translated_head_parameters.push_back(parameter);
+        translated_terms.push_back(repositories.get_or_create_term(translated_free_variable));
     }
     // Important: all other parameters are appended to the axiom parameters
-    auto axiom_parameters = head_parameters;
-    for (const auto& parameter : condition->get_parameters())
-    {
-        axiom_parameters.push_back(parameter);
-    }
-    head_parameters.shrink_to_fit();
-    axiom_parameters.shrink_to_fit();
+    auto translated_axiom_parameters = translated_head_parameters;
+    const auto translated_condition_parameters = this->translate_level_0(condition->get_parameters(), repositories);
+    translated_axiom_parameters.insert(translated_axiom_parameters.end(), translated_condition_parameters.begin(), translated_condition_parameters.end());
+    translated_head_parameters.shrink_to_fit();
+    translated_axiom_parameters.shrink_to_fit();
+
+    const auto translated_condition = this->translate_level_0(condition->get_condition(), repositories);
 
     auto to_nnf_translator = ToNegationNormalFormTranslator();
 
     const auto axiom_condition = translate_level_0(
         repositories.get_or_create_condition(repositories.get_or_create_condition_exists(
-            axiom_parameters,
-            to_nnf_translator.translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_not(condition->get_condition())),
+            translated_axiom_parameters,
+            to_nnf_translator.translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_not(translated_condition)),
                                                 repositories))),
         repositories);
 
     const auto axiom_name = create_unique_axiom_name(this->m_next_axiom_index, this->m_existing_predicate_names);
-    const auto predicate = repositories.get_or_create_predicate(axiom_name, head_parameters);
-    m_instantiated_predicates.insert(predicate);
-    const auto atom = repositories.get_or_create_atom(predicate, terms);
-    const auto substituted_condition =
-        repositories.get_or_create_condition(repositories.get_or_create_condition_literal(repositories.get_or_create_literal(true, atom)));
-    const auto axiom_literal = repositories.get_or_create_literal(false, atom);
+    const auto translated_predicate = repositories.get_or_create_predicate(axiom_name, translated_head_parameters);
+    m_instantiated_predicates.insert(translated_predicate);
+    const auto translated_atom = repositories.get_or_create_atom(translated_predicate, translated_terms);
+    const auto translated_substituted_condition =
+        repositories.get_or_create_condition(repositories.get_or_create_condition_literal(repositories.get_or_create_literal(true, translated_atom)));
+    const auto translated_axiom_literal = repositories.get_or_create_literal(false, translated_atom);
 
-    const auto axiom = repositories.get_or_create_axiom(axiom_parameters, axiom_literal, axiom_condition);
+    const auto translated_axiom = repositories.get_or_create_axiom(translated_axiom_parameters, translated_axiom_literal, axiom_condition);
 
-    m_instantiated_axioms.insert(axiom);
+    m_instantiated_axioms.insert(translated_axiom);
 
     m_scopes.close_scope();
 
-    return substituted_condition;
+    return translated_substituted_condition;
 }
 
 Action RemoveUniversalQuantifiersTranslator::translate_level_2(Action action, Repositories& repositories)
