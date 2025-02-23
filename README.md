@@ -60,8 +60,6 @@ We provide a CMake Superbuild project [here](https://github.com/drexlerd/Loki/tr
 
 The executable illustrate how to use Loki.
 
-The first example shows the incorrect handling of the ownership semantics. The example is supposed to crash when trying to print the domain for the second time.
-
 ```console
 ./build/exe/loki data/gripper/domain.pddl data/gripper/p-2-0.pddl
 ```
