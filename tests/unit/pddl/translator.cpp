@@ -103,7 +103,7 @@ TEST(LokiTests, LokiPddlTranslatorTest)
         }
 
         const auto& problem_function_skeletons =
-            boost::hana::at_key(domain->get_repositories().get_hana_repositories(), boost::hana::type<FunctionSkeletonImpl> {});
+            boost::hana::at_key(translated_domain->get_repositories().get_hana_repositories(), boost::hana::type<FunctionSkeletonImpl> {});
         for (const auto& function_skeleton : problem_function_skeletons)
         {
             if (domain_function_skeletons.contains(function_skeleton->get_name()))
@@ -115,11 +115,11 @@ TEST(LokiTests, LokiPddlTranslatorTest)
 
     {
         // Check that all constants and objects are untyped
-        for (const auto& constant : domain->get_constants())
+        for (const auto& constant : translated_domain->get_constants())
         {
             EXPECT_EQ(constant->get_bases().size(), 0);
         }
-        for (const auto& object : problem->get_objects())
+        for (const auto& object : translated_problem->get_objects())
         {
             EXPECT_EQ(object->get_bases().size(), 0);
         }
