@@ -21,6 +21,7 @@
 #include "translator/remove_universal_quantifiers.hpp"
 #include "translator/rename_quantified_variables.hpp"
 #include "translator/simplify_goal.hpp"
+#include "translator/split_disjunctive_conditions.hpp"
 #include "translator/to_disjunctive_normal_form.hpp"
 #include "translator/to_negation_normal_form.hpp"
 
@@ -71,6 +72,13 @@ DomainTranslationResult translate(const Domain& domain)
     translated_domain = to_disjunctive_normal_form_translator.translate_level_0(translated_domain, builder);
 
     std::cout << "ToDisjunctiveNormalFormTranslator result: " << std::endl;
+    std::cout << *translated_domain << std::endl;
+
+    auto split_disjunctive_conditions_translator = SplitDisjunctiveConditionsTranslator();
+    builder = DomainBuilder();
+    translated_domain = split_disjunctive_conditions_translator.translate_level_0(translated_domain, builder);
+
+    std::cout << "SplitDisjunctiveConditionsTranslator result: " << std::endl;
     std::cout << *translated_domain << std::endl;
 
     return DomainTranslationResult(domain, translated_domain);
