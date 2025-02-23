@@ -17,12 +17,14 @@
 
 #include "loki/details/pddl/translator.hpp"
 
+#include "translator/move_existential_quantifiers.hpp"
 #include "translator/remove_types.hpp"
 #include "translator/remove_universal_quantifiers.hpp"
 #include "translator/rename_quantified_variables.hpp"
 #include "translator/simplify_goal.hpp"
 #include "translator/split_disjunctive_conditions.hpp"
 #include "translator/to_disjunctive_normal_form.hpp"
+#include "translator/to_effect_normal_form.hpp"
 #include "translator/to_negation_normal_form.hpp"
 
 namespace loki
@@ -81,6 +83,20 @@ DomainTranslationResult translate(const Domain& domain)
     std::cout << "SplitDisjunctiveConditionsTranslator result: " << std::endl;
     std::cout << *translated_domain << std::endl;
 
+    auto move_existential_quantifiers_translator = MoveExistentialQuantifiersTranslator();
+    builder = DomainBuilder();
+    translated_domain = move_existential_quantifiers_translator.translate_level_0(translated_domain, builder);
+
+    std::cout << "MoveExistentialQuantifiersTranslator result: " << std::endl;
+    std::cout << *translated_domain << std::endl;
+
+    auto to_effect_normal_form_translator = ToEffectNormalFormTranslator();
+    builder = DomainBuilder();
+    translated_domain = to_effect_normal_form_translator.translate_level_0(translated_domain, builder);
+
+    std::cout << "MoveExistentialQuantifiersTranslator result: " << std::endl;
+    std::cout << *translated_domain << std::endl;
+
     return DomainTranslationResult(domain, translated_domain);
 }
 
@@ -118,6 +134,18 @@ Problem translate(const Problem& problem, const DomainTranslationResult& result)
     auto to_disjunctive_normal_form_translator = ToDisjunctiveNormalFormTranslator();
     builder = ProblemBuilder(result.get_translated_domain());
     translated_problem = to_disjunctive_normal_form_translator.translate_level_0(translated_problem, builder);
+
+    auto split_disjunctive_conditions_translator = SplitDisjunctiveConditionsTranslator();
+    builder = ProblemBuilder(result.get_translated_domain());
+    translated_problem = split_disjunctive_conditions_translator.translate_level_0(translated_problem, builder);
+
+    auto move_existential_quantifiers_translator = MoveExistentialQuantifiersTranslator();
+    builder = ProblemBuilder(result.get_translated_domain());
+    translated_problem = move_existential_quantifiers_translator.translate_level_0(translated_problem, builder);
+
+    auto to_effect_normal_form_translator = ToEffectNormalFormTranslator();
+    builder = ProblemBuilder(result.get_translated_domain());
+    translated_problem = to_effect_normal_form_translator.translate_level_0(translated_problem, builder);
 
     return translated_problem;
 }
