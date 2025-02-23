@@ -56,47 +56,14 @@ cmake --install build --prefix=<path/to/installation-directory>
 We provide a CMake Superbuild project [here](https://github.com/drexlerd/Loki/tree/main/tests/integration/dependencies) that takes care of downloading, building, and installing Loki together and its dependencies. You can simply copy it to your project or integrate it in your own Superbuild and run it similarly to the Superbuild project from above. An example planning library based on Loki is available [here](https://github.com/simon-stahlberg/mimir).
 
 
-## Running the Examples
+## Running the Executables
 
-The examples illustrate best practices on how to use Loki.
+The executable illustrate how to use Loki.
 
 The first example shows the incorrect handling of the ownership semantics. The example is supposed to crash when trying to print the domain for the second time.
 
 ```console
-./build/examples/undefined_behavior
-```
-
-The second example shows how to parse a domain and problem file which is supposed to be used in a planning system where a non-fragmented indexing of atoms and literals is preferred.
-
-```console
-./build/examples/single_problem
-```
-
-The third example shows how to detect structurally equivalent problems over a common domain.
-
-```console
-./build/examples/multiple_problems
-```
-
-The fourth example shows how to find the matched positions of each PDDL object in the input stream and how to report customized clang-style error reports.
-
-```console
-./build/examples/position_cache
-```
-
-
-## Running the Executables
-
-Parsing a domain file and printing it.
-
-```console
-./build/exe/domain benchmarks/gripper/domain.pddl
-```
-
-Parsing a domain and a problem file and printing both.
-
-```console
-./build/exe/problem benchmarks/gripper/domain.pddl benchmarks/gripper/p-2-0.pddl
+./build/exe/loki data/gripper/domain.pddl data/gripper/p-2-0.pddl
 ```
 
 ## Running the Tests
