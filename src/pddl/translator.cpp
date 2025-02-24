@@ -50,13 +50,6 @@ DomainTranslationResult translate(const Domain& domain)
     // std::cout << "ToNegationNormalFormTranslator result:" << std::endl;
     // std::cout << *translated_domain << std::endl;
 
-    auto remove_types_translator = RemoveTypesTranslator();
-    builder = DomainBuilder();
-    translated_domain = remove_types_translator.translate_level_0(translated_domain, builder);
-
-    // std::cout << "RemoveTypesTranslator result:" << std::endl;
-    // std::cout << *translated_domain << std::endl;
-
     auto rename_quantified_variables_translator = RenameQuantifiedVariablesTranslator();
     builder = DomainBuilder();
     translated_domain = rename_quantified_variables_translator.translate_level_0(translated_domain, builder);
@@ -92,11 +85,19 @@ DomainTranslationResult translate(const Domain& domain)
     // std::cout << "MoveExistentialQuantifiersTranslator result: " << std::endl;
     // std::cout << *translated_domain << std::endl;
 
+    /* Type translator cannot come before removal of universal quantifiers because of negations. */
+    auto remove_types_translator = RemoveTypesTranslator();
+    builder = DomainBuilder();
+    translated_domain = remove_types_translator.translate_level_0(translated_domain, builder);
+
+    // std::cout << "RemoveTypesTranslator result:" << std::endl;
+    // std::cout << *translated_domain << std::endl;
+
     auto to_effect_normal_form_translator = ToEffectNormalFormTranslator();
     builder = DomainBuilder();
     translated_domain = to_effect_normal_form_translator.translate_level_0(translated_domain, builder);
 
-    // std::cout << "MoveExistentialQuantifiersTranslator result: " << std::endl;
+    // std::cout << "ToEffectNormalFormTranslator result: " << std::endl;
     // std::cout << *translated_domain << std::endl;
 
     auto initialize_equality_translator = InitializeEqualityTranslator();
