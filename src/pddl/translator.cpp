@@ -137,10 +137,6 @@ Problem translate(const Problem& problem, const DomainTranslationResult& result)
     auto builder = ProblemBuilder(result.get_translated_domain());
     auto translated_problem = to_negation_normal_form_translator.translate_level_0(problem, builder);
 
-    auto remove_types_translator = RemoveTypesTranslator();
-    builder = ProblemBuilder(result.get_translated_domain());
-    translated_problem = remove_types_translator.translate_level_0(translated_problem, builder);
-
     auto rename_quantified_variables_translator = RenameQuantifiedVariablesTranslator();
     builder = ProblemBuilder(result.get_translated_domain());
     translated_problem = rename_quantified_variables_translator.translate_level_0(translated_problem, builder);
@@ -164,6 +160,10 @@ Problem translate(const Problem& problem, const DomainTranslationResult& result)
     auto move_existential_quantifiers_translator = MoveExistentialQuantifiersTranslator();
     builder = ProblemBuilder(result.get_translated_domain());
     translated_problem = move_existential_quantifiers_translator.translate_level_0(translated_problem, builder);
+
+    auto remove_types_translator = RemoveTypesTranslator();
+    builder = ProblemBuilder(result.get_translated_domain());
+    translated_problem = remove_types_translator.translate_level_0(translated_problem, builder);
 
     auto to_effect_normal_form_translator = ToEffectNormalFormTranslator();
     builder = ProblemBuilder(result.get_translated_domain());

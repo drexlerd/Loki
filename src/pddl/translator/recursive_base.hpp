@@ -60,10 +60,10 @@ protected:
         self().prepare_level_2(element);
     }
 
-    void prepare_level_2(loki::Requirements requirements) {}
+    void prepare_level_2(loki::Requirements) {}
     void prepare_level_2(loki::Type type) { this->prepare_level_0(type->get_bases()); }
     void prepare_level_2(loki::Object object) { this->prepare_level_0(object->get_bases()); }
-    void prepare_level_2(loki::Variable variable) {}
+    void prepare_level_2(loki::Variable) {}
     void prepare_level_2(loki::Term term)
     {
         std::visit([this](auto&& arg) { return this->prepare_level_0(arg); }, term->get_object_or_variable());
@@ -134,7 +134,7 @@ protected:
     {
         std::visit([this](auto&& arg) { return this->prepare_level_0(arg); }, effect->get_effect());
     }
-    void prepare_level_2(loki::FunctionExpressionNumber function_expression) {}
+    void prepare_level_2(loki::FunctionExpressionNumber) {}
     void prepare_level_2(loki::FunctionExpressionBinaryOperator function_expression)
     {
         this->prepare_level_0(function_expression->get_left_function_expression());
