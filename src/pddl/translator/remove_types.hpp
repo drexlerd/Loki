@@ -34,12 +34,12 @@ private:
     // Provide default implementations
     using RecursiveCachedBaseTranslator::translate_level_2;
 
-    // Collect predicates that encode types
-    PredicateSet m_translated_predicates;
-
     /**
      * Translate
      */
+
+    Predicate translate_level_2(Predicate predicate, Repositories& repositories);
+    FunctionSkeleton translate_level_2(FunctionSkeleton function_skeleton, Repositories& repositories);
     Object translate_level_2(Object object, Repositories& repositories);
     Condition translate_level_2(ConditionExists condition, Repositories& repositories);
     Condition translate_level_2(ConditionForall condition, Repositories& repositories);
