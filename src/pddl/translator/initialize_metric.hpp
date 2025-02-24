@@ -36,8 +36,8 @@ private:
     // Provide default implementations
     using RecursiveCachedBaseTranslator::translate_level_2;
 
-    bool m_has_metric_defined;
-    bool m_action_costs_enabled;
+    bool m_action_costs_enabled = false;
+    bool m_numeric_fluents_enabled = false;
 
     Action translate_level_2(Action action, Repositories& repositories);
 

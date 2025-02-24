@@ -67,8 +67,8 @@ Action InitializeMetricTranslator::translate_level_2(Action action, Repositories
     const auto translated_condition = this->translate_level_0(action->get_condition(), repositories);
     auto translated_effect = this->translate_level_0(action->get_effect(), repositories);
 
-    // Note: if metric is defined and :action-costs is disabled, then :numeric-fluents is enabled and we must not add numeric effects.
-    if (!m_has_metric_defined && !m_action_costs_enabled)
+    /* If neither :action-costs nor :numeric-fluents is defined, we add effects (increase (total-cost) 1) */
+    if (!m_action_costs_enabled && !m_numeric_fluents_enabled)
     {
         if (translated_effect.has_value())
         {
@@ -89,9 +89,15 @@ Domain InitializeMetricTranslator::translate_level_2(const Domain& domain, Domai
 {
     auto& repositories = builder.get_repositories();
 
-    /* Initialize total-cost function skeleton */
+    m_action_costs_enabled = domain->get_requirements()->test(RequirementEnum::ACTION_COSTS);
+    m_numeric_fluents_enabled = domain->get_requirements()->test(RequirementEnum::NUMERIC_FLUENTS);
+
+    /* Always add (total-cost) function if it is not there even if we might not use it */
     auto translated_function_skeletons = this->translate_level_0(domain->get_function_skeletons(), repositories);
-    translated_function_skeletons.push_back(get_or_create_total_cost_function_skeleton(repositories));
+    bool has_total_cost_function_skeleton =
+        std::any_of(translated_function_skeletons.begin(), translated_function_skeletons.end(), [](auto&& arg) { return arg->get_name() == "total-cost"; });
+    if (!has_total_cost_function_skeleton)
+        translated_function_skeletons.push_back(get_or_create_total_cost_function_skeleton(repositories));
 
     builder.get_name() = domain->get_name();
     builder.get_filepath() = domain->get_filepath();
@@ -120,12 +126,13 @@ Problem InitializeMetricTranslator::translate_level_2(const Problem& problem, Pr
 {
     auto& repositories = builder.get_repositories();
 
-    /* Initialize initial total-cost function value. */
+    /* Always initialize initial total-cost function value if it was not already done even if it is not even used. */
     auto translated_initial_function_values = this->translate_level_0(problem->get_initial_function_values(), repositories);
-    if (!problem->get_optimization_metric().has_value())
-    {
+    bool has_total_cost_function_value = std::any_of(problem->get_initial_function_values().begin(),
+                                                     problem->get_initial_function_values().end(),
+                                                     [](auto&& arg) { return arg->get_function()->get_function_skeleton()->get_name() == "total-cost"; });
+    if (!has_total_cost_function_value)
         translated_initial_function_values.push_back(get_or_create_initial_total_cost_function_value(repositories));
-    }
 
     /* Initialize total-cost metric. */
     builder.get_optimization_metric() = problem->get_optimization_metric().has_value() ?
