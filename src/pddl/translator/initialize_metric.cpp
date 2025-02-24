@@ -130,6 +130,10 @@ Problem InitializeMetricTranslator::translate_level_2(const Problem& problem, Pr
 {
     auto& repositories = builder.get_repositories();
 
+    // It makes no sense to define this in the problem so we check it from the domain.
+    m_action_costs_enabled = problem->get_domain()->get_requirements()->test(RequirementEnum::ACTION_COSTS);
+    m_numeric_fluents_enabled = problem->get_domain()->get_requirements()->test(RequirementEnum::NUMERIC_FLUENTS);
+
     /* If neither :action-costs nor :numeric-fluents is defined, we add total-cost function value of 0 if unavailable. */
     if (!m_action_costs_enabled && !m_numeric_fluents_enabled)
     {
