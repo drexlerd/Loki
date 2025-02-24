@@ -67,7 +67,8 @@ Action InitializeMetricTranslator::translate_level_2(Action action, Repositories
     const auto translated_condition = this->translate_level_0(action->get_condition(), repositories);
     auto translated_effect = this->translate_level_0(action->get_effect(), repositories);
 
-    /* If neither :action-costs nor :numeric-fluents is defined, we add effects (increase (total-cost) 1) */
+    /* If neither :action-costs nor :numeric-fluents is defined, we add effects (increase (total-cost) 1).
+       We dont check availability and simply assume wrong PDDL modelling. The parser should catch it though. */
     if (!m_action_costs_enabled && !m_numeric_fluents_enabled)
     {
         if (translated_effect.has_value())
@@ -92,12 +93,15 @@ Domain InitializeMetricTranslator::translate_level_2(const Domain& domain, Domai
     m_action_costs_enabled = domain->get_requirements()->test(RequirementEnum::ACTION_COSTS);
     m_numeric_fluents_enabled = domain->get_requirements()->test(RequirementEnum::NUMERIC_FLUENTS);
 
-    /* Always add (total-cost) function if it is not there even if we might not use it */
-    auto translated_function_skeletons = this->translate_level_0(domain->get_function_skeletons(), repositories);
-    bool has_total_cost_function_skeleton =
-        std::any_of(translated_function_skeletons.begin(), translated_function_skeletons.end(), [](auto&& arg) { return arg->get_name() == "total-cost"; });
-    if (!has_total_cost_function_skeleton)
-        translated_function_skeletons.push_back(get_or_create_total_cost_function_skeleton(repositories));
+    /* If neither :action-costs nor :numeric-fluents is defined, we add (total-cost) function if unavailable. */
+    if (!m_action_costs_enabled && !m_numeric_fluents_enabled)
+    {
+        bool has_total_cost_function_skeleton = std::any_of(domain->get_function_skeletons().begin(),
+                                                            domain->get_function_skeletons().end(),
+                                                            [](auto&& arg) { return arg->get_name() == "total-cost"; });
+        if (!has_total_cost_function_skeleton)
+            builder.get_function_skeletons().push_back(get_or_create_total_cost_function_skeleton(repositories));
+    }
 
     builder.get_name() = domain->get_name();
     builder.get_filepath() = domain->get_filepath();
@@ -112,7 +116,7 @@ Domain InitializeMetricTranslator::translate_level_2(const Domain& domain, Domai
                                                  translated_static_initial_literals.end());
     const auto translated_predicates = this->translate_level_0(domain->get_predicates(), repositories);
     builder.get_predicates().insert(builder.get_predicates().end(), translated_predicates.begin(), translated_predicates.end());
-
+    auto translated_function_skeletons = this->translate_level_0(domain->get_function_skeletons(), repositories);
     builder.get_function_skeletons().insert(builder.get_function_skeletons().end(), translated_function_skeletons.begin(), translated_function_skeletons.end());
     const auto translated_actions = this->translate_level_0(domain->get_actions(), repositories);
     builder.get_actions().insert(builder.get_actions().end(), translated_actions.begin(), translated_actions.end());
@@ -126,18 +130,24 @@ Problem InitializeMetricTranslator::translate_level_2(const Problem& problem, Pr
 {
     auto& repositories = builder.get_repositories();
 
-    /* Always initialize initial total-cost function value if it was not already done even if it is not even used. */
-    auto translated_initial_function_values = this->translate_level_0(problem->get_initial_function_values(), repositories);
-    bool has_total_cost_function_value = std::any_of(problem->get_initial_function_values().begin(),
-                                                     problem->get_initial_function_values().end(),
-                                                     [](auto&& arg) { return arg->get_function()->get_function_skeleton()->get_name() == "total-cost"; });
-    if (!has_total_cost_function_value)
-        translated_initial_function_values.push_back(get_or_create_initial_total_cost_function_value(repositories));
+    /* If neither :action-costs nor :numeric-fluents is defined, we add total-cost function value of 0 if unavailable. */
+    if (!m_action_costs_enabled && !m_numeric_fluents_enabled)
+    {
+        bool has_total_cost_function_value = std::any_of(problem->get_initial_function_values().begin(),
+                                                         problem->get_initial_function_values().end(),
+                                                         [](auto&& arg) { return arg->get_function()->get_function_skeleton()->get_name() == "total-cost"; });
+        if (!has_total_cost_function_value)
+            builder.get_initial_function_values().push_back(get_or_create_initial_total_cost_function_value(repositories));
+    }
 
     /* Initialize total-cost metric. */
-    builder.get_optimization_metric() = problem->get_optimization_metric().has_value() ?
-                                            this->translate_level_0(problem->get_optimization_metric().value(), repositories) :
-                                            get_or_create_total_cost_metric(repositories);
+    builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric(), repositories);
+
+    /* If neither :action-costs nor :numeric-fluents is defined, we add metric (minimize (total-cost)). */
+    if ((!m_action_costs_enabled && !m_numeric_fluents_enabled) && !builder.get_optimization_metric().has_value())
+    {
+        builder.get_optimization_metric() = get_or_create_total_cost_metric(repositories);
+    }
 
     builder.get_filepath() = problem->get_filepath();
     builder.get_name() = problem->get_name();
@@ -148,7 +158,7 @@ Problem InitializeMetricTranslator::translate_level_2(const Problem& problem, Pr
     builder.get_predicates().insert(builder.get_predicates().end(), translated_predicates.begin(), translated_predicates.end());
     const auto translated_initial_literals = this->translate_level_0(problem->get_initial_literals(), repositories);
     builder.get_initial_literals().insert(builder.get_initial_literals().end(), translated_initial_literals.begin(), translated_initial_literals.end());
-
+    auto translated_initial_function_values = this->translate_level_0(problem->get_initial_function_values(), repositories);
     builder.get_initial_function_values().insert(builder.get_initial_function_values().end(),
                                                  translated_initial_function_values.begin(),
                                                  translated_initial_function_values.end());
