@@ -166,15 +166,6 @@ void write(const AxiomImpl& element, T formatter, std::ostream& out)
         write<T>(*element.get_parameters()[i], formatter, out);
     }
     out << "\n";
-    out << std::string(formatter.indent, ' ') << ":parameters (";
-    for (size_t i = 0; i < element.get_parameters().size(); ++i)
-    {
-        if (i != 0)
-            out << " ";
-        write<T>(*element.get_parameters()[i], formatter, out);
-    }
-    out << ")";
-    out << "\n";
 
     formatter.indent += formatter.add_indent;
 

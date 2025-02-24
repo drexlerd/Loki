@@ -64,8 +64,6 @@ DomainTranslationResult translate(const Domain& domain)
     // std::cout << "RemoveUniversalQuantifiersTranslator result: " << std::endl;
     // std::cout << *translated_domain << std::endl;
 
-    // exit(1);
-
     auto to_disjunctive_normal_form_translator = ToDisjunctiveNormalFormTranslator();
     builder = DomainBuilder();
     translated_domain = to_disjunctive_normal_form_translator.translate_level_0(translated_domain, builder);

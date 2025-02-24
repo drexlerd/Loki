@@ -98,7 +98,7 @@ Condition RemoveUniversalQuantifiersTranslator::translate_level_2(ConditionForal
     const auto translated_free_variables = collect_free_variables(*translated_condition_exists_not_phi);
 
     /* Instantiate the parameters. */
-    auto translated_head_parameters = ParameterList {};
+    auto translated_parameters = ParameterList {};
     auto translated_terms = TermList {};
     for (const auto translated_free_variable : translated_free_variables)
     {
@@ -108,25 +108,19 @@ Condition RemoveUniversalQuantifiersTranslator::translate_level_2(ConditionForal
         const auto translated_bases = translated_optional_parameter.value()->get_bases();
 
         const auto translated_parameter = repositories.get_or_create_parameter(translated_free_variable, translated_bases);
-        translated_head_parameters.push_back(translated_parameter);
+        translated_parameters.push_back(translated_parameter);
         translated_terms.push_back(repositories.get_or_create_term(translated_free_variable));
     }
 
-    /* The variables vars also become become parameters since they are existentially   */
-    auto translated_axiom_parameters = translated_head_parameters;
-    translated_axiom_parameters.insert(translated_axiom_parameters.end(), translated_condition_parameters.begin(), translated_condition_parameters.end());
-    translated_head_parameters.shrink_to_fit();
-    translated_axiom_parameters.shrink_to_fit();
-
     const auto axiom_name = create_unique_axiom_name(this->m_next_axiom_index, this->m_existing_predicate_names);
-    const auto translated_predicate = repositories.get_or_create_predicate(axiom_name, translated_head_parameters);
+    const auto translated_predicate = repositories.get_or_create_predicate(axiom_name, translated_parameters);
     m_instantiated_predicates.insert(translated_predicate);
     const auto translated_atom = repositories.get_or_create_atom(translated_predicate, translated_terms);
     const auto translated_substituted_condition =
         repositories.get_or_create_condition(repositories.get_or_create_condition_literal(repositories.get_or_create_literal(true, translated_atom)));
     const auto translated_axiom_literal = repositories.get_or_create_literal(false, translated_atom);
 
-    const auto translated_axiom = repositories.get_or_create_axiom(translated_axiom_parameters, translated_axiom_literal, translated_condition_exists_not_phi);
+    const auto translated_axiom = repositories.get_or_create_axiom(translated_parameters, translated_axiom_literal, translated_condition_exists_not_phi);
 
     m_instantiated_axioms.insert(translated_axiom);
 
