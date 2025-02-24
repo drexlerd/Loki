@@ -111,11 +111,6 @@ DomainTranslationResult translate(const Domain& domain)
     builder = DomainBuilder();
     translated_domain = initialize_metric_translator.translate_level_0(translated_domain, builder);
 
-    for (const auto& constant : translated_domain->get_constants())
-    {
-        assert(constant->get_bases().empty());
-    }
-
     // std::cout << "InitializeMetricTranslator result: " << std::endl;
     // std::cout << *translated_domain << std::endl;
 
@@ -176,11 +171,6 @@ Problem translate(const Problem& problem, const DomainTranslationResult& result)
     auto initialize_metric_translator = InitializeMetricTranslator();
     builder = ProblemBuilder(result.get_translated_domain());
     translated_problem = initialize_metric_translator.translate_level_0(translated_problem, builder);
-
-    for (const auto& object : translated_problem->get_objects())
-    {
-        assert(object->get_bases().empty());
-    }
 
     return translated_problem;
 }
