@@ -24,10 +24,11 @@ namespace loki
 
 static void increment_num_quantifications(const ParameterList& parameters, std::unordered_map<Variable, size_t>& ref_num_quantifications)
 {
-    for (const auto& parameter : parameters)
+    for (const auto& parameter : parameters)  ///< parameter is untranslated!
     {
         const auto variable = parameter->get_variable();
 
+        // variable is also untranslated!
         ref_num_quantifications.contains(variable) ? ++ref_num_quantifications.at(variable) : ref_num_quantifications[variable] = 0;
     }
 }
@@ -41,8 +42,10 @@ Variable RenameQuantifiedVariablesTranslator::translate_level_2(Variable variabl
         /* If variable is not quantified, then we have a bug somewhere. */
         assert(m_num_quantifications.contains(variable));
 
-        return repositories.get_or_create_variable(variable->get_name() + "_" + std::to_string(variable->get_index()) + "_"
-                                                   + std::to_string(m_num_quantifications.at(variable)));
+        // We use the untranslated variable here because the map track the untranslated variables!
+        const auto num_quantifications = m_num_quantifications.at(variable);
+
+        return repositories.get_or_create_variable(variable->get_name() + "_" + std::to_string(num_quantifications));
     }
 
     return repositories.get_or_create_variable(variable->get_name());
@@ -50,7 +53,7 @@ Variable RenameQuantifiedVariablesTranslator::translate_level_2(Variable variabl
 
 Predicate RenameQuantifiedVariablesTranslator::translate_level_2(Predicate predicate, Repositories& repositories)
 {
-    // Disallow renaming of nested variables
+    // Disallow renaming of nested variables because predicates should not change name!
     m_renaming_enabled = false;
 
     auto result = repositories.get_or_create_predicate(predicate->get_name(), this->translate_level_0(predicate->get_parameters(), repositories));
@@ -63,7 +66,7 @@ Predicate RenameQuantifiedVariablesTranslator::translate_level_2(Predicate predi
 
 FunctionSkeleton RenameQuantifiedVariablesTranslator::translate_level_2(FunctionSkeleton function_skeleton, Repositories& repositories)
 {
-    // Disallow renaming of nested variables
+    // Disallow renaming of nested variables because function skeletons should not change name!
     m_renaming_enabled = false;
 
     auto result = repositories.get_or_create_function_skeleton(function_skeleton->get_name(),
@@ -80,7 +83,7 @@ Action RenameQuantifiedVariablesTranslator::translate_level_2(Action action, Rep
 {
     // Clear quantifications as we enter a new top-level scope.
     m_num_quantifications.clear();
-    increment_num_quantifications(action->get_parameters(), m_num_quantifications);
+    increment_num_quantifications(action->get_parameters(), m_num_quantifications);  ///< We map untranslated variables
 
     const auto translated_parameters = this->translate_level_0(action->get_parameters(), repositories);
     const auto translated_conditions = this->translate_level_0(action->get_condition(), repositories);
@@ -96,7 +99,7 @@ Axiom RenameQuantifiedVariablesTranslator::translate_level_2(Axiom axiom, Reposi
 {
     // Clear quantifications as we enter a new top-level scope.
     m_num_quantifications.clear();
-    increment_num_quantifications(axiom->get_parameters(), m_num_quantifications);
+    increment_num_quantifications(axiom->get_parameters(), m_num_quantifications);  ///< We map untranslated variables
 
     const auto translated_parameters = this->translate_level_0(axiom->get_parameters(), repositories);
     const auto translated_literal = this->translate_level_0(axiom->get_literal(), repositories);
@@ -109,7 +112,7 @@ Axiom RenameQuantifiedVariablesTranslator::translate_level_2(Axiom axiom, Reposi
 
 Condition RenameQuantifiedVariablesTranslator::translate_level_2(ConditionExists condition, Repositories& repositories)
 {
-    increment_num_quantifications(condition->get_parameters(), m_num_quantifications);
+    increment_num_quantifications(condition->get_parameters(), m_num_quantifications);  ///< We map untranslated variables
 
     const auto translated_parameters = this->translate_level_0(condition->get_parameters(), repositories);
     const auto translated_nested_condition = this->translate_level_0(condition->get_condition(), repositories);
@@ -122,7 +125,7 @@ Condition RenameQuantifiedVariablesTranslator::translate_level_2(ConditionExists
 
 Condition RenameQuantifiedVariablesTranslator::translate_level_2(ConditionForall condition, Repositories& repositories)
 {
-    increment_num_quantifications(condition->get_parameters(), m_num_quantifications);
+    increment_num_quantifications(condition->get_parameters(), m_num_quantifications);  ///< We map untranslated variables
 
     const auto translated_parameters = this->translate_level_0(condition->get_parameters(), repositories);
     const auto translated_nested_condition = this->translate_level_0(condition->get_condition(), repositories);
@@ -135,7 +138,7 @@ Condition RenameQuantifiedVariablesTranslator::translate_level_2(ConditionForall
 
 Effect RenameQuantifiedVariablesTranslator::translate_level_2(EffectCompositeForall effect, Repositories& repositories)
 {
-    increment_num_quantifications(effect->get_parameters(), m_num_quantifications);
+    increment_num_quantifications(effect->get_parameters(), m_num_quantifications);  ///< We map untranslated variables
 
     const auto translated_parameters = this->translate_level_0(effect->get_parameters(), repositories);
     const auto translated_nested_effect = this->translate_level_0(effect->get_effect(), repositories);
