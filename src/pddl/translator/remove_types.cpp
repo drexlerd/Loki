@@ -91,32 +91,6 @@ static ConditionList typed_parameter_to_condition_literals(Parameter parameter, 
     return conditions;
 }
 
-Predicate RemoveTypesTranslator::translate_level_2(Predicate predicate, Repositories& repositories)
-{
-    auto translated_untyped_parameters = ParameterList {};
-    for (const auto& parameter : predicate->get_parameters())
-    {
-        translated_untyped_parameters.push_back(
-            repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {}));
-    }
-
-    return repositories.get_or_create_predicate(predicate->get_name(), translated_untyped_parameters);
-}
-
-FunctionSkeleton RemoveTypesTranslator::translate_level_2(FunctionSkeleton function_skeleton, Repositories& repositories)
-{
-    auto translated_untyped_parameters = ParameterList {};
-    for (const auto& parameter : function_skeleton->get_parameters())
-    {
-        translated_untyped_parameters.push_back(
-            repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {}));
-    }
-
-    const auto translated_function_type = this->translate_level_0(function_skeleton->get_type(), repositories);  ///< we keep the function return type
-
-    return repositories.get_or_create_function_skeleton(function_skeleton->get_name(), translated_untyped_parameters, translated_function_type);
-}
-
 Object RemoveTypesTranslator::translate_level_2(Object object, Repositories& repositories) { return typed_object_to_untyped_object(object, repositories); }
 
 Condition RemoveTypesTranslator::translate_level_2(ConditionExists condition, Repositories& repositories)

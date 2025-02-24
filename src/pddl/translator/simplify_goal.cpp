@@ -92,6 +92,7 @@ Problem SimplifyGoalTranslator::translate_level_2(const Problem& problem, Proble
     builder.get_initial_function_values().insert(builder.get_initial_function_values().end(),
                                                  translated_initial_function_values.begin(),
                                                  translated_initial_function_values.end());
+
     if (problem->get_goal_condition().has_value())
     {
         auto next_axiom_index = size_t(0);
