@@ -3,7 +3,7 @@
 namespace loki::benchmarks
 {
 
-loki::AtomList create_atoms(size_t num_objects, size_t num_predicates, loki::PDDLRepositories& factories)
+loki::AtomList create_atoms(size_t num_objects, size_t num_predicates, loki::Repositories& factories)
 {
     // Create num_objects-many objects with name object_1,...,object_<num_objects>
     auto objects = loki::ObjectList();

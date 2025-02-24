@@ -56,7 +56,7 @@ static void BM_IterateAtoms(benchmark::State& state)
     const size_t num_predicates = 100;
     // Choose num_objects sufficiently large, we cast to size_t to stay slightly below to fit into the cache
     const size_t num_objects = static_cast<size_t>(sqrt(num_atoms / num_predicates));
-    auto factories = loki::PDDLRepositories();
+    auto factories = loki::Repositories();
     auto atoms = create_atoms(num_objects, num_predicates, factories);
     benchmark::DoNotOptimize(atoms);
 
@@ -77,7 +77,7 @@ static void BM_RandomlyIterateAtoms(benchmark::State& state)
     const size_t num_atoms = state.range(0);
     const size_t num_predicates = 100;
     const size_t num_objects = static_cast<size_t>(sqrt(num_atoms / num_predicates));
-    auto factories = loki::PDDLRepositories();
+    auto factories = loki::Repositories();
     auto atoms = create_atoms(num_objects, num_predicates, factories);
     benchmark::DoNotOptimize(atoms);
 
