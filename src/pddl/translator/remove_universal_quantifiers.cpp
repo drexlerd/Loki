@@ -144,10 +144,8 @@ Action RemoveUniversalQuantifiersTranslator::translate_level_2(Action action, Re
 
     this->m_scopes.open_scope(translated_parameters);
 
-    auto translated_condition =
-        (action->get_condition().has_value() ? std::optional<Condition>(translate_level_0(action->get_condition().value(), repositories)) : std::nullopt);
-    auto translated_effect =
-        (action->get_effect().has_value() ? std::optional<Effect>(translate_level_0(action->get_effect().value(), repositories)) : std::nullopt);
+    auto translated_condition = translate_level_0(action->get_condition(), repositories);
+    auto translated_effect = translate_level_0(action->get_effect(), repositories);
 
     auto translated_action =
         repositories.get_or_create_action(action->get_name(), action->get_original_arity(), translated_parameters, translated_condition, translated_effect);
@@ -190,6 +188,10 @@ Domain RemoveUniversalQuantifiersTranslator::translate_level_2(const Domain& dom
     const auto translated_constants = this->translate_level_0(domain->get_constants(), repositories);
     builder.get_constants().insert(builder.get_constants().end(), translated_constants.begin(), translated_constants.end());
     const auto translated_predicates = this->translate_level_0(domain->get_predicates(), repositories);
+    const auto translated_static_initial_literals = this->translate_level_0(domain->get_static_initial_literals(), repositories);
+    builder.get_static_initial_literals().insert(builder.get_static_initial_literals().end(),
+                                                 translated_static_initial_literals.begin(),
+                                                 translated_static_initial_literals.end());
     builder.get_predicates().insert(builder.get_predicates().end(), translated_predicates.begin(), translated_predicates.end());
     const auto translated_function_skeletons = this->translate_level_0(domain->get_function_skeletons(), repositories);
     builder.get_function_skeletons().insert(builder.get_function_skeletons().end(), translated_function_skeletons.begin(), translated_function_skeletons.end());
@@ -232,10 +234,8 @@ Problem RemoveUniversalQuantifiersTranslator::translate_level_2(const Problem& p
     builder.get_initial_function_values().insert(builder.get_initial_function_values().end(),
                                                  translated_initial_function_values.begin(),
                                                  translated_initial_function_values.end());
-    if (problem->get_goal_condition().has_value())
-        builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition().value(), repositories);
-    if (problem->get_optimization_metric().has_value())
-        builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric().value(), repositories);
+    builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition(), repositories);
+    builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric(), repositories);
     const auto translated_axioms = this->translate_level_0(problem->get_axioms(), repositories);
     builder.get_axioms().insert(builder.get_axioms().end(), translated_axioms.begin(), translated_axioms.end());
 

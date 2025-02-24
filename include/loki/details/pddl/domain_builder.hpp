@@ -38,6 +38,7 @@ private:
     Requirements m_requirements;
     TypeList m_types;
     ObjectList m_constants;
+    LiteralList m_static_initial_literals;
     PredicateList m_predicates;
     FunctionSkeletonList m_function_skeletons;
     ActionList m_actions;
@@ -62,6 +63,7 @@ public:
     Requirements& get_requirements();
     TypeList& get_types();
     ObjectList& get_constants();
+    LiteralList& get_static_initial_literals();
     PredicateList& get_predicates();
     FunctionSkeletonList& get_function_skeletons();
     ActionList& get_actions();

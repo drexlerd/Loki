@@ -109,8 +109,7 @@ Problem SimplifyGoalTranslator::translate_level_2(const Problem& problem, Proble
         builder.get_predicates().insert(builder.get_predicates().end(), instantiated_predicates.begin(), instantiated_predicates.end());
         builder.get_axioms().insert(builder.get_axioms().end(), instantiated_axioms.begin(), instantiated_axioms.end());
     }
-    if (problem->get_optimization_metric().has_value())
-        builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric().value(), repositories);
+    builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric(), repositories);
     const auto translated_axioms = this->translate_level_0(problem->get_axioms(), repositories);
     builder.get_axioms().insert(builder.get_axioms().end(), translated_axioms.begin(), translated_axioms.end());
 

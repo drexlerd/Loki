@@ -68,8 +68,7 @@ Condition MoveExistentialQuantifiersTranslator::translate_level_2(ConditionExist
 Action MoveExistentialQuantifiersTranslator::translate_level_2(Action action, Repositories& repositories)
 {
     auto translated_parameters = this->translate_level_0(action->get_parameters(), repositories);
-    auto translated_condition =
-        (action->get_condition().has_value() ? std::optional<Condition>(this->translate_level_0(action->get_condition().value(), repositories)) : std::nullopt);
+    auto translated_condition = this->translate_level_0(action->get_condition(), repositories);
 
     if (translated_condition.has_value())
     {
@@ -87,12 +86,11 @@ Action MoveExistentialQuantifiersTranslator::translate_level_2(Action action, Re
         }
     }
 
-    return repositories.get_or_create_action(
-        action->get_name(),
-        action->get_original_arity(),
-        translated_parameters,
-        translated_condition,
-        (action->get_effect().has_value() ? std::optional<Effect>(this->translate_level_0(action->get_effect().value(), repositories)) : std::nullopt));
+    return repositories.get_or_create_action(action->get_name(),
+                                             action->get_original_arity(),
+                                             translated_parameters,
+                                             translated_condition,
+                                             this->translate_level_0(action->get_effect(), repositories));
 }
 
 Axiom MoveExistentialQuantifiersTranslator::translate_level_2(Axiom axiom, Repositories& repositories)

@@ -37,6 +37,7 @@ private:
     Requirements m_requirements;
     TypeList m_types;
     ObjectList m_constants;
+    LiteralList m_static_initial_literals;  ///< May contain literals that represent the type of constants after type translation.
     PredicateList m_predicates;
     FunctionSkeletonList m_function_skeletons;
     ActionList m_actions;
@@ -48,6 +49,7 @@ private:
                Requirements requirements,
                TypeList types,
                ObjectList constants,
+               LiteralList static_initial_literals,
                PredicateList predicates,
                FunctionSkeletonList function_skeletons,
                ActionList actions,
@@ -68,6 +70,7 @@ public:
     const Requirements& get_requirements() const;
     const TypeList& get_types() const;
     const ObjectList& get_constants() const;
+    const LiteralList& get_static_initial_literals() const;
     const PredicateList& get_predicates() const;
     const FunctionSkeletonList& get_function_skeletons() const;
     const ActionList& get_actions() const;

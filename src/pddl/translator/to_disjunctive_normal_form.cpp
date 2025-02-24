@@ -137,6 +137,10 @@ Domain ToDisjunctiveNormalFormTranslator::translate_level_2(const Domain& domain
     builder.get_constants().insert(builder.get_constants().end(), translated_constants.begin(), translated_constants.end());
     const auto translated_predicates = this->translate_level_0(nnf_domain->get_predicates(), repositories);
     builder.get_predicates().insert(builder.get_predicates().end(), translated_predicates.begin(), translated_predicates.end());
+    const auto translated_static_initial_literals = this->translate_level_0(nnf_domain->get_static_initial_literals(), repositories);
+    builder.get_static_initial_literals().insert(builder.get_static_initial_literals().end(),
+                                                 translated_static_initial_literals.begin(),
+                                                 translated_static_initial_literals.end());
     const auto translated_function_skeletons = this->translate_level_0(nnf_domain->get_function_skeletons(), repositories);
     builder.get_function_skeletons().insert(builder.get_function_skeletons().end(), translated_function_skeletons.begin(), translated_function_skeletons.end());
     const auto translated_actions = this->translate_level_0(nnf_domain->get_actions(), repositories);
@@ -167,10 +171,8 @@ Problem ToDisjunctiveNormalFormTranslator::translate_level_2(const Problem& prob
     builder.get_initial_function_values().insert(builder.get_initial_function_values().end(),
                                                  translated_initial_function_values.begin(),
                                                  translated_initial_function_values.end());
-    if (nnf_problem->get_goal_condition().has_value())
-        builder.get_goal_condition() = this->translate_level_0(nnf_problem->get_goal_condition().value(), repositories);
-    if (nnf_problem->get_optimization_metric().has_value())
-        builder.get_optimization_metric() = this->translate_level_0(nnf_problem->get_optimization_metric().value(), repositories);
+    builder.get_goal_condition() = this->translate_level_0(nnf_problem->get_goal_condition(), repositories);
+    builder.get_optimization_metric() = this->translate_level_0(nnf_problem->get_optimization_metric(), repositories);
     const auto translated_axioms = this->translate_level_0(nnf_problem->get_axioms(), repositories);
     builder.get_axioms().insert(builder.get_axioms().end(), translated_axioms.begin(), translated_axioms.end());
 

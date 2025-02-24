@@ -55,6 +55,14 @@ protected:
         std::ranges::for_each(range, [this](auto&& arg) { this->prepare_level_0(arg); });
     }
     template<typename T>
+    void prepare_level_1(const std::optional<T>& element)
+    {
+        if (element.has_value())
+        {
+            self().prepare_level_2(element.value());
+        }
+    }
+    template<typename T>
     void prepare_level_1(const T& element)
     {
         self().prepare_level_2(element);
@@ -160,14 +168,8 @@ protected:
     void prepare_level_2(loki::Action action)
     {
         this->prepare_level_0(action->get_parameters());
-        if (action->get_condition().has_value())
-        {
-            this->prepare_level_0(action->get_condition().value());
-        }
-        if (action->get_effect().has_value())
-        {
-            this->prepare_level_0(action->get_effect().value());
-        }
+        this->prepare_level_0(action->get_condition());
+        this->prepare_level_0(action->get_effect());
     }
     void prepare_level_2(loki::Axiom axiom)
     {
@@ -200,12 +202,17 @@ protected:
 
         return output;
     }
-
+    template<typename T>
+    auto translate_level_1(const std::optional<T>& element, Repositories& repositories)
+    {
+        return element.has_value() ? this->translate_level_0(element.value(), repositories) : std::optional<T> { std::nullopt };
+    }
     template<typename T>
     auto translate_level_1(const T& element, Repositories& repositories)
     {
         return self().translate_level_2(element, repositories);
     }
+
     loki::Requirements translate_level_2(loki::Requirements requirements, Repositories& repositories)
     {
         return repositories.get_or_create_requirements(requirements->get_requirements());
@@ -385,14 +392,11 @@ protected:
     }
     loki::Action translate_level_2(loki::Action action, Repositories& repositories)
     {
-        return repositories.get_or_create_action(
-            action->get_name(),
-            action->get_original_arity(),
-            this->translate_level_0(action->get_parameters(), repositories),
-            (action->get_condition().has_value() ? std::optional<loki::Condition>(this->translate_level_0(action->get_condition().value(), repositories)) :
-                                                   std::nullopt),
-            (action->get_effect().has_value() ? std::optional<loki::Effect>(this->translate_level_0(action->get_effect().value(), repositories)) :
-                                                std::nullopt));
+        return repositories.get_or_create_action(action->get_name(),
+                                                 action->get_original_arity(),
+                                                 this->translate_level_0(action->get_parameters(), repositories),
+                                                 this->translate_level_0(action->get_condition(), repositories),
+                                                 this->translate_level_0(action->get_effect(), repositories));
     }
     loki::Axiom translate_level_2(loki::Axiom axiom, Repositories& repositories)
     {
@@ -419,6 +423,10 @@ protected:
         builder.get_types().insert(builder.get_types().end(), translated_types.begin(), translated_types.end());
         const auto translated_constants = this->translate_level_0(domain->get_constants(), repositories);
         builder.get_constants().insert(builder.get_constants().end(), translated_constants.begin(), translated_constants.end());
+        const auto translated_static_initial_literals = this->translate_level_0(domain->get_static_initial_literals(), repositories);
+        builder.get_static_initial_literals().insert(builder.get_static_initial_literals().end(),
+                                                     translated_static_initial_literals.begin(),
+                                                     translated_static_initial_literals.end());
         const auto translated_predicates = this->translate_level_0(domain->get_predicates(), repositories);
         builder.get_predicates().insert(builder.get_predicates().end(), translated_predicates.begin(), translated_predicates.end());
         const auto translated_function_skeletons = this->translate_level_0(domain->get_function_skeletons(), repositories);
@@ -452,10 +460,8 @@ protected:
         builder.get_initial_function_values().insert(builder.get_initial_function_values().end(),
                                                      translated_initial_function_values.begin(),
                                                      translated_initial_function_values.end());
-        if (problem->get_goal_condition().has_value())
-            builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition().value(), repositories);
-        if (problem->get_optimization_metric().has_value())
-            builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric().value(), repositories);
+        builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition(), repositories);
+        builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric(), repositories);
         const auto translated_axioms = this->translate_level_0(problem->get_axioms(), repositories);
         builder.get_axioms().insert(builder.get_axioms().end(), translated_axioms.begin(), translated_axioms.end());
 

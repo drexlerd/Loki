@@ -83,10 +83,8 @@ Action RenameQuantifiedVariablesTranslator::translate_level_2(Action action, Rep
     increment_num_quantifications(action->get_parameters(), m_num_quantifications);
 
     const auto translated_parameters = this->translate_level_0(action->get_parameters(), repositories);
-    const auto translated_conditions =
-        (action->get_condition().has_value() ? std::optional<Condition>(this->translate_level_0(action->get_condition().value(), repositories)) : std::nullopt);
-    const auto translated_effect =
-        (action->get_effect().has_value() ? std::optional<Effect>(this->translate_level_0(action->get_effect().value(), repositories)) : std::nullopt);
+    const auto translated_conditions = this->translate_level_0(action->get_condition(), repositories);
+    const auto translated_effect = this->translate_level_0(action->get_effect(), repositories);
 
     auto translated_action =
         repositories.get_or_create_action(action->get_name(), action->get_original_arity(), translated_parameters, translated_conditions, translated_effect);

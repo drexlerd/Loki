@@ -35,7 +35,7 @@ private:
     using RecursiveCachedBaseTranslator::translate_level_2;
 
     // Collect predicates that encode types
-    std::unordered_map<Type, Predicate> m_type_to_predicates;
+    PredicateSet m_translated_predicates;
 
     /**
      * Translate

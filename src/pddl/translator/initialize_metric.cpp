@@ -64,11 +64,8 @@ static FunctionValue get_or_create_initial_total_cost_function_value(Repositorie
 Action InitializeMetricTranslator::translate_level_2(Action action, Repositories& repositories)
 {
     const auto translated_parameters = this->translate_level_0(action->get_parameters(), repositories);
-    const auto translated_condition =
-        (action->get_condition().has_value() ? std::optional<loki::Condition>(this->translate_level_0(action->get_condition().value(), repositories)) :
-                                               std::nullopt);
-    auto translated_effect =
-        (action->get_effect().has_value() ? std::optional<loki::Effect>(this->translate_level_0(action->get_effect().value(), repositories)) : std::nullopt);
+    const auto translated_condition = this->translate_level_0(action->get_condition(), repositories);
+    auto translated_effect = this->translate_level_0(action->get_effect(), repositories);
 
     // Note: if metric is defined and :action-costs is disabled, then :numeric-fluents is enabled and we must not add numeric effects.
     if (!m_has_metric_defined && !m_action_costs_enabled)
@@ -103,6 +100,10 @@ Domain InitializeMetricTranslator::translate_level_2(const Domain& domain, Domai
     builder.get_types().insert(builder.get_types().end(), translated_types.begin(), translated_types.end());
     const auto translated_constants = this->translate_level_0(domain->get_constants(), repositories);
     builder.get_constants().insert(builder.get_constants().end(), translated_constants.begin(), translated_constants.end());
+    const auto translated_static_initial_literals = this->translate_level_0(domain->get_static_initial_literals(), repositories);
+    builder.get_static_initial_literals().insert(builder.get_static_initial_literals().end(),
+                                                 translated_static_initial_literals.begin(),
+                                                 translated_static_initial_literals.end());
     const auto translated_predicates = this->translate_level_0(domain->get_predicates(), repositories);
     builder.get_predicates().insert(builder.get_predicates().end(), translated_predicates.begin(), translated_predicates.end());
 

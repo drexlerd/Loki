@@ -36,13 +36,11 @@ ActionList SplitDisjunctiveConditionsTranslator::split_actions_at_disjunction(co
         {
             for (const auto& part : std::get<ConditionOr>(condition.value()->get_condition())->get_conditions())
             {
-                translated_split_actions.push_back(repositories.get_or_create_action(
-                    action->get_name(),
-                    action->get_original_arity(),
-                    this->translate_level_0(action->get_parameters(), repositories),
-                    this->translate_level_0(part, repositories),
-                    action->get_effect().has_value() ? std::optional<Effect>(this->translate_level_0(action->get_effect().value(), repositories)) :
-                                                       std::nullopt));
+                translated_split_actions.push_back(repositories.get_or_create_action(action->get_name(),
+                                                                                     action->get_original_arity(),
+                                                                                     this->translate_level_0(action->get_parameters(), repositories),
+                                                                                     this->translate_level_0(part, repositories),
+                                                                                     this->translate_level_0(action->get_effect(), repositories)));
             }
         }
         else
@@ -148,10 +146,8 @@ Problem SplitDisjunctiveConditionsTranslator::translate_level_2(const Problem& p
     builder.get_initial_function_values().insert(builder.get_initial_function_values().end(),
                                                  translated_initial_function_values.begin(),
                                                  translated_initial_function_values.end());
-    if (problem->get_goal_condition().has_value())
-        builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition().value(), repositories);
-    if (problem->get_optimization_metric().has_value())
-        builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric().value(), repositories);
+    builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition(), repositories);
+    builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric(), repositories);
 
     builder.get_axioms().insert(builder.get_axioms().end(), translated_axioms.begin(), translated_axioms.end());
 

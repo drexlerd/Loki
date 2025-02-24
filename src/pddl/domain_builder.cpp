@@ -63,6 +63,7 @@ Domain DomainBuilder::get_result()
                                                             std::move(m_requirements),
                                                             std::move(m_types),
                                                             std::move(m_constants),
+                                                            std::move(m_static_initial_literals),
                                                             std::move(m_predicates),
                                                             std::move(m_function_skeletons),
                                                             std::move(m_actions),
@@ -75,6 +76,7 @@ std::string& DomainBuilder::get_name() { return m_name; }
 Requirements& DomainBuilder::get_requirements() { return m_requirements; }
 TypeList& DomainBuilder::get_types() { return m_types; }
 ObjectList& DomainBuilder::get_constants() { return m_constants; }
+LiteralList& DomainBuilder::get_static_initial_literals() { return m_static_initial_literals; }
 PredicateList& DomainBuilder::get_predicates() { return m_predicates; }
 FunctionSkeletonList& DomainBuilder::get_function_skeletons() { return m_function_skeletons; }
 ActionList& DomainBuilder::get_actions() { return m_actions; }

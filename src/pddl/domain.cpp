@@ -38,6 +38,7 @@ DomainImpl::DomainImpl(Repositories repositories,
                        Requirements requirements,
                        TypeList types,
                        ObjectList constants,
+                       LiteralList static_initial_literals,
                        PredicateList predicates,
                        FunctionSkeletonList functions,
                        ActionList actions,
@@ -48,6 +49,7 @@ DomainImpl::DomainImpl(Repositories repositories,
     m_requirements(std::move(requirements)),
     m_types(std::move(types)),
     m_constants(std::move(constants)),
+    m_static_initial_literals(std::move(static_initial_literals)),
     m_predicates(std::move(predicates)),
     m_function_skeletons(std::move(functions)),
     m_actions(std::move(actions)),
@@ -66,6 +68,8 @@ const Requirements& DomainImpl::get_requirements() const { return m_requirements
 const TypeList& DomainImpl::get_types() const { return m_types; }
 
 const ObjectList& DomainImpl::get_constants() const { return m_constants; }
+
+const LiteralList& DomainImpl::get_static_initial_literals() const { return m_static_initial_literals; }
 
 const PredicateList& DomainImpl::get_predicates() const { return m_predicates; }
 
