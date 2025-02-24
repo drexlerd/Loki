@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
     auto options = loki::Options();
     options.quiet = false;
-    options.strict = true;
+    options.strict = false;
 
     // 1. Parse the domain
     auto parser = loki::Parser(domain_file, options);
