@@ -280,17 +280,13 @@ Problem RemoveTypesTranslator::translate_level_2(const Problem& problem, Problem
     const auto translated_initial_literals = this->translate_level_0(problem->get_initial_literals(), repositories);
     builder.get_initial_literals().insert(builder.get_initial_literals().end(), translated_initial_literals.begin(), translated_initial_literals.end());
 
-    const auto translated_function_values = this->translate_level_0(problem->get_initial_function_values(), repositories);
-    builder.get_initial_function_values().insert(builder.get_initial_function_values().end(),
-                                                 translated_function_values.begin(),
-                                                 translated_function_values.end());
+    builder.get_initial_function_values() = this->translate_level_0(problem->get_initial_function_values(), repositories);
 
     builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition(), repositories);
 
     builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric(), repositories);
 
-    const auto translated_axioms = this->translate_level_0(problem->get_axioms(), repositories);
-    builder.get_axioms().insert(builder.get_axioms().end(), translated_axioms.begin(), translated_axioms.end());
+    builder.get_axioms() = this->translate_level_0(problem->get_axioms(), repositories);
 
     // Types are define in the domain and copied into ProblemBuilder during its contruction
 

@@ -82,16 +82,12 @@ Problem SimplifyGoalTranslator::translate_level_2(const Problem& problem, Proble
     builder.get_filepath() = problem->get_filepath();
     builder.get_name() = problem->get_name();
     builder.get_requirements() = this->translate_level_0(problem->get_requirements(), repositories);
-    const auto translated_objects = this->translate_level_0(problem->get_objects(), repositories);
-    builder.get_objects().insert(builder.get_objects().end(), translated_objects.begin(), translated_objects.end());
-    const auto translated_predicates = this->translate_level_0(problem->get_predicates(), repositories);
-    builder.get_predicates().insert(builder.get_predicates().end(), translated_predicates.begin(), translated_predicates.end());
-    const auto translated_initial_literals = this->translate_level_0(problem->get_initial_literals(), repositories);
-    builder.get_initial_literals().insert(builder.get_initial_literals().end(), translated_initial_literals.begin(), translated_initial_literals.end());
-    const auto translated_initial_function_values = this->translate_level_0(problem->get_initial_function_values(), repositories);
-    builder.get_initial_function_values().insert(builder.get_initial_function_values().end(),
-                                                 translated_initial_function_values.begin(),
-                                                 translated_initial_function_values.end());
+    builder.get_objects() = this->translate_level_0(problem->get_objects(), repositories);
+    builder.get_predicates() = this->translate_level_0(problem->get_predicates(), repositories);
+    builder.get_initial_literals() = this->translate_level_0(problem->get_initial_literals(), repositories);
+    builder.get_initial_function_values() = this->translate_level_0(problem->get_initial_function_values(), repositories);
+    builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric(), repositories);
+    builder.get_axioms() = this->translate_level_0(problem->get_axioms(), repositories);
 
     if (problem->get_goal_condition().has_value())
     {
@@ -99,20 +95,15 @@ Problem SimplifyGoalTranslator::translate_level_2(const Problem& problem, Proble
         auto instantiated_axioms = AxiomList {};
         auto instantiated_predicates = PredicateList {};
 
-        const auto translated_simplified_goal = simplify_goal_condition(problem->get_goal_condition().value(),
-                                                                        repositories,
-                                                                        instantiated_predicates,
-                                                                        instantiated_axioms,
-                                                                        next_axiom_index,
-                                                                        problem_and_domain_predicate_names);
-
-        builder.get_goal_condition() = translated_simplified_goal;
+        builder.get_goal_condition() = simplify_goal_condition(problem->get_goal_condition().value(),
+                                                               repositories,
+                                                               instantiated_predicates,
+                                                               instantiated_axioms,
+                                                               next_axiom_index,
+                                                               problem_and_domain_predicate_names);
         builder.get_predicates().insert(builder.get_predicates().end(), instantiated_predicates.begin(), instantiated_predicates.end());
         builder.get_axioms().insert(builder.get_axioms().end(), instantiated_axioms.begin(), instantiated_axioms.end());
     }
-    builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric(), repositories);
-    const auto translated_axioms = this->translate_level_0(problem->get_axioms(), repositories);
-    builder.get_axioms().insert(builder.get_axioms().end(), translated_axioms.begin(), translated_axioms.end());
 
     return builder.get_result(problem->get_index());
 }

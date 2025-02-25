@@ -101,27 +101,17 @@ Domain SplitDisjunctiveConditionsTranslator::translate_level_2(const Domain& dom
 {
     auto& repositories = builder.get_repositories();
 
-    // Split actions
-    auto translated_actions = split_actions_at_disjunction(domain->get_actions(), repositories);
-
-    // Split axioms
-    auto translated_axioms = split_axioms_at_disjunction(domain->get_axioms(), repositories);
-
     builder.get_name() = domain->get_name();
     builder.get_filepath() = domain->get_filepath();
     builder.get_requirements() = this->translate_level_0(domain->get_requirements(), repositories);
-    const auto translated_types = this->translate_level_0(domain->get_types(), repositories);
-    builder.get_types().insert(builder.get_types().end(), translated_types.begin(), translated_types.end());
-    const auto translated_constants = this->translate_level_0(domain->get_constants(), repositories);
-    builder.get_constants().insert(builder.get_constants().end(), translated_constants.begin(), translated_constants.end());
-    const auto translated_predicates = this->translate_level_0(domain->get_predicates(), repositories);
-    builder.get_predicates().insert(builder.get_predicates().end(), translated_predicates.begin(), translated_predicates.end());
-    const auto translated_function_skeletons = this->translate_level_0(domain->get_function_skeletons(), repositories);
-    builder.get_function_skeletons().insert(builder.get_function_skeletons().end(), translated_function_skeletons.begin(), translated_function_skeletons.end());
+    builder.get_types() = this->translate_level_0(domain->get_types(), repositories);
+    builder.get_constants() = this->translate_level_0(domain->get_constants(), repositories);
+    builder.get_predicates() = this->translate_level_0(domain->get_predicates(), repositories);
+    builder.get_function_skeletons() = this->translate_level_0(domain->get_function_skeletons(), repositories);
 
-    builder.get_actions().insert(builder.get_actions().end(), translated_actions.begin(), translated_actions.end());
+    builder.get_actions() = split_actions_at_disjunction(domain->get_actions(), repositories);
 
-    builder.get_axioms().insert(builder.get_axioms().end(), translated_axioms.begin(), translated_axioms.end());
+    builder.get_axioms() = split_axioms_at_disjunction(domain->get_axioms(), repositories);
 
     return builder.get_result();
 }
@@ -129,9 +119,6 @@ Domain SplitDisjunctiveConditionsTranslator::translate_level_2(const Domain& dom
 Problem SplitDisjunctiveConditionsTranslator::translate_level_2(const Problem& problem, ProblemBuilder& builder)
 {
     auto& repositories = builder.get_repositories();
-
-    // Split axioms
-    auto translated_axioms = split_axioms_at_disjunction(problem->get_axioms(), repositories);
 
     builder.get_filepath() = problem->get_filepath();
     builder.get_name() = problem->get_name();
@@ -149,7 +136,7 @@ Problem SplitDisjunctiveConditionsTranslator::translate_level_2(const Problem& p
     builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition(), repositories);
     builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric(), repositories);
 
-    builder.get_axioms().insert(builder.get_axioms().end(), translated_axioms.begin(), translated_axioms.end());
+    builder.get_axioms() = split_axioms_at_disjunction(problem->get_axioms(), repositories);
 
     return builder.get_result(problem->get_index());
 }

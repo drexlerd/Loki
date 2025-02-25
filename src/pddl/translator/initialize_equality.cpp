@@ -68,21 +68,16 @@ Problem InitializeEqualityTranslator::translate_level_2(const Problem& problem, 
     builder.get_name() = problem->get_name();
     builder.get_requirements() = this->translate_level_0(problem->get_requirements(), repositories);
 
-    builder.get_objects().insert(builder.get_objects().end(), translated_objects.begin(), translated_objects.end());
-    const auto translated_predicates = this->translate_level_0(problem->get_predicates(), repositories);
-    builder.get_predicates().insert(builder.get_predicates().end(), translated_predicates.begin(), translated_predicates.end());
+    builder.get_objects() = translated_objects;
+    builder.get_predicates() = this->translate_level_0(problem->get_predicates(), repositories);
 
-    builder.get_initial_literals().insert(builder.get_initial_literals().end(), translated_initial_literals.begin(), translated_initial_literals.end());
-    const auto translated_initial_function_values = this->translate_level_0(problem->get_initial_function_values(), repositories);
-    builder.get_initial_function_values().insert(builder.get_initial_function_values().end(),
-                                                 translated_initial_function_values.begin(),
-                                                 translated_initial_function_values.end());
+    builder.get_initial_literals() = translated_initial_literals;
+    builder.get_initial_function_values() = this->translate_level_0(problem->get_initial_function_values(), repositories);
     if (problem->get_goal_condition().has_value())
         builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition().value(), repositories);
     if (problem->get_optimization_metric().has_value())
         builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric().value(), repositories);
-    const auto translated_axioms = this->translate_level_0(problem->get_axioms(), repositories);
-    builder.get_axioms().insert(builder.get_axioms().end(), translated_axioms.begin(), translated_axioms.end());
+    builder.get_axioms() = this->translate_level_0(problem->get_axioms(), repositories);
 
     return builder.get_result(problem->get_index());
 }

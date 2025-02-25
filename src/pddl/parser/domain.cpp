@@ -110,15 +110,15 @@ void parse(const ast::Domain& node, DomainParsingContext& context)
     }
 
     /* Structure section */
+    auto axioms = AxiomList();
+    auto actions = ActionList();
     for (const auto& structure_node : node.structures)
     {
-        auto axioms = AxiomList();
-        auto actions = ActionList();
         auto variant = parse(structure_node, context);
         std::visit(UnpackingVisitor(actions, axioms), variant);
-        context.builder.get_actions().insert(context.builder.get_actions().end(), actions.begin(), actions.end());
-        context.builder.get_axioms().insert(context.builder.get_axioms().end(), axioms.begin(), axioms.end());
     }
+    context.builder.get_actions() = std::move(actions);
+    context.builder.get_axioms() = std::move(axioms);
 
     // Check references
     test_predicate_references(predicates, context);

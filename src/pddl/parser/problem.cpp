@@ -68,7 +68,7 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
     if (node.objects.has_value())
     {
         objects = parse(node.objects.value(), context);
-        context.builder.get_objects().insert(context.builder.get_objects().end(), objects.begin(), objects.end());
+        context.builder.get_objects() = objects;
         track_object_references(objects, context);
     }
 
@@ -77,7 +77,7 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
     if (node.derived_predicates.has_value())
     {
         predicates = parse(node.derived_predicates.value(), context);
-        context.builder.get_predicates().insert(context.builder.get_predicates().end(), predicates.begin(), predicates.end());
+        context.builder.get_predicates() = predicates;
         track_predicate_references(predicates, context);
     }
 
@@ -91,17 +91,14 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
         {
             std::visit(UnpackingVisitor(initial_literals, function_values), initial_element);
         }
-        context.builder.get_initial_literals().insert(context.builder.get_initial_literals().end(), initial_literals.begin(), initial_literals.end());
-        context.builder.get_initial_function_values().insert(context.builder.get_initial_function_values().end(),
-                                                             function_values.begin(),
-                                                             function_values.end());
+        context.builder.get_initial_literals() = std::move(initial_literals);
+        context.builder.get_initial_function_values() = std::move(function_values);
     }
 
     /* Goal section */
     if (node.goal.has_value())
     {
-        const auto goal_condition = parse(node.goal.value(), context);
-        context.builder.get_goal_condition() = goal_condition;
+        context.builder.get_goal_condition() = parse(node.goal.value(), context);
     }
 
     /* Metric section */
@@ -117,7 +114,7 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
         auto actions = ActionList();
         auto variant = parse(structure_node, context);
         std::visit(UnpackingVisitor(actions, axioms), variant);
-        context.builder.get_axioms().insert(context.builder.get_axioms().end(), axioms.begin(), axioms.end());
+        context.builder.get_axioms() = std::move(axioms);
     }
 
     // Check references
