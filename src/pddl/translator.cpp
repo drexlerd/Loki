@@ -18,7 +18,6 @@
 #include "loki/details/pddl/translator.hpp"
 
 #include "translator/initialize_equality.hpp"
-#include "translator/initialize_metric.hpp"
 #include "translator/move_existential_quantifiers.hpp"
 #include "translator/remove_types.hpp"
 #include "translator/remove_universal_quantifiers.hpp"
@@ -107,13 +106,6 @@ DomainTranslationResult translate(const Domain& domain)
     // std::cout << "InitializeEqualityTranslator result: " << std::endl;
     // std::cout << *translated_domain << std::endl;
 
-    auto initialize_metric_translator = InitializeMetricTranslator();
-    builder = DomainBuilder();
-    translated_domain = initialize_metric_translator.translate_level_0(translated_domain, builder);
-
-    // std::cout << "InitializeMetricTranslator result: " << std::endl;
-    // std::cout << *translated_domain << std::endl;
-
     return DomainTranslationResult(domain, translated_domain);
 }
 
@@ -167,10 +159,6 @@ Problem translate(const Problem& problem, const DomainTranslationResult& result)
     auto initialize_equality_translator = InitializeEqualityTranslator();
     builder = ProblemBuilder(result.get_translated_domain());
     translated_problem = initialize_equality_translator.translate_level_0(translated_problem, builder);
-
-    auto initialize_metric_translator = InitializeMetricTranslator();
-    builder = ProblemBuilder(result.get_translated_domain());
-    translated_problem = initialize_metric_translator.translate_level_0(translated_problem, builder);
 
     return translated_problem;
 }
