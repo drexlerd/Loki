@@ -68,25 +68,10 @@ std::variant<Axiom, Action> StructureVisitor<C>::operator()(const ast::Action& n
     track_variable_references(parameter_list, context);
     auto [condition, effect] = parse(node.action_body, context);
     test_variable_references(parameter_list, context);
-    // Remove unused action parameters
-    auto used_parameters = ParameterList {};
-    for (const auto& parameter : parameter_list)
-    {
-        if (!context.references.exists(parameter->get_variable()))
-        {
-            used_parameters.push_back(parameter);
-        }
-        else
-        {
-            if (!context.options.quiet)
-            {
-                std::cout << "Removed unused parameter " << *parameter << " from action " << name << std::endl;
-            }
-        }
-    }
+    // Silently removing parameters results in segfaults when using val on the original domain.
     context.scopes.close_scope();
 
-    const auto action = context.builder.get_repositories().get_or_create_action(name, used_parameters.size(), used_parameters, condition, effect);
+    const auto action = context.builder.get_repositories().get_or_create_action(name, parameter_list.size(), parameter_list, condition, effect);
     context.positions.push_back(action, node);
     return action;
 }
