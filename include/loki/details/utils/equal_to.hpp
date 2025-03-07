@@ -97,7 +97,7 @@ struct EqualTo<std::pair<T1, T2>>
 {
     size_t operator()(const std::pair<T1, T2>& lhs, const std::pair<T1, T2>& rhs) const
     {
-        return loki::EqualTo<T1>()(lhs.first, rhs.first) && loki::EqualTo<T1>()(lhs.second, rhs.second);
+        return loki::EqualTo<T1>()(lhs.first, rhs.first) && loki::EqualTo<T2>()(lhs.second, rhs.second);
     }
 };
 
