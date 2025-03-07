@@ -43,7 +43,7 @@ TEST(LokiTests, LokiPddlTranslatorTest)
     {
         // Check that all domain constants are in the problem
         auto problem_objects = ObjectSet(translated_problem->get_objects().begin(), translated_problem->get_objects().end());
-        for (const auto& constant : domain->get_constants())
+        for (const auto& constant : translated_domain->get_constants())
         {
             EXPECT_TRUE(problem_objects.contains(constant));
         }

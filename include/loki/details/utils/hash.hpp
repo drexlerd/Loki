@@ -68,15 +68,14 @@ struct Hash<std::array<T, N>>
 {
     size_t operator()(const std::array<T, N>& arr) const
     {
-        size_t seed = arr.size();
-        size_t hash[2] = { 0, 0 };
+        size_t aggregated_hash = N;
 
-        loki::MurmurHash3_x64_128(arr.data(), N * sizeof(T), seed, hash);
+        for (const auto& element : arr)
+        {
+            loki::hash_combine(aggregated_hash, Hash<T> {}(element));
+        }
 
-        loki::hash_combine(seed, hash[0]);
-        loki::hash_combine(seed, hash[1]);
-
-        return seed;
+        return aggregated_hash;
     }
 };
 
@@ -89,7 +88,8 @@ struct Hash<std::set<Key, Compare, Allocator>>
 {
     size_t operator()(const std::set<Key, Compare, Allocator>& set) const
     {
-        std::size_t aggregated_hash = 0;
+        std::size_t aggregated_hash = set.size();
+
         for (const auto& item : set)
         {
             loki::hash_combine(aggregated_hash, item);
@@ -108,7 +108,8 @@ struct Hash<std::map<Key, T, Compare, Allocator>>
 {
     size_t operator()(const std::map<Key, T, Compare, Allocator>& map) const
     {
-        std::size_t aggregated_hash = 0;
+        std::size_t aggregated_hash = map.size();
+
         for (const auto& item : map)
         {
             loki::hash_combine(aggregated_hash, item);
@@ -126,15 +127,14 @@ struct Hash<std::vector<T, Allocator>>
 {
     size_t operator()(const std::vector<T, Allocator>& vec) const
     {
-        size_t seed = vec.size();
-        size_t hash[2] = { 0, 0 };
+        size_t aggregated_hash = vec.size();
 
-        loki::MurmurHash3_x64_128(vec.data(), vec.size() * sizeof(T), seed, hash);
+        for (const auto& element : vec)
+        {
+            loki::hash_combine(aggregated_hash, Hash<T> {}(element));
+        }
 
-        loki::hash_combine(seed, hash[0]);
-        loki::hash_combine(seed, hash[1]);
-
-        return seed;
+        return aggregated_hash;
     }
 };
 
