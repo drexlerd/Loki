@@ -50,7 +50,7 @@ public:
     const ParameterList& get_parameters() const;
     const Type& get_type() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_name), std::as_const(m_parameters), std::as_const(m_type)); }
+    auto identifying_members() const { return std::tuple(std::cref(get_name()), std::cref(get_parameters()), get_type()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const FunctionSkeletonImpl& element);

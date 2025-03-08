@@ -92,16 +92,16 @@ public:
 
     auto identifying_members() const
     {
-        return std::forward_as_tuple(std::as_const(m_domain),
-                                     std::as_const(m_name),
-                                     std::as_const(m_requirements),
-                                     std::as_const(m_objects),
-                                     std::as_const(m_predicates),
-                                     std::as_const(m_initial_literals),
-                                     std::as_const(m_initial_function_values),
-                                     std::as_const(m_goal_condition),
-                                     std::as_const(m_optimization_metric),
-                                     std::as_const(m_axioms));
+        return std::tuple(std::cref(get_domain()),
+                          std::cref(get_name()),
+                          get_requirements(),
+                          std::cref(get_objects()),
+                          std::cref(get_predicates()),
+                          std::cref(get_initial_literals()),
+                          std::cref(get_initial_function_values()),
+                          get_goal_condition(),
+                          get_optimization_metric(),
+                          std::cref(get_axioms()));
     }
 };
 

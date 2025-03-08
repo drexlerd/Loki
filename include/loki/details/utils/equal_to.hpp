@@ -45,10 +45,31 @@ struct EqualTo
     bool operator()(const T& lhs, const T& rhs) const { return std::equal_to<T>()(lhs, rhs); }
 };
 
+template<typename T, size_t N>
+struct EqualTo<std::array<T, N>>
+{
+    bool operator()(const std::array<T, N>& lhs, const std::array<T, N>& rhs) const
+    {
+        if constexpr (N == 0)
+            return true;
+
+        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::decay_t<T>>());
+    }
+};
+
+template<typename T>
+struct EqualTo<std::reference_wrapper<T>>
+{
+    bool operator()(const std::reference_wrapper<T>& lhs, const std::reference_wrapper<T>& rhs) const
+    {
+        return loki::EqualTo<std::decay_t<T>>()(lhs.get(), rhs.get());
+    }
+};
+
 template<typename Key, typename Compare, typename Allocator>
 struct EqualTo<std::set<Key, Compare, Allocator>>
 {
-    size_t operator()(const std::set<Key, Compare, Allocator>& lhs, const std::set<Key, Compare, Allocator>& rhs) const
+    bool operator()(const std::set<Key, Compare, Allocator>& lhs, const std::set<Key, Compare, Allocator>& rhs) const
     {
         // Check size first
         if (lhs.size() != rhs.size())
@@ -57,14 +78,14 @@ struct EqualTo<std::set<Key, Compare, Allocator>>
         }
 
         // Compare each element using loki::EqualTo
-        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<Key>());
+        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::decay_t<Key>>());
     }
 };
 
 template<typename Key, typename T, typename Compare, typename Allocator>
 struct EqualTo<std::map<Key, T, Compare, Allocator>>
 {
-    size_t operator()(const std::map<Key, T, Compare, Allocator>& lhs, const std::map<Key, T, Compare, Allocator>& rhs) const
+    bool operator()(const std::map<Key, T, Compare, Allocator>& lhs, const std::map<Key, T, Compare, Allocator>& rhs) const
     {
         // Check if sizes are different
         if (lhs.size() != rhs.size())
@@ -79,7 +100,7 @@ struct EqualTo<std::map<Key, T, Compare, Allocator>>
 template<typename T, typename Allocator>
 struct EqualTo<std::vector<T, Allocator>>
 {
-    size_t operator()(const std::vector<T, Allocator>& lhs, const std::vector<T, Allocator>& rhs) const
+    bool operator()(const std::vector<T, Allocator>& lhs, const std::vector<T, Allocator>& rhs) const
     {
         // Check size first
         if (lhs.size() != rhs.size())
@@ -88,34 +109,35 @@ struct EqualTo<std::vector<T, Allocator>>
         }
 
         // Compare each element using loki::EqualTo
-        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<T>());
+        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::decay_t<T>>());
     }
 };
 
 template<typename T1, typename T2>
 struct EqualTo<std::pair<T1, T2>>
 {
-    size_t operator()(const std::pair<T1, T2>& lhs, const std::pair<T1, T2>& rhs) const
+    bool operator()(const std::pair<T1, T2>& lhs, const std::pair<T1, T2>& rhs) const
     {
-        return loki::EqualTo<T1>()(lhs.first, rhs.first) && loki::EqualTo<T2>()(lhs.second, rhs.second);
+        return loki::EqualTo<std::decay_t<T1>>()(lhs.first, rhs.first) && loki::EqualTo<std::decay_t<T2>>()(lhs.second, rhs.second);
     }
 };
 
 template<typename... Ts>
 struct EqualTo<std::tuple<Ts...>>
 {
-    size_t operator()(const std::tuple<Ts...>& lhs, const std::tuple<Ts...>& rhs) const
+    bool operator()(const std::tuple<Ts...>& lhs, const std::tuple<Ts...>& rhs) const
     {
-        return std::apply([&rhs](const Ts&... lhs_args)
-                          { return std::apply([&lhs_args...](const Ts&... rhs_args) { return (loki::EqualTo<Ts>()(lhs_args, rhs_args) && ...); }, rhs); },
-                          lhs);
+        return std::apply(
+            [&rhs](const Ts&... lhs_args)
+            { return std::apply([&lhs_args...](const Ts&... rhs_args) { return (loki::EqualTo<std::decay_t<Ts>>()(lhs_args, rhs_args) && ...); }, rhs); },
+            lhs);
     }
 };
 
 template<typename... Ts>
 struct EqualTo<std::variant<Ts...>>
 {
-    size_t operator()(const std::variant<Ts...>& lhs, const std::variant<Ts...>& rhs) const
+    bool operator()(const std::variant<Ts...>& lhs, const std::variant<Ts...>& rhs) const
     {
         return std::visit(
             [](const auto& l, const auto& r)
@@ -137,7 +159,7 @@ struct EqualTo<std::variant<Ts...>>
 template<typename T>
 struct EqualTo<std::optional<T>>
 {
-    size_t operator()(const std::optional<T>& lhs, const std::optional<T>& rhs) const
+    bool operator()(const std::optional<T>& lhs, const std::optional<T>& rhs) const
     {
         // Check for presence of values
         if (lhs.has_value() != rhs.has_value())
@@ -152,14 +174,14 @@ struct EqualTo<std::optional<T>>
         }
 
         // Compare the contained values using loki::EqualTo
-        return loki::EqualTo<T>()(lhs.value(), rhs.value());
+        return loki::EqualTo<std::decay_t<T>>()(lhs.value(), rhs.value());
     }
 };
 
 template<typename T, std::size_t Extent>
 struct EqualTo<std::span<T, Extent>>
 {
-    size_t operator()(const std::span<T, Extent>& lhs, const std::span<T, Extent>& rhs) const
+    bool operator()(const std::span<T, Extent>& lhs, const std::span<T, Extent>& rhs) const
     {
         // Check size first
         if (lhs.size() != rhs.size())
@@ -168,7 +190,7 @@ struct EqualTo<std::span<T, Extent>>
         }
 
         // Compare each element using loki::EqualTo
-        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<T>());
+        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::decay_t<T>>());
     }
 };
 
@@ -179,7 +201,7 @@ struct EqualTo<std::span<T, Extent>>
 template<typename T>
 struct EqualTo<ObserverPtr<T>>
 {
-    bool operator()(loki::ObserverPtr<T> lhs, loki::ObserverPtr<T> rhs) const { return EqualTo<std::remove_cvref_t<T>>()(*lhs, *rhs); }
+    bool operator()(loki::ObserverPtr<T> lhs, loki::ObserverPtr<T> rhs) const { return EqualTo<std::decay_t<T>>()(*lhs, *rhs); }
 };
 
 /// @brief EqualTo specialization for an `IdentifiableMembersProxy`
@@ -190,7 +212,10 @@ struct EqualTo<T>
 {
     using MembersTupleType = decltype(std::declval<T>().identifying_members());
 
-    bool operator()(const T& lhs, const T& rhs) const { return EqualTo<MembersTupleType>()(lhs.identifying_members(), rhs.identifying_members()); }
+    bool operator()(const T& lhs, const T& rhs) const
+    {
+        return EqualTo<std::decay_t<MembersTupleType>>()(lhs.identifying_members(), rhs.identifying_members());
+    }
 };
 
 }

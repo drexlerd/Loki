@@ -78,14 +78,14 @@ public:
 
     auto identifying_members() const
     {
-        return std::forward_as_tuple(std::as_const(m_name),
-                                     std::as_const(m_requirements),
-                                     std::as_const(m_types),
-                                     std::as_const(m_constants),
-                                     std::as_const(m_predicates),
-                                     std::as_const(m_function_skeletons),
-                                     std::as_const(m_actions),
-                                     std::as_const(m_axioms));
+        return std::tuple(std::cref(get_name()),
+                          get_requirements(),
+                          std::cref(get_types()),
+                          std::cref(get_constants()),
+                          std::cref(get_predicates()),
+                          std::cref(get_function_skeletons()),
+                          std::cref(get_actions()),
+                          std::cref(get_axioms()));
     }
 };
 

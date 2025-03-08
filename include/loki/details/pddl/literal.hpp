@@ -48,7 +48,7 @@ public:
     bool is_negated() const;
     const Atom& get_atom() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_is_negated), std::as_const(m_atom)); }
+    auto identifying_members() const { return std::tuple(is_negated(), get_atom()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const LiteralImpl& element);

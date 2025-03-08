@@ -49,7 +49,7 @@ public:
     size_t get_index() const;
     const Literal& get_literal() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_literal)); }
+    auto identifying_members() const { return std::tuple(get_literal()); }
 };
 
 /* And */
@@ -75,7 +75,7 @@ public:
     size_t get_index() const;
     const ConditionList& get_conditions() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_conditions)); }
+    auto identifying_members() const { return std::tuple(std::cref(get_conditions())); }
 };
 
 /* Or */
@@ -101,7 +101,7 @@ public:
     size_t get_index() const;
     const ConditionList& get_conditions() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_conditions)); }
+    auto identifying_members() const { return std::tuple(std::cref(get_conditions())); }
 };
 
 /* Not */
@@ -127,7 +127,7 @@ public:
     size_t get_index() const;
     const Condition& get_condition() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_condition)); }
+    auto identifying_members() const { return std::tuple(get_condition()); }
 };
 
 /* Imply */
@@ -155,7 +155,7 @@ public:
     const Condition& get_condition_left() const;
     const Condition& get_condition_right() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_condition_left), std::as_const(m_condition_right)); }
+    auto identifying_members() const { return std::tuple(get_condition_left(), get_condition_right()); }
 };
 
 /* Exists */
@@ -183,7 +183,7 @@ public:
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_parameters), std::as_const(m_condition)); }
+    auto identifying_members() const { return std::tuple(std::cref(get_parameters()), get_condition()); }
 };
 
 /* Forall */
@@ -211,7 +211,7 @@ public:
     const ParameterList& get_parameters() const;
     const Condition& get_condition() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_parameters), std::as_const(m_condition)); }
+    auto identifying_members() const { return std::tuple(std::cref(get_parameters()), get_condition()); }
 };
 
 class ConditionNumericConstraintImpl
@@ -243,10 +243,7 @@ public:
     const FunctionExpression& get_left_function_expression() const;
     const FunctionExpression& get_right_function_expression() const;
 
-    auto identifying_members() const
-    {
-        return std::forward_as_tuple(std::as_const(m_binary_comparator), std::as_const(m_left_function_expression), std::as_const(m_right_function_expression));
-    }
+    auto identifying_members() const { return std::tuple(get_binary_comparator(), get_left_function_expression(), get_right_function_expression()); }
 };
 
 /* Condition */
@@ -275,7 +272,7 @@ public:
     size_t get_index() const;
     const ConditionVariant& get_condition() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_condition)); }
+    auto identifying_members() const { return std::tuple(get_condition()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const ConditionLiteralImpl& element);

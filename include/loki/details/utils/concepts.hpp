@@ -27,57 +27,15 @@
 namespace loki
 {
 
-template<typename T>
-struct is_valid_type : std::false_type
-{
-};
-
-// Allow `const T&`
-template<typename T>
-struct is_valid_type<const T&> : std::true_type
-{
-};
-
-// Allow `const T*&`
-template<typename T>
-struct is_valid_type<const T*&> : std::true_type
-{
-};
-
-// Allow `const T*`
-template<typename T>
-struct is_valid_type<const T*> : std::true_type
-{
-};
-
-// Allow `const T* const`
-template<typename T>
-struct is_valid_type<const T* const> : std::true_type
-{
-};
-
-template<typename T, typename = void>
-struct is_tuple_is_identifying_members_tuple : std::false_type
-{
-};
-
-template<typename... Ts>
-struct is_tuple_is_identifying_members_tuple<std::tuple<Ts...>> : std::conjunction<is_valid_type<Ts>...>
-{
-};
-
-template<typename T>
-concept IsIdentifyingMembersTuple = is_tuple_is_identifying_members_tuple<T>::value;
-
 /**
- * Concept to check whether a type T has a member function that returns `IsIdentifyingMembersTuple`.
+ * Concept to check whether a type T has a member function identifying_members.
  *
  * We use it to automatically generate hash and comparison operators based on the tuple of references.
  */
 
 template<typename T>
 concept HasIdentifyingMembers = requires(const T a) {
-    { a.identifying_members() } -> IsIdentifyingMembersTuple;
+    { a.identifying_members() };
 };
 
 }

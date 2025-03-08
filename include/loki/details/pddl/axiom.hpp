@@ -50,7 +50,7 @@ public:
     const Literal& get_literal() const;
     const Condition& get_condition() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_parameters), std::as_const(m_literal), std::as_const(m_condition)); }
+    auto identifying_members() const { return std::tuple(std::cref(get_parameters()), get_literal(), get_condition()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const AxiomImpl& element);

@@ -48,7 +48,7 @@ public:
     size_t get_index() const;
     const RequirementEnumSet& get_requirements() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_requirements)); }
+    auto identifying_members() const { return std::tuple(std::cref(get_requirements())); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const RequirementsImpl& element);

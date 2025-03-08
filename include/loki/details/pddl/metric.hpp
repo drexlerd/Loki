@@ -57,7 +57,7 @@ public:
     OptimizationMetricEnum get_optimization_metric() const;
     const FunctionExpression& get_function_expression() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_optimization_metric), std::as_const(m_function_expression)); }
+    auto identifying_members() const { return std::tuple(get_optimization_metric(), get_function_expression()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const OptimizationMetricImpl& element);

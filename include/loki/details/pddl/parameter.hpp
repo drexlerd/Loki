@@ -49,7 +49,7 @@ public:
     const Variable& get_variable() const;
     const TypeList& get_bases() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_variable), std::as_const(m_types)); }
+    auto identifying_members() const { return std::tuple(get_variable(), std::cref(get_bases())); }
 };
 
 /// @brief Return true iff specialized_parameter is a specialized version of generalized_parameter

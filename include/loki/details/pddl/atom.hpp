@@ -48,7 +48,7 @@ public:
     const Predicate& get_predicate() const;
     const TermList& get_terms() const;
 
-    auto identifying_members() const { return std::forward_as_tuple(std::as_const(m_predicate), std::as_const(m_terms)); }
+    auto identifying_members() const { return std::tuple(get_predicate(), std::cref(get_terms())); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const AtomImpl& element);

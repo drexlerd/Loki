@@ -63,11 +63,7 @@ public:
 
     auto identifying_members() const
     {
-        return std::tie(std::as_const(m_name),
-                        std::as_const(m_original_arity),
-                        std::as_const(m_parameters),
-                        std::as_const(m_condition),
-                        std::as_const(m_effect));
+        return std::tuple(std::cref(get_name()), get_original_arity(), std::cref(get_parameters()), get_condition(), get_effect());
     }
 };
 
