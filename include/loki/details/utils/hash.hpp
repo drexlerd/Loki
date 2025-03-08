@@ -56,7 +56,7 @@ inline size_t hash_combine(const Ts&... rest);
 template<typename T>
 struct Hash
 {
-    size_t operator()(const T& element) const { return std::hash<T>()(element); }
+    size_t operator()(const T& element) const { return std::hash<T> {}(element); }
 };
 
 /// @brief Hash specialization for std::array.
@@ -86,7 +86,7 @@ struct Hash<std::array<T, N>>
 template<typename T>
 struct Hash<std::reference_wrapper<T>>
 {
-    size_t operator()(const std::reference_wrapper<T>& ref) const { return loki::Hash<std::decay_t<T>>()(ref.get()); }
+    size_t operator()(const std::reference_wrapper<T>& ref) const { return loki::Hash<std::decay_t<T>> {}(ref.get()); }
 };
 
 /// @brief Hash specialization for std::set.
@@ -183,7 +183,7 @@ struct Hash<std::variant<Ts...>>
 {
     size_t operator()(const std::variant<Ts...>& variant) const
     {
-        return std::visit([](const auto& arg) { return Hash<std::decay_t<decltype(arg)>>()(arg); }, variant);
+        return std::visit([](const auto& arg) { return Hash<std::decay_t<decltype(arg)>> {}(arg); }, variant);
     }
 };
 
@@ -194,7 +194,7 @@ struct Hash<std::variant<Ts...>>
 template<typename T>
 struct Hash<std::optional<T>>
 {
-    size_t operator()(const std::optional<T>& optional) const { return optional.has_value() ? Hash<std::decay_t<T>>()(optional.value()) : 0; }
+    size_t operator()(const std::optional<T>& optional) const { return optional.has_value() ? Hash<std::decay_t<T>> {}(optional.value()) : 0; }
 };
 
 /// @brief Hash specialization for a std::span.
@@ -213,7 +213,7 @@ struct Hash<std::span<T, Extent>>
 template<typename T>
 struct Hash<ObserverPtr<T>>
 {
-    size_t operator()(ObserverPtr<T> ptr) const { return Hash<std::decay_t<T>>()(*ptr); }
+    size_t operator()(ObserverPtr<T> ptr) const { return Hash<std::decay_t<T>> {}(*ptr); }
 };
 
 /// @brief std::hash specialization for an `IdentifiableMembersProxy`
@@ -236,7 +236,7 @@ struct Hash<T>
 template<typename T>
 inline void hash_combine(size_t& seed, const T& value)
 {
-    seed ^= Hash<std::decay_t<T>>()(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    seed ^= Hash<std::decay_t<T>> {}(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
 template<typename T, typename... Rest>

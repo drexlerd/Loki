@@ -42,7 +42,7 @@ namespace loki
 template<typename T>
 struct EqualTo
 {
-    bool operator()(const T& lhs, const T& rhs) const { return std::equal_to<T>()(lhs, rhs); }
+    bool operator()(const T& lhs, const T& rhs) const { return std::equal_to<T> {}(lhs, rhs); }
 };
 
 template<typename T, size_t N>
@@ -53,7 +53,7 @@ struct EqualTo<std::array<T, N>>
         if constexpr (N == 0)
             return true;
 
-        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::decay_t<T>>());
+        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::decay_t<T>> {});
     }
 };
 
@@ -62,7 +62,7 @@ struct EqualTo<std::reference_wrapper<T>>
 {
     bool operator()(const std::reference_wrapper<T>& lhs, const std::reference_wrapper<T>& rhs) const
     {
-        return loki::EqualTo<std::decay_t<T>>()(lhs.get(), rhs.get());
+        return loki::EqualTo<std::decay_t<T>> {}(lhs.get(), rhs.get());
     }
 };
 
@@ -78,7 +78,7 @@ struct EqualTo<std::set<Key, Compare, Allocator>>
         }
 
         // Compare each element using loki::EqualTo
-        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::decay_t<Key>>());
+        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::decay_t<Key>> {});
     }
 };
 
@@ -93,7 +93,7 @@ struct EqualTo<std::map<Key, T, Compare, Allocator>>
             return false;
         }
 
-        std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::pair<Key, T>>());
+        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::pair<std::decay_t<Key>, std::decay_t<T>>> {});
     }
 };
 
@@ -109,7 +109,7 @@ struct EqualTo<std::vector<T, Allocator>>
         }
 
         // Compare each element using loki::EqualTo
-        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::decay_t<T>>());
+        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::decay_t<T>> {});
     }
 };
 
@@ -118,7 +118,7 @@ struct EqualTo<std::pair<T1, T2>>
 {
     bool operator()(const std::pair<T1, T2>& lhs, const std::pair<T1, T2>& rhs) const
     {
-        return loki::EqualTo<std::decay_t<T1>>()(lhs.first, rhs.first) && loki::EqualTo<std::decay_t<T2>>()(lhs.second, rhs.second);
+        return loki::EqualTo<std::decay_t<T1>>()(lhs.first, rhs.first) && loki::EqualTo<std::decay_t<T2>> {}(lhs.second, rhs.second);
     }
 };
 
@@ -129,7 +129,7 @@ struct EqualTo<std::tuple<Ts...>>
     {
         return std::apply(
             [&rhs](const Ts&... lhs_args)
-            { return std::apply([&lhs_args...](const Ts&... rhs_args) { return (loki::EqualTo<std::decay_t<Ts>>()(lhs_args, rhs_args) && ...); }, rhs); },
+            { return std::apply([&lhs_args...](const Ts&... rhs_args) { return (loki::EqualTo<std::decay_t<Ts>> {}(lhs_args, rhs_args) && ...); }, rhs); },
             lhs);
     }
 };
@@ -146,7 +146,7 @@ struct EqualTo<std::variant<Ts...>>
                 if constexpr (std::is_same_v<std::decay_t<decltype(l)>, std::decay_t<decltype(r)>>)
                 {
                     // Recursively apply loki::EqualTo for matching types
-                    return loki::EqualTo<std::decay_t<decltype(l)>>()(l, r);
+                    return loki::EqualTo<std::decay_t<decltype(l)>> {}(l, r);
                 }
                 // Different types are always unequal
                 return false;
@@ -174,7 +174,7 @@ struct EqualTo<std::optional<T>>
         }
 
         // Compare the contained values using loki::EqualTo
-        return loki::EqualTo<std::decay_t<T>>()(lhs.value(), rhs.value());
+        return loki::EqualTo<std::decay_t<T>> {}(lhs.value(), rhs.value());
     }
 };
 
@@ -190,7 +190,7 @@ struct EqualTo<std::span<T, Extent>>
         }
 
         // Compare each element using loki::EqualTo
-        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::decay_t<T>>());
+        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), loki::EqualTo<std::decay_t<T>> {});
     }
 };
 
@@ -201,7 +201,7 @@ struct EqualTo<std::span<T, Extent>>
 template<typename T>
 struct EqualTo<ObserverPtr<T>>
 {
-    bool operator()(loki::ObserverPtr<T> lhs, loki::ObserverPtr<T> rhs) const { return EqualTo<std::decay_t<T>>()(*lhs, *rhs); }
+    bool operator()(loki::ObserverPtr<T> lhs, loki::ObserverPtr<T> rhs) const { return EqualTo<std::decay_t<T>> {}(*lhs, *rhs); }
 };
 
 /// @brief EqualTo specialization for an `IdentifiableMembersProxy`
@@ -214,7 +214,7 @@ struct EqualTo<T>
 
     bool operator()(const T& lhs, const T& rhs) const
     {
-        return EqualTo<std::decay_t<MembersTupleType>>()(lhs.identifying_members(), rhs.identifying_members());
+        return EqualTo<std::decay_t<MembersTupleType>> {}(lhs.identifying_members(), rhs.identifying_members());
     }
 };
 
