@@ -44,6 +44,12 @@ struct is_valid_type<const T&&> : std::true_type
 {
 };
 
+// Allow `T&&` (rvalue reference)
+template<typename T>
+struct is_valid_type<T&&> : std::true_type
+{
+};
+
 // Allow `const T*&`
 template<typename T>
 struct is_valid_type<const T*&> : std::true_type
