@@ -49,8 +49,8 @@ static void collect_free_variables_recursively(const loki::ConditionImpl& condit
     }
     else if (const auto condition_imply = std::get_if<loki::ConditionImply>(&condition.get_condition()))
     {
-        collect_free_variables_recursively(*(*condition_imply)->get_condition_left(), ref_quantified_variables, ref_free_variables);
-        collect_free_variables_recursively(*(*condition_imply)->get_condition_right(), ref_quantified_variables, ref_free_variables);
+        collect_free_variables_recursively(*(*condition_imply)->get_left_condition(), ref_quantified_variables, ref_free_variables);
+        collect_free_variables_recursively(*(*condition_imply)->get_right_condition(), ref_quantified_variables, ref_free_variables);
     }
     else if (const auto condition_not = std::get_if<loki::ConditionNot>(&condition.get_condition()))
     {

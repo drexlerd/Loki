@@ -505,8 +505,8 @@ struct AtomicFormulaOfTermsPredicate : x3::position_tagged
 
 struct AtomicFormulaOfTermsEquality : x3::position_tagged
 {
-    Term term_left;
-    Term term_right;
+    Term left_term;
+    Term right_term;
 };
 
 struct AtomicFormulaOfTerms : x3::position_tagged, x3::variant<AtomicFormulaOfTermsPredicate, AtomicFormulaOfTermsEquality>

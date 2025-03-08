@@ -29,7 +29,7 @@ ConditionLiteralImpl::ConditionLiteralImpl(size_t index, Literal literal) : m_in
 
 size_t ConditionLiteralImpl::get_index() const { return m_index; }
 
-const Literal& ConditionLiteralImpl::get_literal() const { return m_literal; }
+Literal ConditionLiteralImpl::get_literal() const { return m_literal; }
 
 /* And */
 ConditionAndImpl::ConditionAndImpl(size_t index, ConditionList conditions) : m_index(index), m_conditions(std::move(conditions)) {}
@@ -50,21 +50,21 @@ ConditionNotImpl::ConditionNotImpl(size_t index, Condition condition) : m_index(
 
 size_t ConditionNotImpl::get_index() const { return m_index; }
 
-const Condition& ConditionNotImpl::get_condition() const { return m_condition; }
+Condition ConditionNotImpl::get_condition() const { return m_condition; }
 
 /* Imply */
-ConditionImplyImpl::ConditionImplyImpl(size_t index, Condition condition_left, Condition condition_right) :
+ConditionImplyImpl::ConditionImplyImpl(size_t index, Condition left_condition, Condition right_condition) :
     m_index(index),
-    m_condition_left(std::move(condition_left)),
-    m_condition_right(std::move(condition_right))
+    m_left_condition(std::move(left_condition)),
+    m_right_condition(std::move(right_condition))
 {
 }
 
 size_t ConditionImplyImpl::get_index() const { return m_index; }
 
-const Condition& ConditionImplyImpl::get_condition_left() const { return m_condition_left; }
+Condition ConditionImplyImpl::get_left_condition() const { return m_left_condition; }
 
-const Condition& ConditionImplyImpl::get_condition_right() const { return m_condition_right; }
+Condition ConditionImplyImpl::get_right_condition() const { return m_right_condition; }
 
 /* Exists */
 ConditionExistsImpl::ConditionExistsImpl(size_t index, ParameterList parameters, Condition condition) :
@@ -78,7 +78,7 @@ size_t ConditionExistsImpl::get_index() const { return m_index; }
 
 const ParameterList& ConditionExistsImpl::get_parameters() const { return m_parameters; }
 
-const Condition& ConditionExistsImpl::get_condition() const { return m_condition; }
+Condition ConditionExistsImpl::get_condition() const { return m_condition; }
 
 /* Forall */
 ConditionForallImpl::ConditionForallImpl(size_t index, ParameterList parameters, Condition condition) :
@@ -92,7 +92,7 @@ size_t ConditionForallImpl::get_index() const { return m_index; }
 
 const ParameterList& ConditionForallImpl::get_parameters() const { return m_parameters; }
 
-const Condition& ConditionForallImpl::get_condition() const { return m_condition; }
+Condition ConditionForallImpl::get_condition() const { return m_condition; }
 
 /* ConditionNumericConstraint */
 
@@ -109,11 +109,11 @@ ConditionNumericConstraintImpl::ConditionNumericConstraintImpl(size_t index,
 
 size_t ConditionNumericConstraintImpl::get_index() const { return m_index; }
 
-const BinaryComparatorEnum& ConditionNumericConstraintImpl::get_binary_comparator() const { return m_binary_comparator; }
+BinaryComparatorEnum ConditionNumericConstraintImpl::get_binary_comparator() const { return m_binary_comparator; }
 
-const FunctionExpression& ConditionNumericConstraintImpl::get_left_function_expression() const { return m_left_function_expression; }
+FunctionExpression ConditionNumericConstraintImpl::get_left_function_expression() const { return m_left_function_expression; }
 
-const FunctionExpression& ConditionNumericConstraintImpl::get_right_function_expression() const { return m_right_function_expression; }
+FunctionExpression ConditionNumericConstraintImpl::get_right_function_expression() const { return m_right_function_expression; }
 
 /* Condition */
 ConditionImpl::ConditionImpl(size_t index, ConditionVariant condition) : m_index(index), m_condition(std::move(condition)) {}

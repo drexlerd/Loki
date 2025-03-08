@@ -233,9 +233,9 @@ template<Formatter T>
 void write(const ConditionImplyImpl& element, T formatter, std::ostream& out)
 {
     out << "(imply ";
-    write<T>(*element.get_condition_left(), formatter, out);
+    write<T>(*element.get_left_condition(), formatter, out);
     out << " ";
-    write<T>(*element.get_condition_right(), formatter, out);
+    write<T>(*element.get_right_condition(), formatter, out);
     out << ")";
 }
 

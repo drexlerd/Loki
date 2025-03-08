@@ -182,7 +182,7 @@ public:
     ConditionAnd get_or_create_condition_and(ConditionList conditions);
     ConditionOr get_or_create_condition_or(ConditionList conditions);
     ConditionNot get_or_create_condition_not(Condition condition);
-    ConditionImply get_or_create_condition_imply(Condition condition_left, Condition condition_right);
+    ConditionImply get_or_create_condition_imply(Condition left_condition, Condition right_condition);
     ConditionExists get_or_create_condition_exists(ParameterList parameters, Condition condition);
 
     ConditionForall get_or_create_condition_forall(ParameterList parameters, Condition condition);

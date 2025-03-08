@@ -28,7 +28,7 @@ size_t LiteralImpl::get_index() const { return m_index; }
 
 bool LiteralImpl::is_negated() const { return m_is_negated; }
 
-const Atom& LiteralImpl::get_atom() const { return m_atom; }
+Atom LiteralImpl::get_atom() const { return m_atom; }
 
 std::ostream& operator<<(std::ostream& out, const LiteralImpl& element)
 {

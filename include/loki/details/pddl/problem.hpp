@@ -78,7 +78,7 @@ public:
     const std::optional<fs::path>& get_filepath() const;
     const Domain& get_domain() const;
     const std::string& get_name() const;
-    const Requirements& get_requirements() const;
+    Requirements get_requirements() const;
     const ObjectList& get_objects() const;
     const ObjectList& get_problem_and_domain_objects() const;
     const PredicateList& get_predicates() const;

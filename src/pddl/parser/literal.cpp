@@ -70,8 +70,8 @@ Atom parse(const ast::AtomicFormulaOfTermsEquality& node, C& context)
     context.references.untrack(RequirementEnum::EQUALITY);
     assert(context.scopes.top().get_predicate("=").has_value());
     const auto [equal_predicate, _position, _error_handler] = context.scopes.top().get_predicate("=").value();
-    auto left_term = boost::apply_visitor(TermReferenceTermVisitor(context), node.term_left);
-    auto right_term = boost::apply_visitor(TermReferenceTermVisitor(context), node.term_right);
+    auto left_term = boost::apply_visitor(TermReferenceTermVisitor(context), node.left_term);
+    auto right_term = boost::apply_visitor(TermReferenceTermVisitor(context), node.right_term);
     const auto atom = context.builder.get_repositories().get_or_create_atom(equal_predicate, TermList { left_term, right_term });
     context.positions.push_back(atom, node);
     return atom;

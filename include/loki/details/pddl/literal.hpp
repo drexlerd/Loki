@@ -46,7 +46,7 @@ public:
 
     size_t get_index() const;
     bool is_negated() const;
-    const Atom& get_atom() const;
+    Atom get_atom() const;
 
     auto identifying_members() const { return std::tuple(is_negated(), get_atom()); }
 };

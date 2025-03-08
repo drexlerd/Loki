@@ -110,8 +110,8 @@ public:
 
     size_t get_index() const;
     BinaryOperatorEnum get_binary_operator() const;
-    const FunctionExpression& get_left_function_expression() const;
-    const FunctionExpression& get_right_function_expression() const;
+    FunctionExpression get_left_function_expression() const;
+    FunctionExpression get_right_function_expression() const;
 
     auto identifying_members() const { return std::tuple(get_binary_operator(), get_left_function_expression(), get_right_function_expression()); }
 };
@@ -165,7 +165,7 @@ public:
     FunctionExpressionMinusImpl& operator=(FunctionExpressionMinusImpl&& other) = default;
 
     size_t get_index() const;
-    const FunctionExpression& get_function_expression() const;
+    FunctionExpression get_function_expression() const;
 
     auto identifying_members() const { return std::tuple(get_function_expression()); }
 };
@@ -191,7 +191,7 @@ public:
     FunctionExpressionFunctionImpl& operator=(FunctionExpressionFunctionImpl&& other) = default;
 
     size_t get_index() const;
-    const Function& get_function() const;
+    Function get_function() const;
 
     auto identifying_members() const { return std::tuple(get_function()); }
 };

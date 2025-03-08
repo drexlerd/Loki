@@ -29,8 +29,8 @@ namespace loki
 Condition ToNegationNormalFormTranslator::translate_level_2(ConditionImply condition, Repositories& repositories)
 {
     return this->translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_or(ConditionList {
-                                       repositories.get_or_create_condition(repositories.get_or_create_condition_not(condition->get_condition_left())),
-                                       condition->get_condition_right() })),
+                                       repositories.get_or_create_condition(repositories.get_or_create_condition_not(condition->get_left_condition())),
+                                       condition->get_right_condition() })),
                                    repositories);
 }
 
@@ -61,8 +61,8 @@ Condition ToNegationNormalFormTranslator::translate_level_2(ConditionNot conditi
     {
         return this->translate_level_0(
             repositories.get_or_create_condition(repositories.get_or_create_condition_and(
-                ConditionList { (*condition_imply)->get_condition_left(),
-                                repositories.get_or_create_condition(repositories.get_or_create_condition_not((*condition_imply)->get_condition_right())) })),
+                ConditionList { (*condition_imply)->get_left_condition(),
+                                repositories.get_or_create_condition(repositories.get_or_create_condition_not((*condition_imply)->get_right_condition())) })),
             repositories);
     }
     else if (const auto condition_and = std::get_if<ConditionAnd>(&translated_nested_condition->get_condition()))

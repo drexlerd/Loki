@@ -48,7 +48,7 @@ public:
     size_t get_index() const;
     const std::string& get_name() const;
     const ParameterList& get_parameters() const;
-    const Type& get_type() const;
+    Type get_type() const;
 
     auto identifying_members() const { return std::tuple(std::cref(get_name()), std::cref(get_parameters()), get_type()); }
 };

@@ -45,7 +45,7 @@ public:
     AtomImpl& operator=(AtomImpl&& other) = default;
 
     size_t get_index() const;
-    const Predicate& get_predicate() const;
+    Predicate get_predicate() const;
     const TermList& get_terms() const;
 
     auto identifying_members() const { return std::tuple(get_predicate(), std::cref(get_terms())); }

@@ -36,7 +36,7 @@ const std::string& FunctionSkeletonImpl::get_name() const { return m_name; }
 
 const ParameterList& FunctionSkeletonImpl::get_parameters() const { return m_parameters; }
 
-const Type& FunctionSkeletonImpl::get_type() const { return m_type; }
+Type FunctionSkeletonImpl::get_type() const { return m_type; }
 
 std::ostream& operator<<(std::ostream& out, const FunctionSkeletonImpl& element)
 {

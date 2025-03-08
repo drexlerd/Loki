@@ -51,7 +51,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionTypedListOfAtomicFunctionSkeletonsR
                           function_typed_list_of_atomic_function_skeletons)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::AtomicFormulaOfTermsPredicate, predicate, terms)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::AtomicFormulaOfTermsEquality, term_left, term_right)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::AtomicFormulaOfTermsEquality, left_term, right_term)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Atom, atomic_formula_of_terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::NegatedAtom, atomic_formula_of_terms)
 

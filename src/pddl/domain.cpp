@@ -63,7 +63,7 @@ const std::optional<fs::path>& DomainImpl::get_filepath() const { return m_filep
 
 const std::string& DomainImpl::get_name() const { return m_name; }
 
-const Requirements& DomainImpl::get_requirements() const { return m_requirements; }
+Requirements DomainImpl::get_requirements() const { return m_requirements; }
 
 const TypeList& DomainImpl::get_types() const { return m_types; }
 

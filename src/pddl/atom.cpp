@@ -27,7 +27,7 @@ AtomImpl::AtomImpl(size_t index, Predicate predicate, TermList terms) : m_index(
 
 size_t AtomImpl::get_index() const { return m_index; }
 
-const Predicate& AtomImpl::get_predicate() const { return m_predicate; }
+Predicate AtomImpl::get_predicate() const { return m_predicate; }
 
 const TermList& AtomImpl::get_terms() const { return m_terms; }
 

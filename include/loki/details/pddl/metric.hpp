@@ -55,7 +55,7 @@ public:
 
     size_t get_index() const;
     OptimizationMetricEnum get_optimization_metric() const;
-    const FunctionExpression& get_function_expression() const;
+    FunctionExpression get_function_expression() const;
 
     auto identifying_members() const { return std::tuple(get_optimization_metric(), get_function_expression()); }
 };

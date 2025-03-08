@@ -26,7 +26,7 @@ FunctionValueImpl::FunctionValueImpl(size_t index, Function function, double num
 
 size_t FunctionValueImpl::get_index() const { return m_index; }
 
-const Function& FunctionValueImpl::get_function() const { return m_function; }
+Function FunctionValueImpl::get_function() const { return m_function; }
 
 double FunctionValueImpl::get_number() const { return m_number; }
 

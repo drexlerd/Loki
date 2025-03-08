@@ -57,7 +57,7 @@ public:
     EffectLiteralImpl& operator=(EffectLiteralImpl&& other) = default;
 
     size_t get_index() const;
-    const Literal& get_literal() const;
+    Literal get_literal() const;
 
     auto identifying_members() const { return std::tuple(get_literal()); }
 };
@@ -112,8 +112,8 @@ public:
 
     size_t get_index() const;
     AssignOperatorEnum get_assign_operator() const;
-    const Function& get_function() const;
-    const FunctionExpression& get_function_expression() const;
+    Function get_function() const;
+    FunctionExpression get_function_expression() const;
 
     auto identifying_members() const { return std::tuple(get_assign_operator(), get_function(), get_function_expression()); }
 };
@@ -141,7 +141,7 @@ public:
 
     size_t get_index() const;
     const ParameterList& get_parameters() const;
-    const Effect& get_effect() const;
+    Effect get_effect() const;
 
     auto identifying_members() const { return std::tuple(std::cref(get_parameters()), get_effect()); }
 };
@@ -168,8 +168,8 @@ public:
     EffectCompositeWhenImpl& operator=(EffectCompositeWhenImpl&& other) = default;
 
     size_t get_index() const;
-    const Condition& get_condition() const;
-    const Effect& get_effect() const;
+    Condition get_condition() const;
+    Effect get_effect() const;
 
     auto identifying_members() const { return std::tuple(get_condition(), get_effect()); }
 };

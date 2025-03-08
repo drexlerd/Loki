@@ -46,7 +46,7 @@ public:
     ParameterImpl& operator=(ParameterImpl&& other) = default;
 
     size_t get_index() const;
-    const Variable& get_variable() const;
+    Variable get_variable() const;
     const TypeList& get_bases() const;
 
     auto identifying_members() const { return std::tuple(get_variable(), std::cref(get_bases())); }

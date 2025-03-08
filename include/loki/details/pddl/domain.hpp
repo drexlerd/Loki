@@ -67,7 +67,7 @@ public:
     const Repositories& get_repositories() const;
     const std::optional<fs::path>& get_filepath() const;
     const std::string& get_name() const;
-    const Requirements& get_requirements() const;
+    Requirements get_requirements() const;
     const TypeList& get_types() const;
     const ObjectList& get_constants() const;
     const LiteralList& get_static_initial_literals() const;

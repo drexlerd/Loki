@@ -45,7 +45,7 @@ EffectLiteralImpl::EffectLiteralImpl(size_t index, Literal literal) : m_index(in
 
 size_t EffectLiteralImpl::get_index() const { return m_index; }
 
-const Literal& EffectLiteralImpl::get_literal() const { return m_literal; }
+Literal EffectLiteralImpl::get_literal() const { return m_literal; }
 
 /* EffectAnd */
 EffectAndImpl::EffectAndImpl(size_t index, EffectList effects) : m_index(index), m_effects(std::move(effects)) {}
@@ -67,9 +67,9 @@ size_t EffectNumericImpl::get_index() const { return m_index; }
 
 AssignOperatorEnum EffectNumericImpl::get_assign_operator() const { return m_assign_operator; }
 
-const Function& EffectNumericImpl::get_function() const { return m_function; }
+Function EffectNumericImpl::get_function() const { return m_function; }
 
-const FunctionExpression& EffectNumericImpl::get_function_expression() const { return m_function_expression; }
+FunctionExpression EffectNumericImpl::get_function_expression() const { return m_function_expression; }
 
 /* CompositeForall */
 EffectCompositeForallImpl::EffectCompositeForallImpl(size_t index, ParameterList parameters, Effect effect) :
@@ -83,7 +83,7 @@ size_t EffectCompositeForallImpl::get_index() const { return m_index; }
 
 const ParameterList& EffectCompositeForallImpl::get_parameters() const { return m_parameters; }
 
-const Effect& EffectCompositeForallImpl::get_effect() const { return m_effect; }
+Effect EffectCompositeForallImpl::get_effect() const { return m_effect; }
 
 /* EffectCompositeWhen */
 EffectCompositeWhenImpl::EffectCompositeWhenImpl(size_t index, Condition condition, Effect effect) :
@@ -95,9 +95,9 @@ EffectCompositeWhenImpl::EffectCompositeWhenImpl(size_t index, Condition conditi
 
 size_t EffectCompositeWhenImpl::get_index() const { return m_index; }
 
-const Condition& EffectCompositeWhenImpl::get_condition() const { return m_condition; }
+Condition EffectCompositeWhenImpl::get_condition() const { return m_condition; }
 
-const Effect& EffectCompositeWhenImpl::get_effect() const { return m_effect; }
+Effect EffectCompositeWhenImpl::get_effect() const { return m_effect; }
 
 /* EffectCompositeOneofImpl */
 EffectCompositeOneofImpl::EffectCompositeOneofImpl(size_t index, EffectList effects) : m_index(index), m_effects(std::move(effects)) {}

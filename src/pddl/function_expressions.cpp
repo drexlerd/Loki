@@ -86,9 +86,9 @@ size_t FunctionExpressionBinaryOperatorImpl::get_index() const { return m_index;
 
 BinaryOperatorEnum FunctionExpressionBinaryOperatorImpl::get_binary_operator() const { return m_binary_operator; }
 
-const FunctionExpression& FunctionExpressionBinaryOperatorImpl::get_left_function_expression() const { return m_left_function_expression; }
+FunctionExpression FunctionExpressionBinaryOperatorImpl::get_left_function_expression() const { return m_left_function_expression; }
 
-const FunctionExpression& FunctionExpressionBinaryOperatorImpl::get_right_function_expression() const { return m_right_function_expression; }
+FunctionExpression FunctionExpressionBinaryOperatorImpl::get_right_function_expression() const { return m_right_function_expression; }
 
 /* FunctionExpressionMultiOperator */
 FunctionExpressionMultiOperatorImpl::FunctionExpressionMultiOperatorImpl(size_t index,
@@ -115,14 +115,14 @@ FunctionExpressionMinusImpl::FunctionExpressionMinusImpl(size_t index, FunctionE
 
 size_t FunctionExpressionMinusImpl::get_index() const { return m_index; }
 
-const FunctionExpression& FunctionExpressionMinusImpl::get_function_expression() const { return m_function_expression; }
+FunctionExpression FunctionExpressionMinusImpl::get_function_expression() const { return m_function_expression; }
 
 /* FunctionExpressionFunction */
 FunctionExpressionFunctionImpl::FunctionExpressionFunctionImpl(size_t index, Function function) : m_index(index), m_function(std::move(function)) {}
 
 size_t FunctionExpressionFunctionImpl::get_index() const { return m_index; }
 
-const Function& FunctionExpressionFunctionImpl::get_function() const { return m_function; }
+Function FunctionExpressionFunctionImpl::get_function() const { return m_function; }
 
 /* FunctionExpression */
 FunctionExpressionImpl::FunctionExpressionImpl(size_t index,

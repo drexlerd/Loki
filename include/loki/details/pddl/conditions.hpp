@@ -47,7 +47,7 @@ public:
     ConditionLiteralImpl& operator=(ConditionLiteralImpl&& other) = default;
 
     size_t get_index() const;
-    const Literal& get_literal() const;
+    Literal get_literal() const;
 
     auto identifying_members() const { return std::tuple(get_literal()); }
 };
@@ -125,7 +125,7 @@ public:
     ConditionNotImpl& operator=(ConditionNotImpl&& other) = default;
 
     size_t get_index() const;
-    const Condition& get_condition() const;
+    Condition get_condition() const;
 
     auto identifying_members() const { return std::tuple(get_condition()); }
 };
@@ -135,10 +135,10 @@ class ConditionImplyImpl
 {
 private:
     size_t m_index;
-    Condition m_condition_left;
-    Condition m_condition_right;
+    Condition m_left_condition;
+    Condition m_right_condition;
 
-    ConditionImplyImpl(size_t index, Condition condition_left, Condition condition_right);
+    ConditionImplyImpl(size_t index, Condition left_condition, Condition right_condition);
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -152,10 +152,10 @@ public:
     ConditionImplyImpl& operator=(ConditionImplyImpl&& other) = default;
 
     size_t get_index() const;
-    const Condition& get_condition_left() const;
-    const Condition& get_condition_right() const;
+    Condition get_left_condition() const;
+    Condition get_right_condition() const;
 
-    auto identifying_members() const { return std::tuple(get_condition_left(), get_condition_right()); }
+    auto identifying_members() const { return std::tuple(get_left_condition(), get_right_condition()); }
 };
 
 /* Exists */
@@ -181,7 +181,7 @@ public:
 
     size_t get_index() const;
     const ParameterList& get_parameters() const;
-    const Condition& get_condition() const;
+    Condition get_condition() const;
 
     auto identifying_members() const { return std::tuple(std::cref(get_parameters()), get_condition()); }
 };
@@ -209,7 +209,7 @@ public:
 
     size_t get_index() const;
     const ParameterList& get_parameters() const;
-    const Condition& get_condition() const;
+    Condition get_condition() const;
 
     auto identifying_members() const { return std::tuple(std::cref(get_parameters()), get_condition()); }
 };
@@ -239,9 +239,9 @@ public:
     ConditionNumericConstraintImpl& operator=(ConditionNumericConstraintImpl&& other) = default;
 
     size_t get_index() const;
-    const BinaryComparatorEnum& get_binary_comparator() const;
-    const FunctionExpression& get_left_function_expression() const;
-    const FunctionExpression& get_right_function_expression() const;
+    BinaryComparatorEnum get_binary_comparator() const;
+    FunctionExpression get_left_function_expression() const;
+    FunctionExpression get_right_function_expression() const;
 
     auto identifying_members() const { return std::tuple(get_binary_comparator(), get_left_function_expression(), get_right_function_expression()); }
 };

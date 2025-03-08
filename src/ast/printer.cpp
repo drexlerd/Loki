@@ -222,7 +222,7 @@ std::string parse_text(const ast::AtomicFormulaOfTermsPredicate& node, const Def
 std::string parse_text(const ast::AtomicFormulaOfTermsEquality& node, const DefaultFormatterOptions& options)
 {
     std::stringstream ss;
-    ss << "(" << "= " << parse_text(node.term_left, options) << " " << parse_text(node.term_right, options) << ")";
+    ss << "(" << "= " << parse_text(node.left_term, options) << " " << parse_text(node.right_term, options) << ")";
     return ss.str();
 }
 

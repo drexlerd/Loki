@@ -30,7 +30,7 @@ ParameterImpl::ParameterImpl(size_t index, Variable variable, TypeList types) : 
 
 size_t ParameterImpl::get_index() const { return m_index; }
 
-const Variable& ParameterImpl::get_variable() const { return m_variable; }
+Variable ParameterImpl::get_variable() const { return m_variable; }
 
 const TypeList& ParameterImpl::get_bases() const { return m_types; }
 

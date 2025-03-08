@@ -45,7 +45,7 @@ public:
     FunctionImpl& operator=(FunctionImpl&& other) = default;
 
     size_t get_index() const;
-    const FunctionSkeleton& get_function_skeleton() const;
+    FunctionSkeleton get_function_skeleton() const;
     const TermList& get_terms() const;
 
     auto identifying_members() const { return std::tuple(get_function_skeleton(), std::cref(get_terms())); }

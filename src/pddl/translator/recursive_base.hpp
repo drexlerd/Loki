@@ -91,8 +91,8 @@ protected:
     void prepare_level_2(loki::ConditionNot condition) { this->prepare_level_0(condition->get_condition()); }
     void prepare_level_2(loki::ConditionImply condition)
     {
-        this->prepare_level_0(condition->get_condition_left());
-        this->prepare_level_0(condition->get_condition_right());
+        this->prepare_level_0(condition->get_left_condition());
+        this->prepare_level_0(condition->get_right_condition());
     }
     void prepare_level_2(loki::ConditionExists condition)
     {
@@ -276,8 +276,8 @@ protected:
     loki::Condition translate_level_2(loki::ConditionImply condition, Repositories& repositories)
     {
         return repositories.get_or_create_condition(
-            repositories.get_or_create_condition_imply(this->translate_level_0(condition->get_condition_left(), repositories),
-                                                       this->translate_level_0(condition->get_condition_right(), repositories)));
+            repositories.get_or_create_condition_imply(this->translate_level_0(condition->get_left_condition(), repositories),
+                                                       this->translate_level_0(condition->get_right_condition(), repositories)));
     }
     loki::Condition translate_level_2(loki::ConditionExists condition, Repositories& repositories)
     {

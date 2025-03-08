@@ -38,9 +38,9 @@ size_t AxiomImpl::get_index() const { return m_index; }
 
 const ParameterList& AxiomImpl::get_parameters() const { return m_parameters; }
 
-const Literal& AxiomImpl::get_literal() const { return m_literal; }
+Literal AxiomImpl::get_literal() const { return m_literal; }
 
-const Condition& AxiomImpl::get_condition() const { return m_condition; }
+Condition AxiomImpl::get_condition() const { return m_condition; }
 
 std::ostream& operator<<(std::ostream& out, const AxiomImpl& element)
 {

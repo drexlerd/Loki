@@ -32,7 +32,7 @@ FunctionImpl::FunctionImpl(size_t index, FunctionSkeleton function_skeleton, Ter
 
 size_t FunctionImpl::get_index() const { return m_index; }
 
-const FunctionSkeleton& FunctionImpl::get_function_skeleton() const { return m_function_skeleton; }
+FunctionSkeleton FunctionImpl::get_function_skeleton() const { return m_function_skeleton; }
 
 const TermList& FunctionImpl::get_terms() const { return m_terms; }
 

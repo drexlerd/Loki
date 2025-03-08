@@ -48,7 +48,7 @@ size_t OptimizationMetricImpl::get_index() const { return m_index; }
 
 OptimizationMetricEnum OptimizationMetricImpl::get_optimization_metric() const { return m_optimization_metric; }
 
-const FunctionExpression& OptimizationMetricImpl::get_function_expression() const { return m_function_expression; }
+FunctionExpression OptimizationMetricImpl::get_function_expression() const { return m_function_expression; }
 
 std::ostream& operator<<(std::ostream& out, const OptimizationMetricImpl& element)
 {

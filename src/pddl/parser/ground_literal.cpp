@@ -55,9 +55,9 @@ Atom parse(const ast::AtomicFormulaOfNamesEquality& node, ProblemParsingContext&
     context.references.untrack(RequirementEnum::EQUALITY);
     assert(context.scopes.top().get_predicate("=").has_value());
     const auto [equal_predicate, _position, _error_handler] = context.scopes.top().get_predicate("=").value();
-    const auto term_left = context.builder.get_repositories().get_or_create_term(parse_object_reference(node.name_left, context));
-    const auto term_right = context.builder.get_repositories().get_or_create_term(parse_object_reference(node.name_right, context));
-    const auto atom = context.builder.get_repositories().get_or_create_atom(equal_predicate, TermList { term_left, term_right });
+    const auto left_term = context.builder.get_repositories().get_or_create_term(parse_object_reference(node.name_left, context));
+    const auto right_term = context.builder.get_repositories().get_or_create_term(parse_object_reference(node.name_right, context));
+    const auto atom = context.builder.get_repositories().get_or_create_atom(equal_predicate, TermList { left_term, right_term });
     context.positions.push_back(atom, node);
     return atom;
 }

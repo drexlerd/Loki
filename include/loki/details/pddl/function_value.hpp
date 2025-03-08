@@ -45,7 +45,7 @@ public:
     FunctionValueImpl& operator=(FunctionValueImpl&& other) = default;
 
     size_t get_index() const;
-    const Function& get_function() const;
+    Function get_function() const;
     double get_number() const;
 
     auto identifying_members() const { return std::tuple(get_function(), get_number()); }

@@ -161,9 +161,9 @@ ConditionNot Repositories::get_or_create_condition_not(Condition condition)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionNotImpl> {}).get_or_create(std::move(condition));
 }
-ConditionImply Repositories::get_or_create_condition_imply(Condition condition_left, Condition condition_right)
+ConditionImply Repositories::get_or_create_condition_imply(Condition left_condition, Condition right_condition)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImplyImpl> {}).get_or_create(std::move(condition_left), std::move(condition_right));
+    return boost::hana::at_key(m_repositories, boost::hana::type<ConditionImplyImpl> {}).get_or_create(std::move(left_condition), std::move(right_condition));
 }
 ConditionExists Repositories::get_or_create_condition_exists(ParameterList parameters, Condition condition)
 {

@@ -114,10 +114,10 @@ Condition ConditionVisitor<C>::operator()(const ast::GoalDescriptorImply& node)
 {
     test_undefined_requirement(RequirementEnum::DISJUNCTIVE_PRECONDITIONS, node, context);
     context.references.untrack(RequirementEnum::DISJUNCTIVE_PRECONDITIONS);
-    auto condition_left = this->operator()(node.goal_descriptor_left);
-    auto condition_right = this->operator()(node.goal_descriptor_right);
+    auto left_condition = this->operator()(node.goal_descriptor_left);
+    auto right_condition = this->operator()(node.goal_descriptor_right);
     const auto condition = context.builder.get_repositories().get_or_create_condition(
-        context.builder.get_repositories().get_or_create_condition_imply(condition_left, condition_right));
+        context.builder.get_repositories().get_or_create_condition_imply(left_condition, right_condition));
     context.positions.push_back(condition, node);
     return condition;
 }
