@@ -38,6 +38,12 @@ struct is_valid_type<const T&> : std::true_type
 {
 };
 
+// Allow `const T&&` (rvalue reference)
+template<typename T>
+struct is_valid_type<const T&&> : std::true_type
+{
+};
+
 // Allow `const T*&`
 template<typename T>
 struct is_valid_type<const T*&> : std::true_type
@@ -53,6 +59,12 @@ struct is_valid_type<const T*> : std::true_type
 // Allow `const T* const`
 template<typename T>
 struct is_valid_type<const T* const> : std::true_type
+{
+};
+
+// Allow `const T* &&` (rvalue reference to pointer)
+template<typename T>
+struct is_valid_type<const T*&&> : std::true_type
 {
 };
 
