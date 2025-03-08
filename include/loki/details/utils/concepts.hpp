@@ -27,43 +27,57 @@
 namespace loki
 {
 
+template<typename T>
+struct is_valid_type : std::false_type
+{
+};
+
+// Allow `const T&`
+template<typename T>
+struct is_valid_type<const T&> : std::true_type
+{
+};
+
+// Allow `const T*&`
+template<typename T>
+struct is_valid_type<const T*&> : std::true_type
+{
+};
+
+// Allow `const T*`
+template<typename T>
+struct is_valid_type<const T*> : std::true_type
+{
+};
+
+// Allow `const T* const`
+template<typename T>
+struct is_valid_type<const T* const> : std::true_type
+{
+};
+
 template<typename T, typename = void>
-struct is_tuple_of_const_references : std::false_type
+struct is_tuple_is_identifying_members_tuple : std::false_type
 {
 };
 
 template<typename... Ts>
-struct is_tuple_of_const_references<
-    std::tuple<Ts...>,
-    std::enable_if_t<std::conjunction_v<std::bool_constant<(std::is_lvalue_reference_v<Ts> && std::is_const_v<std::remove_reference_t<Ts>>) ||   // const T&
-                                                           (std::is_lvalue_reference_v<Ts>&& std::is_pointer_v<std::remove_reference_t<Ts>>) ||  // const T*&
-                                                           (std::is_pointer_v<Ts>&& std::is_const_v<std::remove_pointer_t<Ts>>)                  // const T*
-                                                           >...>>> : std::true_type
+struct is_tuple_is_identifying_members_tuple<std::tuple<Ts...>> : std::conjunction<is_valid_type<Ts>...>
 {
 };
 
 template<typename T>
-concept IsTupleOfConstRefs = is_tuple_of_const_references<T>::value;
-
-static_assert(IsTupleOfConstRefs<std::tuple<const int&>>);
-static_assert(IsTupleOfConstRefs<std::tuple<const int*&>>);
-static_assert(IsTupleOfConstRefs<std::tuple<const int*>>);
-static_assert(!IsTupleOfConstRefs<std::tuple<int*>>);
-static_assert(!IsTupleOfConstRefs<std::tuple<const int>>);
-static_assert(!IsTupleOfConstRefs<std::tuple<int&>>);
-static_assert(!IsTupleOfConstRefs<std::tuple<int>>);
-static_assert(!IsTupleOfConstRefs<const std::tuple<int>>);
-static_assert(!IsTupleOfConstRefs<std::tuple<int>&>);
+concept IsIdentifyingMembersTuple = is_tuple_is_identifying_members_tuple<T>::value;
 
 /**
- * Concept to check whether a type T has a member function that returns `std::tuple<const T1&,...,const TN&>`.
+ * Concept to check whether a type T has a member function that returns `IsIdentifyingMembersTuple`.
  *
  * We use it to automatically generate hash and comparison operators based on the tuple of references.
  */
 
 template<typename T>
 concept HasIdentifyingMembers = requires(const T a) {
-    { a.identifying_members() } -> IsTupleOfConstRefs;
+    { a.identifying_members() } -> IsIdentifyingMembersTuple;
 };
 
 }
