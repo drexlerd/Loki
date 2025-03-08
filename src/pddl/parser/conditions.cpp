@@ -176,10 +176,10 @@ Condition ConditionVisitor<C>::operator()(const ast::GoalDescriptorFunctionCompa
 
     auto binary_comparator = boost::apply_visitor(BinaryComparatorVisitor(), node.binary_comparator);
     auto fexpr_visitor = FunctionExpressionVisitor(context);
-    auto function_expression_left = boost::apply_visitor(fexpr_visitor, node.function_expression_left);
-    auto function_expression_right = boost::apply_visitor(fexpr_visitor, node.function_expression_right);
+    auto left_function_expression = boost::apply_visitor(fexpr_visitor, node.left_function_expression);
+    auto right_function_expression = boost::apply_visitor(fexpr_visitor, node.right_function_expression);
     auto condition = context.builder.get_repositories().get_or_create_condition(
-        context.builder.get_repositories().get_or_create_condition_numeric_constraint(binary_comparator, function_expression_left, function_expression_right));
+        context.builder.get_repositories().get_or_create_condition_numeric_constraint(binary_comparator, left_function_expression, right_function_expression));
     context.positions.push_back(condition, node);
     return condition;
 }

@@ -290,8 +290,8 @@ std::string parse_text(const ast::FunctionExpressionNumber& node, const DefaultF
 std::string parse_text(const ast::FunctionExpressionBinaryOp& node, const DefaultFormatterOptions& options)
 {
     std::stringstream ss;
-    ss << "(" << parse_text(node.binary_operator, options) << " " << parse_text(node.function_expression_left, options) << " "
-       << parse_text(node.function_expression_right, options) << ")";
+    ss << "(" << parse_text(node.binary_operator, options) << " " << parse_text(node.left_function_expression, options) << " "
+       << parse_text(node.right_function_expression, options) << ")";
     return ss.str();
 }
 
@@ -358,8 +358,8 @@ std::string parse_text(const ast::GoalDescriptorForall& node, const DefaultForma
 std::string parse_text(const ast::GoalDescriptorFunctionComparison& node, const DefaultFormatterOptions& options)
 {
     std::stringstream ss;
-    ss << "(" << parse_text(node.binary_comparator, options) << " " << parse_text(node.function_expression_left, options) << " "
-       << parse_text(node.function_expression_right, options) << ")";
+    ss << "(" << parse_text(node.binary_comparator, options) << " " << parse_text(node.left_function_expression, options) << " "
+       << parse_text(node.right_function_expression, options) << ")";
     return ss.str();
 }
 
@@ -767,8 +767,8 @@ string parse_text(const ast::MetricFunctionExpressionNumber& node, const Default
 string parse_text(const ast::MetricFunctionExpressionBinaryOperator& node, const DefaultFormatterOptions& options)
 {
     stringstream ss;
-    ss << "(" << parse_text(node.binary_operator, options) << " " << parse_text(node.metric_function_expression_left, options) << " "
-       << parse_text(node.metric_function_expression_right, options) << ")";
+    ss << "(" << parse_text(node.binary_operator, options) << " " << parse_text(node.metric_left_function_expression, options) << " "
+       << parse_text(node.metric_right_function_expression, options) << ")";
     return ss.str();
 }
 

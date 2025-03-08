@@ -106,8 +106,8 @@ protected:
     }
     void prepare_level_2(loki::ConditionNumericConstraint condition)
     {
-        this->prepare_level_0(condition->get_function_expression_left());
-        this->prepare_level_0(condition->get_function_expression_right());
+        this->prepare_level_0(condition->get_left_function_expression());
+        this->prepare_level_0(condition->get_right_function_expression());
     }
     void prepare_level_2(loki::Condition condition)
     {
@@ -295,8 +295,8 @@ protected:
     {
         return repositories.get_or_create_condition(
             repositories.get_or_create_condition_numeric_constraint(condition->get_binary_comparator(),
-                                                                    this->translate_level_0(condition->get_function_expression_left(), repositories),
-                                                                    this->translate_level_0(condition->get_function_expression_right(), repositories)));
+                                                                    this->translate_level_0(condition->get_left_function_expression(), repositories),
+                                                                    this->translate_level_0(condition->get_right_function_expression(), repositories)));
     }
     loki::Condition translate_level_2(loki::Condition condition, Repositories& repositories)
     {

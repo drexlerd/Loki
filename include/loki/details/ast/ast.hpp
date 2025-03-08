@@ -613,8 +613,8 @@ struct FunctionExpressionNumber : x3::position_tagged
 struct FunctionExpressionBinaryOp : x3::position_tagged
 {
     BinaryOperator binary_operator;
-    FunctionExpression function_expression_left;
-    FunctionExpression function_expression_right;
+    FunctionExpression left_function_expression;
+    FunctionExpression right_function_expression;
 };
 
 struct FunctionExpressionMinus : x3::position_tagged
@@ -690,8 +690,8 @@ struct GoalDescriptorForall : x3::position_tagged
 struct GoalDescriptorFunctionComparison : x3::position_tagged
 {
     BinaryComparator binary_comparator;
-    FunctionExpression function_expression_left;
-    FunctionExpression function_expression_right;
+    FunctionExpression left_function_expression;
+    FunctionExpression right_function_expression;
 };
 
 /* <con-GD> */
@@ -1085,8 +1085,8 @@ struct MetricFunctionExpressionNumber : x3::position_tagged
 struct MetricFunctionExpressionBinaryOperator : x3::position_tagged
 {
     BinaryOperator binary_operator;
-    MetricFunctionExpression metric_function_expression_left;
-    MetricFunctionExpression metric_function_expression_right;
+    MetricFunctionExpression metric_left_function_expression;
+    MetricFunctionExpression metric_right_function_expression;
 };
 
 struct MetricFunctionExpressionMultiOperator : x3::position_tagged

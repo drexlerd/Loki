@@ -187,8 +187,8 @@ public:
 
     ConditionForall get_or_create_condition_forall(ParameterList parameters, Condition condition);
     ConditionNumericConstraint get_or_create_condition_numeric_constraint(BinaryComparatorEnum binary_comparator,
-                                                                          FunctionExpression function_expression_left,
-                                                                          FunctionExpression function_expression_right);
+                                                                          FunctionExpression left_function_expression,
+                                                                          FunctionExpression right_function_expression);
     Condition get_or_create_condition(ConditionLiteral condition);
     Condition get_or_create_condition(ConditionAnd condition);
     Condition get_or_create_condition(ConditionOr condition);

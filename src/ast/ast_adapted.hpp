@@ -57,7 +57,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::NegatedAtom, atomic_formula_of_terms)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionHead, function_symbol, terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionExpressionNumber, number)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionExpressionBinaryOp, binary_operator, function_expression_left, function_expression_right)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionExpressionBinaryOp, binary_operator, left_function_expression, right_function_expression)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionExpressionMinus, function_expression)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionExpressionHead, function_head)
 
@@ -69,7 +69,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::GoalDescriptorNot, goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::GoalDescriptorImply, goal_descriptor_left, goal_descriptor_right)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::GoalDescriptorExists, typed_list_of_variables, goal_descriptor)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::GoalDescriptorForall, typed_list_of_variables, goal_descriptor)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::GoalDescriptorFunctionComparison, binary_comparator, function_expression_left, function_expression_right)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::GoalDescriptorFunctionComparison, binary_comparator, left_function_expression, right_function_expression)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::ConstraintGoalDescriptorAnd, constraint_goal_descriptors)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::ConstraintGoalDescriptorForall, typed_list_of_variables, constraint_goal_descriptor)
@@ -128,7 +128,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::InitialElementTimedLiteral, number, literal
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::InitialElementFunctionValue, ground_function, number)
 
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::MetricFunctionExpressionNumber, number)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::MetricFunctionExpressionBinaryOperator, binary_operator, metric_function_expression_left, metric_function_expression_right)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::MetricFunctionExpressionBinaryOperator, binary_operator, metric_left_function_expression, metric_right_function_expression)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::MetricFunctionExpressionMultiOperator,
                           multi_operator,
                           metric_function_expression_first,

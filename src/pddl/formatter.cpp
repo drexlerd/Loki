@@ -282,9 +282,9 @@ template<Formatter T>
 void write(const ConditionNumericConstraintImpl& element, T formatter, std::ostream& out)
 {
     out << "(" << to_string(element.get_binary_comparator()) << " ";
-    write<T>(*element.get_function_expression_left(), formatter, out);
+    write<T>(*element.get_left_function_expression(), formatter, out);
     out << " ";
-    write<T>(*element.get_function_expression_right(), formatter, out);
+    write<T>(*element.get_right_function_expression(), formatter, out);
     out << ")";
 }
 

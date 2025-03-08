@@ -60,8 +60,8 @@ template<ParsingContext C>
 FunctionExpression FunctionExpressionVisitor<C>::operator()(const ast::FunctionExpressionBinaryOp& node)
 {
     const auto binary_operator = boost::apply_visitor(BinaryOperatorVisitor(), node.binary_operator);
-    const auto left_function_expression = this->operator()(node.function_expression_left);
-    const auto right_function_expression = this->operator()(node.function_expression_right);
+    const auto left_function_expression = this->operator()(node.left_function_expression);
+    const auto right_function_expression = this->operator()(node.right_function_expression);
     const auto function_expression = context.builder.get_repositories().get_or_create_function_expression(
         context.builder.get_repositories().get_or_create_function_expression_binary_operator(binary_operator,
                                                                                              left_function_expression,
@@ -239,8 +239,8 @@ FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const 
 FunctionExpression MetricFunctionExpressionDeclarationVisitor::operator()(const ast::MetricFunctionExpressionBinaryOperator& node)
 {
     const auto binary_operator = boost::apply_visitor(BinaryOperatorVisitor(), node.binary_operator);
-    const auto left_function_expression = this->operator()(node.metric_function_expression_left);
-    const auto right_function_expression = this->operator()(node.metric_function_expression_right);
+    const auto left_function_expression = this->operator()(node.metric_left_function_expression);
+    const auto right_function_expression = this->operator()(node.metric_right_function_expression);
     const auto function_expression = context.builder.get_repositories().get_or_create_function_expression(
         context.builder.get_repositories().get_or_create_function_expression_binary_operator(binary_operator,
                                                                                              left_function_expression,

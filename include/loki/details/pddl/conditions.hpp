@@ -219,13 +219,13 @@ class ConditionNumericConstraintImpl
 private:
     size_t m_index;
     BinaryComparatorEnum m_binary_comparator;
-    FunctionExpression m_function_expression_left;
-    FunctionExpression m_function_expression_right;
+    FunctionExpression m_left_function_expression;
+    FunctionExpression m_right_function_expression;
 
     ConditionNumericConstraintImpl(size_t index,
                                    BinaryComparatorEnum binary_comparator,
-                                   FunctionExpression function_expression_left,
-                                   FunctionExpression function_expression_right);
+                                   FunctionExpression left_function_expression,
+                                   FunctionExpression right_function_expression);
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -240,12 +240,12 @@ public:
 
     size_t get_index() const;
     const BinaryComparatorEnum& get_binary_comparator() const;
-    const FunctionExpression& get_function_expression_left() const;
-    const FunctionExpression& get_function_expression_right() const;
+    const FunctionExpression& get_left_function_expression() const;
+    const FunctionExpression& get_right_function_expression() const;
 
     auto identifying_members() const
     {
-        return std::forward_as_tuple(std::as_const(m_binary_comparator), std::as_const(m_function_expression_left), std::as_const(m_function_expression_right));
+        return std::forward_as_tuple(std::as_const(m_binary_comparator), std::as_const(m_left_function_expression), std::as_const(m_right_function_expression));
     }
 };
 

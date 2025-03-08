@@ -98,12 +98,12 @@ const Condition& ConditionForallImpl::get_condition() const { return m_condition
 
 ConditionNumericConstraintImpl::ConditionNumericConstraintImpl(size_t index,
                                                                BinaryComparatorEnum binary_comparator,
-                                                               FunctionExpression function_expression_left,
-                                                               FunctionExpression function_expression_right) :
+                                                               FunctionExpression left_function_expression,
+                                                               FunctionExpression right_function_expression) :
     m_index(index),
     m_binary_comparator(binary_comparator),
-    m_function_expression_left(function_expression_left),
-    m_function_expression_right(function_expression_right)
+    m_left_function_expression(left_function_expression),
+    m_right_function_expression(right_function_expression)
 {
 }
 
@@ -111,9 +111,9 @@ size_t ConditionNumericConstraintImpl::get_index() const { return m_index; }
 
 const BinaryComparatorEnum& ConditionNumericConstraintImpl::get_binary_comparator() const { return m_binary_comparator; }
 
-const FunctionExpression& ConditionNumericConstraintImpl::get_function_expression_left() const { return m_function_expression_left; }
+const FunctionExpression& ConditionNumericConstraintImpl::get_left_function_expression() const { return m_left_function_expression; }
 
-const FunctionExpression& ConditionNumericConstraintImpl::get_function_expression_right() const { return m_function_expression_right; }
+const FunctionExpression& ConditionNumericConstraintImpl::get_right_function_expression() const { return m_right_function_expression; }
 
 /* Condition */
 ConditionImpl::ConditionImpl(size_t index, ConditionVariant condition) : m_index(index), m_condition(std::move(condition)) {}

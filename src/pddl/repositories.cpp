@@ -181,11 +181,11 @@ ConditionForall Repositories::get_or_create_condition_forall(ParameterList param
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionForallImpl> {}).get_or_create(std::move(parameters), std::move(condition));
 }
 ConditionNumericConstraint Repositories::get_or_create_condition_numeric_constraint(BinaryComparatorEnum binary_comparator,
-                                                                                    FunctionExpression function_expression_left,
-                                                                                    FunctionExpression function_expression_right)
+                                                                                    FunctionExpression left_function_expression,
+                                                                                    FunctionExpression right_function_expression)
 {
     return boost::hana::at_key(m_repositories, boost::hana::type<ConditionNumericConstraintImpl> {})
-        .get_or_create(std::move(binary_comparator), std::move(function_expression_left), std::move(function_expression_right));
+        .get_or_create(std::move(binary_comparator), std::move(left_function_expression), std::move(right_function_expression));
 }
 Condition Repositories::get_or_create_condition(ConditionLiteral condition)
 {

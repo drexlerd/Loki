@@ -49,8 +49,8 @@ Condition ToNegationNormalFormTranslator::translate_level_2(ConditionNot conditi
     {
         return this->translate_level_0(repositories.get_or_create_condition(
                                            repositories.get_or_create_condition_numeric_constraint((*condition_numeric)->get_binary_comparator(),
-                                                                                                   (*condition_numeric)->get_function_expression_left(),
-                                                                                                   (*condition_numeric)->get_function_expression_right())),
+                                                                                                   (*condition_numeric)->get_left_function_expression(),
+                                                                                                   (*condition_numeric)->get_right_function_expression())),
                                        repositories);
     }
     else if (const auto condition_not = std::get_if<ConditionNot>(&translated_nested_condition->get_condition()))
