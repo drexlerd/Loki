@@ -69,9 +69,9 @@ Atom Repositories::get_or_create_atom(Predicate predicate, TermList terms)
     return boost::hana::at_key(m_repositories, boost::hana::type<AtomImpl> {}).get_or_create(std::move(predicate), std::move(terms));
 }
 
-Literal Repositories::get_or_create_literal(bool is_negated, Atom atom)
+Literal Repositories::get_or_create_literal(bool polarity, Atom atom)
 {
-    return boost::hana::at_key(m_repositories, boost::hana::type<LiteralImpl> {}).get_or_create(std::move(is_negated), std::move(atom));
+    return boost::hana::at_key(m_repositories, boost::hana::type<LiteralImpl> {}).get_or_create(std::move(polarity), std::move(atom));
 }
 
 FunctionExpressionNumber Repositories::get_or_create_function_expression_number(double number)

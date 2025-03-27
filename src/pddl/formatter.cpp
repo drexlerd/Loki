@@ -651,7 +651,7 @@ template void write<AddressFormatter>(const FunctionImpl& element, AddressFormat
 template<Formatter T>
 void write(const LiteralImpl& element, T formatter, std::ostream& out)
 {
-    if (element.is_negated())
+    if (!element.get_polarity())
     {
         out << "(not ";
         write<T>(*element.get_atom(), formatter, out);

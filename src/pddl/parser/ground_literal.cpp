@@ -72,14 +72,14 @@ GroundAtomicFormulaOfNamesVisitor::GroundAtomicFormulaOfNamesVisitor(ProblemPars
 /* Literal */
 Literal parse(const ast::GroundAtom& node, ProblemParsingContext& context)
 {
-    const auto literal = context.builder.get_repositories().get_or_create_literal(false, parse(node.atomic_formula_of_names, context));
+    const auto literal = context.builder.get_repositories().get_or_create_literal(true, parse(node.atomic_formula_of_names, context));
     context.positions.push_back(literal, node);
     return literal;
 }
 
 Literal parse(const ast::NegatedGroundAtom& node, ProblemParsingContext& context)
 {
-    const auto literal = context.builder.get_repositories().get_or_create_literal(true, parse(node.atomic_formula_of_names, context));
+    const auto literal = context.builder.get_repositories().get_or_create_literal(false, parse(node.atomic_formula_of_names, context));
     context.positions.push_back(literal, node);
     return literal;
 }

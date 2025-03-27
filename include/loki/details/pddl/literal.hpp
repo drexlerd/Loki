@@ -28,10 +28,10 @@ class LiteralImpl
 {
 private:
     size_t m_index;
-    bool m_is_negated;
+    bool m_polarity;
     Atom m_atom;
 
-    LiteralImpl(size_t index, bool is_negated, Atom atom);
+    LiteralImpl(size_t index, bool polarity, Atom atom);
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -45,10 +45,10 @@ public:
     LiteralImpl& operator=(LiteralImpl&& other) = default;
 
     size_t get_index() const;
-    bool is_negated() const;
+    bool get_polarity() const;
     Atom get_atom() const;
 
-    auto identifying_members() const { return std::tuple(is_negated(), get_atom()); }
+    auto identifying_members() const { return std::tuple(get_polarity(), get_atom()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const LiteralImpl& element);

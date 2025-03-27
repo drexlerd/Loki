@@ -69,7 +69,7 @@ static LiteralList typed_object_to_literals(Object object, Repositories& reposit
     for (const auto& type : types)
     {
         auto additional_literal =
-            repositories.get_or_create_literal(false, repositories.get_or_create_atom(type_to_predicate(type, repositories), TermList { translated_term }));
+            repositories.get_or_create_literal(true, repositories.get_or_create_atom(type_to_predicate(type, repositories), TermList { translated_term }));
         additional_literals.push_back(additional_literal);
     }
     return additional_literals;
@@ -82,7 +82,7 @@ static ConditionList typed_parameter_to_condition_literals(Parameter parameter, 
     for (const auto& type : types)
     {
         auto condition = repositories.get_or_create_condition(repositories.get_or_create_condition_literal(repositories.get_or_create_literal(
-            false,
+            true,
             repositories.get_or_create_atom(
                 type_to_predicate(type, repositories),
                 TermList { repositories.get_or_create_term(repositories.get_or_create_variable(parameter->get_variable()->get_name())) }))));

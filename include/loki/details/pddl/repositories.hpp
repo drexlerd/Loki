@@ -156,7 +156,7 @@ public:
 
     Atom get_or_create_atom(Predicate predicate, TermList terms);
 
-    Literal get_or_create_literal(bool is_negated, Atom atom);
+    Literal get_or_create_literal(bool polarity, Atom atom);
 
     FunctionExpressionNumber get_or_create_function_expression_number(double number);
     FunctionExpressionBinaryOperator get_or_create_function_expression_binary_operator(BinaryOperatorEnum binary_operator,

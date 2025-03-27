@@ -22,11 +22,11 @@
 
 namespace loki
 {
-LiteralImpl::LiteralImpl(size_t index, bool is_negated, Atom atom) : m_index(index), m_is_negated(is_negated), m_atom(std::move(atom)) {}
+LiteralImpl::LiteralImpl(size_t index, bool polarity, Atom atom) : m_index(index), m_polarity(polarity), m_atom(std::move(atom)) {}
 
 size_t LiteralImpl::get_index() const { return m_index; }
 
-bool LiteralImpl::is_negated() const { return m_is_negated; }
+bool LiteralImpl::get_polarity() const { return m_polarity; }
 
 Atom LiteralImpl::get_atom() const { return m_atom; }
 

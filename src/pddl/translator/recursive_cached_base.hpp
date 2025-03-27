@@ -204,7 +204,7 @@ protected:
     }
     loki::Literal translate_level_2(loki::Literal literal, Repositories& repositories)
     {
-        return repositories.get_or_create_literal(literal->is_negated(), this->translate_level_0(literal->get_atom(), repositories));
+        return repositories.get_or_create_literal(literal->get_polarity(), this->translate_level_0(literal->get_atom(), repositories));
     }
     loki::FunctionValue translate_level_2(loki::FunctionValue function_value, Repositories& repositories)
     {

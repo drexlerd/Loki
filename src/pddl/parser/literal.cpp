@@ -102,7 +102,7 @@ template struct LiteralVisitor<ProblemParsingContext>;
 template<ParsingContext C>
 Literal parse(const ast::Atom& node, C& context)
 {
-    const auto literal = context.builder.get_repositories().get_or_create_literal(false, parse(node.atomic_formula_of_terms, context));
+    const auto literal = context.builder.get_repositories().get_or_create_literal(true, parse(node.atomic_formula_of_terms, context));
     context.positions.push_back(literal, node);
     return literal;
 }
@@ -113,7 +113,7 @@ template Literal parse(const ast::Atom& node, ProblemParsingContext& context);
 template<ParsingContext C>
 Literal parse(const ast::NegatedAtom& node, C& context)
 {
-    const auto literal = context.builder.get_repositories().get_or_create_literal(true, parse(node.atomic_formula_of_terms, context));
+    const auto literal = context.builder.get_repositories().get_or_create_literal(false, parse(node.atomic_formula_of_terms, context));
     context.positions.push_back(literal, node);
     return literal;
 }

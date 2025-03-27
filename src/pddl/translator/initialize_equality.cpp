@@ -26,7 +26,7 @@ static Literal get_or_create_equality_literal(Predicate equality_predicate, Obje
 {
     const auto term_object = repositories.get_or_create_term(object);
 
-    return repositories.get_or_create_literal(false, repositories.get_or_create_atom(equality_predicate, TermList { term_object, term_object }));
+    return repositories.get_or_create_literal(true, repositories.get_or_create_atom(equality_predicate, TermList { term_object, term_object }));
 }
 
 Problem InitializeEqualityTranslator::translate_level_2(const Problem& problem, ProblemBuilder& builder)

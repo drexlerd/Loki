@@ -117,8 +117,8 @@ Condition RemoveUniversalQuantifiersTranslator::translate_level_2(ConditionForal
     m_instantiated_predicates.insert(translated_predicate);
     const auto translated_atom = repositories.get_or_create_atom(translated_predicate, translated_terms);
     const auto translated_substituted_condition =
-        repositories.get_or_create_condition(repositories.get_or_create_condition_literal(repositories.get_or_create_literal(true, translated_atom)));
-    const auto translated_axiom_literal = repositories.get_or_create_literal(false, translated_atom);
+        repositories.get_or_create_condition(repositories.get_or_create_condition_literal(repositories.get_or_create_literal(false, translated_atom)));
+    const auto translated_axiom_literal = repositories.get_or_create_literal(true, translated_atom);
 
     const auto translated_axiom = repositories.get_or_create_axiom(translated_parameters, translated_axiom_literal, translated_condition_exists_not_phi);
 

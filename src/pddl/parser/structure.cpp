@@ -102,7 +102,7 @@ std::variant<Axiom, Action> StructureVisitor<C>::operator()(const ast::Axiom& no
     }
 
     const auto literal =
-        context.builder.get_repositories().get_or_create_literal(false, context.builder.get_repositories().get_or_create_atom(predicate, terms));
+        context.builder.get_repositories().get_or_create_literal(true, context.builder.get_repositories().get_or_create_atom(predicate, terms));
 
     const auto condition = parse(node.goal_descriptor, context);
 

@@ -42,7 +42,7 @@ Condition ToNegationNormalFormTranslator::translate_level_2(ConditionNot conditi
     {
         return this->translate_level_0(
             repositories.get_or_create_condition(repositories.get_or_create_condition_literal(
-                repositories.get_or_create_literal(!(*condition_lit)->get_literal()->is_negated(), (*condition_lit)->get_literal()->get_atom()))),
+                repositories.get_or_create_literal(!(*condition_lit)->get_literal()->get_polarity(), (*condition_lit)->get_literal()->get_atom()))),
             repositories);
     }
     else if (const auto condition_numeric = std::get_if<ConditionNumericConstraint>(&translated_nested_condition->get_condition()))

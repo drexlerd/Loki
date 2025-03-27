@@ -61,7 +61,7 @@ Condition SimplifyGoalTranslator::simplify_goal_condition(Condition goal_conditi
     const auto predicate = repositories.get_or_create_predicate(axiom_name, ParameterList {});
     instantiated_predicates.push_back(predicate);
     const auto atom = repositories.get_or_create_atom(predicate, TermList {});
-    const auto literal = repositories.get_or_create_literal(false, atom);
+    const auto literal = repositories.get_or_create_literal(true, atom);
     const auto substituted_condition = repositories.get_or_create_condition(repositories.get_or_create_condition_literal(literal));
     const auto axiom = repositories.get_or_create_axiom(ParameterList {}, literal, this->translate_level_0(goal_condition, repositories));
     instantiated_axioms.push_back(axiom);
