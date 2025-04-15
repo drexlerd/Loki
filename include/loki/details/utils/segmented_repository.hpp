@@ -121,6 +121,24 @@ public:
         return nullptr;
     }
 
+    T const* insert(const T& element) const
+    {
+        // Ensure that element does not exist
+        assert(!find(element));
+
+        // Copy element to persistent memory
+        m_persistent_vector.push_back(element);
+
+        // Fetch the pointer to persistent element;
+        const auto persistent_addr = &m_persistent_vector.back();
+
+        // Mark the element as not unique.
+        m_uniqueness_set.insert(persistent_addr);
+
+        // Return pointer to persistent element.
+        return persistent_addr;
+    }
+
     /// @brief Returns a pointer to an existing object or creates it before if it does not exist.
     template<typename... Args>
     T const* get_or_create(Args&&... args)
