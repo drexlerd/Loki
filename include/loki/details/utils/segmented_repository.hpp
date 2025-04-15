@@ -104,6 +104,23 @@ public:
         m_num_parent_elements = m_parent->size();
     }
 
+    T const* find(const T& element) const
+    {
+        auto element_ptr = ObserverPtr<const T>(&element);
+
+        if (auto result = find(element_ptr))
+        {
+            return result;
+        }
+
+        if (auto result = (m_parent ? m_parent->find(element_ptr) : nullptr))
+        {
+            return result;
+        }
+
+        return nullptr;
+    }
+
     /// @brief Returns a pointer to an existing object or creates it before if it does not exist.
     template<typename... Args>
     T const* get_or_create(Args&&... args)
@@ -119,15 +136,9 @@ public:
 
         // Create element of type T
         auto element = T(index, std::forward<Args>(args)...);
-        auto element_ptr = ObserverPtr<const T>(&element);
 
         /* Test for uniqueness. */
-        if (auto result = find(element_ptr))
-        {
-            return result;
-        }
-
-        if (auto result = (m_parent ? m_parent->find(element_ptr) : nullptr))
+        if (auto result = find(element))
         {
             return result;
         }
