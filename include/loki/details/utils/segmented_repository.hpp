@@ -121,7 +121,7 @@ public:
         return nullptr;
     }
 
-    T const* insert(const T& element) const
+    T const* insert(const T& element)
     {
         // Ensure that element does not exist
         assert(!find(element));
