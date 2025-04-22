@@ -134,7 +134,7 @@ private:
     HanaRepositories m_repositories;
 
 public:
-    Repositories() = default;
+    Repositories();
 
     HanaRepositories& get_hana_repositories();
     const HanaRepositories& get_hana_repositories() const;

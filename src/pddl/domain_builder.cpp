@@ -34,6 +34,21 @@ static void verify_indexing_scheme(const std::vector<const T*>& elements, const 
     }
 }
 
+DomainBuilder::DomainBuilder() :
+    m_repositories(),
+    m_filepath(std::nullopt),
+    m_name(""),
+    m_requirements(nullptr),
+    m_types(),
+    m_constants(),
+    m_static_initial_literals(),
+    m_predicates(),
+    m_function_skeletons(),
+    m_actions(),
+    m_axioms()
+{
+}
+
 Domain DomainBuilder::get_result()
 {
     m_types = uniquify_elements(m_types);  ///< We explicitly add "object" and "number" which may result in duplicates, so we filter them out.

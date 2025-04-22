@@ -22,6 +22,49 @@
 namespace loki
 {
 
+Repositories::Repositories() :
+    m_repositories(
+        boost::hana::make_map(boost::hana::make_pair(boost::hana::type_c<RequirementsImpl>, RequirementsRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<TypeImpl>, TypeRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<VariableImpl>, VariableRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<TermImpl>, TermRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<ObjectImpl>, ObjectRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<AtomImpl>, AtomRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<LiteralImpl>, LiteralRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<ParameterImpl>, ParameterRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<PredicateImpl>, PredicateRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<FunctionExpressionNumberImpl>, FunctionExpressionNumberRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<FunctionExpressionBinaryOperatorImpl>, FunctionExpressionBinaryOperatorRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<FunctionExpressionMultiOperatorImpl>, FunctionExpressionMultiOperatorRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<FunctionExpressionMinusImpl>, FunctionExpressionMinusRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<FunctionExpressionFunctionImpl>, FunctionExpressionFunctionRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<FunctionExpressionImpl>, FunctionExpressionRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<FunctionImpl>, FunctionRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<FunctionSkeletonImpl>, FunctionSkeletonRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<ConditionLiteralImpl>, ConditionLiteralRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<ConditionAndImpl>, ConditionAndRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<ConditionOrImpl>, ConditionOrRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<ConditionNotImpl>, ConditionNotRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<ConditionImplyImpl>, ConditionImplyRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<ConditionExistsImpl>, ConditionExistsRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<ConditionForallImpl>, ConditionForallRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<ConditionNumericConstraintImpl>, ConditionNumericConstraintRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<ConditionImpl>, ConditionRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<EffectLiteralImpl>, EffectLiteralRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<EffectAndImpl>, EffectAndRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<EffectNumericImpl>, EffectNumericRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<EffectCompositeForallImpl>, EffectCompositeForallRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<EffectCompositeWhenImpl>, EffectCompositeWhenRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<EffectCompositeOneofImpl>, EffectCompositeOneofRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<EffectCompositeProbabilisticImpl>, EffectCompositeProbabilisticRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<EffectImpl>, EffectRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<ActionImpl>, ActionRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<AxiomImpl>, AxiomRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<OptimizationMetricImpl>, OptimizationMetricRepository {}),
+                              boost::hana::make_pair(boost::hana::type_c<FunctionValueImpl>, FunctionValueRepository {})))
+{
+}
+
 HanaRepositories& Repositories::get_hana_repositories() { return m_repositories; }
 const HanaRepositories& Repositories::get_hana_repositories() const { return m_repositories; }
 
