@@ -69,6 +69,7 @@ Parser::Parser(const fs::path& domain_filepath, const Options& options) :
     m_domain_scopes->open_scope();  ///< open the root scope which should not be closed
 
     auto context = DomainParsingContext(*m_domain_scopes, *m_domain_position_cache, options);
+    context.builder.get_filepath() = domain_filepath;
 
     parse(node, context);
 
@@ -111,6 +112,7 @@ Problem Parser::parse_problem(const fs::path& problem_filepath, const Options& o
     scopes.open_scope();  ///< open the root scope which should not be closed
 
     auto context = ProblemParsingContext(scopes, position_cache, m_domain, options);
+    context.builder.get_filepath() = problem_filepath;
 
     parse(node, context);
 
