@@ -128,13 +128,13 @@ Problem translate(const Problem& problem, const DomainTranslationResult& result)
     builder = ProblemBuilder(result.get_translated_domain());
     translated_problem = rename_quantified_variables_translator.translate_level_0(translated_problem, builder);
 
-    auto simplify_goal_translator = SimplifyGoalTranslator();
-    builder = ProblemBuilder(result.get_translated_domain());
-    translated_problem = simplify_goal_translator.translate_level_0(translated_problem, builder);
-
     auto remove_universal_quantifiers_translator = RemoveUniversalQuantifiersTranslator();
     builder = ProblemBuilder(result.get_translated_domain());
     translated_problem = remove_universal_quantifiers_translator.translate_level_0(translated_problem, builder);
+
+    auto simplify_goal_translator = SimplifyGoalTranslator();
+    builder = ProblemBuilder(result.get_translated_domain());
+    translated_problem = simplify_goal_translator.translate_level_0(translated_problem, builder);
 
     auto to_disjunctive_normal_form_translator = ToDisjunctiveNormalFormTranslator();
     builder = ProblemBuilder(result.get_translated_domain());
