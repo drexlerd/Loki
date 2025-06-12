@@ -207,6 +207,31 @@ public:
             ++(*this);
             return tmp;
         }
+        const_iterator operator+(difference_type n)
+        {
+            m_pos += n;
+
+            if (m_pos < m_vec->size())
+            {
+                m_index = SegmentedVector::get_index(m_pos);
+                m_offset = SegmentedVector::get_offset(m_pos);
+            }
+            else
+            {
+                // Point to the last element
+                m_index = m_vec->m_segments.size();
+                m_offset = 0;
+            }
+
+            return *this;
+        }
+        const_iterator operator+(difference_type n) const
+        {
+            auto copy = *this;
+            copy += n;
+            return copy;
+        }
+
         bool operator==(const const_iterator& other) const { return m_pos == other.m_pos; }
         bool operator!=(const const_iterator& other) const { return !(*this == other); }
     };

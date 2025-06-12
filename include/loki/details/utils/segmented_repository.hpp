@@ -250,6 +250,19 @@ public:
             ++(*this);
             return tmp;
         }
+        const_iterator& operator+=(difference_type n)
+        {
+            while (n-- > 0)
+                ++(*this);
+            return *this;
+        }
+
+        const_iterator operator+(difference_type n) const
+        {
+            auto copy = *this;
+            copy += n;
+            return copy;
+        }
         bool operator==(const const_iterator& other) const { return m_in_parent == other.m_in_parent && m_it == other.m_it; }
         bool operator!=(const const_iterator& other) const { return !(*this == other); }
     };
