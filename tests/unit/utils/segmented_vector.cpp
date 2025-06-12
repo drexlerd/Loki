@@ -23,24 +23,24 @@ namespace loki::domain::tests
 
 TEST(LokiTests, LokiUtilsSegmentedVectorTest)
 {
-    SegmentedVector<int> vec(1);
+    SegmentedVector<int> vec;
     EXPECT_EQ(vec.size(), 0);
-    EXPECT_EQ(vec.capacity(), 0);
+    EXPECT_EQ(vec.capacity(), 1);
 
     vec.push_back(2);
     EXPECT_EQ(vec.size(), 1);
-    EXPECT_EQ(vec.capacity(), 2);
+    EXPECT_EQ(vec.capacity(), 1);
     EXPECT_EQ(vec[0], 2);
 
     vec.push_back(1);
     EXPECT_EQ(vec.size(), 2);
     EXPECT_EQ(vec[1], 1);
-    EXPECT_EQ(vec.capacity(), 2);
+    EXPECT_EQ(vec.capacity(), 3);
 
     vec.push_back(0);
     EXPECT_EQ(vec.size(), 3);
     EXPECT_EQ(vec[2], 0);
-    EXPECT_EQ(vec.capacity(), 6);
+    EXPECT_EQ(vec.capacity(), 3);
 }
 
 }

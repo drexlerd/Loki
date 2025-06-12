@@ -19,6 +19,7 @@
 #define LOKI_INCLUDE_LOKI_UTILS_SEGMENTED_VECTOR_HPP_
 
 #include <array>
+#include <bit>
 #include <cassert>
 #include <iostream>
 #include <memory>
@@ -35,29 +36,29 @@ template<typename T>
 class SegmentedVector
 {
 private:
-    size_t m_num_element_per_segment;
-    size_t m_maximum_num_elements_per_segment;
-
     std::vector<std::vector<T>> m_segments;
-
-    std::vector<T*> m_accessor;
-
+    size_t m_offset;
     size_t m_size;
     size_t m_capacity;
 
-    void increase_capacity()
+    static size_t get_index(size_t pos) { return std::countr_zero(std::bit_floor(pos + 1)); }
+
+    static size_t get_offset(size_t pos) { return pos - (std::bit_floor(pos + 1) - 1); }
+
+    /// @brief Resizes the vector to fit an inserted element.
+    /// Note: get_index and get_offset is tailored specifically for the doubling strategy starting at 1.
+    void resize_to_fit()
     {
-        assert(m_num_element_per_segment > 0);
+        const auto remaining_entries = m_segments.back().capacity() - m_offset;
 
-        // Use doubling strategy to make future insertions cheaper.
-        m_num_element_per_segment = std::min(2 * m_num_element_per_segment, m_maximum_num_elements_per_segment);
-
-        // Add an additional vector with capacity N
-        m_segments.resize(m_segments.size() + 1);
-        // This reserve is important to avoid reallocations
-        m_segments.back().reserve(m_num_element_per_segment);
-        // Increase total capacity
-        m_capacity += m_num_element_per_segment;
+        if (remaining_entries == 0)
+        {
+            const auto new_segment_size = m_segments.back().size() * 2;
+            m_segments.resize(m_segments.size() + 1);
+            m_segments.back().reserve(new_segment_size);
+            m_offset = 0;
+            m_capacity += new_segment_size;
+        }
     }
 
     void range_check(size_t pos) const
@@ -70,13 +71,11 @@ private:
     }
 
 public:
-    SegmentedVector(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
-        m_num_element_per_segment(initial_num_element_per_segment),
-        m_maximum_num_elements_per_segment(maximum_num_elements_per_segment),
-        m_segments(),
-        m_size(0),
-        m_capacity(0)
+    SegmentedVector() : m_segments(), m_offset(0), m_size(0), m_capacity(0)
     {
+        m_segments.resize(1);
+        m_segments.back().reserve(1);
+        m_capacity = 1;
     }
 
     /**
@@ -84,32 +83,20 @@ public:
      */
     void push_back(T value)
     {
-        // Increase capacity if necessary
-        if (m_size >= m_capacity)
-        {
-            increase_capacity();
-        }
+        resize_to_fit();
 
-        // Take ownership of memory, store address in accessor.
-        auto& segment = m_segments.back();
-        auto& element = segment.emplace_back(std::move(value));
-        m_accessor.push_back(&element);
+        m_segments.back().push_back(std::move(value));
+        ++m_offset;
         ++m_size;
     }
 
     template<typename... Args>
     T& emplace_back(Args&&... args)
     {
-        // Increase capacity if necessary
-        if (m_size >= m_capacity)
-        {
-            increase_capacity();
-        }
+        resize_to_fit();
 
-        // Emplace the new element directly in the segment
-        auto& segment = m_segments.back();
-        auto& element = segment.emplace_back(std::forward<Args>(args)...);
-        m_accessor.push_back(&element);
+        auto& element = m_segments.back().emplace_back(std::forward<Args>(args)...);
+        ++m_offset;
         ++m_size;
 
         return element;
@@ -122,42 +109,111 @@ public:
     T& operator[](size_t pos)
     {
         assert(pos < size());
-        return *m_accessor[pos];
+        const auto index = get_index(pos);
+        const auto offset = get_offset(pos);
+        return m_segments[index][offset];
     }
 
     const T& operator[](size_t pos) const
     {
         assert(pos < size());
-        return *m_accessor[pos];
+        const auto index = get_index(pos);
+        const auto offset = get_offset(pos);
+        return m_segments[index][offset];
     }
 
     T& at(size_t pos)
     {
         range_check(pos);
-        return *m_accessor[pos];
+        const auto index = get_index(pos);
+        const auto offset = get_offset(pos);
+        return m_segments[index][offset];
     }
 
     const T& at(size_t pos) const
     {
         range_check(pos);
-        return *m_accessor[pos];
+        const auto index = get_index(pos);
+        const auto offset = get_offset(pos);
+        return m_segments[index][offset];
     }
 
     T& back()
     {
         range_check(size() - 1);
-        return *m_accessor.back();
+        return m_segments.back().back();
     }
 
     const T& back() const
     {
         range_check(size() - 1);
-        return *m_accessor.back();
+        return m_segments.back().back();
     }
 
-    auto begin() const { return m_accessor.begin(); }
+    class const_iterator
+    {
+    private:
+        const SegmentedVector* m_vec;
+        size_t m_pos;
+        size_t m_index;
+        size_t m_offset;
 
-    auto end() const { return m_accessor.end(); }
+        void advance()
+        {
+            if (++m_pos >= m_vec->size())
+                return;
+
+            if (++m_offset >= m_vec->m_segments[m_index].size())
+            {
+                ++m_index;
+                m_offset = 0;
+            }
+        }
+
+    public:
+        using difference_type = std::ptrdiff_t;
+        using value_type = T;
+        using pointer = const value_type*;
+        using reference = const value_type&;
+        using iterator_category = std::input_iterator_tag;
+        using iterator_concept = std::input_iterator_tag;
+
+        const_iterator() : m_vec(nullptr), m_pos(0), m_index(0), m_offset(0) {}
+        const_iterator(const SegmentedVector& vec, bool begin) : m_vec(&vec), m_pos(0), m_index(0), m_offset(0)
+        {
+            m_pos = begin ? 0 : vec.size();
+
+            if (m_pos < vec.size())
+            {
+                m_index = SegmentedVector::get_index(m_pos);
+                m_offset = SegmentedVector::get_offset(m_pos);
+            }
+            else
+            {
+                // Point past the last element
+                m_index = vec.m_segments.size();
+                m_offset = 0;
+            }
+        }
+        pointer operator*() const { return &m_vec->m_segments[m_index][m_offset]; }
+        const_iterator& operator++()
+        {
+            advance();
+            return *this;
+        }
+        const_iterator operator++(int)
+        {
+            auto tmp = const_iterator(*this);
+            ++(*this);
+            return tmp;
+        }
+        bool operator==(const const_iterator& other) const { return m_pos == other.m_pos; }
+        bool operator!=(const const_iterator& other) const { return !(*this == other); }
+    };
+
+    const_iterator begin() const { return const_iterator(*this, true); }
+
+    const_iterator end() const { return const_iterator(*this, false); }
 
     size_t num_segments() const { return m_segments.size(); }
 

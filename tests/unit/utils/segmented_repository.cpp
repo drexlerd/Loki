@@ -29,7 +29,7 @@ namespace loki::domain::tests
 
 TEST(LokiTests, LokiUtilsSegmentedRepositoryIteratorTest)
 {
-    SegmentedRepository<ObjectImpl> factory(2);
+    SegmentedRepository<ObjectImpl> factory;
 
     const auto object_0 = factory.get_or_create("object_0", TypeList());
     const auto object_1 = factory.get_or_create("object_1", TypeList());
@@ -49,7 +49,7 @@ TEST(LokiTests, LokiUtilsSegmentedRepositoryIteratorTest)
 
 TEST(LokiTests, UtilsSegmentedRepositoryIteratorEmptyTest)
 {
-    SegmentedRepository<ObjectImpl> factory(4);
+    SegmentedRepository<ObjectImpl> factory;
 
     auto objects = ObjectList {};
     for (const auto& object : factory)
@@ -62,8 +62,8 @@ TEST(LokiTests, UtilsSegmentedRepositoryIteratorEmptyTest)
 
 TEST(LokiTests, UtilsSegmentedRepositoryVariantTest)
 {
-    SegmentedRepository<ObjectImpl> objects(2);
-    SegmentedRepository<TermImpl> terms(2);
+    SegmentedRepository<ObjectImpl> objects;
+    SegmentedRepository<TermImpl> terms;
     const auto object_0 = objects.get_or_create("object_0", TypeList());
     const auto object_1 = objects.get_or_create("object_1", TypeList());
 
@@ -77,7 +77,7 @@ TEST(LokiTests, UtilsSegmentedRepositoryVariantTest)
 
 TEST(LokiTests, UtilsSegmentedRepositoryTest)
 {
-    SegmentedRepository<ObjectImpl> factory(2);
+    SegmentedRepository<ObjectImpl> factory;
     EXPECT_EQ(factory.size(), 0);
 
     // Test uniqueness: insert the same element twice

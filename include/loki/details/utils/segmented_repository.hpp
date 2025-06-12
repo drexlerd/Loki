@@ -85,13 +85,7 @@ private:
     }
 
 public:
-    SegmentedRepository(size_t initial_num_element_per_segment = 16, size_t maximum_num_elements_per_segment = 16 * 1024) :
-        m_uniqueness_set(),
-        m_persistent_vector(SegmentedVector<T>(initial_num_element_per_segment, maximum_num_elements_per_segment)),
-        m_parent(nullptr),
-        m_num_parent_elements(0)
-    {
-    }
+    SegmentedRepository() : m_uniqueness_set(), m_persistent_vector(), m_parent(nullptr), m_num_parent_elements(0) {}
     SegmentedRepository(const SegmentedRepository& other) = delete;
     SegmentedRepository& operator=(const SegmentedRepository& other) = delete;
     SegmentedRepository(SegmentedRepository&& other) = default;
@@ -196,9 +190,73 @@ public:
         return (pos < m_num_parent_elements) ? m_parent->at(pos) : &(m_persistent_vector.at(pos - m_num_parent_elements));
     }
 
-    auto begin() const { return m_persistent_vector.begin(); }
+    class const_iterator
+    {
+    private:
+        const SegmentedRepository* m_repo;
+        bool m_in_parent;
 
-    auto end() const { return m_persistent_vector.end(); }
+        SegmentedVector<T>::const_iterator m_it;
+        SegmentedVector<T>::const_iterator m_end;
+
+    public:
+        using difference_type = std::ptrdiff_t;
+        using value_type = T;
+        using pointer = const value_type*;
+        using reference = const value_type&;
+        using iterator_category = std::input_iterator_tag;
+        using iterator_concept = std::input_iterator_tag;
+
+        const_iterator() : m_repo(nullptr), m_in_parent(false), m_it(), m_end() {}
+        const_iterator(const SegmentedRepository& repo, bool begin) : m_repo(&repo)
+        {
+            if (begin)
+            {
+                if (repo.m_parent && !repo.m_parent->m_persistent_vector.empty())
+                {
+                    m_in_parent = true;
+                    m_it = repo.m_parent->m_persistent_vector.begin();
+                    m_end = repo.m_parent->m_persistent_vector.end();
+                }
+                else
+                {
+                    m_in_parent = false;
+                    m_it = repo.m_persistent_vector.begin();
+                    m_end = repo.m_persistent_vector.end();
+                }
+            }
+            else
+            {
+                m_in_parent = false;
+                m_it = repo.m_persistent_vector.end();
+                m_end = repo.m_persistent_vector.end();
+            }
+        }
+        pointer operator*() const { return *m_it; }
+        const_iterator& operator++()
+        {
+            ++m_it;
+            if (m_in_parent && m_it == m_end)
+            {
+                m_it = m_repo->m_persistent_vector.begin();
+                m_end = m_repo->m_persistent_vector.end();
+                m_in_parent = false;
+            }
+            return *this;
+        }
+        const_iterator operator++(int)
+        {
+            auto tmp = const_iterator(*this);
+            ++(*this);
+            return tmp;
+        }
+        bool operator==(const const_iterator& other) const { return m_in_parent == other.m_in_parent && m_it == other.m_it; }
+        bool operator!=(const const_iterator& other) const { return !(*this == other); }
+    };
+
+    const_iterator begin() const { return const_iterator(*this, true); }
+
+    const_iterator end() const { return const_iterator(*this, false); }
 
     const SegmentedVector<T>& get_storage() const { return m_persistent_vector; }
 
