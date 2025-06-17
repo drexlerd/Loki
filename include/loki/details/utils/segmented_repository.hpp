@@ -85,18 +85,25 @@ private:
     }
 
 public:
-    SegmentedRepository() : m_uniqueness_set(), m_persistent_vector(), m_parent(nullptr), m_num_parent_elements(0) {}
+    explicit SegmentedRepository(const SegmentedRepository* parent = nullptr) :
+        m_uniqueness_set(),
+        m_persistent_vector(),
+        m_parent(parent),
+        m_num_parent_elements(0)
+    {
+        if (parent)
+        {
+            if (parent->m_parent)
+                throw std::runtime_error("SegmentedRepository::SegmentedRepository: Multi chaining of SegmentedRepository is not supported.");
+
+            m_num_parent_elements = m_parent->size();
+        }
+    }
+
     SegmentedRepository(const SegmentedRepository& other) = delete;
     SegmentedRepository& operator=(const SegmentedRepository& other) = delete;
     SegmentedRepository(SegmentedRepository&& other) = default;
     SegmentedRepository& operator=(SegmentedRepository&& other) = default;
-
-    void set_parent(const SegmentedRepository& parent)
-    {
-        assert(m_uniqueness_set.empty() && m_persistent_vector.empty());
-        m_parent = &parent;
-        m_num_parent_elements = m_parent->size();
-    }
 
     T const* find(const T& element) const
     {

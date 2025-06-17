@@ -134,7 +134,7 @@ private:
     HanaRepositories m_repositories;
 
 public:
-    Repositories();
+    explicit Repositories(const Repositories* parent = nullptr);
 
     HanaRepositories& get_hana_repositories();
     const HanaRepositories& get_hana_repositories() const;
