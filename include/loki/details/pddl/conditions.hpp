@@ -37,7 +37,7 @@ private:
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
-    friend class SegmentedRepository;
+    friend class IndexedHashSet;
 
 public:
     // moveable but not copyable
@@ -63,7 +63,7 @@ private:
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
-    friend class SegmentedRepository;
+    friend class IndexedHashSet;
 
 public:
     // moveable but not copyable
@@ -89,7 +89,7 @@ private:
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
-    friend class SegmentedRepository;
+    friend class IndexedHashSet;
 
 public:
     // moveable but not copyable
@@ -115,7 +115,7 @@ private:
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
-    friend class SegmentedRepository;
+    friend class IndexedHashSet;
 
 public:
     // moveable but not copyable
@@ -142,7 +142,7 @@ private:
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
-    friend class SegmentedRepository;
+    friend class IndexedHashSet;
 
 public:
     // moveable but not copyable
@@ -170,7 +170,7 @@ private:
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
-    friend class SegmentedRepository;
+    friend class IndexedHashSet;
 
 public:
     // moveable but not copyable
@@ -198,7 +198,7 @@ private:
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
-    friend class SegmentedRepository;
+    friend class IndexedHashSet;
 
 public:
     // moveable but not copyable
@@ -229,7 +229,7 @@ private:
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
-    friend class SegmentedRepository;
+    friend class IndexedHashSet;
 
 public:
     // moveable but not copyable
@@ -260,7 +260,7 @@ private:
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
-    friend class SegmentedRepository;
+    friend class IndexedHashSet;
 
 public:
     // moveable but not copyable

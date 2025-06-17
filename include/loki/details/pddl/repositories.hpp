@@ -37,7 +37,7 @@
 #include "loki/details/pddl/term.hpp"
 #include "loki/details/pddl/type.hpp"
 #include "loki/details/pddl/variable.hpp"
-#include "loki/details/utils/segmented_repository.hpp"
+#include "loki/details/utils/indexed_hash_set.hpp"
 
 #include <boost/hana.hpp>
 
@@ -45,7 +45,7 @@ namespace loki
 {
 
 template<typename T>
-using SegmentedPDDLRepository = SegmentedRepository<T>;
+using SegmentedPDDLRepository = IndexedHashSet<T>;
 
 using RequirementsRepository = SegmentedPDDLRepository<RequirementsImpl>;
 using TypeRepository = SegmentedPDDLRepository<TypeImpl>;

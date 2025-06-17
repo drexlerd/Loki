@@ -22,14 +22,14 @@
 #include <loki/details/pddl/variable.hpp>
 #include <loki/details/utils/equal_to.hpp>
 #include <loki/details/utils/hash.hpp>
-#include <loki/details/utils/segmented_repository.hpp>
+#include <loki/details/utils/indexed_hash_set.hpp>
 
 namespace loki::domain::tests
 {
 
-TEST(LokiTests, LokiUtilsSegmentedRepositoryIteratorTest)
+TEST(LokiTests, LokiUtilsIndexedHashSetIteratorTest)
 {
-    SegmentedRepository<ObjectImpl> factory;
+    IndexedHashSet<ObjectImpl> factory;
 
     const auto object_0 = factory.get_or_create("object_0", TypeList());
     const auto object_1 = factory.get_or_create("object_1", TypeList());
@@ -47,9 +47,9 @@ TEST(LokiTests, LokiUtilsSegmentedRepositoryIteratorTest)
     EXPECT_EQ(objects[2], object_2);
 }
 
-TEST(LokiTests, UtilsSegmentedRepositoryIteratorEmptyTest)
+TEST(LokiTests, UtilsIndexedHashSetIteratorEmptyTest)
 {
-    SegmentedRepository<ObjectImpl> factory;
+    IndexedHashSet<ObjectImpl> factory;
 
     auto objects = ObjectList {};
     for (const auto& object : factory)
@@ -60,10 +60,10 @@ TEST(LokiTests, UtilsSegmentedRepositoryIteratorEmptyTest)
     EXPECT_EQ(objects.size(), 0);
 }
 
-TEST(LokiTests, UtilsSegmentedRepositoryVariantTest)
+TEST(LokiTests, UtilsIndexedHashSetVariantTest)
 {
-    SegmentedRepository<ObjectImpl> objects;
-    SegmentedRepository<TermImpl> terms;
+    IndexedHashSet<ObjectImpl> objects;
+    IndexedHashSet<TermImpl> terms;
     const auto object_0 = objects.get_or_create("object_0", TypeList());
     const auto object_1 = objects.get_or_create("object_1", TypeList());
 
@@ -75,9 +75,9 @@ TEST(LokiTests, UtilsSegmentedRepositoryVariantTest)
     EXPECT_NE(term_0_object_0, term_2_object_1);
 }
 
-TEST(LokiTests, UtilsSegmentedRepositoryTest)
+TEST(LokiTests, UtilsIndexedHashSetTest)
 {
-    SegmentedRepository<ObjectImpl> factory;
+    IndexedHashSet<ObjectImpl> factory;
     EXPECT_EQ(factory.size(), 0);
 
     // Test uniqueness: insert the same element twice

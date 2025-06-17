@@ -27,7 +27,7 @@ Repositories::Repositories(const Repositories* parent) :
                                                               [=](auto type_c)
                                                               {
                                                                   using T = typename decltype(type_c)::type;
-                                                                  using Repo = SegmentedRepository<T>;
+                                                                  using Repo = IndexedHashSet<T>;
 
                                                                   const Repo* parent_repo = nullptr;
                                                                   if (parent)

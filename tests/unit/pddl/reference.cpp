@@ -18,14 +18,14 @@
 #include <gtest/gtest.h>
 #include <loki/details/pddl/object.hpp>
 #include <loki/details/pddl/reference.hpp>
-#include <loki/details/utils/segmented_repository.hpp>
+#include <loki/details/utils/indexed_hash_set.hpp>
 
 namespace loki::domain::tests
 {
 
 TEST(LokiTests, LokiPddlReferenceTest)
 {
-    SegmentedRepository<ObjectImpl> factory;
+    IndexedHashSet<ObjectImpl> factory;
     const auto object_0 = factory.get_or_create("object_0", TypeList());
     const auto object_1 = factory.get_or_create("object_1", TypeList());
 

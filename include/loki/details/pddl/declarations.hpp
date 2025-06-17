@@ -39,7 +39,7 @@ template<typename T>
 using PDDLElement = const T*;
 
 template<typename T, typename Hash, typename EqualTo>
-class SegmentedRepository;
+class IndexedHashSet;
 
 /**
  * Domain
