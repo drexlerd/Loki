@@ -52,11 +52,15 @@ TEST(LokiTests, LokiPddlTranslatorTest)
     {
         // Check that all problem types are domain types.
         const auto& domain_type_list = boost::hana::at_key(domain->get_repositories().get_hana_repositories(), boost::hana::type<TypeImpl> {});
-        auto domain_type_set = TypeSet(domain_type_list.begin(), domain_type_list.end());
+        auto domain_type_set = TypeSet {};
+        for (const auto& type : domain_type_list)
+        {
+            domain_type_set.insert(&type);
+        }
         const auto& problem_type_list = boost::hana::at_key(problem->get_repositories().get_hana_repositories(), boost::hana::type<TypeImpl> {});
         for (const auto& type : problem_type_list)
         {
-            EXPECT_TRUE(domain_type_set.contains(type));
+            EXPECT_TRUE(domain_type_set.contains(&type));
         }
     }
 
@@ -106,9 +110,9 @@ TEST(LokiTests, LokiPddlTranslatorTest)
             boost::hana::at_key(translated_domain->get_repositories().get_hana_repositories(), boost::hana::type<FunctionSkeletonImpl> {});
         for (const auto& function_skeleton : problem_function_skeletons)
         {
-            if (domain_function_skeletons.contains(function_skeleton->get_name()))
+            if (domain_function_skeletons.contains(function_skeleton.get_name()))
             {
-                EXPECT_EQ(function_skeleton, domain_function_skeletons.at(function_skeleton->get_name()));
+                EXPECT_EQ(&function_skeleton, domain_function_skeletons.at(function_skeleton.get_name()));
             }
         }
     }

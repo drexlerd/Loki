@@ -199,7 +199,7 @@ public:
                 m_end = repo.m_vector.end();
             }
         }
-        pointer operator*() const { return *m_it; }
+        reference operator*() const { return **m_it; }
         const_iterator& operator++()
         {
             ++m_it;
