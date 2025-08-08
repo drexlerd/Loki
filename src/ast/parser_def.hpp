@@ -338,7 +338,7 @@ const auto binary_comparator_less_equal_def = lit("<=") > x3::attr(ast::BinaryCo
 const auto binary_comparator_def =
     binary_comparator_greater_equal | binary_comparator_less_equal | binary_comparator_greater | binary_comparator_less | binary_comparator_equal;
 
-const auto function_head_def = ((lit('(') >> function_symbol) > *term) > lit(')') | (function_symbol > x3::attr(std::vector<ast::Term> {}));
+const auto function_head_def = (((lit('(') >> function_symbol) > *term) > lit(')')) | (function_symbol > x3::attr(std::vector<ast::Term> {}));
 const auto function_expression_def = function_expression_binary_op | function_expression_minus | function_expression_head | function_expression_number;
 const auto function_expression_number_def = number;
 // distinguishing unary from binary minus requires some more backtracking
@@ -407,8 +407,8 @@ const auto effect_composite_probabilistic_def = (lit('(') >> keyword_lit("probab
 const auto effect_composite_def = effect_composite_forall | effect_composite_when | effect_composite_oneof | effect_composite_probabilistic;
 
 const auto action_symbol_def = name;
-const auto action_body_def = -(keyword_lit(":precondition") > ((lit('(') >> lit(')')) | precondition_goal_descriptor))
-                             > -(keyword_lit(":effect") > ((lit('(') >> lit(')')) | effect));
+const auto action_body_def = -(keyword_lit(":precondition") > (((lit('(') >> lit(')')) > x3::attr(ast::PreconditionGoalDescriptorAnd())) | precondition_goal_descriptor))
+                             > -(keyword_lit(":effect") > (((lit('(') >> lit(')')) > x3::attr(std::vector<ast::Effect>())) | effect));
 const auto action_def = (lit('(') >> keyword_lit(":action")) > action_symbol > keyword_lit(":parameters") > lit('(') > typed_list_of_variables > lit(')')
                         > action_body > lit(')');
 
