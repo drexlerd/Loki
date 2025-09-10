@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SRC_PDDL_TRANSLATOR_REMOVE_TYPES_HPP_
-#define LOKI_SRC_PDDL_TRANSLATOR_REMOVE_TYPES_HPP_
+#ifndef LOKI_SRC_PDDL_TRANSLATOR_ADD_TYPE_PREDICATES_HPP_
+#define LOKI_SRC_PDDL_TRANSLATOR_ADD_TYPE_PREDICATES_HPP_
 
 #include "recursive_cached_base.hpp"
 
@@ -25,11 +25,11 @@ namespace loki
 /**
  * Compile away types.
  */
-class RemoveTypesTranslator : public RecursiveCachedBaseTranslator<RemoveTypesTranslator>
+class AddTypePredicatesTranslator : public RecursiveCachedBaseTranslator<AddTypePredicatesTranslator>
 {
 private:
     /* Implement RecursiveCachedBaseTranslator interface. */
-    friend class RecursiveCachedBaseTranslator<RemoveTypesTranslator>;
+    friend class RecursiveCachedBaseTranslator<AddTypePredicatesTranslator>;
 
     // Provide default implementations
     using RecursiveCachedBaseTranslator::translate_level_2;

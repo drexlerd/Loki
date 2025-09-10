@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "remove_types.hpp"
+#include "add_type_predicates.hpp"
 
 #include "loki/details/utils/collections.hpp"
 #include "utils.hpp"
@@ -23,86 +23,57 @@
 namespace loki
 {
 
-static void collect_types_from_type_hierarchy_recursively(Type type, TypeSet& ref_type_list)
+
+static Predicate create_type_predicate(Type translated_type, Repositories& repositories)
 {
-    // Base case: Skip object types since they do not contribute to give any additional information
-    if (type->get_name() != "object")
-    {
-        ref_type_list.insert(type);
-    }
-    // Inductive case:
-    for (const auto& base_type : type->get_bases())
-    {
-        collect_types_from_type_hierarchy_recursively(base_type, ref_type_list);
-    }
+    return repositories.get_or_create_predicate(translated_type->get_name(),
+                                             ParameterList { repositories.get_or_create_parameter(repositories.get_or_create_variable("?arg"), TypeList { translated_type }) });
 }
 
-static TypeList collect_types_from_type_hierarchy(const TypeList& type_list)
-{
-    TypeSet flat_type_set;
-    for (const auto& type : type_list)
-    {
-        collect_types_from_type_hierarchy_recursively(type, flat_type_set);
-    }
-    return TypeList(flat_type_set.begin(), flat_type_set.end());
-}
-
-static Predicate type_to_predicate(Type type, Repositories& repositories)
-{
-    auto predicate =
-        repositories.get_or_create_predicate(type->get_name(),
-                                             ParameterList { repositories.get_or_create_parameter(repositories.get_or_create_variable("?arg"), TypeList {}) });
-
-    return predicate;
-}
-
-static Object typed_object_to_untyped_object(Object object, Repositories& repositories)
-{
-    return repositories.get_or_create_object(object->get_name(), TypeList {});
-}
-
-static LiteralList typed_object_to_literals(Object object, Repositories& repositories)
+static LiteralList create_literals_for_object_types(Object translated_object, Repositories& repositories)
 {
     auto additional_literals = LiteralList {};
-    auto translated_term = repositories.get_or_create_term(typed_object_to_untyped_object(object, repositories));
-    auto types = collect_types_from_type_hierarchy(object->get_bases());
+    auto translated_term = repositories.get_or_create_term(translated_object);
+    auto types = collect_types_from_hierarchy(translated_object->get_bases());
+
     for (const auto& type : types)
     {
         auto additional_literal =
-            repositories.get_or_create_literal(true, repositories.get_or_create_atom(type_to_predicate(type, repositories), TermList { translated_term }));
+            repositories.get_or_create_literal(true, repositories.get_or_create_atom(create_type_predicate(type, repositories), TermList { translated_term }));
         additional_literals.push_back(additional_literal);
     }
     return additional_literals;
 }
 
-static ConditionList typed_parameter_to_condition_literals(Parameter parameter, Repositories& repositories)
+static ConditionList create_condition_literals_for_parameter_types(Parameter translated_parameter, Repositories& repositories)
 {
     auto conditions = ConditionList {};
-    auto types = collect_types_from_type_hierarchy(parameter->get_bases());
+    auto types = collect_types_from_hierarchy(translated_parameter->get_bases());
+    
     for (const auto& type : types)
     {
         auto condition = repositories.get_or_create_condition(repositories.get_or_create_condition_literal(repositories.get_or_create_literal(
             true,
             repositories.get_or_create_atom(
-                type_to_predicate(type, repositories),
-                TermList { repositories.get_or_create_term(repositories.get_or_create_variable(parameter->get_variable()->get_name())) }))));
+                create_type_predicate(type, repositories),
+                TermList { repositories.get_or_create_term(repositories.get_or_create_variable(translated_parameter->get_variable()->get_name())) }))));
         conditions.push_back(condition);
     }
     return conditions;
 }
 
-Object RemoveTypesTranslator::translate_level_2(Object object, Repositories& repositories) { return typed_object_to_untyped_object(object, repositories); }
+Object AddTypePredicatesTranslator::translate_level_2(Object object, Repositories& repositories) { return repositories.get_or_create_object(object->get_name(), this->translate_level_0(object->get_bases(), repositories)); }
 
-Condition RemoveTypesTranslator::translate_level_2(ConditionExists condition, Repositories& repositories)
+Condition AddTypePredicatesTranslator::translate_level_2(ConditionExists condition, Repositories& repositories)
 {
     // Translate parameters
-    auto translated_parameters = ParameterList {};
+    auto translated_parameters = this->translate_level_0(condition->get_parameters(), repositories);
     auto translated_part_conditions = ConditionList {};
-    for (const auto& parameter : condition->get_parameters())
+
+    for (const auto& translated_parameter : translated_parameters)
     {
-        translated_parameters.push_back(repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {}));
-        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories);
-        translated_part_conditions.insert(translated_part_conditions.end(), additional_conditions.begin(), additional_conditions.end());
+        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, repositories);
+        translated_part_conditions.insert(translated_part_conditions.end(), translated_condition_literals.begin(), translated_condition_literals.end());
     }
 
     // Translate condition
@@ -112,16 +83,16 @@ Condition RemoveTypesTranslator::translate_level_2(ConditionExists condition, Re
     return repositories.get_or_create_condition(repositories.get_or_create_condition_exists(translated_parameters, translated_condition));
 }
 
-Condition RemoveTypesTranslator::translate_level_2(ConditionForall condition, Repositories& repositories)
+Condition AddTypePredicatesTranslator::translate_level_2(ConditionForall condition, Repositories& repositories)
 {
     // Translate parameters
-    auto translated_parameters = ParameterList {};
+    auto translated_parameters = this->translate_level_0(condition->get_parameters(), repositories);
     auto translated_part_conditions = ConditionList {};
-    for (const auto& parameter : condition->get_parameters())
+    
+    for (const auto& translated_parameter : translated_parameters)
     {
-        translated_parameters.push_back(repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {}));
-        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories);
-        translated_part_conditions.insert(translated_part_conditions.end(), additional_conditions.begin(), additional_conditions.end());
+        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, repositories);
+        translated_part_conditions.insert(translated_part_conditions.end(), translated_condition_literals.begin(), translated_condition_literals.end());
     }
 
     // Translate condition
@@ -131,16 +102,16 @@ Condition RemoveTypesTranslator::translate_level_2(ConditionForall condition, Re
     return repositories.get_or_create_condition(repositories.get_or_create_condition_forall(translated_parameters, translated_condition));
 }
 
-Effect RemoveTypesTranslator::translate_level_2(EffectCompositeForall effect, Repositories& repositories)
+Effect AddTypePredicatesTranslator::translate_level_2(EffectCompositeForall effect, Repositories& repositories)
 {
     // Translate parameters
-    auto translated_parameters = ParameterList {};
+    auto translated_parameters = this->translate_level_0(effect->get_parameters(), repositories);
     auto translated_part_conditions = ConditionList {};
-    for (const auto& parameter : effect->get_parameters())
+
+    for (const auto& translated_parameter : translated_parameters)
     {
-        translated_parameters.push_back(repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {}));
-        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories);
-        translated_part_conditions.insert(translated_part_conditions.end(), additional_conditions.begin(), additional_conditions.end());
+        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, repositories);
+        translated_part_conditions.insert(translated_part_conditions.end(), translated_condition_literals.begin(), translated_condition_literals.end());
     }
 
     // Instantiate a condition to use in "when"
@@ -154,17 +125,18 @@ Effect RemoveTypesTranslator::translate_level_2(EffectCompositeForall effect, Re
         repositories.get_or_create_effect(repositories.get_or_create_effect_composite_when(translated_condition, translated_effect))));
 }
 
-Axiom RemoveTypesTranslator::translate_level_2(Axiom axiom, Repositories& repositories)
+Axiom AddTypePredicatesTranslator::translate_level_2(Axiom axiom, Repositories& repositories)
 {
     // Translate parameters
-    auto translated_parameters = ParameterList {};
+    auto translated_parameters = this->translate_level_0(axiom->get_parameters(), repositories);
     auto translated_part_conditions = ConditionList {};
-    for (const auto& parameter : axiom->get_parameters())
+
+    for (const auto& translated_parameter : translated_parameters)
     {
-        translated_parameters.push_back(repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {}));
-        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories);
-        translated_part_conditions.insert(translated_part_conditions.end(), additional_conditions.begin(), additional_conditions.end());
+        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, repositories);
+        translated_part_conditions.insert(translated_part_conditions.end(), translated_condition_literals.begin(), translated_condition_literals.end());
     }
+
     translated_part_conditions.push_back(this->translate_level_0(axiom->get_condition(), repositories));
 
     // Instantiate the condition
@@ -176,21 +148,21 @@ Axiom RemoveTypesTranslator::translate_level_2(Axiom axiom, Repositories& reposi
     return repositories.get_or_create_axiom(translated_parameters, translated_literal, translated_condition);
 }
 
-Action RemoveTypesTranslator::translate_level_2(Action action, Repositories& repositories)
+Action AddTypePredicatesTranslator::translate_level_2(Action action, Repositories& repositories)
 {
     // Translate parameters
-    auto translated_parameters = ParameterList {};
+    auto translated_parameters = this->translate_level_0(action->get_parameters(), repositories);
     auto translated_part_conditions = ConditionList {};
-    for (const auto& parameter : action->get_parameters())
+
+    for (const auto& translated_parameter : translated_parameters)
     {
-        translated_parameters.push_back(repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {}));
-        auto additional_conditions = typed_parameter_to_condition_literals(parameter, repositories);
-        translated_part_conditions.insert(translated_part_conditions.end(), additional_conditions.begin(), additional_conditions.end());
+        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, repositories);
+        translated_part_conditions.insert(translated_part_conditions.end(), translated_condition_literals.begin(), translated_condition_literals.end());
     }
+
     if (action->get_condition().has_value())
-    {
         translated_part_conditions.push_back(this->translate_level_0(action->get_condition().value(), repositories));
-    }
+
     auto translated_condition =
         translated_part_conditions.empty() ?
             std::nullopt :
@@ -200,32 +172,26 @@ Action RemoveTypesTranslator::translate_level_2(Action action, Repositories& rep
     return repositories.get_or_create_action(action->get_name(), action->get_original_arity(), translated_parameters, translated_condition, translated_effect);
 }
 
-Domain RemoveTypesTranslator::translate_level_2(const Domain& domain, DomainBuilder& builder)
+Domain AddTypePredicatesTranslator::translate_level_2(const Domain& domain, DomainBuilder& builder)
 {
     auto& repositories = builder.get_repositories();
 
     builder.get_name() = domain->get_name();
     builder.get_filepath() = domain->get_filepath();
 
-    // Remove :typing requirement
-    auto requirements_enum_set = domain->get_requirements()->get_requirements();
-    requirements_enum_set.erase(RequirementEnum::TYPING);
-    builder.get_requirements() = repositories.get_or_create_requirements(requirements_enum_set);
+    builder.get_requirements() = this->translate_level_0(domain->get_requirements(), repositories);
 
-    // Translate types into predicates.
-    auto translated_types = collect_types_from_hierarchy(this->translate_level_0(domain->get_types(), repositories));
-    for (const auto& type : translated_types)
+    // Introduce static type predicates.
+    for (const auto& type : collect_types_from_hierarchy(this->translate_level_0(domain->get_types(), repositories)))
     {
-        builder.get_predicates().insert(builder.get_predicates().end(), type_to_predicate(type, repositories));
+        builder.get_predicates().insert(builder.get_predicates().end(), create_type_predicate(type, repositories));
     }
 
-    // Make constants untyped, introduce static initial literals.
-    auto translated_constants = ObjectList {};
-    translated_constants.reserve(domain->get_constants().size());
-    for (const auto& object : domain->get_constants())
+    // Introduce static initial literals for constant types.
+    for (const auto& object : this->translate_level_0(domain->get_constants(), repositories))
     {
-        builder.get_constants().push_back(typed_object_to_untyped_object(object, repositories));
-        auto additional_literals = typed_object_to_literals(object, repositories);
+        builder.get_constants().push_back(object);
+        auto additional_literals = create_literals_for_object_types(object, repositories);
         builder.get_static_initial_literals().insert(builder.get_static_initial_literals().end(), additional_literals.begin(), additional_literals.end());
     }
 
@@ -248,23 +214,20 @@ Domain RemoveTypesTranslator::translate_level_2(const Domain& domain, DomainBuil
     return builder.get_result();
 }
 
-Problem RemoveTypesTranslator::translate_level_2(const Problem& problem, ProblemBuilder& builder)
+Problem AddTypePredicatesTranslator::translate_level_2(const Problem& problem, ProblemBuilder& builder)
 {
     auto& repositories = builder.get_repositories();
 
     builder.get_filepath() = problem->get_filepath();
     builder.get_name() = problem->get_name();
 
-    // Remove :typing requirement
-    auto requirements_enum_set = problem->get_requirements()->get_requirements();
-    requirements_enum_set.erase(RequirementEnum::TYPING);
-    builder.get_requirements() = repositories.get_or_create_requirements(requirements_enum_set);
+    builder.get_requirements() = this->translate_level_0(problem->get_requirements(), repositories);
 
-    // Make objects untyped
-    for (const auto& object : problem->get_objects())
+    // Introduce static initial literals for object types
+    for (const auto& object : this->translate_level_0(problem->get_objects(), repositories))
     {
-        builder.get_objects().push_back(typed_object_to_untyped_object(object, repositories));
-        auto additional_literals = typed_object_to_literals(object, repositories);
+        builder.get_objects().push_back(object);
+        auto additional_literals = create_literals_for_object_types(object, repositories);
         builder.get_initial_literals().insert(builder.get_initial_literals().end(), additional_literals.begin(), additional_literals.end());
     }
     // Make constants untyped

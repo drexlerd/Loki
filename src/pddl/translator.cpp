@@ -19,7 +19,7 @@
 
 #include "translator/initialize_equality.hpp"
 #include "translator/move_existential_quantifiers.hpp"
-#include "translator/remove_types.hpp"
+#include "translator/add_type_predicates.hpp"
 #include "translator/remove_universal_quantifiers.hpp"
 #include "translator/rename_quantified_variables.hpp"
 #include "translator/simplify_goal.hpp"
@@ -85,11 +85,11 @@ DomainTranslationResult translate(const Domain& domain)
     // std::cout << *translated_domain << std::endl;
 
     /* Type translator cannot come before removal of universal quantifiers because of negations. */
-    auto remove_types_translator = RemoveTypesTranslator();
+    auto remove_types_translator = AddTypePredicatesTranslator();
     builder = DomainBuilder();
     translated_domain = remove_types_translator.translate_level_0(translated_domain, builder);
 
-    // std::cout << "RemoveTypesTranslator result:" << std::endl;
+    // std::cout << "AddTypePredicatesTranslator result:" << std::endl;
     // std::cout << *translated_domain << std::endl;
 
     auto to_effect_normal_form_translator = ToEffectNormalFormTranslator();
@@ -148,7 +148,7 @@ Problem translate(const Problem& problem, const DomainTranslationResult& result)
     builder = ProblemBuilder(result.get_translated_domain());
     translated_problem = move_existential_quantifiers_translator.translate_level_0(translated_problem, builder);
 
-    auto remove_types_translator = RemoveTypesTranslator();
+    auto remove_types_translator = AddTypePredicatesTranslator();
     builder = ProblemBuilder(result.get_translated_domain());
     translated_problem = remove_types_translator.translate_level_0(translated_problem, builder);
 

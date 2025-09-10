@@ -118,14 +118,13 @@ TEST(LokiTests, LokiPddlTranslatorTest)
     }
 
     {
-        // Check that all constants and objects are untyped
         for (const auto& constant : translated_domain->get_constants())
         {
-            EXPECT_EQ(constant->get_bases().size(), 0);
+            EXPECT_EQ(constant->get_bases().size(), 1);
         }
         for (const auto& object : translated_problem->get_objects())
         {
-            EXPECT_EQ(object->get_bases().size(), 0);
+            EXPECT_EQ(object->get_bases().size(), 1);
         }
     }
 }
