@@ -33,6 +33,8 @@ private:
 
     TypeImpl(size_t index, std::string name, TypeList bases = {});
 
+    static auto identifying_args(const std::string& name, const TypeList& bases) noexcept { return std::tuple(std::cref(name), std::cref(bases)); }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -48,7 +50,7 @@ public:
     const std::string& get_name() const;
     const TypeList& get_bases() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_name()), std::cref(get_bases())); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_name()), std::cref(get_bases())); }
 };
 
 /// @brief Collects all types from a hierarchy.

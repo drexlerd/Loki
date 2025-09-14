@@ -115,26 +115,28 @@ public:
 
         /* Construct and insert the element in persistent memory. */
 
-        size_t index = size();
+        // 1) Build a non-owning view over the identity (no alloc)
+        auto view = T::identifying_args(args...);
 
-        auto element = T(index, std::forward<Args>(args)...);
-
+        // 2) Probe parent first (no construction of T on hits)
         if (m_parent)
         {
-            if (auto it = m_parent->m_set.find(element); it != m_parent->m_set.end())
+            if (auto it = m_parent->m_set.find(view); it != m_parent->m_set.end())
             {
                 return &*it;
             }
         }
 
-        auto result = m_set.insert(std::move(element));
+        // 3) Probe local set (still no construction of T on hits)
+        if (auto it = m_set.find(view); it != m_set.end())
+            return &*it;
 
-        if (result.second)
-        {
-            m_vector.push_back(&*result.first);
-        }
+        // 4) Miss: construct in-place (no temporary), assign index
+        auto [it, success] = m_set.insert(T(size(), std::forward<Args>(args)...));
+        if (success)
+            m_vector.push_back(&*it);
 
-        return &*result.first;
+        return &*it;
     }
 
     /**

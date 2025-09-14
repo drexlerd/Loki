@@ -34,6 +34,11 @@ private:
 
     AxiomImpl(size_t index, ParameterList parameters, Literal subtyped_literal, Condition condition);
 
+    static auto identifying_args(const ParameterList& parameters, Literal subtyped_literal, Condition condition) noexcept
+    {
+        return std::tuple(std::cref(parameters), subtyped_literal, condition);
+    }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -50,7 +55,7 @@ public:
     Literal get_literal() const;
     Condition get_condition() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_parameters()), get_literal(), get_condition()); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_parameters()), get_literal(), get_condition()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const AxiomImpl& element);

@@ -31,11 +31,13 @@ private:
     Function m_function;
     double m_number;
 
+    FunctionValueImpl(size_t index, Function function, double number);
+
+    static auto identifying_args(Function function, double number) noexcept { return std::tuple(function, number); }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
-
-    FunctionValueImpl(size_t index, Function function, double number);
 
 public:
     // moveable but not copyable
@@ -48,7 +50,7 @@ public:
     Function get_function() const;
     double get_number() const;
 
-    auto identifying_members() const { return std::tuple(get_function(), get_number()); }
+    auto identifying_members() const noexcept { return std::tuple(get_function(), get_number()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const FunctionValueImpl& element);

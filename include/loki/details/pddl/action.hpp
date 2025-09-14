@@ -43,6 +43,15 @@ private:
                std::optional<Condition> condition,
                std::optional<Effect> effect);
 
+    static auto identifying_args(const std::string& name,
+                                 size_t original_arity,
+                                 const ParameterList& parameters,
+                                 std::optional<Condition> condition,
+                                 std::optional<Effect> effect) noexcept
+    {
+        return std::tuple(std::cref(name), original_arity, std::cref(parameters), condition, effect);
+    }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -61,7 +70,7 @@ public:
     const std::optional<Condition>& get_condition() const;
     const std::optional<Effect>& get_effect() const;
 
-    auto identifying_members() const
+    auto identifying_members() const noexcept
     {
         return std::tuple(std::cref(get_name()), get_original_arity(), std::cref(get_parameters()), get_condition(), get_effect());
     }

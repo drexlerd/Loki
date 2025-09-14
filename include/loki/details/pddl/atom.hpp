@@ -33,6 +33,8 @@ private:
 
     AtomImpl(size_t index, Predicate predicate, TermList terms);
 
+    static auto identifying_args(Predicate predicate, const TermList& terms) noexcept { return std::tuple(predicate, std::cref(terms)); }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -48,7 +50,7 @@ public:
     Predicate get_predicate() const;
     const TermList& get_terms() const;
 
-    auto identifying_members() const { return std::tuple(get_predicate(), std::cref(get_terms())); }
+    auto identifying_members() const noexcept { return std::tuple(get_predicate(), std::cref(get_terms())); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const AtomImpl& element);

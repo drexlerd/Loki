@@ -90,7 +90,7 @@ public:
     const AxiomList& get_axioms() const;
     const AxiomList& get_problem_and_domain_axioms() const;
 
-    auto identifying_members() const
+    auto identifying_members() const noexcept
     {
         return std::tuple(std::cref(get_domain()),
                           std::cref(get_name()),

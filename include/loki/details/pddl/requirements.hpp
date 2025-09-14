@@ -32,6 +32,8 @@ private:
 
     RequirementsImpl(size_t index, RequirementEnumSet requirements);
 
+    static auto identifying_args(const RequirementEnumSet& requirements) noexcept { return std::tuple(std::cref(requirements)); }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -48,7 +50,7 @@ public:
     size_t get_index() const;
     const RequirementEnumSet& get_requirements() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_requirements())); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_requirements())); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const RequirementsImpl& element);

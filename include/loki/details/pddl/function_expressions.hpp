@@ -66,6 +66,8 @@ private:
 
     FunctionExpressionNumberImpl(size_t index, double number);
 
+    static auto identifying_args(double number) noexcept { return std::tuple(number); }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -80,7 +82,7 @@ public:
     size_t get_index() const;
     double get_number() const;
 
-    auto identifying_members() const { return std::tuple(get_number()); }
+    auto identifying_members() const noexcept { return std::tuple(get_number()); }
 };
 
 /* FunctionExpressionBinaryOperator */
@@ -96,6 +98,12 @@ private:
                                          BinaryOperatorEnum binary_operator,
                                          FunctionExpression left_function_expression,
                                          FunctionExpression right_function_expression);
+
+    static auto
+    identifying_args(BinaryOperatorEnum binary_operator, FunctionExpression left_function_expression, FunctionExpression right_function_expression) noexcept
+    {
+        return std::tuple(binary_operator, left_function_expression, right_function_expression);
+    }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -113,7 +121,7 @@ public:
     FunctionExpression get_left_function_expression() const;
     FunctionExpression get_right_function_expression() const;
 
-    auto identifying_members() const { return std::tuple(get_binary_operator(), get_left_function_expression(), get_right_function_expression()); }
+    auto identifying_members() const noexcept { return std::tuple(get_binary_operator(), get_left_function_expression(), get_right_function_expression()); }
 };
 
 /* FunctionExpressionMultiOperator */
@@ -125,6 +133,11 @@ private:
     FunctionExpressionList m_function_expressions;
 
     FunctionExpressionMultiOperatorImpl(size_t index, MultiOperatorEnum multi_operator, FunctionExpressionList function_expressions);
+
+    static auto identifying_args(MultiOperatorEnum multi_operator, const FunctionExpressionList& function_expressions) noexcept
+    {
+        return std::tuple(multi_operator, std::cref(function_expressions));
+    }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -141,7 +154,7 @@ public:
     MultiOperatorEnum get_multi_operator() const;
     const FunctionExpressionList& get_function_expressions() const;
 
-    auto identifying_members() const { return std::tuple(get_multi_operator(), std::cref(get_function_expressions())); }
+    auto identifying_members() const noexcept { return std::tuple(get_multi_operator(), std::cref(get_function_expressions())); }
 };
 
 /* FunctionExpressionMinus */
@@ -152,6 +165,8 @@ private:
     FunctionExpression m_function_expression;
 
     FunctionExpressionMinusImpl(size_t index, FunctionExpression function_expression);
+
+    static auto identifying_args(FunctionExpression function_expression) noexcept { return std::tuple(function_expression); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -167,7 +182,7 @@ public:
     size_t get_index() const;
     FunctionExpression get_function_expression() const;
 
-    auto identifying_members() const { return std::tuple(get_function_expression()); }
+    auto identifying_members() const noexcept { return std::tuple(get_function_expression()); }
 };
 
 /* FunctionExpressionFunction */
@@ -178,6 +193,8 @@ private:
     Function m_function;
 
     FunctionExpressionFunctionImpl(size_t index, Function function);
+
+    static auto identifying_args(Function function) noexcept { return std::tuple(function); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -193,7 +210,7 @@ public:
     size_t get_index() const;
     Function get_function() const;
 
-    auto identifying_members() const { return std::tuple(get_function()); }
+    auto identifying_members() const noexcept { return std::tuple(get_function()); }
 };
 
 /* FunctionExpression */
@@ -215,6 +232,15 @@ private:
                                         FunctionExpressionMinus,
                                         FunctionExpressionFunction> function_expression);
 
+    static auto identifying_args(std::variant<FunctionExpressionNumber,
+                                              FunctionExpressionBinaryOperator,
+                                              FunctionExpressionMultiOperator,
+                                              FunctionExpressionMinus,
+                                              FunctionExpressionFunction> function_expression) noexcept
+    {
+        return std::tuple(function_expression);
+    }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -234,7 +260,7 @@ public:
                        FunctionExpressionFunction>&
     get_function_expression() const;
 
-    auto identifying_members() const { return std::tuple(get_function_expression()); }
+    auto identifying_members() const noexcept { return std::tuple(get_function_expression()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const FunctionExpressionNumberImpl& element);

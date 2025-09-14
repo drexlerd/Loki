@@ -33,6 +33,8 @@ private:
 
     VariableImpl(size_t index, std::string name);
 
+    static auto identifying_args(const std::string& name) noexcept { return std::tuple(std::cref(name)); }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -47,7 +49,7 @@ public:
     size_t get_index() const;
     const std::string& get_name() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_name())); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_name())); }
 };
 
 extern VariableSet collect_free_variables(const loki::ConditionImpl& condition);

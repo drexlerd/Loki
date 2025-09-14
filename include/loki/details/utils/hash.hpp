@@ -222,7 +222,15 @@ struct Hash<ObserverPtr<T>>
 template<HasIdentifyingMembers T>
 struct Hash<T>
 {
-    size_t operator()(const T& proxy) const { return loki::hash_combine(proxy.identifying_members()); }
+    using is_transparent = void;  // <-- enables hetero lookup
+
+    size_t operator()(const T& element) const { return loki::hash_combine(element.identifying_members()); }
+
+    template<typename... Args>
+    size_t operator()(const std::tuple<Args...>& view) const
+    {
+        return loki::hash_combine(view);
+    }
 };
 
 /**

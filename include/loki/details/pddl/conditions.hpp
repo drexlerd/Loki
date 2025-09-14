@@ -35,6 +35,8 @@ private:
 
     ConditionLiteralImpl(size_t index, Literal literal);
 
+    static auto identifying_args(Literal literal) noexcept { return std::tuple(literal); }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -49,7 +51,7 @@ public:
     size_t get_index() const;
     Literal get_literal() const;
 
-    auto identifying_members() const { return std::tuple(get_literal()); }
+    auto identifying_members() const noexcept { return std::tuple(get_literal()); }
 };
 
 /* And */
@@ -60,6 +62,8 @@ private:
     ConditionList m_conditions;
 
     ConditionAndImpl(size_t index, ConditionList conditions);
+
+    static auto identifying_args(const ConditionList& conditions) noexcept { return std::tuple(std::cref(conditions)); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -75,7 +79,7 @@ public:
     size_t get_index() const;
     const ConditionList& get_conditions() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_conditions())); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_conditions())); }
 };
 
 /* Or */
@@ -86,6 +90,8 @@ private:
     ConditionList m_conditions;
 
     ConditionOrImpl(size_t index, ConditionList conditions);
+
+    static auto identifying_args(const ConditionList& conditions) noexcept { return std::tuple(std::cref(conditions)); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -101,7 +107,7 @@ public:
     size_t get_index() const;
     const ConditionList& get_conditions() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_conditions())); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_conditions())); }
 };
 
 /* Not */
@@ -112,6 +118,8 @@ private:
     Condition m_condition;
 
     ConditionNotImpl(size_t index, Condition condition);
+
+    static auto identifying_args(Condition condition) noexcept { return std::tuple(condition); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -127,7 +135,7 @@ public:
     size_t get_index() const;
     Condition get_condition() const;
 
-    auto identifying_members() const { return std::tuple(get_condition()); }
+    auto identifying_members() const noexcept { return std::tuple(get_condition()); }
 };
 
 /* Imply */
@@ -139,6 +147,8 @@ private:
     Condition m_right_condition;
 
     ConditionImplyImpl(size_t index, Condition left_condition, Condition right_condition);
+
+    static auto identifying_args(Condition left_condition, Condition right_condition) noexcept { return std::tuple(left_condition, right_condition); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -155,7 +165,7 @@ public:
     Condition get_left_condition() const;
     Condition get_right_condition() const;
 
-    auto identifying_members() const { return std::tuple(get_left_condition(), get_right_condition()); }
+    auto identifying_members() const noexcept { return std::tuple(get_left_condition(), get_right_condition()); }
 };
 
 /* Exists */
@@ -167,6 +177,8 @@ private:
     Condition m_condition;
 
     ConditionExistsImpl(size_t index, ParameterList parameters, Condition condition);
+
+    static auto identifying_args(const ParameterList& parameters, Condition condition) noexcept { return std::tuple(std::cref(parameters), condition); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -183,7 +195,7 @@ public:
     const ParameterList& get_parameters() const;
     Condition get_condition() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_parameters()), get_condition()); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_parameters()), get_condition()); }
 };
 
 /* Forall */
@@ -195,6 +207,8 @@ private:
     Condition m_condition;
 
     ConditionForallImpl(size_t index, ParameterList parameters, Condition condition);
+
+    static auto identifying_args(const ParameterList& parameters, Condition condition) noexcept { return std::tuple(std::cref(parameters), condition); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -211,7 +225,7 @@ public:
     const ParameterList& get_parameters() const;
     Condition get_condition() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_parameters()), get_condition()); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_parameters()), get_condition()); }
 };
 
 class ConditionNumericConstraintImpl
@@ -226,6 +240,12 @@ private:
                                    BinaryComparatorEnum binary_comparator,
                                    FunctionExpression left_function_expression,
                                    FunctionExpression right_function_expression);
+
+    static auto
+    identifying_args(BinaryComparatorEnum binary_comparator, FunctionExpression left_function_expression, FunctionExpression right_function_expression) noexcept
+    {
+        return std::tuple(binary_comparator, left_function_expression, right_function_expression);
+    }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -243,7 +263,7 @@ public:
     FunctionExpression get_left_function_expression() const;
     FunctionExpression get_right_function_expression() const;
 
-    auto identifying_members() const { return std::tuple(get_binary_comparator(), get_left_function_expression(), get_right_function_expression()); }
+    auto identifying_members() const noexcept { return std::tuple(get_binary_comparator(), get_left_function_expression(), get_right_function_expression()); }
 };
 
 /* Condition */
@@ -257,6 +277,8 @@ private:
     ConditionVariant m_condition;
 
     ConditionImpl(size_t index, ConditionVariant condition);
+
+    static auto identifying_args(ConditionVariant condition) noexcept { return std::tuple(condition); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -272,7 +294,7 @@ public:
     size_t get_index() const;
     const ConditionVariant& get_condition() const;
 
-    auto identifying_members() const { return std::tuple(get_condition()); }
+    auto identifying_members() const noexcept { return std::tuple(get_condition()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const ConditionLiteralImpl& element);

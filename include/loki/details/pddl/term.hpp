@@ -35,6 +35,8 @@ private:
 
     TermImpl(size_t index, std::variant<Object, Variable> object_or_variable);
 
+    static auto identifying_args(std::variant<Object, Variable> object_or_variable) noexcept { return std::tuple(object_or_variable); }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -49,7 +51,7 @@ public:
     size_t get_index() const;
     const std::variant<Object, Variable>& get_object_or_variable() const;
 
-    auto identifying_members() const { return std::tuple(get_object_or_variable()); }
+    auto identifying_members() const noexcept { return std::tuple(get_object_or_variable()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const TermImpl& element);

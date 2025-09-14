@@ -30,14 +30,14 @@ TEST(LokiTests, LokiUtilsHashTest)
         size_t num_true_elements;
         size_t num_dont_care_elements;
 
-        auto identifying_members() const { return std::tuple(std::cref(num_true_elements), std::cref(num_dont_care_elements)); }
+        auto identifying_members() const noexcept { return std::tuple(std::cref(num_true_elements), std::cref(num_dont_care_elements)); }
     };
 
     struct NumericConstraintSplit
     {
         NumericConstraintSplitDistribution distribution;
 
-        auto identifying_members() const { return std::tuple(std::cref(distribution)); }
+        auto identifying_members() const noexcept { return std::tuple(std::cref(distribution)); }
     };
 
     using Split = std::variant<NumericConstraintSplit, int>;

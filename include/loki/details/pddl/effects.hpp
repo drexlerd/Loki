@@ -45,6 +45,8 @@ private:
 
     EffectLiteralImpl(size_t index, Literal literal);
 
+    static auto identifying_args(Literal literal) noexcept { return std::tuple(literal); }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -59,7 +61,7 @@ public:
     size_t get_index() const;
     Literal get_literal() const;
 
-    auto identifying_members() const { return std::tuple(get_literal()); }
+    auto identifying_members() const noexcept { return std::tuple(get_literal()); }
 };
 
 /* And */
@@ -70,6 +72,8 @@ private:
     EffectList m_effects;
 
     EffectAndImpl(size_t index, EffectList effects);
+
+    static auto identifying_args(const EffectList& effects) noexcept { return std::tuple(std::cref(effects)); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -85,7 +89,7 @@ public:
     size_t get_index() const;
     const EffectList& get_effects() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_effects())); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_effects())); }
 };
 
 /* EffectNumeric */
@@ -98,6 +102,11 @@ private:
     FunctionExpression m_function_expression;
 
     EffectNumericImpl(size_t index, AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression);
+
+    static auto identifying_args(AssignOperatorEnum assign_operator, Function function, FunctionExpression function_expression) noexcept
+    {
+        return std::tuple(assign_operator, function, function_expression);
+    }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -115,7 +124,7 @@ public:
     Function get_function() const;
     FunctionExpression get_function_expression() const;
 
-    auto identifying_members() const { return std::tuple(get_assign_operator(), get_function(), get_function_expression()); }
+    auto identifying_members() const noexcept { return std::tuple(get_assign_operator(), get_function(), get_function_expression()); }
 };
 
 /* CompositeForall */
@@ -127,6 +136,8 @@ private:
     Effect m_effect;
 
     EffectCompositeForallImpl(size_t index, ParameterList parameters, Effect effect);
+
+    static auto identifying_args(const ParameterList& parameters, Effect effect) noexcept { return std::tuple(std::cref(parameters), effect); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -143,7 +154,7 @@ public:
     const ParameterList& get_parameters() const;
     Effect get_effect() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_parameters()), get_effect()); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_parameters()), get_effect()); }
 };
 
 /* CompositeWhen */
@@ -155,6 +166,8 @@ private:
     Effect m_effect;
 
     EffectCompositeWhenImpl(size_t index, Condition condition, Effect effect);
+
+    static auto identifying_args(Condition condition, Effect effect) noexcept { return std::tuple(condition, effect); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -171,7 +184,7 @@ public:
     Condition get_condition() const;
     Effect get_effect() const;
 
-    auto identifying_members() const { return std::tuple(get_condition(), get_effect()); }
+    auto identifying_members() const noexcept { return std::tuple(get_condition(), get_effect()); }
 };
 
 class EffectCompositeOneofImpl
@@ -181,6 +194,8 @@ private:
     EffectList m_effects;
 
     EffectCompositeOneofImpl(size_t index, EffectList effects);
+
+    static auto identifying_args(const EffectList& effects) noexcept { return std::tuple(std::cref(effects)); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -196,7 +211,7 @@ public:
     size_t get_index() const;
     const EffectList& get_effects() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_effects())); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_effects())); }
 };
 
 class EffectCompositeProbabilisticImpl
@@ -206,6 +221,8 @@ private:
     EffectDistribution m_effect_distribution;
 
     EffectCompositeProbabilisticImpl(size_t index, EffectDistribution effect_distribution);
+
+    static auto identifying_args(const EffectDistribution& effect_distribution) noexcept { return std::tuple(std::cref(effect_distribution)); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -221,7 +238,7 @@ public:
     size_t get_index() const;
     const EffectDistribution& get_effect_distribution() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_effect_distribution())); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_effect_distribution())); }
 };
 
 /* EffectImpl */
@@ -235,6 +252,8 @@ private:
     EffectVariant m_effect;
 
     EffectImpl(size_t index, EffectVariant effect);
+
+    static auto identifying_args(EffectVariant effect) noexcept { return std::tuple(effect); }
 
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
@@ -250,7 +269,7 @@ public:
     size_t get_index() const;
     const EffectVariant& get_effect() const;
 
-    auto identifying_members() const { return std::tuple(get_effect()); }
+    auto identifying_members() const noexcept { return std::tuple(get_effect()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const EffectLiteralImpl& element);

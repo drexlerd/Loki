@@ -34,6 +34,8 @@ private:
 
     ParameterImpl(size_t index, Variable variable, TypeList types);
 
+    static auto identifying_args(Variable variable, const TypeList& parameters) noexcept { return std::tuple(variable, std::cref(parameters)); }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -49,7 +51,7 @@ public:
     Variable get_variable() const;
     const TypeList& get_bases() const;
 
-    auto identifying_members() const { return std::tuple(get_variable(), std::cref(get_bases())); }
+    auto identifying_members() const noexcept { return std::tuple(get_variable(), std::cref(get_bases())); }
 };
 
 /// @brief Return true iff specialized_parameter is a specialized version of generalized_parameter

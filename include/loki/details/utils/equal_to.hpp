@@ -210,11 +210,36 @@ struct EqualTo<ObserverPtr<T>>
 template<HasIdentifyingMembers T>
 struct EqualTo<T>
 {
+    using is_transparent = void;  // <-- enables hetero lookup
+
     using MembersTupleType = decltype(std::declval<T>().identifying_members());
 
     bool operator()(const T& lhs, const T& rhs) const
     {
         return EqualTo<std::decay_t<MembersTupleType>> {}(lhs.identifying_members(), rhs.identifying_members());
+    }
+
+    // Mixed overloads required by Abseil: (T, view) and (view, T)
+    template<class U>
+        requires std::same_as<std::remove_cvref_t<U>, MembersTupleType>
+    bool operator()(const T& a, const U& v) const noexcept
+    {
+        return EqualTo<std::decay_t<MembersTupleType>> {}(a.identifying_members(), v);
+    }
+
+    template<class U>
+        requires std::same_as<std::remove_cvref_t<U>, MembersTupleType>
+    bool operator()(const U& v, const T& b) const noexcept
+    {
+        return EqualTo<std::decay_t<MembersTupleType>> {}(v, b.identifying_members());
+    }
+
+    // Optional: view-view compare (handy for testing)
+    template<class U, class V>
+        requires(std::same_as<std::remove_cvref_t<U>, MembersTupleType> && std::same_as<std::remove_cvref_t<V>, MembersTupleType>)
+    bool operator()(const U& u, const V& v) const noexcept
+    {
+        return EqualTo<std::decay_t<MembersTupleType>> {}(u, v);
     }
 };
 

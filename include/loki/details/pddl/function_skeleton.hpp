@@ -34,6 +34,11 @@ private:
 
     FunctionSkeletonImpl(size_t index, std::string name, ParameterList parameters, Type type);
 
+    static auto identifying_args(const std::string& name, const ParameterList& parameters, Type type) noexcept
+    {
+        return std::tuple(std::cref(name), std::cref(parameters), type);
+    }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -50,7 +55,7 @@ public:
     const ParameterList& get_parameters() const;
     Type get_type() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_name()), std::cref(get_parameters()), get_type()); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_name()), std::cref(get_parameters()), get_type()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const FunctionSkeletonImpl& element);

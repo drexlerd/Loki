@@ -42,6 +42,11 @@ private:
 
     OptimizationMetricImpl(size_t index, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression);
 
+    static auto identifying_args(OptimizationMetricEnum optimization_metric, FunctionExpression function_expression) noexcept
+    {
+        return std::tuple(optimization_metric, function_expression);
+    }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -57,7 +62,7 @@ public:
     OptimizationMetricEnum get_optimization_metric() const;
     FunctionExpression get_function_expression() const;
 
-    auto identifying_members() const { return std::tuple(get_optimization_metric(), get_function_expression()); }
+    auto identifying_members() const noexcept { return std::tuple(get_optimization_metric(), get_function_expression()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const OptimizationMetricImpl& element);

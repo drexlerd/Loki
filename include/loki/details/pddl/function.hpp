@@ -33,6 +33,8 @@ private:
 
     FunctionImpl(size_t index, FunctionSkeleton function_skeleton, TermList terms);
 
+    static auto identifying_args(FunctionSkeleton function_skeleton, const TermList& terms) noexcept { return std::tuple(function_skeleton, std::cref(terms)); }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -48,7 +50,7 @@ public:
     FunctionSkeleton get_function_skeleton() const;
     const TermList& get_terms() const;
 
-    auto identifying_members() const { return std::tuple(get_function_skeleton(), std::cref(get_terms())); }
+    auto identifying_members() const noexcept { return std::tuple(get_function_skeleton(), std::cref(get_terms())); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const FunctionImpl& element);

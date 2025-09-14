@@ -76,7 +76,7 @@ public:
     const ActionList& get_actions() const;
     const AxiomList& get_axioms() const;
 
-    auto identifying_members() const
+    auto identifying_members() const noexcept
     {
         return std::tuple(std::cref(get_name()),
                           get_requirements(),

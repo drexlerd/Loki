@@ -33,6 +33,8 @@ private:
 
     LiteralImpl(size_t index, bool polarity, Atom atom);
 
+    static auto identifying_args(bool polarity, Atom atom) noexcept { return std::tuple(polarity, atom); }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -48,7 +50,7 @@ public:
     bool get_polarity() const;
     Atom get_atom() const;
 
-    auto identifying_members() const { return std::tuple(get_polarity(), get_atom()); }
+    auto identifying_members() const noexcept { return std::tuple(get_polarity(), get_atom()); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const LiteralImpl& element);

@@ -35,6 +35,11 @@ private:
 
     PredicateImpl(size_t index, std::string name, ParameterList parameters);
 
+    static auto identifying_args(const std::string& name, const ParameterList& parameters) noexcept
+    {
+        return std::tuple(std::cref(name), std::cref(parameters));
+    }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -50,7 +55,7 @@ public:
     const std::string& get_name() const;
     const ParameterList& get_parameters() const;
 
-    auto identifying_members() const { return std::tuple(std::cref(get_name()), std::cref(get_parameters())); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_name()), std::cref(get_parameters())); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const PredicateImpl& element);

@@ -33,6 +33,8 @@ private:
 
     ObjectImpl(size_t index, std::string name, TypeList types = {});
 
+    static auto identifying_args(const std::string& name, const TypeList& types) noexcept { return std::tuple(std::cref(name), std::cref(types)); }
+
     // Give access to the constructor.
     template<typename T, typename Hash, typename EqualTo>
     friend class IndexedHashSet;
@@ -48,7 +50,7 @@ public:
     const std::string& get_name() const;
     const TypeList& get_bases() const;
 
-    auto identifying_members() const { return std::tuple(get_name(), std::cref(get_bases())); }
+    auto identifying_members() const noexcept { return std::tuple(std::cref(get_name()), std::cref(get_bases())); }
 };
 
 extern std::ostream& operator<<(std::ostream& out, const ObjectImpl& element);
