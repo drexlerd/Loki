@@ -22,6 +22,7 @@
 #include "loki/details/utils/murmurhash3.h"
 #include "loki/details/utils/observer_ptr.hpp"
 
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -57,6 +58,21 @@ template<typename T>
 struct Hash
 {
     size_t operator()(const T& element) const { return std::hash<T> {}(element); }
+};
+
+/// @brief Hash specialization for double.
+///
+/// Returns fixed salt for NaN.
+template<>
+struct Hash<double>
+{
+    size_t operator()(double el) const
+    {
+        if (std::isnan(el))
+            return 0x9e3779b97f4a7c15ULL;  // any fixed salt
+
+        return std::hash<double> {}(el);
+    }
 };
 
 /// @brief Hash specialization for std::array.

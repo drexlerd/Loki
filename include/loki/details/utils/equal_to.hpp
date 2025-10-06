@@ -22,6 +22,7 @@
 #include "loki/details/utils/observer_ptr.hpp"
 
 #include <array>
+#include <cmath>
 #include <functional>
 #include <map>
 #include <optional>
@@ -43,6 +44,18 @@ template<typename T>
 struct EqualTo
 {
     bool operator()(const T& lhs, const T& rhs) const { return std::equal_to<T> {}(lhs, rhs); }
+};
+
+template<>
+struct EqualTo<double>
+{
+    bool operator()(double lhs, double rhs) const
+    {
+        if (std::isnan(lhs) && std::isnan(rhs))
+            return true;
+
+        return lhs == rhs;
+    }
 };
 
 template<typename T, size_t N>
