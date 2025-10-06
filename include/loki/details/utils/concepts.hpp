@@ -27,6 +27,9 @@
 namespace loki
 {
 
+template<typename T>
+concept IsFloatingPoint = std::is_floating_point_v<T>;
+
 /**
  * Concept to check whether a type T has a member function identifying_members.
  *

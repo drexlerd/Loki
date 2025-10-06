@@ -46,10 +46,10 @@ struct EqualTo
     bool operator()(const T& lhs, const T& rhs) const { return std::equal_to<T> {}(lhs, rhs); }
 };
 
-template<>
-struct EqualTo<double>
+template<IsFloatingPoint T>
+struct EqualTo<T>
 {
-    bool operator()(double lhs, double rhs) const
+    bool operator()(const T& lhs, const T& rhs) const
     {
         if (std::isnan(lhs) && std::isnan(rhs))
             return true;
