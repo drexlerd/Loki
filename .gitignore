@@ -37,4 +37,5 @@ build
 *.out
 *.app
 
-dependencies
+dependencies/build
+dependencies/installs
