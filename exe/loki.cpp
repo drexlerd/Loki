@@ -30,6 +30,7 @@ int main(int argc, char** argv)
     program.add_argument("-S", "--strict").default_value(false).implicit_value(true).help("Enable strict parsing mode.");
     program.add_argument("-Q", "--quiet").default_value(true).implicit_value(false).help("Disable quiet mode.");
     /* TODO(Dominik): add translator options */
+    program.add_argument("-T", "--remove_typing").default_value(false).implicit_value(true).help("Enable removal of typing.");
 
     try
     {
@@ -46,17 +47,18 @@ int main(int argc, char** argv)
     auto problem_filepath = program.get<std::string>("--problem-filepath");
     auto out_domain_filepath = program.get<std::string>("--out-domain-filepath");
     auto out_problem_filepath = program.get<std::string>("--out-problem-filepath");
-    auto strict = program.get<bool>("--strict");
-    auto quiet = program.get<bool>("--quiet");
 
-    auto options = loki::Options();
-    options.quiet = quiet;
-    options.strict = strict;
+    auto parser_options = loki::ParserOptions();
+    parser_options.quiet = program.get<bool>("--quiet");
+    parser_options.strict = program.get<bool>("--strict");
 
-    auto parser = loki::Parser(domain_filepath, options);
+    auto translator_options = loki::TranslatorOptions();
+    translator_options.remove_typing = program.get<bool>("--remove_typing");
+
+    auto parser = loki::Parser(domain_filepath, parser_options);
     const auto domain = parser.get_domain();
 
-    const auto domain_translation_result = loki::translate(domain);
+    const auto domain_translation_result = loki::translate(domain, translator_options);
     std::cout << *domain_translation_result.get_translated_domain() << std::endl;
 
     if (!out_domain_filepath.empty())
@@ -68,9 +70,9 @@ int main(int argc, char** argv)
 
     if (!problem_filepath.empty())
     {
-        auto problem = parser.parse_problem(problem_filepath, options);
+        auto problem = parser.parse_problem(problem_filepath, parser_options);
 
-        const auto translated_problem = loki::translate(problem, domain_translation_result);
+        const auto translated_problem = loki::translate(problem, domain_translation_result, translator_options);
         std::cout << *translated_problem << std::endl;
 
         if (!out_problem_filepath.empty())

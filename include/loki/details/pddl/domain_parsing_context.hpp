@@ -34,7 +34,7 @@ struct DomainParsingContext
     PDDLPositionCache& positions;
     ReferencedPDDLObjects references;
 
-    Options options;
+    ParserOptions options;
 
     DomainBuilder builder;
 
@@ -42,7 +42,7 @@ struct DomainParsingContext
 
     bool ignore_free_variables;  ///< We must allow free variables in axioms.
 
-    DomainParsingContext(ScopeStack& scopes, PDDLPositionCache& positions, const Options& options) :
+    DomainParsingContext(ScopeStack& scopes, PDDLPositionCache& positions, const ParserOptions& options) :
         scopes(scopes),
         positions(positions),
         references(),

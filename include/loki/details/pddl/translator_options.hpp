@@ -15,17 +15,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_PDDL_PARSER_OPTIONS_HPP_
-#define LOKI_INCLUDE_LOKI_PDDL_PARSER_OPTIONS_HPP_
+#ifndef LOKI_INCLUDE_LOKI_PDDL_TRANSLATOR_OPTIONS_HPP_
+#define LOKI_INCLUDE_LOKI_PDDL_TRANSLATOR_OPTIONS_HPP_
 
 namespace loki
 {
-struct ParserOptions
+struct TranslatorOptions
 {
-    bool strict;
-    bool quiet;
+    bool remove_typing;
 
-    ParserOptions() : strict(false), quiet(true) {}
+    TranslatorOptions() : remove_typing(false) {}
 };
 }
 

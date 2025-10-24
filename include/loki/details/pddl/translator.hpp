@@ -19,6 +19,7 @@
 #define LOKI_INCLUDE_LOKI_PDDL_TRANSLATOR_HPP_
 
 #include "loki/details/pddl/declarations.hpp"
+#include "loki/details/pddl/translator_options.hpp"
 
 namespace loki
 {
@@ -37,9 +38,9 @@ public:
     const Domain& get_translated_domain() const;
 };
 
-extern DomainTranslationResult translate(const Domain& domain);
+extern DomainTranslationResult translate(const Domain& domain, const TranslatorOptions& options = TranslatorOptions());
 
-extern Problem translate(const Problem& problem, const DomainTranslationResult& result);
+extern Problem translate(const Problem& problem, const DomainTranslationResult& result, const TranslatorOptions& options = TranslatorOptions());
 
 }
 

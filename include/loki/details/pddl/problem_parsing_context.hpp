@@ -35,7 +35,7 @@ struct ProblemParsingContext
     PDDLPositionCache& positions;
     ReferencedPDDLObjects references;
 
-    Options options;
+    ParserOptions options;
 
     ProblemBuilder builder;  ///< Construct the resulting problem while parsing
 
@@ -43,7 +43,7 @@ struct ProblemParsingContext
 
     bool ignore_free_variables;  ///< We must allow free variables in axioms.
 
-    ProblemParsingContext(ScopeStack& scopes, PDDLPositionCache& positions, const Domain& domain, const Options& options) :
+    ProblemParsingContext(ScopeStack& scopes, PDDLPositionCache& positions, const Domain& domain, const ParserOptions& options) :
         scopes(scopes),
         positions(positions),
         references(),

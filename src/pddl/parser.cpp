@@ -37,7 +37,7 @@
 
 namespace loki
 {
-Parser::Parser(const fs::path& domain_filepath, const Options& options) :
+Parser::Parser(const fs::path& domain_filepath, const ParserOptions& options) :
     m_domain(nullptr),
     m_domain_position_cache(nullptr),
     m_domain_scopes(nullptr),
@@ -83,7 +83,7 @@ Parser::Parser(const fs::path& domain_filepath, const Options& options) :
     m_domain = context.builder.get_result();
 }
 
-Problem Parser::parse_problem(const fs::path& problem_filepath, const Options& options)
+Problem Parser::parse_problem(const fs::path& problem_filepath, const ParserOptions& options)
 {
     auto source = loki::read_file(problem_filepath);
 
