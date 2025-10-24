@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     program.add_argument("-S", "--strict").default_value(false).implicit_value(true).help("Enable strict parsing mode.");
     program.add_argument("-Q", "--quiet").default_value(true).implicit_value(false).help("Disable quiet mode.");
     /* TODO(Dominik): add translator options */
-    program.add_argument("-T", "--remove_typing").default_value(false).implicit_value(true).help("Enable removal of typing.");
+    program.add_argument("-T", "--remove-typing").default_value(false).implicit_value(true).help("Enable removal of typing.");
 
     try
     {
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     parser_options.strict = program.get<bool>("--strict");
 
     auto translator_options = loki::TranslatorOptions();
-    translator_options.remove_typing = program.get<bool>("--remove_typing");
+    translator_options.remove_typing = program.get<bool>("--remove-typing");
 
     auto parser = loki::Parser(domain_filepath, parser_options);
     const auto domain = parser.get_domain();

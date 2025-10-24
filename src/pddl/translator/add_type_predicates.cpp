@@ -23,11 +23,11 @@
 namespace loki
 {
 
-
 static Predicate create_type_predicate(Type translated_type, Repositories& repositories)
 {
-    return repositories.get_or_create_predicate(translated_type->get_name(),
-                                             ParameterList { repositories.get_or_create_parameter(repositories.get_or_create_variable("?arg"), TypeList { translated_type }) });
+    return repositories.get_or_create_predicate(
+        translated_type->get_name(),
+        ParameterList { repositories.get_or_create_parameter(repositories.get_or_create_variable("?arg"), TypeList { translated_type }) });
 }
 
 static LiteralList create_literals_for_object_types(Object translated_object, Repositories& repositories)
@@ -49,7 +49,7 @@ static ConditionList create_condition_literals_for_parameter_types(Parameter tra
 {
     auto conditions = ConditionList {};
     auto types = collect_types_from_hierarchy(translated_parameter->get_bases());
-    
+
     for (const auto& type : types)
     {
         auto condition = repositories.get_or_create_condition(repositories.get_or_create_condition_literal(repositories.get_or_create_literal(
@@ -62,7 +62,10 @@ static ConditionList create_condition_literals_for_parameter_types(Parameter tra
     return conditions;
 }
 
-Object AddTypePredicatesTranslator::translate_level_2(Object object, Repositories& repositories) { return repositories.get_or_create_object(object->get_name(), this->translate_level_0(object->get_bases(), repositories)); }
+Object AddTypePredicatesTranslator::translate_level_2(Object object, Repositories& repositories)
+{
+    return repositories.get_or_create_object(object->get_name(), this->translate_level_0(object->get_bases(), repositories));
+}
 
 Condition AddTypePredicatesTranslator::translate_level_2(ConditionExists condition, Repositories& repositories)
 {
@@ -88,7 +91,7 @@ Condition AddTypePredicatesTranslator::translate_level_2(ConditionForall conditi
     // Translate parameters
     auto translated_parameters = this->translate_level_0(condition->get_parameters(), repositories);
     auto translated_part_conditions = ConditionList {};
-    
+
     for (const auto& translated_parameter : translated_parameters)
     {
         auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, repositories);
@@ -181,8 +184,10 @@ Domain AddTypePredicatesTranslator::translate_level_2(const Domain& domain, Doma
 
     builder.get_requirements() = this->translate_level_0(domain->get_requirements(), repositories);
 
+    builder.get_types() = this->translate_level_0(domain->get_types(), repositories);
+
     // Introduce static type predicates.
-    for (const auto& type : collect_types_from_hierarchy(this->translate_level_0(domain->get_types(), repositories)))
+    for (const auto& type : collect_types_from_hierarchy(builder.get_types()))
     {
         builder.get_predicates().insert(builder.get_predicates().end(), create_type_predicate(type, repositories));
     }
