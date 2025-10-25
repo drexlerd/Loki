@@ -34,7 +34,7 @@ Object RemoveTypingTranslator::translate_level_2(Object object, Repositories& re
 
 Parameter RemoveTypingTranslator::translate_level_2(Parameter parameter, Repositories& repositories)
 {
-    return repositories.get_or_create_parameter(parameter->get_variable(), TypeList {});
+    return repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories), TypeList {});
 }
 
 Domain RemoveTypingTranslator::translate_level_2(const Domain& domain, DomainBuilder& builder)

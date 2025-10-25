@@ -65,6 +65,7 @@ Problem ProblemBuilder::get_result(size_t problem_index)
     std::sort(problem_and_domain_predicates.begin(),
               problem_and_domain_predicates.end(),
               [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+
     verify_indexing_scheme(problem_and_domain_predicates, "ProblemBuilder::get_result: problem_and_domain_predicates must follow and indexing scheme");
     std::sort(m_predicates.begin(), m_predicates.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
 
