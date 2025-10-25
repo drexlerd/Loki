@@ -121,6 +121,7 @@ struct FunctionHeadClass;
 struct FunctionExpressionClass;
 struct FunctionExpressionNumberClass;
 struct FunctionExpressionBinaryOpClass;
+struct FunctionExpressionMultiOpClass;
 struct FunctionExpressionMinusClass;
 struct FunctionExpressionHeadClass;
 
@@ -319,6 +320,7 @@ typedef x3::rule<FunctionExpressionClass, ast::FunctionExpression> function_expr
 typedef x3::rule<FunctionHeadClass, ast::FunctionHead> function_head_type;
 typedef x3::rule<FunctionExpressionNumberClass, ast::FunctionExpressionNumber> function_expression_number_type;
 typedef x3::rule<FunctionExpressionBinaryOpClass, ast::FunctionExpressionBinaryOp> function_expression_binary_op_type;
+typedef x3::rule<FunctionExpressionMultiOpClass, ast::FunctionExpressionMultiOp> function_expression_multi_op_type;
 typedef x3::rule<FunctionExpressionMinusClass, ast::FunctionExpressionMinus> function_expression_minus_type;
 typedef x3::rule<FunctionExpressionHeadClass, ast::FunctionExpressionHead> function_expression_head_type;
 

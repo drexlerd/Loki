@@ -24,6 +24,53 @@
 namespace loki::domain::tests
 {
 
+TEST(LokiTests, LokiPddlTranslatorReparseTest)
+{
+    {
+        const auto domain_file = fs::path(std::string(DATA_DIR) + "miconic-fulladl/domain.pddl");
+        const auto problem_file = fs::path(std::string(DATA_DIR) + "miconic-fulladl/test_problem.pddl");
+
+        auto parser = loki::Parser(domain_file);
+        const auto domain = parser.get_domain();
+        const auto domain_translation_result = loki::translate(domain);
+
+        std::stringstream ss;
+        ss << *domain_translation_result.get_translated_domain();
+
+        auto parser2 = loki::Parser(ss.str(), domain_file);
+
+        const auto problem = parser.parse_problem(problem_file);
+        const auto translated_problem = loki::translate(problem, domain_translation_result);
+
+        ss = std::stringstream {};
+        ss << *translated_problem;
+
+        parser2.parse_problem(ss.str(), problem_file);
+    }
+
+    {
+        const auto domain_file = fs::path(std::string(DATA_DIR) + "delivery/numeric/domain.pddl");
+        const auto problem_file = fs::path(std::string(DATA_DIR) + "delivery/numeric/pfile1.pddl");
+
+        auto parser = loki::Parser(domain_file);
+        const auto domain = parser.get_domain();
+        const auto domain_translation_result = loki::translate(domain);
+
+        std::stringstream ss;
+        ss << *domain_translation_result.get_translated_domain();
+
+        auto parser2 = loki::Parser(ss.str(), domain_file);
+
+        const auto problem = parser.parse_problem(problem_file);
+        const auto translated_problem = loki::translate(problem, domain_translation_result);
+
+        ss = std::stringstream {};
+        ss << *translated_problem;
+
+        parser2.parse_problem(ss.str(), problem_file);
+    }
+}
+
 TEST(LokiTests, LokiPddlTranslatorTest)
 {
     const auto domain_file = fs::path(std::string(DATA_DIR) + "miconic-fulladl/domain.pddl");
@@ -31,14 +78,10 @@ TEST(LokiTests, LokiPddlTranslatorTest)
 
     auto parser = loki::Parser(domain_file);
     const auto domain = parser.get_domain();
-    std::cout << *domain << std::endl << std::endl;
     const auto problem = parser.parse_problem(problem_file);
-    std::cout << *problem << std::endl;
     const auto domain_translation_result = loki::translate(domain);
     const auto translated_domain = domain_translation_result.get_translated_domain();
-    std::cout << *domain_translation_result.get_translated_domain() << std::endl;
     const auto translated_problem = loki::translate(problem, domain_translation_result);
-    std::cout << *translated_problem << std::endl;
 
     {
         // Check that all domain constants are in the problem

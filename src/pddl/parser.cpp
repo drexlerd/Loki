@@ -37,19 +37,15 @@
 
 namespace loki
 {
-Parser::Parser(const fs::path& domain_filepath, const ParserOptions& options) :
+Parser::Parser(const std::string& source, const fs::path& domain_filepath, const ParserOptions& options) :
     m_domain(nullptr),
     m_domain_position_cache(nullptr),
     m_domain_scopes(nullptr),
     m_next_problem_index(0)
 {
-    auto source = loki::read_file(domain_filepath);
-
     const auto start = std::chrono::high_resolution_clock::now();
     if (!options.quiet)
-    {
-        std::cout << "Started parsing domain file: " << domain_filepath << std::endl;
-    }
+        std::cout << "Started parsing domain: " << domain_filepath << std::endl;
 
     /* Parse the AST */
     auto node = ast::Domain();
@@ -76,22 +72,18 @@ Parser::Parser(const fs::path& domain_filepath, const ParserOptions& options) :
     const auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     if (!options.quiet)
-    {
-        std::cout << "Finished parsing domain file after " << duration.count() << " milliseconds." << std::endl;
-    }
+        std::cout << "Finished parsing domain after " << duration.count() << " milliseconds." << std::endl;
 
     m_domain = context.builder.get_result();
 }
 
-Problem Parser::parse_problem(const fs::path& problem_filepath, const ParserOptions& options)
-{
-    auto source = loki::read_file(problem_filepath);
+Parser::Parser(const fs::path& domain_filepath, const ParserOptions& options) : Parser(loki::read_file(domain_filepath), domain_filepath, options) {}
 
+Problem Parser::parse_problem(const std::string& source, const fs::path& problem_filepath, const ParserOptions& options)
+{
     const auto start = std::chrono::high_resolution_clock::now();
     if (!options.quiet)
-    {
-        std::cout << "Started parsing problem file: " << problem_filepath << std::endl;
-    }
+        std::cout << "Started parsing problem: " << std::endl;
 
     /* Parse the AST */
     auto node = ast::Problem();
@@ -99,9 +91,7 @@ Problem Parser::parse_problem(const fs::path& problem_filepath, const ParserOpti
     auto x3_error_handler = error_handler_type(source.begin(), source.end(), error_stream, problem_filepath);
     bool success = parse_ast(source, problem(), node, x3_error_handler);
     if (!success)
-    {
         throw SyntaxParserError("", error_stream.str());
-    }
 
     // std::cout << parse_text(node) << std::endl;
 
@@ -119,11 +109,14 @@ Problem Parser::parse_problem(const fs::path& problem_filepath, const ParserOpti
     const auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     if (!options.quiet)
-    {
-        std::cout << "Finished parsing problem file after " << duration.count() << " milliseconds." << std::endl;
-    }
+        std::cout << "Finished parsing problem after " << duration.count() << " milliseconds." << std::endl;
 
     return context.builder.get_result(m_next_problem_index++);
+}
+
+Problem Parser::parse_problem(const fs::path& problem_filepath, const ParserOptions& options)
+{
+    return parse_problem(loki::read_file(problem_filepath), problem_filepath, options);
 }
 
 const Domain& Parser::get_domain() const { return m_domain; }

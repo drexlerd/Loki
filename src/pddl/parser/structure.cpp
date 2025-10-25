@@ -92,7 +92,7 @@ std::variant<Axiom, Action> StructureVisitor<C>::operator()(const ast::Axiom& no
     auto parameter_list_visitor = ParameterListVisitor(context);
     auto parameter_list = boost::apply_visitor(parameter_list_visitor, node.atomic_formula_skeleton.typed_list_of_variables);
     const auto [predicate, position_, error_handler] = context.scopes.top().get_predicate(predicate_name).value();
-    test_arity_compatibility(parameter_list.size(), predicate->get_parameters().size(), node.atomic_formula_skeleton, context);
+    // test_arity_compatibility(parameter_list.size(), predicate->get_parameters().size(), node.atomic_formula_skeleton, context);
 
     // Turn predicate parameters into terms
     auto terms = TermList {};
@@ -113,7 +113,7 @@ std::variant<Axiom, Action> StructureVisitor<C>::operator()(const ast::Axiom& no
     auto variables = collect_free_variables(*condition);
     // Check whether axiom parameters match derived predicate and
     // subtract axiom parameter variables from free variables
-    for (size_t i = 0; i < parameter_list.size(); ++i)
+    for (size_t i = 0; i < predicate->get_parameters().size(); ++i)
     {
         const auto axiom_parameter = parameter_list[i];
         const auto predicate_parameter = predicate->get_parameters()[i];

@@ -39,6 +39,7 @@ struct FunctionExpressionVisitor : boost::static_visitor<FunctionExpression>
 
     FunctionExpression operator()(const ast::FunctionExpressionNumber& node);
     FunctionExpression operator()(const ast::FunctionExpressionBinaryOp& node);
+    FunctionExpression operator()(const ast::FunctionExpressionMultiOp& node);
     FunctionExpression operator()(const ast::FunctionExpressionMinus& node);
     FunctionExpression operator()(const ast::FunctionExpressionHead node);
     FunctionExpression operator()(const ast::FunctionExpression& node);

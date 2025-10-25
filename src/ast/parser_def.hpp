@@ -137,6 +137,7 @@ function_expression_type const function_expression = "function_expression";
 function_head_type const function_head = "function_head";
 function_expression_number_type const function_expression_number = "function_expression_number";
 function_expression_binary_op_type const function_expression_binary_op = "function_expression_binary_op";
+function_expression_multi_op_type const function_expression_multi_op = "function_expression_multi_op";
 function_expression_minus_type const function_expression_minus = "function_expression_minus";
 function_expression_head_type const function_expression_head = "function_expression_head";
 
@@ -338,11 +339,13 @@ const auto binary_comparator_less_equal_def = lit("<=") > x3::attr(ast::BinaryCo
 const auto binary_comparator_def =
     binary_comparator_greater_equal | binary_comparator_less_equal | binary_comparator_greater | binary_comparator_less | binary_comparator_equal;
 
-const auto function_head_def = (((lit('(') >> function_symbol) > *term) > lit(')')) | (function_symbol > x3::attr(std::vector<ast::Term> {}));
-const auto function_expression_def = function_expression_binary_op | function_expression_minus | function_expression_head | function_expression_number;
+const auto function_head_def = (((lit('(') >> function_symbol) > *term) > lit(')'));
+const auto function_expression_def =
+    function_expression_binary_op | function_expression_multi_op | function_expression_minus | function_expression_head | function_expression_number;
 const auto function_expression_number_def = number;
 // distinguishing unary from binary minus requires some more backtracking
 const auto function_expression_binary_op_def = (lit('(') >> binary_operator >> function_expression >> function_expression) > lit(')');
+const auto function_expression_multi_op_def = (lit('(') >> multi_operator >> *function_expression) > lit(')');
 const auto function_expression_minus_def = (lit('(') >> lit('-') >> function_expression) > lit(')');
 const auto function_expression_head_def = function_head;
 
@@ -407,7 +410,8 @@ const auto effect_composite_probabilistic_def = (lit('(') >> keyword_lit("probab
 const auto effect_composite_def = effect_composite_forall | effect_composite_when | effect_composite_oneof | effect_composite_probabilistic;
 
 const auto action_symbol_def = name;
-const auto action_body_def = -(keyword_lit(":precondition") > (((lit('(') >> lit(')')) > x3::attr(ast::PreconditionGoalDescriptorAnd())) | precondition_goal_descriptor))
+const auto action_body_def = -(keyword_lit(":precondition")
+                               > (((lit('(') >> lit(')')) > x3::attr(ast::PreconditionGoalDescriptorAnd())) | precondition_goal_descriptor))
                              > -(keyword_lit(":effect") > (((lit('(') >> lit(')')) > x3::attr(std::vector<ast::Effect>())) | effect));
 const auto action_def = (lit('(') >> keyword_lit(":action")) > action_symbol > keyword_lit(":parameters") > lit('(') > typed_list_of_variables > lit(')')
                         > action_body > lit(')');
@@ -443,7 +447,7 @@ const auto ground_literal_def = negated_ground_atom | ground_atom;
 
 const auto initial_element_literals_def = ground_literal;
 const auto initial_element_timed_literal_def = (lit('(') >> lit("at") >> number) > ground_literal > lit(')');
-const auto initial_element_function_value_def = (lit('(') >> lit('=') >> ground_function) > number > lit(')');
+const auto initial_element_function_value_def = lit('(') >> lit('=') >> ground_function >> number > lit(')');
 const auto initial_element_def = initial_element_timed_literal | initial_element_function_value | initial_element_literals;
 
 const auto metric_function_expression_binary_operator_def = (lit('(') >> binary_operator >> metric_function_expression >> metric_function_expression)
@@ -546,6 +550,7 @@ BOOST_SPIRIT_DEFINE(function_head,
                     function_expression,
                     function_expression_number,
                     function_expression_binary_op,
+                    function_expression_multi_op,
                     function_expression_minus,
                     function_expression_head)
 
@@ -846,6 +851,9 @@ struct FunctionExpressionNumberClass : x3::annotate_on_success
 {
 };
 struct FunctionExpressionBinaryOpClass : x3::annotate_on_success
+{
+};
+struct FunctionExpressionMultiOpClass : x3::annotate_on_success
 {
 };
 struct FunctionExpressionMinusClass : x3::annotate_on_success
@@ -1260,6 +1268,7 @@ parser::function_expression_type const& function_expression() { return parser::f
 parser::function_head_type const& function_head() { return parser::function_head; }
 parser::function_expression_number_type const& function_expression_number() { return parser::function_expression_number; }
 parser::function_expression_binary_op_type const& function_expression_binary_op() { return parser::function_expression_binary_op; }
+parser::function_expression_multi_op_type const& function_expression_multi_op() { return parser::function_expression_multi_op; }
 parser::function_expression_minus_type const& function_expression_minus() { return parser::function_expression_minus; }
 parser::function_expression_head_type const& function_expression_head() { return parser::function_expression_head; }
 

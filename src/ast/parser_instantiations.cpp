@@ -102,6 +102,7 @@ BOOST_SPIRIT_INSTANTIATE(function_expression_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(function_head_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(function_expression_number_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(function_expression_binary_op_type, iterator_type, context_type)
+BOOST_SPIRIT_INSTANTIATE(function_expression_multi_op_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(function_expression_minus_type, iterator_type, context_type)
 BOOST_SPIRIT_INSTANTIATE(function_expression_head_type, iterator_type, context_type)
 

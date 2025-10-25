@@ -173,7 +173,6 @@ Domain RemoveUniversalQuantifiersTranslator::translate_level_2(const Domain& dom
 
     builder.get_name() = domain->get_name();
     builder.get_filepath() = domain->get_filepath();
-    builder.get_requirements() = this->translate_level_0(domain->get_requirements(), repositories);
     builder.get_types() = this->translate_level_0(domain->get_types(), repositories);
     builder.get_constants() = this->translate_level_0(domain->get_constants(), repositories);
     builder.get_predicates() = this->translate_level_0(domain->get_predicates(), repositories);
@@ -191,6 +190,11 @@ Domain RemoveUniversalQuantifiersTranslator::translate_level_2(const Domain& dom
         builder.get_axioms().push_back(axiom);
     }
 
+    auto requirements = domain->get_requirements()->get_requirements();
+    if (!builder.get_axioms().empty())
+        requirements.insert(loki::RequirementEnum::DERIVED_PREDICATES);
+    builder.get_requirements() = repositories.get_or_create_requirements(std::move(requirements));
+
     return builder.get_result();
 }
 
@@ -205,7 +209,6 @@ Problem RemoveUniversalQuantifiersTranslator::translate_level_2(const Problem& p
 
     builder.get_filepath() = problem->get_filepath();
     builder.get_name() = problem->get_name();
-    builder.get_requirements() = this->translate_level_0(problem->get_requirements(), repositories);
     builder.get_objects() = this->translate_level_0(problem->get_objects(), repositories);
     builder.get_predicates() = this->translate_level_0(problem->get_predicates(), repositories);
     builder.get_initial_literals() = this->translate_level_0(problem->get_initial_literals(), repositories);
@@ -222,6 +225,11 @@ Problem RemoveUniversalQuantifiersTranslator::translate_level_2(const Problem& p
     {
         builder.get_axioms().push_back(axiom);
     }
+
+    auto requirements = problem->get_requirements()->get_requirements();
+    if (!builder.get_axioms().empty())
+        requirements.insert(loki::RequirementEnum::DERIVED_PREDICATES);
+    builder.get_requirements() = repositories.get_or_create_requirements(std::move(requirements));
 
     return builder.get_result(problem->get_index());
 }

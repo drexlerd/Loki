@@ -71,6 +71,19 @@ FunctionExpression FunctionExpressionVisitor<C>::operator()(const ast::FunctionE
 }
 
 template<ParsingContext C>
+FunctionExpression FunctionExpressionVisitor<C>::operator()(const ast::FunctionExpressionMultiOp& node)
+{
+    const auto multi_operator = boost::apply_visitor(MultiOperatorVisitor(), node.multi_operator);
+    auto function_expressions = FunctionExpressionList {};
+    for (const auto& child_node : node.function_expressions)
+        function_expressions.push_back(this->operator()(child_node));
+    const auto function_expression = context.builder.get_repositories().get_or_create_function_expression(
+        context.builder.get_repositories().get_or_create_function_expression_multi_operator(multi_operator, function_expressions));
+    context.positions.push_back(function_expression, node);
+    return function_expression;
+}
+
+template<ParsingContext C>
 FunctionExpression FunctionExpressionVisitor<C>::operator()(const ast::FunctionExpressionMinus& node)
 {
     const auto child_function_expression = this->operator()(node.function_expression);

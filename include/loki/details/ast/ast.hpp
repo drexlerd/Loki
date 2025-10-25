@@ -107,6 +107,7 @@ struct FunctionHead;
 struct FunctionExpression;  // :numeric-fluents
 struct FunctionExpressionNumber;
 struct FunctionExpressionBinaryOp;
+struct FunctionExpressionMultiOp;
 struct FunctionExpressionMinus;
 struct FunctionExpressionHead;
 
@@ -598,6 +599,7 @@ struct FunctionExpression :
     x3::position_tagged,
     x3::variant<x3::forward_ast<FunctionExpressionNumber>,
                 x3::forward_ast<FunctionExpressionBinaryOp>,
+                x3::forward_ast<FunctionExpressionMultiOp>,
                 x3::forward_ast<FunctionExpressionMinus>,
                 x3::forward_ast<FunctionExpressionHead>>
 {
@@ -615,6 +617,12 @@ struct FunctionExpressionBinaryOp : x3::position_tagged
     BinaryOperator binary_operator;
     FunctionExpression left_function_expression;
     FunctionExpression right_function_expression;
+};
+
+struct FunctionExpressionMultiOp : x3::position_tagged
+{
+    MultiOperator multi_operator;
+    std::vector<FunctionExpression> function_expressions;
 };
 
 struct FunctionExpressionMinus : x3::position_tagged

@@ -295,6 +295,20 @@ std::string parse_text(const ast::FunctionExpressionBinaryOp& node, const Defaul
     return ss.str();
 }
 
+std::string parse_text(const ast::FunctionExpressionMultiOp& node, const DefaultFormatterOptions& options)
+{
+    std::stringstream ss;
+    ss << "(" << parse_text(node.multi_operator, options) << " ";
+    for (size_t i = 0; i < node.function_expressions.size(); ++i)
+    {
+        if (i != 0)
+            ss << " ";
+        ss << parse_text(node.function_expressions.at(i), options);
+    }
+    ss << ")";
+    return ss.str();
+}
+
 std::string parse_text(const ast::FunctionExpressionMinus& node, const DefaultFormatterOptions& options)
 {
     std::stringstream ss;

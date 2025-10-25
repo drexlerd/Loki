@@ -81,7 +81,6 @@ Problem SimplifyGoalTranslator::translate_level_2(const Problem& problem, Proble
 
     builder.get_filepath() = problem->get_filepath();
     builder.get_name() = problem->get_name();
-    builder.get_requirements() = this->translate_level_0(problem->get_requirements(), repositories);
     builder.get_objects() = this->translate_level_0(problem->get_objects(), repositories);
     builder.get_predicates() = this->translate_level_0(problem->get_predicates(), repositories);
     builder.get_initial_literals() = this->translate_level_0(problem->get_initial_literals(), repositories);
@@ -104,6 +103,11 @@ Problem SimplifyGoalTranslator::translate_level_2(const Problem& problem, Proble
         builder.get_predicates().insert(builder.get_predicates().end(), instantiated_predicates.begin(), instantiated_predicates.end());
         builder.get_axioms().insert(builder.get_axioms().end(), instantiated_axioms.begin(), instantiated_axioms.end());
     }
+
+    auto requirements = problem->get_requirements()->get_requirements();
+    if (!builder.get_axioms().empty())
+        requirements.insert(loki::RequirementEnum::DERIVED_PREDICATES);
+    builder.get_requirements() = repositories.get_or_create_requirements(std::move(requirements));
 
     return builder.get_result(problem->get_index());
 }

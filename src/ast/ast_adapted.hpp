@@ -58,6 +58,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::NegatedAtom, atomic_formula_of_terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionHead, function_symbol, terms)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionExpressionNumber, number)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionExpressionBinaryOp, binary_operator, left_function_expression, right_function_expression)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionExpressionMultiOp, multi_operator, function_expressions)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionExpressionMinus, function_expression)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::FunctionExpressionHead, function_head)
 

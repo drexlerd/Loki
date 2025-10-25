@@ -107,6 +107,7 @@ extern std::string parse_text(const ast::FunctionHead& node, const DefaultFormat
 extern std::string parse_text(const ast::FunctionExpression& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::FunctionExpressionNumber& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::FunctionExpressionBinaryOp& node, const DefaultFormatterOptions& options = {});
+extern std::string parse_text(const ast::FunctionExpressionMultiOp& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::FunctionExpressionMinus& node, const DefaultFormatterOptions& options = {});
 extern std::string parse_text(const ast::FunctionExpressionHead& node, const DefaultFormatterOptions& options = {});
 

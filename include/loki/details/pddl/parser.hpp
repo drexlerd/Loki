@@ -32,7 +32,11 @@ namespace loki
 class Parser
 {
 public:
+    Parser(const std::string& source, const fs::path& domain_filepath = "", const ParserOptions& options = ParserOptions());
+
     Parser(const fs::path& domain_filepath, const ParserOptions& options = ParserOptions());
+
+    Problem parse_problem(const std::string& source, const fs::path& problem_filepath = "", const ParserOptions& options = ParserOptions());
 
     Problem parse_problem(const fs::path& problem_filepath, const ParserOptions& options = ParserOptions());
 

@@ -60,13 +60,13 @@ bool is_subtype_or_equal(const Type& type, const TypeList& parent_types)
 
 std::ostream& operator<<(std::ostream& out, const TypeImpl& element)
 {
-    write_typed(element, StringFormatter(), out);
+    write(element, StringFormatter(), out);
     return out;
 }
 
 std::ostream& operator<<(std::ostream& out, Type element)
 {
-    write_typed(*element, AddressFormatter(), out);
+    write(*element, AddressFormatter(), out);
     return out;
 }
 
