@@ -34,7 +34,7 @@ enum class AssignOperatorEnum
 };
 
 extern std::unordered_map<AssignOperatorEnum, std::string> assign_operator_enum_to_string;
-extern const std::string& to_string(AssignOperatorEnum assign_operator);
+extern std::ostream& operator<<(std::ostream& out, AssignOperatorEnum element);
 
 /* Literal */
 class EffectLiteralImpl

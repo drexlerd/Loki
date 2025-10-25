@@ -44,10 +44,11 @@ std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string = { 
                                                                                 { RequirementEnum::NON_DETERMINISTIC, ":non-deterministic" },
                                                                                 { RequirementEnum::PROBABILISTIC, ":probabilistic-effects" } };
 
-const std::string& to_string(RequirementEnum requirement)
+std::ostream& operator<<(std::ostream& out, RequirementEnum element)
 {
-    assert(requirement_enum_to_string.count(requirement));
-    return requirement_enum_to_string.at(requirement);
+    assert(requirement_enum_to_string.count(element));
+    out << requirement_enum_to_string.at(element);
+    return out;
 }
 
 }

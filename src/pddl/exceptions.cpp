@@ -23,6 +23,7 @@
 #include "loki/details/pddl/object.hpp"
 #include "loki/details/pddl/parameter.hpp"
 #include "loki/details/pddl/variable.hpp"
+#include "loki/details/utils/ostream.hpp"
 
 #include <sstream>
 #include <string>

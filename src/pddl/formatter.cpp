@@ -18,12 +18,86 @@
 #include "formatter.hpp"
 
 #include "loki/details/utils/hash.hpp"
+#include "loki/details/utils/ostream.hpp"
 
 #include <cassert>
+#include <fmt/core.h>
+#include <fmt/ostream.h>
+#include <fmt/ranges.h>
 #include <sstream>
 
 namespace loki
 {
+
+/**
+ * Helpers to materialize strings
+ */
+
+template<Formatter F, typename T>
+std::string untyped_string(const T& element, F formatter)
+{
+    std::stringstream ss;
+    if constexpr (std::is_pointer_v<std::decay_t<decltype(element)>>)
+        write_untyped(*element, formatter, ss);
+    else
+        write_untyped(element, formatter, ss);
+    return ss.str();
+}
+
+template<Formatter F, typename T>
+std::string typed_string(const T& element, F formatter)
+{
+    std::stringstream ss;
+    if constexpr (std::is_pointer_v<std::decay_t<decltype(element)>>)
+        write_typed(*element, formatter, ss);
+    else
+        write_typed(element, formatter, ss);
+    return ss.str();
+}
+
+template<Formatter F, typename T>
+std::string string(const T& element, F formatter)
+{
+    std::stringstream ss;
+    if constexpr (std::is_pointer_v<std::decay_t<decltype(element)>>)
+        write(*element, formatter, ss);
+    else
+        write(element, formatter, ss);
+    return ss.str();
+}
+
+template<Formatter F, std::ranges::input_range Range>
+std::vector<std::string> untyped_strings(const Range& range, F formatter)
+{
+    auto result = std::vector<std::string> {};
+    if constexpr (std::ranges::sized_range<Range>)
+        result.reserve(std::ranges::size(range));
+    for (const auto& element : range)
+        result.push_back(untyped_string(element, formatter));
+    return result;
+}
+
+template<Formatter F, std::ranges::input_range Range>
+std::vector<std::string> typed_strings(const Range& range, F formatter)
+{
+    auto result = std::vector<std::string> {};
+    if constexpr (std::ranges::sized_range<Range>)
+        result.reserve(std::ranges::size(range));
+    for (const auto& element : range)
+        result.push_back(typed_string(element, formatter));
+    return result;
+}
+
+template<Formatter F, std::ranges::input_range Range>
+std::vector<std::string> strings(const Range& range, F formatter)
+{
+    auto result = std::vector<std::string> {};
+    if constexpr (std::ranges::sized_range<Range>)
+        result.reserve(std::ranges::size(range));
+    for (const auto& element : range)
+        result.push_back(string(element, formatter));
+    return result;
+}
 
 /**
  * Explicit templates
@@ -41,68 +115,6 @@ void write_untyped<AddressFormatter>(const ObjectImpl& element, AddressFormatter
     out << reinterpret_cast<uintptr_t>(&element);
 }
 
-template<>
-void write_untyped<AddressFormatter>(const VariableImpl& element, AddressFormatter, std::ostream& out)
-{
-    out << reinterpret_cast<uintptr_t>(&element);
-}
-
-template<>
-void write_typed<AddressFormatter>(const TypeImpl& element, AddressFormatter formatter, std::ostream& out)
-{
-    out << reinterpret_cast<uintptr_t>(&element);
-    if (!element.get_bases().empty())
-    {
-        out << " - ";
-        if (element.get_bases().size() > 1)
-        {
-            out << "(either ";
-            for (size_t i = 0; i < element.get_bases().size(); ++i)
-            {
-                if (i != 0)
-                    out << " ";
-                write_untyped<AddressFormatter>(*element.get_bases()[i], formatter, out);
-            }
-            out << ")";
-        }
-        else if (element.get_bases().size() == 1)
-        {
-            write_untyped<AddressFormatter>(*element.get_bases().front(), formatter, out);
-        }
-    }
-}
-
-template<>
-void write_typed<AddressFormatter>(const ObjectImpl& element, AddressFormatter formatter, std::ostream& out)
-{
-    out << reinterpret_cast<uintptr_t>(&element);
-    if (!element.get_bases().empty())
-    {
-        out << " - ";
-        if (element.get_bases().size() > 1)
-        {
-            out << "(either ";
-            for (size_t i = 0; i < element.get_bases().size(); ++i)
-            {
-                if (i != 0)
-                    out << " ";
-                write_untyped<AddressFormatter>(*element.get_bases()[i], formatter, out);
-            }
-            out << ")";
-        }
-        else if (element.get_bases().size() == 1)
-        {
-            write_untyped<AddressFormatter>(*element.get_bases().front(), formatter, out);
-        }
-    }
-}
-
-template<>
-void write_typed<AddressFormatter>(const VariableImpl& element, AddressFormatter, std::ostream& out)
-{
-    out << reinterpret_cast<uintptr_t>(&element);
-}
-
 /**
  * Generic templates
  */
@@ -110,32 +122,35 @@ void write_typed<AddressFormatter>(const VariableImpl& element, AddressFormatter
 template<Formatter T>
 void write(const ActionImpl& element, T formatter, std::ostream& out)
 {
-    out << std::string(formatter.indent, ' ') << "(:action " << element.get_name() << "\n";
+    // Header
+    fmt::print(out, "(:action {}\n", element.get_name());
 
     formatter.indent += formatter.add_indent;
+    auto indent = std::string(formatter.indent, ' ');
 
-    out << std::string(formatter.indent, ' ') << ":parameters (";
-    for (size_t i = 0; i < element.get_parameters().size(); ++i)
-    {
-        if (i != 0)
-            out << " ";
-        write<T>(*element.get_parameters()[i], formatter, out);
-    }
-    out << ")";
-    out << "\n";
-    out << std::string(formatter.indent, ' ') << ":conditions ";
+    // Parameters
+    if (element.get_parameters().empty())
+        fmt::print(out, "{}:parameters ()\n", indent);
+    else
+        fmt::print(out, "{}:parameters ({})\n", indent, fmt::join(strings(element.get_parameters(), formatter), " "));
+
+    // Conditions
     if (element.get_condition().has_value())
-        write<T>(*element.get_condition().value(), formatter, out);
+        fmt::print(out, "{}:conditions {}\n", indent, string(element.get_condition().value(), formatter));
     else
-        out << "()";
+        fmt::print(out, "{}:conditions ()\n", indent);
 
-    out << "\n";
-    out << std::string(formatter.indent, ' ') << ":effects ";
+    // Effects
     if (element.get_effect().has_value())
-        write<T>(*element.get_effect().value(), formatter, out);
+        fmt::print(out, "{}:effects {}\n", indent, string(element.get_effect().value(), formatter));
     else
-        out << "()";
-    out << ")\n";
+        fmt::print(out, "{}:effects ()\n", indent);
+
+    formatter.indent -= formatter.add_indent;
+    indent = std::string(formatter.indent, ' ');
+
+    // End action
+    fmt::print(out, "{})", indent);
 }
 
 template void write<StringFormatter>(const ActionImpl& element, StringFormatter formatter, std::ostream& out);
@@ -144,13 +159,10 @@ template void write<AddressFormatter>(const ActionImpl& element, AddressFormatte
 template<Formatter T>
 void write(const AtomImpl& element, T formatter, std::ostream& out)
 {
-    out << "(" << element.get_predicate()->get_name();
-    for (size_t i = 0; i < element.get_terms().size(); ++i)
-    {
-        out << " ";
-        write_untyped<T>(*element.get_terms()[i], formatter, out);
-    }
-    out << ")";
+    if (element.get_terms().empty())
+        fmt::print(out, "({})", element.get_predicate()->get_name());
+    else
+        fmt::print(out, "({} {})", element.get_predicate()->get_name(), fmt::join(untyped_strings(element.get_terms(), formatter), " "));
 }
 
 template void write<StringFormatter>(const AtomImpl& element, StringFormatter formatter, std::ostream& out);
@@ -159,19 +171,24 @@ template void write<AddressFormatter>(const AtomImpl& element, AddressFormatter 
 template<Formatter T>
 void write(const AxiomImpl& element, T formatter, std::ostream& out)
 {
-    out << std::string(formatter.indent, ' ') << "(:derived " << element.get_literal()->get_atom()->get_predicate()->get_name();
-    for (size_t i = 0; i < element.get_literal()->get_atom()->get_terms().size(); ++i)
-    {
-        out << " ";
-        write<T>(*element.get_parameters()[i], formatter, out);
-    }
-    out << "\n";
+    // Header line: "(:derived <pred> <params...\n"
+    const auto& predicate_name = element.get_literal()->get_atom()->get_predicate()->get_name();
+    if (element.get_parameters().empty())
+        fmt::print(out, "(:derived {}\n", predicate_name);
+    else
+        fmt::print(out, "(:derived {} {}\n", predicate_name, fmt::join(strings(element.get_parameters(), formatter), " "));
 
     formatter.indent += formatter.add_indent;
+    auto indent = std::string(formatter.indent, ' ');
 
-    out << std::string(formatter.indent, ' ');
-    write<T>(*element.get_condition(), formatter, out);
-    out << ")\n";
+    // Conditions
+    fmt::print(out, "{}{}\n", indent, string(element.get_condition(), formatter));
+
+    formatter.indent -= formatter.add_indent;
+    indent = std::string(formatter.indent, ' ');
+
+    // End axiom
+    fmt::print(out, "{})", indent);
 }
 
 template void write<StringFormatter>(const AxiomImpl& element, StringFormatter formatter, std::ostream& out);
@@ -189,14 +206,7 @@ template void write<AddressFormatter>(const ConditionLiteralImpl& element, Addre
 template<Formatter T>
 void write(const ConditionAndImpl& element, T formatter, std::ostream& out)
 {
-    out << "(and ";
-    for (size_t i = 0; i < element.get_conditions().size(); ++i)
-    {
-        if (i != 0)
-            out << " ";
-        write<T>(*element.get_conditions()[i], formatter, out);
-    }
-    out << ")";
+    fmt::print(out, "(and {})", fmt::join(strings(element.get_conditions(), formatter), " "));
 }
 
 template void write<StringFormatter>(const ConditionAndImpl& element, StringFormatter formatter, std::ostream& out);
@@ -205,14 +215,7 @@ template void write<AddressFormatter>(const ConditionAndImpl& element, AddressFo
 template<Formatter T>
 void write(const ConditionOrImpl& element, T formatter, std::ostream& out)
 {
-    out << "(or ";
-    for (size_t i = 0; i < element.get_conditions().size(); ++i)
-    {
-        if (i != 0)
-            out << " ";
-        write<T>(*element.get_conditions()[i], formatter, out);
-    }
-    out << ")";
+    fmt::print(out, "(or {})", fmt::join(strings(element.get_conditions(), formatter), " "));
 }
 
 template void write<StringFormatter>(const ConditionOrImpl& element, StringFormatter formatter, std::ostream& out);
@@ -221,9 +224,7 @@ template void write<AddressFormatter>(const ConditionOrImpl& element, AddressFor
 template<Formatter T>
 void write(const ConditionNotImpl& element, T formatter, std::ostream& out)
 {
-    out << "(not ";
-    write<T>(*element.get_condition(), formatter, out);
-    out << ")";
+    fmt::print(out, "(not {})", string(element.get_condition(), formatter));
 }
 
 template void write<StringFormatter>(const ConditionNotImpl& element, StringFormatter formatter, std::ostream& out);
@@ -232,11 +233,7 @@ template void write<AddressFormatter>(const ConditionNotImpl& element, AddressFo
 template<Formatter T>
 void write(const ConditionImplyImpl& element, T formatter, std::ostream& out)
 {
-    out << "(imply ";
-    write<T>(*element.get_left_condition(), formatter, out);
-    out << " ";
-    write<T>(*element.get_right_condition(), formatter, out);
-    out << ")";
+    fmt::print(out, "(imply {} {})", string(element.get_left_condition(), formatter), string(element.get_right_condition(), formatter));
 }
 
 template void write<StringFormatter>(const ConditionImplyImpl& element, StringFormatter formatter, std::ostream& out);
@@ -245,16 +242,7 @@ template void write<AddressFormatter>(const ConditionImplyImpl& element, Address
 template<Formatter T>
 void write(const ConditionExistsImpl& element, T formatter, std::ostream& out)
 {
-    out << "(exists (";
-    for (size_t i = 0; i < element.get_parameters().size(); ++i)
-    {
-        if (i != 0)
-            out << " ";
-        write<T>(*element.get_parameters()[i], formatter, out);
-    }
-    out << ") ";
-    write<T>(*element.get_condition(), formatter, out);
-    out << ")";
+    fmt::print(out, "(exists ({}) {})", fmt::join(strings(element.get_parameters(), formatter), " "), string(element.get_condition(), formatter));
 }
 
 template void write<StringFormatter>(const ConditionExistsImpl& element, StringFormatter formatter, std::ostream& out);
@@ -263,16 +251,7 @@ template void write<AddressFormatter>(const ConditionExistsImpl& element, Addres
 template<Formatter T>
 void write(const ConditionForallImpl& element, T formatter, std::ostream& out)
 {
-    out << "(forall (";
-    for (size_t i = 0; i < element.get_parameters().size(); ++i)
-    {
-        if (i != 0)
-            out << " ";
-        write<T>(*element.get_parameters()[i], formatter, out);
-    }
-    out << ") ";
-    write<T>(*element.get_condition(), formatter, out);
-    out << ")";
+    fmt::print(out, "(forall ({}) {})", fmt::join(strings(element.get_parameters(), formatter), " "), string(element.get_condition(), formatter));
 }
 
 template void write<StringFormatter>(const ConditionForallImpl& element, StringFormatter formatter, std::ostream& out);
@@ -281,11 +260,7 @@ template void write<AddressFormatter>(const ConditionForallImpl& element, Addres
 template<Formatter T>
 void write(const ConditionNumericConstraintImpl& element, T formatter, std::ostream& out)
 {
-    out << "(" << to_string(element.get_binary_comparator()) << " ";
-    write<T>(*element.get_left_function_expression(), formatter, out);
-    out << " ";
-    write<T>(*element.get_right_function_expression(), formatter, out);
-    out << ")";
+    fmt::print(out, "({} {})", string(element.get_left_function_expression(), formatter), string(element.get_right_function_expression(), formatter));
 }
 
 template void write<StringFormatter>(const ConditionNumericConstraintImpl& element, StringFormatter formatter, std::ostream& out);
@@ -303,127 +278,132 @@ template void write<AddressFormatter>(const ConditionImpl& element, AddressForma
 template<Formatter T>
 void write(const DomainImpl& element, T formatter, std::ostream& out)
 {
-    out << std::string(formatter.indent, ' ') << "(define (domain " << element.get_name() << ")\n";
+    auto indent = std::string(formatter.indent, ' ');
+
+    // Header
+    fmt::print(out, "{}(define (domain {})\n", indent, element.get_name());
 
     formatter.indent += formatter.add_indent;
+    indent = std::string(formatter.indent, ' ');
 
+    // Requirements
     if (!element.get_requirements()->get_requirements().empty())
-    {
-        out << std::string(formatter.indent, ' ');
-        write<T>(*element.get_requirements(), formatter, out);
-        out << "\n";
-    }
+        fmt::print(out, "{}{}\n", indent, string(element.get_requirements(), formatter));
+
+    // Types
     if (!element.get_types().empty())
     {
-        out << std::string(formatter.indent, ' ') << "(:types ";
         std::unordered_map<TypeList, TypeList, Hash<TypeList>> subtypes_by_parent_types;
         for (const auto& type : element.get_types())
-        {
-            // We do not want to print root type "object"
             if (!type->get_bases().empty())
-            {
                 subtypes_by_parent_types[type->get_bases()].push_back(type);
-            }
-        }
-        size_t i = 0;
-        for (const auto& [types, sub_types] : subtypes_by_parent_types)
-        {
-            if (i != 0)
-                out << "\n" << std::string(formatter.indent, ' ');
-            for (size_t i = 0; i < sub_types.size(); ++i)
-            {
-                if (i != 0)
-                    out << " ";
 
-                write_untyped<T>(*sub_types[i], formatter, out);
-            }
-            out << " - ";
+        fmt::print(out, "{}(:types\n", indent);
+
+        formatter.indent += formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
+        for (const auto& [types, sub_types] : subtypes_by_parent_types)
             if (types.size() > 1)
-            {
-                out << "(either ";
-                for (size_t i = 0; i < types.size(); ++i)
-                {
-                    if (i != 0)
-                        out << " ";
-                    write_untyped<T>(*types[i], formatter, out);
-                }
-                out << ")";
-            }
-            else if (types.size() == 1)
-            {
-                write_untyped<T>(*types.front(), formatter, out);
-            }
-            ++i;
-        }
-        out << ")\n";
+                fmt::print(out,
+                           "{}{} - (either {})\n",
+                           indent,
+                           fmt::join(untyped_strings(sub_types, formatter), " "),
+                           fmt::join(untyped_strings(types, formatter), " "));
+            else
+                fmt::print(out,
+                           "{}{} - {}\n",
+                           indent,
+                           fmt::join(untyped_strings(sub_types, formatter), " "),
+                           fmt::join(untyped_strings(types, formatter), " "));
+
+        formatter.indent -= formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
+        fmt::print(out, "{})\n", indent);
     }
+
+    // Constants
     if (!element.get_constants().empty())
     {
-        out << std::string(formatter.indent, ' ') << "(:constants ";
         std::unordered_map<TypeList, ObjectList, Hash<TypeList>> constants_by_types;
         for (const auto& constant : element.get_constants())
-        {
             constants_by_types[constant->get_bases()].push_back(constant);
-        }
-        size_t j = 0;
-        for (const auto& pair : constants_by_types)
+
+        fmt::print(out, "{}(:constants\n", indent);
+
+        formatter.indent += formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
+        for (const auto& [types, constants] : constants_by_types)
         {
-            if (j != 0)
-                out << "\n" << std::string(formatter.indent, ' ');
-            const auto& constants = pair.second;
-            for (size_t i = 0; i < constants.size(); ++i)
-            {
-                if (i != 0)
-                    out << " ";
-                if (i < constants.size() - 1 || !element.get_requirements()->test(RequirementEnum::TYPING))
-                {
-                    write_untyped<T>(*constants[i], formatter, out);
-                }
-                else
-                {
-                    write_typed<T>(*constants[i], formatter, out);
-                }
-            }
-            ++j;
+            if (!element.get_requirements()->test(RequirementEnum::TYPING))
+                fmt::print(out, "{}{}\n", indent, fmt::join(untyped_strings(constants, formatter), " "));
+            else if (types.size() > 1)
+                fmt::print(out,
+                           "{}{} - (either {})\n",
+                           indent,
+                           fmt::join(untyped_strings(constants, formatter), " "),
+                           fmt::join(untyped_strings(types, formatter), " "));
+            else
+                fmt::print(out,
+                           "{}{} - {}\n",
+                           indent,
+                           fmt::join(untyped_strings(constants, formatter), " "),
+                           fmt::join(untyped_strings(types, formatter), " "));
         }
-        out << ")\n";
+
+        formatter.indent -= formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
+        fmt::print(out, "{})\n", indent);
     }
+
+    // Predicates
     if (!element.get_predicates().empty())
     {
-        out << std::string(formatter.indent, ' ') << "(:predicates ";
-        for (size_t i = 0; i < element.get_predicates().size(); ++i)
-        {
-            if (i != 0)
-                out << " ";
-            write<T>(*element.get_predicates()[i], formatter, out);
-        }
-        out << ")\n";
+        fmt::print(out, "{}(:predicates\n", std::string(formatter.indent, ' '));
+
+        formatter.indent += formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
+        for (const auto& predicate : element.get_predicates())
+            fmt::print(out, "{}{}\n", indent, string(predicate, formatter));
+
+        formatter.indent -= formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
+        fmt::print(out, "{})\n", indent);
     }
+
+    // FunctionSkeletons
     if (!element.get_function_skeletons().empty())
     {
-        out << std::string(formatter.indent, ' ') << "(:functions ";
-        for (size_t i = 0; i < element.get_function_skeletons().size(); ++i)
-        {
-            if (i != 0)
-                out << " ";
-            write<T>(*element.get_function_skeletons()[i], formatter, out);
-        }
-        out << ")\n";
+        fmt::print(out, "{}(:functions\n", std::string(formatter.indent, ' '));
+
+        formatter.indent += formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
+        for (const auto& function_skeleton : element.get_function_skeletons())
+            fmt::print(out, "{}{}\n", indent, string(function_skeleton, formatter));
+
+        formatter.indent -= formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
+        fmt::print(out, "{})\n", indent);
     }
 
     for (const auto& action : element.get_actions())
-    {
-        write<T>(*action, formatter, out);
-    }
+        fmt::print(out, "{}{}\n", indent, string(action, formatter));
 
     for (const auto& axiom : element.get_axioms())
-    {
-        write<T>(*axiom, formatter, out);
-    }
+        fmt::print(out, "{}{}\n", indent, string(axiom, formatter));
 
     formatter.indent -= formatter.add_indent;
+    indent = std::string(formatter.indent, ' ');
 
-    out << std::string(formatter.indent, ' ') << ")";
+    // End domain
+    fmt::print(out, "{})", indent);
 }
 
 template void write<StringFormatter>(const DomainImpl& element, StringFormatter formatter, std::ostream& out);
@@ -441,14 +421,7 @@ template void write<AddressFormatter>(const EffectLiteralImpl& element, AddressF
 template<Formatter T>
 void write(const EffectAndImpl& element, T formatter, std::ostream& out)
 {
-    out << "(and ";
-    for (size_t i = 0; i < element.get_effects().size(); ++i)
-    {
-        if (i != 0)
-            out << " ";
-        write<T>(*element.get_effects()[i], formatter, out);
-    }
-    out << ")";
+    fmt::print(out, "(and {})", fmt::join(strings(element.get_effects(), formatter), " "));
 }
 
 template void write<StringFormatter>(const EffectAndImpl& element, StringFormatter formatter, std::ostream& out);
@@ -457,11 +430,11 @@ template void write<AddressFormatter>(const EffectAndImpl& element, AddressForma
 template<Formatter T>
 void write(const EffectNumericImpl& element, T formatter, std::ostream& out)
 {
-    out << "(" << to_string(element.get_assign_operator()) << " ";
-    write<T>(*element.get_function(), formatter, out);
-    out << " ";
-    write<T>(*element.get_function_expression(), formatter, out);
-    out << ")";
+    fmt::print(out,
+               "({} {} {})",
+               string(element.get_function(), formatter),
+               to_string(element.get_assign_operator()),
+               string(element.get_function_expression(), formatter));
 }
 
 template void write<StringFormatter>(const EffectNumericImpl& element, StringFormatter formatter, std::ostream& out);
@@ -470,16 +443,7 @@ template void write<AddressFormatter>(const EffectNumericImpl& element, AddressF
 template<Formatter T>
 void write(const EffectCompositeForallImpl& element, T formatter, std::ostream& out)
 {
-    out << "(forall (";
-    for (size_t i = 0; i < element.get_parameters().size(); ++i)
-    {
-        if (i != 0)
-            out << " ";
-        write<T>(*element.get_parameters()[i], formatter, out);
-    }
-    out << ") ";
-    write<T>(*element.get_effect(), formatter, out);
-    out << ")";
+    fmt::print(out, "(forall ({}) {})", fmt::join(strings(element.get_parameters(), formatter), " "), string(element.get_effect(), formatter));
 }
 
 template void write<StringFormatter>(const EffectCompositeForallImpl& element, StringFormatter formatter, std::ostream& out);
@@ -488,11 +452,7 @@ template void write<AddressFormatter>(const EffectCompositeForallImpl& element, 
 template<Formatter T>
 void write(const EffectCompositeWhenImpl& element, T formatter, std::ostream& out)
 {
-    out << "(when ";
-    write<T>(*element.get_condition(), formatter, out);
-    out << " ";
-    write<T>(*element.get_effect(), formatter, out);
-    out << ")";
+    fmt::print(out, "(when {} {})", string(element.get_condition(), formatter), string(element.get_effect(), formatter));
 }
 
 template void write<StringFormatter>(const EffectCompositeWhenImpl& element, StringFormatter formatter, std::ostream& out);
@@ -501,14 +461,7 @@ template void write<AddressFormatter>(const EffectCompositeWhenImpl& element, Ad
 template<Formatter T>
 void write(const EffectCompositeOneofImpl& element, T formatter, std::ostream& out)
 {
-    out << "(oneof ";
-    for (size_t i = 0; i < element.get_effects().size(); ++i)
-    {
-        if (i != 0)
-            out << " ";
-        write<T>(*element.get_effects()[i], formatter, out);
-    }
-    out << ")";
+    fmt::print(out, "(oneof {})", fmt::join(strings(element.get_effects(), formatter), " "));
 }
 
 template void write<StringFormatter>(const EffectCompositeOneofImpl& element, StringFormatter formatter, std::ostream& out);
@@ -517,18 +470,11 @@ template void write<AddressFormatter>(const EffectCompositeOneofImpl& element, A
 template<Formatter T>
 void write(const EffectCompositeProbabilisticImpl& element, T formatter, std::ostream& out)
 {
-    out << "(probabilistic ";
-    for (size_t i = 0; i < element.get_effect_distribution().size(); ++i)
-    {
-        if (i != 0)
-            out << " ";
-
-        const auto& [probability, possibility] = element.get_effect_distribution()[i];
-
-        out << probability << " ";
-        write<T>(*possibility, formatter, out);
-    }
-    out << ")";
+    fmt::print(out,
+               "(probabilistic {})",
+               fmt::join(element.get_effect_distribution()
+                             | std::views::transform([&](const auto& pair) { return fmt::format("{} {}", pair.first, string(pair.second, formatter)); }),
+                         " "));
 }
 
 template void write<StringFormatter>(const EffectCompositeProbabilisticImpl& element, StringFormatter formatter, std::ostream& out);
@@ -555,11 +501,11 @@ template void write<AddressFormatter>(const FunctionExpressionNumberImpl& elemen
 template<Formatter T>
 void write(const FunctionExpressionBinaryOperatorImpl& element, T formatter, std::ostream& out)
 {
-    out << "(" << to_string(element.get_binary_operator()) << " ";
-    write<T>(*element.get_left_function_expression(), formatter, out);
-    out << " ";
-    write<T>(*element.get_right_function_expression(), formatter, out);
-    out << ")";
+    fmt::print(out,
+               "({} {} {})",
+               to_string(element.get_binary_operator()),
+               string(element.get_left_function_expression(), formatter),
+               string(element.get_right_function_expression(), formatter));
 }
 
 template void write<StringFormatter>(const FunctionExpressionBinaryOperatorImpl& element, StringFormatter formatter, std::ostream& out);
@@ -568,14 +514,7 @@ template void write<AddressFormatter>(const FunctionExpressionBinaryOperatorImpl
 template<Formatter T>
 void write(const FunctionExpressionMultiOperatorImpl& element, T formatter, std::ostream& out)
 {
-    out << "(" << to_string(element.get_multi_operator());
-    assert(!element.get_function_expressions().empty());
-    for (const auto& function_expression : element.get_function_expressions())
-    {
-        out << " ";
-        write<T>(*function_expression, formatter, out);
-    }
-    out << ")";
+    fmt::print(out, "({} {})", to_string(element.get_multi_operator()), fmt::join(strings(element.get_function_expressions(), formatter), " "));
 }
 
 template void write<StringFormatter>(const FunctionExpressionMultiOperatorImpl& element, StringFormatter formatter, std::ostream& out);
@@ -584,9 +523,7 @@ template void write<AddressFormatter>(const FunctionExpressionMultiOperatorImpl&
 template<Formatter T>
 void write(const FunctionExpressionMinusImpl& element, T formatter, std::ostream& out)
 {
-    out << "(- ";
-    write<T>(*element.get_function_expression(), formatter, out);
-    out << ")";
+    fmt::print(out, "(- {})", string(element.get_function_expression(), formatter));
 }
 
 template void write<StringFormatter>(const FunctionExpressionMinusImpl& element, StringFormatter formatter, std::ostream& out);
@@ -613,13 +550,10 @@ template void write<AddressFormatter>(const FunctionExpressionImpl& element, Add
 template<Formatter T>
 void write(const FunctionSkeletonImpl& element, T formatter, std::ostream& out)
 {
-    out << "(" << element.get_name();
-    for (size_t i = 0; i < element.get_parameters().size(); ++i)
-    {
-        out << " ";
-        write<T>(*element.get_parameters()[i], formatter, out);
-    }
-    out << ")";
+    if (element.get_parameters().empty())
+        fmt::print(out, "({})", element.get_name());
+    else
+        fmt::print(out, "({} {})", element.get_name(), fmt::join(strings(element.get_parameters(), formatter), " "));
 }
 
 template void write<StringFormatter>(const FunctionSkeletonImpl& element, StringFormatter formatter, std::ostream& out);
@@ -629,20 +563,9 @@ template<Formatter T>
 void write(const FunctionImpl& element, T formatter, std::ostream& out)
 {
     if (element.get_terms().empty())
-    {
-        out << "(" << element.get_function_skeleton()->get_name() << ")";
-    }
+        fmt::print(out, "({})", element.get_function_skeleton()->get_name());
     else
-    {
-        out << "(" << element.get_function_skeleton()->get_name() << "(";
-        for (size_t i = 0; i < element.get_terms().size(); ++i)
-        {
-            if (i != 0)
-                out << " ";
-            write_untyped<T>(*element.get_terms()[i], formatter, out);
-        }
-        out << "))";
-    }
+        fmt::print(out, "({} {})", element.get_function_skeleton()->get_name(), fmt::join(untyped_strings(element.get_terms(), formatter), " "));
 }
 
 template void write<StringFormatter>(const FunctionImpl& element, StringFormatter formatter, std::ostream& out);
@@ -652,15 +575,9 @@ template<Formatter T>
 void write(const LiteralImpl& element, T formatter, std::ostream& out)
 {
     if (!element.get_polarity())
-    {
-        out << "(not ";
-        write<T>(*element.get_atom(), formatter, out);
-        out << ")";
-    }
+        fmt::print(out, "(not {})", string(element.get_atom(), formatter));
     else
-    {
         write<T>(*element.get_atom(), formatter, out);
-    }
 }
 
 template void write<StringFormatter>(const LiteralImpl& element, StringFormatter formatter, std::ostream& out);
@@ -669,9 +586,7 @@ template void write<AddressFormatter>(const LiteralImpl& element, AddressFormatt
 template<Formatter T>
 void write(const OptimizationMetricImpl& element, T formatter, std::ostream& out)
 {
-    out << "(" << to_string(element.get_optimization_metric()) << " ";
-    write<T>(*element.get_function_expression(), formatter, out);
-    out << ")";
+    fmt::print(out, "({} {})", to_string(element.get_optimization_metric()), string(element.get_function_expression(), formatter));
 }
 
 template void write<StringFormatter>(const OptimizationMetricImpl& element, StringFormatter formatter, std::ostream& out);
@@ -680,9 +595,7 @@ template void write<AddressFormatter>(const OptimizationMetricImpl& element, Add
 template<Formatter T>
 void write(const FunctionValueImpl& element, T formatter, std::ostream& out)
 {
-    out << "(= ";
-    write<T>(*element.get_function(), formatter, out);
-    out << " " << element.get_number() << ")";
+    fmt::print(out, "(= {} {})", string(element.get_function(), formatter), element.get_number());
 }
 
 template void write<StringFormatter>(const FunctionValueImpl& element, StringFormatter formatter, std::ostream& out);
@@ -691,25 +604,16 @@ template void write<AddressFormatter>(const FunctionValueImpl& element, AddressF
 template<Formatter T>
 void write(const ParameterImpl& element, T formatter, std::ostream& out)
 {
-    write_untyped<T>(*element.get_variable(), formatter, out);
+    write_untyped(*element.get_variable(), formatter, out);
+
     if (!element.get_bases().empty())
     {
-        out << " - ";
+        fmt::print(out, "{}", " - ");
+
         if (element.get_bases().size() > 1)
-        {
-            out << "(either ";
-            for (size_t i = 0; i < element.get_bases().size(); ++i)
-            {
-                if (i != 0)
-                    out << " ";
-                write_untyped<T>(*element.get_bases()[i], formatter, out);
-            }
-            out << ")";
-        }
+            fmt::print(out, "(either {})", fmt::join(untyped_strings(element.get_bases(), formatter), " "));
         else if (element.get_bases().size() == 1)
-        {
-            write_untyped<T>(*element.get_bases().front(), formatter, out);
-        }
+            fmt::print(out, "{}", untyped_string(element.get_bases().front(), formatter));
     }
 }
 
@@ -719,13 +623,10 @@ template void write<AddressFormatter>(const ParameterImpl& element, AddressForma
 template<Formatter T>
 void write(const PredicateImpl& element, T formatter, std::ostream& out)
 {
-    out << "(" << element.get_name();
-    for (size_t i = 0; i < element.get_parameters().size(); ++i)
-    {
-        out << " ";
-        write<T>(*element.get_parameters()[i], formatter, out);
-    }
-    out << ")";
+    if (element.get_parameters().empty())
+        fmt::print(out, "({})", element.get_name());
+    else
+        fmt::print(out, "({} {})", element.get_name(), fmt::join(strings(element.get_parameters(), formatter), " "));
 }
 
 template void write<StringFormatter>(const PredicateImpl& element, StringFormatter formatter, std::ostream& out);
@@ -734,102 +635,107 @@ template void write<AddressFormatter>(const PredicateImpl& element, AddressForma
 template<Formatter T>
 void write(const ProblemImpl& element, T formatter, std::ostream& out)
 {
-    out << std::string(formatter.indent, ' ') << "(define (problem " << element.get_name() << ")\n";
+    auto indent = std::string(formatter.indent, ' ');
+
+    // Header
+    fmt::print(out, "{}(define (problem {})\n", indent, element.get_name());
 
     formatter.indent += formatter.add_indent;
+    indent = std::string(formatter.indent, ' ');
 
-    out << std::string(formatter.indent, ' ') << "(:domain " << element.get_domain()->get_name() << ")\n";
+    // Domain
+    fmt::print(out, "{}(:domain {})\n", indent, element.get_domain()->get_name());
+
+    // Requirements
     if (!element.get_requirements()->get_requirements().empty())
-    {
-        out << std::string(formatter.indent, ' ');
-        write<T>(*element.get_requirements(), formatter, out);
-        out << "\n";
-    }
+        fmt::print(out, "{}{}\n", indent, string(element.get_requirements(), formatter));
 
+    // Constants
     if (!element.get_objects().empty())
     {
-        out << std::string(formatter.indent, ' ') << "(:objects ";
         std::unordered_map<TypeList, ObjectList, Hash<TypeList>> objects_by_types;
-        for (const auto& object : element.get_objects())
-        {
-            objects_by_types[object->get_bases()].push_back(object);
-        }
-        size_t j = 0;
+        for (const auto& constant : element.get_objects())
+            objects_by_types[constant->get_bases()].push_back(constant);
+
+        fmt::print(out, "{}(:objects\n", indent);
+
+        formatter.indent += formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
         for (const auto& [types, objects] : objects_by_types)
         {
-            if (j != 0)
-                out << "\n" << std::string(formatter.indent, ' ');
-            for (size_t i = 0; i < objects.size(); ++i)
-            {
-                if (i != 0)
-                {
-                    out << " ";
-                }
-                if (i < objects.size() - 1 || !element.get_domain()->get_requirements()->test(RequirementEnum::TYPING))
-                {
-                    write_untyped<T>(*objects[i], formatter, out);
-                }
-                else
-                {
-                    write_typed<T>(*objects[i], formatter, out);
-                }
-            }
-            ++j;
+            if (!element.get_requirements()->test(RequirementEnum::TYPING))
+                fmt::print(out, "{}{}\n", indent, fmt::join(untyped_strings(objects, formatter), " "));
+            else if (types.size() > 1)
+                fmt::print(out,
+                           "{}{} - (either {})\n",
+                           indent,
+                           fmt::join(untyped_strings(objects, formatter), " "),
+                           fmt::join(untyped_strings(types, formatter), " "));
+            else
+                fmt::print(out, "{}{} - {}\n", indent, fmt::join(untyped_strings(objects, formatter), " "), fmt::join(untyped_strings(types, formatter), " "));
         }
-        out << ")\n";
+
+        formatter.indent -= formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
+        fmt::print(out, "{})\n", indent);
     }
 
+    // Predicates
     if (!element.get_predicates().empty())
     {
-        out << std::string(formatter.indent, ' ') << "(:predicates ";
-        for (size_t i = 0; i < element.get_predicates().size(); ++i)
-        {
-            if (i != 0)
-                out << " ";
-            write<T>(*element.get_predicates()[i], formatter, out);
-        }
-        out << ")\n";
+        fmt::print(out, "{}(:predicates\n", std::string(formatter.indent, ' '));
+
+        formatter.indent += formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
+        for (const auto& predicate : element.get_predicates())
+            fmt::print(out, "{}{}\n", indent, string(predicate, formatter));
+
+        formatter.indent -= formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
+        fmt::print(out, "{})\n", indent);
     }
 
+    // Init
     if (!(element.get_initial_literals().empty() && element.get_initial_function_values().empty()))
     {
-        out << std::string(formatter.indent, ' ') << "(:init ";
-        for (size_t i = 0; i < element.get_initial_literals().size(); ++i)
-        {
-            if (i != 0)
-                out << " ";
-            write<T>(*element.get_initial_literals()[i], formatter, out);
-        }
-        for (size_t i = 0; i < element.get_initial_function_values().size(); ++i)
-        {
-            out << " ";
-            write<T>(*element.get_initial_function_values()[i], formatter, out);
-        }
-    }
-    out << ")\n";
+        fmt::print(out, "{}(:init\n", indent);
 
+        formatter.indent += formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
+        for (const auto& literal : element.get_initial_literals())
+            fmt::print(out, "{}{}\n", indent, string(literal, formatter));
+
+        for (const auto& function_value : element.get_initial_function_values())
+            fmt::print(out, "{}{}\n", indent, string(function_value, formatter));
+
+        formatter.indent -= formatter.add_indent;
+        indent = std::string(formatter.indent, ' ');
+
+        fmt::print(out, "{})\n", indent);
+    }
+
+    // Goal
     if (element.get_goal_condition().has_value())
-    {
-        out << std::string(formatter.indent, ' ') << "(:goal ";
-        write<T>(*element.get_goal_condition().value(), formatter, out);
-        out << ")\n";
-    }
+        fmt::print(out, "{}(:goal {})\n", indent, string(element.get_goal_condition().value(), formatter));
 
+    // Metric
     if (element.get_optimization_metric().has_value())
-    {
-        out << std::string(formatter.indent, ' ') << "(:metric ";
-        write<T>(*element.get_optimization_metric().value(), formatter, out);
-        out << ")\n";
-    }
+        fmt::print(out, "{}(:metric {})\n", indent, string(element.get_optimization_metric().value(), formatter));
 
+    // Axioms
     for (const auto& axiom : element.get_axioms())
-    {
-        write<T>(*axiom, formatter, out);
-    }
+        fmt::print(out, "{}{}\n", indent, string(axiom, formatter));
 
     formatter.indent -= formatter.add_indent;
+    indent = std::string(formatter.indent, ' ');
 
-    out << std::string(formatter.indent, ' ') << ")";
+    // End problem
+    fmt::print(out, "{})", indent);
 }
 
 template void write<StringFormatter>(const ProblemImpl& element, StringFormatter formatter, std::ostream& out);
@@ -838,25 +744,27 @@ template void write<AddressFormatter>(const ProblemImpl& element, AddressFormatt
 template<Formatter T>
 void write(const RequirementsImpl& element, T, std::ostream& out)
 {
-    out << "(:requirements ";
-    int i = 0;
-    for (const auto& requirement : element.get_requirements())
-    {
-        if (i != 0)
-            out << " ";
-        out << to_string(requirement);
-        ++i;
-    }
-    out << ")";
+    fmt::print(out,
+               "(:requirements {})",
+               fmt::join(element.get_requirements() | std::views::transform([](RequirementEnum r) { return loki::to_string(r); }), " "));
 }
 
 template void write<StringFormatter>(const RequirementsImpl& element, StringFormatter formatter, std::ostream& out);
 template void write<AddressFormatter>(const RequirementsImpl& element, AddressFormatter formatter, std::ostream& out);
 
 template<Formatter T>
+void write(const VariableImpl& element, T, std::ostream& out)
+{
+    fmt::print(out, "{}", element.get_name());
+}
+
+template void write<StringFormatter>(const VariableImpl& element, StringFormatter formatter, std::ostream& out);
+template void write<AddressFormatter>(const VariableImpl& element, AddressFormatter formatter, std::ostream& out);
+
+template<Formatter T>
 void write_untyped(const TypeImpl& element, T, std::ostream& out)
 {
-    out << element.get_name();
+    fmt::print(out, "{}", element.get_name());
 }
 
 template void write_untyped<StringFormatter>(const TypeImpl& element, StringFormatter formatter, std::ostream& out);
@@ -873,7 +781,7 @@ template void write_untyped<AddressFormatter>(const TermImpl& element, AddressFo
 template<Formatter T>
 void write_untyped(const ObjectImpl& element, T, std::ostream& out)
 {
-    out << element.get_name();
+    fmt::print(out, "{}", element.get_name());
 }
 
 template void write_untyped<StringFormatter>(const ObjectImpl& element, StringFormatter formatter, std::ostream& out);
@@ -881,7 +789,7 @@ template void write_untyped<StringFormatter>(const ObjectImpl& element, StringFo
 template<Formatter T>
 void write_untyped(const VariableImpl& element, T, std::ostream& out)
 {
-    out << element.get_name();
+    fmt::print(out, "{}", element.get_name());
 }
 
 template void write_untyped<StringFormatter>(const VariableImpl& element, StringFormatter formatter, std::ostream& out);
@@ -889,29 +797,21 @@ template void write_untyped<StringFormatter>(const VariableImpl& element, String
 template<Formatter T>
 void write_typed(const TypeImpl& element, T formatter, std::ostream& out)
 {
-    out << element.get_name();
+    write_untyped(element, formatter, out);
+
     if (!element.get_bases().empty())
     {
-        out << " - ";
+        fmt::print(out, "{}", " - ");
+
         if (element.get_bases().size() > 1)
-        {
-            out << "(either ";
-            for (size_t i = 0; i < element.get_bases().size(); ++i)
-            {
-                if (i != 0)
-                    out << " ";
-                write_untyped<T>(*element.get_bases()[i], formatter, out);
-            }
-            out << ")";
-        }
+            fmt::print(out, "(either {})", fmt::join(untyped_strings(element.get_bases(), formatter), " "));
         else if (element.get_bases().size() == 1)
-        {
-            write_untyped<T>(*element.get_bases().front(), formatter, out);
-        }
+            fmt::print(out, "{}", untyped_string(element.get_bases().front(), formatter));
     }
 }
 
 template void write_typed<StringFormatter>(const TypeImpl& element, StringFormatter formatter, std::ostream& out);
+template void write_typed<AddressFormatter>(const TypeImpl& element, AddressFormatter formatter, std::ostream& out);
 
 template<Formatter T>
 void write_typed(const TermImpl& element, T formatter, std::ostream& out)
@@ -925,34 +825,26 @@ template void write_typed<AddressFormatter>(const TermImpl& element, AddressForm
 template<Formatter T>
 void write_typed(const ObjectImpl& element, T formatter, std::ostream& out)
 {
-    out << element.get_name();
+    write_untyped(element, formatter, out);
+
     if (!element.get_bases().empty())
     {
-        out << " - ";
+        fmt::print(out, "{}", " - ");
+
         if (element.get_bases().size() > 1)
-        {
-            out << "(either ";
-            for (size_t i = 0; i < element.get_bases().size(); ++i)
-            {
-                if (i != 0)
-                    out << " ";
-                write_untyped<T>(*element.get_bases()[i], formatter, out);
-            }
-            out << ")";
-        }
+            fmt::print(out, "(either {})", fmt::join(untyped_strings(element.get_bases(), formatter), " "));
         else if (element.get_bases().size() == 1)
-        {
-            write_untyped<T>(*element.get_bases().front(), formatter, out);
-        }
+            fmt::print(out, "{}", untyped_string(element.get_bases().front(), formatter));
     }
 }
 
 template void write_typed<StringFormatter>(const ObjectImpl& element, StringFormatter formatter, std::ostream& out);
+template void write_typed<AddressFormatter>(const ObjectImpl& element, AddressFormatter formatter, std::ostream& out);
 
 template<Formatter T>
 void write_typed(const VariableImpl& element, T, std::ostream& out)
 {
-    out << element.get_name();
+    fmt::print(out, "{}", element.get_name());
 }
 
 template void write_typed<StringFormatter>(const VariableImpl& element, StringFormatter formatter, std::ostream& out);

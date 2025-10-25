@@ -16,7 +16,11 @@ target_compile_definitions(parsers PUBLIC
 # Create an alias for simpler reference
 add_library(loki::parsers ALIAS parsers)
 
-target_link_libraries(parsers absl::flat_hash_set)
+target_link_libraries(parsers
+  PUBLIC
+    absl::flat_hash_set 
+  PRIVATE
+    fmt::fmt)
 
 # Use include depending on building or using from installed location
 target_include_directories(parsers

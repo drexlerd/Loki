@@ -34,10 +34,11 @@ std::unordered_map<AssignOperatorEnum, std::string> assign_operator_enum_to_stri
     { AssignOperatorEnum::INCREASE, "increase" }, { AssignOperatorEnum::DECREASE, "decrease" },
 };
 
-const std::string& to_string(AssignOperatorEnum assign_operator)
+std::ostream& operator<<(std::ostream& out, AssignOperatorEnum element)
 {
-    assert(assign_operator_enum_to_string.count(assign_operator));
-    return assign_operator_enum_to_string.at(assign_operator);
+    assert(assign_operator_enum_to_string.count(element));
+    out << assign_operator_enum_to_string.at(element);
+    return out;
 }
 
 /* EffectLiteral */

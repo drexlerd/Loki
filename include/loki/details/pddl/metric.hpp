@@ -31,7 +31,7 @@ enum class OptimizationMetricEnum
 };
 
 extern std::unordered_map<OptimizationMetricEnum, std::string> optimization_metric_enum_to_string;
-extern const std::string& to_string(OptimizationMetricEnum optimization_metric);
+extern std::ostream& operator<<(std::ostream& out, OptimizationMetricEnum element);
 
 class OptimizationMetricImpl
 {

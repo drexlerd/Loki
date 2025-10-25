@@ -132,6 +132,8 @@ template<Formatter T>
 void write(const ProblemImpl& element, T formatter, std::ostream& out);
 template<Formatter T>
 void write(const RequirementsImpl& element, T formatter, std::ostream& out);
+template<Formatter T>
+void write(const VariableImpl& element, T formatter, std::ostream& out);
 
 template<Formatter T>
 void write_untyped(const TypeImpl& element, T formatter, std::ostream& out);
@@ -139,8 +141,6 @@ template<Formatter T>
 void write_untyped(const TermImpl& element, T formatter, std::ostream& out);
 template<Formatter T>
 void write_untyped(const ObjectImpl& element, T formatter, std::ostream& out);
-template<Formatter T>
-void write_untyped(const VariableImpl& element, T formatter, std::ostream& out);
 
 template<Formatter T>
 void write_typed(const TypeImpl& element, T formatter, std::ostream& out);
@@ -148,8 +148,6 @@ template<Formatter T>
 void write_typed(const TermImpl& element, T formatter, std::ostream& out);
 template<Formatter T>
 void write_typed(const ObjectImpl& element, T formatter, std::ostream& out);
-template<Formatter T>
-void write_typed(const VariableImpl& element, T formatter, std::ostream& out);
 
 }
 

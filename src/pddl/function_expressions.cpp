@@ -33,10 +33,11 @@ std::unordered_map<BinaryComparatorEnum, std::string> binary_comparator_enum_to_
     { BinaryComparatorEnum::LESS_EQUAL, "<=" },
 };
 
-const std::string& to_string(BinaryComparatorEnum binary_comparator)
+std::ostream& operator<<(std::ostream& out, BinaryComparatorEnum element)
 {
-    assert(binary_comparator_enum_to_string.count(binary_comparator));
-    return binary_comparator_enum_to_string.at(binary_comparator);
+    assert(binary_comparator_enum_to_string.count(element));
+    out << binary_comparator_enum_to_string.at(element);
+    return out;
 }
 
 std::unordered_map<BinaryOperatorEnum, std::string> binary_operator_enum_to_string = {
@@ -46,10 +47,11 @@ std::unordered_map<BinaryOperatorEnum, std::string> binary_operator_enum_to_stri
     { BinaryOperatorEnum::DIV, "/" },
 };
 
-const std::string& to_string(BinaryOperatorEnum binary_operator)
+std::ostream& operator<<(std::ostream& out, BinaryOperatorEnum element)
 {
-    assert(binary_operator_enum_to_string.count(binary_operator));
-    return binary_operator_enum_to_string.at(binary_operator);
+    assert(binary_operator_enum_to_string.count(element));
+    out << binary_operator_enum_to_string.at(element);
+    return out;
 }
 
 std::unordered_map<MultiOperatorEnum, std::string> multi_operator_enum_to_string = {
@@ -57,10 +59,11 @@ std::unordered_map<MultiOperatorEnum, std::string> multi_operator_enum_to_string
     { MultiOperatorEnum::PLUS, "+" },
 };
 
-const std::string& to_string(MultiOperatorEnum multi_operator)
+std::ostream& operator<<(std::ostream& out, MultiOperatorEnum element)
 {
-    assert(multi_operator_enum_to_string.count(multi_operator));
-    return multi_operator_enum_to_string.at(multi_operator);
+    assert(multi_operator_enum_to_string.count(element));
+    out << multi_operator_enum_to_string.at(element);
+    return out;
 }
 
 /* FunctionExpressionNumber */

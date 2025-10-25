@@ -35,7 +35,7 @@ enum class BinaryComparatorEnum
 };
 
 extern std::unordered_map<BinaryComparatorEnum, std::string> binary_comparator_enum_to_string;
-extern const std::string& to_string(BinaryComparatorEnum binary_comparator);
+extern std::ostream& operator<<(std::ostream& out, BinaryComparatorEnum element);
 
 enum class BinaryOperatorEnum
 {
@@ -46,7 +46,7 @@ enum class BinaryOperatorEnum
 };
 
 extern std::unordered_map<BinaryOperatorEnum, std::string> binary_operator_enum_to_string;
-extern const std::string& to_string(BinaryOperatorEnum binary_operator);
+extern std::ostream& operator<<(std::ostream& out, BinaryOperatorEnum element);
 
 enum class MultiOperatorEnum
 {
@@ -55,7 +55,7 @@ enum class MultiOperatorEnum
 };
 
 extern std::unordered_map<MultiOperatorEnum, std::string> multi_operator_enum_to_string;
-extern const std::string& to_string(MultiOperatorEnum multi_operator);
+extern std::ostream& operator<<(std::ostream& out, MultiOperatorEnum element);
 
 /* FunctionExpressionNumber */
 class FunctionExpressionNumberImpl

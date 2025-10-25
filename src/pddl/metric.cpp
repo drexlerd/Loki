@@ -31,10 +31,11 @@ std::unordered_map<OptimizationMetricEnum, std::string> optimization_metric_enum
     { OptimizationMetricEnum::MAXIMIZE, "maximize" },
 };
 
-const std::string& to_string(OptimizationMetricEnum optimization_metric)
+std::ostream& operator<<(std::ostream& out, OptimizationMetricEnum element)
 {
-    assert(optimization_metric_enum_to_string.count(optimization_metric));
-    return optimization_metric_enum_to_string.at(optimization_metric);
+    assert(optimization_metric_enum_to_string.count(element));
+    out << optimization_metric_enum_to_string.at(element);
+    return out;
 }
 
 OptimizationMetricImpl::OptimizationMetricImpl(size_t index, OptimizationMetricEnum optimization_metric, FunctionExpression function_expression) :
