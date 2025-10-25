@@ -604,7 +604,7 @@ template void write<AddressFormatter>(const FunctionValueImpl& element, AddressF
 template<Formatter T>
 void write(const ParameterImpl& element, T formatter, std::ostream& out)
 {
-    write_untyped(*element.get_variable(), formatter, out);
+    write(*element.get_variable(), formatter, out);
 
     if (!element.get_bases().empty())
     {
