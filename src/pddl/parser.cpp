@@ -57,7 +57,7 @@ Parser::Parser(const std::string& source, const fs::path& domain_filepath, const
         throw SyntaxParserError("", error_stream.str());
     }
 
-    // std::cout << parse_text(node) << std::endl;
+    // std::cout << string(node, DefaultFormatter {}) << std::endl;
 
     m_domain_error_handler = std::make_unique<FilePositionErrorHandler>(x3_error_handler.get_position_cache(), domain_filepath, 4);
     m_domain_position_cache = std::make_unique<PDDLPositionCache>(*m_domain_error_handler);
@@ -93,7 +93,7 @@ Problem Parser::parse_problem(const std::string& source, const fs::path& problem
     if (!success)
         throw SyntaxParserError("", error_stream.str());
 
-    // std::cout << parse_text(node) << std::endl;
+    // std::cout << string(node, DefaultFormatter {}) << std::endl;
 
     auto error_handler = FilePositionErrorHandler(x3_error_handler.get_position_cache(), problem_filepath, 4);
     auto position_cache = PDDLPositionCache(error_handler);

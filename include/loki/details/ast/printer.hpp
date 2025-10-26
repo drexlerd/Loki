@@ -26,7 +26,7 @@ namespace loki
 struct DefaultFormatter
 {
     int indent = 0;
-    int add_indent = 0;
+    int add_indent = 4;
 };
 
 template<typename T>

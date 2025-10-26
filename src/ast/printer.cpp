@@ -306,9 +306,12 @@ void write(const ast::TypedListOfNamesRecursively& node, T formatter, std::ostre
 {
     if (!node.names.empty())
     {
-        fmt::print(out, "{} - {}\n", fmt::join(strings(node.names, formatter), " "), string(node.type, formatter));
+        fmt::print(out, "{} - {}", fmt::join(strings(node.names, formatter), " "), string(node.type, formatter));
 
-        write(node.typed_list_of_names, formatter, out);
+        auto remainder = fmt::format("{}", string(node.typed_list_of_names, formatter));
+
+        if (!remainder.empty())
+            fmt::print(out, " {}", remainder);
     }
 }
 
@@ -327,9 +330,12 @@ void write(const ast::TypedListOfVariablesRecursively& node, T formatter, std::o
 {
     if (!node.variables.empty())
     {
-        fmt::print(out, "{} - {}\n", fmt::join(strings(node.variables, formatter), " "), string(node.type, formatter));
+        fmt::print(out, "{} - {}", fmt::join(strings(node.variables, formatter), " "), string(node.type, formatter));
 
-        write(node.typed_list_of_variables, formatter, out);
+        auto remainder = fmt::format("{}", string(node.typed_list_of_variables, formatter));
+
+        if (!remainder.empty())
+            fmt::print(out, " {}", remainder);
     }
 }
 
@@ -378,10 +384,10 @@ void write(const ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& nod
 {
     if (!node.atomic_function_skeletons.empty())
     {
-        fmt::print(out, "{} - {}\n", fmt::join(strings(node.atomic_function_skeletons, formatter), " "), string(node.function_type, formatter));
+        fmt::print(out, "{} - {}", fmt::join(strings(node.atomic_function_skeletons, formatter), " "), string(node.function_type, formatter));
 
         if (node.function_typed_list_of_atomic_function_skeletons.has_value())
-            write(node.function_typed_list_of_atomic_function_skeletons.value(), formatter, out);
+            fmt::print(out, "\n{}", string(node.function_typed_list_of_atomic_function_skeletons.value(), formatter));
     }
 }
 
@@ -987,7 +993,7 @@ void write(const ast::ActionBody& node, T formatter, std::ostream& out)
     auto indent = std::string(formatter.indent, ' ');
     fmt::print(
         out,
-        "{}\n",
+        "{}{}",
         node.precondition_goal_descriptor.has_value() ? indent + "(:precondition " + string(node.precondition_goal_descriptor.value(), formatter) + ")\n" : "",
         node.effect.has_value() ? indent + "(:effect " + string(node.effect.value(), formatter) + ")\n" : "");
 }
@@ -1007,7 +1013,10 @@ void write(const ast::Action& node, T formatter, std::ostream& out)
     fmt::print(out, "{}:parameters ({})\n", indent, string(node.typed_list_of_variables, formatter));
 
     // Body
-    fmt::print(out, "{}:precondition {}\n", indent, string(node.action_body, formatter));
+    fmt::print(out, "{}", string(node.action_body, formatter));
+
+    formatter.indent -= formatter.add_indent;
+    indent = std::string(formatter.indent, ' ');
 
     // End action
     fmt::print(out, "{})", indent);
@@ -1454,10 +1463,13 @@ void write(const ast::Problem& node, T formatter, std::ostream& out)
     auto indent = std::string(formatter.indent, ' ');
 
     // Header
-    fmt::print(out, "{}(define (domain {})\n", indent, string(node.domain_name, formatter));
+    fmt::print(out, "{}(define (problem {})\n", indent, string(node.problem_name, formatter));
 
     formatter.indent += formatter.add_indent;
     indent = std::string(formatter.indent, ' ');
+
+    // Domain
+    fmt::print(out, "{}(:domain {})\n", indent, string(node.domain_name, formatter));
 
     // Requirements
     if (node.requirements.has_value())

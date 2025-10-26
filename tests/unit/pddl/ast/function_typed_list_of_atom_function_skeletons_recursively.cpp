@@ -31,7 +31,7 @@ TEST(LokiTests, LokiPddlAstFunctionTypedListOfAtomicFunctionSkeletonsRecursively
 
     // recursive
     EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - number", function_typed_list_of_atomic_function_skeletons_recursively(), ast));
-    EXPECT_EQ(string(ast, DefaultFormatter {}), "(function-symbol1 ?var1 ?var2) - number\n");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "(function-symbol1 ?var1 ?var2) - number");
 
     // implicit "number" type
     EXPECT_ANY_THROW(parse_ast("(function-symbol1 ?var1 ?var2)", function_typed_list_of_atomic_function_skeletons_recursively(), ast));

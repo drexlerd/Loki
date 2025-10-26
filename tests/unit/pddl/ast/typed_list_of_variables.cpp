@@ -31,7 +31,7 @@ TEST(LokiTests, LokiPddlAstTypedListOfVariablesTest)
 
     // recursive alternative
     EXPECT_NO_THROW(parse_ast("?var1 ?var2 - type1 ?var3 ?var4 - type2", typed_list_of_variables(), ast));
-    EXPECT_EQ(string(ast, DefaultFormatter {}), "?var1 ?var2 - type1\n?var3 ?var4 - type2\n");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "?var1 ?var2 - type1 ?var3 ?var4 - type2");
 
     // implicit "object" type alternative
     EXPECT_NO_THROW(parse_ast("?var1 ?var2", typed_list_of_variables(), ast));

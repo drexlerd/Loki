@@ -33,10 +33,10 @@ TEST(LokiTests, LokiPddlAstAtomicFormulaSkeletonTest)
     EXPECT_EQ(string(ast, DefaultFormatter {}), "(predicate1 ?var1 ?var2)");
 
     EXPECT_NO_THROW(parse_ast("(predicate1 ?var1 - type1 ?var2 - type2)", atomic_formula_skeleton(), ast));
-    EXPECT_EQ(string(ast, DefaultFormatter {}), "(predicate1 ?var1 - type1\n?var2 - type2\n)");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "(predicate1 ?var1 - type1 ?var2 - type2)");
 
     EXPECT_NO_THROW(parse_ast("(predicate1 ?var1 ?var2 - type1)", atomic_formula_skeleton(), ast));
-    EXPECT_EQ(string(ast, DefaultFormatter {}), "(predicate1 ?var1 ?var2 - type1\n)");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "(predicate1 ?var1 ?var2 - type1)");
 
     EXPECT_ANY_THROW(parse_ast("(?var1 ?var2 - type1)", atomic_formula_skeleton(), ast));
 }
