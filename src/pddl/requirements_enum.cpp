@@ -18,31 +18,35 @@
 #include "loki/details/pddl/requirements_enum.hpp"
 
 #include <cassert>
+#include <ostream>
+#include <string>
 
 namespace loki
 {
 
-std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string = { { RequirementEnum::STRIPS, ":strips" },
-                                                                                { RequirementEnum::TYPING, ":typing" },
-                                                                                { RequirementEnum::NEGATIVE_PRECONDITIONS, ":negative-preconditions" },
-                                                                                { RequirementEnum::DISJUNCTIVE_PRECONDITIONS, ":disjunctive-preconditions" },
-                                                                                { RequirementEnum::EQUALITY, ":equality" },
-                                                                                { RequirementEnum::EXISTENTIAL_PRECONDITIONS, ":existential-preconditions" },
-                                                                                { RequirementEnum::UNIVERSAL_PRECONDITIONS, ":universal-preconditions" },
-                                                                                { RequirementEnum::QUANTIFIED_PRECONDITIONS, ":quantified-preconditions" },
-                                                                                { RequirementEnum::CONDITIONAL_EFFECTS, ":conditional-effects" },
-                                                                                { RequirementEnum::FLUENTS, ":fluents" },
-                                                                                { RequirementEnum::OBJECT_FLUENTS, ":object-fluents" },
-                                                                                { RequirementEnum::NUMERIC_FLUENTS, ":numeric-fluents" },
-                                                                                { RequirementEnum::ADL, ":adl" },
-                                                                                { RequirementEnum::DURATIVE_ACTIONS, ":durative-actions" },
-                                                                                { RequirementEnum::DERIVED_PREDICATES, ":derived-predicates" },
-                                                                                { RequirementEnum::TIMED_INITIAL_LITERALS, ":timed-initial-literals" },
-                                                                                { RequirementEnum::PREFERENCES, ":preferences" },
-                                                                                { RequirementEnum::CONSTRAINTS, ":constraints" },
-                                                                                { RequirementEnum::ACTION_COSTS, ":action-costs" },
-                                                                                { RequirementEnum::NON_DETERMINISTIC, ":non-deterministic" },
-                                                                                { RequirementEnum::PROBABILISTIC, ":probabilistic-effects" } };
+const std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string = {
+    { RequirementEnum::STRIPS, ":strips" },
+    { RequirementEnum::TYPING, ":typing" },
+    { RequirementEnum::NEGATIVE_PRECONDITIONS, ":negative-preconditions" },
+    { RequirementEnum::DISJUNCTIVE_PRECONDITIONS, ":disjunctive-preconditions" },
+    { RequirementEnum::EQUALITY, ":equality" },
+    { RequirementEnum::EXISTENTIAL_PRECONDITIONS, ":existential-preconditions" },
+    { RequirementEnum::UNIVERSAL_PRECONDITIONS, ":universal-preconditions" },
+    { RequirementEnum::QUANTIFIED_PRECONDITIONS, ":quantified-preconditions" },
+    { RequirementEnum::CONDITIONAL_EFFECTS, ":conditional-effects" },
+    { RequirementEnum::FLUENTS, ":fluents" },
+    { RequirementEnum::OBJECT_FLUENTS, ":object-fluents" },
+    { RequirementEnum::NUMERIC_FLUENTS, ":numeric-fluents" },
+    { RequirementEnum::ADL, ":adl" },
+    { RequirementEnum::DURATIVE_ACTIONS, ":durative-actions" },
+    { RequirementEnum::DERIVED_PREDICATES, ":derived-predicates" },
+    { RequirementEnum::TIMED_INITIAL_LITERALS, ":timed-initial-literals" },
+    { RequirementEnum::PREFERENCES, ":preferences" },
+    { RequirementEnum::CONSTRAINTS, ":constraints" },
+    { RequirementEnum::ACTION_COSTS, ":action-costs" },
+    { RequirementEnum::NON_DETERMINISTIC, ":non-deterministic" },
+    { RequirementEnum::PROBABILISTIC, ":probabilistic-effects" }
+};
 
 std::ostream& operator<<(std::ostream& out, RequirementEnum element)
 {

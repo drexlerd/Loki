@@ -53,7 +53,7 @@ enum class RequirementEnum
 using RequirementEnumSet = std::set<RequirementEnum>;
 using RequirementEnumList = std::vector<RequirementEnum>;
 
-extern std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string;
+extern const std::unordered_map<RequirementEnum, std::string> requirement_enum_to_string;
 
 extern std::ostream& operator<<(std::ostream& out, RequirementEnum element);
 
