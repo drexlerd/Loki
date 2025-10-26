@@ -30,11 +30,11 @@ TEST(LokiTests, LokiPddlAstVariableTest)
     ast::Variable ast;
 
     EXPECT_NO_THROW(parse_ast("?loki", variable(), ast));
-    EXPECT_EQ(parse_text(ast), "?loki");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "?loki");
     EXPECT_NO_THROW(parse_ast("?loki ?kilo", variable(), ast));
-    EXPECT_EQ(parse_text(ast), "?loki");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "?loki");
     EXPECT_NO_THROW(parse_ast("?loki(?kilo)", variable(), ast));
-    EXPECT_EQ(parse_text(ast), "?loki");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "?loki");
 
     EXPECT_ANY_THROW(parse_ast("loki", variable(), ast));
     EXPECT_ANY_THROW(parse_ast("1loki", variable(), ast));

@@ -58,7 +58,10 @@ struct AddressFormatter
 };
 
 template<typename T>
-concept Formatter = std::same_as<T, StringFormatter> || std::same_as<T, AddressFormatter>;
+concept Formatter = requires(T f) {
+    { f.indent } -> std::convertible_to<std::size_t>;
+    { f.add_indent } -> std::convertible_to<std::size_t>;
+};
 
 template<Formatter T>
 void write(const ActionImpl& element, T formatter, std::ostream& out);

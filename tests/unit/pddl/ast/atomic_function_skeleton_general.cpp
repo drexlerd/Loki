@@ -30,13 +30,13 @@ TEST(LokiTests, LokiPddlAstAtomicFunctionSkeletonGeneralTest)
     ast::AtomicFunctionSkeletonGeneral ast;
 
     EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2)", atomic_function_skeleton_general(), ast));
-    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2)");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "(function-symbol1 ?var1 ?var2)");
 
     EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 - type1 ?var2 - type2)", atomic_function_skeleton_general(), ast));
-    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 - type1\n?var2 - type2)");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "(function-symbol1 ?var1 - type1\n?var2 - type2\n)");
 
     EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2 - type1)", atomic_function_skeleton_general(), ast));
-    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2 - type1)");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "(function-symbol1 ?var1 ?var2 - type1\n)");
 
     EXPECT_ANY_THROW(parse_ast("(?var1 ?var2 - type1)", atomic_function_skeleton_general(), ast));
 }

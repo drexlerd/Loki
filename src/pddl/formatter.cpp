@@ -421,7 +421,7 @@ template void write<AddressFormatter>(const EffectImpl& element, AddressFormatte
 template<Formatter T>
 void write(const FunctionExpressionNumberImpl& element, T, std::ostream& out)
 {
-    out << element.get_number();
+    fmt::print(out, "{}", element.get_number());
 }
 
 template void write<StringFormatter>(const FunctionExpressionNumberImpl& element, StringFormatter formatter, std::ostream& out);

@@ -30,7 +30,7 @@ TEST(LokiTests, LokiPddlAstFunctionSymbolTotalCostTest)
     ast::FunctionSymbol ast;
 
     EXPECT_NO_THROW(parse_ast("total-cost", function_symbol_total_cost(), ast));
-    EXPECT_EQ(parse_text(ast), "total-cost");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "total-cost");
 
     // wrong keyword
     EXPECT_ANY_THROW(parse_ast("loki ", function_symbol_total_cost(), ast));

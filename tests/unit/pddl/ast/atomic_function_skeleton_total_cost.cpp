@@ -30,7 +30,7 @@ TEST(LokiTests, LokiPddlAstAtomicFunctionSkeletonTotalCostTest)
     ast::AtomicFunctionSkeletonTotalCost ast;
 
     EXPECT_NO_THROW(parse_ast("(total-cost)", atomic_function_skeleton_total_cost(), ast));
-    EXPECT_EQ(parse_text(ast), "(total-cost)");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "(total-cost)");
 
     EXPECT_ANY_THROW(parse_ast("(loki)", atomic_function_skeleton_total_cost(), ast));
 }

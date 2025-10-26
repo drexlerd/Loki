@@ -31,17 +31,17 @@ TEST(LokiTests, LokiPddlAstTypedListOfNamesTest)
 
     // recursive alternative
     EXPECT_NO_THROW(parse_ast("name1 name2 - type1 name3 name4 - type2", typed_list_of_names(), ast));
-    EXPECT_EQ(parse_text(ast), "name1 name2 - type1\nname3 name4 - type2");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "name1 name2 - type1\nname3 name4 - type2\n");
 
     // implicit "object" type alternative
     EXPECT_NO_THROW(parse_ast("name1 name2", typed_list_of_names(), ast));
-    EXPECT_EQ(parse_text(ast), "name1 name2");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "name1 name2");
 
     EXPECT_NO_THROW(parse_ast("?var1 ?var2", typed_list_of_names(), ast));
-    EXPECT_EQ(parse_text(ast), "");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "");
 
     EXPECT_NO_THROW(parse_ast("- type1", typed_list_of_names(), ast));
-    EXPECT_EQ(parse_text(ast), "");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "");
 }
 
 }

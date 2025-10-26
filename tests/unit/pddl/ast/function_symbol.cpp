@@ -31,11 +31,11 @@ TEST(LokiTests, LokiPddlAstFunctionSymbolTest)
     ast::FunctionSymbol ast;
 
     EXPECT_NO_THROW(parse_ast("loki", function_symbol(), ast));
-    EXPECT_EQ(parse_text(ast), "loki");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "loki");
     EXPECT_NO_THROW(parse_ast("loki kilo", function_symbol(), ast));
     EXPECT_NO_THROW(parse_ast("loki", function_symbol(), ast));
     EXPECT_NO_THROW(parse_ast("loki(kilo)", function_symbol(), ast));
-    EXPECT_EQ(parse_text(ast), "loki");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "loki");
 
     EXPECT_ANY_THROW(parse_ast("1loki", function_symbol(), ast));
     EXPECT_ANY_THROW(parse_ast("-loki", function_symbol(), ast));

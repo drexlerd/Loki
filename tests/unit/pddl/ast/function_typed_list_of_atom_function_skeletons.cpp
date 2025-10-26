@@ -31,11 +31,11 @@ TEST(LokiTests, LokiPddlAstFunctionTypedListOfAtomicFunctionSkeletonsTest)
 
     // recursive alternative
     EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - number", function_typed_list_of_atomic_function_skeletons(), ast));
-    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2) - number");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "(function-symbol1 ?var1 ?var2) - number\n");
 
     // implicit "number" type alternative
     EXPECT_NO_THROW(parse_ast("(function-symbol1 ?var1 ?var2)", function_typed_list_of_atomic_function_skeletons(), ast));
-    EXPECT_EQ(parse_text(ast), "(function-symbol1 ?var1 ?var2)");
+    EXPECT_EQ(string(ast, DefaultFormatter {}), "(function-symbol1 ?var1 ?var2)");
 
     // function type does not match "number"
     EXPECT_ANY_THROW(parse_ast("(function-symbol1 ?var1 ?var2) - wrong", function_typed_list_of_atomic_function_skeletons(), ast));

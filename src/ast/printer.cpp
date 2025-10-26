@@ -17,949 +17,1492 @@
 
 #include "loki/details/ast/printer.hpp"
 
+#include <fmt/core.h>
+#include <fmt/ostream.h>
+#include <fmt/ranges.h>
+#include <ranges>
 #include <sstream>
 #include <vector>
 
-using namespace std;
-
 namespace loki
 {
-// Printer for std::vector
-template<typename T>
-inline std::string parse_text(const std::vector<T>& nodes, const DefaultFormatterOptions& options);
 
-// Printer for boost::variant
-class NodeVisitorPrinter : public boost::static_visitor<std::string>
+// Writer for boost::variant
+template<Formatter T>
+class NodeVisitorPrinter
 {
 private:
-    const DefaultFormatterOptions* options;
+    T formatter;
+    std::ostream& out;
 
 public:
-    NodeVisitorPrinter(const DefaultFormatterOptions& options) : options(&options) {}
+    NodeVisitorPrinter(T formatter, std::ostream& out) : formatter(formatter), out(out) {}
 
     template<typename Node>
-    std::string operator()(const Node& node) const
-    {
-        return parse_text(node, *options);
-    }
+    void operator()(const Node& node) const;
 };
 
-string parse_text(const ast::Name& node, const DefaultFormatterOptions&) { return node.characters; }
+template<Formatter F, std::ranges::input_range Range>
+void write(const Range& range, F formatter, std::ostream& out);
 
-string parse_text(const ast::Variable& node, const DefaultFormatterOptions&) { return node.characters; }
-
-std::string parse_text(const ast::FunctionSymbol& node, const DefaultFormatterOptions& options) { return parse_text(node.name, options); }
-
-string parse_text(const ast::Term& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
-
-std::string parse_text(const ast::Predicate& node, const DefaultFormatterOptions& options) { return parse_text(node.name, options); }
-
-string parse_text(const ast::Number& node, const DefaultFormatterOptions&)
+template<Formatter T>
+void write(const ast::Name& node, T /*formatter*/, std::ostream& out)
 {
-    stringstream ss;
-    ss << node.value;
-    return ss.str();
+    fmt::print(out, "{}", node.characters);
 }
 
-std::string parse_text(const ast::RequirementStrips&, const DefaultFormatterOptions&) { return ":strips"; }
-std::string parse_text(const ast::RequirementTyping&, const DefaultFormatterOptions&) { return ":typing"; }
-std::string parse_text(const ast::RequirementNegativePreconditions&, const DefaultFormatterOptions&) { return ":negative-preconditions"; }
-std::string parse_text(const ast::RequirementDisjunctivePreconditions&, const DefaultFormatterOptions&) { return ":disjunctive-preconditions"; }
-std::string parse_text(const ast::RequirementEquality&, const DefaultFormatterOptions&) { return ":equality"; }
-std::string parse_text(const ast::RequirementExistentialPreconditions&, const DefaultFormatterOptions&) { return ":existential-preconditions"; }
-std::string parse_text(const ast::RequirementUniversalPreconditions&, const DefaultFormatterOptions&) { return ":universal-preconditions"; }
-std::string parse_text(const ast::RequirementQuantifiedPreconditions&, const DefaultFormatterOptions&) { return ":quantified-preconditions"; }
-std::string parse_text(const ast::RequirementConditionalEffects&, const DefaultFormatterOptions&) { return ":conditional-effects"; }
-std::string parse_text(const ast::RequirementFluents&, const DefaultFormatterOptions&) { return ":fluents"; }
-std::string parse_text(const ast::RequirementObjectFluents&, const DefaultFormatterOptions&) { return ":object-fluents"; }
-std::string parse_text(const ast::RequirementFunctionValues&, const DefaultFormatterOptions&) { return ":numeric-fluents"; }
-std::string parse_text(const ast::RequirementAdl&, const DefaultFormatterOptions&) { return ":adl"; }
-std::string parse_text(const ast::RequirementDurativeActions&, const DefaultFormatterOptions&) { return ":durative-actions"; }
-std::string parse_text(const ast::RequirementDerivedPredicates&, const DefaultFormatterOptions&) { return ":derived-predicates"; }
-std::string parse_text(const ast::RequirementTimedInitialLiterals&, const DefaultFormatterOptions&) { return ":timed-initial-literals"; }
-std::string parse_text(const ast::RequirementPreferences&, const DefaultFormatterOptions&) { return ":preferences"; }
-std::string parse_text(const ast::RequirementConstraints&, const DefaultFormatterOptions&) { return ":constraints"; }
-std::string parse_text(const ast::RequirementActionCosts&, const DefaultFormatterOptions&) { return ":action-costs"; }
-std::string parse_text(const ast::RequirementNonDeterministic&, const DefaultFormatterOptions&) { return ":non-deterministic"; }
-std::string parse_text(const ast::RequirementProbabilisticEffects&, const DefaultFormatterOptions&) { return ":probablistic-effects"; }
+template void write<DefaultFormatter>(const ast::Name& node, DefaultFormatter formatter, std::ostream& out);
 
-std::string parse_text(const ast::Requirement& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
-
-string parse_text(const ast::Type& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
-
-string parse_text(const ast::TypeObject& /*node*/, const DefaultFormatterOptions& /*options*/) { return "object"; }
-
-string parse_text(const ast::TypeNumber& /*node*/, const DefaultFormatterOptions& /*options*/) { return "number"; }
-
-string parse_text(const ast::TypeEither& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::Variable& node, T /*formatter*/, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(either ";
-    for (size_t i = 0; i < node.types.size(); ++i)
+    fmt::print(out, "{}", node.characters);
+}
+
+template void write<DefaultFormatter>(const ast::Variable& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::FunctionSymbol& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "{}", string(node.name, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::FunctionSymbol& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Term& node, T formatter, std::ostream& out)
+{
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
+}
+
+template void write<DefaultFormatter>(const ast::Term& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Predicate& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "{}", string(node.name, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::Predicate& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Number& node, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, "{}", node.value);
+}
+
+template void write<DefaultFormatter>(const ast::Number& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::RequirementStrips& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":strips");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementStrips&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementTyping& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":typing");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementTyping&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementNegativePreconditions& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":negative-preconditions");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementNegativePreconditions&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementDisjunctivePreconditions& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":disjunctive-preconditions");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementDisjunctivePreconditions&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementEquality& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":equality");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementEquality&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementExistentialPreconditions& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":existential-preconditions");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementExistentialPreconditions&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementUniversalPreconditions& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":universal-preconditions");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementUniversalPreconditions&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementQuantifiedPreconditions& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":quantified-preconditions");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementQuantifiedPreconditions&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementConditionalEffects& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":conditional-effects");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementConditionalEffects&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementFluents& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":fluents");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementFluents&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementObjectFluents& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":object-fluents");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementObjectFluents&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementFunctionValues& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":numeric-fluents");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementFunctionValues&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementAdl& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":adl");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementAdl&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementDurativeActions& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":durative-actions");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementDurativeActions&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementDerivedPredicates& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":derived-predicates");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementDerivedPredicates&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementTimedInitialLiterals& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":timed-initial-literals");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementTimedInitialLiterals&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementPreferences& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":preferences");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementPreferences&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementConstraints& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":constraints");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementConstraints&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementActionCosts& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":action-costs");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementActionCosts&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementNonDeterministic& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":non-deterministic");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementNonDeterministic&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::RequirementProbabilisticEffects& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ":probabilistic-effects");
+}
+
+template void write<DefaultFormatter>(const ast::RequirementProbabilisticEffects&, DefaultFormatter, std::ostream&);
+
+template<Formatter T>
+void write(const ast::Requirement& node, T formatter, std::ostream& out)
+{
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
+}
+
+template void write<DefaultFormatter>(const ast::Requirement& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Type& node, T formatter, std::ostream& out)
+{
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
+}
+
+template void write<DefaultFormatter>(const ast::Type& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::TypeObject& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, "object");
+}
+
+template void write<DefaultFormatter>(const ast::TypeObject& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::TypeNumber& /*node*/, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, "number");
+}
+
+template void write<DefaultFormatter>(const ast::TypeNumber& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::TypeEither& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "(either {})", fmt::join(strings(node.types, formatter), " "));
+}
+
+template void write<DefaultFormatter>(const ast::TypeEither& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::TypedListOfNamesRecursively& node, T formatter, std::ostream& out)
+{
+    if (!node.names.empty())
     {
-        if (i != 0)
-            ss << " ";
-        ss << parse_text(node.types[i], options);
+        fmt::print(out, "{} - {}\n", fmt::join(strings(node.names, formatter), " "), string(node.type, formatter));
+
+        write(node.typed_list_of_names, formatter, out);
     }
-    ss << ")";
-    return ss.str();
 }
 
-string parse_text(const ast::TypedListOfNamesRecursively& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::TypedListOfNamesRecursively& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::TypedListOfNames& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    for (size_t i = 0; i < node.names.size(); ++i)
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
+}
+
+template void write<DefaultFormatter>(const ast::TypedListOfNames& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::TypedListOfVariablesRecursively& node, T formatter, std::ostream& out)
+{
+    if (!node.variables.empty())
     {
-        if (i != 0)
-            ss << " ";
-        ss << parse_text(node.names[i], options);
-    }
-    ss << " - " << parse_text(node.type, options);
+        fmt::print(out, "{} - {}\n", fmt::join(strings(node.variables, formatter), " "), string(node.type, formatter));
 
-    // lookahead
-    auto nested_options = DefaultFormatterOptions { options.indent + options.add_indent, options.add_indent };
-    auto nested_text = parse_text(node.typed_list_of_names, nested_options);
-    if (nested_text.size() > 0)
+        write(node.typed_list_of_variables, formatter, out);
+    }
+}
+
+template void write<DefaultFormatter>(const ast::TypedListOfVariablesRecursively& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::TypedListOfVariables& node, T formatter, std::ostream& out)
+{
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
+}
+
+template void write<DefaultFormatter>(const ast::TypedListOfVariables& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::AtomicFormulaSkeleton& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "({} {})", string(node.predicate, formatter), string(node.typed_list_of_variables, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::AtomicFormulaSkeleton& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::AtomicFunctionSkeletonTotalCost& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "({})", string(node.function_symbol, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::AtomicFunctionSkeletonTotalCost& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::AtomicFunctionSkeletonGeneral& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "({} {})", string(node.function_symbol, formatter), string(node.arguments, formatter));
+}
+
+template<Formatter T>
+void write(const ast::AtomicFunctionSkeleton& node, T formatter, std::ostream& out)
+{
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
+}
+
+template void write<DefaultFormatter>(const ast::AtomicFunctionSkeleton& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& node, T formatter, std::ostream& out)
+{
+    if (!node.atomic_function_skeletons.empty())
     {
-        ss << "\n";
-        ss << string(nested_options.indent, ' ') << nested_text;
+        fmt::print(out, "{} - {}\n", fmt::join(strings(node.atomic_function_skeletons, formatter), " "), string(node.function_type, formatter));
+
+        if (node.function_typed_list_of_atomic_function_skeletons.has_value())
+            write(node.function_typed_list_of_atomic_function_skeletons.value(), formatter, out);
     }
-    return ss.str();
 }
 
-string parse_text(const ast::TypedListOfNames& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
+template void write<DefaultFormatter>(const ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& node, DefaultFormatter formatter, std::ostream& out);
 
-std::string parse_text(const ast::TypedListOfVariablesRecursively& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::FunctionTypedListOfAtomicFunctionSkeletons& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    for (size_t i = 0; i < node.variables.size(); ++i)
-    {
-        if (i != 0)
-            ss << " ";
-        ss << parse_text(node.variables[i]);
-    }
-    ss << " - " << parse_text(node.type, options);
-
-    // lookahead
-    auto nested_options = DefaultFormatterOptions { options.indent + options.add_indent, options.add_indent };
-    auto nested_text = parse_text(node.typed_list_of_variables, options);
-    if (nested_text.size() > 0)
-    {
-        ss << "\n";
-        ss << string(nested_options.indent, ' ') << nested_text;
-    }
-    return ss.str();
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-std::string parse_text(const ast::TypedListOfVariables& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::FunctionTypedListOfAtomicFunctionSkeletons& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::AtomicFormulaOfTermsPredicate& node, T formatter, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    fmt::print(out, "({} {})", string(node.predicate, formatter), fmt::join(strings(node.terms, formatter), " "));
 }
 
-std::string parse_text(const ast::AtomicFormulaSkeleton& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::AtomicFormulaOfTermsPredicate& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::AtomicFormulaOfTermsEquality& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(" << parse_text(node.predicate, options) << " " << parse_text(node.typed_list_of_variables, options) << ")";
-    return ss.str();
+    fmt::print(out, "(= {} {})", string(node.left_term, formatter), string(node.right_term, formatter));
 }
 
-std::string parse_text(const ast::AtomicFunctionSkeletonTotalCost& node, const DefaultFormatterOptions& /*options*/)
+template void write<DefaultFormatter>(const ast::AtomicFormulaOfTermsEquality& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::AtomicFormulaOfTerms& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(" << parse_text(node.function_symbol) << ")";
-    return ss.str();
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-std::string parse_text(const ast::AtomicFunctionSkeletonGeneral& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::AtomicFormulaOfTerms& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Atom& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(" << parse_text(node.function_symbol, options) << " " << parse_text(node.arguments, options) << ")";
-    return ss.str();
+    write(node.atomic_formula_of_terms, formatter, out);
 }
 
-std::string parse_text(const ast::AtomicFunctionSkeleton& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::NegatedAtom& node, T formatter, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    fmt::print(out, "(not {})", string(node.atomic_formula_of_terms, formatter));
 }
 
-std::string parse_text(const ast::FunctionTypedListOfAtomicFunctionSkeletonsRecursively& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::Literal& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    for (size_t i = 0; i < node.atomic_function_skeletons.size(); ++i)
-    {
-        if (i != 0)
-            ss << " ";
-        ss << parse_text(node.atomic_function_skeletons[i], options);
-    }
-    ss << " - " << parse_text(node.function_type, options);
-
-    // lookahead
-    auto nested_options = DefaultFormatterOptions { options.indent + options.add_indent, options.add_indent };
-    if (node.function_typed_list_of_atomic_function_skeletons.has_value())
-    {
-        auto nested_text = parse_text(node.function_typed_list_of_atomic_function_skeletons.value(), options);
-        if (nested_text.size() > 0)
-        {
-            ss << "\n";
-            ss << string(nested_options.indent, ' ') << nested_text;
-        }
-    }
-    return ss.str();
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-std::string parse_text(const ast::FunctionTypedListOfAtomicFunctionSkeletons& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::Literal& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::MultiOperatorMul&, T /*formatter*/, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    fmt::print(out, "*");
 }
 
-std::string parse_text(const ast::AtomicFormulaOfTermsPredicate& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::MultiOperatorMul&, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::MultiOperatorPlus&, T /*formatter*/, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(" << parse_text(node.predicate, options) << " " << parse_text(node.terms, options) << ")";
-    return ss.str();
+    fmt::print(out, "+");
 }
 
-std::string parse_text(const ast::AtomicFormulaOfTermsEquality& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::MultiOperatorPlus&, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::MultiOperator& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(" << "= " << parse_text(node.left_term, options) << " " << parse_text(node.right_term, options) << ")";
-    return ss.str();
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-std::string parse_text(const ast::AtomicFormulaOfTerms& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::MultiOperator& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::BinaryOperatorMinus&, T /*formatter*/, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    fmt::print(out, "-");
 }
 
-std::string parse_text(const ast::Atom& node, const DefaultFormatterOptions& options) { return parse_text(node.atomic_formula_of_terms, options); }
+template void write<DefaultFormatter>(const ast::BinaryOperatorMinus&, DefaultFormatter formatter, std::ostream& out);
 
-std::string parse_text(const ast::NegatedAtom& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::BinaryOperatorDiv&, T /*formatter*/, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(not " << parse_text(node.atomic_formula_of_terms, options) << ")";
-    return ss.str();
+    fmt::print(out, "/");
 }
 
-std::string parse_text(const ast::Literal& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
+template void write<DefaultFormatter>(const ast::BinaryOperatorDiv&, DefaultFormatter formatter, std::ostream& out);
 
-std::string parse_text(const ast::MultiOperatorMul&, const DefaultFormatterOptions&) { return "*"; }
-std::string parse_text(const ast::MultiOperatorPlus&, const DefaultFormatterOptions&) { return "+"; }
-std::string parse_text(const ast::MultiOperator& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::BinaryOperator& node, T formatter, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-std::string parse_text(const ast::BinaryOperatorMinus&, const DefaultFormatterOptions&) { return "-"; }
-std::string parse_text(const ast::BinaryOperatorDiv&, const DefaultFormatterOptions&) { return "/"; }
-std::string parse_text(const ast::BinaryOperator& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::BinaryOperator& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::BinaryComparatorGreater&, T /*formatter*/, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    fmt::print(out, ">");
 }
 
-std::string parse_text(const ast::BinaryComparatorGreater&, const DefaultFormatterOptions&) { return ">"; }
-std::string parse_text(const ast::BinaryComparatorLess&, const DefaultFormatterOptions&) { return "<"; }
-std::string parse_text(const ast::BinaryComparatorEqual&, const DefaultFormatterOptions&) { return "="; }
-std::string parse_text(const ast::BinaryComparatorGreaterEqual&, const DefaultFormatterOptions&) { return ">="; }
-std::string parse_text(const ast::BinaryComparatorLessEqual&, const DefaultFormatterOptions&) { return "<="; }
-std::string parse_text(const ast::BinaryComparator& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::BinaryComparatorGreater& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::BinaryComparatorLess&, T /*formatter*/, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    fmt::print(out, "<");
 }
 
-std::string parse_text(const ast::FunctionHead& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::BinaryComparatorLess& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::BinaryComparatorEqual&, T /*formatter*/, std::ostream& out)
 {
-    std::stringstream ss;
+    fmt::print(out, "=");
+}
+
+template void write<DefaultFormatter>(const ast::BinaryComparatorEqual& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::BinaryComparatorGreaterEqual&, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, ">=");
+}
+
+template void write<DefaultFormatter>(const ast::BinaryComparatorGreaterEqual& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::BinaryComparatorLessEqual&, T /*formatter*/, std::ostream& out)
+{
+    fmt::print(out, "<=");
+}
+
+template void write<DefaultFormatter>(const ast::BinaryComparatorLessEqual& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::BinaryComparator& node, T formatter, std::ostream& out)
+{
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
+}
+
+template void write<DefaultFormatter>(const ast::BinaryComparator& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::FunctionHead& node, T formatter, std::ostream& out)
+{
     if (node.terms.size() > 0)
-    {
-        ss << "(" << parse_text(node.function_symbol, options) << " " << parse_text(node.terms, options) << ")";
-    }
+        fmt::print(out, "({} {})", string(node.function_symbol, formatter), fmt::join(strings(node.terms, formatter), " "));
     else
-    {
-        ss << parse_text(node.function_symbol, options);
-    }
-    return ss.str();
+        fmt::print(out, "({})", string(node.function_symbol, formatter));
 }
 
-std::string parse_text(const ast::FunctionExpression& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::FunctionHead& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::FunctionExpression& node, T formatter, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-std::string parse_text(const ast::FunctionExpressionNumber& node, const DefaultFormatterOptions& options) { return parse_text(node.number, options); }
+template void write<DefaultFormatter>(const ast::FunctionExpression& node, DefaultFormatter formatter, std::ostream& out);
 
-std::string parse_text(const ast::FunctionExpressionBinaryOp& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::FunctionExpressionNumber& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(" << parse_text(node.binary_operator, options) << " " << parse_text(node.left_function_expression, options) << " "
-       << parse_text(node.right_function_expression, options) << ")";
-    return ss.str();
+    write(node.number, formatter, out);
 }
 
-std::string parse_text(const ast::FunctionExpressionMultiOp& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::FunctionExpressionNumber& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::FunctionExpressionBinaryOp& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(" << parse_text(node.multi_operator, options) << " ";
-    for (size_t i = 0; i < node.function_expressions.size(); ++i)
-    {
-        if (i != 0)
-            ss << " ";
-        ss << parse_text(node.function_expressions.at(i), options);
-    }
-    ss << ")";
-    return ss.str();
+    fmt::print(out,
+               "({} {} {})",
+               string(node.binary_operator, formatter),
+               string(node.left_function_expression, formatter),
+               string(node.right_function_expression, formatter));
 }
 
-std::string parse_text(const ast::FunctionExpressionMinus& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::FunctionExpressionBinaryOp& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::FunctionExpressionMultiOp& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(- " << parse_text(node.function_expression, options) << ")";
-    return ss.str();
+    fmt::print(out, "({} {})", string(node.multi_operator, formatter), fmt::join(strings(node.function_expressions, formatter), " "));
 }
 
-std::string parse_text(const ast::FunctionExpressionHead& node, const DefaultFormatterOptions& options) { return parse_text(node.function_head, options); }
+template void write<DefaultFormatter>(const ast::FunctionExpressionMultiOp& node, DefaultFormatter formatter, std::ostream& out);
 
-std::string parse_text(const ast::GoalDescriptor& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::FunctionExpressionMinus& node, T formatter, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    fmt::print(out, "(- {})", string(node.function_expression, formatter));
 }
 
-std::string parse_text(const ast::GoalDescriptorAtom& node, const DefaultFormatterOptions& options) { return parse_text(node.atom, options); }
+template void write<DefaultFormatter>(const ast::FunctionExpressionMinus& node, DefaultFormatter formatter, std::ostream& out);
 
-std::string parse_text(const ast::GoalDescriptorLiteral& node, const DefaultFormatterOptions& options) { return parse_text(node.literal, options); }
-
-std::string parse_text(const ast::GoalDescriptorAnd& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::FunctionExpressionHead& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(and " << parse_text(node.goal_descriptors, options) << ")";
-    return ss.str();
+    write(node.function_head, formatter, out);
 }
 
-std::string parse_text(const ast::GoalDescriptorOr& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::FunctionExpressionHead& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::GoalDescriptor& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(or " << parse_text(node.goal_descriptors, options) << ")";
-    return ss.str();
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-std::string parse_text(const ast::GoalDescriptorNot& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::GoalDescriptor& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::GoalDescriptorAtom& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(not " << parse_text(node.goal_descriptor, options) << ")";
-    return ss.str();
+    write(node.atom, formatter, out);
 }
 
-std::string parse_text(const ast::GoalDescriptorImply& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::GoalDescriptorAtom& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::GoalDescriptorLiteral& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(imply " << parse_text(node.goal_descriptor_left, options) << " " << parse_text(node.goal_descriptor_right, options) << ")";
-    return ss.str();
+    write(node.literal, formatter, out);
 }
 
-std::string parse_text(const ast::GoalDescriptorExists& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::GoalDescriptorLiteral& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::GoalDescriptorAnd& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(exists " << parse_text(node.typed_list_of_variables, options) << " " << parse_text(node.goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out, "(and {})", fmt::join(strings(node.goal_descriptors, formatter), " "));
 }
 
-std::string parse_text(const ast::GoalDescriptorForall& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::GoalDescriptorAnd& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::GoalDescriptorOr& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(forall " << parse_text(node.typed_list_of_variables, options) << " " << parse_text(node.goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out, "(or {})", fmt::join(strings(node.goal_descriptors, formatter), " "));
 }
 
-std::string parse_text(const ast::GoalDescriptorFunctionComparison& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::GoalDescriptorOr& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::GoalDescriptorNot& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(" << parse_text(node.binary_comparator, options) << " " << parse_text(node.left_function_expression, options) << " "
-       << parse_text(node.right_function_expression, options) << ")";
-    return ss.str();
+    fmt::print(out, "(not {})", string(node.goal_descriptor, formatter));
 }
 
-std::string parse_text(const ast::ConstraintGoalDescriptor& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::GoalDescriptorNot& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::GoalDescriptorImply& node, T formatter, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    fmt::print(out, "(imply {} {})", string(node.goal_descriptor_left, formatter), string(node.goal_descriptor_right, formatter));
 }
 
-std::string parse_text(const ast::ConstraintGoalDescriptorAnd& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::GoalDescriptorImply& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::GoalDescriptorExists& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(and " << parse_text(node.constraint_goal_descriptors, options) << ")";
-    return ss.str();
+    fmt::print(out, "(exists ({}) {})", string(node.typed_list_of_variables, formatter), string(node.goal_descriptor, formatter));
 }
 
-std::string parse_text(const ast::ConstraintGoalDescriptorForall& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::GoalDescriptorExists& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::GoalDescriptorForall& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(forall " << parse_text(node.typed_list_of_variables, options) << " " << parse_text(node.constraint_goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out, "(forall ({}) {})", string(node.typed_list_of_variables, formatter), string(node.goal_descriptor, formatter));
 }
 
-std::string parse_text(const ast::ConstraintGoalDescriptorAtEnd& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::GoalDescriptorForall& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::GoalDescriptorFunctionComparison& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(at end " << parse_text(node.goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out,
+               "({} {} {})",
+               string(node.binary_comparator, formatter),
+               string(node.left_function_expression, formatter),
+               string(node.right_function_expression, formatter));
 }
 
-std::string parse_text(const ast::ConstraintGoalDescriptorAlways& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::GoalDescriptorFunctionComparison& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ConstraintGoalDescriptor& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(always " << parse_text(node.goal_descriptor, options) << ")";
-    return ss.str();
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-std::string parse_text(const ast::ConstraintGoalDescriptorSometime& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::ConstraintGoalDescriptor& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ConstraintGoalDescriptorAnd& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(sometime " << parse_text(node.goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out, "(and {})", fmt::join(strings(node.constraint_goal_descriptors, formatter), " "));
 }
 
-std::string parse_text(const ast::ConstraintGoalDescriptorWithin& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::ConstraintGoalDescriptorAnd& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ConstraintGoalDescriptorForall& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(within " << parse_text(node.number, options) << " " << parse_text(node.goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out, "(forall ({}) {})", string(node.typed_list_of_variables, formatter), string(node.constraint_goal_descriptor, formatter));
 }
 
-std::string parse_text(const ast::ConstraintGoalDescriptorAtMostOnce& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::ConstraintGoalDescriptorForall& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ConstraintGoalDescriptorAtEnd& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(at-most-once " << parse_text(node.goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out, "(at end {})", string(node.goal_descriptor, formatter));
 }
 
-std::string parse_text(const ast::ConstraintGoalDescriptorSometimeAfter& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::ConstraintGoalDescriptorAtEnd& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ConstraintGoalDescriptorAlways& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(sometime-after " << parse_text(node.goal_descriptor_left, options) << " " << parse_text(node.goal_descriptor_right, options) << ")";
-    return ss.str();
+    fmt::print(out, "(always {})", string(node.goal_descriptor, formatter));
 }
 
-std::string parse_text(const ast::ConstraintGoalDescriptorSometimeBefore& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::ConstraintGoalDescriptorAlways& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ConstraintGoalDescriptorSometime& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(sometime-before " << parse_text(node.goal_descriptor_left, options) << " " << parse_text(node.goal_descriptor_right, options) << ")";
-    return ss.str();
+    fmt::print(out, "(sometime {})", string(node.goal_descriptor, formatter));
 }
 
-std::string parse_text(const ast::ConstraintGoalDescriptorAlwaysWithin& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::ConstraintGoalDescriptorSometime& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ConstraintGoalDescriptorWithin& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(always-within " << parse_text(node.number, options) << " " << parse_text(node.goal_descriptor_left, options) << " "
-       << parse_text(node.goal_descriptor_right, options) << ")";
-    return ss.str();
+    fmt::print(out, "(within {} {})", string(node.number, formatter), string(node.goal_descriptor, formatter));
 }
 
-std::string parse_text(const ast::ConstraintGoalDescriptorHoldDuring& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::ConstraintGoalDescriptorWithin& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ConstraintGoalDescriptorAtMostOnce& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(hold-during " << parse_text(node.number_left, options) << " " << parse_text(node.number_right, options) << " "
-       << parse_text(node.goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out, "(at-most-once {})", string(node.goal_descriptor, formatter));
 }
 
-std::string parse_text(const ast::ConstraintGoalDescriptorHoldAfter& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::ConstraintGoalDescriptorAtMostOnce& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ConstraintGoalDescriptorSometimeAfter& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(hold-after " << parse_text(node.number, options) << " " << parse_text(node.goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out, "(sometime-after {} {})", string(node.goal_descriptor_left, formatter), string(node.goal_descriptor_right, formatter));
 }
 
-std::string parse_text(const ast::PreferenceName& node, const DefaultFormatterOptions& options) { return parse_text(node.name, options); }
+template void write<DefaultFormatter>(const ast::ConstraintGoalDescriptorSometimeAfter& node, DefaultFormatter formatter, std::ostream& out);
 
-std::string parse_text(const ast::PreconditionGoalDescriptor& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::ConstraintGoalDescriptorSometimeBefore& node, T formatter, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    fmt::print(out, "(sometime-before {} {})", string(node.goal_descriptor_left, formatter), string(node.goal_descriptor_right, formatter));
 }
 
-std::string parse_text(const ast::PreconditionGoalDescriptorSimple& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::ConstraintGoalDescriptorSometimeBefore& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ConstraintGoalDescriptorAlwaysWithin& node, T formatter, std::ostream& out)
 {
-    return parse_text(node.goal_descriptor, options);
+    fmt::print(out,
+               "(always-within {} {} {})",
+               string(node.number, formatter),
+               string(node.goal_descriptor_left, formatter),
+               string(node.goal_descriptor_right, formatter));
 }
 
-std::string parse_text(const ast::PreconditionGoalDescriptorAnd& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::ConstraintGoalDescriptorAlwaysWithin& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ConstraintGoalDescriptorHoldDuring& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(and " << parse_text(node.precondition_goal_descriptors, options) << ")";
-    return ss.str();
+    fmt::print(out,
+               "(hold-during {} {} {})",
+               string(node.number_left, formatter),
+               string(node.number_right, formatter),
+               string(node.goal_descriptor, formatter));
 }
 
-std::string parse_text(const ast::PreconditionGoalDescriptorPreference& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::ConstraintGoalDescriptorHoldDuring& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ConstraintGoalDescriptorHoldAfter& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(preference " << parse_text(node.preference_name, options) << " " << parse_text(node.goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out, "(hold-after {} {})", string(node.number, formatter), string(node.goal_descriptor, formatter));
 }
 
-std::string parse_text(const ast::PreconditionGoalDescriptorForall& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::ConstraintGoalDescriptorHoldAfter& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::PreferenceName& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(forall " << parse_text(node.typed_list_of_variables, options) << " " << parse_text(node.precondition_goal_descriptor, options) << ")";
-    return ss.str();
+    write(node.name, formatter, out);
 }
 
-std::string parse_text(const ast::AssignOperatorAssign&, const DefaultFormatterOptions&) { return "assign"; }
-std::string parse_text(const ast::AssignOperatorScaleUp&, const DefaultFormatterOptions&) { return "scale-up"; }
-std::string parse_text(const ast::AssignOperatorScaleDown&, const DefaultFormatterOptions&) { return "scale-down"; }
-std::string parse_text(const ast::AssignOperatorIncrease&, const DefaultFormatterOptions&) { return "increase"; }
-std::string parse_text(const ast::AssignOperatorDecrease&, const DefaultFormatterOptions&) { return "decrease"; }
-std::string parse_text(const ast::AssignOperator& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::PreferenceName& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::PreconditionGoalDescriptor& node, T formatter, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-std::string parse_text(const ast::Effect& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
+template void write<DefaultFormatter>(const ast::PreconditionGoalDescriptor& node, DefaultFormatter formatter, std::ostream& out);
 
-std::string parse_text(const ast::NumberAndEffect& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::PreconditionGoalDescriptorSimple& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    parse_text(node.number, options);
-    ss << " ";
-    parse_text(node.effect, options);
-    return ss.str();
+    write(node.goal_descriptor, formatter, out);
 }
 
-std::string parse_text(const ast::EffectProductionLiteral& node, const DefaultFormatterOptions& options) { return parse_text(node.literal, options); }
+template void write<DefaultFormatter>(const ast::PreconditionGoalDescriptorSimple& node, DefaultFormatter formatter, std::ostream& out);
 
-std::string parse_text(const ast::EffectProductionNumeric& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::PreconditionGoalDescriptorAnd& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(" << parse_text(node.assign_operator, options) << " " << parse_text(node.function_head, options) << " "
-       << parse_text(node.function_expression, options) << ")";
-    return ss.str();
+    fmt::print(out, "(and {})", fmt::join(strings(node.precondition_goal_descriptors, formatter), " "));
 }
 
-std::string parse_text(const ast::EffectProduction& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::PreconditionGoalDescriptorAnd& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::PreconditionGoalDescriptorPreference& node, T formatter, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    fmt::print(out, "(preference {} {})", string(node.preference_name, formatter), string(node.goal_descriptor, formatter));
 }
 
-std::string parse_text(const ast::EffectCompositeForall& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::PreconditionGoalDescriptorPreference& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::PreconditionGoalDescriptorForall& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(forall " << parse_text(node.typed_list_of_variables, options) << " " << parse_text(node.effect, options) << ")";
-    return ss.str();
+    fmt::print(out, "(forall ({}) {})", string(node.typed_list_of_variables, formatter), string(node.precondition_goal_descriptor, formatter));
 }
 
-std::string parse_text(const ast::EffectCompositeWhen& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::PreconditionGoalDescriptorForall& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::AssignOperatorAssign&, T /*formatter*/, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(when " << parse_text(node.goal_descriptor, options) << " " << parse_text(node.effect, options) << ")";
-    return ss.str();
+    fmt::print(out, "assign");
 }
 
-std::string parse_text(const ast::EffectCompositeOneof& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::AssignOperatorAssign&, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::AssignOperatorScaleUp&, T /*formatter*/, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(oneof " << parse_text(node.possibilities, options) << ")";
-    return ss.str();
+    fmt::print(out, "scale-up");
 }
 
-std::string parse_text(const ast::EffectCompositeProbabilistic& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::AssignOperatorScaleUp&, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::AssignOperatorScaleDown&, T /*formatter*/, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(probabilistic ";
-    for (size_t i = 0; i < node.possibilities.size(); ++i)
-    {
-        if (i != 0)
-            ss << " ";
-        ss << parse_text(node.possibilities.at(i), options);
-    }
-    ss << ")";
-    return ss.str();
+    fmt::print(out, "scale-down");
 }
 
-std::string parse_text(const ast::EffectComposite& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::AssignOperatorScaleDown&, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::AssignOperatorIncrease&, T /*formatter*/, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    fmt::print(out, "increase");
 }
 
-std::string parse_text(const ast::ActionSymbol& node, const DefaultFormatterOptions& options) { return parse_text(node.name, options); }
+template void write<DefaultFormatter>(const ast::AssignOperatorIncrease&, DefaultFormatter formatter, std::ostream& out);
 
-std::string parse_text(const ast::ActionBody& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::AssignOperatorDecrease&, T /*formatter*/, std::ostream& out)
 {
-    std::stringstream ss;
-    if (node.precondition_goal_descriptor.has_value())
-    {
-        ss << std::string(options.indent, ' ') << ":precondition " << parse_text(node.precondition_goal_descriptor.value(), options) << "\n";
-    }
-    if (node.effect.has_value())
-    {
-        ss << std::string(options.indent, ' ') << ":effect " << parse_text(node.effect.value(), options);
-    }
-    return ss.str();
+    fmt::print(out, "decrease");
 }
 
-std::string parse_text(const ast::Action& node, const DefaultFormatterOptions& options)
-{
-    std::stringstream ss;
-    ss << std::string(options.indent, ' ') << "(:action " << parse_text(node.action_symbol, options) << "\n";
-    DefaultFormatterOptions nested_options { options.indent + options.add_indent, options.add_indent };
-    ss << std::string(nested_options.indent, ' ') << ":parameters (" << parse_text(node.typed_list_of_variables, nested_options) << ")\n"
-       << parse_text(node.action_body, nested_options) << "\n";
-    ss << std::string(options.indent, ' ') << ")";
+template void write<DefaultFormatter>(const ast::AssignOperatorDecrease&, DefaultFormatter formatter, std::ostream& out);
 
-    return ss.str();
+template<Formatter T>
+void write(const ast::AssignOperator& node, T formatter, std::ostream& out)
+{
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-std::string parse_text(const ast::Axiom& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::AssignOperator& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Effect& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << std::string(options.indent, ' ') << "(:derived " << parse_text(node.atomic_formula_skeleton, options) << "\n";
-    DefaultFormatterOptions nested_options { options.indent + options.add_indent, options.add_indent };
-    ss << std::string(nested_options.indent, ' ') << parse_text(node.goal_descriptor, options) << ")\n";
-    return ss.str();
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-std::string parse_text(const ast::DomainName& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::Effect& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::NumberAndEffect& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(domain " << parse_text(node.name, options) << ")";
-    return ss.str();
+    fmt::print(out, "{} {}", string(node.number, formatter), string(node.effect, formatter));
 }
 
-std::string parse_text(const ast::Requirements& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::NumberAndEffect& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::EffectProductionLiteral& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(:requirements ";
-    for (size_t i = 0; i < node.requirements.size(); ++i)
-    {
-        if (i != 0)
-            ss << " ";
-        ss << parse_text(node.requirements[i], options);
-    }
-    ss << ")";
-    return ss.str();
+    write(node.literal, formatter, out);
 }
 
-std::string parse_text(const ast::Types& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::EffectProductionLiteral& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::EffectProductionNumeric& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(:types " << parse_text(node.typed_list_of_names, options) << ")";
-    return ss.str();
+    fmt::print(out, "{} {}", string(node.assign_operator, formatter), string(node.function_head, formatter), string(node.function_expression, formatter));
 }
 
-std::string parse_text(const ast::Constants& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::EffectProductionNumeric& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::EffectProduction& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(:constants " << parse_text(node.typed_list_of_names, options) << ")";
-    return ss.str();
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-std::string parse_text(const ast::Predicates& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::EffectProduction& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::EffectCompositeForall& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(:predicates " << parse_text(node.atomic_formula_skeletons, options) << ")";
-    return ss.str();
+    fmt::print(out, "(forall ({}) {})", string(node.typed_list_of_variables, formatter), string(node.effect, formatter));
 }
 
-std::string parse_text(const ast::Functions& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::EffectCompositeForall& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::EffectCompositeWhen& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(:functions " << parse_text(node.function_types_list_of_atomic_function_skeletons, options) << ")";
-    return ss.str();
+    fmt::print(out, "(when {} {})", string(node.goal_descriptor, formatter), string(node.effect, formatter));
 }
 
-std::string parse_text(const ast::Constraints& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::EffectCompositeWhen& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::EffectCompositeOneof& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(:constraints " << parse_text(node.constraint_goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out, "(oneof {})", fmt::join(strings(node.possibilities, formatter), " "));
 }
 
-std::string parse_text(const ast::Structure& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
+template void write<DefaultFormatter>(const ast::EffectCompositeOneof& node, DefaultFormatter formatter, std::ostream& out);
 
-std::string parse_text(const ast::Domain& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::EffectCompositeProbabilistic& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << string(options.indent, ' ') << "(define " << parse_text(node.domain_name, options) << "\n";
-    auto nested_options = DefaultFormatterOptions { options.indent + options.add_indent, options.add_indent };
+    fmt::print(
+        out,
+        "(probabilistic {})",
+        fmt::join(node.possibilities | std::views::transform([&](const auto& child_node) { return fmt::format("{}", string(child_node, formatter)); }), " "));
+}
+
+template void write<DefaultFormatter>(const ast::EffectCompositeProbabilistic& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::EffectComposite& node, T formatter, std::ostream& out)
+{
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
+}
+
+template void write<DefaultFormatter>(const ast::EffectComposite& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ActionSymbol& node, T formatter, std::ostream& out)
+{
+    write(node.name, formatter, out);
+}
+
+template void write<DefaultFormatter>(const ast::ActionSymbol& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ActionBody& node, T formatter, std::ostream& out)
+{
+    auto indent = std::string(formatter.indent, ' ');
+    fmt::print(
+        out,
+        "{}\n",
+        node.precondition_goal_descriptor.has_value() ? indent + "(:precondition " + string(node.precondition_goal_descriptor.value(), formatter) + ")\n" : "",
+        node.effect.has_value() ? indent + "(:effect " + string(node.effect.value(), formatter) + ")\n" : "");
+}
+
+template void write<DefaultFormatter>(const ast::ActionBody& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Action& node, T formatter, std::ostream& out)
+{
+    // Header
+    fmt::print(out, "(:action {}\n", string(node.action_symbol, formatter));
+
+    formatter.indent += formatter.add_indent;
+    auto indent = std::string(formatter.indent, ' ');
+
+    // Parameters
+    fmt::print(out, "{}:parameters ({})\n", indent, string(node.typed_list_of_variables, formatter));
+
+    // Body
+    fmt::print(out, "{}:precondition {}\n", indent, string(node.action_body, formatter));
+
+    // End action
+    fmt::print(out, "{})", indent);
+}
+
+template void write<DefaultFormatter>(const ast::Action& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Axiom& node, T formatter, std::ostream& out)
+{
+    // Header line: "(:derived <pred> <params...\n"
+    fmt::print(out, "(:derived ({} {})\n", string(node.atomic_formula_skeleton, formatter), string(node.goal_descriptor, formatter));
+
+    formatter.indent += formatter.add_indent;
+    auto indent = std::string(formatter.indent, ' ');
+
+    // Conditions
+    fmt::print(out, "{}{}\n", indent, string(node.goal_descriptor, formatter));
+
+    formatter.indent -= formatter.add_indent;
+    indent = std::string(formatter.indent, ' ');
+
+    // End axiom
+    fmt::print(out, "{})", indent);
+}
+
+template void write<DefaultFormatter>(const ast::Axiom& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::DomainName& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "(domain {})", string(node.name, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::DomainName& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Requirements& node, T formatter, std::ostream& out)
+{
+    fmt::print(
+        out,
+        "(:requirements {})",
+        fmt::join(node.requirements | std::views::transform([&](const auto& child_node) { return fmt::format("{}", string(child_node, formatter)); }), " "));
+}
+
+template void write<DefaultFormatter>(const ast::Requirements& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Types& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "(:types {})", string(node.typed_list_of_names, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::Types& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Constants& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "(:constants {})", string(node.typed_list_of_names, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::Constants& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Predicates& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "(:predicates {})", fmt::join(strings(node.atomic_formula_skeletons, formatter), " "));
+}
+
+template void write<DefaultFormatter>(const ast::Predicates& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Functions& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "(:functions {})", string(node.function_types_list_of_atomic_function_skeletons, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::Functions& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Constraints& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "(:constraints {})", string(node.constraint_goal_descriptor, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::Constraints& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Structure& node, T formatter, std::ostream& out)
+{
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
+}
+
+template void write<DefaultFormatter>(const ast::Structure& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Domain& node, T formatter, std::ostream& out)
+{
+    auto indent = std::string(formatter.indent, ' ');
+
+    // Header
+    fmt::print(out, "{}(define (domain {})\n", indent, string(node.domain_name, formatter));
+
+    formatter.indent += formatter.add_indent;
+    indent = std::string(formatter.indent, ' ');
+
+    // Requirements
     if (node.requirements.has_value())
-    {
-        ss << string(nested_options.indent, ' ') << parse_text(node.requirements.value(), nested_options) << "\n";
-    }
+        fmt::print(out, "{}{}\n", indent, string(node.requirements.value(), formatter));
+
+    // Types
     if (node.types.has_value())
-    {
-        ss << string(nested_options.indent, ' ') << parse_text(node.types.value(), nested_options) << "\n";
-    }
+        fmt::print(out, "{}{}\n", indent, string(node.types.value(), formatter));
+
+    // Constants
     if (node.constants.has_value())
-    {
-        ss << string(nested_options.indent, ' ') << parse_text(node.constants.value(), nested_options) << "\n";
-    }
+        fmt::print(out, "{}{}\n", indent, string(node.constants.value(), formatter));
+
+    // Predicates
     if (node.predicates.has_value())
-    {
-        ss << string(nested_options.indent, ' ') << parse_text(node.predicates.value(), nested_options) << "\n";
-    }
+        fmt::print(out, "{}{}\n", indent, string(node.predicates.value(), formatter));
+
+    // Functions
     if (node.functions.has_value())
-    {
-        ss << string(nested_options.indent, ' ') << parse_text(node.functions.value(), nested_options) << "\n";
-    }
-    if (node.constraints.has_value())
-    {
-        ss << string(nested_options.indent, ' ') << parse_text(node.constraints.value(), nested_options) << "\n";
-    }
-    for (size_t i = 0; i < node.structures.size(); ++i)
-    {
-        ss << string(nested_options.indent, ' ') << parse_text(node.structures[i], nested_options) << "\n";
-    }
-    ss << std::string(options.indent, ' ') << ")";
-    return ss.str();
+        fmt::print(out, "{}{}\n", indent, string(node.functions.value(), formatter));
+
+    for (const auto& structure : node.structures)
+        fmt::print(out, "{}{}\n", indent, string(structure, formatter));
+
+    formatter.indent -= formatter.add_indent;
+    indent = std::string(formatter.indent, ' ');
+
+    // End domain
+    fmt::print(out, "{})", indent);
 }
 
-string parse_text(const ast::GroundFunction& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::Domain& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::GroundFunction& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
     if (node.names.size() > 0)
-    {
-        ss << "(" << parse_text(node.function_symbol, options) << " " << parse_text(node.names, options) << ")";
-    }
+        fmt::print(out, "({} {})", string(node.function_symbol, formatter), fmt::join(strings(node.names, formatter), " "));
     else
-    {
-        ss << parse_text(node.function_symbol, options);
-    }
-    return ss.str();
+        fmt::print(out, "({})", string(node.function_symbol, formatter));
 }
 
-string parse_text(const ast::AtomicFormulaOfNamesPredicate& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::GroundFunction& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::AtomicFormulaOfNamesPredicate& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(" << parse_text(node.predicate, options) << " " << parse_text(node.names, options) << ")";
-    return ss.str();
+    fmt::print(out, "({} {})", string(node.predicate, formatter), fmt::join(strings(node.names, formatter), " "));
 }
 
-string parse_text(const ast::AtomicFormulaOfNamesEquality& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::AtomicFormulaOfNamesPredicate& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::AtomicFormulaOfNamesEquality& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(" << "= " << parse_text(node.name_left, options) << " " << parse_text(node.name_right, options) << ")";
-    return ss.str();
+    fmt::print(out, "(= {} {})", string(node.name_left, formatter), string(node.name_right, formatter));
 }
 
-string parse_text(const ast::AtomicFormulaOfNames& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::AtomicFormulaOfNamesEquality& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::AtomicFormulaOfNames& node, T formatter, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-string parse_text(const ast::GroundAtom& node, const DefaultFormatterOptions& options) { return parse_text(node.atomic_formula_of_names, options); }
+template void write<DefaultFormatter>(const ast::AtomicFormulaOfNames& node, DefaultFormatter formatter, std::ostream& out);
 
-string parse_text(const ast::NegatedGroundAtom& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::GroundAtom& node, T formatter, std::ostream& out)
 {
-    std::stringstream ss;
-    ss << "(not " << parse_text(node.atomic_formula_of_names, options) << ")";
-    return ss.str();
+    write(node.atomic_formula_of_names, formatter, out);
 }
 
-string parse_text(const ast::GroundLiteral& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
+template void write<DefaultFormatter>(const ast::GroundAtom& node, DefaultFormatter formatter, std::ostream& out);
 
-string parse_text(const ast::InitialElementLiteral& node, const DefaultFormatterOptions& options) { return parse_text(node.literal, options); }
-
-string parse_text(const ast::InitialElementTimedLiteral& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::NegatedGroundAtom& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(at " << parse_text(node.number, options) << " " << parse_text(node.literal, options) << ")";
-    return ss.str();
+    fmt::print(out, "(not {})", string(node.atomic_formula_of_names, formatter));
 }
 
-string parse_text(const ast::InitialElementFunctionValue& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::NegatedGroundAtom& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::GroundLiteral& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(= " << parse_text(node.ground_function, options) << " " << parse_text(node.number, options) << ")";
-    return ss.str();
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-string parse_text(const ast::InitialElement& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
+template void write<DefaultFormatter>(const ast::GroundLiteral& node, DefaultFormatter formatter, std::ostream& out);
 
-string parse_text(const ast::MetricFunctionExpression& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::InitialElementLiteral& node, T formatter, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    write(node.literal, formatter, out);
 }
 
-string parse_text(const ast::MetricFunctionExpressionNumber& node, const DefaultFormatterOptions& options) { return parse_text(node.number, options); }
+template void write<DefaultFormatter>(const ast::InitialElementLiteral& node, DefaultFormatter formatter, std::ostream& out);
 
-string parse_text(const ast::MetricFunctionExpressionBinaryOperator& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::InitialElementTimedLiteral& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(" << parse_text(node.binary_operator, options) << " " << parse_text(node.metric_left_function_expression, options) << " "
-       << parse_text(node.metric_right_function_expression, options) << ")";
-    return ss.str();
+    fmt::print(out, "(at {} {})", string(node.number, formatter), string(node.literal, formatter));
 }
 
-string parse_text(const ast::MetricFunctionExpressionMultiOperator& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::InitialElementTimedLiteral& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::InitialElementFunctionValue& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(" << parse_text(node.multi_operator, options) << " " << parse_text(node.metric_function_expression_first, options) << " "
-       << parse_text(node.metric_function_expression_remaining, options) << ")";
-    return ss.str();
+    fmt::print(out, "(= {} {})", string(node.ground_function, formatter), string(node.number, formatter));
 }
 
-string parse_text(const ast::MetricFunctionExpressionMinus& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::InitialElementFunctionValue& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::InitialElement& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(-" << parse_text(node.metric_function_expression, options) << ")";
-    return ss.str();
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-string parse_text(const ast::MetricFunctionExpressionBasicFunctionTerm& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::InitialElement& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::MetricFunctionExpression& node, T formatter, std::ostream& out)
 {
-    return parse_text(node.ground_function, options);
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-string parse_text(const ast::MetricFunctionExpressionTotalTime&, const DefaultFormatterOptions&) { return "total-time"; }
+template void write<DefaultFormatter>(const ast::MetricFunctionExpression& node, DefaultFormatter formatter, std::ostream& out);
 
-string parse_text(const ast::MetricFunctionExpressionPreferences& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::MetricFunctionExpressionNumber& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(" << "is-violated " << parse_text(node.preference_name, options) << ")";
-    return ss.str();
+    write(node.number, formatter, out);
 }
 
-string parse_text(const ast::OptimizationMinimize&, const DefaultFormatterOptions&) { return "minimize"; }
-string parse_text(const ast::OptimizationMaximize&, const DefaultFormatterOptions&) { return "maximize"; }
-string parse_text(const ast::Optimization& node, const DefaultFormatterOptions& options) { return boost::apply_visitor(NodeVisitorPrinter(options), node); }
+template void write<DefaultFormatter>(const ast::MetricFunctionExpressionNumber& node, DefaultFormatter formatter, std::ostream& out);
 
-std::string parse_text(const ast::MetricSpecificationTotalCost& node, const DefaultFormatterOptions& options)
+template<Formatter T>
+void write(const ast::MetricFunctionExpressionBinaryOperator& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(:metric " << parse_text(node.optimization_minimize, options) << " " << parse_text(node.function_symbol_total_cost, options) << ")";
-    return ss.str();
+    fmt::print(out,
+               "({} {} {})",
+               string(node.binary_operator, formatter),
+               string(node.metric_left_function_expression, formatter),
+               string(node.metric_right_function_expression, formatter));
 }
 
-std::string parse_text(const ast::MetricSpecificationGeneral& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::MetricFunctionExpressionBinaryOperator& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::MetricFunctionExpressionMultiOperator& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(:metric " << parse_text(node.optimization, options) << " " << parse_text(node.metric_function_expression, options) << ")";
-    return ss.str();
+    fmt::print(out,
+               "({} {} {})",
+               string(node.multi_operator, formatter),
+               string(node.metric_function_expression_first, formatter),
+               fmt::join(strings(node.metric_function_expression_remaining, formatter), " "));
 }
 
-string parse_text(const ast::PreferenceConstraintGoalDescriptor& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::MetricFunctionExpressionMultiOperator& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::MetricFunctionExpressionMinus& node, T formatter, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    fmt::print(out, "(- {})", string(node.metric_function_expression, formatter));
 }
 
-string parse_text(const ast::PreferenceConstraintGoalDescriptorAnd& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::MetricFunctionExpressionMinus& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::MetricFunctionExpressionBasicFunctionTerm& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(and " << parse_text(node.preference_constraint_goal_descriptors, options) << ")";
-    return ss.str();
+    write(node.ground_function, formatter, out);
 }
 
-string parse_text(const ast::PreferenceConstraintGoalDescriptorForall& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::MetricFunctionExpressionBasicFunctionTerm& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::MetricFunctionExpressionTotalTime& /*node*/, T /*formatter*/, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(forall " << parse_text(node.typed_list_of_variables, options) << " " << parse_text(node.preference_constraint_goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out, "total-time");
 }
 
-string parse_text(const ast::PreferenceConstraintGoalDescriptorPreference& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::MetricFunctionExpressionTotalTime& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::MetricFunctionExpressionPreferences& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(preference ";
-    if (node.preference_name.has_value())
-    {
-        ss << parse_text(node.preference_name.value(), options) << " ";
-    }
-    ss << parse_text(node.constraint_goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out, "(is-violated {})", string(node.preference_name, formatter));
 }
 
-string parse_text(const ast::PreferenceConstraintGoalDescriptorSimple& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::MetricFunctionExpressionPreferences& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::OptimizationMinimize& /*node*/, T /*formatter*/, std::ostream& out)
 {
-    return parse_text(node.constraint_goal_descriptor, options);
+    fmt::print(out, "minimize");
 }
 
-string parse_text(const ast::ProblemName& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::OptimizationMinimize&, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::OptimizationMaximize& /*node*/, T /*formatter*/, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(problem " << parse_text(node.name, options) << ")";
-    return ss.str();
+    fmt::print(out, "maximize");
 }
 
-string parse_text(const ast::ProblemDomainName& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::OptimizationMaximize&, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Optimization& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(:domain " << parse_text(node.name, options) << ")";
-    return ss.str();
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-string parse_text(const ast::Objects& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::Optimization& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::MetricSpecificationTotalCost& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(:objects " << parse_text(node.typed_list_of_names, options) << ")";
-    return ss.str();
+    fmt::print(out, "(:metric {} {})", string(node.optimization_minimize, formatter), string(node.function_symbol_total_cost, formatter));
 }
 
-string parse_text(const ast::Initial& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::MetricSpecificationTotalCost& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::MetricSpecificationGeneral& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(:init " << parse_text(node.initial_elements, options) << ")";
-    return ss.str();
+    fmt::print(out, "(:metric {} {})", string(node.optimization, formatter), string(node.metric_function_expression, formatter));
 }
 
-string parse_text(const ast::Goal& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::MetricSpecificationGeneral& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::PreferenceConstraintGoalDescriptor& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(:goal " << parse_text(node.precondition_goal_descriptor, options) << ")";
-    return ss.str();
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
 }
 
-string parse_text(const ast::ProblemConstraints& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::PreferenceConstraintGoalDescriptor& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::PreferenceConstraintGoalDescriptorAnd& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << "(:constraints " << parse_text(node.preference_constraint_goal_descriptor, options) << ")";
-    return ss.str();
+    fmt::print(out, "(and {})", fmt::join(string(node.preference_constraint_goal_descriptors, formatter), " "));
 }
 
-string parse_text(const ast::MetricSpecification& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::PreferenceConstraintGoalDescriptorAnd& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::PreferenceConstraintGoalDescriptorForall& node, T formatter, std::ostream& out)
 {
-    return boost::apply_visitor(NodeVisitorPrinter(options), node);
+    fmt::print(out, "(forall ({}) {})", string(node.typed_list_of_variables, formatter), string(node.preference_constraint_goal_descriptor, formatter));
 }
 
-string parse_text(const ast::Problem& node, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::PreferenceConstraintGoalDescriptorForall& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::PreferenceConstraintGoalDescriptorPreference& node, T formatter, std::ostream& out)
 {
-    stringstream ss;
-    ss << string(options.indent, ' ') << "(define " << parse_text(node.problem_name, options) << "\n";
-    auto nested_options = DefaultFormatterOptions { options.indent + options.add_indent, options.add_indent };
-    ss << string(nested_options.indent, ' ') << parse_text(node.domain_name, nested_options) << "\n";
+    fmt::print(out,
+               "(preference{} {})",
+               node.preference_name.has_value() ? " " + string(node.preference_name.value(), formatter) : "",
+               string(node.constraint_goal_descriptor, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::PreferenceConstraintGoalDescriptorPreference& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::PreferenceConstraintGoalDescriptorSimple& node, T formatter, std::ostream& out)
+{
+    write(node.constraint_goal_descriptor, formatter, out);
+}
+
+template void write<DefaultFormatter>(const ast::PreferenceConstraintGoalDescriptorSimple& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ProblemName& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "(problem {})", string(node.name, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::ProblemName& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ProblemDomainName& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "(:domain {})", string(node.name, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::ProblemDomainName& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Objects& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "(:objects {})", string(node.typed_list_of_names, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::Objects& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Initial& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "(:init {})", fmt::join(strings(node.initial_elements, formatter), " "));
+}
+
+template void write<DefaultFormatter>(const ast::Initial& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Goal& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "(:goal {})", string(node.precondition_goal_descriptor, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::Goal& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::ProblemConstraints& node, T formatter, std::ostream& out)
+{
+    fmt::print(out, "(:constraints {})", string(node.preference_constraint_goal_descriptor, formatter));
+}
+
+template void write<DefaultFormatter>(const ast::ProblemConstraints& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::MetricSpecification& node, T formatter, std::ostream& out)
+{
+    boost::apply_visitor(NodeVisitorPrinter(formatter, out), node);
+}
+
+template void write<DefaultFormatter>(const ast::MetricSpecification& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+void write(const ast::Problem& node, T formatter, std::ostream& out)
+{
+    auto indent = std::string(formatter.indent, ' ');
+
+    // Header
+    fmt::print(out, "{}(define (domain {})\n", indent, string(node.domain_name, formatter));
+
+    formatter.indent += formatter.add_indent;
+    indent = std::string(formatter.indent, ' ');
+
+    // Requirements
     if (node.requirements.has_value())
-    {
-        ss << string(nested_options.indent, ' ') << parse_text(node.requirements.value(), nested_options) << "\n";
-    }
+        fmt::print(out, "{}{}\n", indent, string(node.requirements.value(), formatter));
+
+    // Objects
     if (node.objects.has_value())
-    {
-        ss << string(nested_options.indent, ' ') << parse_text(node.objects.value(), nested_options) << "\n";
-    }
+        fmt::print(out, "{}{}\n", indent, string(node.objects.value(), formatter));
+
+    // Initial
     if (node.initial.has_value())
-    {
-        ss << string(nested_options.indent, ' ') << parse_text(node.initial.value(), nested_options) << "\n";
-    }
+        fmt::print(out, "{}{}\n", indent, string(node.initial.value(), formatter));
+
+    // Goal
     if (node.goal.has_value())
-    {
-        ss << string(nested_options.indent, ' ') << parse_text(node.goal.value(), nested_options) << "\n";
-    }
+        fmt::print(out, "{}{}\n", indent, string(node.goal.value(), formatter));
+
+    // Constraints
     if (node.constraints.has_value())
-    {
-        ss << string(nested_options.indent, ' ') << parse_text(node.constraints.value(), nested_options) << "\n";
-    }
+        fmt::print(out, "{}{}\n", indent, string(node.constraints.value(), formatter));
+
+    // Metric
     if (node.metric_specification.has_value())
-    {
-        ss << string(nested_options.indent, ' ') << parse_text(node.metric_specification.value(), nested_options) << "\n";
-    }
-    ss << string(options.indent, ' ') << ")";
-    return ss.str();
+        fmt::print(out, "{}{}\n", indent, string(node.metric_specification.value(), formatter));
+
+    formatter.indent -= formatter.add_indent;
+    indent = std::string(formatter.indent, ' ');
+
+    // End problem
+    fmt::print(out, "{})", indent);
 }
 
-template<typename T>
-inline std::string parse_text(const std::vector<T>& nodes, const DefaultFormatterOptions& options)
+template void write<DefaultFormatter>(const ast::Problem& node, DefaultFormatter formatter, std::ostream& out);
+
+template<Formatter T>
+template<typename Node>
+void NodeVisitorPrinter<T>::operator()(const Node& node) const
 {
-    std::stringstream ss;
-    for (size_t i = 0; i < nodes.size(); ++i)
-    {
-        if (i != 0)
-            ss << " ";
-        ss << parse_text(nodes[i], options);
-    }
-    return ss.str();
+    write(node, formatter, out);
 }
+
+template<Formatter F, std::ranges::input_range Range>
+void write(const Range& range, F formatter, std::ostream& out)
+{
+    fmt::print(out, "{}", fmt::join(strings(range, formatter), " "));
+}
+
 }
