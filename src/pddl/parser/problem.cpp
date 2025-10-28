@@ -108,14 +108,14 @@ void parse(const ast::Problem& node, ProblemParsingContext& context)
     }
 
     /* Structure section */
+    auto axioms = AxiomList();
+    auto actions = ActionList();
     for (const auto& structure_node : node.structures)
     {
-        auto axioms = AxiomList();
-        auto actions = ActionList();
         auto variant = parse(structure_node, context);
         std::visit(UnpackingVisitor(actions, axioms), variant);
-        context.builder.get_axioms() = std::move(axioms);
     }
+    context.builder.get_axioms() = std::move(axioms);
 
     // Check references
     test_object_references(objects, context);

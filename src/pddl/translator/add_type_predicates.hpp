@@ -34,11 +34,15 @@ private:
     // Provide default implementations
     using RecursiveCachedBaseTranslator::translate_level_2;
 
+    bool m_remove_typing;
+
     /**
      * Translate
      */
 
+    Requirements translate_level_2(Requirements requirements, Repositories& repositories);
     Object translate_level_2(Object object, Repositories& repositories);
+    Parameter translate_level_2(Parameter parameter, Repositories& repositories);
     Condition translate_level_2(ConditionExists condition, Repositories& repositories);
     Condition translate_level_2(ConditionForall condition, Repositories& repositories);
     Effect translate_level_2(EffectCompositeForall effect, Repositories& repositories);
@@ -46,6 +50,9 @@ private:
     Axiom translate_level_2(Axiom axiom, Repositories& repositories);
     Domain translate_level_2(const Domain& domain, DomainBuilder& builder);
     Problem translate_level_2(const Problem& problem, ProblemBuilder& builder);
+
+public:
+    AddTypePredicatesTranslator(bool remove_typing);
 };
 
 }

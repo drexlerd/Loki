@@ -20,7 +20,6 @@
 #include "translator/add_type_predicates.hpp"
 #include "translator/initialize_equality.hpp"
 #include "translator/move_existential_quantifiers.hpp"
-#include "translator/remove_typing.hpp"
 #include "translator/remove_universal_quantifiers.hpp"
 #include "translator/rename_quantified_variables.hpp"
 #include "translator/simplify_goal.hpp"
@@ -88,7 +87,7 @@ DomainTranslationResult translate(const Domain& domain, const TranslatorOptions&
     // std::cout << *translated_domain << std::endl;
 
     /* Type translator cannot come before removal of universal quantifiers because of negations. */
-    auto remove_types_translator = AddTypePredicatesTranslator();
+    auto remove_types_translator = AddTypePredicatesTranslator(options.remove_typing);
     builder = DomainBuilder();
     translated_domain = remove_types_translator.translate_level_0(translated_domain, builder);
 
@@ -109,16 +108,6 @@ DomainTranslationResult translate(const Domain& domain, const TranslatorOptions&
     // std::cout << "InitializeEqualityTranslator result: " << std::endl;
     // std::cout << *translated_domain << std::endl;
 
-    if (options.remove_typing)
-    {
-        auto remove_typing_translator = RemoveTypingTranslator();
-        builder = DomainBuilder();
-        translated_domain = remove_typing_translator.translate_level_0(translated_domain, builder);
-
-        // std::cout << "RemoveTypingTranslator result: " << std::endl;
-        // std::cout << *translated_domain << std::endl;
-    }
-
     return DomainTranslationResult(domain, translated_domain);
 }
 
@@ -135,17 +124,14 @@ Problem translate(const Problem& problem, const DomainTranslationResult& result,
 
     auto translated_problem = problem;
 
-    if (options.remove_typing)
-    {
-        auto remove_typing_translator = RemoveTypingTranslator();  // Run first to ensure matching predicates
-        auto builder = ProblemBuilder(result.get_translated_domain());
-        translated_problem = remove_typing_translator.translate_level_0(problem, builder);
+    auto remove_types_translator = AddTypePredicatesTranslator(options.remove_typing);
+    auto builder = ProblemBuilder(result.get_translated_domain());
+    translated_problem = remove_types_translator.translate_level_0(translated_problem, builder);
 
-        // std::cout << "RemoveTypingTranslator result: " << std::endl;
-    }
+    // std::cout << "AddTypePredicatesTranslator result: " << std::endl;
 
     auto to_negation_normal_form_translator = ToNegationNormalFormTranslator();
-    auto builder = ProblemBuilder(result.get_translated_domain());
+    builder = ProblemBuilder(result.get_translated_domain());
     translated_problem = to_negation_normal_form_translator.translate_level_0(translated_problem, builder);
 
     // std::cout << "ToNegationNormalFormTranslator result: " << std::endl;
@@ -185,12 +171,6 @@ Problem translate(const Problem& problem, const DomainTranslationResult& result,
     translated_problem = move_existential_quantifiers_translator.translate_level_0(translated_problem, builder);
 
     // std::cout << "MoveExistentialQuantifiersTranslator result: " << std::endl;
-
-    auto remove_types_translator = AddTypePredicatesTranslator();
-    builder = ProblemBuilder(result.get_translated_domain());
-    translated_problem = remove_types_translator.translate_level_0(translated_problem, builder);
-
-    // std::cout << "AddTypePredicatesTranslator result: " << std::endl;
 
     auto to_effect_normal_form_translator = ToEffectNormalFormTranslator();
     builder = ProblemBuilder(result.get_translated_domain());

@@ -30,13 +30,13 @@ static Predicate create_type_predicate(Type translated_type, Repositories& repos
         ParameterList { repositories.get_or_create_parameter(repositories.get_or_create_variable("?arg"), TypeList { translated_type }) });
 }
 
-static LiteralList create_literals_for_object_types(Object translated_object, Repositories& repositories)
+static LiteralList create_literals_for_object_types(Object translated_object, const TypeList& translated_types, Repositories& repositories)
 {
     auto additional_literals = LiteralList {};
     auto translated_term = repositories.get_or_create_term(translated_object);
-    auto types = collect_types_from_hierarchy(translated_object->get_bases());
+    auto translated_types_hierarchy = collect_types_from_hierarchy(translated_types);
 
-    for (const auto& type : types)
+    for (const auto& type : translated_types_hierarchy)
     {
         auto additional_literal =
             repositories.get_or_create_literal(true, repositories.get_or_create_atom(create_type_predicate(type, repositories), TermList { translated_term }));
@@ -45,12 +45,12 @@ static LiteralList create_literals_for_object_types(Object translated_object, Re
     return additional_literals;
 }
 
-static ConditionList create_condition_literals_for_parameter_types(Parameter translated_parameter, Repositories& repositories)
+static ConditionList create_condition_literals_for_parameter_types(Parameter translated_parameter, const TypeList& translated_types, Repositories& repositories)
 {
     auto conditions = ConditionList {};
-    auto types = collect_types_from_hierarchy(translated_parameter->get_bases());
+    auto translated_type_hierarchy = collect_types_from_hierarchy(translated_types);
 
-    for (const auto& type : types)
+    for (const auto& type : translated_type_hierarchy)
     {
         auto condition = repositories.get_or_create_condition(repositories.get_or_create_condition_literal(repositories.get_or_create_literal(
             true,
@@ -62,20 +62,36 @@ static ConditionList create_condition_literals_for_parameter_types(Parameter tra
     return conditions;
 }
 
+Requirements AddTypePredicatesTranslator::translate_level_2(Requirements requirements, Repositories& repositories)
+{
+    auto requirements_set = requirements->get_requirements();
+    if (m_remove_typing)
+        requirements_set.erase(loki::RequirementEnum::TYPING);
+    return repositories.get_or_create_requirements(requirements_set);
+}
+
 Object AddTypePredicatesTranslator::translate_level_2(Object object, Repositories& repositories)
 {
-    return repositories.get_or_create_object(object->get_name(), this->translate_level_0(object->get_bases(), repositories));
+    return repositories.get_or_create_object(object->get_name(), m_remove_typing ? TypeList {} : this->translate_level_0(object->get_bases(), repositories));
+}
+
+Parameter AddTypePredicatesTranslator::translate_level_2(Parameter parameter, Repositories& repositories)
+{
+    return repositories.get_or_create_parameter(this->translate_level_0(parameter->get_variable(), repositories),
+                                                m_remove_typing ? TypeList {} : this->translate_level_0(parameter->get_bases(), repositories));
 }
 
 Condition AddTypePredicatesTranslator::translate_level_2(ConditionExists condition, Repositories& repositories)
 {
-    // Translate parameters
-    auto translated_parameters = this->translate_level_0(condition->get_parameters(), repositories);
+    auto translated_parameters = ParameterList {};
     auto translated_part_conditions = ConditionList {};
 
-    for (const auto& translated_parameter : translated_parameters)
+    for (const auto& parameter : condition->get_parameters())
     {
-        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, repositories);
+        auto translated_parameter = this->translate_level_0(parameter, repositories);
+        translated_parameters.push_back(translated_parameter);
+        auto translated_types = this->translate_level_0(parameter->get_bases(), repositories);
+        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, translated_types, repositories);
         translated_part_conditions.insert(translated_part_conditions.end(), translated_condition_literals.begin(), translated_condition_literals.end());
     }
 
@@ -88,13 +104,15 @@ Condition AddTypePredicatesTranslator::translate_level_2(ConditionExists conditi
 
 Condition AddTypePredicatesTranslator::translate_level_2(ConditionForall condition, Repositories& repositories)
 {
-    // Translate parameters
-    auto translated_parameters = this->translate_level_0(condition->get_parameters(), repositories);
+    auto translated_parameters = ParameterList {};
     auto translated_part_conditions = ConditionList {};
 
-    for (const auto& translated_parameter : translated_parameters)
+    for (const auto& parameter : condition->get_parameters())
     {
-        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, repositories);
+        auto translated_parameter = this->translate_level_0(parameter, repositories);
+        translated_parameters.push_back(translated_parameter);
+        auto translated_types = this->translate_level_0(parameter->get_bases(), repositories);
+        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, translated_types, repositories);
         translated_part_conditions.insert(translated_part_conditions.end(), translated_condition_literals.begin(), translated_condition_literals.end());
     }
 
@@ -108,12 +126,15 @@ Condition AddTypePredicatesTranslator::translate_level_2(ConditionForall conditi
 Effect AddTypePredicatesTranslator::translate_level_2(EffectCompositeForall effect, Repositories& repositories)
 {
     // Translate parameters
-    auto translated_parameters = this->translate_level_0(effect->get_parameters(), repositories);
+    auto translated_parameters = ParameterList {};
     auto translated_part_conditions = ConditionList {};
 
-    for (const auto& translated_parameter : translated_parameters)
+    for (const auto& parameter : effect->get_parameters())
     {
-        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, repositories);
+        auto translated_parameter = this->translate_level_0(parameter, repositories);
+        translated_parameters.push_back(translated_parameter);
+        auto translated_types = this->translate_level_0(parameter->get_bases(), repositories);
+        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, translated_types, repositories);
         translated_part_conditions.insert(translated_part_conditions.end(), translated_condition_literals.begin(), translated_condition_literals.end());
     }
 
@@ -131,12 +152,15 @@ Effect AddTypePredicatesTranslator::translate_level_2(EffectCompositeForall effe
 Axiom AddTypePredicatesTranslator::translate_level_2(Axiom axiom, Repositories& repositories)
 {
     // Translate parameters
-    auto translated_parameters = this->translate_level_0(axiom->get_parameters(), repositories);
+    auto translated_parameters = ParameterList {};
     auto translated_part_conditions = ConditionList {};
 
-    for (const auto& translated_parameter : translated_parameters)
+    for (const auto& parameter : axiom->get_parameters())
     {
-        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, repositories);
+        auto translated_parameter = this->translate_level_0(parameter, repositories);
+        translated_parameters.push_back(translated_parameter);
+        auto translated_types = this->translate_level_0(parameter->get_bases(), repositories);
+        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, translated_types, repositories);
         translated_part_conditions.insert(translated_part_conditions.end(), translated_condition_literals.begin(), translated_condition_literals.end());
     }
 
@@ -154,12 +178,15 @@ Axiom AddTypePredicatesTranslator::translate_level_2(Axiom axiom, Repositories& 
 Action AddTypePredicatesTranslator::translate_level_2(Action action, Repositories& repositories)
 {
     // Translate parameters
-    auto translated_parameters = this->translate_level_0(action->get_parameters(), repositories);
+    auto translated_parameters = ParameterList {};
     auto translated_part_conditions = ConditionList {};
 
-    for (const auto& translated_parameter : translated_parameters)
+    for (const auto& parameter : action->get_parameters())
     {
-        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, repositories);
+        auto translated_parameter = this->translate_level_0(parameter, repositories);
+        translated_parameters.push_back(translated_parameter);
+        auto translated_types = this->translate_level_0(parameter->get_bases(), repositories);
+        auto translated_condition_literals = create_condition_literals_for_parameter_types(translated_parameter, translated_types, repositories);
         translated_part_conditions.insert(translated_part_conditions.end(), translated_condition_literals.begin(), translated_condition_literals.end());
     }
 
@@ -184,19 +211,22 @@ Domain AddTypePredicatesTranslator::translate_level_2(const Domain& domain, Doma
 
     builder.get_requirements() = this->translate_level_0(domain->get_requirements(), repositories);
 
-    builder.get_types() = this->translate_level_0(domain->get_types(), repositories);
-
     // Introduce static type predicates.
-    for (const auto& type : collect_types_from_hierarchy(builder.get_types()))
+    for (const auto& type : collect_types_from_hierarchy(this->translate_level_0(domain->get_types(), repositories)))
     {
         builder.get_predicates().insert(builder.get_predicates().end(), create_type_predicate(type, repositories));
     }
 
+    if (!m_remove_typing)
+        builder.get_types() = this->translate_level_0(domain->get_types(), repositories);
+
     // Introduce static initial literals for constant types.
-    for (const auto& object : this->translate_level_0(domain->get_constants(), repositories))
+    for (const auto& object : domain->get_constants())
     {
-        builder.get_constants().push_back(object);
-        auto additional_literals = create_literals_for_object_types(object, repositories);
+        auto translated_object = this->translate_level_0(object, repositories);
+        auto translated_types = this->translate_level_0(object->get_bases(), repositories);
+        builder.get_constants().push_back(translated_object);
+        auto additional_literals = create_literals_for_object_types(translated_object, translated_types, repositories);
         builder.get_static_initial_literals().insert(builder.get_static_initial_literals().end(), additional_literals.begin(), additional_literals.end());
     }
 
@@ -229,10 +259,12 @@ Problem AddTypePredicatesTranslator::translate_level_2(const Problem& problem, P
     builder.get_requirements() = this->translate_level_0(problem->get_requirements(), repositories);
 
     // Introduce static initial literals for object types
-    for (const auto& object : this->translate_level_0(problem->get_objects(), repositories))
+    for (const auto& object : problem->get_objects())
     {
-        builder.get_objects().push_back(object);
-        auto additional_literals = create_literals_for_object_types(object, repositories);
+        auto translated_object = this->translate_level_0(object, repositories);
+        auto translated_types = this->translate_level_0(object->get_bases(), repositories);
+        builder.get_objects().push_back(translated_object);
+        auto additional_literals = create_literals_for_object_types(translated_object, translated_types, repositories);
         builder.get_initial_literals().insert(builder.get_initial_literals().end(), additional_literals.begin(), additional_literals.end());
     }
     // Make constants untyped
@@ -260,5 +292,7 @@ Problem AddTypePredicatesTranslator::translate_level_2(const Problem& problem, P
 
     return builder.get_result(problem->get_index());
 }
+
+AddTypePredicatesTranslator::AddTypePredicatesTranslator(bool remove_typing) : m_remove_typing(remove_typing) {}
 
 }

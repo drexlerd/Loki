@@ -77,6 +77,7 @@ Problem InitializeEqualityTranslator::translate_level_2(const Problem& problem, 
         builder.get_goal_condition() = this->translate_level_0(problem->get_goal_condition().value(), repositories);
     if (problem->get_optimization_metric().has_value())
         builder.get_optimization_metric() = this->translate_level_0(problem->get_optimization_metric().value(), repositories);
+
     builder.get_axioms() = this->translate_level_0(problem->get_axioms(), repositories);
 
     return builder.get_result(problem->get_index());
