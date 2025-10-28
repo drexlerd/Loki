@@ -22,7 +22,7 @@
 #include "loki/details/pddl/domain_builder.hpp"
 #include "loki/details/pddl/parser_options.hpp"
 #include "loki/details/pddl/position_cache.hpp"
-#include "loki/details/pddl/reference.hpp"
+#include "loki/details/pddl/reference_tracker.hpp"
 #include "loki/details/pddl/scope.hpp"
 
 namespace loki
@@ -31,8 +31,8 @@ namespace loki
 struct DomainParsingContext
 {
     ScopeStack& scopes;
-    PDDLPositionCache& positions;
-    ReferencedPDDLObjects references;
+    PositionCaches& positions;
+    ReferenceTrackers references;
 
     ParserOptions options;
 
@@ -42,7 +42,7 @@ struct DomainParsingContext
 
     bool ignore_free_variables;  ///< We must allow free variables in axioms.
 
-    DomainParsingContext(ScopeStack& scopes, PDDLPositionCache& positions, const ParserOptions& options) :
+    DomainParsingContext(ScopeStack& scopes, PositionCaches& positions, const ParserOptions& options) :
         scopes(scopes),
         positions(positions),
         references(),

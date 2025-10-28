@@ -23,7 +23,7 @@
 #include "loki/details/pddl/parser_options.hpp"
 #include "loki/details/pddl/position_cache.hpp"
 #include "loki/details/pddl/problem_builder.hpp"
-#include "loki/details/pddl/reference.hpp"
+#include "loki/details/pddl/reference_tracker.hpp"
 #include "loki/details/pddl/scope.hpp"
 
 namespace loki
@@ -32,8 +32,8 @@ namespace loki
 struct ProblemParsingContext
 {
     ScopeStack& scopes;
-    PDDLPositionCache& positions;
-    ReferencedPDDLObjects references;
+    PositionCaches& positions;
+    ReferenceTrackers references;
 
     ParserOptions options;
 
@@ -43,7 +43,7 @@ struct ProblemParsingContext
 
     bool ignore_free_variables;  ///< We must allow free variables in axioms.
 
-    ProblemParsingContext(ScopeStack& scopes, PDDLPositionCache& positions, const Domain& domain, const ParserOptions& options) :
+    ProblemParsingContext(ScopeStack& scopes, PositionCaches& positions, const Domain& domain, const ParserOptions& options) :
         scopes(scopes),
         positions(positions),
         references(),

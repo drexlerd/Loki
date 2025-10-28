@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_INCLUDE_LOKI_PDDL_REFERENCE_HPP_
-#define LOKI_INCLUDE_LOKI_PDDL_REFERENCE_HPP_
+#ifndef LOKI_INCLUDE_LOKI_PDDL_REFERENCE_TRACKER_HPP_
+#define LOKI_INCLUDE_LOKI_PDDL_REFERENCE_TRACKER_HPP_
 
 #include "loki/details/ast/config.hpp"
 #include "loki/details/pddl/declarations.hpp"
@@ -41,7 +41,7 @@ namespace loki
 ///        3. Verify that all variables are untracked, meaning
 ///           that they were referenced at least once.
 template<typename... Ts>
-class References
+class ReferenceTracker
 {
 private:
     std::tuple<std::unordered_set<Ts>...> references;
@@ -49,21 +49,31 @@ private:
 public:
     /// @brief Returns a pointer if it exists.
     template<typename T>
-    bool exists(T reference) const;
+    bool exists(T reference) const
+    {
+        const auto& t_references = std::get<std::unordered_set<T>>(references);
+        return t_references.count(reference);
+    }
 
     /// @brief Inserts a pointer of type T
     template<typename T>
-    void track(T reference);
+    void track(T reference)
+    {
+        auto& t_references = std::get<std::unordered_set<T>>(references);
+        t_references.insert(reference);
+    }
 
     /// @brief Erases a pointer of Type T
     template<typename T>
-    void untrack(T reference);
+    void untrack(T reference)
+    {
+        auto& t_references = std::get<std::unordered_set<T>>(references);
+        t_references.erase(reference);
+    }
 };
 
-using ReferencedPDDLObjects = References<Object, Predicate, FunctionSkeleton, Variable, RequirementEnum>;
+using ReferenceTrackers = ReferenceTracker<Object, Predicate, FunctionSkeleton, Variable, RequirementEnum>;
 
 }
-
-#include "reference.tpp"
 
 #endif

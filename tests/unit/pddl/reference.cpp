@@ -29,7 +29,7 @@ TEST(LokiTests, LokiPddlReferenceTest)
     const auto object_0 = factory.get_or_create("object_0", TypeList());
     const auto object_1 = factory.get_or_create("object_1", TypeList());
 
-    ReferencedPDDLObjects references;
+    ReferenceTrackers references;
     EXPECT_TRUE(!references.exists(object_0));
     EXPECT_TRUE(!references.exists(object_1));
     references.track(object_0);

@@ -46,7 +46,7 @@
 namespace loki
 {
 template<typename T>
-using PositionMapType = std::unordered_map<PDDLElement<T>, PositionList>;
+using PositionMapType = std::unordered_map<const T*, PositionList>;
 
 /// @brief Stores all occurrences of a PDDL object in the input file for each PDDL type T.
 template<typename... Ts>
@@ -55,73 +55,47 @@ class PositionCache
 private:
     std::tuple<PositionMapType<Ts>...> m_positions;
 
-    // Do we really need error handler here?
-    FilePositionErrorHandler& m_error_handler;
-
 public:
-    explicit PositionCache(FilePositionErrorHandler& error_handler);
+    template<typename T>
+    void push_back(const T* element, const Position& position)
+    {
+        auto& t_positions = std::get<PositionMapType<T>>(m_positions);
+        t_positions[element].push_back(position);
+    }
 
     template<typename T>
-    void push_back(const PDDLElement<T>& element, const Position& position);
-
-    template<typename T>
-    PositionList get(const PDDLElement<T>& element) const;
-
-    const FilePositionErrorHandler& get_error_handler() const;
+    PositionList get(const T* element) const
+    {
+        auto& t_positions = std::get<PositionMapType<T>>(m_positions);
+        auto it = t_positions.find(element);
+        if (it != t_positions.end())
+        {
+            return it->second;
+        }
+        return {};
+    }
 };
 
-template<typename... Ts>
-PositionCache<Ts...>::PositionCache(FilePositionErrorHandler& error_handler) : m_error_handler(error_handler)
-{
-}
-
-template<typename... Ts>
-template<typename T>
-void PositionCache<Ts...>::push_back(const PDDLElement<T>& element, const Position& position)
-{
-    auto& t_positions = std::get<PositionMapType<T>>(m_positions);
-    t_positions[element].push_back(position);
-}
-
-template<typename... Ts>
-template<typename T>
-PositionList PositionCache<Ts...>::get(const PDDLElement<T>& element) const
-{
-    auto& t_positions = std::get<PositionMapType<T>>(m_positions);
-    auto it = t_positions.find(element);
-    if (it != t_positions.end())
-    {
-        return it->second;
-    }
-    return {};
-}
-
-template<typename... Ts>
-const FilePositionErrorHandler& PositionCache<Ts...>::get_error_handler() const
-{
-    return m_error_handler;
-}
-
-using PDDLPositionCache = PositionCache<RequirementsImpl,
-                                        TypeImpl,
-                                        VariableImpl,
-                                        TermImpl,
-                                        ObjectImpl,
-                                        AtomImpl,
-                                        LiteralImpl,
-                                        ParameterImpl,
-                                        PredicateImpl,
-                                        FunctionExpressionImpl,
-                                        FunctionImpl,
-                                        FunctionSkeletonImpl,
-                                        ConditionImpl,
-                                        EffectImpl,
-                                        ActionImpl,
-                                        AxiomImpl,
-                                        OptimizationMetricImpl,
-                                        FunctionValueImpl,
-                                        DomainImpl,
-                                        ProblemImpl>;
+using PositionCaches = PositionCache<RequirementsImpl,
+                                     TypeImpl,
+                                     VariableImpl,
+                                     TermImpl,
+                                     ObjectImpl,
+                                     AtomImpl,
+                                     LiteralImpl,
+                                     ParameterImpl,
+                                     PredicateImpl,
+                                     FunctionExpressionImpl,
+                                     FunctionImpl,
+                                     FunctionSkeletonImpl,
+                                     ConditionImpl,
+                                     EffectImpl,
+                                     ActionImpl,
+                                     AxiomImpl,
+                                     OptimizationMetricImpl,
+                                     FunctionValueImpl,
+                                     DomainImpl,
+                                     ProblemImpl>;
 
 }
 

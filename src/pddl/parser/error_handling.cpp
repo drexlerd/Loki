@@ -285,7 +285,7 @@ void test_nonnegative_number(double number, const Position& position, const C& c
 {
     if (number < 0)
     {
-        throw NegativeCostError(context.positions.get_error_handler()(position, ""));
+        throw NegativeCostError(context.scopes.top().get_error_handler()(position, ""));
     }
 }
 

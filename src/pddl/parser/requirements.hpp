@@ -20,7 +20,7 @@
 
 #include "loki/details/ast/ast.hpp"
 #include "loki/details/pddl/concepts.hpp"
-#include "loki/details/pddl/reference.hpp"
+#include "loki/details/pddl/reference_tracker.hpp"
 
 namespace loki
 {

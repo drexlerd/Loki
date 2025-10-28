@@ -43,11 +43,16 @@ public:
     const Domain& get_domain() const;
 
 private:
-    Domain m_domain;                                                   ///< The parsed domain.
-    std::unique_ptr<FilePositionErrorHandler> m_domain_error_handler;  ///< The error handler.
-    std::unique_ptr<PDDLPositionCache> m_domain_position_cache;        ///< The mapping of pddl elements to positions in the input domain file.
-    std::unique_ptr<ScopeStack> m_domain_scopes;                       ///< The declared domain elements.
-    size_t m_next_problem_index;                                       ///< The index for the next problem.
+    Domain m_domain;
+    std::unique_ptr<ScopeStack> m_scopes;
+
+    std::unique_ptr<FilePositionErrorHandler> m_domain_error_handler;
+    std::unique_ptr<PositionCaches> m_domain_position_cache;
+
+    std::unique_ptr<FilePositionErrorHandler> m_problem_error_handler;
+    std::unique_ptr<PositionCaches> m_problem_position_cache;
+
+    size_t m_next_problem_index;  ///< The index for the next problem.
 };
 
 }

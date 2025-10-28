@@ -35,8 +35,6 @@ namespace loki
 /**
  * Common
  */
-template<typename T>
-using PDDLElement = const T*;
 
 template<typename T, typename Hash, typename EqualTo>
 class IndexedHashSet;

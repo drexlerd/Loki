@@ -39,8 +39,11 @@ namespace loki
 {
 Parser::Parser(const std::string& source, const fs::path& domain_filepath, const ParserOptions& options) :
     m_domain(nullptr),
+    m_scopes(nullptr),
+    m_domain_error_handler(nullptr),
     m_domain_position_cache(nullptr),
-    m_domain_scopes(nullptr),
+    m_problem_error_handler(nullptr),
+    m_problem_position_cache(nullptr),
     m_next_problem_index(0)
 {
     const auto start = std::chrono::high_resolution_clock::now();
@@ -60,11 +63,11 @@ Parser::Parser(const std::string& source, const fs::path& domain_filepath, const
     // std::cout << string(node, DefaultFormatter {}) << std::endl;
 
     m_domain_error_handler = std::make_unique<FilePositionErrorHandler>(x3_error_handler.get_position_cache(), domain_filepath, 4);
-    m_domain_position_cache = std::make_unique<PDDLPositionCache>(*m_domain_error_handler);
-    m_domain_scopes = std::make_unique<ScopeStack>(*m_domain_error_handler);
-    m_domain_scopes->open_scope();  ///< open the root scope which should not be closed
+    m_domain_position_cache = std::make_unique<PositionCaches>();
+    m_scopes = std::make_unique<ScopeStack>(*m_domain_error_handler);
+    m_scopes->open_scope();  ///< open the root scope which should not be closed
 
-    auto context = DomainParsingContext(*m_domain_scopes, *m_domain_position_cache, options);
+    auto context = DomainParsingContext(*m_scopes, *m_domain_position_cache, options);
     context.builder.get_filepath() = domain_filepath;
 
     parse(node, context);
@@ -95,13 +98,13 @@ Problem Parser::parse_problem(const std::string& source, const fs::path& problem
 
     // std::cout << string(node, DefaultFormatter {}) << std::endl;
 
-    auto error_handler = FilePositionErrorHandler(x3_error_handler.get_position_cache(), problem_filepath, 4);
-    auto position_cache = PDDLPositionCache(error_handler);
-    assert(m_domain_scopes->get_stack().size() == 1);
-    auto scopes = ScopeStack(error_handler, m_domain_scopes.get());
+    m_problem_error_handler = std::make_unique<FilePositionErrorHandler>(x3_error_handler.get_position_cache(), problem_filepath, 4);
+    auto position_cache = std::make_unique<PositionCaches>();
+    assert(m_scopes->get_stack().size() == 1);
+    auto scopes = ScopeStack(*m_problem_error_handler, m_scopes.get());
     scopes.open_scope();  ///< open the root scope which should not be closed
 
-    auto context = ProblemParsingContext(scopes, position_cache, m_domain, options);
+    auto context = ProblemParsingContext(scopes, *position_cache, m_domain, options);
     context.builder.get_filepath() = problem_filepath;
 
     parse(node, context);
