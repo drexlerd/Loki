@@ -28,13 +28,14 @@ class DomainTranslationResult
 {
 private:
     Domain original_domain;  ///< used to check that a problem can be translated with this result.
-
+    Domain translated_typed_domain;
     Domain translated_domain;
 
 public:
-    DomainTranslationResult(Domain original_domain, Domain translated_domain);
+    DomainTranslationResult(Domain original_domain, Domain translated_typed_domain, Domain translated_domain);
 
     const Domain& get_original_domain() const;
+    const Domain& get_translated_typed_domain() const;
     const Domain& get_translated_domain() const;
 };
 
