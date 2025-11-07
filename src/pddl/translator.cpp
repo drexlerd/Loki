@@ -85,6 +85,14 @@ DomainTranslationResult translate(const Domain& domain, const TranslatorOptions&
     // std::cout << "MoveExistentialQuantifiersTranslator result: " << std::endl;
     // std::cout << *translated_domain << std::endl;
 
+    /* Type translator cannot come before removal of universal quantifiers because of negations and must come before ToEffectNormalFormTranslator. */
+    auto remove_types_translator = AddTypePredicatesTranslator(options.remove_typing);
+    builder = DomainBuilder();
+    translated_domain = remove_types_translator.translate_level_0(translated_domain, builder);
+
+    // std::cout << "AddTypePredicatesTranslator result:" << std::endl;
+    // std::cout << *translated_domain << std::endl;
+
     auto to_effect_normal_form_translator = ToEffectNormalFormTranslator();
     builder = DomainBuilder();
     translated_domain = to_effect_normal_form_translator.translate_level_0(translated_domain, builder);
@@ -98,14 +106,6 @@ DomainTranslationResult translate(const Domain& domain, const TranslatorOptions&
     auto translated_typed_domain = translated_domain;
 
     // std::cout << "InitializeEqualityTranslator result: " << std::endl;
-    // std::cout << *translated_domain << std::endl;
-
-    /* Type translator cannot come before removal of universal quantifiers because of negations. */
-    auto remove_types_translator = AddTypePredicatesTranslator(options.remove_typing);
-    builder = DomainBuilder();
-    translated_domain = remove_types_translator.translate_level_0(translated_domain, builder);
-
-    // std::cout << "AddTypePredicatesTranslator result:" << std::endl;
     // std::cout << *translated_domain << std::endl;
 
     return DomainTranslationResult(domain, translated_typed_domain, translated_domain);
