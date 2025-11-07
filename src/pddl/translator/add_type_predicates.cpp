@@ -276,7 +276,7 @@ Problem AddTypePredicatesTranslator::translate_level_2(const Problem& problem, P
         builder.get_initial_literals().insert(builder.get_initial_literals().end(), additional_literals.begin(), additional_literals.end());
     }
     // Make constants untyped
-    auto translated_domain_static_initial_literals = this->translate_level_0(problem->get_domain()->get_static_initial_literals(), repositories);
+    auto translated_domain_static_initial_literals = this->translate_level_0(builder.get_domain()->get_static_initial_literals(), repositories);
     builder.get_initial_literals().insert(builder.get_initial_literals().end(),
                                           translated_domain_static_initial_literals.begin(),
                                           translated_domain_static_initial_literals.end());
