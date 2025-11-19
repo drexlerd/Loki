@@ -18,7 +18,6 @@
 #include "loki/details/pddl/translator.hpp"
 
 #include "translator/add_type_predicates.hpp"
-#include "translator/compile_conditional_effects.hpp"
 #include "translator/initialize_equality.hpp"
 #include "translator/move_existential_quantifiers.hpp"
 #include "translator/remove_universal_quantifiers.hpp"
@@ -85,13 +84,6 @@ DomainTranslationResult translate(const Domain& domain, const TranslatorOptions&
 
     // std::cout << "MoveExistentialQuantifiersTranslator result: " << std::endl;
     //  std::cout << *translated_domain << std::endl;
-
-    // if (options.compile_conditional_effects)
-    // {
-    //     auto compile_conditional_effects_translator = CompileConditionalEffectsTranslator();
-    //     builder = DomainBuilder();
-    //     translated_domain = compile_conditional_effects_translator.translate_level_0(translated_domain, builder);
-    // }
 
     /* Type translator cannot come before removal of universal quantifiers because of negations and must come before ToEffectNormalFormTranslator. */
     auto remove_types_translator = AddTypePredicatesTranslator(options.remove_typing);

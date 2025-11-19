@@ -31,10 +31,6 @@ int main(int argc, char** argv)
     program.add_argument("-Q", "--quiet").default_value(true).implicit_value(false).help("Disable quiet mode.");
     /* TODO(Dominik): add translator options */
     program.add_argument("-T", "--remove-typing").default_value(false).implicit_value(true).help("Enable removal of typing.");
-    program.add_argument("-C", "--compile-conditional-effects")
-        .default_value(false)
-        .implicit_value(true)
-        .help("Enable the compilation of conditional effects.");
 
     try
     {
@@ -58,7 +54,6 @@ int main(int argc, char** argv)
 
     auto translator_options = loki::TranslatorOptions();
     translator_options.remove_typing = program.get<bool>("--remove-typing");
-    translator_options.compile_conditional_effects = program.get<bool>("--compile-conditional-effects");
 
     auto parser = loki::Parser(domain_filepath, parser_options);
     const auto domain = parser.get_domain();

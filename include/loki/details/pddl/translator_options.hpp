@@ -23,9 +23,8 @@ namespace loki
 struct TranslatorOptions
 {
     bool remove_typing;
-    bool compile_conditional_effects;
 
-    TranslatorOptions() : remove_typing(false), compile_conditional_effects(false) {}
+    TranslatorOptions() : remove_typing(false) {}
 };
 }
 
