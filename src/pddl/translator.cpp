@@ -18,6 +18,7 @@
 #include "loki/details/pddl/translator.hpp"
 
 #include "translator/add_type_predicates.hpp"
+#include "translator/compile_conditional_effects.hpp"
 #include "translator/initialize_equality.hpp"
 #include "translator/move_existential_quantifiers.hpp"
 #include "translator/remove_universal_quantifiers.hpp"
@@ -41,74 +42,80 @@ DomainTranslationResult::DomainTranslationResult(Domain original_domain, Domain 
 DomainTranslationResult translate(const Domain& domain, const TranslatorOptions& options)
 {
     // std::cout << "Given domain" << std::endl;
-    // std::cout << *domain << std::endl;
+    //  std::cout << *domain << std::endl;
 
     auto to_negation_normal_form_translator = ToNegationNormalFormTranslator();
     auto builder = DomainBuilder();
     auto translated_domain = to_negation_normal_form_translator.translate_level_0(domain, builder);
 
     // std::cout << "ToNegationNormalFormTranslator result:" << std::endl;
-    // std::cout << *translated_domain << std::endl;
+    //  std::cout << *translated_domain << std::endl;
 
     auto rename_quantified_variables_translator = RenameQuantifiedVariablesTranslator();
     builder = DomainBuilder();
     translated_domain = rename_quantified_variables_translator.translate_level_0(translated_domain, builder);
 
     // std::cout << "RenameQuantifiedVariablesTranslator result: " << std::endl;
-    // std::cout << *translated_domain << std::endl;
+    //  std::cout << *translated_domain << std::endl;
 
     auto remove_universal_quantifiers_translator = RemoveUniversalQuantifiersTranslator();
     builder = DomainBuilder();
     translated_domain = remove_universal_quantifiers_translator.translate_level_0(translated_domain, builder);
 
     // std::cout << "RemoveUniversalQuantifiersTranslator result: " << std::endl;
-    // std::cout << *translated_domain << std::endl;
+    //  std::cout << *translated_domain << std::endl;
 
     auto to_disjunctive_normal_form_translator = ToDisjunctiveNormalFormTranslator();
     builder = DomainBuilder();
     translated_domain = to_disjunctive_normal_form_translator.translate_level_0(translated_domain, builder);
 
     // std::cout << "ToDisjunctiveNormalFormTranslator result: " << std::endl;
-    // std::cout << *translated_domain << std::endl;
+    //  std::cout << *translated_domain << std::endl;
 
     auto split_disjunctive_conditions_translator = SplitDisjunctiveConditionsTranslator();
     builder = DomainBuilder();
     translated_domain = split_disjunctive_conditions_translator.translate_level_0(translated_domain, builder);
 
     // std::cout << "SplitDisjunctiveConditionsTranslator result: " << std::endl;
-    // std::cout << *translated_domain << std::endl;
+    //  std::cout << *translated_domain << std::endl;
 
     auto move_existential_quantifiers_translator = MoveExistentialQuantifiersTranslator();
     builder = DomainBuilder();
     translated_domain = move_existential_quantifiers_translator.translate_level_0(translated_domain, builder);
 
     // std::cout << "MoveExistentialQuantifiersTranslator result: " << std::endl;
-    // std::cout << *translated_domain << std::endl;
+    //  std::cout << *translated_domain << std::endl;
+
+    // if (options.compile_conditional_effects)
+    // {
+    //     auto compile_conditional_effects_translator = CompileConditionalEffectsTranslator();
+    //     builder = DomainBuilder();
+    //     translated_domain = compile_conditional_effects_translator.translate_level_0(translated_domain, builder);
+    // }
 
     /* Type translator cannot come before removal of universal quantifiers because of negations and must come before ToEffectNormalFormTranslator. */
     auto remove_types_translator = AddTypePredicatesTranslator(options.remove_typing);
     builder = DomainBuilder();
-    translated_domain = remove_types_translator.translate_level_0(translated_domain, builder);
+    auto translated_untyped_domain = remove_types_translator.translate_level_0(translated_domain, builder);
 
     // std::cout << "AddTypePredicatesTranslator result:" << std::endl;
-    // std::cout << *translated_domain << std::endl;
+    //  std::cout << *translated_domain << std::endl;
 
     auto to_effect_normal_form_translator = ToEffectNormalFormTranslator();
     builder = DomainBuilder();
-    translated_domain = to_effect_normal_form_translator.translate_level_0(translated_domain, builder);
+    translated_untyped_domain = to_effect_normal_form_translator.translate_level_0(translated_untyped_domain, builder);
 
     // std::cout << "ToEffectNormalFormTranslator result: " << std::endl;
-    // std::cout << *translated_domain << std::endl;
+    //  std::cout << *translated_domain << std::endl;
 
     auto initialize_equality_translator = InitializeEqualityTranslator();
     builder = DomainBuilder();
-    translated_domain = initialize_equality_translator.translate_level_0(translated_domain, builder);
-    auto translated_typed_domain = translated_domain;
+    translated_untyped_domain = initialize_equality_translator.translate_level_0(translated_untyped_domain, builder);
 
     // std::cout << "InitializeEqualityTranslator result: " << std::endl;
-    // std::cout << *translated_domain << std::endl;
+    //  std::cout << *translated_domain << std::endl;
 
-    return DomainTranslationResult(domain, translated_typed_domain, translated_domain);
+    return DomainTranslationResult(domain, translated_domain, translated_untyped_domain);
 }
 
 const Domain& DomainTranslationResult::get_original_domain() const { return original_domain; }
