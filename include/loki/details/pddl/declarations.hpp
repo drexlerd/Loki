@@ -28,6 +28,8 @@
 #include <utility>
 #include <variant>
 #include <vector>
+#include <concepts>
+#include <type_traits>
 
 namespace loki
 {
@@ -195,6 +197,11 @@ class ProblemBuilder;
 struct ProblemParsingContext;
 
 class Repositories;
+
+template<typename T>
+struct dependent_false : std::false_type
+{
+};
 
 }
 

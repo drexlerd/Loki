@@ -32,60 +32,186 @@ size_t VariableImpl::get_index() const { return m_index; }
 
 const std::string& VariableImpl::get_name() const { return m_name; }
 
-static void collect_free_variables_recursively(const loki::ConditionImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
+/**
+ * Forward declarations
+ */
+
+static void collect_free_variables_recursively(const loki::FunctionImpl& function, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables);
+
+static void
+collect_free_variables_recursively(const loki::FunctionExpressionNumberImpl& fexpr, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables);
+
+static void collect_free_variables_recursively(const loki::FunctionExpressionBinaryOperatorImpl& fexpr,
+                                               VariableSet& ref_quantified_variables,
+                                               VariableSet& ref_free_variables);
+
+static void collect_free_variables_recursively(const loki::FunctionExpressionMultiOperatorImpl& fexpr,
+                                               VariableSet& ref_quantified_variables,
+                                               VariableSet& ref_free_variables);
+
+static void
+collect_free_variables_recursively(const loki::FunctionExpressionMinusImpl& fexpr, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables);
+
+static void
+collect_free_variables_recursively(const loki::FunctionExpressionFunctionImpl& fexpr, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables);
+
+static void
+collect_free_variables_recursively(const loki::FunctionExpressionImpl& fexpr, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables);
+
+static void
+collect_free_variables_recursively(const loki::ConditionLiteralImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables);
+
+static void
+collect_free_variables_recursively(const loki::ConditionImplyImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables);
+
+static void collect_free_variables_recursively(const loki::ConditionNotImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables);
+
+static void collect_free_variables_recursively(const loki::ConditionAndImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables);
+
+static void collect_free_variables_recursively(const loki::ConditionOrImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables);
+
+static void
+collect_free_variables_recursively(const loki::ConditionExistsImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables);
+
+static void
+collect_free_variables_recursively(const loki::ConditionForallImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables);
+
+static void collect_free_variables_recursively(const loki::ConditionNumericConstraintImpl& condition,
+                                               VariableSet& ref_quantified_variables,
+                                               VariableSet& ref_free_variables);
+
+static void collect_free_variables_recursively(const loki::ConditionImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables);
+
+/**
+ * Definitions
+ */
+
+static void collect_free_variables_recursively(const loki::FunctionImpl& function, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
 {
-    if (const auto condition_literal = std::get_if<loki::ConditionLiteral>(&condition.get_condition()))
+    for (const auto& term : function.get_terms())
     {
-        for (const auto& term : (*condition_literal)->get_literal()->get_atom()->get_terms())
+        if (const auto variable = std::get_if<Variable>(&term->get_object_or_variable()))
         {
-            if (const auto variable = std::get_if<Variable>(&term->get_object_or_variable()))
+            if (!ref_quantified_variables.count(*variable))
             {
-                if (!ref_quantified_variables.count(*variable))
-                {
-                    ref_free_variables.insert(*variable);
-                }
+                ref_free_variables.insert(*variable);
             }
         }
     }
-    else if (const auto condition_imply = std::get_if<loki::ConditionImply>(&condition.get_condition()))
+}
+
+static void collect_free_variables_recursively(const loki::FunctionExpressionNumberImpl&, VariableSet&, VariableSet&) {}
+
+static void collect_free_variables_recursively(const loki::FunctionExpressionBinaryOperatorImpl& fexpr,
+                                               VariableSet& ref_quantified_variables,
+                                               VariableSet& ref_free_variables)
+{
+    collect_free_variables_recursively(*fexpr.get_left_function_expression(), ref_quantified_variables, ref_free_variables);
+    collect_free_variables_recursively(*fexpr.get_right_function_expression(), ref_quantified_variables, ref_free_variables);
+}
+
+static void collect_free_variables_recursively(const loki::FunctionExpressionMultiOperatorImpl& fexpr,
+                                               VariableSet& ref_quantified_variables,
+                                               VariableSet& ref_free_variables)
+{
+    for (const auto& part : fexpr.get_function_expressions())
     {
-        collect_free_variables_recursively(*(*condition_imply)->get_left_condition(), ref_quantified_variables, ref_free_variables);
-        collect_free_variables_recursively(*(*condition_imply)->get_right_condition(), ref_quantified_variables, ref_free_variables);
+        collect_free_variables_recursively(*part, ref_quantified_variables, ref_free_variables);
     }
-    else if (const auto condition_not = std::get_if<loki::ConditionNot>(&condition.get_condition()))
+}
+
+static void
+collect_free_variables_recursively(const loki::FunctionExpressionMinusImpl& fexpr, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
+{
+    collect_free_variables_recursively(*fexpr.get_function_expression(), ref_quantified_variables, ref_free_variables);
+}
+
+static void
+collect_free_variables_recursively(const loki::FunctionExpressionFunctionImpl& fexpr, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
+{
+    collect_free_variables_recursively(*fexpr.get_function(), ref_quantified_variables, ref_free_variables);
+}
+
+static void
+collect_free_variables_recursively(const loki::FunctionExpressionImpl& fexpr, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
+{
+    std::visit([&](auto&& arg) { collect_free_variables_recursively(*arg, ref_quantified_variables, ref_free_variables); }, fexpr.get_function_expression());
+}
+
+static void
+collect_free_variables_recursively(const loki::ConditionLiteralImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
+{
+    for (const auto& term : condition.get_literal()->get_atom()->get_terms())
     {
-        collect_free_variables_recursively(*(*condition_not)->get_condition(), ref_quantified_variables, ref_free_variables);
-    }
-    else if (const auto condition_and = std::get_if<loki::ConditionAnd>(&condition.get_condition()))
-    {
-        for (const auto& part : (*condition_and)->get_conditions())
+        if (const auto variable = std::get_if<Variable>(&term->get_object_or_variable()))
         {
-            collect_free_variables_recursively(*part, ref_quantified_variables, ref_free_variables);
+            if (!ref_quantified_variables.count(*variable))
+            {
+                ref_free_variables.insert(*variable);
+            }
         }
     }
-    else if (const auto condition_or = std::get_if<loki::ConditionOr>(&condition.get_condition()))
+}
+
+static void
+collect_free_variables_recursively(const loki::ConditionImplyImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
+{
+    collect_free_variables_recursively(*condition.get_left_condition(), ref_quantified_variables, ref_free_variables);
+    collect_free_variables_recursively(*condition.get_right_condition(), ref_quantified_variables, ref_free_variables);
+}
+
+static void collect_free_variables_recursively(const loki::ConditionNotImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
+{
+    collect_free_variables_recursively(*condition.get_condition(), ref_quantified_variables, ref_free_variables);
+}
+
+static void collect_free_variables_recursively(const loki::ConditionAndImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
+{
+    for (const auto& part : condition.get_conditions())
     {
-        for (const auto& part : (*condition_or)->get_conditions())
-        {
-            collect_free_variables_recursively(*part, ref_quantified_variables, ref_free_variables);
-        }
+        collect_free_variables_recursively(*part, ref_quantified_variables, ref_free_variables);
     }
-    else if (const auto condition_exists = std::get_if<loki::ConditionExists>(&condition.get_condition()))
+}
+
+static void collect_free_variables_recursively(const loki::ConditionOrImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
+{
+    for (const auto& part : condition.get_conditions())
     {
-        for (const auto& parameter : (*condition_exists)->get_parameters())
-        {
-            ref_quantified_variables.insert(parameter->get_variable());
-        }
-        collect_free_variables_recursively(*(*condition_exists)->get_condition(), ref_quantified_variables, ref_free_variables);
+        collect_free_variables_recursively(*part, ref_quantified_variables, ref_free_variables);
     }
-    else if (const auto condition_forall = std::get_if<loki::ConditionForall>(&condition.get_condition()))
+}
+
+static void
+collect_free_variables_recursively(const loki::ConditionExistsImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
+{
+    for (const auto& parameter : condition.get_parameters())
     {
-        for (const auto& parameter : (*condition_forall)->get_parameters())
-        {
-            ref_quantified_variables.insert(parameter->get_variable());
-        }
-        collect_free_variables_recursively(*(*condition_forall)->get_condition(), ref_quantified_variables, ref_free_variables);
+        ref_quantified_variables.insert(parameter->get_variable());
     }
+    collect_free_variables_recursively(*condition.get_condition(), ref_quantified_variables, ref_free_variables);
+}
+
+static void
+collect_free_variables_recursively(const loki::ConditionForallImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
+{
+    for (const auto& parameter : condition.get_parameters())
+    {
+        ref_quantified_variables.insert(parameter->get_variable());
+    }
+    collect_free_variables_recursively(*condition.get_condition(), ref_quantified_variables, ref_free_variables);
+}
+
+static void collect_free_variables_recursively(const loki::ConditionNumericConstraintImpl& condition,
+                                               VariableSet& ref_quantified_variables,
+                                               VariableSet& ref_free_variables)
+{
+    collect_free_variables_recursively(*condition.get_left_function_expression(), ref_quantified_variables, ref_free_variables);
+    collect_free_variables_recursively(*condition.get_right_function_expression(), ref_quantified_variables, ref_free_variables);
+}
+
+static void collect_free_variables_recursively(const loki::ConditionImpl& condition, VariableSet& ref_quantified_variables, VariableSet& ref_free_variables)
+{
+    std::visit([&](auto&& arg) { collect_free_variables_recursively(*arg, ref_quantified_variables, ref_free_variables); }, condition.get_condition());
 }
 
 VariableSet collect_free_variables(const ConditionImpl& condition)
@@ -109,5 +235,4 @@ std::ostream& operator<<(std::ostream& out, Variable element)
     write(*element, AddressFormatter(), out);
     return out;
 }
-
 }
