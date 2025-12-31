@@ -1,0 +1,89 @@
+Bootstrap: docker
+From: ubuntu:24.04
+Stage: build
+
+%files
+    . /opt/loki
+
+%post
+    # Set noninteractive mode for apt
+    export DEBIAN_FRONTEND=noninteractive
+
+    # Update and install dependencies
+    apt-get update
+    apt-get install -y \
+        build-essential \
+        cmake \
+        git \
+        wget \
+        ca-certificates \
+        libboost-dev \
+        ccache \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*
+
+    # Set working directory
+    cd /opt/loki
+
+    # Build and install dependencies
+    cmake -S dependencies -B dependencies/build -DCMAKE_INSTALL_PREFIX=dependencies/installs
+    cmake --build dependencies/build -j$(nproc)
+
+    # Build Loki
+    cmake -S . -B build \
+        -DCMAKE_PREFIX_PATH=/opt/loki/dependencies/installs \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_TESTS=OFF \
+        -DBUILD_BENCHMARKS=OFF
+    cmake --build build -j$(nproc)
+
+    # Install Loki to a staging directory
+    cmake --install build --prefix=/opt/loki/install
+
+
+# Runtime stage
+Bootstrap: docker
+From: ubuntu:24.04
+Stage: runtime
+
+%files from build
+    /opt/loki/install /usr/local
+    /opt/loki/build/exe/loki /usr/local/bin/loki
+    /opt/loki/dependencies/installs/lib /usr/local/lib
+
+%post
+    # Install only runtime dependencies
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update
+    apt-get install -y \
+        libstdc++6 \
+        libgomp1 \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*
+
+    # Update library cache
+    ldconfig
+
+%environment
+    export LC_ALL=C
+    export PATH=/usr/local/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+%runscript
+    exec loki "$@"
+
+%labels
+    Author Dominik Drexler
+    Description Loki PDDL parser and translator
+
+%help
+    This is a container for Loki, a C++20 library for syntactic and semantic
+    parsing and translation of PDDL files.
+
+    Usage:
+        apptainer run loki.sif <domain.pddl> <problem.pddl>
+
+    Or start an interactive shell:
+        apptainer shell loki.sif
+
+    The loki executable is available at /usr/local/bin/loki
