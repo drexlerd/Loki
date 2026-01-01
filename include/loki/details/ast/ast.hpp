@@ -99,6 +99,7 @@ struct BinaryOperator;
 struct BinaryComparatorGreater;
 struct BinaryComparatorLess;
 struct BinaryComparatorEqual;
+struct BinaryComparatorUnequal;
 struct BinaryComparatorGreaterEqual;
 struct BinaryComparatorLessEqual;
 struct BinaryComparator;
@@ -573,6 +574,10 @@ struct BinaryComparatorEqual : x3::position_tagged
 {
 };
 
+struct BinaryComparatorUnequal : x3::position_tagged
+{
+};
+
 struct BinaryComparatorGreaterEqual : x3::position_tagged
 {
 };
@@ -583,7 +588,12 @@ struct BinaryComparatorLessEqual : x3::position_tagged
 
 struct BinaryComparator :
     x3::position_tagged,
-    x3::variant<BinaryComparatorGreater, BinaryComparatorLess, BinaryComparatorEqual, BinaryComparatorGreaterEqual, BinaryComparatorLessEqual>
+    x3::variant<BinaryComparatorGreater,
+                BinaryComparatorLess,
+                BinaryComparatorEqual,
+                BinaryComparatorGreaterEqual,
+                BinaryComparatorUnequal,
+                BinaryComparatorLessEqual>
 {
     using base_type::base_type;
     using base_type::operator=;

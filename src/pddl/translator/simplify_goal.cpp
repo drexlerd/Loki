@@ -33,40 +33,48 @@ Condition SimplifyGoalTranslator::simplify_goal_condition(Condition goal_conditi
                                                           size_t& next_axiom_index,
                                                           std::unordered_set<std::string>& problem_and_domain_predicate_names)
 {
-    if (std::get_if<ConditionLiteral>(&goal_condition->get_condition()))
-    {
-        return this->translate_level_0(goal_condition, repositories);
-    }
-    else if (std::get_if<ConditionNumericConstraint>(&goal_condition->get_condition()))
-    {
-        return this->translate_level_0(goal_condition, repositories);
-    }
-    else if (const auto condition_and = std::get_if<ConditionAnd>(&goal_condition->get_condition()))
-    {
-        auto parts = ConditionList {};
-        parts.reserve((*condition_and)->get_conditions().size());
-        for (const auto& part : (*condition_and)->get_conditions())
+    return std::visit(
+        [&](auto&& arg)
         {
-            parts.push_back(simplify_goal_condition(part,
-                                                    repositories,
-                                                    instantiated_predicates,
-                                                    instantiated_axioms,
-                                                    next_axiom_index,
-                                                    problem_and_domain_predicate_names));
-        }
-        return repositories.get_or_create_condition(repositories.get_or_create_condition_and(parts));
-    }
+            using Variant = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<Variant, ConditionLiteral>)
+            {
+                return this->translate_level_0(goal_condition, repositories);
+            }
+            else if constexpr (std::is_same_v<Variant, ConditionNumericConstraint>)
+            {
+                return this->translate_level_0(goal_condition, repositories);
+            }
+            else if constexpr (std::is_same_v<Variant, ConditionAnd>)
+            {
+                auto parts = ConditionList {};
+                parts.reserve(arg->get_conditions().size());
+                for (const auto& part : arg->get_conditions())
+                {
+                    parts.push_back(simplify_goal_condition(part,
+                                                            repositories,
+                                                            instantiated_predicates,
+                                                            instantiated_axioms,
+                                                            next_axiom_index,
+                                                            problem_and_domain_predicate_names));
+                }
+                return repositories.get_or_create_condition(repositories.get_or_create_condition_and(parts));
+            }
+            else
+            {
+                const auto axiom_name = create_unique_axiom_name(next_axiom_index, problem_and_domain_predicate_names);
+                const auto predicate = repositories.get_or_create_predicate(axiom_name, ParameterList {});
+                instantiated_predicates.push_back(predicate);
+                const auto atom = repositories.get_or_create_atom(predicate, TermList {});
+                const auto literal = repositories.get_or_create_literal(true, atom);
+                const auto substituted_condition = repositories.get_or_create_condition(repositories.get_or_create_condition_literal(literal));
+                const auto axiom = repositories.get_or_create_axiom(ParameterList {}, literal, this->translate_level_0(goal_condition, repositories));
+                instantiated_axioms.push_back(axiom);
 
-    const auto axiom_name = create_unique_axiom_name(next_axiom_index, problem_and_domain_predicate_names);
-    const auto predicate = repositories.get_or_create_predicate(axiom_name, ParameterList {});
-    instantiated_predicates.push_back(predicate);
-    const auto atom = repositories.get_or_create_atom(predicate, TermList {});
-    const auto literal = repositories.get_or_create_literal(true, atom);
-    const auto substituted_condition = repositories.get_or_create_condition(repositories.get_or_create_condition_literal(literal));
-    const auto axiom = repositories.get_or_create_axiom(ParameterList {}, literal, this->translate_level_0(goal_condition, repositories));
-    instantiated_axioms.push_back(axiom);
-
-    return substituted_condition;
+                return substituted_condition;
+            }
+        },
+        goal_condition->get_condition());
 }
 
 Problem SimplifyGoalTranslator::translate_level_2(const Problem& problem, ProblemBuilder& builder)

@@ -29,9 +29,30 @@ std::unordered_map<BinaryComparatorEnum, std::string> binary_comparator_enum_to_
     { BinaryComparatorEnum::GREATER, ">" },         //
     { BinaryComparatorEnum::LESS, "<" },            //
     { BinaryComparatorEnum::EQUAL, "=" },           //
+    { BinaryComparatorEnum::UNEQUAL, "!=" },        //
     { BinaryComparatorEnum::GREATER_EQUAL, ">=" },  //
     { BinaryComparatorEnum::LESS_EQUAL, "<=" },
 };
+
+BinaryComparatorEnum negate(BinaryComparatorEnum element)
+{
+    switch (element)
+    {
+        case BinaryComparatorEnum::LESS:
+            return BinaryComparatorEnum::GREATER_EQUAL;
+        case BinaryComparatorEnum::LESS_EQUAL:
+            return BinaryComparatorEnum::GREATER;
+        case BinaryComparatorEnum::GREATER:
+            return BinaryComparatorEnum::LESS_EQUAL;
+        case BinaryComparatorEnum::GREATER_EQUAL:
+            return BinaryComparatorEnum::LESS;
+        case BinaryComparatorEnum::EQUAL:
+            return BinaryComparatorEnum::UNEQUAL;
+        case BinaryComparatorEnum::UNEQUAL:
+            return BinaryComparatorEnum::EQUAL;
+    }
+    throw std::logic_error("Unhandled BinaryComparatorEnum in negate()");
+}
 
 std::ostream& operator<<(std::ostream& out, BinaryComparatorEnum element)
 {

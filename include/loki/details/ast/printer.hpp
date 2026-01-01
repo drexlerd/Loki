@@ -187,6 +187,8 @@ void write(const ast::BinaryComparatorLess& node, T formatter, std::ostream& out
 template<Formatter T>
 void write(const ast::BinaryComparatorEqual& node, T formatter, std::ostream& out);
 template<Formatter T>
+void write(const ast::BinaryComparatorUnequal& node, T formatter, std::ostream& out);
+template<Formatter T>
 void write(const ast::BinaryComparatorGreaterEqual& node, T formatter, std::ostream& out);
 template<Formatter T>
 void write(const ast::BinaryComparatorLessEqual& node, T formatter, std::ostream& out);

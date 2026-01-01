@@ -90,13 +90,19 @@ static void collect_free_variables_recursively(const loki::FunctionImpl& functio
 {
     for (const auto& term : function.get_terms())
     {
-        if (const auto variable = std::get_if<Variable>(&term->get_object_or_variable()))
-        {
-            if (!ref_quantified_variables.count(*variable))
+        std::visit(
+            [&](auto&& arg)
             {
-                ref_free_variables.insert(*variable);
-            }
-        }
+                using Variant = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<Variant, Variable>)
+                {
+                    if (!ref_quantified_variables.count(arg))
+                    {
+                        ref_free_variables.insert(arg);
+                    }
+                }
+            },
+            term->get_object_or_variable());
     }
 }
 
@@ -143,13 +149,19 @@ collect_free_variables_recursively(const loki::ConditionLiteralImpl& condition, 
 {
     for (const auto& term : condition.get_literal()->get_atom()->get_terms())
     {
-        if (const auto variable = std::get_if<Variable>(&term->get_object_or_variable()))
-        {
-            if (!ref_quantified_variables.count(*variable))
+        std::visit(
+            [&](auto&& arg)
             {
-                ref_free_variables.insert(*variable);
-            }
-        }
+                using Variant = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<Variant, Variable>)
+                {
+                    if (!ref_quantified_variables.count(arg))
+                    {
+                        ref_free_variables.insert(arg);
+                    }
+                }
+            },
+            term->get_object_or_variable());
     }
 }
 

@@ -47,21 +47,17 @@ private:
 
 public:
     /// @brief Create a `ProblemBuilder` for a given `Domain`.
-    ///
-    /// Copies all elements from the domain repositories as external elements into the problem repositories.
-    /// We use canonical representations to retrieve syntactically equivalent elements from the domain in most cases,
-    /// especially for the critial ones such as Type, Predicate, FunctionSkeleton, Object and all of its nested elements.
-    /// We do not yet have a canonical representation for Condition, FunctionExpression, and Effect, meaning that there can be semantic duplicates.
-    ///
-    /// The canonical representation is important during translation to ensure that we can decouple the domain from the problem translation.
-    /// Let's assume we translate the domain first, meaning that we get new addresses for all elements and that we now translate a problem.
-    /// The copy step ensures that we reuse elements of the translated domain during the problem translation.
     explicit ProblemBuilder(Domain domain);
 
     /// @brief Finalizes the `Problem` and returns it.
     /// The `ProblemBuilder` is in an invalid state afterwards.
     /// @return the resulting `Problem`.
     Problem get_result(size_t problem_index);
+
+    /// @brief Finalizes the `Problem`, verify indexing schemes, and returns it.
+    /// The `ProblemBuilder` is in an invalid state afterwards.
+    /// @return the resulting `Problem`.
+    Problem get_result_checked(size_t problem_index);
 
     /**
      * Get and modify components of the problem.

@@ -30,12 +30,14 @@ enum class BinaryComparatorEnum
     GREATER,        ///< ">"
     LESS,           ///< "<"
     EQUAL,          ///< "="
+    UNEQUAL,        ///< "!="
     GREATER_EQUAL,  ///< ">="
     LESS_EQUAL,     ///< "<="
 };
 
 extern std::unordered_map<BinaryComparatorEnum, std::string> binary_comparator_enum_to_string;
 extern std::ostream& operator<<(std::ostream& out, BinaryComparatorEnum element);
+extern BinaryComparatorEnum negate(BinaryComparatorEnum element);
 
 enum class BinaryOperatorEnum
 {

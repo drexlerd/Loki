@@ -30,16 +30,23 @@ Condition ToDisjunctiveNormalFormTranslator::translate_level_2(ConditionAnd cond
 
     auto disjunctive_parts = ConditionList {};
     auto other_parts = ConditionList {};
+
     for (const auto translated_part : translated_nested_conditions)
     {
-        if (const auto disjunctive_part = std::get_if<ConditionOr>(&translated_part->get_condition()))
-        {
-            disjunctive_parts.push_back(translated_part);
-        }
-        else
-        {
-            other_parts.push_back(translated_part);
-        }
+        std::visit(
+            [&](auto&& arg)
+            {
+                using Variant = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<Variant, ConditionOr>)
+                {
+                    disjunctive_parts.push_back(translated_part);
+                }
+                else
+                {
+                    other_parts.push_back(translated_part);
+                }
+            },
+            translated_part->get_condition());
     }
 
     if (disjunctive_parts.empty())
@@ -92,16 +99,25 @@ Condition ToDisjunctiveNormalFormTranslator::translate_level_2(ConditionExists c
     const auto translated_parameters = this->translate_level_0(condition->get_parameters(), repositories);
     const auto translated_condition = this->translate_level_0(condition->get_condition(), repositories);
 
-    if (const auto translated_disjunctive_condition = std::get_if<ConditionOr>(&translated_condition->get_condition()))
-    {
-        auto result_parts = ConditionList {};
-        for (const auto& part : (*translated_disjunctive_condition)->get_conditions())
+    return std::visit(
+        [&](auto&& arg)
         {
-            result_parts.push_back(repositories.get_or_create_condition(repositories.get_or_create_condition_exists(translated_parameters, part)));
-        }
-        return this->translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_or(result_parts)), repositories);
-    }
-    return flatten(repositories.get_or_create_condition_exists(translated_parameters, translated_condition), repositories);
+            using Variant = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<Variant, ConditionOr>)
+            {
+                auto result_parts = ConditionList {};
+                for (const auto& part : arg->get_conditions())
+                {
+                    result_parts.push_back(repositories.get_or_create_condition(repositories.get_or_create_condition_exists(translated_parameters, part)));
+                }
+                return this->translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_or(result_parts)), repositories);
+            }
+            else
+            {
+                return flatten(repositories.get_or_create_condition_exists(translated_parameters, translated_condition), repositories);
+            }
+        },
+        translated_condition->get_condition());
 }
 
 Condition ToDisjunctiveNormalFormTranslator::translate_level_2(ConditionForall condition, Repositories& repositories)
@@ -109,16 +125,25 @@ Condition ToDisjunctiveNormalFormTranslator::translate_level_2(ConditionForall c
     const auto translated_parameters = this->translate_level_0(condition->get_parameters(), repositories);
     const auto translated_condition = this->translate_level_0(condition->get_condition(), repositories);
 
-    if (const auto translated_disjunctive_condition = std::get_if<ConditionOr>(&translated_condition->get_condition()))
-    {
-        auto result_parts = ConditionList {};
-        for (const auto& part : (*translated_disjunctive_condition)->get_conditions())
+    return std::visit(
+        [&](auto&& arg)
         {
-            result_parts.push_back(repositories.get_or_create_condition(repositories.get_or_create_condition_forall(translated_parameters, part)));
-        }
-        return this->translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_or(result_parts)), repositories);
-    }
-    return flatten(repositories.get_or_create_condition_forall(translated_parameters, translated_condition), repositories);
+            using Variant = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<Variant, ConditionOr>)
+            {
+                auto result_parts = ConditionList {};
+                for (const auto& part : arg->get_conditions())
+                {
+                    result_parts.push_back(repositories.get_or_create_condition(repositories.get_or_create_condition_forall(translated_parameters, part)));
+                }
+                return this->translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_or(result_parts)), repositories);
+            }
+            else
+            {
+                return flatten(repositories.get_or_create_condition_forall(translated_parameters, translated_condition), repositories);
+            }
+        },
+        translated_condition->get_condition());
 }
 
 Domain ToDisjunctiveNormalFormTranslator::translate_level_2(const Domain& domain, DomainBuilder& builder)

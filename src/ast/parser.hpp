@@ -113,6 +113,7 @@ struct BinaryOperatorClass;
 struct BinaryComparatorGreaterClass;
 struct BinaryComparatorLessClass;
 struct BinaryComparatorEqualClass;
+struct BinaryComparatorUnequalClass;
 struct BinaryComparatorGreaterEqualClass;
 struct BinaryComparatorLessEqualClass;
 struct BinaryComparatorClass;
@@ -312,6 +313,7 @@ typedef x3::rule<BinaryOperatorClass, ast::BinaryOperator> binary_operator_type;
 typedef x3::rule<BinaryComparatorGreaterClass, ast::BinaryComparatorGreater> binary_comparator_greater_type;
 typedef x3::rule<BinaryComparatorLessClass, ast::BinaryComparatorLess> binary_comparator_less_type;
 typedef x3::rule<BinaryComparatorEqualClass, ast::BinaryComparatorEqual> binary_comparator_equal_type;
+typedef x3::rule<BinaryComparatorUnequalClass, ast::BinaryComparatorUnequal> binary_comparator_unequal_type;
 typedef x3::rule<BinaryComparatorGreaterEqualClass, ast::BinaryComparatorGreaterEqual> binary_comparator_greater_equal_type;
 typedef x3::rule<BinaryComparatorLessEqualClass, ast::BinaryComparatorLessEqual> binary_comparator_less_equal_type;
 typedef x3::rule<BinaryComparatorClass, ast::BinaryComparator> binary_comparator_type;
@@ -503,6 +505,7 @@ BOOST_SPIRIT_DECLARE(multi_operator_mul_type,
 BOOST_SPIRIT_DECLARE(binary_comparator_greater_type,
                      binary_comparator_less_type,
                      binary_comparator_equal_type,
+                     binary_comparator_unequal_type,
                      binary_comparator_greater_equal_type,
                      binary_comparator_less_equal_type,
                      binary_comparator_type)
@@ -680,6 +683,7 @@ parser::binary_operator_type const& binary_operator();
 parser::binary_comparator_greater_type const& binary_comparator_greater();
 parser::binary_comparator_less_type const& binary_comparator_less();
 parser::binary_comparator_equal_type const& binary_comparator_equal();
+parser::binary_comparator_unequal_type const& binary_comparator_unequal();
 parser::binary_comparator_greater_equal_type const& binary_comparator_greater_equal();
 parser::binary_comparator_less_equal_type const& binary_comparator_less_equal();
 parser::binary_comparator_type const& binary_comparator();

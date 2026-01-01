@@ -129,6 +129,7 @@ binary_operator_type const binary_operator = "binary_operator";
 binary_comparator_greater_type const binary_comparator_greater = "binary_comparator_greater";
 binary_comparator_less_type const binary_comparator_less = "binary_comparator_less";
 binary_comparator_equal_type const binary_comparator_equal = "binary_comparator_equal";
+binary_comparator_unequal_type const binary_comparator_unequal = "binary_comparator_unequal";
 binary_comparator_greater_equal_type const binary_comparator_greater_equal = "binary_comparator_greater_equal";
 binary_comparator_less_equal_type const binary_comparator_less_equal = "binary_comparator_less_equal";
 binary_comparator_type const binary_comparator = "binary_comparator";
@@ -334,10 +335,11 @@ const auto binary_operator_def = binary_operator_minus | binary_operator_div | m
 const auto binary_comparator_greater_def = lit('>') > x3::attr(ast::BinaryComparatorGreater {});
 const auto binary_comparator_less_def = lit('<') > x3::attr(ast::BinaryComparatorLess {});
 const auto binary_comparator_equal_def = lit('=') > x3::attr(ast::BinaryComparatorEqual {});
+const auto binary_comparator_unequal_def = lit('=') > x3::attr(ast::BinaryComparatorUnequal {});
 const auto binary_comparator_greater_equal_def = lit(">=") > x3::attr(ast::BinaryComparatorGreaterEqual {});
 const auto binary_comparator_less_equal_def = lit("<=") > x3::attr(ast::BinaryComparatorLessEqual {});
-const auto binary_comparator_def =
-    binary_comparator_greater_equal | binary_comparator_less_equal | binary_comparator_greater | binary_comparator_less | binary_comparator_equal;
+const auto binary_comparator_def = binary_comparator_greater_equal | binary_comparator_less_equal | binary_comparator_greater | binary_comparator_less
+                                   | binary_comparator_equal | binary_comparator_unequal;
 
 const auto function_head_def = (((lit('(') >> function_symbol) > *term) > lit(')'));
 const auto function_expression_def =
@@ -542,6 +544,7 @@ BOOST_SPIRIT_DEFINE(multi_operator_mul, multi_operator_plus, multi_operator, bin
 BOOST_SPIRIT_DEFINE(binary_comparator_greater,
                     binary_comparator_less,
                     binary_comparator_equal,
+                    binary_comparator_unequal,
                     binary_comparator_greater_equal,
                     binary_comparator_less_equal,
                     binary_comparator)
@@ -829,6 +832,9 @@ struct BinaryComparatorLessClass : x3::annotate_on_success
 {
 };
 struct BinaryComparatorEqualClass : x3::annotate_on_success
+{
+};
+struct BinaryComparatorUnequalClass : x3::annotate_on_success
 {
 };
 struct BinaryComparatorGreaterEqualClass : x3::annotate_on_success
@@ -1260,6 +1266,7 @@ parser::binary_operator_type const& binary_operator() { return parser::binary_op
 parser::binary_comparator_greater_type const& binary_comparator_greater() { return parser::binary_comparator_greater; }
 parser::binary_comparator_less_type const& binary_comparator_less() { return parser::binary_comparator_less; }
 parser::binary_comparator_equal_type const& binary_comparator_equal() { return parser::binary_comparator_equal; }
+parser::binary_comparator_unequal_type const& binary_comparator_unequal() { return parser::binary_comparator_unequal; }
 parser::binary_comparator_greater_equal_type const& binary_comparator_greater_equal() { return parser::binary_comparator_greater_equal; }
 parser::binary_comparator_less_equal_type const& binary_comparator_less_equal() { return parser::binary_comparator_less_equal; }
 parser::binary_comparator_type const& binary_comparator() { return parser::binary_comparator; }

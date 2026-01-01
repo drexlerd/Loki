@@ -65,6 +65,12 @@ extern Condition flatten(ConditionExists condition, Repositories& pddl_repositor
 extern Condition flatten(ConditionForall condition, Repositories& pddl_repositories);
 
 /**
+ * Flatten condition
+ */
+
+extern Condition flatten(Condition condition, Repositories& pddl_repositories);
+
+/**
  * Flatten conditional when
  *
  * A > (B > e)    =>  (A and B) > e
@@ -77,6 +83,12 @@ extern Effect flatten(EffectCompositeWhen effect, Repositories& pddl_repositorie
  * forall(vars1, forall(vars2, e))    =>  forall(vars1+vars2, e)
  */
 extern Effect flatten(EffectCompositeForall effect, Repositories& pddl_repositories);
+
+/**
+ * Flatten effect
+ */
+
+extern Effect flatten(Effect effect, Repositories& pddl_repositories);
 
 /**
  * Axioms

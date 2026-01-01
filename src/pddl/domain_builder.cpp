@@ -51,7 +51,37 @@ DomainBuilder::DomainBuilder() :
 
 Domain DomainBuilder::get_result()
 {
-    m_types = uniquify_elements(m_types);  ///< We explicitly add "object" and "number" which may result in duplicates, so we filter them out.
+    m_types = uniquify_elements(m_types);  ///< We explicitly added "object" and "number" which may result in duplicates, so we filter them out.
+    std::sort(m_types.begin(), m_types.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    std::sort(m_constants.begin(), m_constants.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    std::sort(m_predicates.begin(), m_predicates.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    std::sort(m_function_skeletons.begin(), m_function_skeletons.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    std::sort(m_actions.begin(), m_actions.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    std::sort(m_axioms.begin(), m_axioms.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    m_requirements = (m_requirements) ? m_requirements : m_repositories.get_or_create_requirements(RequirementEnumSet { RequirementEnum::STRIPS });
+
+    return std::shared_ptr<const DomainImpl>(new DomainImpl(std::move(m_repositories),
+                                                            std::move(m_filepath),
+                                                            std::move(m_name),
+                                                            std::move(m_requirements),
+                                                            std::move(m_types),
+                                                            std::move(m_constants),
+                                                            std::move(m_static_initial_literals),
+                                                            std::move(m_predicates),
+                                                            std::move(m_function_skeletons),
+                                                            std::move(m_actions),
+                                                            std::move(m_axioms)));
+}
+
+Domain DomainBuilder::get_result_checked()
+{
+    m_types = uniquify_elements(m_types);  ///< We explicitly added "object" and "number" which may result in duplicates, so we filter them out.
     std::sort(m_types.begin(), m_types.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
     verify_indexing_scheme(m_types, "DomainBuilder::get_result: types must follow and indexing scheme");
 

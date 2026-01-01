@@ -35,6 +35,7 @@ struct BinaryComparatorVisitor : boost::static_visitor<BinaryComparatorEnum>
     BinaryComparatorEnum operator()(const ast::BinaryComparatorGreater& node) const;
     BinaryComparatorEnum operator()(const ast::BinaryComparatorLess& node) const;
     BinaryComparatorEnum operator()(const ast::BinaryComparatorEqual& node) const;
+    BinaryComparatorEnum operator()(const ast::BinaryComparatorUnequal& node) const;
     BinaryComparatorEnum operator()(const ast::BinaryComparatorGreaterEqual& node) const;
     BinaryComparatorEnum operator()(const ast::BinaryComparatorLessEqual& node) const;
 };

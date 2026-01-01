@@ -36,72 +36,88 @@ Condition ToNegationNormalFormTranslator::translate_level_2(ConditionImply condi
 
 Condition ToNegationNormalFormTranslator::translate_level_2(ConditionNot condition, Repositories& repositories)
 {
-    auto translated_nested_condition = this->translate_level_0(condition->get_condition(), repositories);
+    const auto translated_nested = this->translate_level_0(condition->get_condition(), repositories);
 
-    if (const auto condition_lit = std::get_if<ConditionLiteral>(&translated_nested_condition->get_condition()))
-    {
-        return this->translate_level_0(
-            repositories.get_or_create_condition(repositories.get_or_create_condition_literal(
-                repositories.get_or_create_literal(!(*condition_lit)->get_literal()->get_polarity(), (*condition_lit)->get_literal()->get_atom()))),
-            repositories);
-    }
-    else if (const auto condition_numeric = std::get_if<ConditionNumericConstraint>(&translated_nested_condition->get_condition()))
-    {
-        return this->translate_level_0(repositories.get_or_create_condition(
-                                           repositories.get_or_create_condition_numeric_constraint((*condition_numeric)->get_binary_comparator(),
-                                                                                                   (*condition_numeric)->get_left_function_expression(),
-                                                                                                   (*condition_numeric)->get_right_function_expression())),
-                                       repositories);
-    }
-    else if (const auto condition_not = std::get_if<ConditionNot>(&translated_nested_condition->get_condition()))
-    {
-        return this->translate_level_0((*condition_not)->get_condition(), repositories);
-    }
-    else if (const auto condition_imply = std::get_if<ConditionImply>(&translated_nested_condition->get_condition()))
-    {
-        return this->translate_level_0(
-            repositories.get_or_create_condition(repositories.get_or_create_condition_and(
-                ConditionList { (*condition_imply)->get_left_condition(),
-                                repositories.get_or_create_condition(repositories.get_or_create_condition_not((*condition_imply)->get_right_condition())) })),
-            repositories);
-    }
-    else if (const auto condition_and = std::get_if<ConditionAnd>(&translated_nested_condition->get_condition()))
-    {
-        auto nested_parts = ConditionList {};
-        nested_parts.reserve((*condition_and)->get_conditions().size());
-        for (const auto& nested_condition : (*condition_and)->get_conditions())
+    return std::visit(
+        [&](auto&& arg) -> Condition
         {
-            nested_parts.push_back(repositories.get_or_create_condition(repositories.get_or_create_condition_not(nested_condition)));
-        }
-        return this->translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_or(nested_parts)), repositories);
-    }
-    else if (const auto condition_or = std::get_if<ConditionOr>(&translated_nested_condition->get_condition()))
-    {
-        auto nested_parts = ConditionList {};
-        nested_parts.reserve((*condition_or)->get_conditions().size());
-        for (const auto& nested_condition : (*condition_or)->get_conditions())
-        {
-            nested_parts.push_back(repositories.get_or_create_condition(repositories.get_or_create_condition_not(nested_condition)));
-        }
-        return this->translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_and(nested_parts)), repositories);
-    }
-    else if (const auto condition_exists = std::get_if<ConditionExists>(&translated_nested_condition->get_condition()))
-    {
-        return this->translate_level_0(
-            repositories.get_or_create_condition(repositories.get_or_create_condition_forall(
-                (*condition_exists)->get_parameters(),
-                repositories.get_or_create_condition(repositories.get_or_create_condition_not((*condition_exists)->get_condition())))),
-            repositories);
-    }
-    else if (const auto condition_forall = std::get_if<ConditionForall>(&translated_nested_condition->get_condition()))
-    {
-        return this->translate_level_0(
-            repositories.get_or_create_condition(repositories.get_or_create_condition_exists(
-                (*condition_forall)->get_parameters(),
-                repositories.get_or_create_condition(repositories.get_or_create_condition_not((*condition_forall)->get_condition())))),
-            repositories);
-    }
-    throw std::runtime_error("Missing implementation to push negations inwards.");
+            using V = std::decay_t<decltype(arg)>;
+
+            if constexpr (std::is_same_v<V, ConditionLiteral>)
+            {
+                // not p  =>  (flip polarity)
+                const auto lit = arg->get_literal();
+                return this->translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_literal(
+                                                   repositories.get_or_create_literal(!lit->get_polarity(), lit->get_atom()))),
+                                               repositories);
+            }
+            else if constexpr (std::is_same_v<V, ConditionNumericConstraint>)
+            {
+                // not (x ~ y)  =>  (negate comparator)
+                return this->translate_level_0(
+                    repositories.get_or_create_condition(repositories.get_or_create_condition_numeric_constraint(negate(arg->get_binary_comparator()),
+                                                                                                                 arg->get_left_function_expression(),
+                                                                                                                 arg->get_right_function_expression())),
+                    repositories);
+            }
+            else if constexpr (std::is_same_v<V, ConditionNot>)
+            {
+                // not (not phi) => phi
+                return this->translate_level_0(arg->get_condition(), repositories);
+            }
+            else if constexpr (std::is_same_v<V, ConditionImply>)
+            {
+                // not (a -> b)  =>  a and not b
+                return this->translate_level_0(
+                    repositories.get_or_create_condition(repositories.get_or_create_condition_and(
+                        ConditionList { arg->get_left_condition(),
+                                        repositories.get_or_create_condition(repositories.get_or_create_condition_not(arg->get_right_condition())) })),
+                    repositories);
+            }
+            else if constexpr (std::is_same_v<V, ConditionAnd>)
+            {
+                // not (and_i phi_i) => or_i not phi_i
+                ConditionList parts;
+                const auto& cs = arg->get_conditions();
+                parts.reserve(cs.size());
+                for (const auto& c : cs)
+                    parts.push_back(repositories.get_or_create_condition(repositories.get_or_create_condition_not(c)));
+
+                return this->translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_or(parts)), repositories);
+            }
+            else if constexpr (std::is_same_v<V, ConditionOr>)
+            {
+                // not (or_i phi_i) => and_i not phi_i
+                ConditionList parts;
+                const auto& cs = arg->get_conditions();
+                parts.reserve(cs.size());
+                for (const auto& c : cs)
+                    parts.push_back(repositories.get_or_create_condition(repositories.get_or_create_condition_not(c)));
+
+                return this->translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_and(parts)), repositories);
+            }
+            else if constexpr (std::is_same_v<V, ConditionExists>)
+            {
+                // not (exists x. phi) => forall x. not phi
+                return this->translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_forall(
+                                                   arg->get_parameters(),
+                                                   repositories.get_or_create_condition(repositories.get_or_create_condition_not(arg->get_condition())))),
+                                               repositories);
+            }
+            else if constexpr (std::is_same_v<V, ConditionForall>)
+            {
+                // not (forall x. phi) => exists x. not phi
+                return this->translate_level_0(repositories.get_or_create_condition(repositories.get_or_create_condition_exists(
+                                                   arg->get_parameters(),
+                                                   repositories.get_or_create_condition(repositories.get_or_create_condition_not(arg->get_condition())))),
+                                               repositories);
+            }
+            else
+            {
+                throw std::runtime_error("Missing implementation to push negations inwards.");
+            }
+        },
+        translated_nested->get_condition());
 }
 
 Condition ToNegationNormalFormTranslator::translate_level_2(ConditionAnd condition, Repositories& repositories)

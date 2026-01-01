@@ -323,10 +323,16 @@ void test_incompatible_grounding(const ParameterList& parameters, const TermList
 
     for (size_t i = 0; i < parameters.size(); ++i)
     {
-        if (const auto object = std::get_if<Object>(&terms[i]->get_object_or_variable()))
-        {
-            test_incompatible_grounding_helper(parameters[i], *object, positions[i], context);
-        }
+        std::visit(
+            [&](auto&& arg)
+            {
+                using Variant = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<Variant, Object>)
+                {
+                    test_incompatible_grounding_helper(parameters[i], arg, positions[i], context);
+                }
+            },
+            terms[i]->get_object_or_variable());
     }
 }
 

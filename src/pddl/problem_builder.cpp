@@ -57,6 +57,50 @@ Problem ProblemBuilder::get_result(size_t problem_index)
     auto problem_and_domain_objects = m_objects;
     problem_and_domain_objects.insert(problem_and_domain_objects.end(), m_domain->get_constants().begin(), m_domain->get_constants().end());
     std::sort(problem_and_domain_objects.begin(), problem_and_domain_objects.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(m_objects.begin(), m_objects.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    auto problem_and_domain_predicates = m_predicates;
+    problem_and_domain_predicates.insert(problem_and_domain_predicates.end(), m_domain->get_predicates().begin(), m_domain->get_predicates().end());
+    std::sort(problem_and_domain_predicates.begin(),
+              problem_and_domain_predicates.end(),
+              [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    std::sort(m_predicates.begin(), m_predicates.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    std::sort(m_initial_literals.begin(), m_initial_literals.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    std::sort(m_initial_function_values.begin(), m_initial_function_values.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    auto problem_and_domain_axioms = m_axioms;
+    problem_and_domain_axioms.insert(problem_and_domain_axioms.end(), m_domain->get_axioms().begin(), m_domain->get_axioms().end());
+    std::sort(problem_and_domain_axioms.begin(), problem_and_domain_axioms.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+    std::sort(m_axioms.begin(), m_axioms.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
+
+    m_requirements = (m_requirements) ? m_requirements : m_repositories.get_or_create_requirements(RequirementEnumSet { RequirementEnum::STRIPS });
+
+    return std::shared_ptr<ProblemImpl>(new ProblemImpl(problem_index,
+                                                        std::move(m_repositories),
+                                                        std::move(m_filepath),
+                                                        std::move(m_domain),
+                                                        std::move(m_name),
+                                                        std::move(m_requirements),
+                                                        std::move(m_objects),
+                                                        std::move(problem_and_domain_objects),
+                                                        std::move(m_predicates),
+                                                        std::move(problem_and_domain_predicates),
+                                                        std::move(m_initial_literals),
+                                                        std::move(m_initial_function_values),
+                                                        std::move(m_goal_condition),
+                                                        std::move(m_optimization_metric),
+                                                        std::move(m_axioms),
+                                                        std::move(problem_and_domain_axioms)));
+}
+
+Problem ProblemBuilder::get_result_checked(size_t problem_index)
+{
+    auto problem_and_domain_objects = m_objects;
+    problem_and_domain_objects.insert(problem_and_domain_objects.end(), m_domain->get_constants().begin(), m_domain->get_constants().end());
+    std::sort(problem_and_domain_objects.begin(), problem_and_domain_objects.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
     verify_indexing_scheme(problem_and_domain_objects, "ProblemBuilder::get_result: problem_and_domain_objects must follow and indexing scheme");
     std::sort(m_objects.begin(), m_objects.end(), [](auto&& lhs, auto&& rhs) { return lhs->get_index() < rhs->get_index(); });
 

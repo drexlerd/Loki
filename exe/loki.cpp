@@ -22,15 +22,14 @@
 
 int main(int argc, char** argv)
 {
-    auto program = argparse::ArgumentParser("AStar search.");
-    program.add_argument("-D", "--domain-filepath").required().help("The path to the PDDL domain file.");
-    program.add_argument("-P", "--problem-filepath").default_value("").help("The path to the PDDL problem file.");
-    program.add_argument("-OD", "--out-domain-filepath").default_value("").help("The path to the output PDDL domain file.");
-    program.add_argument("-OP", "--out-problem-filepath").default_value("").help("The path to the output PDDL problem file.");
+    auto program = argparse::ArgumentParser("loki");
+    program.add_argument("domain").required().help("The path to the PDDL domain file.");
+    program.add_argument("problem").default_value("").help("The path to the PDDL problem file.");
+    program.add_argument("-OD", "--out-domain").default_value("").help("The path to the output PDDL domain file.");
+    program.add_argument("-OP", "--out-problem").default_value("").help("The path to the output PDDL problem file.");
     program.add_argument("-S", "--strict").default_value(false).implicit_value(true).help("Enable strict parsing mode.");
-    program.add_argument("-Q", "--quiet").default_value(true).implicit_value(false).help("Disable quiet mode.");
-    /* TODO(Dominik): add translator options */
-    program.add_argument("-T", "--remove-typing").default_value(false).implicit_value(true).help("Enable removal of typing.");
+    program.add_argument("-V", "--verbose").default_value(false).implicit_value(true).help("Verbose prints.");
+    program.add_argument("--remove-typing").default_value(false).implicit_value(true).help("Enable removal of typing.");
 
     try
     {
@@ -43,13 +42,13 @@ int main(int argc, char** argv)
         std::exit(1);
     }
 
-    auto domain_filepath = program.get<std::string>("--domain-filepath");
-    auto problem_filepath = program.get<std::string>("--problem-filepath");
-    auto out_domain_filepath = program.get<std::string>("--out-domain-filepath");
-    auto out_problem_filepath = program.get<std::string>("--out-problem-filepath");
+    auto domain_filepath = program.get<std::string>("domain");
+    auto problem_filepath = program.get<std::string>("problem");
+    auto out_domain_filepath = program.get<std::string>("--out-domain");
+    auto out_problem_filepath = program.get<std::string>("--out-problem");
 
     auto parser_options = loki::ParserOptions();
-    parser_options.quiet = program.get<bool>("--quiet");
+    parser_options.verbose = program.get<bool>("--verbose");
     parser_options.strict = program.get<bool>("--strict");
 
     auto translator_options = loki::TranslatorOptions();
@@ -59,7 +58,8 @@ int main(int argc, char** argv)
     const auto domain = parser.get_domain();
 
     const auto domain_translation_result = loki::translate(domain, translator_options);
-    std::cout << *domain_translation_result.get_translated_domain() << std::endl;
+    if (parser_options.verbose)
+        std::cout << *domain_translation_result.get_translated_domain() << std::endl;
 
     if (!out_domain_filepath.empty())
     {
@@ -73,7 +73,8 @@ int main(int argc, char** argv)
         auto problem = parser.parse_problem(problem_filepath, parser_options);
 
         const auto translated_problem = loki::translate(problem, domain_translation_result, translator_options);
-        std::cout << *translated_problem << std::endl;
+        if (parser_options.verbose)
+            std::cout << *translated_problem << std::endl;
 
         if (!out_problem_filepath.empty())
         {

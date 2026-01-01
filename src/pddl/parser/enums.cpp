@@ -27,6 +27,8 @@ BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryCompar
 
 BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorEqual&) const { return BinaryComparatorEnum::EQUAL; }
 
+BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorUnequal&) const { return BinaryComparatorEnum::UNEQUAL; }
+
 BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorGreaterEqual&) const { return BinaryComparatorEnum::GREATER_EQUAL; }
 
 BinaryComparatorEnum BinaryComparatorVisitor::operator()(const ast::BinaryComparatorLessEqual&) const { return BinaryComparatorEnum::LESS_EQUAL; }

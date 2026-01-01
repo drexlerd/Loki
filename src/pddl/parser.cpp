@@ -47,7 +47,7 @@ Parser::Parser(const std::string& source, const fs::path& domain_filepath, const
     m_next_problem_index(0)
 {
     const auto start = std::chrono::high_resolution_clock::now();
-    if (!options.quiet)
+    if (options.verbose)
         std::cout << "Started parsing domain: " << domain_filepath << std::endl;
 
     /* Parse the AST */
@@ -74,7 +74,7 @@ Parser::Parser(const std::string& source, const fs::path& domain_filepath, const
 
     const auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    if (!options.quiet)
+    if (options.verbose)
         std::cout << "Finished parsing domain after " << duration.count() << " milliseconds." << std::endl;
 
     m_domain = context.builder.get_result();
@@ -85,7 +85,7 @@ Parser::Parser(const fs::path& domain_filepath, const ParserOptions& options) : 
 Problem Parser::parse_problem(const std::string& source, const fs::path& problem_filepath, const ParserOptions& options)
 {
     const auto start = std::chrono::high_resolution_clock::now();
-    if (!options.quiet)
+    if (options.verbose)
         std::cout << "Started parsing problem: " << std::endl;
 
     /* Parse the AST */
@@ -111,7 +111,7 @@ Problem Parser::parse_problem(const std::string& source, const fs::path& problem
 
     const auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    if (!options.quiet)
+    if (options.verbose)
         std::cout << "Finished parsing problem after " << duration.count() << " milliseconds." << std::endl;
 
     return context.builder.get_result(m_next_problem_index++);

@@ -32,18 +32,24 @@ Effect ToEffectNormalFormTranslator::translate_level_2(EffectAnd effect, Reposit
     auto other_effects = EffectList {};
     for (const auto& nested_translated_effect : translated_nested_effects)
     {
-        if (const auto nested_translated_effect_literal = std::get_if<EffectLiteral>(&nested_translated_effect->get_effect()))
-        {
-            effect_literals.emplace(nested_translated_effect);
-        }
-        else if (const auto nested_translated_effect_when = std::get_if<EffectCompositeWhen>(&nested_translated_effect->get_effect()))
-        {
-            effect_when.push_back(nested_translated_effect);
-        }
-        else
-        {
-            other_effects.push_back(nested_translated_effect);
-        }
+        std::visit(
+            [&](auto&& arg)
+            {
+                using V = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<V, EffectLiteral>)
+                {
+                    effect_literals.emplace(nested_translated_effect);
+                }
+                else if constexpr (std::is_same_v<V, EffectCompositeWhen>)
+                {
+                    effect_literals.emplace(nested_translated_effect);
+                }
+                else
+                {
+                    other_effects.push_back(nested_translated_effect);
+                }
+            },
+            nested_translated_effect->get_effect());
     }
 
     // 2. e and (phi > e)  =>  e
@@ -71,18 +77,27 @@ Effect ToEffectNormalFormTranslator::translate_level_2(EffectCompositeForall eff
     auto translated_parameters = this->translate_level_0(effect->get_parameters(), repositories);
     auto translated_nested_effect = this->translate_level_0(effect->get_effect(), repositories);
 
-    if (const auto translated_nested_effect_and = std::get_if<EffectAnd>(&translated_nested_effect->get_effect()))
-    {
-        // 4. forall(vars, (e1 and e2))  => forall(vars, e1) and forall(vars, e2)
-        auto result_parts = EffectList {};
-        for (const auto& part : (*translated_nested_effect_and)->get_effects())
+    return std::visit(
+        [&](auto&& arg)
         {
-            result_parts.push_back(repositories.get_or_create_effect(repositories.get_or_create_effect_composite_forall(translated_parameters, part)));
-        }
-        return this->translate_level_0(repositories.get_or_create_effect_and(result_parts), repositories);
-    }
-    // 5. forall(vars1, forall(vars2, e))  =>  forall(vars1+vars2, e)
-    return flatten(repositories.get_or_create_effect_composite_forall(translated_parameters, translated_nested_effect), repositories);
+            using V = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<V, EffectAnd>)
+            {
+                // 4. forall(vars, (e1 and e2))  => forall(vars, e1) and forall(vars, e2)
+                auto result_parts = EffectList {};
+                for (const auto& part : arg->get_effects())
+                {
+                    result_parts.push_back(repositories.get_or_create_effect(repositories.get_or_create_effect_composite_forall(translated_parameters, part)));
+                }
+                return this->translate_level_0(repositories.get_or_create_effect_and(result_parts), repositories);
+            }
+            else
+            {
+                // 5. forall(vars1, forall(vars2, e))  =>  forall(vars1+vars2, e)
+                return flatten(repositories.get_or_create_effect_composite_forall(translated_parameters, translated_nested_effect), repositories);
+            }
+        },
+        translated_nested_effect->get_effect());
 }
 
 Effect ToEffectNormalFormTranslator::translate_level_2(EffectCompositeWhen effect, Repositories& repositories)
@@ -90,48 +105,66 @@ Effect ToEffectNormalFormTranslator::translate_level_2(EffectCompositeWhen effec
     const auto translated_condition = this->translate_level_0(effect->get_condition(), repositories);
     const auto translated_nested_effect = this->translate_level_0(effect->get_effect(), repositories);
 
-    if (const auto translated_nested_effect_when = std::get_if<EffectCompositeWhen>(&translated_nested_effect->get_effect()))
-    {
-        // 6. phi > (psi > e)  =>  (phi and psi) > e
-        return this->translate_level_0(repositories.get_or_create_effect(repositories.get_or_create_effect_composite_when(
-                                           repositories.get_or_create_condition(repositories.get_or_create_condition_and(
-                                               ConditionList { translated_condition, (*translated_nested_effect_when)->get_condition() })),
-                                           (*translated_nested_effect_when)->get_effect())),
-                                       repositories);
-    }
-    else if (const auto translated_nested_effect_and = std::get_if<EffectAnd>(&translated_nested_effect->get_effect()))
-    {
-        // 7. phi > (e1 and e2)  =>  (phi > e1) and (phi > e2)
-        auto parts = EffectList {};
-        for (const auto& translated_nested_effect : (*translated_nested_effect_and)->get_effects())
+    return std::visit(
+        [&](auto&& effect_arg) -> Effect
         {
-            parts.push_back(
-                repositories.get_or_create_effect(repositories.get_or_create_effect_composite_when(translated_condition, translated_nested_effect)));
-        }
-        return this->translate_level_0(repositories.get_or_create_effect_and(parts), repositories);
-    }
-    else if (const auto translated_nested_effect_forall = std::get_if<EffectCompositeForall>(&translated_nested_effect->get_effect()))
-    {
-        // 8. phi > forall(vars, e)  => forall(vars, phi > e)
-        return this->translate_level_0(
-            repositories.get_or_create_effect_composite_forall(
-                (*translated_nested_effect_forall)->get_parameters(),
-                repositories.get_or_create_effect(
-                    repositories.get_or_create_effect_composite_when(translated_condition, (*translated_nested_effect_forall)->get_effect()))),
-            repositories);
-    }
-    else if (const auto translated_condition_exists = std::get_if<ConditionExists>(&translated_condition->get_condition()))
-    {
-        // 9. exists(vars, phi) > e  => forall(vars, phi > e)
-        return this->translate_level_0(
-            repositories.get_or_create_effect_composite_forall(
-                (*translated_condition_exists)->get_parameters(),
-                repositories.get_or_create_effect(
-                    repositories.get_or_create_effect_composite_when((*translated_condition_exists)->get_condition(), translated_nested_effect))),
-            repositories);
-    }
+            using EffectV = std::decay_t<decltype(effect_arg)>;
 
-    return repositories.get_or_create_effect(repositories.get_or_create_effect_composite_when(translated_condition, translated_nested_effect));
+            if constexpr (std::is_same_v<EffectV, EffectCompositeWhen>)
+            {
+                // 6. phi > (psi > e)  =>  (phi and psi) > e
+                return this->translate_level_0(repositories.get_or_create_effect(repositories.get_or_create_effect_composite_when(
+                                                   repositories.get_or_create_condition(repositories.get_or_create_condition_and(
+                                                       ConditionList { translated_condition, effect_arg->get_condition() })),
+                                                   effect_arg->get_effect())),
+                                               repositories);
+            }
+            else if constexpr (std::is_same_v<EffectV, EffectAnd>)
+            {
+                // 7. phi > (e1 and e2)  =>  (phi > e1) and (phi > e2)
+                auto parts = EffectList {};
+                for (const auto& part : effect_arg->get_effects())
+                {
+                    parts.push_back(repositories.get_or_create_effect(repositories.get_or_create_effect_composite_when(translated_condition, part)));
+                }
+                return this->translate_level_0(repositories.get_or_create_effect_and(parts), repositories);
+            }
+            else if constexpr (std::is_same_v<EffectV, EffectCompositeForall>)
+            {
+                // 8. phi > forall(vars, e)  => forall(vars, phi > e)
+                return this->translate_level_0(
+                    repositories.get_or_create_effect_composite_forall(
+                        effect_arg->get_parameters(),
+                        repositories.get_or_create_effect(repositories.get_or_create_effect_composite_when(translated_condition, effect_arg->get_effect()))),
+                    repositories);
+            }
+            else
+            {
+                return std::visit(
+                    [&](auto&& condition_arg) -> Effect
+                    {
+                        using ConditionV = std::decay_t<decltype(condition_arg)>;
+
+                        if constexpr (std::is_same_v<ConditionV, ConditionExists>)
+                        {
+                            // 9. exists(vars, phi) > e  => forall(vars, phi > e)
+                            return this->translate_level_0(
+                                repositories.get_or_create_effect_composite_forall(
+                                    condition_arg->get_parameters(),
+                                    repositories.get_or_create_effect(
+                                        repositories.get_or_create_effect_composite_when(condition_arg->get_condition(), translated_nested_effect))),
+                                repositories);
+                        }
+                        else
+                        {
+                            return repositories.get_or_create_effect(
+                                repositories.get_or_create_effect_composite_when(translated_condition, translated_nested_effect));
+                        }
+                    },
+                    translated_condition->get_condition());
+            }
+        },
+        translated_nested_effect->get_effect());
 }
 
 Condition ToEffectNormalFormTranslator::translate_level_2(ConditionAnd condition, Repositories& repositories)

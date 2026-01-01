@@ -53,6 +53,11 @@ public:
     /// @return the resulting `Domain`.
     Domain get_result();
 
+    /// @brief Finalizes the `Domain`, verify indexing schemes, and returns it.
+    /// The `DomainBuilder` is in an invalid state afterwards.
+    /// @return the resulting `Domain`.
+    Domain get_result_checked();
+
     /**
      * Get and modify components of the domain.
      */

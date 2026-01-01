@@ -32,17 +32,22 @@ Condition MoveExistentialQuantifiersTranslator::translate_level_2(ConditionAnd c
     auto translated_parts = ConditionList {};
     for (const auto translated_nested_condition : translated_nested_conditions)
     {
-        if (const auto translated_nested_condition_exists = std::get_if<ConditionExists>(&translated_nested_condition->get_condition()))
-        {
-            translated_parameters.insert((*translated_nested_condition_exists)->get_parameters().begin(),
-                                         (*translated_nested_condition_exists)->get_parameters().end());
+        std::visit(
+            [&](auto&& arg)
+            {
+                using Variant = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<Variant, ConditionExists>)
+                {
+                    translated_parameters.insert(arg->get_parameters().begin(), arg->get_parameters().end());
 
-            translated_parts.push_back((*translated_nested_condition_exists)->get_condition());
-        }
-        else
-        {
-            translated_parts.push_back(translated_nested_condition);
-        }
+                    translated_parts.push_back(arg->get_condition());
+                }
+                else
+                {
+                    translated_parts.push_back(translated_nested_condition);
+                }
+            },
+            translated_nested_condition->get_condition());
     }
 
     const auto translated_parts_conjunction = flatten(repositories.get_or_create_condition_and(translated_parts), repositories);
@@ -72,18 +77,24 @@ Action MoveExistentialQuantifiersTranslator::translate_level_2(Action action, Re
 
     if (translated_condition.has_value())
     {
-        if (const auto translated_condition_exists = std::get_if<ConditionExists>(&translated_condition.value()->get_condition()))
-        {
-            for (const auto& translated_parameter : (*translated_condition_exists)->get_parameters())
+        std::visit(
+            [&](auto&& arg)
             {
-                if (std::find(std::begin(translated_parameters), std::end(translated_parameters), translated_parameter) == translated_parameters.end())
+                using Variant = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<Variant, ConditionExists>)
                 {
-                    translated_parameters.push_back(translated_parameter);
-                }
-            }
+                    for (const auto& translated_parameter : arg->get_parameters())
+                    {
+                        if (std::find(std::begin(translated_parameters), std::end(translated_parameters), translated_parameter) == translated_parameters.end())
+                        {
+                            translated_parameters.push_back(translated_parameter);
+                        }
+                    }
 
-            translated_condition = (*translated_condition_exists)->get_condition();
-        }
+                    translated_condition = arg->get_condition();
+                }
+            },
+            translated_condition.value()->get_condition());
     }
 
     return repositories.get_or_create_action(action->get_name(),
@@ -99,18 +110,24 @@ Axiom MoveExistentialQuantifiersTranslator::translate_level_2(Axiom axiom, Repos
     auto translated_literal = this->translate_level_0(axiom->get_literal(), repositories);
     auto translated_condition = this->translate_level_0(axiom->get_condition(), repositories);
 
-    if (const auto translated_condition_exists = std::get_if<ConditionExists>(&translated_condition->get_condition()))
-    {
-        for (const auto& translated_parameter : (*translated_condition_exists)->get_parameters())
+    std::visit(
+        [&](auto&& arg)
         {
-            if (std::find(std::begin(translated_parameters), std::end(translated_parameters), translated_parameter) == translated_parameters.end())
+            using Variant = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<Variant, ConditionExists>)
             {
-                translated_parameters.push_back(translated_parameter);
-            }
-        }
+                for (const auto& translated_parameter : arg->get_parameters())
+                {
+                    if (std::find(std::begin(translated_parameters), std::end(translated_parameters), translated_parameter) == translated_parameters.end())
+                    {
+                        translated_parameters.push_back(translated_parameter);
+                    }
+                }
 
-        translated_condition = (*translated_condition_exists)->get_condition();
-    }
+                translated_condition = arg->get_condition();
+            }
+        },
+        translated_condition->get_condition());
 
     return repositories.get_or_create_axiom(translated_parameters, translated_literal, translated_condition);
 }

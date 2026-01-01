@@ -23,9 +23,9 @@ namespace loki
 struct ParserOptions
 {
     bool strict;
-    bool quiet;
+    bool verbose;
 
-    ParserOptions() : strict(false), quiet(true) {}
+    ParserOptions() : strict(false), verbose(false) {}
 };
 }
 
