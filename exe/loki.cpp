@@ -24,9 +24,9 @@ int main(int argc, char** argv)
 {
     auto program = argparse::ArgumentParser("loki");
     program.add_argument("domain").required().help("The path to the PDDL domain file.");
-    program.add_argument("problem").default_value("").help("The path to the PDDL problem file.");
-    program.add_argument("-OD", "--out-domain").default_value("").help("The path to the output PDDL domain file.");
-    program.add_argument("-OP", "--out-problem").default_value("").help("The path to the output PDDL problem file.");
+    program.add_argument("problem").default_value(std::string {}).help("The path to the PDDL problem file.");
+    program.add_argument("-OD", "--out-domain").help("The path to the output PDDL domain file.");
+    program.add_argument("-OP", "--out-problem").help("The path to the output PDDL problem file.");
     program.add_argument("-S", "--strict").default_value(false).implicit_value(true).help("Enable strict parsing mode.");
     program.add_argument("-V", "--verbose").default_value(false).implicit_value(true).help("Verbose prints.");
     program.add_argument("--remove-typing").default_value(false).implicit_value(true).help("Enable removal of typing.");
@@ -44,8 +44,6 @@ int main(int argc, char** argv)
 
     auto domain_filepath = program.get<std::string>("domain");
     auto problem_filepath = program.get<std::string>("problem");
-    auto out_domain_filepath = program.get<std::string>("--out-domain");
-    auto out_problem_filepath = program.get<std::string>("--out-problem");
 
     auto parser_options = loki::ParserOptions();
     parser_options.verbose = program.get<bool>("--verbose");
@@ -61,8 +59,9 @@ int main(int argc, char** argv)
     if (parser_options.verbose)
         std::cout << *domain_translation_result.get_translated_domain() << std::endl;
 
-    if (!out_domain_filepath.empty())
+    if (program.is_used("--out-domain"))
     {
+        auto out_domain_filepath = program.get<std::string>("--out-domain");
         auto out_domain_file = std::ofstream(out_domain_filepath);
         out_domain_file << *domain_translation_result.get_translated_domain();
         out_domain_file.close();
@@ -76,8 +75,9 @@ int main(int argc, char** argv)
         if (parser_options.verbose)
             std::cout << *translated_problem << std::endl;
 
-        if (!out_problem_filepath.empty())
+        if (program.is_used("--out-problem"))
         {
+            auto out_problem_filepath = program.get<std::string>("--out-problem");
             auto out_problem_file = std::ofstream(out_problem_filepath);
             out_problem_file << *translated_problem;
             out_problem_file.close();
