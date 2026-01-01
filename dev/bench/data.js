@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1765544789631,
+  "lastUpdate": 1767265233958,
   "repoUrl": "https://github.com/drexlerd/Loki",
   "entries": {
     "Benchmark": [
@@ -24900,6 +24900,84 @@ window.BENCHMARK_DATA = {
             "value": 7200535.376345245,
             "unit": "ns/iter",
             "extra": "iterations: 93\ncpu: 7199484.322580648 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dominik.drexler@gmx.net",
+            "name": "Dominik Drexler",
+            "username": "drexlerd"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "411e04d14dee225081d570547d1e221afd2ae7fa",
+          "message": "Merge pull request #15 from jendrikseipp/apptainer\n\nAdd Apptainer recipe and GitHub Action workflow for building it.",
+          "timestamp": "2026-01-01T11:47:31+01:00",
+          "tree_id": "4de0d3215ea835530dc18976550d54e1b69bcf89",
+          "url": "https://github.com/drexlerd/Loki/commit/411e04d14dee225081d570547d1e221afd2ae7fa"
+        },
+        "date": 1767265232521,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "loki::benchmarks::BM_ConstructAtoms",
+            "value": 211618238.33328223,
+            "unit": "ns/iter",
+            "extra": "iterations: 3\ncpu: 211616468.33333337 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_IterateAtoms/100",
+            "value": 5741.5056070417295,
+            "unit": "ns/iter",
+            "extra": "iterations: 120206\ncpu: 5740.752533151423 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_IterateAtoms/1000",
+            "value": 49921.32597318669,
+            "unit": "ns/iter",
+            "extra": "iterations: 13949\ncpu: 49916.570650225825 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_IterateAtoms/10000",
+            "value": 552344.4952755234,
+            "unit": "ns/iter",
+            "extra": "iterations: 1270\ncpu: 552154.5078740156 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_IterateAtoms/100000",
+            "value": 5303417.893938703,
+            "unit": "ns/iter",
+            "extra": "iterations: 132\ncpu: 5302752.636363635 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_RandomlyIterateAtoms/100",
+            "value": 5778.750703014485,
+            "unit": "ns/iter",
+            "extra": "iterations: 120908\ncpu: 5778.431427200848 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_RandomlyIterateAtoms/1000",
+            "value": 51837.81598635845,
+            "unit": "ns/iter",
+            "extra": "iterations: 13499\ncpu: 51828.581672716486 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_RandomlyIterateAtoms/10000",
+            "value": 607612.5230233853,
+            "unit": "ns/iter",
+            "extra": "iterations: 1151\ncpu: 607559.557775847 ns\nthreads: 1"
+          },
+          {
+            "name": "loki::benchmarks::BM_RandomlyIterateAtoms/100000",
+            "value": 7856366.604652638,
+            "unit": "ns/iter",
+            "extra": "iterations: 86\ncpu: 7853817.7093023285 ns\nthreads: 1"
           }
         ]
       }
