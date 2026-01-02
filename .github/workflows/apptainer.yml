@@ -34,5 +34,6 @@ jobs:
         if: (github.event_name != 'pull_request')
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | apptainer remote login -u ${GITHUB_ACTOR} --password-stdin oras://ghcr.io
-          apptainer push image.sif oras://ghcr.io/${GITHUB_REPOSITORY}:latest
-          # Image can now be pulled with "apptainer pull oras://ghcr.io/${GITHUB_REPOSITORY}:latest"
+          REPO_LC="$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')"
+          apptainer push image.sif oras://ghcr.io/${REPO_LC}:latest
+          # Image can now be pulled with "apptainer pull oras://ghcr.io/${REPO_LC}:latest"
