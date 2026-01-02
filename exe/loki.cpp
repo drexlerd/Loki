@@ -20,16 +20,36 @@
 #include <iostream>
 #include <loki/loki.hpp>
 
+static constexpr std::string version = "1.0.0";
+
+static void add_version(argparse::ArgumentParser& program)
+{
+    program.add_argument("-V", "--version")
+        .nargs(0)
+        .action(
+            [&](const auto&)
+            {
+                std::cout << version << std::endl;
+                std::exit(0);
+            })
+        .help("Print version information and exit.");
+}
+
 int main(int argc, char** argv)
 {
-    auto program = argparse::ArgumentParser("loki");
+    auto program = argparse::ArgumentParser("loki", version, argparse::default_arguments::help);
+    add_version(program);
+
     program.add_argument("domain").required().help("The path to the PDDL domain file.");
     program.add_argument("problem").default_value(std::string {}).help("The path to the PDDL problem file.");
-    program.add_argument("-OD", "--out-domain").help("The path to the output PDDL domain file.");
-    program.add_argument("-OP", "--out-problem").help("The path to the output PDDL problem file.");
-    program.add_argument("-S", "--strict").default_value(false).implicit_value(true).help("Enable strict parsing mode.");
-    program.add_argument("-V", "--verbose").default_value(false).implicit_value(true).help("Verbose prints.");
-    program.add_argument("--remove-typing").default_value(false).implicit_value(true).help("Enable removal of typing.");
+    program.add_argument("-d", "--out-domain").help("The path to the output PDDL domain file.");
+    program.add_argument("-p", "--out-problem").help("The path to the output PDDL problem file.");
+    program.add_argument("-s", "--strict")
+        .default_value(false)
+        .implicit_value(true)
+        .help("Enable strict parsing mode to catch unused objects, predicates, functions, and parameters.");
+    program.add_argument("-v", "--verbose").default_value(false).implicit_value(true).help("Enable verbose console prints.");
+    program.add_argument("--remove-typing").default_value(false).implicit_value(true).help("Enable the removal of type annotations.");
 
     try
     {
