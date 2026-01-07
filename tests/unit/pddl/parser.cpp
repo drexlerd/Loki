@@ -15,6 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "loki/details/pddl/parser_options.hpp"
 #include <gtest/gtest.h>
 #include <loki/details/pddl/domain.hpp>
 #include <loki/details/pddl/exceptions.hpp>
@@ -39,6 +40,25 @@ TEST(LokiTests, ParserTest)
 
     EXPECT_EQ(problem->get_objects().size(), 4);
     EXPECT_EQ(problem->get_initial_literals().size(), 11);
+}
+
+TEST(LokiTests, ParserStringTest)
+{
+    const std::string domain_str =
+        "(define (domain test-domain) "
+        "        (:requirements :strips) "
+        "        (:predicates (p)) "
+        "        (:action a "
+        "         :parameters () "
+        "         :precondition (and) "
+        "         :effect (and (p))))";
+
+    auto parser = Parser(domain_str, "", ParserOptions());
+    auto domain = parser.get_domain();
+
+    EXPECT_EQ(domain->get_constants().size(), 0);
+    EXPECT_EQ(domain->get_predicates().size(), 1);
+    EXPECT_EQ(domain->get_actions().size(), 1);
 }
 
 TEST(LokiTests, ParserNonDeterministicTest)
