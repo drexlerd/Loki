@@ -3,6 +3,8 @@ project(InstallBenchmark)
 
 include(ExternalProject)
 
+set(LOKI_BENCHMARK_GIT_TAG v1.8.3 CACHE STRING "Git tag used to build benchmark.")
+
 list(APPEND CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     -DCMAKE_BUILD_TYPE=Release
@@ -19,7 +21,9 @@ endforeach()
 ExternalProject_Add(
     benchmark
     GIT_REPOSITORY https://github.com/google/benchmark.git
-    GIT_TAG v1.8.3
+    GIT_TAG ${LOKI_BENCHMARK_GIT_TAG}
     PREFIX ${CMAKE_BINARY_DIR}/benchmark
+    STAMP_DIR ${CMAKE_BINARY_DIR}/benchmark/stamp/${LOKI_BENCHMARK_GIT_TAG}
+    UPDATE_COMMAND ""
     CMAKE_ARGS ${CMAKE_ARGS}
 )
