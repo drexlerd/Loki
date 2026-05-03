@@ -4,7 +4,7 @@ file(GLOB_RECURSE PRIVATE_HEADER_FILES
     "*.hpp" "**/*.hpp")
 file(GLOB_RECURSE PUBLIC_HEADER_FILES
     "../include/*.hpp" "../include/**/*.hpp")
-add_library(parsers STATIC ${SRC_FILES} ${PRIVATE_HEADER_FILES} ${PUBLIC_HEADER_FILES})
+add_library(parsers ${SRC_FILES} ${PRIVATE_HEADER_FILES} ${PUBLIC_HEADER_FILES})
 set_target_properties(parsers PROPERTIES OUTPUT_NAME loki_parsers)
 
 # Add compile definitions for the parsers target

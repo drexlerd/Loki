@@ -12,6 +12,6 @@ ExternalProject_Add(
     PREFIX ${CMAKE_BINARY_DIR}/boost
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> ./bootstrap.sh --prefix=<INSTALL_DIR>
     BUILD_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> ./b2 headers
-    INSTALL_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> ./b2 install
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> ./b2 install link=shared runtime-link=shared
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
 )

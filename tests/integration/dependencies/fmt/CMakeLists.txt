@@ -13,6 +13,8 @@ if (NOT fmt_FOUND)
     list(APPEND CMAKE_ARGS
             -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}
             -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
+            -DBUILD_SHARED_LIBS:BOOL=ON
+            -DFMT_TEST:BOOL=OFF
     )
     message(STATUS "Preparing external project \"fmt\" with args:")
     foreach (CMAKE_ARG ${CMAKE_ARGS})
@@ -29,4 +31,3 @@ if (NOT fmt_FOUND)
 else ()
     message(STATUS "fmt is already installed.")
 endif ()
-

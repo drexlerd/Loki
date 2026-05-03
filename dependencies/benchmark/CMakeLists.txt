@@ -6,6 +6,7 @@ include(ExternalProject)
 list(APPEND CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     -DCMAKE_BUILD_TYPE=Release
+    -DBUILD_SHARED_LIBS=ON
     -DBENCHMARK_ENABLE_GTEST_TESTS=OFF
     )
 
@@ -21,4 +22,3 @@ ExternalProject_Add(
     PREFIX ${CMAKE_BINARY_DIR}/benchmark
     CMAKE_ARGS ${CMAKE_ARGS}
 )
-

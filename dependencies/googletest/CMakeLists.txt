@@ -5,6 +5,7 @@ include(ExternalProject)
 
 list(APPEND CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+    -DBUILD_SHARED_LIBS=ON
 )
 
 message(STATUS "Preparing external project \"googletest\" with args:")
