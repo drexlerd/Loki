@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/repositories.hpp"
+#include "loki/pddl/repositories.hpp"
 
 #include <algorithm>
 

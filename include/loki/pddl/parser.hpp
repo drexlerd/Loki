@@ -1,0 +1,60 @@
+/*
+ * Copyright (C) 2023 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#ifndef LOKI_INCLUDE_LOKI_PDDL_PARSER_HPP_
+#define LOKI_INCLUDE_LOKI_PDDL_PARSER_HPP_
+
+#include "loki/pddl/declarations.hpp"
+#include "loki/pddl/parser_options.hpp"
+#include "loki/pddl/position_cache.hpp"
+#include "loki/pddl/scope.hpp"
+#include "loki/utils/filesystem.hpp"
+
+#include <memory>
+
+namespace loki
+{
+
+class Parser
+{
+public:
+    Parser(const std::string& source, const fs::path& domain_filepath = "", const ParserOptions& options = ParserOptions());
+
+    Parser(const fs::path& domain_filepath, const ParserOptions& options = ParserOptions());
+
+    Problem parse_problem(const std::string& source, const fs::path& problem_filepath = "", const ParserOptions& options = ParserOptions());
+
+    Problem parse_problem(const fs::path& problem_filepath, const ParserOptions& options = ParserOptions());
+
+    const Domain& get_domain() const;
+
+private:
+    Domain m_domain;
+    std::unique_ptr<ScopeStack> m_scopes;
+
+    std::unique_ptr<FilePositionErrorHandler> m_domain_error_handler;
+    std::unique_ptr<PositionCaches> m_domain_position_cache;
+
+    std::unique_ptr<FilePositionErrorHandler> m_problem_error_handler;
+    std::unique_ptr<PositionCaches> m_problem_position_cache;
+
+    size_t m_next_problem_index;  ///< The index for the next problem.
+};
+
+}
+
+#endif

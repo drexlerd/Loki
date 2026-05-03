@@ -18,10 +18,10 @@
 #ifndef LOKI_SRC_PDDL_PARSER_CONDITIONS_HPP_
 #define LOKI_SRC_PDDL_PARSER_CONDITIONS_HPP_
 
-#include "loki/details/ast/ast.hpp"
-#include "loki/details/pddl/concepts.hpp"
-#include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/scope.hpp"
+#include "loki/ast/ast.hpp"
+#include "loki/pddl/concepts.hpp"
+#include "loki/pddl/declarations.hpp"
+#include "loki/pddl/scope.hpp"
 
 #include <variant>
 

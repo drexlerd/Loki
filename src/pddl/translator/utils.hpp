@@ -18,7 +18,7 @@
 #ifndef LOKI_SRC_PDDL_TRANSLATOR_UTILS_HPP_
 #define LOKI_SRC_PDDL_TRANSLATOR_UTILS_HPP_
 
-#include "loki/details/pddl/declarations.hpp"
+#include "loki/pddl/declarations.hpp"
 
 #include <random>
 

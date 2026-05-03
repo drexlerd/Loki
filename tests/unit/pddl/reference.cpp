@@ -16,9 +16,9 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/details/pddl/object.hpp>
-#include <loki/details/pddl/reference_tracker.hpp>
-#include <loki/details/utils/indexed_hash_set.hpp>
+#include <loki/pddl/object.hpp>
+#include <loki/pddl/reference_tracker.hpp>
+#include <loki/utils/indexed_hash_set.hpp>
 
 namespace loki::domain::tests
 {

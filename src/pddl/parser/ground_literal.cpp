@@ -19,9 +19,9 @@
 
 #include "common.hpp"
 #include "error_handling.hpp"
-#include "loki/details/pddl/exceptions.hpp"
-#include "loki/details/pddl/problem_parsing_context.hpp"
-#include "loki/details/pddl/scope.hpp"
+#include "loki/pddl/exceptions.hpp"
+#include "loki/pddl/problem_parsing_context.hpp"
+#include "loki/pddl/scope.hpp"
 #include "objects.hpp"
 #include "reference_utils.hpp"
 

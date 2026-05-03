@@ -15,14 +15,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/axiom.hpp"
+#include "loki/pddl/axiom.hpp"
 
 #include "formatter.hpp"
-#include "loki/details/pddl/conditions.hpp"
-#include "loki/details/pddl/effects.hpp"
-#include "loki/details/pddl/literal.hpp"
-#include "loki/details/pddl/parameter.hpp"
-#include "loki/details/pddl/predicate.hpp"
+#include "loki/pddl/conditions.hpp"
+#include "loki/pddl/effects.hpp"
+#include "loki/pddl/literal.hpp"
+#include "loki/pddl/parameter.hpp"
+#include "loki/pddl/predicate.hpp"
 
 namespace loki
 {

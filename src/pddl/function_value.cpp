@@ -15,10 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/function_value.hpp"
+#include "loki/pddl/function_value.hpp"
 
 #include "formatter.hpp"
-#include "loki/details/pddl/function.hpp"
+#include "loki/pddl/function.hpp"
 
 namespace loki
 {

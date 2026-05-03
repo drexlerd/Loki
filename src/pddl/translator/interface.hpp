@@ -18,8 +18,8 @@
 #ifndef LOKI_SRC_PDDL_TRANSLATOR_INTERFACE_HPP_
 #define LOKI_SRC_PDDL_TRANSLATOR_INTERFACE_HPP_
 
-#include "loki/details/pddl/concepts.hpp"
-#include "loki/details/pddl/problem.hpp"
+#include "loki/pddl/concepts.hpp"
+#include "loki/pddl/problem.hpp"
 
 namespace loki
 {

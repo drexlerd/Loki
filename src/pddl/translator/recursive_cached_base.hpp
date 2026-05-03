@@ -19,11 +19,11 @@
 #define LOKI_SRC_PDDL_TRANSLATOR_RECURSIVE_CACHED_BASE_HPP_
 
 #include "interface.hpp"
-#include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/domain.hpp"
-#include "loki/details/pddl/domain_builder.hpp"
-#include "loki/details/pddl/problem.hpp"
-#include "loki/details/pddl/problem_builder.hpp"
+#include "loki/pddl/declarations.hpp"
+#include "loki/pddl/domain.hpp"
+#include "loki/pddl/domain_builder.hpp"
+#include "loki/pddl/problem.hpp"
+#include "loki/pddl/problem_builder.hpp"
 
 namespace loki
 {

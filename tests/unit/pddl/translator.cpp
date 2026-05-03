@@ -16,10 +16,10 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/details/pddl/domain.hpp>
-#include <loki/details/pddl/parser.hpp>
-#include <loki/details/pddl/problem.hpp>
-#include <loki/details/pddl/translator.hpp>
+#include <loki/pddl/domain.hpp>
+#include <loki/pddl/parser.hpp>
+#include <loki/pddl/problem.hpp>
+#include <loki/pddl/translator.hpp>
 
 namespace loki::domain::tests
 {

@@ -18,9 +18,9 @@
 #ifndef LOKI_SRC_PDDL_PARSER_REQUIREMENTS_HPP_
 #define LOKI_SRC_PDDL_PARSER_REQUIREMENTS_HPP_
 
-#include "loki/details/ast/ast.hpp"
-#include "loki/details/pddl/concepts.hpp"
-#include "loki/details/pddl/reference_tracker.hpp"
+#include "loki/ast/ast.hpp"
+#include "loki/pddl/concepts.hpp"
+#include "loki/pddl/reference_tracker.hpp"
 
 namespace loki
 {

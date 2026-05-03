@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/exceptions.hpp"
+#include "loki/exceptions.hpp"
 
 #include <string>
 

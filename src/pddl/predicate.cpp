@@ -15,13 +15,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/predicate.hpp"
+#include "loki/pddl/predicate.hpp"
 
 #include "formatter.hpp"
-#include "loki/details/pddl/parameter.hpp"
-#include "loki/details/pddl/type.hpp"
-#include "loki/details/pddl/variable.hpp"
-#include "loki/details/utils/collections.hpp"
+#include "loki/pddl/parameter.hpp"
+#include "loki/pddl/type.hpp"
+#include "loki/pddl/variable.hpp"
+#include "loki/utils/collections.hpp"
 
 #include <memory>
 

@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/requirements.hpp"
+#include "loki/pddl/requirements.hpp"
 
 #include "formatter.hpp"
 

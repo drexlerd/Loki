@@ -26,12 +26,12 @@ Stage: build
     cd /opt/loki
 
     # Build and install dependencies
-    cmake -S dependencies -B dependencies/build -DCMAKE_INSTALL_PREFIX=dependencies/installs
-    cmake --build dependencies/build -j$(nproc)
+    cmake -S dependencies -B dependencies-build -DCMAKE_INSTALL_PREFIX=/opt/loki/dependencies-install
+    cmake --build dependencies-build -j$(nproc)
 
     # Build Loki
     cmake -S . -B build \
-        -DCMAKE_PREFIX_PATH=/opt/loki/dependencies/installs \
+        -DCMAKE_PREFIX_PATH=/opt/loki/dependencies-install \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_TESTS=OFF \
         -DBUILD_BENCHMARKS=OFF
@@ -49,7 +49,7 @@ Stage: runtime
 %files from build
     /opt/loki/install /usr/local
     /opt/loki/build/exe/loki /usr/local/bin/loki
-    /opt/loki/dependencies/installs/lib /usr/local/lib
+    /opt/loki/dependencies-install/lib /usr/local/lib
 
 %post
     # Install only runtime dependencies

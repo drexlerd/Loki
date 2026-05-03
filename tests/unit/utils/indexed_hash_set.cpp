@@ -16,13 +16,13 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/details/pddl/object.hpp>
-#include <loki/details/pddl/term.hpp>
-#include <loki/details/pddl/type.hpp>
-#include <loki/details/pddl/variable.hpp>
-#include <loki/details/utils/equal_to.hpp>
-#include <loki/details/utils/hash.hpp>
-#include <loki/details/utils/indexed_hash_set.hpp>
+#include <loki/pddl/object.hpp>
+#include <loki/pddl/term.hpp>
+#include <loki/pddl/type.hpp>
+#include <loki/pddl/variable.hpp>
+#include <loki/utils/equal_to.hpp>
+#include <loki/utils/hash.hpp>
+#include <loki/utils/indexed_hash_set.hpp>
 
 namespace loki::domain::tests
 {

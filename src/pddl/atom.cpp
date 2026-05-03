@@ -15,11 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/atom.hpp"
+#include "loki/pddl/atom.hpp"
 
 #include "formatter.hpp"
-#include "loki/details/pddl/predicate.hpp"
-#include "loki/details/pddl/term.hpp"
+#include "loki/pddl/predicate.hpp"
+#include "loki/pddl/term.hpp"
 
 namespace loki
 {

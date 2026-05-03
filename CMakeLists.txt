@@ -16,7 +16,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project(loki VERSION "0.0.1" LANGUAGES C CXX)
 
 # Compilation flags, some configuration-specific
-# When applying -fsanitize=address, also set it in dependencies (abseil) via -DCMAKE_CXX_FLAGS="-fsanitize=address"
+# When applying -fsanitize=address, also set it in dependencies via -DCMAKE_CXX_FLAGS="-fsanitize=address"
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -Wuninitialized -pedantic -fPIC")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -fomit-frame-pointer")
 set(CMAKE_CXX_FLAGS_DEBUG "-O3 -DDEBUG")
@@ -89,10 +89,9 @@ if(Boost_FOUND)
 endif()
 
 
-find_package(absl CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
-if(absl_FOUND)
-  include_directories(${absl_INCLUDE_DIRS})
-  message(STATUS "Found absl: ${absl_DIR} (found version ${absl_VERSION})")
+find_package(gtl CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+if(gtl_FOUND)
+  message(STATUS "Found gtl: ${gtl_DIR}")
 endif()
 
 

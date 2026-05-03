@@ -17,7 +17,7 @@
 
 #include "to_disjunctive_normal_form.hpp"
 
-#include "loki/details/utils/collections.hpp"
+#include "loki/utils/collections.hpp"
 #include "to_negation_normal_form.hpp"
 #include "utils.hpp"
 

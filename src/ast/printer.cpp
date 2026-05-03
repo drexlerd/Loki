@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/ast/printer.hpp"
+#include "loki/ast/printer.hpp"
 
 #include <fmt/core.h>
 #include <fmt/ostream.h>

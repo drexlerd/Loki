@@ -15,11 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/object.hpp"
+#include "loki/pddl/object.hpp"
 
 #include "formatter.hpp"
-#include "loki/details/pddl/type.hpp"
-#include "loki/details/utils/collections.hpp"
+#include "loki/pddl/type.hpp"
+#include "loki/utils/collections.hpp"
 
 namespace loki
 {

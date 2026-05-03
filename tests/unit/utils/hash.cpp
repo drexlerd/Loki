@@ -16,8 +16,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/details/utils/equal_to.hpp>
-#include <loki/details/utils/hash.hpp>
+#include <loki/utils/equal_to.hpp>
+#include <loki/utils/hash.hpp>
 #include <unordered_set>
 
 namespace loki::domain::tests

@@ -17,13 +17,14 @@
 
 #include "formatter.hpp"
 
-#include "loki/details/utils/hash.hpp"
-#include "loki/details/utils/ostream.hpp"
+#include "loki/utils/hash.hpp"
+#include "loki/utils/ostream.hpp"
 
 #include <cassert>
 #include <fmt/core.h>
 #include <fmt/ostream.h>
 #include <fmt/ranges.h>
+#include <ranges>
 #include <sstream>
 
 namespace loki

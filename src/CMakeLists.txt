@@ -18,7 +18,7 @@ add_library(loki::parsers ALIAS parsers)
 
 target_link_libraries(parsers
   PUBLIC
-    absl::flat_hash_set 
+    gtl::gtl
   PRIVATE
     fmt::fmt)
 

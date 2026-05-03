@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/utils/memory.hpp"
+#include "loki/utils/memory.hpp"
 
 #if defined(__linux__)
 
@@ -68,7 +68,7 @@ std::tuple<double, double> process_mem_usage()
 
 #if defined(__APPLE__)
 
-#include "loki/details/utils/memory.hpp"
+#include "loki/utils/memory.hpp"
 
 #include <mach/mach.h>
 

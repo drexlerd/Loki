@@ -17,8 +17,8 @@
 
 #include "simplify_goal.hpp"
 
-#include "loki/details/pddl/problem_builder.hpp"
-#include "loki/details/utils/collections.hpp"
+#include "loki/pddl/problem_builder.hpp"
+#include "loki/utils/collections.hpp"
 #include "utils.hpp"
 
 using namespace std::string_literals;

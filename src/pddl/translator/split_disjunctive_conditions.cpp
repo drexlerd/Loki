@@ -17,7 +17,7 @@
 
 #include "split_disjunctive_conditions.hpp"
 
-#include "loki/details/utils/collections.hpp"
+#include "loki/utils/collections.hpp"
 #include "utils.hpp"
 
 using namespace std::string_literals;

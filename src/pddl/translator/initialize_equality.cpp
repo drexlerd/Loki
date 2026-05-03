@@ -17,7 +17,7 @@
 
 #include "initialize_equality.hpp"
 
-#include "loki/details/utils/collections.hpp"
+#include "loki/utils/collections.hpp"
 
 namespace loki
 {

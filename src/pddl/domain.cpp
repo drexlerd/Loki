@@ -15,16 +15,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/domain.hpp"
+#include "loki/pddl/domain.hpp"
 
 #include "formatter.hpp"
-#include "loki/details/pddl/action.hpp"
-#include "loki/details/pddl/axiom.hpp"
-#include "loki/details/pddl/function_skeleton.hpp"
-#include "loki/details/pddl/object.hpp"
-#include "loki/details/pddl/predicate.hpp"
-#include "loki/details/pddl/requirements.hpp"
-#include "loki/details/pddl/type.hpp"
+#include "loki/pddl/action.hpp"
+#include "loki/pddl/axiom.hpp"
+#include "loki/pddl/function_skeleton.hpp"
+#include "loki/pddl/object.hpp"
+#include "loki/pddl/predicate.hpp"
+#include "loki/pddl/requirements.hpp"
+#include "loki/pddl/type.hpp"
 
 #include <iostream>
 

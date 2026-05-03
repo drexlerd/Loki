@@ -7,7 +7,7 @@
 // compile and run any of them on any platform, but your performance with the
 // non-native version will be less than optimal.
 
-#include "loki/details/utils/murmurhash3.h"
+#include "loki/utils/murmurhash3.h"
 
 //-----------------------------------------------------------------------------
 // Platform-specific functions and macros

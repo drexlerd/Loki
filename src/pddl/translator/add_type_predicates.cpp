@@ -17,7 +17,7 @@
 
 #include "add_type_predicates.hpp"
 
-#include "loki/details/utils/collections.hpp"
+#include "loki/utils/collections.hpp"
 #include "utils.hpp"
 
 namespace loki

@@ -20,6 +20,6 @@ ExternalProject_Add(
     GIT_REPOSITORY https://github.com/drexlerd/Loki.git
     GIT_TAG main
     PREFIX ${CMAKE_BINARY_DIR}/loki
-    DEPENDS boost abseil
+    DEPENDS boost gtl
     CMAKE_ARGS ${CMAKE_ARGS}
 )

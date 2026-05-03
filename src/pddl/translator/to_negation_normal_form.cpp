@@ -17,10 +17,10 @@
 
 #include "to_negation_normal_form.hpp"
 
-#include "loki/details/pddl/conditions.hpp"
-#include "loki/details/pddl/effects.hpp"
-#include "loki/details/pddl/repositories.hpp"
-#include "loki/details/utils/collections.hpp"
+#include "loki/pddl/conditions.hpp"
+#include "loki/pddl/effects.hpp"
+#include "loki/pddl/repositories.hpp"
+#include "loki/utils/collections.hpp"
 #include "utils.hpp"
 
 namespace loki

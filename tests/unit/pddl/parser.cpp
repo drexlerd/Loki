@@ -15,12 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/parser_options.hpp"
+#include "loki/pddl/parser_options.hpp"
 #include <gtest/gtest.h>
-#include <loki/details/pddl/domain.hpp>
-#include <loki/details/pddl/exceptions.hpp>
-#include <loki/details/pddl/parser.hpp>
-#include <loki/details/pddl/problem.hpp>
+#include <loki/pddl/domain.hpp>
+#include <loki/pddl/exceptions.hpp>
+#include <loki/pddl/parser.hpp>
+#include <loki/pddl/problem.hpp>
 
 namespace loki::domain::tests
 {

@@ -15,19 +15,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/problem.hpp"
+#include "loki/pddl/problem.hpp"
 
 #include "formatter.hpp"
-#include "loki/details/pddl/axiom.hpp"
-#include "loki/details/pddl/conditions.hpp"
-#include "loki/details/pddl/domain.hpp"
-#include "loki/details/pddl/function_value.hpp"
-#include "loki/details/pddl/literal.hpp"
-#include "loki/details/pddl/metric.hpp"
-#include "loki/details/pddl/object.hpp"
-#include "loki/details/pddl/predicate.hpp"
-#include "loki/details/pddl/requirements.hpp"
-#include "loki/details/pddl/type.hpp"
+#include "loki/pddl/axiom.hpp"
+#include "loki/pddl/conditions.hpp"
+#include "loki/pddl/domain.hpp"
+#include "loki/pddl/function_value.hpp"
+#include "loki/pddl/literal.hpp"
+#include "loki/pddl/metric.hpp"
+#include "loki/pddl/object.hpp"
+#include "loki/pddl/predicate.hpp"
+#include "loki/pddl/requirements.hpp"
+#include "loki/pddl/type.hpp"
 
 #include <iostream>
 

@@ -15,10 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/domain_builder.hpp"
+#include "loki/pddl/domain_builder.hpp"
 
-#include "loki/details/pddl/domain.hpp"
-#include "loki/details/utils/collections.hpp"
+#include "loki/pddl/domain.hpp"
+#include "loki/utils/collections.hpp"
 
 namespace loki
 {

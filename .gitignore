@@ -1,5 +1,8 @@
 # Build artefacts
 build
+build-*
+dependencies-build
+dependencies-install
 
 # IDE files
 .vscode
@@ -36,6 +39,3 @@ build
 *.exe
 *.out
 *.app
-
-dependencies/build
-dependencies/installs

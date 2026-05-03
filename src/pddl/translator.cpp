@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/translator.hpp"
+#include "loki/pddl/translator.hpp"
 
 #include "translator/add_type_predicates.hpp"
 #include "translator/initialize_equality.hpp"

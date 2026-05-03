@@ -33,9 +33,9 @@ We provide a CMake Superbuild project that takes care of downloading, building, 
 
 ```console
 # Configure dependencies
-cmake -S dependencies -B dependencies/build -DCMAKE_INSTALL_PREFIX=dependencies/installs
+cmake -S dependencies -B dependencies-build -DCMAKE_INSTALL_PREFIX=${PWD}/dependencies-install
 # Build and install dependencies
-cmake --build dependencies/build -j16
+cmake --build dependencies-build -j16
 ```
 
 
@@ -43,7 +43,7 @@ cmake --build dependencies/build -j16
 
 ```console
 # Configure with installation prefixes of all dependencies
-cmake -S . -B build -DCMAKE_PREFIX_PATH=${PWD}/dependencies/installs
+cmake -S . -B build -DCMAKE_PREFIX_PATH=${PWD}/dependencies-install
 # Build
 cmake --build build -j16
 # Install (optional)
@@ -76,7 +76,7 @@ The benchmark framework depends on [GoogleBenchmark](https://github.com/google/b
 
 We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Tools` extensions by Microsoft. To get maximum IDE support, you should set the following `Cmake: Configure Args` in the `CMake Tools` extension settings under `Workspace`:
 
-- `-DCMAKE_PREFIX_PATH=${workspaceFolder}/dependencies/installs`
+- `-DCMAKE_PREFIX_PATH=${workspaceFolder}/dependencies-install`
 - `-DBUILD_TESTS=ON`
 - `-DBUILD_BENCHMARKS=ON`
 

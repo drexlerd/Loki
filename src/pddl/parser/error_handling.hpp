@@ -18,10 +18,10 @@
 #ifndef LOKI_SRC_PDDL_PARSER_ERROR_HANDLING_HPP_
 #define LOKI_SRC_PDDL_PARSER_ERROR_HANDLING_HPP_
 
-#include "loki/details/ast/config.hpp"
-#include "loki/details/pddl/concepts.hpp"
-#include "loki/details/pddl/declarations.hpp"
-#include "loki/details/pddl/requirements_enum.hpp"
+#include "loki/ast/config.hpp"
+#include "loki/pddl/concepts.hpp"
+#include "loki/pddl/declarations.hpp"
+#include "loki/pddl/requirements_enum.hpp"
 
 namespace loki
 {

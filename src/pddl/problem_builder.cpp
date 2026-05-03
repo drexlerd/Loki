@@ -15,12 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/details/pddl/problem_builder.hpp"
+#include "loki/pddl/problem_builder.hpp"
 
-#include "loki/details/pddl/domain.hpp"
-#include "loki/details/pddl/problem.hpp"
-#include "loki/details/pddl/translator.hpp"
-#include "loki/details/utils/collections.hpp"
+#include "loki/pddl/domain.hpp"
+#include "loki/pddl/problem.hpp"
+#include "loki/pddl/translator.hpp"
+#include "loki/utils/collections.hpp"
 
 namespace loki
 {
