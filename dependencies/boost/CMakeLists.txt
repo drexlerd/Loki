@@ -24,6 +24,6 @@ ExternalProject_Add(
     STAMP_DIR ${CMAKE_BINARY_DIR}/boost/stamp/${LOKI_BOOST_VERSION}
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> ./bootstrap.sh --prefix=<INSTALL_DIR>
     BUILD_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> ./b2 headers
-    INSTALL_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> ./b2 install link=${BOOST_LINK} runtime-link=${BOOST_RUNTIME_LINK}
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> ./b2 install --without-python link=${BOOST_LINK} runtime-link=${BOOST_RUNTIME_LINK}
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
 )
