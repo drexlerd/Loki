@@ -6,6 +6,13 @@ file(GLOB_RECURSE PUBLIC_HEADER_FILES
     "../include/*.hpp" "../include/**/*.hpp")
 add_library(parsers ${SRC_FILES} ${PRIVATE_HEADER_FILES} ${PUBLIC_HEADER_FILES})
 set_target_properties(parsers PROPERTIES OUTPUT_NAME loki_parsers)
+if(BUILD_SHARED_LIBS)
+    if(APPLE)
+        set_target_properties(parsers PROPERTIES INSTALL_RPATH "@loader_path")
+    else()
+        set_target_properties(parsers PROPERTIES INSTALL_RPATH "$ORIGIN")
+    endif()
+endif()
 
 # Add compile definitions for the parsers target
 target_compile_definitions(parsers PUBLIC

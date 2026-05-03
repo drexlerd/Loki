@@ -16,6 +16,8 @@ if (NOT gtl_FOUND)
             -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
             -DCMAKE_PREFIX_PATH=${CMAKE_INSTALL_PREFIX}
             -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+            -DBUILD_SHARED_LIBS=${LOKI_BUILD_SHARED_DEPENDENCIES}
+            -DCMAKE_INSTALL_RPATH=${LOKI_DEPENDENCY_INSTALL_RPATH}
             # -DCMAKE_CXX_FLAGS="-fsanitize=address"
             # Disable extras that drag in the failing example
             -DGTL_BUILD_EXAMPLES=OFF

@@ -38,6 +38,14 @@ cmake -S dependencies -B dependencies-build -DCMAKE_INSTALL_PREFIX=${PWD}/depend
 cmake --build dependencies-build -j16
 ```
 
+For downstream Python/C++ packages or other relocatable shared-library installs, build the bundled dependencies as shared libraries:
+
+```console
+cmake -S dependencies -B dependencies-build \
+  -DCMAKE_INSTALL_PREFIX=${PWD}/dependencies-install \
+  -DLOKI_BUILD_SHARED_DEPENDENCIES=ON
+```
+
 
 ## Build Instructions
 
@@ -48,6 +56,15 @@ cmake -S . -B build -DCMAKE_PREFIX_PATH=${PWD}/dependencies-install
 cmake --build build -j16
 # Install (optional)
 cmake --install build --prefix=<path/to/installation-directory>
+```
+
+When configuring Loki against a shared dependency prefix, disable static dependency lookup:
+
+```console
+cmake -S . -B build \
+  -DCMAKE_PREFIX_PATH=${PWD}/dependencies-install \
+  -DBUILD_SHARED_LIBS=ON \
+  -DLOKI_LINK_STATIC_DEPENDENCIES=OFF
 ```
 
 

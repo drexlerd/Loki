@@ -56,6 +56,8 @@ else()
     message("Build shared libraries disabled.")
 endif()
 
+option(LOKI_LINK_STATIC_DEPENDENCIES "Prefer static dependency libraries when finding installed dependencies." OFF)
+
 
 set(DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/")
 add_definitions(-DDATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/")

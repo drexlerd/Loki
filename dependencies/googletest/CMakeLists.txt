@@ -5,7 +5,8 @@ include(ExternalProject)
 
 list(APPEND CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-    -DBUILD_SHARED_LIBS=ON
+    -DBUILD_SHARED_LIBS=${LOKI_BUILD_SHARED_DEPENDENCIES}
+    -DCMAKE_INSTALL_RPATH=${LOKI_DEPENDENCY_INSTALL_RPATH}
 )
 
 message(STATUS "Preparing external project \"googletest\" with args:")
