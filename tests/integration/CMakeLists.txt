@@ -16,6 +16,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(integration_example VERSION "0.0.1" LANGUAGES C CXX)
 
+option(LOKI_LINK_STATIC_DEPENDENCIES "Prefer static dependency libraries when finding installed dependencies." OFF)
+set(Boost_USE_STATIC_LIBS ${LOKI_LINK_STATIC_DEPENDENCIES})
+set(Boost_USE_STATIC_RUNTIME ${LOKI_LINK_STATIC_DEPENDENCIES})
 
 ##############################################################
 # CMake modules and macro files

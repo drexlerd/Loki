@@ -5,6 +5,14 @@ include(ExternalProject)
 
 message(STATUS "Preparing external project \"boost\":")
 
+if(LOKI_BUILD_SHARED_DEPENDENCIES)
+    set(BOOST_LINK shared)
+    set(BOOST_RUNTIME_LINK shared)
+else()
+    set(BOOST_LINK static)
+    set(BOOST_RUNTIME_LINK static)
+endif()
+
 # We need to build boost for cmake support
 ExternalProject_Add(
     boost
@@ -12,6 +20,6 @@ ExternalProject_Add(
     PREFIX ${CMAKE_BINARY_DIR}/boost
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> ./bootstrap.sh --prefix=<INSTALL_DIR>
     BUILD_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> ./b2 headers
-    INSTALL_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> ./b2 install link=shared runtime-link=shared
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> ./b2 install link=${BOOST_LINK} runtime-link=${BOOST_RUNTIME_LINK}
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
 )
