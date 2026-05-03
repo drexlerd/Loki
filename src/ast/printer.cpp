@@ -371,6 +371,8 @@ void write(const ast::AtomicFunctionSkeletonGeneral& node, T formatter, std::ost
     fmt::print(out, "({} {})", string(node.function_symbol, formatter), string(node.arguments, formatter));
 }
 
+template void write<DefaultFormatter>(const ast::AtomicFunctionSkeletonGeneral& node, DefaultFormatter formatter, std::ostream& out);
+
 template<Formatter T>
 void write(const ast::AtomicFunctionSkeleton& node, T formatter, std::ostream& out)
 {
