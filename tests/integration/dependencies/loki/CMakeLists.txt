@@ -8,6 +8,7 @@ list(APPEND CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     -DCMAKE_PREFIX_PATH=${CMAKE_INSTALL_PREFIX}
     -DCMAKE_BUILD_TYPE=Release
+    -DBUILD_SHARED_LIBS=ON
     )
 
 message(STATUS "Preparing external project \"loki\" with args:")
@@ -17,9 +18,8 @@ endforeach()
 
 ExternalProject_Add(
     loki
-    GIT_REPOSITORY https://github.com/drexlerd/Loki.git
-    GIT_TAG main
+    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../..
     PREFIX ${CMAKE_BINARY_DIR}/loki
-    DEPENDS boost gtl
+    DEPENDS boost fmt gtl
     CMAKE_ARGS ${CMAKE_ARGS}
 )
