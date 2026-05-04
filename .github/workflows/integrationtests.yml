@@ -13,14 +13,26 @@ jobs:
     - name: Checkout Loki
       uses: actions/checkout@v2
 
-    - name: Configure, Build, and Install Dependencies
+    - name: Install native dependencies
       run: |
-        cd tests/integration/dependencies
-        cmake -S . -B "$GITHUB_WORKSPACE/tests/integration/dependencies-build" -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/tests/integration/dependencies-install"
-        cmake --build "$GITHUB_WORKSPACE/tests/integration/dependencies-build"
+        python -m pip install --upgrade pip
+        python -m pip install pyyggdrasil==0.0.2
+
+    - name: Build and Install Loki
+      run: |
+        cmake -S . -B build_loki \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_SHARED_LIBS=ON \
+          -DLOKI_BUILD_TESTS=OFF \
+          -DLOKI_BUILD_BENCHMARKS=OFF \
+          -DLOKI_BUILD_EXECUTABLES=OFF \
+          -DLOKI_LINK_STATIC_DEPENDENCIES=OFF \
+          -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
+        cmake --build build_loki
+        cmake --install build_loki --prefix "$GITHUB_WORKSPACE/tests/integration/loki-install"
 
     - name: Build and Test Project
       run: |
         cd tests/integration
-        cmake -S . -B build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/tests/integration/dependencies-install"
+        cmake -S . -B build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/tests/integration/loki-install"
         cmake --build build

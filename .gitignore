@@ -3,6 +3,11 @@ build
 build-*
 dependencies-build
 dependencies-install
+dist
+*.egg-info
+.venv
+__pycache__
+*.pyc
 
 # IDE files
 .vscode

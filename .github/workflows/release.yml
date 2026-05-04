@@ -1,0 +1,150 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build_sdist:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install build frontend
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build
+
+      - name: Build source distribution
+        run: python -m build --sdist
+
+      - name: Upload sdist artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  build_wheels_linux:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture: ["x86_64"]
+        python-version: ["cp39", "cp310", "cp311", "cp312", "cp313"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install cibuildwheel
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install cibuildwheel
+
+      - name: Build Linux wheels
+        run: cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_PLATFORM: linux
+          CIBW_BUILD: "${{ matrix.python-version }}-*"
+          CIBW_SKIP: "*-musllinux_*"
+          CIBW_ARCHS: "${{ matrix.architecture }}"
+          CIBW_BUILD_VERBOSITY: "1"
+          CIBW_ENVIRONMENT: "PYPDDL_JOBS=2"
+
+      - name: Upload Linux wheels artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: wheels-linux-${{ matrix.python-version }}-${{ matrix.architecture }}
+          path: wheelhouse/*.whl
+
+  build_wheels_macos:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["cp39", "cp310", "cp311", "cp312", "cp313"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install cibuildwheel
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install cibuildwheel
+
+      - name: Build macOS wheels
+        run: cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_PLATFORM: macos
+          CIBW_BUILD: "${{ matrix.python-version }}-*"
+          CIBW_ARCHS: arm64
+          CIBW_BUILD_VERBOSITY: "1"
+          CIBW_ENVIRONMENT: "PYPDDL_JOBS=2"
+
+      - name: Upload macOS wheels artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: wheels-macos-${{ matrix.python-version }}-arm64
+          path: wheelhouse/*.whl
+
+  publish:
+    needs:
+      - build_sdist
+      - build_wheels_linux
+      - build_wheels_macos
+    runs-on: ubuntu-latest
+
+    if: github.repository_owner == 'drexlerd'
+
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Check version matches tag
+        run: |
+          VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          TAG=${GITHUB_REF#refs/tags/v}
+
+          echo "Package version: $VERSION"
+          echo "Git tag: $TAG"
+
+          if [ "$VERSION" != "$TAG" ]; then
+            echo "Version mismatch: pyproject.toml=$VERSION tag=$TAG"
+            exit 1
+          fi
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Inspect distributions
+        run: find dist -maxdepth 1 -type f
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist

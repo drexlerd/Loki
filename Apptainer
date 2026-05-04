@@ -15,9 +15,10 @@ Stage: build
         build-essential \
         cmake \
         git \
+        python3 \
+        python3-pip \
         wget \
         ca-certificates \
-        libboost-dev \
         ccache \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/*
@@ -25,13 +26,12 @@ Stage: build
     # Set working directory
     cd /opt/loki
 
-    # Build and install dependencies
-    cmake -S dependencies -B dependencies-build -DCMAKE_INSTALL_PREFIX=/opt/loki/dependencies-install
-    cmake --build dependencies-build -j$(nproc)
+    # Install native dependencies
+    python3 -m pip install --break-system-packages pyyggdrasil==0.0.2
 
     # Build Loki
     cmake -S . -B build \
-        -DCMAKE_PREFIX_PATH=/opt/loki/dependencies-install \
+        -DCMAKE_PREFIX_PATH="$(python3 -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')" \
         -DCMAKE_BUILD_TYPE=Release \
         -DLOKI_BUILD_TESTS=OFF \
         -DLOKI_BUILD_BENCHMARKS=OFF \
@@ -50,7 +50,6 @@ Stage: runtime
 %files from build
     /opt/loki/install /usr/local
     /opt/loki/build/exe/loki /usr/local/bin/loki
-    /opt/loki/dependencies-install/lib /usr/local/lib
 
 %post
     # Install only runtime dependencies

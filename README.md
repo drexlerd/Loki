@@ -29,40 +29,39 @@ The translator is based on the method presented in section four of the paper [*"
 
 Loki depends on a fraction of [Boost's](boost.org) header-only libraries (Fusion, Spirit x3, Container), its performance benchmarking framework depends on [GoogleBenchmark](https://github.com/google/benchmark), and its testing framework depends on [GoogleTest](https://github.com/google/googletest).
 
-We provide a CMake Superbuild project that takes care of downloading, building, and installing all dependencies.
+Loki consumes these native dependencies from `pyyggdrasil`:
 
 ```console
-# Configure dependencies
-cmake -S dependencies -B dependencies-build -DCMAKE_INSTALL_PREFIX=${PWD}/dependencies-install
-# Build and install dependencies
-cmake --build dependencies-build -j16
+uv pip install pyyggdrasil==0.0.2
+cmake -S . -B build \
+  -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
 ```
 
-For downstream Python/C++ packages or other relocatable shared-library installs, build the bundled dependencies as shared libraries:
+For offline/local development, install `pyyggdrasil` from the sibling source
+checkout instead:
 
 ```console
-cmake -S dependencies -B dependencies-build \
-  -DCMAKE_INSTALL_PREFIX=${PWD}/dependencies-install \
-  -DLOKI_BUILD_SHARED_DEPENDENCIES=ON
+cd ../yggdrasil
+uv pip install --python ../Loki/.venv/bin/python .
 ```
-
 
 ## Build Instructions
 
 ```console
-# Configure with installation prefixes of all dependencies
-cmake -S . -B build -DCMAKE_PREFIX_PATH=${PWD}/dependencies-install
+# Configure with the pyyggdrasil native prefix
+cmake -S . -B build \
+  -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
 # Build
 cmake --build build -j16
 # Install (optional)
 cmake --install build --prefix=<path/to/installation-directory>
 ```
 
-When configuring Loki against a shared dependency prefix, disable static dependency lookup:
+For shared-library builds, disable static dependency lookup:
 
 ```console
 cmake -S . -B build \
-  -DCMAKE_PREFIX_PATH=${PWD}/dependencies-install \
+  -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')" \
   -DBUILD_SHARED_LIBS=ON \
   -DLOKI_LINK_STATIC_DEPENDENCIES=OFF
 ```
@@ -70,7 +69,24 @@ cmake -S . -B build \
 
 ## Integration Instructions
 
-We provide a CMake Superbuild project [here](https://github.com/drexlerd/Loki/tree/main/tests/integration/dependencies) that takes care of downloading, building, and installing Loki together and its dependencies. You can simply copy it to your project or integrate it in your own Superbuild and run it similarly to the Superbuild project from above. An example planning library based on Loki is available [here](https://github.com/simon-stahlberg/mimir).
+The Python package `pypddl` installs Loki's native headers, shared library, and
+CMake package config under `pypddl.native_prefix()`. It depends on
+`pyyggdrasil==0.0.2` for third-party native dependencies:
+
+```python
+import pypddl
+import pyyggdrasil
+
+print(pypddl.native_prefix())
+print(pyyggdrasil.native_prefix())
+```
+
+Downstream CMake projects can then use:
+
+```console
+cmake -S . -B build \
+  -DCMAKE_PREFIX_PATH="$(python -c 'import pypddl; print(pypddl.native_prefix())')"
+```
 
 
 ## Running the Executables
@@ -91,9 +107,9 @@ The benchmark framework depends on [GoogleBenchmark](https://github.com/google/b
 
 ## IDE Support
 
-We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Tools` extensions by Microsoft. To get maximum IDE support, you should set the following `Cmake: Configure Args` in the `CMake Tools` extension settings under `Workspace`:
+We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Tools` extensions by Microsoft. Install `pyyggdrasil==0.0.2` into the Python environment used for configuring CMake, then set the following `Cmake: Configure Args` in the `CMake Tools` extension settings under `Workspace`:
 
-- `-DCMAKE_PREFIX_PATH=${workspaceFolder}/dependencies-install`
+- `-DCMAKE_PREFIX_PATH=<output of python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())'>`
 - `-DLOKI_BUILD_TESTS=ON`
 - `-DLOKI_BUILD_BENCHMARKS=ON`
 

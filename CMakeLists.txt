@@ -64,6 +64,17 @@ else()
 endif()
 
 option(LOKI_LINK_STATIC_DEPENDENCIES "Prefer static dependency libraries when finding installed dependencies." OFF)
+option(BUILD_PYPDDL "Build Loki for the pypddl Python wheel." OFF)
+
+if(BUILD_PYPDDL)
+  set(LOKI_INSTALL_PREFIX "pypddl/native")
+  set(LOKI_INSTALL_COMPONENT pypddl)
+  set(LOKI_INSTALL_INTERFACE_INCLUDEDIR "${LOKI_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}")
+else()
+  set(LOKI_INSTALL_PREFIX "")
+  set(LOKI_INSTALL_COMPONENT loki)
+  set(LOKI_INSTALL_INTERFACE_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}")
+endif()
 
 
 set(DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/")
@@ -81,6 +92,7 @@ list(APPEND CMAKE_MODULE_PATH
 )
 include("configure_boost")
 include("configure_ccache")
+include("configure_yggdrasil")
 
 
 ##############################################################
@@ -96,6 +108,8 @@ configure_ccache()
 
 # set(CMAKE_FIND_DEBUG_MODE ON)
 
+configure_yggdrasil()
+
 # Boost
 # Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
 configure_boost()
@@ -106,15 +120,33 @@ if(Boost_FOUND)
 endif()
 
 
-find_package(gtl CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_package(gtl CONFIG QUIET PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(gtl_FOUND)
   message(STATUS "Found gtl: ${gtl_DIR}")
+else()
+  find_path(GTL_INCLUDE_DIR gtl/gtl_config.hpp PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES include NO_DEFAULT_PATH)
+  if(NOT GTL_INCLUDE_DIR)
+    message(FATAL_ERROR "Could not find gtl headers")
+  endif()
+  add_library(gtl::gtl INTERFACE IMPORTED)
+  set_target_properties(gtl::gtl PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${GTL_INCLUDE_DIR}")
+  message(STATUS "Found gtl headers: ${GTL_INCLUDE_DIR}")
 endif()
 
 
-find_package(fmt REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_package(fmt QUIET PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(fmt_FOUND)
   message(STATUS "Found fmt: ${fmt_DIR} (found version ${fmt_VERSION})")
+else()
+  find_path(FMT_INCLUDE_DIR fmt/core.h PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES include NO_DEFAULT_PATH)
+  if(NOT FMT_INCLUDE_DIR)
+    message(FATAL_ERROR "Could not find fmt headers")
+  endif()
+  add_library(fmt::fmt INTERFACE IMPORTED)
+  set_target_properties(fmt::fmt PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${FMT_INCLUDE_DIR}"
+    INTERFACE_COMPILE_DEFINITIONS FMT_HEADER_ONLY)
+  message(STATUS "Found fmt headers: ${FMT_INCLUDE_DIR}")
 endif()
 
 
@@ -143,12 +175,14 @@ endif()
 
 # Install header files
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/loki"
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+    DESTINATION "${LOKI_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}"
+    COMPONENT ${LOKI_INSTALL_COMPONENT})
 
 # Install cmake scripts
 install(
     DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/loki/cmake"
+    DESTINATION "${LOKI_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/loki/cmake"
+    COMPONENT ${LOKI_INSTALL_COMPONENT}
 )
 
 
@@ -181,5 +215,12 @@ install(
   FILES
     "${CMAKE_CURRENT_BINARY_DIR}/lokiConfig.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/lokiConfigVersion.cmake"
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/loki"
+  DESTINATION "${LOKI_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/loki"
+  COMPONENT ${LOKI_INSTALL_COMPONENT}
 )
+
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/python/src/pypddl/__init__.py"
+        DESTINATION "pypddl"
+        COMPONENT pypddl)
+
+add_custom_target(pypddl_wheel DEPENDS parsers)

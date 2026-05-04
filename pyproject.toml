@@ -1,0 +1,68 @@
+[build-system]
+requires = [
+    "scikit-build-core>=0.10",
+    "pyyggdrasil==0.0.2",
+]
+build-backend = "pypddl_build_backend"
+backend-path = ["python"]
+
+[project]
+name = "pypddl"
+version = "0.0.1"
+description = "Python-distributed native package for the Loki PDDL parser library"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    {name = "Dominik Drexler", email = "dominik.drexler@liu.se"},
+]
+dependencies = [
+    "pyyggdrasil==0.0.2",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+
+[project.urls]
+Homepage = "https://github.com/drexlerd/Loki"
+
+[tool.scikit-build]
+build.targets = ["pypddl_wheel"]
+cmake.build-type = "Release"
+install.components = ["pypddl"]
+wheel.packages = []
+
+[tool.scikit-build.sdist]
+include = [
+    "CMakeLists.txt",
+    "Config.cmake.in",
+    "README.md",
+    "pyproject.toml",
+    "python/**",
+    "cmake/**",
+    "include/**",
+    "src/**",
+]
+exclude = [
+    "build*/**",
+    "*.egg-info/**",
+]
+
+[tool.scikit-build.cmake.define]
+BUILD_SHARED_LIBS = "ON"
+BUILD_PYPDDL = "ON"
+LOKI_BUILD_TESTS = "OFF"
+LOKI_BUILD_BENCHMARKS = "OFF"
+LOKI_BUILD_EXECUTABLES = "OFF"
+LOKI_LINK_STATIC_DEPENDENCIES = "OFF"
+CMAKE_INSTALL_LIBDIR = "lib"
+
+[tool.cibuildwheel]
+container-engine = "docker"
+
+[tool.cibuildwheel.linux]
+repair-wheel-command = "LD_LIBRARY_PATH=$PWD/$(python -c 'import pyyggdrasil, os; print(os.path.relpath(pyyggdrasil.native_prefix() / \"lib\"))') auditwheel repair -w {dest_dir} {wheel}"
+
+[tool.cibuildwheel.macos]
+repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"

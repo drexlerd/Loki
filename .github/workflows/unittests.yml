@@ -13,15 +13,15 @@ jobs:
     - name: Checkout Loki
       uses: actions/checkout@v2
 
-    - name: Configure, Build, and Install Dependencies
+    - name: Install native dependencies
       run: |
-        cmake -S dependencies -B dependencies-build -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/dependencies-install
-        cmake --build dependencies-build
+        python -m pip install --upgrade pip
+        python -m pip install pyyggdrasil==0.0.2
 
     # Debug
     - name: Debug, Configure, and Build Loki
       run: |
-        cmake -DCMAKE_BUILD_TYPE=Debug -DLOKI_BUILD_TESTS=ON -S . -B build_debug -DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/dependencies-install
+        cmake -DCMAKE_BUILD_TYPE=Debug -DLOKI_BUILD_TESTS=ON -S . -B build_debug -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
         cmake --build build_debug
 
     - name: Debug Test
@@ -31,7 +31,7 @@ jobs:
     # Release
     - name: Release, Configure, and Build Loki
       run: |
-        cmake -DCMAKE_BUILD_TYPE=Release -DLOKI_BUILD_TESTS=ON -S . -B build_release -DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/dependencies-install
+        cmake -DCMAKE_BUILD_TYPE=Release -DLOKI_BUILD_TESTS=ON -S . -B build_release -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
         cmake --build build_release
 
     - name: Release Test

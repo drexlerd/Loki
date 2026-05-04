@@ -7,10 +7,20 @@ file(GLOB_RECURSE PUBLIC_HEADER_FILES
 add_library(parsers ${SRC_FILES} ${PRIVATE_HEADER_FILES} ${PUBLIC_HEADER_FILES})
 set_target_properties(parsers PROPERTIES OUTPUT_NAME loki_parsers)
 if(BUILD_SHARED_LIBS)
-    if(APPLE)
-        set_target_properties(parsers PROPERTIES INSTALL_RPATH "@loader_path")
+    if(BUILD_PYPDDL)
+        if(APPLE)
+            set(LOKI_PARSERS_INSTALL_RPATH "@loader_path;@loader_path/../../../pyyggdrasil/lib")
+        else()
+            set(LOKI_PARSERS_INSTALL_RPATH "$ORIGIN;$ORIGIN/../../../pyyggdrasil/lib")
+        endif()
+    elseif(APPLE)
+        set(LOKI_PARSERS_INSTALL_RPATH "@loader_path")
     else()
-        set_target_properties(parsers PROPERTIES INSTALL_RPATH "$ORIGIN")
+        set(LOKI_PARSERS_INSTALL_RPATH "$ORIGIN")
+    endif()
+
+    if(LOKI_PARSERS_INSTALL_RPATH)
+        set_target_properties(parsers PROPERTIES INSTALL_RPATH "${LOKI_PARSERS_INSTALL_RPATH}")
     endif()
 endif()
 
@@ -33,25 +43,25 @@ target_link_libraries(parsers
 target_include_directories(parsers
     PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+        "$<INSTALL_INTERFACE:${LOKI_INSTALL_INTERFACE_INCLUDEDIR}>"
 )
 
 # Install the target and create export-set
 install(
     TARGETS parsers
     EXPORT lokiparsersTargets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    LIBRARY DESTINATION ${LOKI_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} COMPONENT ${LOKI_INSTALL_COMPONENT}
+    ARCHIVE DESTINATION ${LOKI_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} COMPONENT ${LOKI_INSTALL_COMPONENT}
+    RUNTIME DESTINATION ${LOKI_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR} COMPONENT ${LOKI_INSTALL_COMPONENT}
+    INCLUDES DESTINATION ${LOKI_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 # Generate and install export file
 install(EXPORT lokiparsersTargets
     NAMESPACE loki::
-    COMPONENT parsers
     FILE "lokiparsersTargets.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/loki"
+    DESTINATION "${LOKI_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/loki"
+    COMPONENT ${LOKI_INSTALL_COMPONENT}
 )
 
 # Generate build tree export file
