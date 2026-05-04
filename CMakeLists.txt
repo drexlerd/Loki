@@ -67,9 +67,9 @@ option(LOKI_LINK_STATIC_DEPENDENCIES "Prefer static dependency libraries when fi
 option(BUILD_PYPDDL "Build Loki for the pypddl Python wheel." OFF)
 
 if(BUILD_PYPDDL)
-  set(LOKI_INSTALL_PREFIX "pypddl/native")
+  set(LOKI_INSTALL_PREFIX "pypddl/native/")
   set(LOKI_INSTALL_COMPONENT pypddl)
-  set(LOKI_INSTALL_INTERFACE_INCLUDEDIR "${LOKI_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}")
+  set(LOKI_INSTALL_INTERFACE_INCLUDEDIR "${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_INCLUDEDIR}")
 else()
   set(LOKI_INSTALL_PREFIX "")
   set(LOKI_INSTALL_COMPONENT loki)
@@ -134,19 +134,33 @@ else()
 endif()
 
 
-find_package(fmt QUIET PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
-if(fmt_FOUND)
-  message(STATUS "Found fmt: ${fmt_DIR} (found version ${fmt_VERSION})")
-else()
+if(BUILD_PYPDDL)
   find_path(FMT_INCLUDE_DIR fmt/core.h PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES include NO_DEFAULT_PATH)
   if(NOT FMT_INCLUDE_DIR)
     message(FATAL_ERROR "Could not find fmt headers")
   endif()
-  add_library(fmt::fmt INTERFACE IMPORTED)
-  set_target_properties(fmt::fmt PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${FMT_INCLUDE_DIR}"
-    INTERFACE_COMPILE_DEFINITIONS FMT_HEADER_ONLY)
+  if(NOT TARGET fmt::fmt)
+    add_library(fmt::fmt INTERFACE IMPORTED)
+    set_target_properties(fmt::fmt PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${FMT_INCLUDE_DIR}"
+      INTERFACE_COMPILE_DEFINITIONS FMT_HEADER_ONLY)
+  endif()
   message(STATUS "Found fmt headers: ${FMT_INCLUDE_DIR}")
+else()
+  find_package(fmt QUIET PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+  if(fmt_FOUND)
+    message(STATUS "Found fmt: ${fmt_DIR} (found version ${fmt_VERSION})")
+  else()
+    find_path(FMT_INCLUDE_DIR fmt/core.h PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES include NO_DEFAULT_PATH)
+    if(NOT FMT_INCLUDE_DIR)
+      message(FATAL_ERROR "Could not find fmt headers")
+    endif()
+    add_library(fmt::fmt INTERFACE IMPORTED)
+    set_target_properties(fmt::fmt PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${FMT_INCLUDE_DIR}"
+      INTERFACE_COMPILE_DEFINITIONS FMT_HEADER_ONLY)
+    message(STATUS "Found fmt headers: ${FMT_INCLUDE_DIR}")
+  endif()
 endif()
 
 
@@ -175,13 +189,13 @@ endif()
 
 # Install header files
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/loki"
-    DESTINATION "${LOKI_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}"
+    DESTINATION "${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_INCLUDEDIR}"
     COMPONENT ${LOKI_INSTALL_COMPONENT})
 
 # Install cmake scripts
 install(
     DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/"
-    DESTINATION "${LOKI_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/loki/cmake"
+    DESTINATION "${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_LIBDIR}/cmake/loki/cmake"
     COMPONENT ${LOKI_INSTALL_COMPONENT}
 )
 
@@ -215,7 +229,7 @@ install(
   FILES
     "${CMAKE_CURRENT_BINARY_DIR}/lokiConfig.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/lokiConfigVersion.cmake"
-  DESTINATION "${LOKI_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/loki"
+  DESTINATION "${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_LIBDIR}/cmake/loki"
   COMPONENT ${LOKI_INSTALL_COMPONENT}
 )
 

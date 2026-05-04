@@ -61,8 +61,5 @@ CMAKE_INSTALL_LIBDIR = "lib"
 [tool.cibuildwheel]
 container-engine = "docker"
 
-[tool.cibuildwheel.linux]
-repair-wheel-command = "LD_LIBRARY_PATH=$PWD/$(python -c 'import pyyggdrasil, os; print(os.path.relpath(pyyggdrasil.native_prefix() / \"lib\"))') auditwheel repair -w {dest_dir} {wheel}"
-
 [tool.cibuildwheel.macos]
 repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
