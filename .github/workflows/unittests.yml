@@ -21,19 +21,31 @@ jobs:
     # Debug
     - name: Debug, Configure, and Build Loki
       run: |
-        cmake -DCMAKE_BUILD_TYPE=Debug -DLOKI_BUILD_TESTS=ON -S . -B build_debug -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
+        cmake -DCMAKE_BUILD_TYPE=Debug -DLOKI_BUILD_TESTS=ON -S . -B build_debug \
+          -DPython3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
+          -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
         cmake --build build_debug
 
     - name: Debug Test
       working-directory: build_debug/tests/unit
-      run: GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V
+      run: |
+        NATIVE_LIB_DIR="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix() / "lib")')"
+        export DYLD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${DYLD_LIBRARY_PATH:-}"
+        export LD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${LD_LIBRARY_PATH:-}"
+        GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V --output-on-failure
 
     # Release
     - name: Release, Configure, and Build Loki
       run: |
-        cmake -DCMAKE_BUILD_TYPE=Release -DLOKI_BUILD_TESTS=ON -S . -B build_release -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
+        cmake -DCMAKE_BUILD_TYPE=Release -DLOKI_BUILD_TESTS=ON -S . -B build_release \
+          -DPython3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
+          -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
         cmake --build build_release
 
     - name: Release Test
       working-directory: build_release/tests/unit
-      run: GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V
+      run: |
+        NATIVE_LIB_DIR="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix() / "lib")')"
+        export DYLD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${DYLD_LIBRARY_PATH:-}"
+        export LD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${LD_LIBRARY_PATH:-}"
+        GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V --output-on-failure
