@@ -134,34 +134,17 @@ else()
 endif()
 
 
-if(BUILD_PYPDDL)
-  find_path(FMT_INCLUDE_DIR fmt/core.h PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES include NO_DEFAULT_PATH)
-  if(NOT FMT_INCLUDE_DIR)
-    message(FATAL_ERROR "Could not find fmt headers")
-  endif()
-  if(NOT TARGET fmt::fmt)
-    add_library(fmt::fmt INTERFACE IMPORTED)
-    set_target_properties(fmt::fmt PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${FMT_INCLUDE_DIR}"
-      INTERFACE_COMPILE_DEFINITIONS FMT_HEADER_ONLY)
-  endif()
-  message(STATUS "Found fmt headers: ${FMT_INCLUDE_DIR}")
-else()
-  find_package(fmt QUIET PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
-  if(fmt_FOUND)
-    message(STATUS "Found fmt: ${fmt_DIR} (found version ${fmt_VERSION})")
-  else()
-    find_path(FMT_INCLUDE_DIR fmt/core.h PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES include NO_DEFAULT_PATH)
-    if(NOT FMT_INCLUDE_DIR)
-      message(FATAL_ERROR "Could not find fmt headers")
-    endif()
-    add_library(fmt::fmt INTERFACE IMPORTED)
-    set_target_properties(fmt::fmt PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${FMT_INCLUDE_DIR}"
-      INTERFACE_COMPILE_DEFINITIONS FMT_HEADER_ONLY)
-    message(STATUS "Found fmt headers: ${FMT_INCLUDE_DIR}")
-  endif()
+find_path(FMT_INCLUDE_DIR fmt/core.h PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES include NO_DEFAULT_PATH)
+if(NOT FMT_INCLUDE_DIR)
+  message(FATAL_ERROR "Could not find fmt headers")
 endif()
+if(NOT TARGET fmt::fmt)
+  add_library(fmt::fmt INTERFACE IMPORTED)
+  set_target_properties(fmt::fmt PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${FMT_INCLUDE_DIR}"
+    INTERFACE_COMPILE_DEFINITIONS FMT_HEADER_ONLY)
+endif()
+message(STATUS "Found fmt headers: ${FMT_INCLUDE_DIR}")
 
 
 ##############################################################
@@ -233,8 +216,10 @@ install(
   COMPONENT ${LOKI_INSTALL_COMPONENT}
 )
 
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/python/src/pypddl/__init__.py"
-        DESTINATION "pypddl"
-        COMPONENT pypddl)
+if(BUILD_PYPDDL)
+  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/python/src/pypddl/__init__.py"
+          DESTINATION "pypddl"
+          COMPONENT pypddl)
+endif()
 
 add_custom_target(pypddl_wheel DEPENDS parsers)

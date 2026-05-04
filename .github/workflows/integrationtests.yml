@@ -27,6 +27,7 @@ jobs:
           -DLOKI_BUILD_BENCHMARKS=OFF \
           -DLOKI_BUILD_EXECUTABLES=OFF \
           -DLOKI_LINK_STATIC_DEPENDENCIES=OFF \
+          -DPython3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
           -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
         cmake --build build_loki
         cmake --install build_loki --prefix "$GITHUB_WORKSPACE/tests/integration/loki-install"
@@ -34,5 +35,7 @@ jobs:
     - name: Build and Test Project
       run: |
         cd tests/integration
-        cmake -S . -B build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/tests/integration/loki-install"
+        cmake -S . -B build \
+          -DPython3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
+          -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/tests/integration/loki-install"
         cmake --build build
