@@ -33,8 +33,9 @@ Stage: build
     cmake -S . -B build \
         -DCMAKE_PREFIX_PATH=/opt/loki/dependencies-install \
         -DCMAKE_BUILD_TYPE=Release \
-        -DBUILD_TESTS=OFF \
-        -DBUILD_BENCHMARKS=OFF
+        -DLOKI_BUILD_TESTS=OFF \
+        -DLOKI_BUILD_BENCHMARKS=OFF \
+        -DLOKI_BUILD_EXECUTABLES=ON
     cmake --build build -j$(nproc)
 
     # Install Loki to a staging directory

@@ -34,19 +34,26 @@ message(STATUS "Build configuration: ${CMAKE_BUILD_TYPE}")
 # make cache variables for install destinations
 include(GNUInstallDirs)
 
-option(BUILD_TESTS "Enables compilation of tests." OFF)
-if (BUILD_TESTS)
+option(LOKI_BUILD_TESTS "Enables compilation of Loki tests." OFF)
+if (LOKI_BUILD_TESTS)
     message("Build tests enabled.")
     enable_testing()
 else()
     message("Build tests disabled.")
 endif()
 
-option(BUILD_BENCHMARKS "Enables compilation of tests." OFF)
-if (BUILD_BENCHMARKS)
+option(LOKI_BUILD_BENCHMARKS "Enables compilation of Loki benchmarks." OFF)
+if (LOKI_BUILD_BENCHMARKS)
     message("Build benchmarks enabled.")
 else()
     message("Build benchmarks disabled.")
+endif()
+
+option(LOKI_BUILD_EXECUTABLES "Enables compilation of Loki executables." OFF)
+if (LOKI_BUILD_EXECUTABLES)
+    message("Build executables enabled.")
+else()
+    message("Build executables disabled.")
 endif()
 
 option(BUILD_SHARED_LIBS "Build shared libraries." ON)
@@ -117,13 +124,15 @@ endif()
 
 add_subdirectory(src)
 
-add_subdirectory(exe)
+if (LOKI_BUILD_EXECUTABLES)
+  add_subdirectory(exe)
+endif()
 
-if (BUILD_TESTS)
+if (LOKI_BUILD_TESTS)
   add_subdirectory(tests)
 endif()
 
-if (BUILD_BENCHMARKS)
+if (LOKI_BUILD_BENCHMARKS)
   add_subdirectory(benchmarks)
 endif()
 

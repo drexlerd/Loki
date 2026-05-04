@@ -27,7 +27,7 @@ jobs:
 
       - name: Configure, and Build Loki
         run: |
-          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCHMARKS=ON -S . -B build -DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/dependencies-install
+          cmake -DCMAKE_BUILD_TYPE=Release -DLOKI_BUILD_BENCHMARKS=ON -S . -B build -DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/dependencies-install
           cmake --build build -j$(nproc)
 
       # Run benchmarks and store the output to a file

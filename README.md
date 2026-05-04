@@ -75,7 +75,7 @@ We provide a CMake Superbuild project [here](https://github.com/drexlerd/Loki/tr
 
 ## Running the Executables
 
-The executable illustrate how to use Loki.
+The executable illustrates how to use Loki. It is disabled by default and can be enabled with `-DLOKI_BUILD_EXECUTABLES=ON`.
 
 ```console
 ./build/exe/loki data/gripper/domain.pddl data/gripper/p-2-0.pddl
@@ -83,19 +83,19 @@ The executable illustrate how to use Loki.
 
 ## Running the Tests
 
-The testing framework depends on [GoogleTest](https://github.com/google/googletest) and requires the additional compile flag `-DBUILD_TESTS=ON` to be set in the cmake configure step.
+The testing framework depends on [GoogleTest](https://github.com/google/googletest) and requires the additional compile flag `-DLOKI_BUILD_TESTS=ON` to be set in the cmake configure step.
 
 ## Performance Benchmarks
 
-The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark) and requires the additional compile flag `-DBUILD_BENCHMARKS=ON` to be set in the cmake configure step. The results from the GitHub action can be viewed [here](https://drexlerd.github.io/Loki/dev/bench/).
+The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark) and requires the additional compile flag `-DLOKI_BUILD_BENCHMARKS=ON` to be set in the cmake configure step. The results from the GitHub action can be viewed [here](https://drexlerd.github.io/Loki/dev/bench/).
 
 ## IDE Support
 
 We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Tools` extensions by Microsoft. To get maximum IDE support, you should set the following `Cmake: Configure Args` in the `CMake Tools` extension settings under `Workspace`:
 
 - `-DCMAKE_PREFIX_PATH=${workspaceFolder}/dependencies-install`
-- `-DBUILD_TESTS=ON`
-- `-DBUILD_BENCHMARKS=ON`
+- `-DLOKI_BUILD_TESTS=ON`
+- `-DLOKI_BUILD_BENCHMARKS=ON`
 
 After running `CMake: Configure` in Visual Studio Code (ctrl + shift + p), you should see all include paths being correctly resolved.
 

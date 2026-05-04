@@ -21,7 +21,7 @@ jobs:
     # Debug
     - name: Debug, Configure, and Build Loki
       run: |
-        cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -S . -B build_debug -DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/dependencies-install
+        cmake -DCMAKE_BUILD_TYPE=Debug -DLOKI_BUILD_TESTS=ON -S . -B build_debug -DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/dependencies-install
         cmake --build build_debug
 
     - name: Debug Test
@@ -31,7 +31,7 @@ jobs:
     # Release
     - name: Release, Configure, and Build Loki
       run: |
-        cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -S . -B build_release -DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/dependencies-install
+        cmake -DCMAKE_BUILD_TYPE=Release -DLOKI_BUILD_TESTS=ON -S . -B build_release -DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/dependencies-install
         cmake --build build_release
 
     - name: Release Test
