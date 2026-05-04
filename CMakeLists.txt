@@ -13,7 +13,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Establish project
 ##############################################################
 
-project(loki VERSION "0.0.1" LANGUAGES C CXX)
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml" LOKI_PROJECT_VERSION_LINE REGEX "^version[ \t]*=" LIMIT_COUNT 1)
+if(NOT LOKI_PROJECT_VERSION_LINE)
+    message(FATAL_ERROR "Could not read project version from pyproject.toml")
+endif()
+string(REGEX REPLACE "^version[ \t]*=[ \t]*\"([^\"]+)\".*$" "\\1" LOKI_PROJECT_VERSION "${LOKI_PROJECT_VERSION_LINE}")
+
+project(loki VERSION "${LOKI_PROJECT_VERSION}" LANGUAGES C CXX)
 
 # Compilation flags, some configuration-specific
 # When applying -fsanitize=address, also set it in dependencies via -DCMAKE_CXX_FLAGS="-fsanitize=address"
@@ -90,16 +96,7 @@ message("DATA_DIR: ${DATA_DIR}")
 list(APPEND CMAKE_MODULE_PATH
   "${PROJECT_SOURCE_DIR}/cmake"
 )
-include("configure_boost")
-include("configure_ccache")
 include("configure_yggdrasil")
-
-
-##############################################################
-# CCache
-##############################################################
-
-configure_ccache()
 
 
 ##############################################################
@@ -112,8 +109,10 @@ configure_yggdrasil()
 
 # Boost
 # Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
-configure_boost()
-find_package(Boost ${BOOST_MIN_VERSION} REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+set(Boost_NO_SYSTEM_PATHS ON)
+set(Boost_USE_STATIC_LIBS ${LOKI_LINK_STATIC_DEPENDENCIES})
+set(Boost_USE_STATIC_RUNTIME ${LOKI_LINK_STATIC_DEPENDENCIES})
+find_package(Boost 1.74.0 REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
   message(STATUS "Found Boost: ${Boost_DIR} (found version ${Boost_VERSION})")
@@ -152,6 +151,10 @@ message(STATUS "Found fmt headers: ${FMT_INCLUDE_DIR}")
 ##############################################################
 
 add_subdirectory(src)
+
+if(BUILD_PYPDDL)
+  add_subdirectory(python)
+endif()
 
 if (LOKI_BUILD_EXECUTABLES)
   add_subdirectory(exe)
@@ -215,11 +218,3 @@ install(
   DESTINATION "${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_LIBDIR}/cmake/loki"
   COMPONENT ${LOKI_INSTALL_COMPONENT}
 )
-
-if(BUILD_PYPDDL)
-  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/python/src/pypddl/__init__.py"
-          DESTINATION "pypddl"
-          COMPONENT pypddl)
-endif()
-
-add_custom_target(pypddl_wheel DEPENDS parsers)

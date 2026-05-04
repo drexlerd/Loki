@@ -6,6 +6,7 @@ dependencies-install
 dist
 *.egg-info
 .venv
+.pypddl-yggdrasil-lib-dir
 __pycache__
 *.pyc
 
