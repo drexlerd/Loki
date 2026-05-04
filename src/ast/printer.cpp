@@ -518,7 +518,7 @@ void write(const ast::BinaryComparatorEqual&, T /*formatter*/, std::ostream& out
 }
 
 template<Formatter T>
-void write(const ast::BinaryComparatorUnequal& node, T /*formatter*/, std::ostream& out)
+void write(const ast::BinaryComparatorUnequal&, T /*formatter*/, std::ostream& out)
 {
     fmt::print(out, "!=");
 }
