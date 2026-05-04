@@ -32,7 +32,23 @@ jobs:
         NATIVE_LIB_DIR="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix() / "lib")')"
         export DYLD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${DYLD_LIBRARY_PATH:-}"
         export LD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${LD_LIBRARY_PATH:-}"
-        GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V --output-on-failure
+        if ! GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V --output-on-failure; then
+          if [ "$(uname)" = "Darwin" ]; then
+            echo "==== loki_tests dylibs ===="
+            otool -L ./loki_tests || true
+            echo "==== loki_tests rpaths ===="
+            otool -l ./loki_tests | grep -A3 LC_RPATH || true
+            echo "==== libloki_parsers dylibs ===="
+            otool -L ../../src/libloki_parsers.dylib || true
+            echo "==== lldb backtrace ===="
+            lldb --batch \
+              -o "settings set target.disable-aslr false" \
+              -o "run" \
+              -o "thread backtrace all" \
+              -- ./loki_tests || true
+          fi
+          exit 1
+        fi
 
     # Release
     - name: Release, Configure, and Build Loki
@@ -48,4 +64,20 @@ jobs:
         NATIVE_LIB_DIR="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix() / "lib")')"
         export DYLD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${DYLD_LIBRARY_PATH:-}"
         export LD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${LD_LIBRARY_PATH:-}"
-        GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V --output-on-failure
+        if ! GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V --output-on-failure; then
+          if [ "$(uname)" = "Darwin" ]; then
+            echo "==== loki_tests dylibs ===="
+            otool -L ./loki_tests || true
+            echo "==== loki_tests rpaths ===="
+            otool -l ./loki_tests | grep -A3 LC_RPATH || true
+            echo "==== libloki_parsers dylibs ===="
+            otool -L ../../src/libloki_parsers.dylib || true
+            echo "==== lldb backtrace ===="
+            lldb --batch \
+              -o "settings set target.disable-aslr false" \
+              -o "run" \
+              -o "thread backtrace all" \
+              -- ./loki_tests || true
+          fi
+          exit 1
+        fi
