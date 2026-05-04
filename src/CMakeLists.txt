@@ -22,6 +22,10 @@ if(BUILD_SHARED_LIBS)
     if(LOKI_PARSERS_INSTALL_RPATH)
         set_target_properties(parsers PROPERTIES INSTALL_RPATH "${LOKI_PARSERS_INSTALL_RPATH}")
     endif()
+
+    if(YGGDRASIL_NATIVE_PREFIX)
+        set_target_properties(parsers PROPERTIES BUILD_RPATH "${YGGDRASIL_NATIVE_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+    endif()
 endif()
 
 # Add compile definitions for the parsers target

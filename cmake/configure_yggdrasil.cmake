@@ -18,6 +18,7 @@ function(configure_yggdrasil)
 
   if(yggdrasil_result EQUAL 0 AND EXISTS "${yggdrasil_prefix}")
     list(PREPEND CMAKE_PREFIX_PATH "${yggdrasil_prefix}")
+    set(YGGDRASIL_NATIVE_PREFIX "${yggdrasil_prefix}" PARENT_SCOPE)
     set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" PARENT_SCOPE)
     message(STATUS "Found yggdrasil native prefix: ${yggdrasil_prefix}")
   endif()
