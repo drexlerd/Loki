@@ -107,7 +107,10 @@ include("configure_yggdrasil")
 
 configure_yggdrasil()
 
+# -----
 # Boost
+# -----
+
 # Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
 set(Boost_NO_SYSTEM_PATHS ON)
 set(Boost_USE_STATIC_LIBS ${LOKI_LINK_STATIC_DEPENDENCIES})
@@ -118,32 +121,23 @@ if(Boost_FOUND)
   message(STATUS "Found Boost: ${Boost_DIR} (found version ${Boost_VERSION})")
 endif()
 
+# -----
+# GTL
+# -----
 
-find_package(gtl CONFIG QUIET PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_package(gtl CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(gtl_FOUND)
   message(STATUS "Found gtl: ${gtl_DIR}")
-else()
-  find_path(GTL_INCLUDE_DIR gtl/gtl_config.hpp PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES include NO_DEFAULT_PATH)
-  if(NOT GTL_INCLUDE_DIR)
-    message(FATAL_ERROR "Could not find gtl headers")
-  endif()
-  add_library(gtl::gtl INTERFACE IMPORTED)
-  set_target_properties(gtl::gtl PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${GTL_INCLUDE_DIR}")
-  message(STATUS "Found gtl headers: ${GTL_INCLUDE_DIR}")
 endif()
 
+# -----
+# Fmt
+# -----
 
-find_path(FMT_INCLUDE_DIR fmt/core.h PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES include NO_DEFAULT_PATH)
-if(NOT FMT_INCLUDE_DIR)
-  message(FATAL_ERROR "Could not find fmt headers")
+find_package(fmt CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+if(fmt_FOUND)
+  message(STATUS "Found fmt: ${fmt_DIR} (found version ${fmt_VERSION})")
 endif()
-if(NOT TARGET fmt::fmt)
-  add_library(fmt::fmt INTERFACE IMPORTED)
-  set_target_properties(fmt::fmt PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${FMT_INCLUDE_DIR}"
-    INTERFACE_COMPILE_DEFINITIONS FMT_HEADER_ONLY)
-endif()
-message(STATUS "Found fmt headers: ${FMT_INCLUDE_DIR}")
 
 
 ##############################################################

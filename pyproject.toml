@@ -1,14 +1,14 @@
 [build-system]
 requires = [
     "scikit-build-core>=0.10",
-    "pyyggdrasil==0.0.3",
+    "pyyggdrasil==0.0.4",
 ]
 build-backend = "pypddl_build_backend"
 backend-path = ["python"]
 
 [project]
 name = "pypddl"
-version = "1.0.1"
+version = "1.0.2"
 description = "Python-distributed native package for the Loki PDDL parser library"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -16,7 +16,7 @@ authors = [
     {name = "Dominik Drexler", email = "dominik.drexler@liu.se"},
 ]
 dependencies = [
-    "pyyggdrasil==0.0.3",
+    "pyyggdrasil==0.0.4",
 ]
 
 [project.optional-dependencies]
