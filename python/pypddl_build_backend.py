@@ -13,7 +13,6 @@ from scikit_build_core import build as scikit_build
 
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
-YGGDRASIL_LIB_DIR_FILE = ROOT_DIR / ".pypddl-yggdrasil-lib-dir"
 
 
 def _num_jobs() -> int:
@@ -31,16 +30,8 @@ def _yggdrasil_prefix() -> Path:
     return pyyggdrasil.native_prefix().resolve()
 
 
-def _native_lib_dirs(prefix: Path) -> list[Path]:
-    return [path for path in sorted(prefix.glob("lib*")) if path.is_dir()]
-
-
 def _prepare_native_build() -> None:
     yggdrasil_prefix = _yggdrasil_prefix()
-    YGGDRASIL_LIB_DIR_FILE.write_text(
-        os.pathsep.join(str(path) for path in _native_lib_dirs(yggdrasil_prefix)),
-        encoding="utf-8",
-    )
 
     os.environ.setdefault("CMAKE_BUILD_PARALLEL_LEVEL", str(_num_jobs()))
     _prepend_cmake_args(

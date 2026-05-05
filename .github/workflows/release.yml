@@ -113,7 +113,7 @@ jobs:
       - build_wheels_macos
     runs-on: ubuntu-latest
 
-    if: github.repository_owner == 'drexlerd'
+    if: github.repository_owner == 'planning-and-learning'
 
     permissions:
       id-token: write

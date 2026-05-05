@@ -15,7 +15,7 @@ permissions:
 jobs:
   build-image:
     name: Build Apptainer image
-    if: github.repository == 'drexlerd/Loki'
+    if: github.repository == 'planning-and-learning/loki'
     runs-on: ubuntu-24.04
 
     steps:

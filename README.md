@@ -32,7 +32,7 @@ Loki depends on a fraction of [Boost's](boost.org) header-only libraries (Fusion
 Loki consumes these native dependencies from `pyyggdrasil`:
 
 ```console
-uv pip install pyyggdrasil==0.0.2
+uv pip install pyyggdrasil==0.0.6
 cmake -S . -B build \
   -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
 ```
@@ -42,7 +42,7 @@ checkout instead:
 
 ```console
 cd ../yggdrasil
-uv pip install --python ../Loki/.venv/bin/python .
+uv pip install --python ../loki/.venv/bin/python .
 ```
 
 ## Build Instructions
@@ -71,7 +71,7 @@ cmake -S . -B build \
 
 The Python package `pypddl` installs Loki's native headers, shared library, and
 CMake package config under `pypddl.native_prefix()`. It depends on
-`pyyggdrasil==0.0.2` for third-party native dependencies:
+`pyyggdrasil==0.0.6` for third-party native dependencies:
 
 ```python
 import pypddl
@@ -103,11 +103,11 @@ The testing framework depends on [GoogleTest](https://github.com/google/googlete
 
 ## Performance Benchmarks
 
-The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark) and requires the additional compile flag `-DLOKI_BUILD_BENCHMARKS=ON` to be set in the cmake configure step. The results from the GitHub action can be viewed [here](https://drexlerd.github.io/Loki/dev/bench/).
+The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark) and requires the additional compile flag `-DLOKI_BUILD_BENCHMARKS=ON` to be set in the cmake configure step. The results from the GitHub action can be viewed [here](https://planning-and-learning.github.io/loki/dev/bench/).
 
 ## IDE Support
 
-We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Tools` extensions by Microsoft. Install `pyyggdrasil==0.0.2` into the Python environment used for configuring CMake, then set the following `Cmake: Configure Args` in the `CMake Tools` extension settings under `Workspace`:
+We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Tools` extensions by Microsoft. Install `pyyggdrasil==0.0.6` into the Python environment used for configuring CMake, then set the following `Cmake: Configure Args` in the `CMake Tools` extension settings under `Workspace`:
 
 - `-DCMAKE_PREFIX_PATH=<output of python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())'>`
 - `-DLOKI_BUILD_TESTS=ON`
