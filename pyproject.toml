@@ -11,6 +11,7 @@ name = "pypddl"
 version = "1.0.2"
 description = "Python-distributed native package for the Loki PDDL parser library"
 readme = "README.md"
+license = "GPL-3.0-or-later"
 requires-python = ">=3.9"
 authors = [
     {name = "Dominik Drexler", email = "dominik.drexler@liu.se"},
@@ -37,6 +38,7 @@ wheel.packages = []
 include = [
     "CMakeLists.txt",
     "Config.cmake.in",
+    "LICENSE",
     "README.md",
     "pyproject.toml",
     "python/**",
