@@ -449,7 +449,7 @@ const auto ground_literal_def = negated_ground_atom | ground_atom;
 
 const auto initial_element_literals_def = ground_literal;
 const auto initial_element_timed_literal_def = (lit('(') >> lit("at") >> number) > ground_literal > lit(')');
-const auto initial_element_function_value_def = lit('(') >> lit('=') >> ground_function >> number > lit(')');
+const auto initial_element_function_value_def = (lit('(') >> lit('=') >> ground_function >> number) > lit(')');
 const auto initial_element_def = initial_element_timed_literal | initial_element_function_value | initial_element_literals;
 
 const auto metric_function_expression_binary_operator_def = (lit('(') >> binary_operator >> metric_function_expression >> metric_function_expression)

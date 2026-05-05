@@ -60,9 +60,10 @@ CMAKE_INSTALL_LIBDIR = "lib"
 
 [tool.cibuildwheel]
 container-engine = "docker"
+before-build = "python -m pip install --no-cache-dir pyyggdrasil==0.0.5"
 
 [tool.cibuildwheel.linux]
-repair-wheel-command = "LD_LIBRARY_PATH=$(cat .pypddl-yggdrasil-lib-dir) auditwheel repair -w {dest_dir} {wheel}"
+repair-wheel-command = "LD_LIBRARY_PATH=$(python -c 'import os, pyyggdrasil; print(os.pathsep.join(str(path) for path in sorted(pyyggdrasil.native_prefix().glob(\"lib*\")) if path.is_dir()))') auditwheel repair -w {dest_dir} {wheel}"
 
 [tool.cibuildwheel.macos]
-repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
+repair-wheel-command = "DYLD_LIBRARY_PATH=$(python -c 'import os, pyyggdrasil; print(os.pathsep.join(str(path) for path in sorted(pyyggdrasil.native_prefix().glob(\"lib*\")) if path.is_dir()))') delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
