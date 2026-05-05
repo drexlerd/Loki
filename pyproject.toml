@@ -1,7 +1,7 @@
 [build-system]
 requires = [
     "scikit-build-core>=0.10",
-    "pyyggdrasil==0.0.4",
+    "pyyggdrasil==0.0.5",
 ]
 build-backend = "pypddl_build_backend"
 backend-path = ["python"]
@@ -16,7 +16,7 @@ authors = [
     {name = "Dominik Drexler", email = "dominik.drexler@liu.se"},
 ]
 dependencies = [
-    "pyyggdrasil==0.0.4",
+    "pyyggdrasil==0.0.5",
 ]
 
 [project.optional-dependencies]
