@@ -1,14 +1,14 @@
 [build-system]
 requires = [
     "scikit-build-core>=0.10",
-    "pyyggdrasil==0.0.6",
+    "pyyggdrasil>=0.0.7",
 ]
 build-backend = "pypddl_build_backend"
 backend-path = ["python"]
 
 [project]
 name = "pypddl"
-version = "1.0.3"
+version = "1.0.4"
 description = "Python-distributed native package for the Loki PDDL parser library"
 readme = "README.md"
 license = "GPL-3.0-or-later"
@@ -17,7 +17,7 @@ authors = [
     {name = "Dominik Drexler", email = "dominik.drexler@liu.se"},
 ]
 dependencies = [
-    "pyyggdrasil==0.0.6",
+    "pyyggdrasil>=0.0.7",
 ]
 
 [project.optional-dependencies]
@@ -62,7 +62,7 @@ CMAKE_INSTALL_LIBDIR = "lib"
 
 [tool.cibuildwheel]
 container-engine = "docker"
-before-build = "python -m pip install --no-cache-dir pyyggdrasil==0.0.6"
+before-build = "python -m pip install --no-cache-dir pyyggdrasil>=0.0.7"
 
 [tool.cibuildwheel.linux]
 repair-wheel-command = "LD_LIBRARY_PATH=$(python -c 'import os, pyyggdrasil; print(os.pathsep.join(str(path) for path in sorted(pyyggdrasil.native_prefix().glob(\"lib*\")) if path.is_dir()))') auditwheel repair -w {dest_dir} {wheel}"
