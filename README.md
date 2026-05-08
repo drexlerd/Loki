@@ -115,6 +115,21 @@ We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Too
 
 After running `CMake: Configure` in Visual Studio Code (ctrl + shift + p), you should see all include paths being correctly resolved.
 
+## Citing Loki
+
+If you use Loki in your research, please cite it as follows:
+
+```bibtex
+@misc{drexler-zenodo2026,
+  author =       "Dominik Drexler",
+  title =        "{Loki}: A {PDDL} Parser and Normalizer",
+  publisher =    "Zenodo",
+  year =         "2026",
+  doi =          "10.5281/zenodo.20081136",
+  url =          "https://doi.org/10.5281/zenodo.20081136",
+}
+```
+
 ## Acknowledgements
 
 This work was partially supported by the Wallenberg AI, Autonomous Systems and Software Program (WASP) funded by the Knut and Alice Wallenberg Foundation.
