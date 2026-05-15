@@ -32,7 +32,7 @@ Loki depends on a fraction of [Boost's](boost.org) header-only libraries (Fusion
 Loki consumes these native dependencies from `pyyggdrasil`:
 
 ```console
-uv pip install pyyggdrasil>=0.0.7
+uv pip install pyyggdrasil>=0.0.8
 cmake -S . -B build \
   -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
 ```
@@ -71,7 +71,7 @@ cmake -S . -B build \
 
 The Python package `pypddl` installs Loki's native headers, shared library, and
 CMake package config under `pypddl.native_prefix()`. It depends on
-`pyyggdrasil>=0.0.7` for third-party native dependencies:
+`pyyggdrasil>=0.0.8` for third-party native dependencies:
 
 ```python
 import pypddl
@@ -107,7 +107,7 @@ The benchmark framework depends on [GoogleBenchmark](https://github.com/google/b
 
 ## IDE Support
 
-We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Tools` extensions by Microsoft. Install `pyyggdrasil>=0.0.7` into the Python environment used for configuring CMake, then set the following `Cmake: Configure Args` in the `CMake Tools` extension settings under `Workspace`:
+We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Tools` extensions by Microsoft. Install `pyyggdrasil>=0.0.8` into the Python environment used for configuring CMake, then set the following `Cmake: Configure Args` in the `CMake Tools` extension settings under `Workspace`:
 
 - `-DCMAKE_PREFIX_PATH=<output of python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())'>`
 - `-DLOKI_BUILD_TESTS=ON`
