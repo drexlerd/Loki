@@ -26,12 +26,14 @@ jobs:
       - name: Build Linux wheel
         run: cibuildwheel --output-dir wheelhouse
         env:
+          PIP_INDEX_URL: https://test.pypi.org/simple/
+          PIP_EXTRA_INDEX_URL: https://pypi.org/simple/
           CIBW_PLATFORM: linux
           CIBW_BUILD: "cp313-*"
           CIBW_SKIP: "*-musllinux_*"
           CIBW_ARCHS: x86_64
           CIBW_BUILD_VERBOSITY: "1"
-          CIBW_ENVIRONMENT: "PYPDDL_JOBS=2 PIP_NO_CACHE_DIR=1"
+          CIBW_ENVIRONMENT: "PYPDDL_JOBS=2 PIP_NO_CACHE_DIR=1 PIP_INDEX_URL=https://test.pypi.org/simple/ PIP_EXTRA_INDEX_URL=https://pypi.org/simple/"
 
       - name: Upload Linux wheel artifact
         uses: actions/upload-artifact@v5
@@ -59,11 +61,13 @@ jobs:
       - name: Build macOS wheel
         run: cibuildwheel --output-dir wheelhouse
         env:
+          PIP_INDEX_URL: https://test.pypi.org/simple/
+          PIP_EXTRA_INDEX_URL: https://pypi.org/simple/
           CIBW_PLATFORM: macos
           CIBW_BUILD: "cp313-*"
           CIBW_ARCHS: arm64
           CIBW_BUILD_VERBOSITY: "1"
-          CIBW_ENVIRONMENT: "PYPDDL_JOBS=2 PIP_NO_CACHE_DIR=1"
+          CIBW_ENVIRONMENT: "PYPDDL_JOBS=2 PIP_NO_CACHE_DIR=1 PIP_INDEX_URL=https://test.pypi.org/simple/ PIP_EXTRA_INDEX_URL=https://pypi.org/simple/"
 
       - name: Upload macOS wheel artifact
         uses: actions/upload-artifact@v5
@@ -78,6 +82,10 @@ jobs:
     runs-on: ubuntu-latest
 
     if: github.repository_owner == 'planning-and-learning'
+
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Download wheel artifacts
