@@ -119,16 +119,6 @@ enabled with `-DLOKI_BUILD_EXECUTABLES=ON`.
 ./build/exe/loki data/gripper/domain.pddl data/gripper/p-2-0.pddl
 ```
 
-## IDE Support
-
-We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Tools` extensions by Microsoft. Install `pyyggdrasil>=0.0.9` into the Python environment used for configuring CMake, then set the following `Cmake: Configure Args` in the `CMake Tools` extension settings under `Workspace`:
-
-- `-DCMAKE_PREFIX_PATH=<output of python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())'>`
-- `-DLOKI_BUILD_TESTS=ON`
-- `-DLOKI_BUILD_PROFILING=ON`
-
-After running `CMake: Configure` in Visual Studio Code (ctrl + shift + p), you should see all include paths being correctly resolved.
-
 ## Citing Loki
 
 If you use Loki in your research, please cite it as follows:
