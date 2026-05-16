@@ -1,83 +1,60 @@
-name: Googletest Unit Tests
+name: CI Ctest
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - test-pypi
+  pull_request:
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
+  build-and-test:
     runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            build_type: Debug
+          - os: macos-latest
+            build_type: Release
 
     steps:
-    - name: Checkout Loki
-      uses: actions/checkout@v2
+      - name: Checkout Loki
+        uses: actions/checkout@v4
 
-    - name: Install native dependencies
-      run: |
-        python -m pip install --no-cache-dir --upgrade pip
-        python -m pip install --no-cache-dir pyyggdrasil>=0.0.7
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
 
-    # Debug
-    - name: Debug, Configure, and Build Loki
-      run: |
-        cmake -DCMAKE_BUILD_TYPE=Debug -DLOKI_BUILD_TESTS=ON -S . -B build_debug \
-          -DPython3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
-          -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
-        cmake --build build_debug
+      - name: Install python requirements
+        run: |
+          python -m pip install --no-cache-dir --upgrade pip
+          python -m pip install --no-cache-dir pyyggdrasil>=0.0.9
+        env:
+          PIP_NO_CACHE_DIR: 1
+          PYYGGDRASIL_JOBS: 2
 
-    - name: Debug Test
-      working-directory: build_debug/tests/unit
-      run: |
-        NATIVE_LIB_DIR="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix() / "lib")')"
-        export DYLD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${DYLD_LIBRARY_PATH:-}"
-        export LD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${LD_LIBRARY_PATH:-}"
-        if ! GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V --output-on-failure; then
-          if [ "$(uname)" = "Darwin" ]; then
-            echo "==== loki_tests dylibs ===="
-            otool -L ./loki_tests || true
-            echo "==== loki_tests rpaths ===="
-            otool -l ./loki_tests | grep -A3 LC_RPATH || true
-            echo "==== libloki_parsers dylibs ===="
-            otool -L ../../src/libloki_parsers.dylib || true
-            echo "==== lldb backtrace ===="
-            lldb --batch \
-              -o "settings set target.disable-aslr false" \
-              -o "run" \
-              -o "thread backtrace all" \
-              -- ./loki_tests || true
-          fi
-          exit 1
-        fi
+      - name: Install CMake on Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake
 
-    # Release
-    - name: Release, Configure, and Build Loki
-      run: |
-        cmake -DCMAKE_BUILD_TYPE=Release -DLOKI_BUILD_TESTS=ON -S . -B build_release \
-          -DPython3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
-          -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
-        cmake --build build_release
+      - name: Configure and Build Loki
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                -DLOKI_BUILD_TESTS=ON \
+                -DCMAKE_INSTALL_LIBDIR=lib \
+                -DPython3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')" \
+                -S . -B build_${{ matrix.build_type }} \
+                -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
+          cmake --build build_${{ matrix.build_type }} -j2
 
-    - name: Release Test
-      working-directory: build_release/tests/unit
-      run: |
-        NATIVE_LIB_DIR="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix() / "lib")')"
-        export DYLD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${DYLD_LIBRARY_PATH:-}"
-        export LD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${LD_LIBRARY_PATH:-}"
-        if ! GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V --output-on-failure; then
-          if [ "$(uname)" = "Darwin" ]; then
-            echo "==== loki_tests dylibs ===="
-            otool -L ./loki_tests || true
-            echo "==== loki_tests rpaths ===="
-            otool -l ./loki_tests | grep -A3 LC_RPATH || true
-            echo "==== libloki_parsers dylibs ===="
-            otool -L ../../src/libloki_parsers.dylib || true
-            echo "==== lldb backtrace ===="
-            lldb --batch \
-              -o "settings set target.disable-aslr false" \
-              -o "run" \
-              -o "thread backtrace all" \
-              -- ./loki_tests || true
-          fi
-          exit 1
-        fi
+      - name: Run Tests
+        working-directory: build_${{ matrix.build_type }}/tests/unit
+        run: |
+          NATIVE_LIB_DIR="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix() / "lib")')"
+          export DYLD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${DYLD_LIBRARY_PATH:-}"
+          export LD_LIBRARY_PATH="${NATIVE_LIB_DIR}:$PWD/../../src:${LD_LIBRARY_PATH:-}"
+          GTEST_OUTPUT=xml:test-results/ GTEST_COLOR=1 ctest -V

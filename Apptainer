@@ -34,7 +34,7 @@ Stage: build
         -DCMAKE_PREFIX_PATH="$(python3 -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')" \
         -DCMAKE_BUILD_TYPE=Release \
         -DLOKI_BUILD_TESTS=OFF \
-        -DLOKI_BUILD_BENCHMARKS=OFF \
+        -DLOKI_BUILD_PROFILING=OFF \
         -DLOKI_BUILD_EXECUTABLES=ON
     cmake --build build -j$(nproc)
 

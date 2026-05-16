@@ -48,11 +48,11 @@ else()
     message("Build tests disabled.")
 endif()
 
-option(LOKI_BUILD_BENCHMARKS "Enables compilation of Loki benchmarks." OFF)
-if (LOKI_BUILD_BENCHMARKS)
-    message("Build benchmarks enabled.")
+option(LOKI_BUILD_PROFILING "Build Loki profiling targets." OFF)
+if (LOKI_BUILD_PROFILING)
+    message("Build profiling targets enabled.")
 else()
-    message("Build benchmarks disabled.")
+    message("Build profiling targets disabled.")
 endif()
 
 option(LOKI_BUILD_EXECUTABLES "Enables compilation of Loki executables." OFF)
@@ -64,9 +64,9 @@ endif()
 
 message("Build shared libraries enabled.")
 
-option(BUILD_PYPDDL "Build Loki for the pypddl Python wheel." OFF)
+option(LOKI_BUILD_PYPDDL "Build Loki for the pypddl Python wheel." OFF)
 
-if(BUILD_PYPDDL)
+if(LOKI_BUILD_PYPDDL)
   set(LOKI_INSTALL_PREFIX "pypddl/native/")
   set(LOKI_INSTALL_COMPONENT pypddl)
   set(LOKI_INSTALL_INTERFACE_INCLUDEDIR "${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_INCLUDEDIR}")
@@ -140,7 +140,7 @@ endif()
 
 add_subdirectory(src)
 
-if(BUILD_PYPDDL)
+if(LOKI_BUILD_PYPDDL)
   add_subdirectory(python)
 endif()
 
@@ -152,8 +152,8 @@ if (LOKI_BUILD_TESTS)
   add_subdirectory(tests)
 endif()
 
-if (LOKI_BUILD_BENCHMARKS)
-  add_subdirectory(benchmarks)
+if (LOKI_BUILD_PROFILING)
+  add_subdirectory(profiling)
 endif()
 
 

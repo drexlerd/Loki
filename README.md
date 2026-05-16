@@ -65,8 +65,8 @@ CMake options:
 | --- | --- | --- |
 | `LOKI_BUILD_TESTS` | `OFF` | Build Loki tests. |
 | `LOKI_BUILD_EXECUTABLES` | `OFF` | Build Loki executables. |
-| `LOKI_BUILD_BENCHMARKS` | `OFF` | Build Loki benchmarks. |
-| `BUILD_PYPDDL` | `OFF` | Build Loki for the `pypddl` Python wheel. |
+| `LOKI_BUILD_PROFILING` | `OFF` | Build Loki profiling targets. |
+| `LOKI_BUILD_PYPDDL` | `OFF` | Build Loki for the `pypddl` Python wheel. |
 
 Run tests from a build configured with `-DLOKI_BUILD_TESTS=ON`:
 
@@ -125,7 +125,7 @@ We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Too
 
 - `-DCMAKE_PREFIX_PATH=<output of python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())'>`
 - `-DLOKI_BUILD_TESTS=ON`
-- `-DLOKI_BUILD_BENCHMARKS=ON`
+- `-DLOKI_BUILD_PROFILING=ON`
 
 After running `CMake: Configure` in Visual Studio Code (ctrl + shift + p), you should see all include paths being correctly resolved.
 

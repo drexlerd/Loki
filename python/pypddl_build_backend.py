@@ -56,9 +56,9 @@ def _prepare_native_build() -> None:
     _prepend_env_paths("DYLD_LIBRARY_PATH", native_library_dirs)
     _prepend_cmake_args(
         f"-DCMAKE_PREFIX_PATH={yggdrasil_prefix}",
-        "-DBUILD_PYPDDL=ON",
+        "-DLOKI_BUILD_PYPDDL=ON",
         "-DLOKI_BUILD_TESTS=OFF",
-        "-DLOKI_BUILD_BENCHMARKS=OFF",
+        "-DLOKI_BUILD_PROFILING=OFF",
         "-DLOKI_BUILD_EXECUTABLES=OFF",
         "-DCMAKE_INSTALL_LIBDIR=lib",
     )

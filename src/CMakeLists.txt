@@ -7,7 +7,7 @@ file(GLOB_RECURSE PUBLIC_HEADER_FILES
 add_library(parsers SHARED ${SRC_FILES} ${PRIVATE_HEADER_FILES} ${PUBLIC_HEADER_FILES})
 set_target_properties(parsers PROPERTIES OUTPUT_NAME loki_parsers)
 
-if(BUILD_PYPDDL)
+if(LOKI_BUILD_PYPDDL)
     if(APPLE)
         set(LOKI_PARSERS_INSTALL_RPATH "@loader_path;@loader_path/../../../pyyggdrasil/lib")
     else()
