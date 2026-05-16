@@ -29,13 +29,13 @@ The translator is based on the method presented in section four of the paper [*"
 
 Loki depends on a fraction of [Boost's](boost.org) header-only libraries (Fusion, Spirit x3, Container), its performance benchmarking framework depends on [GoogleBenchmark](https://github.com/google/benchmark), and its testing framework depends on [GoogleTest](https://github.com/google/googletest).
 
-Loki consumes these native dependencies from `pyyggdrasil`:
+Loki consumes native dependencies from Python packages:
 
-```console
-uv pip install pyyggdrasil>=0.0.8
-cmake -S . -B build \
-  -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
-```
+- `pyyggdrasil >= 0.0.9` for shared third-party native dependencies.
+
+The shared workspace layout and general Python/CMake integration pattern are
+documented in the
+[Planning and Learning build instructions](https://github.com/planning-and-learning/.github/blob/main/profile/README.md#local-development).
 
 For offline/local development, install `pyyggdrasil` from the sibling source
 checkout instead:
@@ -45,33 +45,52 @@ cd ../yggdrasil
 uv pip install --python ../loki/.venv/bin/python .
 ```
 
-## Build Instructions
+## Build C++
+
+Install Loki's native dependency providers into the active Python environment,
+then configure CMake with their native prefixes:
 
 ```console
-# Configure with the pyyggdrasil native prefix
+python -m pip install 'pyyggdrasil>=0.0.9'
+
 cmake -S . -B build \
   -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
-# Build
-cmake --build build -j16
-# Install (optional)
+
+cmake --build build -j4
+```
+
+CMake options:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `LOKI_BUILD_TESTS` | `OFF` | Build Loki tests. |
+| `LOKI_BUILD_EXECUTABLES` | `OFF` | Build Loki executables. |
+| `LOKI_BUILD_BENCHMARKS` | `OFF` | Build Loki benchmarks. |
+| `BUILD_PYPDDL` | `OFF` | Build Loki for the `pypddl` Python wheel. |
+
+Run tests from a build configured with `-DLOKI_BUILD_TESTS=ON`:
+
+```console
+ctest --test-dir build --output-on-failure
+```
+
+Install Loki from a configured build directory with:
+
+```console
 cmake --install build --prefix=<path/to/installation-directory>
 ```
 
-For shared-library builds, disable static dependency lookup:
+## Build Python
 
 ```console
-cmake -S . -B build \
-  -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')" \
-  -DBUILD_SHARED_LIBS=ON \
-  -DLOKI_LINK_STATIC_DEPENDENCIES=OFF
+python -m pip install .
 ```
 
-
-## Integration Instructions
+## CMake Integration
 
 The Python package `pypddl` installs Loki's native headers, shared library, and
 CMake package config under `pypddl.native_prefix()`. It depends on
-`pyyggdrasil>=0.0.8` for third-party native dependencies:
+`pyyggdrasil>=0.0.9` for third-party native dependencies:
 
 ```python
 import pypddl
@@ -81,33 +100,28 @@ print(pypddl.native_prefix())
 print(pyyggdrasil.native_prefix())
 ```
 
-Downstream CMake projects can then use:
+Downstream CMake projects should include the native prefixes of `pypddl` and
+its native package dependencies in `CMAKE_PREFIX_PATH`:
 
 ```console
 cmake -S . -B build \
-  -DCMAKE_PREFIX_PATH="$(python -c 'import pypddl; print(pypddl.native_prefix())')"
+  -DCMAKE_PREFIX_PATH="$(python -c 'import os, pyyggdrasil, pypddl; print(os.pathsep.join(map(str, [pyyggdrasil.native_prefix(), pypddl.native_prefix()])))')"
 ```
 
+Loki exports the `loki::parsers` target.
 
 ## Running the Executables
 
-The executable illustrates how to use Loki. It is disabled by default and can be enabled with `-DLOKI_BUILD_EXECUTABLES=ON`.
+The executable illustrates how to use Loki. It is disabled by default and can be
+enabled with `-DLOKI_BUILD_EXECUTABLES=ON`.
 
 ```console
 ./build/exe/loki data/gripper/domain.pddl data/gripper/p-2-0.pddl
 ```
 
-## Running the Tests
-
-The testing framework depends on [GoogleTest](https://github.com/google/googletest) and requires the additional compile flag `-DLOKI_BUILD_TESTS=ON` to be set in the cmake configure step.
-
-## Performance Benchmarks
-
-The benchmark framework depends on [GoogleBenchmark](https://github.com/google/benchmark) and requires the additional compile flag `-DLOKI_BUILD_BENCHMARKS=ON` to be set in the cmake configure step. The results from the GitHub action can be viewed [here](https://planning-and-learning.github.io/loki/dev/bench/).
-
 ## IDE Support
 
-We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Tools` extensions by Microsoft. Install `pyyggdrasil>=0.0.8` into the Python environment used for configuring CMake, then set the following `Cmake: Configure Args` in the `CMake Tools` extension settings under `Workspace`:
+We developed Loki in Visual Studio Code. We recommend the `C/C++` and `CMake Tools` extensions by Microsoft. Install `pyyggdrasil>=0.0.9` into the Python environment used for configuring CMake, then set the following `Cmake: Configure Args` in the `CMake Tools` extension settings under `Workspace`:
 
 - `-DCMAKE_PREFIX_PATH=<output of python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())'>`
 - `-DLOKI_BUILD_TESTS=ON`

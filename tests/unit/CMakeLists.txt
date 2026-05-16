@@ -18,12 +18,10 @@ target_link_libraries(${TEST_NAME}
         loki::parsers
         GTest::gtest)
 
-if(BUILD_SHARED_LIBS)
-    set(LOKI_TEST_BUILD_RPATH "$<TARGET_FILE_DIR:parsers>")
-    if(YGGDRASIL_NATIVE_PREFIX)
-        list(APPEND LOKI_TEST_BUILD_RPATH "${YGGDRASIL_NATIVE_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-    endif()
-    set_target_properties(${TEST_NAME} PROPERTIES BUILD_RPATH "${LOKI_TEST_BUILD_RPATH}")
+set(LOKI_TEST_BUILD_RPATH "$<TARGET_FILE_DIR:parsers>")
+if(YGGDRASIL_NATIVE_PREFIX)
+    list(APPEND LOKI_TEST_BUILD_RPATH "${YGGDRASIL_NATIVE_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
+set_target_properties(${TEST_NAME} PROPERTIES BUILD_RPATH "${LOKI_TEST_BUILD_RPATH}")
 
 add_test(domain_gtests ${TEST_NAME})

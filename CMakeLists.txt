@@ -62,14 +62,8 @@ else()
     message("Build executables disabled.")
 endif()
 
-option(BUILD_SHARED_LIBS "Build shared libraries." ON)
-if (BUILD_SHARED_LIBS)
-    message("Build shared libraries enabled.")
-else()
-    message("Build shared libraries disabled.")
-endif()
+message("Build shared libraries enabled.")
 
-option(LOKI_LINK_STATIC_DEPENDENCIES "Prefer static dependency libraries when finding installed dependencies." OFF)
 option(BUILD_PYPDDL "Build Loki for the pypddl Python wheel." OFF)
 
 if(BUILD_PYPDDL)
@@ -113,8 +107,8 @@ configure_yggdrasil()
 
 # Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
 set(Boost_NO_SYSTEM_PATHS ON)
-set(Boost_USE_STATIC_LIBS ${LOKI_LINK_STATIC_DEPENDENCIES})
-set(Boost_USE_STATIC_RUNTIME ${LOKI_LINK_STATIC_DEPENDENCIES})
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.74.0 REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
