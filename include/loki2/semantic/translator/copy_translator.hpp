@@ -21,6 +21,7 @@
 #include "loki2/semantic/translator/effect_translator.hpp"
 #include "loki2/semantic/translator/effect_normal_form_translator.hpp"
 #include "loki2/semantic/translator/equality_translator.hpp"
+#include "loki2/semantic/translator/goal_simplification_translator.hpp"
 #include "loki2/semantic/translator/top_level_translator.hpp"
 #include "loki2/semantic/translator/type_translator.hpp"
 
@@ -39,6 +40,7 @@ class CopyTranslator : private CopyContextOwner,
                        public EffectTranslator<CopyTranslator>,
                        public EffectNormalFormTranslator<CopyTranslator>,
                        public EqualityTranslator<CopyTranslator>,
+                       public GoalSimplificationTranslator<CopyTranslator>,
                        public TopLevelTranslator<CopyTranslator>,
                        public TypeTranslator<CopyTranslator>
 {
@@ -56,6 +58,7 @@ public:
         EffectTranslator<CopyTranslator>(context()),
         EffectNormalFormTranslator<CopyTranslator>(context()),
         EqualityTranslator<CopyTranslator>(context()),
+        GoalSimplificationTranslator<CopyTranslator>(context()),
         TopLevelTranslator<CopyTranslator>(context()),
         TypeTranslator<CopyTranslator>(context())
     {
@@ -97,13 +100,14 @@ public:
     using ConditionNnfTranslator<CopyTranslator>::copy_condition_node;
 
     using ConditionQuantifierTranslator<CopyTranslator>::make_generated_axiom_condition;
-    using ConditionQuantifierTranslator<CopyTranslator>::make_generated_goal_condition;
-    using ConditionQuantifierTranslator<CopyTranslator>::simplify_goal_condition;
-    using ConditionQuantifierTranslator<CopyTranslator>::simplify_goal_condition_node;
     using ConditionQuantifierTranslator<CopyTranslator>::as_exists;
     using ConditionQuantifierTranslator<CopyTranslator>::move_existentials;
     using ConditionQuantifierTranslator<CopyTranslator>::move_existentials_node;
     using ConditionQuantifierTranslator<CopyTranslator>::lift_top_level_exists;
+
+    using GoalSimplificationTranslator<CopyTranslator>::make_generated_goal_condition;
+    using GoalSimplificationTranslator<CopyTranslator>::simplify_goal_condition;
+    using GoalSimplificationTranslator<CopyTranslator>::simplify_goal_condition_node;
 
     using EffectTranslator<CopyTranslator>::copy;
 
