@@ -10,6 +10,7 @@
 #ifndef LOKI2_PARSER_HPP_
 #define LOKI2_PARSER_HPP_
 
+#include "loki2/parser/options.hpp"
 #include "loki2/parser/parser.hpp"
 #include "loki2/parser/parser_def.hpp"
 

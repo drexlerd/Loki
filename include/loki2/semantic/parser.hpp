@@ -12,6 +12,7 @@
 
 #include "loki2/ast.hpp"
 #include "loki2/parser.hpp"
+#include "loki2/semantic/errors.hpp"
 #include "loki2/pddl/pddl.hpp"
 #include "loki2/semantic/translator.hpp"
 
@@ -28,6 +29,7 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -36,17 +38,11 @@ namespace loki2::semantic
 {
 namespace fs = std::filesystem;
 
-class SemanticError : public std::runtime_error
-{
-public:
-    using std::runtime_error::runtime_error;
-};
-
 inline std::string read_file(const fs::path& path)
 {
     std::ifstream in(path);
     if (!in)
-        throw SemanticError("Could not open PDDL file: " + path.string());
+        throw SemanticError(SemanticErrorCode::ParseFailure, "Could not open PDDL file: " + path.string());
     std::ostringstream out;
     out << in.rdbuf();
     return out.str();
@@ -55,7 +51,8 @@ inline std::string read_file(const fs::path& path)
 class Parser
 {
 public:
-    Parser() :
+    explicit Parser(parser::ParserOptions options = {}) :
+        m_options(options),
         m_storage(std::make_shared<detail::TranslationStorage>(0))
     {
         m_object_type = intern_type("object", {});
@@ -71,11 +68,40 @@ public:
     pddl::DomainView get_domain() const
     {
         if (!m_domain)
-            throw SemanticError("No domain has been parsed.");
+            throw SemanticError(SemanticErrorCode::MissingDomain, "No domain has been parsed.");
         return ygg::make_view(*m_domain, repo());
     }
 
-    pddl::DomainView parse_domain(const ast::Domain& domain)
+    pddl::DomainView parse_domain(const std::string& source)
+    {
+        auto first = source.cbegin();
+        parser::ErrorHandlerType error_handler(first, source.cend(), std::cerr);
+        ast::Domain domain_ast;
+        if (!parser::parse_domain_with_options(source, domain_ast, error_handler, m_options))
+            throw ParseError("Could not parse PDDL domain.");
+        auto scope = ErrorHandlerScope { *this, error_handler };
+        return parse_domain_ast(domain_ast);
+    }
+
+    pddl::DomainView parse_domain(const fs::path& path) { return parse_domain(read_file(path)); }
+    pddl::DomainView parse_domain_file(const fs::path& path) { return parse_domain(path); }
+
+    pddl::TaskView parse_task(const std::string& source)
+    {
+        auto first = source.cbegin();
+        parser::ErrorHandlerType error_handler(first, source.cend(), std::cerr);
+        ast::Task task_ast;
+        if (!parser::parse_task_with_options(source, task_ast, error_handler, m_options))
+            throw ParseError("Could not parse PDDL task.");
+        auto scope = ErrorHandlerScope { *this, error_handler };
+        return parse_task_ast(task_ast);
+    }
+
+    pddl::TaskView parse_task(const fs::path& path) { return parse_task(read_file(path)); }
+    pddl::TaskView parse_task_file(const fs::path& path) { return parse_task(path); }
+
+private:
+    pddl::DomainView parse_domain_ast(const ast::Domain& domain)
     {
         clear_domain_symbols();
         m_object_type = intern_type("object", {});
@@ -103,24 +129,12 @@ public:
         return get_domain();
     }
 
-    pddl::DomainView parse_domain(const std::string& source)
-    {
-        auto first = source.cbegin();
-        parser::ErrorHandlerType error_handler(first, source.cend(), std::cerr);
-        ast::Domain domain_ast;
-        if (!parser::parse_domain(source, domain_ast, error_handler))
-            throw SemanticError("Could not parse PDDL domain.");
-        return parse_domain(domain_ast);
-    }
-
-    pddl::DomainView parse_domain_file(const fs::path& path) { return parse_domain(read_file(path)); }
-
-    pddl::TaskView parse_task(const ast::Task& task)
+    pddl::TaskView parse_task_ast(const ast::Task& task)
     {
         if (!m_domain)
-            throw SemanticError("Cannot parse task before parsing a domain.");
+            throw_at(task, SemanticError(SemanticErrorCode::MissingDomain, "Cannot parse task before parsing a domain."));
         if (!m_domain_name.empty() && task.domain_name.text != m_domain_name)
-            throw SemanticError("Task references domain '" + task.domain_name.text + "' but parser holds domain '" + m_domain_name + "'.");
+            throw_at(task.domain_name, MismatchedDomainError(m_domain_name, task.domain_name.text));
 
         const auto domain_storage = m_storage;
         auto parse_storage = std::make_shared<detail::TranslationStorage>(m_task_storages.size() + 1, &domain_storage->repository);
@@ -143,6 +157,14 @@ public:
         };
         TaskObjectScope task_object_scope { *this, m_task_objects };
         m_task_objects = &task_objects;
+
+        struct ObjectDeclarationScope
+        {
+            Parser& parser;
+            std::unordered_set<std::string> previous;
+            ~ObjectDeclarationScope() { parser.m_declared_objects = std::move(previous); }
+        };
+        ObjectDeclarationScope object_declaration_scope { *this, m_declared_objects };
 
         auto requirements = parse_requirements(task.requirements);
         auto objects = parse_objects(task.objects, task_objects);
@@ -167,19 +189,8 @@ public:
         return canonicalize_task(view, domain_storage);
     }
 
-    pddl::TaskView parse_task(const std::string& source)
-    {
-        auto first = source.cbegin();
-        parser::ErrorHandlerType error_handler(first, source.cend(), std::cerr);
-        ast::Task task_ast;
-        if (!parser::parse_task(source, task_ast, error_handler))
-            throw SemanticError("Could not parse PDDL task.");
-        return parse_task(task_ast);
-    }
-
-    pddl::TaskView parse_task_file(const fs::path& path) { return parse_task(read_file(path)); }
-
-private:
+    parser::ParserOptions m_options;
+    const parser::ErrorHandlerType* m_error_handler = nullptr;
     std::shared_ptr<detail::TranslationStorage> m_storage;
     std::vector<std::shared_ptr<detail::TranslationStorage>> m_task_storages;
     cista::optional<ygg::Index<pddl::Domain>> m_domain;
@@ -191,6 +202,10 @@ private:
     std::unordered_map<std::string, ygg::Index<pddl::Object>> m_objects;
     std::unordered_map<std::string, ygg::Index<pddl::Predicate>> m_predicates;
     std::unordered_map<std::string, ygg::Index<pddl::FunctionSkeleton>> m_functions;
+    std::unordered_set<std::string> m_declared_types;
+    std::unordered_set<std::string> m_declared_objects;
+    std::unordered_set<std::string> m_declared_predicates;
+    std::unordered_set<std::string> m_declared_functions;
     std::vector<std::unordered_map<std::string, ygg::Index<pddl::Variable>>> m_variable_scopes;
     std::unordered_map<std::string, ygg::Index<pddl::Object>>* m_task_objects = nullptr;
 
@@ -201,12 +216,40 @@ private:
     pddl::Builder& build() noexcept { return m_storage->builder; }
     const pddl::Builder& build() const noexcept { return m_storage->builder; }
 
+    struct ErrorHandlerScope
+    {
+        Parser& parser;
+        const parser::ErrorHandlerType* previous;
+
+        ErrorHandlerScope(Parser& parser, const parser::ErrorHandlerType& error_handler) :
+            parser(parser),
+            previous(parser.m_error_handler)
+        {
+            parser.m_error_handler = &error_handler;
+        }
+
+        ~ErrorHandlerScope() { parser.m_error_handler = previous; }
+    };
+
+    template<typename Node, typename Error>
+    [[noreturn]] void throw_at(const Node& node, Error error) const
+    {
+        if (m_error_handler)
+            if (auto source_range = parser::source_range(*m_error_handler, node))
+                error.set_source_range(*source_range);
+        throw error;
+    }
+
     void rebuild_domain_symbols()
     {
         m_types.clear();
         m_objects.clear();
         m_predicates.clear();
         m_functions.clear();
+        m_declared_types.clear();
+        m_declared_objects.clear();
+        m_declared_predicates.clear();
+        m_declared_functions.clear();
         if (!m_domain)
             return;
 
@@ -214,6 +257,7 @@ private:
         {
             const auto& data = repo()[type];
             m_types[std::string(data.name)] = type;
+            m_declared_types.insert(std::string(data.name));
             for (auto base : data.bases)
                 self(self, base);
         };
@@ -225,15 +269,21 @@ private:
         {
             const auto& data = repo()[object];
             m_objects[std::string(data.name)] = object;
+            m_declared_objects.insert(std::string(data.name));
             for (auto type : data.types)
                 remember_type(remember_type, type);
         }
         for (auto predicate : domain.predicates)
-            m_predicates[std::string(repo()[predicate].name)] = predicate;
+        {
+            const auto name = std::string(repo()[predicate].name);
+            m_predicates[name] = predicate;
+            m_declared_predicates.insert(name);
+        }
         for (auto function : domain.functions)
         {
             const auto& data = repo()[function];
             m_functions[std::string(data.name)] = function;
+            m_declared_functions.insert(std::string(data.name));
             remember_type(remember_type, data.type);
         }
 
@@ -279,6 +329,10 @@ private:
         m_objects.clear();
         m_predicates.clear();
         m_functions.clear();
+        m_declared_types.clear();
+        m_declared_objects.clear();
+        m_declared_predicates.clear();
+        m_declared_functions.clear();
         m_variable_scopes.clear();
         m_task_objects = nullptr;
     }
@@ -291,6 +345,20 @@ private:
             if (c >= 'A' && c <= 'Z')
                 c = static_cast<char>(c - 'A' + 'a');
         return text;
+    }
+
+    template<typename Node>
+    void ensure_new(std::unordered_set<std::string>& names, std::string name, SemanticErrorCode code, const std::string& kind, const Node& node) const
+    {
+        if (!names.insert(name).second)
+            throw_at(node, DuplicateDefinitionError(code, kind, name));
+    }
+
+    template<typename Node>
+    void ensure_arity(const std::string& name, size_t expected, size_t actual, const Node& node) const
+    {
+        if (expected != actual)
+            throw_at(node, ArityMismatchError(name, expected, actual));
     }
 
     ygg::Index<pddl::Type> intern_type(const std::string& name, ygg::IndexList<pddl::Type> bases)
@@ -307,13 +375,13 @@ private:
     {
         auto result = ygg::IndexList<pddl::Requirement> {};
         for (const auto& node : nodes)
-            result.push_back(build().requirement(repo(), requirement_kind(node.name.text)).get_index());
+            result.push_back(build().requirement(repo(), requirement_kind(node)).get_index());
         return result;
     }
 
-    pddl::RequirementKind requirement_kind(std::string name) const
+    pddl::RequirementKind requirement_kind(const ast::Requirement& node) const
     {
-        name = key(std::move(name));
+        auto name = key(node.name.text);
         if (name == "strips") return pddl::RequirementKind::Strips;
         if (name == "typing") return pddl::RequirementKind::Typing;
         if (name == "negative-preconditions") return pddl::RequirementKind::NegativePreconditions;
@@ -331,7 +399,7 @@ private:
         if (name == "derived-predicates") return pddl::RequirementKind::DerivedPredicates;
         if (name == "non-deterministic") return pddl::RequirementKind::NonDeterministic;
         if (name == "probabilistic-effects") return pddl::RequirementKind::ProbabilisticEffects;
-        throw SemanticError("Unsupported requirement: :" + name);
+        throw_at(node.name, UnsupportedRequirementError(name));
     }
 
     ygg::IndexList<pddl::Type> parse_types(const std::vector<ast::TypedName>& nodes)
@@ -339,8 +407,10 @@ private:
         auto result = ygg::IndexList<pddl::Type> {};
         for (const auto& node : nodes)
         {
+            const auto name = key(node.name.text);
+            ensure_new(m_declared_types, name, SemanticErrorCode::DuplicateType, "type", node.name);
             auto bases = node.type ? parse_type_expression(*node.type) : ygg::IndexList<pddl::Type> { m_object_type };
-            result.push_back(intern_type(node.name.text, std::move(bases)));
+            result.push_back(intern_type(name, std::move(bases)));
         }
         return result;
     }
@@ -356,6 +426,8 @@ private:
         auto k = key(node.name.text);
         if (auto it = m_types.find(k); it != m_types.end())
             result.push_back(it->second);
+        else if (m_options.strict)
+            throw_at(node.name, UndefinedTypeError(k));
         else
             result.push_back(intern_type(k, {}));
         return result;
@@ -377,9 +449,11 @@ private:
         auto result = ygg::IndexList<pddl::Object> {};
         for (const auto& node : nodes)
         {
+            const auto name = key(node.name.text);
+            ensure_new(m_declared_objects, name, SemanticErrorCode::DuplicateObject, "object", node.name);
             auto types = node.type ? parse_type_expression(*node.type) : ygg::IndexList<pddl::Type> { m_object_type };
-            auto view = build().object(repo(), to_cista(node.name.text), std::move(types));
-            table[node.name.text] = view.get_index();
+            auto view = build().object(repo(), to_cista(name), std::move(types));
+            table[name] = view.get_index();
             result.push_back(view.get_index());
         }
         return result;
@@ -390,9 +464,12 @@ private:
         auto result = ygg::IndexList<pddl::Parameter> {};
         for (const auto& node : nodes)
         {
-            auto variable = build().variable(repo(), to_cista(node.variable.text)).get_index();
+            const auto name = key(node.variable.text);
+            if (!m_variable_scopes.empty() && m_variable_scopes.back().contains(name))
+                throw_at(node.variable, DuplicateDefinitionError(SemanticErrorCode::DuplicateVariable, "variable", name));
+            auto variable = build().variable(repo(), to_cista(name)).get_index();
             if (!m_variable_scopes.empty())
-                m_variable_scopes.back()[node.variable.text] = variable;
+                m_variable_scopes.back()[name] = variable;
             auto types = node.type ? parse_type_expression(*node.type) : ygg::IndexList<pddl::Type> { m_object_type };
             result.push_back(build().parameter(repo(), variable, std::move(types)).get_index());
         }
@@ -407,8 +484,10 @@ private:
             m_variable_scopes.emplace_back();
             auto parameters = parse_parameters(node.parameters);
             m_variable_scopes.pop_back();
-            auto view = build().predicate(repo(), to_cista(node.name.text), std::move(parameters));
-            m_predicates[node.name.text] = view.get_index();
+            const auto name = key(node.name.text);
+            ensure_new(m_declared_predicates, name, SemanticErrorCode::DuplicatePredicate, "predicate", node.name);
+            auto view = build().predicate(repo(), to_cista(name), std::move(parameters));
+            m_predicates[name] = view.get_index();
             result.push_back(view.get_index());
         }
         return result;
@@ -422,55 +501,73 @@ private:
             m_variable_scopes.emplace_back();
             auto parameters = parse_parameters(node.parameters);
             m_variable_scopes.pop_back();
+            const auto name = key(node.name.text);
+            ensure_new(m_declared_functions, name, SemanticErrorCode::DuplicateFunction, "function", node.name);
             auto type = node.type ? parse_type_expression(*node.type).front() : m_number_type;
-            auto view = build().function_skeleton(repo(), to_cista(node.name.text), std::move(parameters), type);
-            m_functions[node.name.text] = view.get_index();
+            auto view = build().function_skeleton(repo(), to_cista(name), std::move(parameters), type);
+            m_functions[name] = view.get_index();
             result.push_back(view.get_index());
         }
         return result;
     }
 
-    ygg::Index<pddl::Predicate> predicate(const std::string& name)
+    ygg::Index<pddl::Predicate> predicate(const ast::Identifier& identifier, size_t arity)
     {
+        const auto name = key(identifier.text);
         if (auto it = m_predicates.find(name); it != m_predicates.end())
+        {
+            if (m_declared_predicates.contains(name))
+                ensure_arity(name, repo()[it->second].parameters.size(), arity, identifier);
             return it->second;
+        }
+        if (m_options.strict)
+            throw_at(identifier, UndefinedPredicateError(name));
         auto view = build().predicate(repo(), to_cista(name), {});
         m_predicates[name] = view.get_index();
         return view.get_index();
     }
 
-    ygg::Index<pddl::FunctionSkeleton> function(const std::string& name)
+    ygg::Index<pddl::FunctionSkeleton> function(const ast::Identifier& identifier, size_t arity)
     {
+        const auto name = key(identifier.text);
         if (auto it = m_functions.find(name); it != m_functions.end())
+        {
+            if (m_declared_functions.contains(name))
+                ensure_arity(name, repo()[it->second].parameters.size(), arity, identifier);
             return it->second;
+        }
+        if (m_options.strict)
+            throw_at(identifier, UndefinedFunctionError(name));
         auto view = build().function_skeleton(repo(), to_cista(name), {}, m_number_type);
         m_functions[name] = view.get_index();
         return view.get_index();
     }
 
-    ygg::Index<pddl::Variable> variable(const std::string& name) const
+    ygg::Index<pddl::Variable> variable(const ast::Identifier& identifier) const
     {
+        const auto name = key(identifier.text);
         for (auto it = m_variable_scopes.rbegin(); it != m_variable_scopes.rend(); ++it)
             if (auto found = it->find(name); found != it->end())
                 return found->second;
-        throw SemanticError("Undefined variable: ?" + name);
+        throw_at(identifier, UndefinedVariableError(identifier.text));
     }
 
-    ygg::Index<pddl::Object> object(const std::string& name) const
+    ygg::Index<pddl::Object> object(const ast::Identifier& identifier) const
     {
+        const auto name = key(identifier.text);
         if (m_task_objects)
             if (auto it = m_task_objects->find(name); it != m_task_objects->end())
                 return it->second;
         if (auto it = m_objects.find(name); it != m_objects.end())
             return it->second;
-        throw SemanticError("Undefined object: " + name);
+        throw_at(identifier, UndefinedObjectError(identifier.text));
     }
 
     ygg::Index<pddl::Term> parse_term(const ast::Term& node)
     {
         if (node.variable)
-            return build().term(repo(), ygg::Data<pddl::Term>::Variant(variable(node.name.text))).get_index();
-        return build().term(repo(), ygg::Data<pddl::Term>::Variant(object(node.name.text))).get_index();
+            return build().term(repo(), ygg::Data<pddl::Term>::Variant(variable(node.name))).get_index();
+        return build().term(repo(), ygg::Data<pddl::Term>::Variant(object(node.name))).get_index();
     }
 
     ygg::IndexList<pddl::Term> parse_terms(const std::vector<ast::Term>& nodes)
@@ -483,7 +580,8 @@ private:
 
     ygg::Index<pddl::Atom> parse_atom(const ast::Atom& node)
     {
-        return build().atom(repo(), predicate(node.predicate.text), parse_terms(node.terms)).get_index();
+        auto terms = parse_terms(node.terms);
+        return build().atom(repo(), predicate(node.predicate, terms.size()), std::move(terms)).get_index();
     }
 
     ygg::Index<pddl::Literal> parse_literal(const ast::Literal& node)
@@ -539,7 +637,8 @@ private:
 
     ygg::Index<pddl::FunctionTerm> parse_function_term(const ast::FunctionTerm& node)
     {
-        return build().function_term(repo(), function(node.function.text), parse_terms(node.terms)).get_index();
+        auto terms = parse_terms(node.terms);
+        return build().function_term(repo(), function(node.function, terms.size()), std::move(terms)).get_index();
     }
 
     ygg::Index<pddl::FunctionExpression> parse_function_expression(const ast::FunctionExpression& expression)
@@ -574,7 +673,7 @@ private:
         for (const auto& child : node.effects) list.push_back(parse_effect(child.get()));
         return wrap_effect(build().effect_and(repo(), std::move(list)).get_index());
     }
-    ygg::Index<pddl::Effect> parse_effect_node(const ast::EffectNumeric& node) { return wrap_effect(build().effect_numeric(repo(), numeric_effect_operator(node.op), function(node.function.function.text), parse_terms(node.function.terms), parse_function_expression(node.expression.get())).get_index()); }
+    ygg::Index<pddl::Effect> parse_effect_node(const ast::EffectNumeric& node) { return wrap_effect(build().effect_numeric(repo(), numeric_effect_operator(node.op), function(node.function.function, node.function.terms.size()), parse_terms(node.function.terms), parse_function_expression(node.expression.get())).get_index()); }
     ygg::Index<pddl::Effect> parse_effect_node(const ast::EffectForall& node)
     {
         m_variable_scopes.emplace_back();
@@ -622,7 +721,7 @@ private:
             term.variable = true;
             terms.push_back(parse_term(term));
         }
-        auto pred = predicate(node.head.name.text);
+        auto pred = predicate(node.head.name, terms.size());
         auto atom = build().atom(repo(), pred, std::move(terms)).get_index();
         auto head = build().literal(repo(), true, atom).get_index();
         auto condition = parse_condition(node.condition);

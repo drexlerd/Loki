@@ -707,6 +707,97 @@ TEST(Loki2SemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
     EXPECT_GT(translated.get_domain().get_data().predicates.size(), domain.get_data().predicates.size());
 }
 
+
+TEST(Loki2SemanticParser, StrictModeRejectsUndefinedPredicates)
+{
+    const auto domain = std::string { R"(
+(define (domain strict-undefined)
+  (:predicates)
+  (:action a
+    :parameters ()
+    :precondition (missing)
+    :effect (and))
+)
+)" };
+
+    auto options = parser::ParserOptions {};
+    options.strict = true;
+    auto parser = semantic::Parser(options);
+
+    try
+    {
+        parser.parse_domain(domain);
+        FAIL() << "Expected UndefinedPredicateError";
+    }
+    catch (const semantic::SemanticError& error)
+    {
+        EXPECT_EQ(error.code(), semantic::SemanticErrorCode::UndefinedPredicate);
+        ASSERT_TRUE(error.source_range().has_value());
+        EXPECT_EQ(error.source_range()->begin.line, 6);
+        EXPECT_EQ(error.source_range()->begin.column, 20);
+    }
+}
+
+TEST(Loki2SemanticParser, ReportsDuplicatePredicateDefinitions)
+{
+    const auto domain = std::string { R"(
+(define (domain duplicate-predicate)
+  (:predicates (p) (p))
+)
+)" };
+
+    auto parser = semantic::Parser();
+    try
+    {
+        parser.parse_domain(domain);
+        FAIL() << "Expected duplicate predicate error";
+    }
+    catch (const semantic::SemanticError& error)
+    {
+        EXPECT_EQ(error.code(), semantic::SemanticErrorCode::DuplicatePredicate);
+    }
+}
+
+TEST(Loki2SemanticParser, ReportsDeclaredPredicateArityMismatch)
+{
+    const auto domain = std::string { R"(
+(define (domain bad-arity)
+  (:predicates (p ?x))
+  (:action a
+    :parameters ()
+    :precondition (p)
+    :effect (and))
+)
+)" };
+
+    auto parser = semantic::Parser();
+    try
+    {
+        parser.parse_domain(domain);
+        FAIL() << "Expected arity mismatch";
+    }
+    catch (const semantic::SemanticError& error)
+    {
+        EXPECT_EQ(error.code(), semantic::SemanticErrorCode::ArityMismatch);
+    }
+}
+
+TEST(Loki2SemanticParser, PermissiveModeKeepsImplicitPredicateCompatibility)
+{
+    const auto domain = std::string { R"(
+(define (domain permissive-implicit)
+  (:predicates)
+  (:action a
+    :parameters ()
+    :precondition (missing)
+    :effect (and))
+)
+)" };
+
+    auto parser = semantic::Parser();
+    EXPECT_NO_THROW(parser.parse_domain(domain));
+}
+
 TEST(Loki2SemanticParser, ParsesAndTranslatesAllSuiteCases)
 {
     const auto cases = semantic_suite::load_cases();

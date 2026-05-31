@@ -13,6 +13,7 @@
 #include "loki2/ast/ast.hpp"
 #include "loki2/parser/config.hpp"
 #include "loki2/parser/error_handler.hpp"
+#include "loki2/parser/options.hpp"
 
 #include <boost/spirit/home/x3.hpp>
 
@@ -22,23 +23,23 @@ namespace x3 = boost::spirit::x3;
 
 namespace rules
 {
-struct IdentifierClass;
-struct TypeExpressionClass;
-struct TypedNameListClass;
-struct TypedVariableListClass;
-struct TermClass;
-struct AtomClass;
-struct LiteralClass;
-struct FunctionTermClass;
-struct FunctionExpressionClass;
-struct ConditionClass;
-struct EffectClass;
-struct PredicateDeclarationClass;
-struct FunctionDeclarationClass;
-struct ActionClass;
-struct AxiomClass;
-struct MetricClass;
-struct InitialFunctionValueClass;
+struct IdentifierClass : ErrorHandlerBase {};
+struct TypeExpressionClass : ErrorHandlerBase {};
+struct TypedNameListClass : ErrorHandlerBase {};
+struct TypedVariableListClass : ErrorHandlerBase {};
+struct TermClass : ErrorHandlerBase {};
+struct AtomClass : ErrorHandlerBase {};
+struct LiteralClass : ErrorHandlerBase {};
+struct FunctionTermClass : ErrorHandlerBase {};
+struct FunctionExpressionClass : ErrorHandlerBase {};
+struct ConditionClass : ErrorHandlerBase {};
+struct EffectClass : ErrorHandlerBase {};
+struct PredicateDeclarationClass : ErrorHandlerBase {};
+struct FunctionDeclarationClass : ErrorHandlerBase {};
+struct ActionClass : ErrorHandlerBase {};
+struct AxiomClass : ErrorHandlerBase {};
+struct MetricClass : ErrorHandlerBase {};
+struct InitialFunctionValueClass : ErrorHandlerBase {};
 struct DomainClass : ErrorHandlerBase {};
 struct TaskClass : ErrorHandlerBase {};
 struct FileClass : ErrorHandlerBase {};
@@ -108,48 +109,66 @@ rules::task_type const& task();
 rules::file_type const& file();
 
 template<typename Iterator, typename Parser, typename Node>
-bool parse_ast(Iterator& first, Iterator last, const Parser& parser, Node& out, ErrorHandler<Iterator>& error_handler)
+bool parse_ast(Iterator& first, Iterator last, const Parser& parser, Node& out, ErrorHandler<Iterator>& error_handler, const ParserOptions& options = {})
 {
+    (void) options;
     out = Node {};
     auto wrapped = x3::with<ErrorHandlerTag>(std::ref(error_handler))[parser];
     return phrase_parse(first, last, wrapped, pddl_skipper(), out);
 }
 
 template<typename Parser, typename Node>
-bool parse_ast(const std::string& source, const Parser& parser, Node& out, ErrorHandlerType& error_handler)
+bool parse_ast(const std::string& source, const Parser& parser, Node& out, ErrorHandlerType& error_handler, const ParserOptions& options = {})
 {
     auto first = source.begin();
-    return parse_ast(first, source.end(), parser, out, error_handler);
+    return parse_ast(first, source.end(), parser, out, error_handler, options);
 }
 
 template<typename Iterator, typename Parser, typename Node>
-bool parse_full(Iterator& first, Iterator last, const Parser& parser, Node& out, ErrorHandler<Iterator>& error_handler)
+bool parse_full(Iterator& first, Iterator last, const Parser& parser, Node& out, ErrorHandler<Iterator>& error_handler, const ParserOptions& options = {})
 {
+    (void) options;
+    (void) options;
     out = Node {};
     auto wrapped = x3::with<ErrorHandlerTag>(std::ref(error_handler))[parser >> x3::eoi];
     return phrase_parse(first, last, wrapped, pddl_skipper(), out);
 }
 
 template<typename Parser, typename Node>
-bool parse_full(const std::string& source, const Parser& parser, Node& out, ErrorHandlerType& error_handler)
+bool parse_full(const std::string& source, const Parser& parser, Node& out, ErrorHandlerType& error_handler, const ParserOptions& options = {})
 {
     auto first = source.begin();
-    return parse_full(first, source.end(), parser, out, error_handler);
+    return parse_full(first, source.end(), parser, out, error_handler, options);
+}
+
+inline bool parse_domain_with_options(const std::string& source, ast::Domain& out, ErrorHandlerType& error_handler, const ParserOptions& options)
+{
+    return parse_full(source, domain(), out, error_handler, options);
 }
 
 inline bool parse_domain(const std::string& source, ast::Domain& out, ErrorHandlerType& error_handler)
 {
-    return parse_full(source, domain(), out, error_handler);
+    return parse_domain_with_options(source, out, error_handler, {});
+}
+
+inline bool parse_task_with_options(const std::string& source, ast::Task& out, ErrorHandlerType& error_handler, const ParserOptions& options)
+{
+    return parse_full(source, task(), out, error_handler, options);
 }
 
 inline bool parse_task(const std::string& source, ast::Task& out, ErrorHandlerType& error_handler)
 {
-    return parse_full(source, task(), out, error_handler);
+    return parse_task_with_options(source, out, error_handler, {});
+}
+
+inline bool parse_file_with_options(const std::string& source, ast::File& out, ErrorHandlerType& error_handler, const ParserOptions& options)
+{
+    return parse_full(source, file(), out, error_handler, options);
 }
 
 inline bool parse_file(const std::string& source, ast::File& out, ErrorHandlerType& error_handler)
 {
-    return parse_full(source, file(), out, error_handler);
+    return parse_file_with_options(source, out, error_handler, {});
 }
 
 }
