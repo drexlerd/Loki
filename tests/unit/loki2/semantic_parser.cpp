@@ -73,16 +73,19 @@ template<class... Ts>
 Overloaded(Ts...) -> Overloaded<Ts...>;
 
 template<typename T>
-void expect_contiguous_indices(const ygg::IndexList<T>& indices, const std::string& label)
+void expect_contiguous_indices(const ygg::IndexList<T>& indices, const std::string& label, const pddl::Repository& repository, bool require_order = true)
 {
     SCOPED_TRACE(label);
-    if (indices.empty())
-        return;
 
     auto values = std::vector<ygg::uint_t> {};
     values.reserve(indices.size());
     for (auto index : indices)
-        values.push_back(index.get_value());
+    {
+        if (&repository.get_canonical_context(index) == &repository)
+            values.push_back(index.get_value());
+    }
+    if (values.empty())
+        return;
 
     auto sorted = values;
     std::sort(sorted.begin(), sorted.end());
@@ -90,16 +93,19 @@ void expect_contiguous_indices(const ygg::IndexList<T>& indices, const std::stri
     {
         if (sorted[i] != sorted[i - 1] + 1)
         {
-            ADD_FAILURE() << label << " has an index gap between " << sorted[i - 1] << " and " << sorted[i];
+            ADD_FAILURE() << label << " has a local index gap between " << sorted[i - 1] << " and " << sorted[i];
             break;
         }
     }
+
+    if (!require_order)
+        return;
 
     for (size_t i = 1; i < values.size(); ++i)
     {
         if (values[i] != values[i - 1] + 1)
         {
-            ADD_FAILURE() << label << " is not stored in contiguous canonical index order at offset " << i
+            ADD_FAILURE() << label << " is not stored in contiguous local canonical index order at offset " << i
                           << ": previous=" << values[i - 1] << ", current=" << values[i];
             break;
         }
@@ -109,23 +115,23 @@ void expect_contiguous_indices(const ygg::IndexList<T>& indices, const std::stri
 void expect_contiguous_domain_indices(pddl::DomainView domain)
 {
     const auto& data = domain.get_data();
-    expect_contiguous_indices(data.requirements, "domain.requirements");
-    expect_contiguous_indices(data.types, "domain.types");
-    expect_contiguous_indices(data.constants, "domain.constants");
-    expect_contiguous_indices(data.predicates, "domain.predicates");
-    expect_contiguous_indices(data.functions, "domain.functions");
-    expect_contiguous_indices(data.actions, "domain.actions");
-    expect_contiguous_indices(data.axioms, "domain.axioms");
+    expect_contiguous_indices(data.requirements, "domain.requirements", domain.get_context());
+    expect_contiguous_indices(data.types, "domain.types", domain.get_context(), false);
+    expect_contiguous_indices(data.constants, "domain.constants", domain.get_context());
+    expect_contiguous_indices(data.predicates, "domain.predicates", domain.get_context());
+    expect_contiguous_indices(data.functions, "domain.functions", domain.get_context());
+    expect_contiguous_indices(data.actions, "domain.actions", domain.get_context());
+    expect_contiguous_indices(data.axioms, "domain.axioms", domain.get_context());
 }
 
 void expect_contiguous_task_indices(pddl::TaskView task)
 {
     const auto& data = task.get_data();
-    expect_contiguous_indices(data.requirements, "task.requirements");
-    expect_contiguous_indices(data.objects, "task.objects");
-    expect_contiguous_indices(data.initial_literals, "task.initial_literals");
-    expect_contiguous_indices(data.initial_function_values, "task.initial_function_values");
-    expect_contiguous_indices(data.axioms, "task.axioms");
+    expect_contiguous_indices(data.requirements, "task.requirements", task.get_context());
+    expect_contiguous_indices(data.objects, "task.objects", task.get_context());
+    expect_contiguous_indices(data.initial_literals, "task.initial_literals", task.get_context());
+    expect_contiguous_indices(data.initial_function_values, "task.initial_function_values", task.get_context());
+    expect_contiguous_indices(data.axioms, "task.axioms", task.get_context());
 }
 
 bool contains_not_or_imply(ygg::Index<pddl::Condition> condition, const pddl::Repository& repository)
@@ -638,7 +644,8 @@ TEST(Loki2SemanticTranslator, AddsTypePredicatesAndRemovesTypingByDefault)
     EXPECT_TRUE(condition_mentions_predicate(*action.precondition, repository, "thing"));
 
     const auto task = parser.parse_task(task_source);
-    const auto translated_task = semantic::translate(task, translation);
+    const auto translated_task_result = semantic::translate(task, translation);
+    const auto translated_task = translated_task_result.get_translated_task();
     EXPECT_GE(count_initial_literals_for_predicate(translated_task.get_data().initial_literals, translated_task.get_context(), "thing"), 2);
 }
 
@@ -662,12 +669,13 @@ TEST(Loki2SemanticTranslator, InitializesEqualityForConstantsAndTaskObjects)
     const auto domain = parser.parse_domain(domain_source);
     const auto translation = semantic::translate(domain);
     const auto task = parser.parse_task(task_source);
-    const auto translated = semantic::translate(task, translation);
+    const auto translated_result = semantic::translate(task, translation);
+    const auto translated = translated_result.get_translated_task();
 
-    EXPECT_TRUE(has_equality_predicate(translation.get_translated_domain()));
+    EXPECT_TRUE(has_equality_predicate(translated.get_domain()));
     EXPECT_EQ(count_equality_literals(translated.get_data().initial_literals, translated.get_context()),
               count_unique_object_names(translation.get_translated_domain(), translated));
-    EXPECT_EQ(translated.get_domain().get_index(), translation.get_translated_domain().get_index());
+    EXPECT_EQ(&translated.get_domain().get_context().get_root(), &translation.get_translated_domain().get_context().get_root());
 }
 
 TEST(Loki2SemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
@@ -688,14 +696,15 @@ TEST(Loki2SemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
     const auto domain_translation = semantic::translate(domain);
     const auto original_translated_domain_axioms = domain_translation.get_translated_domain().get_data().axioms.size();
     const auto task = parser.parse_task(task_source);
-    const auto translated = semantic::translate(task, domain_translation);
+    const auto translated_result = semantic::translate(task, domain_translation);
+    const auto translated = translated_result.get_translated_task();
     const auto& repository = translated.get_context();
 
     ASSERT_TRUE(translated.get_data().goal.has_value());
     EXPECT_FALSE(contains_not_or_imply(*translated.get_data().goal, repository));
     EXPECT_EQ(translated.get_data().axioms.size(), 1);
     EXPECT_EQ(domain_translation.get_translated_domain().get_data().axioms.size(), original_translated_domain_axioms);
-    EXPECT_GT(domain_translation.get_translated_domain().get_data().predicates.size(), domain.get_data().predicates.size());
+    EXPECT_GT(translated.get_domain().get_data().predicates.size(), domain.get_data().predicates.size());
 }
 
 TEST(Loki2SemanticParser, ParsesAndTranslatesAllSuiteCases)
@@ -712,8 +721,9 @@ TEST(Loki2SemanticParser, ParsesAndTranslatesAllSuiteCases)
             const auto domain = parser.parse_domain_file(item.domain_file);
             const auto translation = semantic::translate(domain);
             const auto task = parser.parse_task_file(item.task_file);
-            const auto translated = semantic::translate(task, translation);
-            EXPECT_EQ(translated.get_domain().get_context().get_index(), translation.get_translated_domain().get_context().get_index());
+            const auto translated_result = semantic::translate(task, translation);
+            const auto translated = translated_result.get_translated_task();
+            EXPECT_EQ(&translated.get_domain().get_context().get_root(), &translation.get_translated_domain().get_context().get_root());
         }
         catch (const std::exception& e)
         {
@@ -762,15 +772,19 @@ TEST(Loki2SemanticParser, ParsesDomainAndManyTasks)
     EXPECT_EQ(semantic::domain_translation_steps().size(), 9);
     EXPECT_EQ(semantic::task_translation_steps().size(), 10);
     const auto task1 = parser.parse_task_file(root / "test-1.pddl");
-    const auto translated1 = semantic::translate(task1, translation);
+    const auto translated1_result = semantic::translate(task1, translation);
+    const auto translated1 = translated1_result.get_translated_task();
     EXPECT_EQ(std::string(translated1.get_domain().get_name()), "gripper-strips");
-    EXPECT_EQ(translated1.get_context().get_index(), translated_domain.get_context().get_index());
+    EXPECT_NE(translated1.get_context().get_index(), translated_domain.get_context().get_index());
+    EXPECT_EQ(&translated1.get_domain().get_context().get_root(), &translated_domain.get_context().get_root());
     EXPECT_GT(translated1.get_initial_literals().get_data().size(), 0);
 
     const auto task2 = parser.parse_task_file(root / "test-1.pddl");
-    const auto translated2 = semantic::translate(task2, translation);
+    const auto translated2_result = semantic::translate(task2, translation);
+    const auto translated2 = translated2_result.get_translated_task();
     EXPECT_EQ(std::string(translated2.get_domain().get_name()), "gripper-strips");
-    EXPECT_EQ(translated2.get_context().get_index(), translated_domain.get_context().get_index());
+    EXPECT_NE(translated2.get_context().get_index(), translated_domain.get_context().get_index());
+    EXPECT_EQ(&translated2.get_domain().get_context().get_root(), &translated_domain.get_context().get_root());
     EXPECT_GT(translated2.get_initial_literals().get_data().size(), 0);
 }
 
@@ -798,9 +812,11 @@ TEST(Loki2SemanticParser, ParsesAndTranslatesDistinctTasksAfterOneDomain)
     const auto translation = semantic::translate(domain);
 
     const auto first_task = parser.parse_task(first_task_source);
-    const auto first_translated = semantic::translate(first_task, translation);
+    const auto first_translated_result = semantic::translate(first_task, translation);
+    const auto first_translated = first_translated_result.get_translated_task();
     const auto second_task = parser.parse_task(second_task_source);
-    const auto second_translated = semantic::translate(second_task, translation);
+    const auto second_translated_result = semantic::translate(second_task, translation);
+    const auto second_translated = second_translated_result.get_translated_task();
 
     auto has_object = [](pddl::TaskView task, const std::string& name)
     {
@@ -811,11 +827,14 @@ TEST(Loki2SemanticParser, ParsesAndTranslatesDistinctTasksAfterOneDomain)
         return false;
     };
 
-    EXPECT_EQ(first_translated.get_context().get_index(), translation.get_translated_domain().get_context().get_index());
-    EXPECT_EQ(second_translated.get_context().get_index(), translation.get_translated_domain().get_context().get_index());
+    EXPECT_NE(first_translated.get_context().get_index(), translation.get_translated_domain().get_context().get_index());
+    EXPECT_NE(second_translated.get_context().get_index(), translation.get_translated_domain().get_context().get_index());
+    EXPECT_EQ(&first_translated.get_domain().get_context().get_root(), &translation.get_translated_domain().get_context().get_root());
+    EXPECT_EQ(&second_translated.get_domain().get_context().get_root(), &translation.get_translated_domain().get_context().get_root());
     EXPECT_TRUE(has_object(first_translated, "a"));
     EXPECT_TRUE(has_object(second_translated, "b"));
-    EXPECT_NE(first_translated.get_index(), second_translated.get_index());
+    EXPECT_NE(&first_translated.get_context(), &second_translated.get_context());
+    EXPECT_NE(std::string(first_translated.get_name()), std::string(second_translated.get_name()));
 }
 
 }

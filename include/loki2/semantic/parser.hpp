@@ -13,6 +13,7 @@
 #include "loki2/ast.hpp"
 #include "loki2/parser.hpp"
 #include "loki2/pddl/pddl.hpp"
+#include "loki2/semantic/translator.hpp"
 
 #include <boost/optional.hpp>
 #include <boost/variant/apply_visitor.hpp>
@@ -27,6 +28,7 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -54,23 +56,23 @@ class Parser
 {
 public:
     Parser() :
-        m_repository(0)
+        m_storage(std::make_shared<detail::TranslationStorage>(0))
     {
         m_object_type = intern_type("object", {});
         m_number_type = intern_type("number", {});
     }
 
-    const pddl::Repository& repository() const noexcept { return m_repository; }
-    pddl::Repository& repository() noexcept { return m_repository; }
-    const pddl::Builder& builder() const noexcept { return m_builder; }
-    pddl::Builder& builder() noexcept { return m_builder; }
+    const pddl::Repository& repository() const noexcept { return repo(); }
+    pddl::Repository& repository() noexcept { return repo(); }
+    const pddl::Builder& builder() const noexcept { return build(); }
+    pddl::Builder& builder() noexcept { return build(); }
 
     bool has_domain() const noexcept { return m_domain.has_value(); }
     pddl::DomainView get_domain() const
     {
         if (!m_domain)
             throw SemanticError("No domain has been parsed.");
-        return ygg::make_view(*m_domain, m_repository);
+        return ygg::make_view(*m_domain, repo());
     }
 
     pddl::DomainView parse_domain(const ast::Domain& domain)
@@ -91,11 +93,14 @@ public:
         for (const auto& action : domain.actions)
             actions.push_back(parse_action(action));
 
+        types.clear();
+        for (auto i = ygg::uint_t { 0 }; i < repo().size<pddl::Type>(); ++i)
+            types.push_back(ygg::Index<pddl::Type>(i));
         auto data = ygg::Data<pddl::Domain>(to_cista(domain.name.text), std::move(requirements), std::move(types), std::move(constants), std::move(predicates), std::move(functions), std::move(actions), std::move(axioms));
-        auto view = m_builder.domain(m_repository, std::move(data));
-        m_domain = view.get_index();
+        auto view = build().domain(repo(), std::move(data));
+        canonicalize_domain(view);
         m_domain_name = domain.name.text;
-        return view;
+        return get_domain();
     }
 
     pddl::DomainView parse_domain(const std::string& source)
@@ -116,6 +121,18 @@ public:
             throw SemanticError("Cannot parse task before parsing a domain.");
         if (!m_domain_name.empty() && task.domain_name.text != m_domain_name)
             throw SemanticError("Task references domain '" + task.domain_name.text + "' but parser holds domain '" + m_domain_name + "'.");
+
+        const auto domain_storage = m_storage;
+        auto parse_storage = std::make_shared<detail::TranslationStorage>(m_task_storages.size() + 1, &domain_storage->repository);
+        detail::inherit_domain_identity_mappings(*parse_storage, *domain_storage);
+        struct StorageScope
+        {
+            Parser& parser;
+            std::shared_ptr<detail::TranslationStorage> previous;
+            ~StorageScope() { parser.m_storage = std::move(previous); }
+        };
+        StorageScope storage_scope { *this, m_storage };
+        m_storage = std::move(parse_storage);
 
         auto task_objects = std::unordered_map<std::string, ygg::Index<pddl::Object>> {};
         struct TaskObjectScope
@@ -146,8 +163,8 @@ public:
             axioms.push_back(parse_axiom(axiom));
 
         auto data = ygg::Data<pddl::Task>(to_cista(task.name.text), *m_domain, std::move(requirements), std::move(objects), std::move(initial_literals), std::move(initial_function_values), goal, metric, std::move(axioms));
-        auto view = m_builder.task(m_repository, std::move(data));
-        return view;
+        auto view = build().task(repo(), std::move(data));
+        return canonicalize_task(view, domain_storage);
     }
 
     pddl::TaskView parse_task(const std::string& source)
@@ -163,8 +180,8 @@ public:
     pddl::TaskView parse_task_file(const fs::path& path) { return parse_task(read_file(path)); }
 
 private:
-    pddl::Repository m_repository;
-    pddl::Builder m_builder;
+    std::shared_ptr<detail::TranslationStorage> m_storage;
+    std::vector<std::shared_ptr<detail::TranslationStorage>> m_task_storages;
     cista::optional<ygg::Index<pddl::Domain>> m_domain;
     std::string m_domain_name;
 
@@ -179,8 +196,83 @@ private:
 
     static cista::offset::string to_cista(const std::string& text) { return cista::offset::string(text); }
 
+    pddl::Repository& repo() noexcept { return m_storage->repository; }
+    const pddl::Repository& repo() const noexcept { return m_storage->repository; }
+    pddl::Builder& build() noexcept { return m_storage->builder; }
+    const pddl::Builder& build() const noexcept { return m_storage->builder; }
+
+    void rebuild_domain_symbols()
+    {
+        m_types.clear();
+        m_objects.clear();
+        m_predicates.clear();
+        m_functions.clear();
+        if (!m_domain)
+            return;
+
+        auto remember_type = [&](auto&& self, ygg::Index<pddl::Type> type) -> void
+        {
+            const auto& data = repo()[type];
+            m_types[std::string(data.name)] = type;
+            for (auto base : data.bases)
+                self(self, base);
+        };
+
+        const auto& domain = repo()[*m_domain];
+        for (auto type : domain.types)
+            remember_type(remember_type, type);
+        for (auto object : domain.constants)
+        {
+            const auto& data = repo()[object];
+            m_objects[std::string(data.name)] = object;
+            for (auto type : data.types)
+                remember_type(remember_type, type);
+        }
+        for (auto predicate : domain.predicates)
+            m_predicates[std::string(repo()[predicate].name)] = predicate;
+        for (auto function : domain.functions)
+        {
+            const auto& data = repo()[function];
+            m_functions[std::string(data.name)] = function;
+            remember_type(remember_type, data.type);
+        }
+
+        if (auto it = m_types.find("object"); it != m_types.end())
+            m_object_type = it->second;
+        else
+            m_object_type = intern_type("object", {});
+
+        if (auto it = m_types.find("number"); it != m_types.end())
+            m_number_type = it->second;
+        else
+            m_number_type = intern_type("number", {});
+    }
+
+    void canonicalize_domain(pddl::DomainView domain)
+    {
+        auto canonical = std::make_shared<detail::TranslationStorage>(0);
+        auto copier = detail::CanonicalCopyTranslator(canonical);
+        auto copied = copier.copy_domain(domain);
+        m_storage = std::move(canonical);
+        m_task_storages.clear();
+        m_domain = copied.get_index();
+        rebuild_domain_symbols();
+    }
+
+    pddl::TaskView canonicalize_task(pddl::TaskView task, const std::shared_ptr<detail::TranslationStorage>& domain_storage)
+    {
+        auto canonical = std::make_shared<detail::TranslationStorage>(m_task_storages.size() + 1, &domain_storage->repository);
+        detail::inherit_domain_identity_mappings(*canonical, *domain_storage);
+        auto copier = detail::CanonicalCopyTranslator(canonical);
+        auto copied = copier.copy_task(task);
+        m_task_storages.push_back(canonical);
+        return ygg::make_view(copied.get_index(), m_task_storages.back()->repository);
+    }
+
     void clear_domain_symbols()
     {
+        m_storage = std::make_shared<detail::TranslationStorage>(0);
+        m_task_storages.clear();
         m_domain = {};
         m_domain_name.clear();
         m_types.clear();
@@ -206,7 +298,7 @@ private:
         auto k = key(name);
         if (auto it = m_types.find(k); it != m_types.end() && bases.empty())
             return it->second;
-        auto view = m_builder.type(m_repository, to_cista(k), std::move(bases));
+        auto view = build().type(repo(), to_cista(k), std::move(bases));
         m_types[k] = view.get_index();
         return view.get_index();
     }
@@ -215,7 +307,7 @@ private:
     {
         auto result = ygg::IndexList<pddl::Requirement> {};
         for (const auto& node : nodes)
-            result.push_back(m_builder.requirement(m_repository, requirement_kind(node.name.text)).get_index());
+            result.push_back(build().requirement(repo(), requirement_kind(node.name.text)).get_index());
         return result;
     }
 
@@ -286,7 +378,7 @@ private:
         for (const auto& node : nodes)
         {
             auto types = node.type ? parse_type_expression(*node.type) : ygg::IndexList<pddl::Type> { m_object_type };
-            auto view = m_builder.object(m_repository, to_cista(node.name.text), std::move(types));
+            auto view = build().object(repo(), to_cista(node.name.text), std::move(types));
             table[node.name.text] = view.get_index();
             result.push_back(view.get_index());
         }
@@ -298,11 +390,11 @@ private:
         auto result = ygg::IndexList<pddl::Parameter> {};
         for (const auto& node : nodes)
         {
-            auto variable = m_builder.variable(m_repository, to_cista(node.variable.text)).get_index();
+            auto variable = build().variable(repo(), to_cista(node.variable.text)).get_index();
             if (!m_variable_scopes.empty())
                 m_variable_scopes.back()[node.variable.text] = variable;
             auto types = node.type ? parse_type_expression(*node.type) : ygg::IndexList<pddl::Type> { m_object_type };
-            result.push_back(m_builder.parameter(m_repository, variable, std::move(types)).get_index());
+            result.push_back(build().parameter(repo(), variable, std::move(types)).get_index());
         }
         return result;
     }
@@ -315,7 +407,7 @@ private:
             m_variable_scopes.emplace_back();
             auto parameters = parse_parameters(node.parameters);
             m_variable_scopes.pop_back();
-            auto view = m_builder.predicate(m_repository, to_cista(node.name.text), std::move(parameters));
+            auto view = build().predicate(repo(), to_cista(node.name.text), std::move(parameters));
             m_predicates[node.name.text] = view.get_index();
             result.push_back(view.get_index());
         }
@@ -331,7 +423,7 @@ private:
             auto parameters = parse_parameters(node.parameters);
             m_variable_scopes.pop_back();
             auto type = node.type ? parse_type_expression(*node.type).front() : m_number_type;
-            auto view = m_builder.function_skeleton(m_repository, to_cista(node.name.text), std::move(parameters), type);
+            auto view = build().function_skeleton(repo(), to_cista(node.name.text), std::move(parameters), type);
             m_functions[node.name.text] = view.get_index();
             result.push_back(view.get_index());
         }
@@ -342,7 +434,7 @@ private:
     {
         if (auto it = m_predicates.find(name); it != m_predicates.end())
             return it->second;
-        auto view = m_builder.predicate(m_repository, to_cista(name), {});
+        auto view = build().predicate(repo(), to_cista(name), {});
         m_predicates[name] = view.get_index();
         return view.get_index();
     }
@@ -351,7 +443,7 @@ private:
     {
         if (auto it = m_functions.find(name); it != m_functions.end())
             return it->second;
-        auto view = m_builder.function_skeleton(m_repository, to_cista(name), {}, m_number_type);
+        auto view = build().function_skeleton(repo(), to_cista(name), {}, m_number_type);
         m_functions[name] = view.get_index();
         return view.get_index();
     }
@@ -377,8 +469,8 @@ private:
     ygg::Index<pddl::Term> parse_term(const ast::Term& node)
     {
         if (node.variable)
-            return m_builder.term(m_repository, ygg::Data<pddl::Term>::Variant(variable(node.name.text))).get_index();
-        return m_builder.term(m_repository, ygg::Data<pddl::Term>::Variant(object(node.name.text))).get_index();
+            return build().term(repo(), ygg::Data<pddl::Term>::Variant(variable(node.name.text))).get_index();
+        return build().term(repo(), ygg::Data<pddl::Term>::Variant(object(node.name.text))).get_index();
     }
 
     ygg::IndexList<pddl::Term> parse_terms(const std::vector<ast::Term>& nodes)
@@ -391,12 +483,12 @@ private:
 
     ygg::Index<pddl::Atom> parse_atom(const ast::Atom& node)
     {
-        return m_builder.atom(m_repository, predicate(node.predicate.text), parse_terms(node.terms)).get_index();
+        return build().atom(repo(), predicate(node.predicate.text), parse_terms(node.terms)).get_index();
     }
 
     ygg::Index<pddl::Literal> parse_literal(const ast::Literal& node)
     {
-        return m_builder.literal(m_repository, node.positive, parse_atom(node.atom)).get_index();
+        return build().literal(repo(), node.positive, parse_atom(node.atom)).get_index();
     }
 
     ygg::Index<pddl::Condition> parse_condition(const ast::Condition& condition)
@@ -406,31 +498,31 @@ private:
 
     ygg::Index<pddl::Condition> wrap_condition(ygg::Data<pddl::Condition>::Variant value)
     {
-        return m_builder.condition(m_repository, std::move(value)).get_index();
+        return build().condition(repo(), std::move(value)).get_index();
     }
 
-    ygg::Index<pddl::Condition> parse_condition_node(const ast::ConditionLiteral& node) { return wrap_condition(m_builder.condition_literal(m_repository, parse_literal(node.literal)).get_index()); }
+    ygg::Index<pddl::Condition> parse_condition_node(const ast::ConditionLiteral& node) { return wrap_condition(build().condition_literal(repo(), parse_literal(node.literal)).get_index()); }
     ygg::Index<pddl::Condition> parse_condition_node(const ast::ConditionAnd& node)
     {
         auto list = ygg::IndexList<pddl::Condition> {};
         for (const auto& child : node.conditions) list.push_back(parse_condition(child.get()));
-        return wrap_condition(m_builder.condition_and(m_repository, std::move(list)).get_index());
+        return wrap_condition(build().condition_and(repo(), std::move(list)).get_index());
     }
     ygg::Index<pddl::Condition> parse_condition_node(const ast::ConditionOr& node)
     {
         auto list = ygg::IndexList<pddl::Condition> {};
         for (const auto& child : node.conditions) list.push_back(parse_condition(child.get()));
-        return wrap_condition(m_builder.condition_or(m_repository, std::move(list)).get_index());
+        return wrap_condition(build().condition_or(repo(), std::move(list)).get_index());
     }
-    ygg::Index<pddl::Condition> parse_condition_node(const ast::ConditionNot& node) { return wrap_condition(m_builder.condition_not(m_repository, parse_condition(node.condition.get())).get_index()); }
-    ygg::Index<pddl::Condition> parse_condition_node(const ast::ConditionImply& node) { return wrap_condition(m_builder.condition_imply(m_repository, parse_condition(node.left.get()), parse_condition(node.right.get())).get_index()); }
+    ygg::Index<pddl::Condition> parse_condition_node(const ast::ConditionNot& node) { return wrap_condition(build().condition_not(repo(), parse_condition(node.condition.get())).get_index()); }
+    ygg::Index<pddl::Condition> parse_condition_node(const ast::ConditionImply& node) { return wrap_condition(build().condition_imply(repo(), parse_condition(node.left.get()), parse_condition(node.right.get())).get_index()); }
     ygg::Index<pddl::Condition> parse_condition_node(const ast::ConditionExists& node)
     {
         m_variable_scopes.emplace_back();
         auto parameters = parse_parameters(node.parameters);
         auto child = parse_condition(node.condition.get());
         m_variable_scopes.pop_back();
-        return wrap_condition(m_builder.condition_exists(m_repository, std::move(parameters), child).get_index());
+        return wrap_condition(build().condition_exists(repo(), std::move(parameters), child).get_index());
     }
     ygg::Index<pddl::Condition> parse_condition_node(const ast::ConditionForall& node)
     {
@@ -438,16 +530,16 @@ private:
         auto parameters = parse_parameters(node.parameters);
         auto child = parse_condition(node.condition.get());
         m_variable_scopes.pop_back();
-        return wrap_condition(m_builder.condition_forall(m_repository, std::move(parameters), child).get_index());
+        return wrap_condition(build().condition_forall(repo(), std::move(parameters), child).get_index());
     }
     ygg::Index<pddl::Condition> parse_condition_node(const ast::ConditionNumericConstraint& node)
     {
-        return wrap_condition(m_builder.condition_numeric_constraint(m_repository, comparator(node.comparator), parse_function_expression(node.left.get()), parse_function_expression(node.right.get())).get_index());
+        return wrap_condition(build().condition_numeric_constraint(repo(), comparator(node.comparator), parse_function_expression(node.left.get()), parse_function_expression(node.right.get())).get_index());
     }
 
     ygg::Index<pddl::FunctionTerm> parse_function_term(const ast::FunctionTerm& node)
     {
-        return m_builder.function_term(m_repository, function(node.function.text), parse_terms(node.terms)).get_index();
+        return build().function_term(repo(), function(node.function.text), parse_terms(node.terms)).get_index();
     }
 
     ygg::Index<pddl::FunctionExpression> parse_function_expression(const ast::FunctionExpression& expression)
@@ -457,53 +549,53 @@ private:
 
     ygg::Index<pddl::FunctionExpression> wrap_function_expression(ygg::Data<pddl::FunctionExpression>::Variant value)
     {
-        return m_builder.function_expression(m_repository, std::move(value)).get_index();
+        return build().function_expression(repo(), std::move(value)).get_index();
     }
-    ygg::Index<pddl::FunctionExpression> parse_function_expression_node(const ast::FunctionExpressionNumber& node) { return wrap_function_expression(m_builder.number(m_repository, node.value).get_index()); }
+    ygg::Index<pddl::FunctionExpression> parse_function_expression_node(const ast::FunctionExpressionNumber& node) { return wrap_function_expression(build().number(repo(), node.value).get_index()); }
     ygg::Index<pddl::FunctionExpression> parse_function_expression_node(const ast::FunctionExpressionFunction& node) { return wrap_function_expression(parse_function_term(node.term)); }
-    ygg::Index<pddl::FunctionExpression> parse_function_expression_node(const ast::FunctionExpressionUnary& node) { return wrap_function_expression(m_builder.unary_function_expression(m_repository, pddl::UnaryArithmeticOperator::Minus, parse_function_expression(node.expression.get())).get_index()); }
-    ygg::Index<pddl::FunctionExpression> parse_function_expression_node(const ast::FunctionExpressionBinary& node) { return wrap_function_expression(m_builder.binary_function_expression(m_repository, binary_operator(node.op), parse_function_expression(node.left.get()), parse_function_expression(node.right.get())).get_index()); }
+    ygg::Index<pddl::FunctionExpression> parse_function_expression_node(const ast::FunctionExpressionUnary& node) { return wrap_function_expression(build().unary_function_expression(repo(), pddl::UnaryArithmeticOperator::Minus, parse_function_expression(node.expression.get())).get_index()); }
+    ygg::Index<pddl::FunctionExpression> parse_function_expression_node(const ast::FunctionExpressionBinary& node) { return wrap_function_expression(build().binary_function_expression(repo(), binary_operator(node.op), parse_function_expression(node.left.get()), parse_function_expression(node.right.get())).get_index()); }
     ygg::Index<pddl::FunctionExpression> parse_function_expression_node(const ast::FunctionExpressionMulti& node)
     {
         auto expressions = ygg::IndexList<pddl::FunctionExpression> {};
         for (const auto& child : node.expressions) expressions.push_back(parse_function_expression(child.get()));
-        return wrap_function_expression(m_builder.multi_function_expression(m_repository, multi_operator(node.op), std::move(expressions)).get_index());
+        return wrap_function_expression(build().multi_function_expression(repo(), multi_operator(node.op), std::move(expressions)).get_index());
     }
 
     ygg::Index<pddl::Effect> parse_effect(const ast::Effect& effect)
     {
         return boost::apply_visitor([&](const auto& node) { return parse_effect_node(node); }, effect);
     }
-    ygg::Index<pddl::Effect> wrap_effect(ygg::Data<pddl::Effect>::Variant value) { return m_builder.effect(m_repository, std::move(value)).get_index(); }
-    ygg::Index<pddl::Effect> parse_effect_node(const ast::EffectLiteral& node) { return wrap_effect(m_builder.effect_literal(m_repository, parse_literal(node.literal)).get_index()); }
+    ygg::Index<pddl::Effect> wrap_effect(ygg::Data<pddl::Effect>::Variant value) { return build().effect(repo(), std::move(value)).get_index(); }
+    ygg::Index<pddl::Effect> parse_effect_node(const ast::EffectLiteral& node) { return wrap_effect(build().effect_literal(repo(), parse_literal(node.literal)).get_index()); }
     ygg::Index<pddl::Effect> parse_effect_node(const ast::EffectAnd& node)
     {
         auto list = ygg::IndexList<pddl::Effect> {};
         for (const auto& child : node.effects) list.push_back(parse_effect(child.get()));
-        return wrap_effect(m_builder.effect_and(m_repository, std::move(list)).get_index());
+        return wrap_effect(build().effect_and(repo(), std::move(list)).get_index());
     }
-    ygg::Index<pddl::Effect> parse_effect_node(const ast::EffectNumeric& node) { return wrap_effect(m_builder.effect_numeric(m_repository, numeric_effect_operator(node.op), function(node.function.function.text), parse_terms(node.function.terms), parse_function_expression(node.expression.get())).get_index()); }
+    ygg::Index<pddl::Effect> parse_effect_node(const ast::EffectNumeric& node) { return wrap_effect(build().effect_numeric(repo(), numeric_effect_operator(node.op), function(node.function.function.text), parse_terms(node.function.terms), parse_function_expression(node.expression.get())).get_index()); }
     ygg::Index<pddl::Effect> parse_effect_node(const ast::EffectForall& node)
     {
         m_variable_scopes.emplace_back();
         auto parameters = parse_parameters(node.parameters);
         auto child = parse_effect(node.effect.get());
         m_variable_scopes.pop_back();
-        return wrap_effect(m_builder.effect_forall(m_repository, std::move(parameters), child).get_index());
+        return wrap_effect(build().effect_forall(repo(), std::move(parameters), child).get_index());
     }
-    ygg::Index<pddl::Effect> parse_effect_node(const ast::EffectWhen& node) { return wrap_effect(m_builder.effect_when(m_repository, parse_condition(node.condition.get()), parse_effect(node.effect.get())).get_index()); }
+    ygg::Index<pddl::Effect> parse_effect_node(const ast::EffectWhen& node) { return wrap_effect(build().effect_when(repo(), parse_condition(node.condition.get()), parse_effect(node.effect.get())).get_index()); }
     ygg::Index<pddl::Effect> parse_effect_node(const ast::EffectOneOf& node)
     {
         auto list = ygg::IndexList<pddl::Effect> {};
         for (const auto& child : node.effects) list.push_back(parse_effect(child.get()));
-        return wrap_effect(m_builder.effect_one_of(m_repository, std::move(list)).get_index());
+        return wrap_effect(build().effect_one_of(repo(), std::move(list)).get_index());
     }
     ygg::Index<pddl::Effect> parse_effect_node(const ast::EffectProbabilistic& node)
     {
         auto list = ygg::IndexList<pddl::EffectProbabilisticAlternative> {};
         for (const auto& alternative : node.alternatives)
-            list.push_back(m_builder.effect_probabilistic_alternative(m_repository, alternative.probability, parse_effect(alternative.effect.get())).get_index());
-        return wrap_effect(m_builder.effect_probabilistic(m_repository, std::move(list)).get_index());
+            list.push_back(build().effect_probabilistic_alternative(repo(), alternative.probability, parse_effect(alternative.effect.get())).get_index());
+        return wrap_effect(build().effect_probabilistic(repo(), std::move(list)).get_index());
     }
 
     ygg::Index<pddl::Action> parse_action(const ast::Action& node)
@@ -515,7 +607,7 @@ private:
         auto effect = cista::optional<ygg::Index<pddl::Effect>> {};
         if (node.effect) effect = parse_effect(*node.effect);
         m_variable_scopes.pop_back();
-        return m_builder.action(m_repository, to_cista(node.name.text), std::move(parameters), precondition, effect).get_index();
+        return build().action(repo(), to_cista(node.name.text), std::move(parameters), precondition, effect).get_index();
     }
 
     ygg::Index<pddl::Axiom> parse_axiom(const ast::Axiom& node)
@@ -531,19 +623,19 @@ private:
             terms.push_back(parse_term(term));
         }
         auto pred = predicate(node.head.name.text);
-        auto atom = m_builder.atom(m_repository, pred, std::move(terms)).get_index();
-        auto head = m_builder.literal(m_repository, true, atom).get_index();
+        auto atom = build().atom(repo(), pred, std::move(terms)).get_index();
+        auto head = build().literal(repo(), true, atom).get_index();
         auto condition = parse_condition(node.condition);
         m_variable_scopes.pop_back();
-        return m_builder.axiom(m_repository, std::move(parameters), head, condition).get_index();
+        return build().axiom(repo(), std::move(parameters), head, condition).get_index();
     }
 
     void parse_initial_element(const ast::Literal& literal, ygg::IndexList<pddl::Literal>& literals, ygg::IndexList<pddl::InitialFunctionValue>&) { literals.push_back(parse_literal(literal)); }
-    void parse_initial_element(const ast::InitialFunctionValue& value, ygg::IndexList<pddl::Literal>&, ygg::IndexList<pddl::InitialFunctionValue>& values) { values.push_back(m_builder.initial_function_value(m_repository, parse_function_term(value.function), parse_function_expression(value.value)).get_index()); }
+    void parse_initial_element(const ast::InitialFunctionValue& value, ygg::IndexList<pddl::Literal>&, ygg::IndexList<pddl::InitialFunctionValue>& values) { values.push_back(build().initial_function_value(repo(), parse_function_term(value.function), parse_function_expression(value.value)).get_index()); }
 
     ygg::Index<pddl::Metric> parse_metric(const ast::Metric& node)
     {
-        return m_builder.metric(m_repository, key(node.optimization.text) != "maximize", parse_function_expression(node.expression)).get_index();
+        return build().metric(repo(), key(node.optimization.text) != "maximize", parse_function_expression(node.expression)).get_index();
     }
 
     static pddl::BinaryComparator comparator(std::string op)
