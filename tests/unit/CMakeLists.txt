@@ -1,4 +1,5 @@
 find_package(GTest "1.11.0" REQUIRED COMPONENTS GTest Main PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_library(Boost_JSON_LIBRARY boost_json PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES lib NO_DEFAULT_PATH REQUIRED)
 
 file(GLOB_RECURSE SRC_FILES
     "*.cpp" "**/*.cpp")
@@ -16,7 +17,8 @@ target_include_directories(${TEST_NAME}
 target_link_libraries(${TEST_NAME}
     PRIVATE
         loki::parsers
-        GTest::gtest)
+        GTest::gtest
+        ${Boost_JSON_LIBRARY})
 
 set(LOKI_TEST_BUILD_RPATH "$<TARGET_FILE_DIR:parsers>")
 if(YGGDRASIL_NATIVE_PREFIX)

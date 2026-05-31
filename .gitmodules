@@ -1,0 +1,3 @@
+[submodule "data/planning-benchmarks"]
+	path = data/planning-benchmarks
+	url = https://github.com/planning-and-learning/planning-benchmarks.git

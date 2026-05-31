@@ -39,7 +39,6 @@ add_library(loki::parsers ALIAS parsers)
 target_link_libraries(parsers
   PUBLIC
     gtl::gtl
-  PRIVATE
     fmt::fmt)
 
 # Use include depending on building or using from installed location
