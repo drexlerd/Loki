@@ -19,20 +19,20 @@ namespace loki::tests
 
 TEST(LokiPublicFacade, CanonicalLokiUmbrellaExposesLokiFacade)
 {
-    auto parser = loki::Parser();
-    const auto domain = parser.parse_domain(std::string { R"(
+    auto parser = loki::Parser(std::string { R"(
         (define (domain umbrella)
           (:requirements :strips)
           (:predicates (ready)))
     )" });
+
+    const auto domain = parser.get_domain();
 
     EXPECT_EQ(domain.get_name(), "umbrella");
 }
 
 TEST(LokiPublicFacade, ExposesParserAndTranslatorThroughLokiNamespace)
 {
-    auto parser = loki::Parser();
-    const auto domain = parser.parse_domain(std::string { R"(
+    auto parser = loki::Parser(std::string { R"(
         (define (domain facade)
           (:requirements :strips)
           (:predicates (ready))
@@ -41,6 +41,8 @@ TEST(LokiPublicFacade, ExposesParserAndTranslatorThroughLokiNamespace)
             :precondition (ready)
             :effect (ready)))
     )" });
+
+    const auto domain = parser.get_domain();
 
     const auto task = parser.parse_task(std::string { R"(
         (define (problem facade-task)
@@ -59,8 +61,7 @@ TEST(LokiPublicFacade, ExposesParserAndTranslatorThroughLokiNamespace)
 
 TEST(LokiPublicFacade, FormatsSemanticDomainAndTaskAsReparseablePddl)
 {
-    auto parser = loki::Parser();
-    const auto domain = parser.parse_domain(std::string { R"(
+    auto parser = loki::Parser(std::string { R"(
         (define (domain facade-format)
           (:requirements :strips)
           (:predicates (ready) (seen ?x))
@@ -70,6 +71,8 @@ TEST(LokiPublicFacade, FormatsSemanticDomainAndTaskAsReparseablePddl)
             :effect (and (ready) (seen ?x)))
         )
     )" });
+
+    const auto domain = parser.get_domain();
     const auto task = parser.parse_task(std::string { R"(
         (define (problem facade-format-task)
           (:domain facade-format)
@@ -82,8 +85,10 @@ TEST(LokiPublicFacade, FormatsSemanticDomainAndTaskAsReparseablePddl)
     const auto domain_text = loki::formalism::format::domain(domain);
     const auto task_text = loki::formalism::format::task(task);
 
-    auto reparsed = loki::Parser();
-    const auto reparsed_domain = reparsed.parse_domain(domain_text);
+    auto reparsed = loki::Parser(domain_text);
+
+
+    const auto reparsed_domain = reparsed.get_domain();
     const auto reparsed_task = reparsed.parse_task(task_text);
 
     EXPECT_EQ(reparsed_domain.get_name(), domain.get_name());

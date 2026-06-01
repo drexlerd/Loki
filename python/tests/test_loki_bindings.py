@@ -10,8 +10,7 @@ def ixs(values):
 
 
 def test_parser_binding_parses_domain_and_task():
-    parser = pypddl.Parser()
-    domain = parser.parse_domain(
+    parser = pypddl.Parser(
         """
 (define (domain py-gripper)
   (:predicates (at ?x) (carry ?x))
@@ -22,6 +21,7 @@ def test_parser_binding_parses_domain_and_task():
 )
 """
     )
+    domain = parser.domain()
     task = parser.parse_task(
         """
 (define (problem py-gripper-task)
@@ -44,8 +44,7 @@ def test_parser_binding_parses_domain_and_task():
 
 
 def test_translation_bindings_return_translated_views():
-    parser = pypddl.Parser()
-    domain = parser.parse_domain(
+    parser = pypddl.Parser(
         """
 (define (domain py-translate)
   (:predicates (p) (q))
@@ -53,6 +52,7 @@ def test_translation_bindings_return_translated_views():
 )
 """
     )
+    domain = parser.domain()
     task = parser.parse_task(
         """
 (define (problem py-translate-task)
@@ -237,22 +237,22 @@ def test_parser_path_entry_points_and_strict_options():
 
     options = pypddl.ParserOptions()
     assert options.strict is False
-    parser = pypddl.Parser(options)
-    domain = parser.parse_domain_path(domain_path)
-    task = parser.parse_task_path(task_path)
+    parser = pypddl.Parser(domain_path, options)
+    domain = parser.domain()
+    task = parser.parse_task(task_path)
 
     assert domain.get_name() == "py-path"
     assert task.get_domain().get_name() == "py-path"
 
 
 def test_views_expose_typed_indices():
-    parser = pypddl.Parser()
-    domain = parser.parse_domain("""
+    parser = pypddl.Parser("""
 (define (domain py-index)
   (:predicates (p))
   (:action a :parameters () :precondition (p) :effect (and (p)))
 )
 """)
+    domain = parser.domain()
 
     assert isinstance(domain.get_index(), pypddl.DomainIndex)
     assert isinstance(domain.get_index(), pypddl.DomainIndex)
@@ -263,9 +263,8 @@ def test_views_expose_typed_indices():
 
 
 def test_semantic_error_uses_typed_exception():
-    parser = pypddl.Parser()
     try:
-        parser.parse_domain("""
+        parser = pypddl.Parser("""
 (define (domain py-error)
   (:predicates (p) (p))
 )
@@ -277,9 +276,8 @@ def test_semantic_error_uses_typed_exception():
 
 
 def test_parse_error_uses_typed_exception():
-    parser = pypddl.Parser()
     try:
-        parser.parse_domain("(define (domain broken) (:predicates (p))")
+        parser = pypddl.Parser("(define (domain broken) (:predicates (p))")
     except pypddl.ParseError:
         pass
     else:
@@ -287,8 +285,7 @@ def test_parse_error_uses_typed_exception():
 
 
 def test_recursive_variant_views_are_inspectable():
-    parser = pypddl.Parser()
-    domain = parser.parse_domain("""
+    parser = pypddl.Parser("""
 (define (domain py-recursive)
   (:requirements :disjunctive-preconditions :conditional-effects)
   (:predicates (p) (q))
@@ -298,6 +295,7 @@ def test_recursive_variant_views_are_inspectable():
     :effect (and (when (p) (q))))
 )
 """)
+    domain = parser.domain()
 
     action = domain.get_actions()[0]
     assert isinstance(action.get_precondition().get_variant(), pypddl.ConditionOr)

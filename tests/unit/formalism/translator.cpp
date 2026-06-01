@@ -42,8 +42,9 @@ std::unordered_set<std::string> object_names(ObjectList objects)
 
 void expect_translated_pddl_reparses(const fs::path& domain_file, const fs::path& problem_file)
 {
-    auto parser = loki::Parser();
-    const auto domain = parser.parse_domain(domain_file);
+    auto parser = loki::Parser(domain_file);
+
+    const auto domain = parser.get_domain();
     const auto task = parser.parse_task(problem_file);
 
     const auto domain_translation = loki::translate(domain);
@@ -52,8 +53,10 @@ void expect_translated_pddl_reparses(const fs::path& domain_file, const fs::path
     const auto domain_text = formalism::format::domain(domain_translation.get_translated_domain());
     const auto task_text = formalism::format::task(task_translation.get_translated_task());
 
-    auto reparsed = loki::Parser();
-    const auto reparsed_domain = reparsed.parse_domain(domain_text);
+    auto reparsed = loki::Parser(domain_text);
+
+
+    const auto reparsed_domain = reparsed.get_domain();
     const auto reparsed_task = reparsed.parse_task(task_text);
 
     EXPECT_EQ(reparsed_domain.get_name(), domain_translation.get_translated_domain().get_name());
@@ -78,8 +81,10 @@ TEST(LokiTests, LokiPddlTranslatorTest)
     const auto domain_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/domain.pddl");
     const auto problem_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/test-1.pddl");
 
-    auto parser = loki::Parser();
-    const auto domain = parser.parse_domain(domain_file);
+    auto parser = loki::Parser(domain_file);
+
+
+    const auto domain = parser.get_domain();
     const auto problem = parser.parse_task(problem_file);
     const auto domain_translation_result = loki::translate(domain);
     const auto translated_domain = domain_translation_result.get_translated_domain();

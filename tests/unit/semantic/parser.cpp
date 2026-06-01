@@ -506,8 +506,10 @@ TEST(LokiSemanticTranslator, RewritesConditionsToNegationNormalForm)
         ":effect (and (p)))"
         ")" };
 
-    semantic::Parser parser;
-    const auto domain = parser.parse_domain(domain_source);
+    semantic::Parser parser(domain_source);
+
+
+    const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
     const auto& translated_repository = translated_domain.get_context();
@@ -532,8 +534,10 @@ TEST(LokiSemanticTranslator, RenamesQuantifiedVariablesDeterministically)
         ":effect (and (p ?x)))"
         ")" };
 
-    semantic::Parser parser;
-    const auto domain = parser.parse_domain(domain_source);
+    semantic::Parser parser(domain_source);
+
+
+    const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
     const auto& repository = translated_domain.get_context();
@@ -559,8 +563,10 @@ TEST(LokiSemanticTranslator, RemovesUniversalQuantifiersWithDerivedAxioms)
         ":effect (and))"
         ")" };
 
-    semantic::Parser parser;
-    const auto domain = parser.parse_domain(domain_source);
+    semantic::Parser parser(domain_source);
+
+
+    const auto domain = parser.get_domain();
     const auto original_axioms = domain.get_data().axioms.size();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
@@ -584,8 +590,10 @@ TEST(LokiSemanticTranslator, SplitsDisjunctiveActionPreconditionsAfterDnf)
         ":effect (and))"
         ")" };
 
-    semantic::Parser parser;
-    const auto domain = parser.parse_domain(domain_source);
+    semantic::Parser parser(domain_source);
+
+
+    const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
     const auto& repository = translated_domain.get_context();
@@ -613,8 +621,10 @@ TEST(LokiSemanticTranslator, MovesExistentialPreconditionVariablesToActionParame
         ":effect (and))"
         ")" };
 
-    semantic::Parser parser;
-    const auto domain = parser.parse_domain(domain_source);
+    semantic::Parser parser(domain_source);
+
+
+    const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
     const auto& repository = translated_domain.get_context();
@@ -636,8 +646,10 @@ TEST(LokiSemanticTranslator, SplitsDisjunctiveWhenEffectsAndFlattensConjunctions
         ":effect (when (or (p) (q)) (and (r) (s))))"
         ")" };
 
-    semantic::Parser parser;
-    const auto domain = parser.parse_domain(domain_source);
+    semantic::Parser parser(domain_source);
+
+
+    const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
     const auto& repository = translated_domain.get_context();
@@ -668,8 +680,10 @@ TEST(LokiSemanticTranslator, AddsTypePredicatesAndRemovesTypingByDefault)
         "(:goal (p o))"
         ")" };
 
-    semantic::Parser parser;
-    const auto domain = parser.parse_domain(domain_source);
+    semantic::Parser parser(domain_source);
+
+
+    const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
     const auto& repository = translated_domain.get_context();
@@ -706,8 +720,10 @@ TEST(LokiSemanticTranslator, InitializesEqualityForConstantsAndTaskObjects)
         "(:goal (p))"
         ")" };
 
-    semantic::Parser parser;
-    const auto domain = parser.parse_domain(domain_source);
+    semantic::Parser parser(domain_source);
+
+
+    const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
     const auto task = parser.parse_task(task_source);
     const auto translated_result = semantic::translate(task, translation);
@@ -732,8 +748,10 @@ TEST(LokiSemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
         "(:goal (or (p) (q)))"
         ")" };
 
-    semantic::Parser parser;
-    const auto domain = parser.parse_domain(domain_source);
+    semantic::Parser parser(domain_source);
+
+
+    const auto domain = parser.get_domain();
     const auto domain_translation = semantic::translate(domain);
     const auto original_translated_domain_axioms = domain_translation.get_translated_domain().get_data().axioms.size();
     const auto task = parser.parse_task(task_source);
@@ -757,10 +775,9 @@ TEST(LokiSemanticParser, JsonNegativeSuiteReportsExpectedSemanticErrors)
         SCOPED_TRACE(item.name);
         auto options = parser::ParserOptions {};
         options.strict = item.strict;
-        auto parser = semantic::Parser(options);
         try
         {
-            parser.parse_domain(item.domain_source);
+            auto parser = semantic::Parser(item.domain_source, options);
             if (item.entry == "task")
                 parser.parse_task(item.task_source);
             FAIL() << "Expected semantic error";
@@ -779,10 +796,9 @@ TEST(LokiSemanticParser, ReportsSyntaxFailureMessage)
 )
 )" };
 
-    auto parser = semantic::Parser();
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain);
         FAIL() << "Expected parse error";
     }
     catch (const semantic::ParseError& error)
@@ -805,11 +821,10 @@ TEST(LokiSemanticParser, StrictModeRejectsUndefinedPredicates)
 
     auto options = parser::ParserOptions {};
     options.strict = true;
-    auto parser = semantic::Parser(options);
 
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain, options);
         FAIL() << "Expected UndefinedPredicateError";
     }
     catch (const semantic::UndefinedPredicateError&)
@@ -825,10 +840,9 @@ TEST(LokiSemanticParser, ReportsDuplicatePredicateDefinitions)
 )
 )" };
 
-    auto parser = semantic::Parser();
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain);
         FAIL() << "Expected duplicate predicate error";
     }
     catch (const semantic::DuplicatePredicateError&)
@@ -851,10 +865,9 @@ TEST(LokiSemanticParser, ReportsDuplicateActionDefinitions)
 )
 )" };
 
-    auto parser = semantic::Parser();
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain);
         FAIL() << "Expected duplicate action error";
     }
     catch (const semantic::DuplicateActionError&)
@@ -877,11 +890,10 @@ TEST(LokiSemanticParser, StrictModeRejectsMissingRequirements)
 
     auto options = parser::ParserOptions {};
     options.strict = true;
-    auto parser = semantic::Parser(options);
 
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain, options);
         FAIL() << "Expected missing requirement error";
     }
     catch (const semantic::MissingRequirementError& error)
@@ -902,8 +914,7 @@ TEST(LokiSemanticParser, PermissiveModeAllowsMissingRequirements)
 )
 )" };
 
-    auto parser = semantic::Parser();
-    EXPECT_NO_THROW(parser.parse_domain(domain));
+    EXPECT_NO_THROW(semantic::Parser(domain));
 }
 
 TEST(LokiSemanticParser, StrictModeExpandsAdlRequirement)
@@ -921,8 +932,7 @@ TEST(LokiSemanticParser, StrictModeExpandsAdlRequirement)
 
     auto options = parser::ParserOptions {};
     options.strict = true;
-    auto parser = semantic::Parser(options);
-    EXPECT_NO_THROW(parser.parse_domain(domain));
+    EXPECT_NO_THROW(semantic::Parser(domain, options));
 }
 
 
@@ -940,11 +950,10 @@ TEST(LokiSemanticParser, StrictModeRejectsMissingEqualityRequirement)
 
     auto options = parser::ParserOptions {};
     options.strict = true;
-    auto parser = semantic::Parser(options);
 
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain, options);
         FAIL() << "Expected missing equality requirement";
     }
     catch (const semantic::MissingRequirementError& error)
@@ -966,10 +975,9 @@ TEST(LokiSemanticParser, ReportsInvalidEqualityArity)
 )
 )" };
 
-    auto parser = semantic::Parser();
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain);
         FAIL() << "Expected invalid equality";
     }
     catch (const semantic::InvalidEqualityError&)
@@ -995,11 +1003,10 @@ TEST(LokiSemanticParser, StrictModeRejectsPredicateArgumentTypeMismatch)
 
     auto options = parser::ParserOptions {};
     options.strict = true;
-    auto parser = semantic::Parser(options);
 
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain, options);
         FAIL() << "Expected type mismatch";
     }
     catch (const semantic::TypeMismatchError&)
@@ -1022,8 +1029,7 @@ TEST(LokiSemanticParser, PermissiveModeAllowsPredicateArgumentTypeMismatch)
 )
 )" };
 
-    auto parser = semantic::Parser();
-    EXPECT_NO_THROW(parser.parse_domain(domain));
+    EXPECT_NO_THROW(semantic::Parser(domain));
 }
 
 TEST(LokiSemanticParser, StrictModeRejectsFunctionArgumentTypeMismatch)
@@ -1043,11 +1049,10 @@ TEST(LokiSemanticParser, StrictModeRejectsFunctionArgumentTypeMismatch)
 
     auto options = parser::ParserOptions {};
     options.strict = true;
-    auto parser = semantic::Parser(options);
 
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain, options);
         FAIL() << "Expected type mismatch";
     }
     catch (const semantic::TypeMismatchError&)
@@ -1073,8 +1078,7 @@ TEST(LokiSemanticParser, ReportsInvalidMetricOptimization)
 )
 )" };
 
-    auto parser = semantic::Parser();
-    parser.parse_domain(domain);
+    auto parser = semantic::Parser(domain);
     try
     {
         parser.parse_task(task);
@@ -1098,10 +1102,9 @@ TEST(LokiSemanticParser, ReportsInvalidNumericEffectOperator)
 )
 )" };
 
-    auto parser = semantic::Parser();
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain);
         FAIL() << "Expected invalid numeric effect";
     }
     catch (const semantic::InvalidNumericEffectError&)
@@ -1123,10 +1126,9 @@ TEST(LokiSemanticParser, ReportsInvalidNumericConstraintComparator)
 )
 )" };
 
-    auto parser = semantic::Parser();
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain);
         FAIL() << "Expected invalid numeric constraint";
     }
     catch (const semantic::InvalidNumericConstraintError&)
@@ -1147,10 +1149,9 @@ TEST(LokiSemanticParser, ReportsOutOfRangeProbabilisticEffectProbability)
 )
 )" };
 
-    auto parser = semantic::Parser();
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain);
         FAIL() << "Expected invalid probabilistic effect";
     }
     catch (const semantic::InvalidProbabilisticEffectError&)
@@ -1170,10 +1171,9 @@ TEST(LokiSemanticParser, ReportsProbabilisticEffectTotalAboveOne)
 )
 )" };
 
-    auto parser = semantic::Parser();
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain);
         FAIL() << "Expected invalid probabilistic effect";
     }
     catch (const semantic::InvalidProbabilisticEffectError&)
@@ -1193,10 +1193,9 @@ TEST(LokiSemanticParser, ReportsDeclaredPredicateArityMismatch)
 )
 )" };
 
-    auto parser = semantic::Parser();
     try
     {
-        parser.parse_domain(domain);
+        auto parser = semantic::Parser(domain);
         FAIL() << "Expected arity mismatch";
     }
     catch (const semantic::ArityMismatchError&)
@@ -1216,8 +1215,7 @@ TEST(LokiSemanticParser, PermissiveModeKeepsImplicitPredicateCompatibility)
 )
 )" };
 
-    auto parser = semantic::Parser();
-    EXPECT_NO_THROW(parser.parse_domain(domain));
+    EXPECT_NO_THROW(semantic::Parser(domain));
 }
 
 TEST(LokiSemanticParser, ParsesAndTranslatesAllSuiteCases)
@@ -1230,8 +1228,9 @@ TEST(LokiSemanticParser, ParsesAndTranslatesAllSuiteCases)
         SCOPED_TRACE(item.name);
         try
         {
-            semantic::Parser parser;
-            const auto domain = parser.parse_domain(item.domain_file);
+            semantic::Parser parser(item.domain_file);
+
+            const auto domain = parser.get_domain();
             const auto translation = semantic::translate(domain);
             const auto task = parser.parse_task(item.task_file);
             const auto translated_result = semantic::translate(task, translation);
@@ -1255,8 +1254,9 @@ TEST(LokiSemanticParser, ParsesAllSuiteCasesWithContiguousTopLevelIndices)
         SCOPED_TRACE(item.name);
         try
         {
-            semantic::Parser parser;
-            const auto domain = parser.parse_domain(item.domain_file);
+            semantic::Parser parser(item.domain_file);
+
+            const auto domain = parser.get_domain();
             const auto task = parser.parse_task(item.task_file);
             EXPECT_EQ(task.get_domain().get_index(), domain.get_index());
             expect_contiguous_domain_indices(domain);
@@ -1273,8 +1273,10 @@ TEST(LokiSemanticParser, ParsesDomainAndManyTasks)
 {
     const auto root = fs::path(std::string(DATA_DIR)) / "planning-benchmarks" / "tests" / "classical" / "gripper";
 
-    semantic::Parser parser;
-    const auto domain = parser.parse_domain(root / "domain.pddl");
+    semantic::Parser parser(root / "domain.pddl");
+
+
+    const auto domain = parser.get_domain();
     EXPECT_EQ(std::string(domain.get_name()), "gripper-strips");
     EXPECT_GT(domain.get_actions().get_data().size(), 0);
 
@@ -1320,8 +1322,10 @@ TEST(LokiSemanticParser, ParsesAndTranslatesDistinctTasksAfterOneDomain)
         "(:goal (p b))"
         ")" };
 
-    semantic::Parser parser;
-    const auto domain = parser.parse_domain(domain_source);
+    semantic::Parser parser(domain_source);
+
+
+    const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
 
     const auto first_task = parser.parse_task(first_task_source);

@@ -64,14 +64,12 @@ void bind_semantic(nb::module_& m)
         .def_rw("strict", &parser::ParserOptions::strict);
 
     nb::class_<semantic::Parser>(m, "Parser")
-        .def(nb::init<parser::ParserOptions>(), "options"_a = parser::ParserOptions {})
-        .def("has_domain", &semantic::Parser::has_domain)
+        .def(nb::init<const std::string&, parser::ParserOptions>(), "domain_source"_a, "options"_a = parser::ParserOptions {})
+        .def(nb::init<const std::filesystem::path&, parser::ParserOptions>(), "domain_path"_a, "options"_a = parser::ParserOptions {})
         .def("domain", &semantic::Parser::get_domain)
         .def("repository", nb::overload_cast<>(&semantic::Parser::repository), nb::rv_policy::reference_internal)
-        .def("parse_domain", nb::overload_cast<const std::string&>(&semantic::Parser::parse_domain), "source"_a)
-        .def("parse_domain_path", nb::overload_cast<const std::filesystem::path&>(&semantic::Parser::parse_domain), "path"_a)
         .def("parse_task", nb::overload_cast<const std::string&>(&semantic::Parser::parse_task), "source"_a)
-        .def("parse_task_path", nb::overload_cast<const std::filesystem::path&>(&semantic::Parser::parse_task), "path"_a);
+        .def("parse_task", nb::overload_cast<const std::filesystem::path&>(&semantic::Parser::parse_task), "path"_a);
 
     nb::class_<semantic::DomainTranslationResult>(m, "DomainTranslationResult")
         .def_prop_ro("original_domain", &semantic::DomainTranslationResult::get_original_domain)

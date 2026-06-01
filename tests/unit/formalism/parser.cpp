@@ -30,8 +30,9 @@ TEST(LokiTests, ParserTest)
 {
     const auto domain_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/domain.pddl");
     const auto problem_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/test-1.pddl");
-    auto parser = loki::Parser();
-    const auto domain = parser.parse_domain(domain_file);
+    auto parser = loki::Parser(domain_file);
+
+    const auto domain = parser.get_domain();
     const auto problem = parser.parse_task(problem_file);
 
     EXPECT_EQ(domain.get_constants().size(), 2);
@@ -53,8 +54,10 @@ TEST(LokiTests, ParserStringTest)
         "         :precondition (and) "
         "         :effect (and (p))))";
 
-    auto parser = loki::Parser();
-    const auto domain = parser.parse_domain(domain_str);
+    auto parser = loki::Parser(domain_str);
+
+
+    const auto domain = parser.get_domain();
 
     EXPECT_EQ(domain.get_constants().size(), 0);
     EXPECT_EQ(domain.get_predicates().size(), 1);
@@ -73,8 +76,10 @@ TEST(LokiTests, ParserNonDeterministicTest)
 )
 )" };
 
-    auto parser = loki::Parser();
-    const auto domain = parser.parse_domain(domain_str);
+    auto parser = loki::Parser(domain_str);
+
+
+    const auto domain = parser.get_domain();
 
     EXPECT_EQ(domain.get_constants().size(), 0);
     EXPECT_EQ(domain.get_predicates().size(), 2);
@@ -95,11 +100,11 @@ TEST(LokiTests, ParserNonDeterministicMissingRequirementTest)
 
     auto options = loki::ParserOptions {};
     options.strict = true;
-    auto parser = loki::Parser(options);
 
     try
     {
-        static_cast<void>(parser.parse_domain(domain_str));
+        auto parser = loki::Parser(domain_str, options);
+        static_cast<void>(parser.get_domain());
         FAIL() << "Expected missing requirement diagnostic";
     }
     catch (const loki::MissingRequirementError&)
