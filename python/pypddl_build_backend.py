@@ -5,6 +5,7 @@ import os
 import platform
 import shutil
 import subprocess
+import sys
 import zipfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -56,6 +57,8 @@ def _prepare_native_build() -> None:
     _prepend_env_paths("DYLD_LIBRARY_PATH", native_library_dirs)
     _prepend_cmake_args(
         f"-DCMAKE_PREFIX_PATH={yggdrasil_prefix}",
+        f"-DPython_EXECUTABLE={sys.executable}",
+        f"-DPython3_EXECUTABLE={sys.executable}",
         "-DLOKI_BUILD_PYPDDL=ON",
         "-DLOKI_BUILD_TESTS=OFF",
         "-DLOKI_BUILD_PROFILING=OFF",
@@ -76,7 +79,7 @@ def _is_native_library(path: Path) -> bool:
 def _strip_args() -> list[str]:
     if platform.system() == "Darwin":
         return ["-x"]
-    return ["--strip-unneeded"]
+    return ["--strip-debug"]
 
 
 def _record_digest(path: Path) -> tuple[str, str]:
@@ -140,6 +143,44 @@ def _strip_wheel_native_libraries(wheel_path: Path) -> None:
         replacement_path.replace(wheel_path)
 
 
+def _fix_wheel_stubs(wheel_path: Path) -> None:
+    with TemporaryDirectory(prefix="pypddl-wheel-") as tmp:
+        wheel_root = Path(tmp) / "wheel"
+        with zipfile.ZipFile(wheel_path) as wheel:
+            wheel.extractall(wheel_root)
+
+        def install_stub(path: Path, target: Path) -> None:
+            package_dir = target.with_suffix("")
+            if package_dir.is_dir():
+                target = package_dir / "__init__.pyi"
+
+            if target.exists():
+                return
+
+            target.parent.mkdir(parents=True, exist_ok=True)
+            text = path.read_text(encoding="utf-8")
+            text = text.replace("pypddl._pypddl.", "pypddl.")
+            text = text.replace("pypddl._pypddl", "pypddl")
+            target.write_text(text, encoding="utf-8")
+
+        private_stub_root = wheel_root / "pypddl" / "_pypddl"
+        if private_stub_root.is_dir():
+            public_stub_root = wheel_root / "pypddl"
+            for path in sorted(private_stub_root.rglob("*.pyi")):
+                install_stub(path, public_stub_root / path.relative_to(private_stub_root))
+            shutil.rmtree(private_stub_root)
+
+        _rewrite_record(wheel_root)
+
+        replacement_path = wheel_path.with_suffix(".tmp")
+        with zipfile.ZipFile(replacement_path, "w", compression=zipfile.ZIP_DEFLATED) as wheel:
+            for path in sorted(wheel_root.rglob("*")):
+                if path.is_file():
+                    wheel.write(path, path.relative_to(wheel_root).as_posix())
+
+        replacement_path.replace(wheel_path)
+
+
 def get_requires_for_build_wheel(config_settings=None):
     return scikit_build.get_requires_for_build_wheel(config_settings)
 
@@ -155,13 +196,17 @@ def prepare_metadata_for_build_wheel(metadata_directory, config_settings=None):
 def build_wheel(wheel_directory, config_settings=None, metadata_directory=None):
     _prepare_native_build()
     wheel_filename = scikit_build.build_wheel(wheel_directory, config_settings, metadata_directory)
-    _strip_wheel_native_libraries(Path(wheel_directory) / wheel_filename)
+    wheel_path = Path(wheel_directory) / wheel_filename
+    _fix_wheel_stubs(wheel_path)
+    _strip_wheel_native_libraries(wheel_path)
     return wheel_filename
 
 
 def build_editable(wheel_directory, config_settings=None, metadata_directory=None):
     _prepare_native_build()
-    return scikit_build.build_editable(wheel_directory, config_settings, metadata_directory)
+    wheel_filename = scikit_build.build_editable(wheel_directory, config_settings, metadata_directory)
+    _fix_wheel_stubs(Path(wheel_directory) / wheel_filename)
+    return wheel_filename
 
 
 def build_sdist(sdist_directory, config_settings=None):
