@@ -33,7 +33,12 @@ public:
 template<typename Derived>
 ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::make_generated_axiom_condition(ygg::Index<formalism::Condition> condition)
 {
-    const auto free_parameters = this->self().free_parameters_in_scope(condition);
+    const auto dnf = this->self().flatten_condition(this->self().to_dnf(condition));
+    const auto cached = this->m_context.generated_axiom_conditions.find(dnf.get_value());
+    if (cached != this->m_context.generated_axiom_conditions.end())
+        return cached->second;
+
+    const auto free_parameters = this->self().free_parameters_in_scope(dnf);
     auto predicate_parameters = ygg::IndexList<formalism::Parameter> {};
     auto terms = ygg::IndexList<formalism::Term> {};
     for (auto parameter : free_parameters)
@@ -49,7 +54,6 @@ ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::make_ge
     const auto negative_literal = formalism::get_or_create<formalism::Literal>(this->m_storage->repository, false, atom).get_index();
 
     auto parts = ygg::IndexList<formalism::Condition> {};
-    const auto dnf = this->self().flatten_condition(this->self().to_dnf(condition));
     if (const auto condition_or = this->self().as_or(dnf))
     {
         for (auto part : this->m_storage->repository[*condition_or].conditions)
@@ -75,7 +79,9 @@ ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::make_ge
         this->m_generated_axioms.push_back(axiom);
     }
     this->m_generated_predicates.push_back(predicate);
-    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, negative_literal).get_index());
+    const auto result = this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, negative_literal).get_index());
+    this->m_context.generated_axiom_conditions.emplace(dnf.get_value(), result);
+    return result;
 }
 
 template<typename Derived>

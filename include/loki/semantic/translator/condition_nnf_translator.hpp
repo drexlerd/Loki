@@ -106,10 +106,10 @@ ygg::Index<formalism::Condition> ConditionNnfTranslator<Derived>::negate_conditi
     this->self().increment_quantifications(data.parameters, repository);
     auto parameters = this->self().copy_parameters(data.parameters, repository);
     this->self().enter_scope(parameters);
-    const auto negated = this->self().negate_condition(data.condition, repository);
+    const auto condition = this->self().copy(data.condition, repository);
     this->self().leave_scope();
-    const auto exists_not = this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), negated).get_index()));
-    return this->self().make_generated_axiom_condition(exists_not);
+    const auto exists = this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), condition).get_index()));
+    return this->self().make_generated_axiom_condition(exists);
 }
 
 template<typename Derived>

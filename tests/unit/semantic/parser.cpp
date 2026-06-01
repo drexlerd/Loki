@@ -623,6 +623,73 @@ TEST(LokiSemanticTranslator, RemovesUniversalQuantifiersWithDerivedAxioms)
     EXPECT_FALSE(contains_forall(*action.precondition, repository));
 }
 
+TEST(LokiSemanticTranslator, LowersNegatedExistsWithoutNegatingInnerCondition)
+{
+    const auto domain_source = std::string {
+        "(define (domain negated-exists)"
+        "(:requirements :typing :existential-preconditions)"
+        "(:predicates (p ?x - object ?y - object))"
+        "(:action a :parameters (?x - object) "
+        ":precondition (not (exists (?y - object) (p ?x ?y))) "
+        ":effect (and))"
+        ")" };
+
+    semantic::Parser parser(domain_source);
+
+    const auto translation = semantic::translate(parser.get_domain());
+    const auto translated_domain = translation.get_translated_domain();
+    const auto& repository = translated_domain.get_context();
+
+    ASSERT_EQ(translated_domain.get_data().axioms.size(), 1);
+    const auto& axiom = repository[translated_domain.get_data().axioms.front()];
+    EXPECT_TRUE(condition_mentions_predicate(axiom.condition, repository, "p"));
+    EXPECT_TRUE(condition_mentions_predicate(axiom.condition, repository, "object"));
+    ASSERT_EQ(translated_domain.get_data().actions.size(), 1);
+    const auto& action = repository[translated_domain.get_data().actions.front()];
+    ASSERT_TRUE(action.precondition.has_value());
+    EXPECT_FALSE(contains_exists(*action.precondition, repository));
+}
+
+
+TEST(LokiSemanticTranslator, ReusesGeneratedAxiomsForIdenticalUniversalConditions)
+{
+    const auto domain_source = std::string {
+        "(define (domain universal-cache)"
+        "(:requirements :typing :universal-preconditions)"
+        "(:predicates (p ?x - object ?y - object))"
+        "(:action a :parameters (?x - object) "
+        ":precondition (forall (?y - object) (p ?x ?y)) "
+        ":effect (and))"
+        "(:action b :parameters (?x - object) "
+        ":precondition (forall (?y - object) (p ?x ?y)) "
+        ":effect (and))"
+        ")" };
+
+    semantic::Parser parser(domain_source);
+
+    const auto translation = semantic::translate(parser.get_domain());
+    const auto translated_domain = translation.get_translated_domain();
+    const auto& repository = translated_domain.get_context();
+
+    auto generated_predicates = std::size_t {};
+    for (auto predicate : translated_domain.get_data().predicates)
+    {
+        if (std::string(repository[predicate].name).starts_with("_universal_"))
+            ++generated_predicates;
+    }
+
+    EXPECT_EQ(generated_predicates, 1);
+    EXPECT_EQ(translated_domain.get_data().axioms.size(), 1);
+    ASSERT_EQ(translated_domain.get_data().actions.size(), 2);
+    for (auto action_index : translated_domain.get_data().actions)
+    {
+        const auto& action = repository[action_index];
+        ASSERT_TRUE(action.precondition.has_value());
+        EXPECT_FALSE(contains_forall(*action.precondition, repository));
+    }
+}
+
+
 TEST(LokiSemanticTranslator, SplitsDisjunctiveActionPreconditionsAfterDnf)
 {
     const auto domain_source = std::string {
