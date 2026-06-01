@@ -1,50 +1,31 @@
-file(GLOB_RECURSE SRC_FILES
-    "*.cpp" "**/*.cpp")
-file(GLOB_RECURSE PRIVATE_HEADER_FILES
-    "*.hpp" "**/*.hpp")
-file(GLOB_RECURSE PUBLIC_HEADER_FILES
-    "../include/*.hpp" "../include/**/*.hpp")
-add_library(parsers SHARED ${SRC_FILES} ${PRIVATE_HEADER_FILES} ${PUBLIC_HEADER_FILES})
-set_target_properties(parsers PROPERTIES OUTPUT_NAME loki_parsers)
+add_library(parsers INTERFACE)
 
-if(LOKI_BUILD_PYPDDL)
-    if(APPLE)
-        set(LOKI_PARSERS_INSTALL_RPATH "@loader_path;@loader_path/../../../pyyggdrasil/lib")
-    else()
-        set(LOKI_PARSERS_INSTALL_RPATH "$ORIGIN;$ORIGIN/../../../pyyggdrasil/lib")
+set(LOKI_YGGDRASIL_INCLUDE_DIRS)
+foreach(candidate IN ITEMS
+        "${YGGDRASIL_NATIVE_PREFIX}/include"
+        "${PROJECT_SOURCE_DIR}/../yggdrasil/include")
+    if(candidate AND EXISTS "${candidate}/yggdrasil")
+        list(APPEND LOKI_YGGDRASIL_INCLUDE_DIRS "${candidate}")
     endif()
-elseif(APPLE)
-    set(LOKI_PARSERS_INSTALL_RPATH "@loader_path")
-else()
-    set(LOKI_PARSERS_INSTALL_RPATH "$ORIGIN")
-endif()
-
-if(LOKI_PARSERS_INSTALL_RPATH)
-    set_target_properties(parsers PROPERTIES INSTALL_RPATH "${LOKI_PARSERS_INSTALL_RPATH}")
-endif()
-
-if(YGGDRASIL_NATIVE_PREFIX)
-    set_target_properties(parsers PROPERTIES BUILD_RPATH "${YGGDRASIL_NATIVE_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-endif()
-
-# Add compile definitions for the parsers target
-target_compile_definitions(parsers PUBLIC
-    BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
-    BOOST_MPL_LIMIT_LIST_SIZE=50
-)
+endforeach()
 
 # Create an alias for simpler reference
 add_library(loki::parsers ALIAS parsers)
 
-target_link_libraries(parsers
-  PUBLIC
-    gtl::gtl
-    fmt::fmt)
+target_compile_definitions(parsers INTERFACE
+    BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
+    BOOST_MPL_LIMIT_LIST_SIZE=50
+)
 
-# Use include depending on building or using from installed location
+target_link_libraries(parsers
+    INTERFACE
+        gtl::gtl
+        fmt::fmt)
+
 target_include_directories(parsers
-    PUBLIC
+    INTERFACE
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+        "$<BUILD_INTERFACE:${LOKI_YGGDRASIL_INCLUDE_DIRS}>"
         "$<INSTALL_INTERFACE:${LOKI_INSTALL_INTERFACE_INCLUDEDIR}>"
 )
 
@@ -52,9 +33,6 @@ target_include_directories(parsers
 install(
     TARGETS parsers
     EXPORT lokiparsersTargets
-    LIBRARY DESTINATION ${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_LIBDIR} COMPONENT ${LOKI_INSTALL_COMPONENT}
-    ARCHIVE DESTINATION ${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_LIBDIR} COMPONENT ${LOKI_INSTALL_COMPONENT}
-    RUNTIME DESTINATION ${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_BINDIR} COMPONENT ${LOKI_INSTALL_COMPONENT}
     INCLUDES DESTINATION ${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_INCLUDEDIR}
 )
 

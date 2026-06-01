@@ -19,7 +19,8 @@
 
 #include <benchmark/benchmark.h>
 #include <iostream>
-#include <loki/loki.hpp>
+#include <cmath>
+#include <numeric>
 #include <random>
 
 namespace loki::benchmarks
@@ -28,16 +29,16 @@ namespace loki::benchmarks
 struct AtomAccessResult
 {
     size_t atom_identifier;
-    loki::Predicate atom_predicate;
-    loki::TermList atom_terms;
+    loki::pddl::PredicateView atom_predicate;
+    std::vector<loki::pddl::TermView> atom_terms;
 };
 
-static AtomAccessResult access_atom_data(const loki::Atom& atom)
+static AtomAccessResult access_atom_data(loki::pddl::AtomView atom)
 {
-    const auto atom_identifier = atom->get_index();
-    const auto atom_predicate = atom->get_predicate();
-    auto atom_terms = loki::TermList();
-    for (const auto& term : atom->get_terms())
+    const auto atom_identifier = atom.get_index().get_value();
+    const auto atom_predicate = atom.get_predicate();
+    auto atom_terms = std::vector<loki::pddl::TermView>();
+    for (const auto& term : atom.get_terms())
     {
         atom_terms.push_back(term);
     }
@@ -56,8 +57,10 @@ static void BM_IterateAtoms(benchmark::State& state)
     const size_t num_predicates = 100;
     // Choose num_objects sufficiently large, we cast to size_t to stay slightly below to fit into the cache
     const size_t num_objects = static_cast<size_t>(sqrt(num_atoms / num_predicates));
-    auto factories = loki::Repositories();
-    auto atoms = create_atoms(num_objects, num_predicates, factories);
+    auto repository_factory = loki::pddl::RepositoryFactory();
+    auto repository = repository_factory.create_shared();
+    auto builder = loki::pddl::Builder();
+    auto atoms = create_atoms(num_objects, num_predicates, *repository, builder);
     benchmark::DoNotOptimize(atoms);
 
     for (auto _ : state)
@@ -69,7 +72,7 @@ static void BM_IterateAtoms(benchmark::State& state)
         }
     }
 
-    state.SetBytesProcessed(state.iterations() * atoms.size() * sizeof(loki::ActionImpl));
+    state.SetBytesProcessed(state.iterations() * atoms.size() * sizeof(loki::pddl::AtomView));
 }
 
 static void BM_RandomlyIterateAtoms(benchmark::State& state)
@@ -77,8 +80,10 @@ static void BM_RandomlyIterateAtoms(benchmark::State& state)
     const size_t num_atoms = state.range(0);
     const size_t num_predicates = 100;
     const size_t num_objects = static_cast<size_t>(sqrt(num_atoms / num_predicates));
-    auto factories = loki::Repositories();
-    auto atoms = create_atoms(num_objects, num_predicates, factories);
+    auto repository_factory = loki::pddl::RepositoryFactory();
+    auto repository = repository_factory.create_shared();
+    auto builder = loki::pddl::Builder();
+    auto atoms = create_atoms(num_objects, num_predicates, *repository, builder);
     benchmark::DoNotOptimize(atoms);
 
     std::random_device rd;   // Obtain a random number from hardware
@@ -97,7 +102,7 @@ static void BM_RandomlyIterateAtoms(benchmark::State& state)
         }
     }
 
-    state.SetBytesProcessed(state.iterations() * atoms.size() * sizeof(loki::ActionImpl));
+    state.SetBytesProcessed(state.iterations() * atoms.size() * sizeof(loki::pddl::AtomView));
 }
 
 }

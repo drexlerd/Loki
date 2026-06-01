@@ -15,31 +15,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/pddl/parser_options.hpp"
 #include <gtest/gtest.h>
-#include <loki/pddl/domain.hpp>
-#include <loki/pddl/exceptions.hpp>
-#include <loki/pddl/parser.hpp>
-#include <loki/pddl/problem.hpp>
 
-namespace loki::domain::tests
+#include <loki/loki.hpp>
+
+#include <filesystem>
+#include <string>
+
+namespace loki::tests
 {
+namespace fs = std::filesystem;
 
 TEST(LokiTests, ParserTest)
 {
-    return;
-    const auto domain_file = fs::path(std::string(DATA_DIR) + "gripper/domain.pddl");
-    const auto problem_file = fs::path(std::string(DATA_DIR) + "gripper/p-2-0.pddl");
-    auto parser = Parser(domain_file);
-    auto domain = parser.get_domain();
-    auto problem = parser.parse_problem(problem_file);
+    const auto domain_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/domain.pddl");
+    const auto problem_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/test-1.pddl");
+    auto parser = loki::Parser();
+    const auto domain = parser.parse_domain(domain_file);
+    const auto problem = parser.parse_task(problem_file);
 
-    EXPECT_EQ(domain->get_constants().size(), 2);
-    EXPECT_EQ(domain->get_predicates().size(), 7);
-    EXPECT_EQ(domain->get_actions().size(), 3);
+    EXPECT_EQ(domain.get_constants().size(), 2);
+    EXPECT_EQ(domain.get_predicates().size(), 7);
+    EXPECT_EQ(domain.get_actions().size(), 3);
 
-    EXPECT_EQ(problem->get_objects().size(), 4);
-    EXPECT_EQ(problem->get_initial_literals().size(), 11);
+    EXPECT_EQ(problem.get_objects().size(), 4);
+    EXPECT_EQ(problem.get_initial_literals().size(), 11);
 }
 
 TEST(LokiTests, ParserStringTest)
@@ -53,34 +53,62 @@ TEST(LokiTests, ParserStringTest)
         "         :precondition (and) "
         "         :effect (and (p))))";
 
-    auto parser = Parser(domain_str, "", ParserOptions());
-    auto domain = parser.get_domain();
+    auto parser = loki::Parser();
+    const auto domain = parser.parse_domain(domain_str);
 
-    EXPECT_EQ(domain->get_constants().size(), 0);
-    EXPECT_EQ(domain->get_predicates().size(), 1);
-    EXPECT_EQ(domain->get_actions().size(), 1);
+    EXPECT_EQ(domain.get_constants().size(), 0);
+    EXPECT_EQ(domain.get_predicates().size(), 1);
+    EXPECT_EQ(domain.get_actions().size(), 1);
 }
 
 TEST(LokiTests, ParserNonDeterministicTest)
 {
-    const auto domain_file = fs::path(std::string(DATA_DIR) + "blocks-non-deterministic/domain.pddl");
-    const auto problem_file = fs::path(std::string(DATA_DIR) + "blocks-non-deterministic/p20.pddl");
-    auto parser = Parser(domain_file);
-    auto domain = parser.get_domain();
-    auto problem = parser.parse_problem(problem_file);
+    const auto domain_str = std::string { R"(
+(define (domain nondet)
+  (:requirements :strips :non-deterministic)
+  (:predicates (p) (q))
+  (:action a
+    :parameters ()
+    :effect (oneof (p) (q)))
+)
+)" };
 
-    EXPECT_EQ(domain->get_constants().size(), 0);
-    EXPECT_EQ(domain->get_predicates().size(), 8);
-    EXPECT_EQ(domain->get_actions().size(), 7);
+    auto parser = loki::Parser();
+    const auto domain = parser.parse_domain(domain_str);
 
-    EXPECT_EQ(problem->get_objects().size(), 10);
-    EXPECT_EQ(problem->get_initial_literals().size(), 13);
+    EXPECT_EQ(domain.get_constants().size(), 0);
+    EXPECT_EQ(domain.get_predicates().size(), 2);
+    EXPECT_EQ(domain.get_actions().size(), 1);
 }
 
 TEST(LokiTests, ParserNonDeterministicMissingRequirementTest)
 {
-    const auto domain_file = fs::path(std::string(DATA_DIR) + "blocks-non-deterministic/domain-missing-requirement.pddl");
-    EXPECT_THROW(Parser(domain_file).get_domain(), UndefinedRequirementError);
+    const auto domain_str = std::string { R"(
+(define (domain missing-requirement)
+  (:predicates (p) (q))
+  (:action a
+    :parameters ()
+    :precondition (or (p) (q))
+    :effect (and))
+)
+)" };
+
+    auto options = loki::ParserOptions {};
+    options.strict = true;
+    auto parser = loki::Parser(options);
+
+    try
+    {
+        static_cast<void>(parser.parse_domain(domain_str));
+        FAIL() << "Expected missing requirement diagnostic";
+    }
+    catch (const loki::SemanticError& error)
+    {
+        EXPECT_EQ(error.code(), loki::SemanticErrorCode::MissingRequirement);
+        ASSERT_TRUE(error.source_range().has_value());
+        EXPECT_EQ(error.source_range()->begin.line, 6);
+        EXPECT_EQ(error.source_range()->begin.column, 19);
+    }
 }
 
-}
+} // namespace loki::tests

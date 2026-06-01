@@ -19,7 +19,6 @@
 
 #include <benchmark/benchmark.h>
 #include <iostream>
-#include <loki/loki.hpp>
 #include <random>
 
 namespace loki::benchmarks
@@ -33,9 +32,11 @@ static void BM_ConstructAtoms(benchmark::State& state)
 
     for (auto _ : state)
     {
-        auto factories = loki::Repositories();
+        auto repository_factory = loki::pddl::RepositoryFactory();
+        auto repository = repository_factory.create_shared();
+        auto builder = loki::pddl::Builder();
 
-        auto atoms = create_atoms(num_objects, num_predicates, factories);
+        auto atoms = create_atoms(num_objects, num_predicates, *repository, builder);
         benchmark::DoNotOptimize(atoms);
     }
 }

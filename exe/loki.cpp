@@ -20,6 +20,8 @@
 #include <iostream>
 #include <loki/loki.hpp>
 
+#include <filesystem>
+
 static constexpr std::string version = "1.0.0";
 
 static void add_version(argparse::ArgumentParser& program)
@@ -62,44 +64,46 @@ int main(int argc, char** argv)
         std::exit(1);
     }
 
-    auto domain_filepath = program.get<std::string>("domain");
-    auto problem_filepath = program.get<std::string>("problem");
+    const auto domain_filepath = std::filesystem::path(program.get<std::string>("domain"));
+    const auto problem_filepath = std::filesystem::path(program.get<std::string>("problem"));
+    const auto verbose = program.get<bool>("--verbose");
 
     auto parser_options = loki::ParserOptions();
-    parser_options.verbose = program.get<bool>("--verbose");
     parser_options.strict = program.get<bool>("--strict");
 
     auto translator_options = loki::TranslatorOptions();
     translator_options.remove_typing = program.get<bool>("--remove-typing");
 
-    auto parser = loki::Parser(domain_filepath, parser_options);
-    const auto domain = parser.get_domain();
+    auto parser = loki::Parser(parser_options);
+    const auto domain = parser.parse_domain(domain_filepath);
 
     const auto domain_translation_result = loki::translate(domain, translator_options);
-    if (parser_options.verbose)
-        std::cout << *domain_translation_result.get_translated_domain() << std::endl;
+    const auto translated_domain_text = loki::pddl::format::domain(domain_translation_result.get_translated_domain());
+    if (verbose)
+        std::cout << translated_domain_text << std::endl;
 
     if (program.is_used("--out-domain"))
     {
         auto out_domain_filepath = program.get<std::string>("--out-domain");
         auto out_domain_file = std::ofstream(out_domain_filepath);
-        out_domain_file << *domain_translation_result.get_translated_domain();
+        out_domain_file << translated_domain_text;
         out_domain_file.close();
     }
 
     if (!problem_filepath.empty())
     {
-        auto problem = parser.parse_problem(problem_filepath, parser_options);
+        auto task = parser.parse_task(problem_filepath);
 
-        const auto translated_problem = loki::translate(problem, domain_translation_result, translator_options);
-        if (parser_options.verbose)
-            std::cout << *translated_problem << std::endl;
+        const auto translated_task_result = loki::translate(task, domain_translation_result, translator_options);
+        const auto translated_task_text = loki::pddl::format::task(translated_task_result.get_translated_task());
+        if (verbose)
+            std::cout << translated_task_text << std::endl;
 
         if (program.is_used("--out-problem"))
         {
             auto out_problem_filepath = program.get<std::string>("--out-problem");
             auto out_problem_file = std::ofstream(out_problem_filepath);
-            out_problem_file << *translated_problem;
+            out_problem_file << translated_task_text;
             out_problem_file.close();
         }
     }

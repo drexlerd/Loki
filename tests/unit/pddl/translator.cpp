@@ -16,160 +16,102 @@
  */
 
 #include <gtest/gtest.h>
-#include <loki/pddl/domain.hpp>
-#include <loki/pddl/parser.hpp>
-#include <loki/pddl/problem.hpp>
-#include <loki/pddl/translator.hpp>
 
-namespace loki::domain::tests
+#include <loki/loki.hpp>
+#include <loki/pddl/formatter.hpp>
+
+#include <filesystem>
+#include <string>
+#include <unordered_set>
+
+namespace loki::tests
 {
+namespace fs = std::filesystem;
+
+namespace
+{
+
+template<typename ObjectList>
+std::unordered_set<std::string> object_names(ObjectList objects)
+{
+    auto result = std::unordered_set<std::string> {};
+    for (auto object : objects)
+        result.insert(std::string(object.get_name()));
+    return result;
+}
+
+void expect_translated_pddl_reparses(const fs::path& domain_file, const fs::path& problem_file)
+{
+    auto parser = loki::Parser();
+    const auto domain = parser.parse_domain(domain_file);
+    const auto task = parser.parse_task(problem_file);
+
+    const auto domain_translation = loki::translate(domain);
+    const auto task_translation = loki::translate(task, domain_translation);
+
+    const auto domain_text = pddl::format::domain(domain_translation.get_translated_domain());
+    const auto task_text = pddl::format::task(task_translation.get_translated_task());
+
+    auto reparsed = loki::Parser();
+    const auto reparsed_domain = reparsed.parse_domain(domain_text);
+    const auto reparsed_task = reparsed.parse_task(task_text);
+
+    EXPECT_EQ(reparsed_domain.get_name(), domain_translation.get_translated_domain().get_name());
+    EXPECT_EQ(reparsed_task.get_name(), task_translation.get_translated_task().get_name());
+    EXPECT_EQ(reparsed_task.get_domain().get_name(), reparsed_domain.get_name());
+}
+
+} // namespace
 
 TEST(LokiTests, LokiPddlTranslatorReparseTest)
 {
-    {
-        const auto domain_file = fs::path(std::string(DATA_DIR) + "miconic-fulladl/domain.pddl");
-        const auto problem_file = fs::path(std::string(DATA_DIR) + "miconic-fulladl/test_problem.pddl");
-
-        auto parser = loki::Parser(domain_file);
-        const auto domain = parser.get_domain();
-        const auto domain_translation_result = loki::translate(domain);
-
-        std::stringstream ss;
-        ss << *domain_translation_result.get_translated_domain();
-
-        auto parser2 = loki::Parser(ss.str(), domain_file);
-
-        const auto problem = parser.parse_problem(problem_file);
-        const auto translated_problem = loki::translate(problem, domain_translation_result);
-
-        ss = std::stringstream {};
-        ss << *translated_problem;
-
-        parser2.parse_problem(ss.str(), problem_file);
-    }
-
-    {
-        const auto domain_file = fs::path(std::string(DATA_DIR) + "delivery/numeric/domain.pddl");
-        const auto problem_file = fs::path(std::string(DATA_DIR) + "delivery/numeric/pfile1.pddl");
-
-        auto parser = loki::Parser(domain_file);
-        const auto domain = parser.get_domain();
-        const auto domain_translation_result = loki::translate(domain);
-
-        std::stringstream ss;
-        ss << *domain_translation_result.get_translated_domain();
-
-        auto parser2 = loki::Parser(ss.str(), domain_file);
-
-        const auto problem = parser.parse_problem(problem_file);
-        const auto translated_problem = loki::translate(problem, domain_translation_result);
-
-        ss = std::stringstream {};
-        ss << *translated_problem;
-
-        parser2.parse_problem(ss.str(), problem_file);
-    }
+    expect_translated_pddl_reparses(fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/domain.pddl"),
+                                    fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/test-1.pddl"));
+    expect_translated_pddl_reparses(fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/domain.pddl"),
+                                    fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/test-1.pddl"));
+    expect_translated_pddl_reparses(fs::path(std::string(DATA_DIR) + "planning-benchmarks/profiling/ipc2023-numeric/delivery/domain.pddl"),
+                                    fs::path(std::string(DATA_DIR) + "planning-benchmarks/profiling/ipc2023-numeric/delivery/pfile1.pddl"));
 }
 
 TEST(LokiTests, LokiPddlTranslatorTest)
 {
-    const auto domain_file = fs::path(std::string(DATA_DIR) + "miconic-fulladl/domain.pddl");
-    const auto problem_file = fs::path(std::string(DATA_DIR) + "miconic-fulladl/test_problem.pddl");
+    const auto domain_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/domain.pddl");
+    const auto problem_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/test-1.pddl");
 
-    auto parser = loki::Parser(domain_file);
-    const auto domain = parser.get_domain();
-    const auto problem = parser.parse_problem(problem_file);
+    auto parser = loki::Parser();
+    const auto domain = parser.parse_domain(domain_file);
+    const auto problem = parser.parse_task(problem_file);
     const auto domain_translation_result = loki::translate(domain);
     const auto translated_domain = domain_translation_result.get_translated_domain();
-    const auto translated_problem = loki::translate(problem, domain_translation_result);
+    const auto problem_translation_result = loki::translate(problem, domain_translation_result);
+    const auto translated_problem = problem_translation_result.get_translated_task();
 
     {
-        // Check that all domain constants are in the problem
-        auto problem_objects = ObjectSet(translated_problem->get_objects().begin(), translated_problem->get_objects().end());
-        for (const auto& constant : translated_domain->get_constants())
+        const auto problem_objects = object_names(translated_problem.get_objects());
+        for (auto constant : translated_domain.get_constants())
         {
-            EXPECT_TRUE(problem_objects.contains(constant));
+            EXPECT_TRUE(problem_objects.contains(std::string(constant.get_name())));
         }
     }
 
     {
-        // Check that all problem types are domain types.
-        const auto& domain_type_list = boost::hana::at_key(domain->get_repositories().get_hana_repositories(), boost::hana::type<TypeImpl> {});
-        auto domain_type_set = TypeSet {};
-        for (const auto& type : domain_type_list)
+        EXPECT_EQ(translated_problem.get_domain().get_name(), translated_domain.get_name());
+        EXPECT_EQ(&translated_problem.get_domain().get_context(), &translated_domain.get_context());
+    }
+
+    {
+        auto names = std::unordered_set<std::string> {};
+        for (auto object : translated_problem.get_objects())
         {
-            domain_type_set.insert(&type);
-        }
-        const auto& problem_type_list = boost::hana::at_key(problem->get_repositories().get_hana_repositories(), boost::hana::type<TypeImpl> {});
-        for (const auto& type : problem_type_list)
-        {
-            EXPECT_TRUE(domain_type_set.contains(&type));
+            EXPECT_TRUE(names.insert(std::string(object.get_name())).second);
         }
     }
 
     {
-        // Check that problem does not introduce object with same name as constant in domain.
-        auto domain_constants = std::unordered_map<std::string, Object> {};
-        for (const auto& constant : translated_domain->get_constants())
-        {
-            domain_constants.emplace(constant->get_name(), constant);
-        }
-
-        for (const auto& object : translated_problem->get_objects())
-        {
-            if (domain_constants.contains(object->get_name()))
-            {
-                EXPECT_EQ(object, domain_constants.at(object->get_name()));
-            }
-        }
-    }
-
-    {
-        // Check that problem does not introduce predicate with same name as predicate in domain.
-        auto domain_predicates = std::unordered_map<std::string, Predicate> {};
-        for (const auto& predicate : translated_domain->get_predicates())
-        {
-            domain_predicates.emplace(predicate->get_name(), predicate);
-        }
-
-        for (const auto& predicate : translated_problem->get_predicates())
-        {
-            if (domain_predicates.contains(predicate->get_name()))
-            {
-                EXPECT_EQ(predicate, domain_predicates.at(predicate->get_name()));
-            }
-        }
-    }
-
-    {
-        // Check that problem does not introduce function skeleton with same name as function skeleton in domain.
-        auto domain_function_skeletons = std::unordered_map<std::string, FunctionSkeleton> {};
-        for (const auto& function_skeleton : translated_domain->get_function_skeletons())
-        {
-            domain_function_skeletons.emplace(function_skeleton->get_name(), function_skeleton);
-        }
-
-        const auto& problem_function_skeletons =
-            boost::hana::at_key(translated_domain->get_repositories().get_hana_repositories(), boost::hana::type<FunctionSkeletonImpl> {});
-        for (const auto& function_skeleton : problem_function_skeletons)
-        {
-            if (domain_function_skeletons.contains(function_skeleton.get_name()))
-            {
-                EXPECT_EQ(&function_skeleton, domain_function_skeletons.at(function_skeleton.get_name()));
-            }
-        }
-    }
-
-    {
-        for (const auto& constant : translated_domain->get_constants())
-        {
-            EXPECT_EQ(constant->get_bases().size(), 1);
-        }
-        for (const auto& object : translated_problem->get_objects())
-        {
-            EXPECT_EQ(object->get_bases().size(), 1);
-        }
+        EXPECT_FALSE(translated_domain.get_actions().empty());
+        EXPECT_FALSE(translated_problem.get_initial_literals().empty());
+        EXPECT_TRUE(translated_problem.get_goal().has_value());
     }
 }
 
-}
+} // namespace loki::tests

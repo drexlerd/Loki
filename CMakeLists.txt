@@ -162,7 +162,7 @@ endif()
 ###########
 
 # Install header files
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/loki" "${PROJECT_SOURCE_DIR}/include/loki2"
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/loki"
     DESTINATION "${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_INCLUDEDIR}"
     COMPONENT ${LOKI_INSTALL_COMPONENT})
 
