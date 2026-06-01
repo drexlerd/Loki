@@ -22,6 +22,8 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <unordered_set>
+#include <vector>
 #include <variant>
 
 namespace loki::formalism::format
@@ -177,20 +179,25 @@ inline void term_list(EntityListView<Term> terms, std::ostream& out)
     }
 }
 
+inline void parameter(ParameterView parameter, std::ostream& out)
+{
+    variable_text(parameter.get_variable().get_name(), out);
+    if (!parameter.get_types().empty())
+    {
+        out << " - ";
+        type_list(parameter.get_types(), out);
+    }
+}
+
 inline void parameters(EntityListView<Parameter> parameters, std::ostream& out)
 {
     auto first = true;
-    for (auto parameter : parameters)
+    for (auto parameter_view : parameters)
     {
         if (!first)
             out << ' ';
         first = false;
-        variable_text(parameter.get_variable().get_name(), out);
-        if (!parameter.get_types().empty())
-        {
-            out << " - ";
-            type_list(parameter.get_types(), out);
-        }
+        parameter(parameter_view, out);
     }
 }
 
@@ -464,11 +471,49 @@ inline void action(ActionView action, std::ostream& out, Options options)
 
 inline void axiom(AxiomView axiom, std::ostream& out, Options options)
 {
+    auto head_variables = std::unordered_set<ygg::uint_t> {};
+    for (auto term_view : axiom.get_head().get_atom().get_terms())
+    {
+        std::visit(
+            [&](const auto& value)
+            {
+                using T = std::remove_cvref_t<decltype(value)>;
+                if constexpr (std::same_as<T, ygg::Index<Variable>>)
+                    head_variables.insert(value.get_value());
+            },
+            term_view.get_data().value);
+    }
+
+    auto existential_parameters = std::vector<ParameterView> {};
+    for (auto parameter_view : axiom.get_parameters())
+    {
+        if (!head_variables.contains(parameter_view.get_variable().get_index().get_value()))
+            existential_parameters.push_back(parameter_view);
+    }
+
     spaces(out, options.indent);
     out << "(:derived ";
     literal(axiom.get_head(), out);
     out << ' ';
-    condition(axiom.get_condition(), out);
+    if (!existential_parameters.empty())
+    {
+        out << "(exists (";
+        auto first = true;
+        for (auto parameter_view : existential_parameters)
+        {
+            if (!first)
+                out << ' ';
+            first = false;
+            parameter(parameter_view, out);
+        }
+        out << ") ";
+        condition(axiom.get_condition(), out);
+        out << ')';
+    }
+    else
+    {
+        condition(axiom.get_condition(), out);
+    }
     out << ')';
 }
 

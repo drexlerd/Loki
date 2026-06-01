@@ -43,13 +43,38 @@ ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::make_ge
     }
 
     const auto name = cista::offset::string("_universal_" + std::to_string(this->m_num_generated_axioms++));
-    const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, name, predicate_parameters).get_index();
+    const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, name, this->self().maybe_strip_parameters(predicate_parameters)).get_index();
     const auto atom = formalism::get_or_create<formalism::Atom>(this->m_storage->repository, predicate, terms).get_index();
     const auto positive_head = formalism::get_or_create<formalism::Literal>(this->m_storage->repository, true, atom).get_index();
     const auto negative_literal = formalism::get_or_create<formalism::Literal>(this->m_storage->repository, false, atom).get_index();
-    const auto axiom = formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, free_parameters, positive_head, condition).get_index();
+
+    auto parts = ygg::IndexList<formalism::Condition> {};
+    const auto dnf = this->self().flatten_condition(this->self().to_dnf(condition));
+    if (const auto condition_or = this->self().as_or(dnf))
+    {
+        for (auto part : this->m_storage->repository[*condition_or].conditions)
+            parts.push_back(part);
+    }
+    else
+    {
+        parts.push_back(dnf);
+    }
+
+    for (auto part : parts)
+    {
+        auto axiom_parameters = free_parameters;
+        auto axiom_condition = part;
+        this->self().lift_top_level_exists(axiom_parameters, axiom_condition);
+        this->self().prepend_type_conditions(axiom_condition, axiom_parameters);
+        axiom_condition = this->self().flatten_condition(axiom_condition);
+        const auto axiom = formalism::get_or_create<formalism::Axiom>(
+            this->m_storage->repository,
+            this->self().maybe_strip_parameters(axiom_parameters),
+            positive_head,
+            axiom_condition).get_index();
+        this->m_generated_axioms.push_back(axiom);
+    }
     this->m_generated_predicates.push_back(predicate);
-    this->m_generated_axioms.push_back(axiom);
     return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, negative_literal).get_index());
 }
 
@@ -98,17 +123,17 @@ ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::move_ex
             parts.push_back(moved);
         }
     }
-    auto conjunction = this->self().wrap_condition(formalism::get_or_create<formalism::ConditionAnd>(this->m_storage->repository, std::move(parts)).get_index());
+    auto conjunction = this->self().make_conjunction(std::move(parts));
     if (parameters.empty())
         return conjunction;
-    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), conjunction).get_index());
+    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), conjunction).get_index()));
 }
 
 template<typename Derived>
 ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionExists> node)
 {
     const auto& data = this->m_storage->repository[node];
-    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, data.parameters, this->self().move_existentials(data.condition)).get_index());
+    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, data.parameters, this->self().move_existentials(data.condition)).get_index()));
 }
 
 template<typename Derived>
@@ -117,7 +142,7 @@ ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::move_ex
     auto parts = ygg::IndexList<formalism::Condition> {};
     for (auto child : this->m_storage->repository[node].conditions)
         parts.push_back(this->self().move_existentials(child));
-    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionOr>(this->m_storage->repository, std::move(parts)).get_index());
+    return this->self().make_disjunction(std::move(parts));
 }
 
 template<typename Derived>
@@ -140,7 +165,7 @@ void ConditionQuantifierTranslator<Derived>::lift_top_level_exists(ygg::IndexLis
             parameters.push_back(parameter);
         moved = data.condition;
     }
-    condition = moved;
+    condition = this->self().flatten_condition(moved);
 }
 
 template<typename Derived>

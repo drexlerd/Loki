@@ -389,6 +389,50 @@ bool condition_mentions_predicate(ygg::Index<formalism::Condition> condition, co
         repository[condition].value);
 }
 
+
+std::optional<std::string> variable_term_name(ygg::Index<formalism::Term> term, const formalism::Repository& repository)
+{
+    return std::visit(
+        Overloaded {
+            [&](ygg::Index<formalism::Variable> variable) -> std::optional<std::string> { return std::string(repository[variable].name); },
+            [&](auto) -> std::optional<std::string> { return std::nullopt; },
+        },
+        repository[term].value);
+}
+
+bool has_top_level_effect_literal_with_terms(ygg::Index<formalism::Effect> effect,
+                                             const formalism::Repository& repository,
+                                             const std::string& predicate_name,
+                                             const std::string& first_variable,
+                                             const std::string& second_variable)
+{
+    return std::visit(
+        Overloaded {
+            [&](ygg::Index<formalism::EffectLiteral> node)
+            {
+                const auto literal = repository[node].literal;
+                const auto atom = repository[repository[literal].atom];
+                const auto predicate = atom.predicate;
+                if (std::string(repository[predicate].name) != predicate_name || atom.terms.size() != 2)
+                    return false;
+                const auto first = variable_term_name(atom.terms[0], repository);
+                const auto second = variable_term_name(atom.terms[1], repository);
+                return first && second && *first == first_variable && *second == second_variable;
+            },
+            [&](ygg::Index<formalism::EffectAnd> node)
+            {
+                for (auto child : repository[node].effects)
+                {
+                    if (has_top_level_effect_literal_with_terms(child, repository, predicate_name, first_variable, second_variable))
+                        return true;
+                }
+                return false;
+            },
+            [&](auto) { return false; },
+        },
+        repository[effect].value);
+}
+
 std::size_t count_initial_literals_for_predicate(const ygg::IndexList<formalism::Literal>& literals, const formalism::Repository& repository, const std::string& name)
 {
     auto result = std::size_t { 0 };
@@ -661,6 +705,31 @@ TEST(LokiSemanticTranslator, SplitsDisjunctiveWhenEffectsAndFlattensConjunctions
     EXPECT_EQ(count_effect_when(*action.effect, repository), 4);
 }
 
+
+TEST(LokiSemanticTranslator, KeepsActionScopedEffectVariablesAfterQuantifierRenaming)
+{
+    const auto domain_path = fs::path(std::string(DATA_DIR)) / "planning-benchmarks/tests/classical/airport/domain.pddl";
+    semantic::Parser parser(domain_path);
+
+    const auto translation = semantic::translate(parser.get_domain());
+    const auto translated_domain = translation.get_translated_domain();
+    const auto& repository = translated_domain.get_context();
+
+    auto found_takeoff = false;
+    for (auto action_index : translated_domain.get_data().actions)
+    {
+        const auto& action = repository[action_index];
+        if (std::string(action.name) != "takeoff")
+            continue;
+
+        found_takeoff = true;
+        ASSERT_TRUE(action.effect.has_value());
+        EXPECT_TRUE(has_top_level_effect_literal_with_terms(*action.effect, repository, "blocked", "s_0", "a_0"));
+        EXPECT_FALSE(has_top_level_effect_literal_with_terms(*action.effect, repository, "blocked", "s_2", "a_0"));
+    }
+    EXPECT_TRUE(found_takeoff);
+}
+
 TEST(LokiSemanticTranslator, AddsTypePredicatesAndRemovesTypingByDefault)
 {
     const auto domain_source = std::string {
@@ -914,7 +983,10 @@ TEST(LokiSemanticParser, PermissiveModeAllowsMissingRequirements)
 )
 )" };
 
-    EXPECT_NO_THROW(semantic::Parser(domain));
+    EXPECT_NO_THROW({
+        auto parser = semantic::Parser(domain);
+        (void) parser;
+    });
 }
 
 TEST(LokiSemanticParser, StrictModeExpandsAdlRequirement)
@@ -1029,7 +1101,10 @@ TEST(LokiSemanticParser, PermissiveModeAllowsPredicateArgumentTypeMismatch)
 )
 )" };
 
-    EXPECT_NO_THROW(semantic::Parser(domain));
+    EXPECT_NO_THROW({
+        auto parser = semantic::Parser(domain);
+        (void) parser;
+    });
 }
 
 TEST(LokiSemanticParser, StrictModeRejectsFunctionArgumentTypeMismatch)
@@ -1215,7 +1290,10 @@ TEST(LokiSemanticParser, PermissiveModeKeepsImplicitPredicateCompatibility)
 )
 )" };
 
-    EXPECT_NO_THROW(semantic::Parser(domain));
+    EXPECT_NO_THROW({
+        auto parser = semantic::Parser(domain);
+        (void) parser;
+    });
 }
 
 TEST(LokiSemanticParser, ParsesAndTranslatesAllSuiteCases)

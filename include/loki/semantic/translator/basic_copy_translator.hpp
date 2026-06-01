@@ -292,56 +292,36 @@ ygg::Index<formalism::FunctionExpressionNumber> BasicCopyTranslator<Derived>::co
 template<typename Derived>
 ygg::Index<formalism::FunctionTerm> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::FunctionTerm> source, const formalism::Repository& repository)
 {
-    ygg::Index<formalism::FunctionTerm> out;
-    if (find_mapped(this->m_storage->function_terms, source, out)) return out;
     const auto& data = repository[source];
-    out = formalism::get_or_create<formalism::FunctionTerm>(this->m_storage->repository, this->self().copy(data.function, repository), this->self().template copy_list<formalism::Term>(data.terms, repository)).get_index();
-    remember(this->m_storage->function_terms, source, out);
-    return out;
+    return formalism::get_or_create<formalism::FunctionTerm>(this->m_storage->repository, this->self().copy(data.function, repository), this->self().template copy_list<formalism::Term>(data.terms, repository)).get_index();
 }
 
 template<typename Derived>
 ygg::Index<formalism::UnaryFunctionExpression> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::UnaryFunctionExpression> source, const formalism::Repository& repository)
 {
-    ygg::Index<formalism::UnaryFunctionExpression> out;
-    if (find_mapped(this->m_storage->unary_expressions, source, out)) return out;
     const auto& data = repository[source];
-    out = formalism::get_or_create<formalism::UnaryFunctionExpression>(this->m_storage->repository, data.op, this->self().copy(data.expression, repository)).get_index();
-    remember(this->m_storage->unary_expressions, source, out);
-    return out;
+    return formalism::get_or_create<formalism::UnaryFunctionExpression>(this->m_storage->repository, data.op, this->self().copy(data.expression, repository)).get_index();
 }
 
 template<typename Derived>
 ygg::Index<formalism::BinaryFunctionExpression> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::BinaryFunctionExpression> source, const formalism::Repository& repository)
 {
-    ygg::Index<formalism::BinaryFunctionExpression> out;
-    if (find_mapped(this->m_storage->binary_expressions, source, out)) return out;
     const auto& data = repository[source];
-    out = formalism::get_or_create<formalism::BinaryFunctionExpression>(this->m_storage->repository, data.op, this->self().copy(data.left, repository), this->self().copy(data.right, repository)).get_index();
-    remember(this->m_storage->binary_expressions, source, out);
-    return out;
+    return formalism::get_or_create<formalism::BinaryFunctionExpression>(this->m_storage->repository, data.op, this->self().copy(data.left, repository), this->self().copy(data.right, repository)).get_index();
 }
 
 template<typename Derived>
 ygg::Index<formalism::MultiFunctionExpression> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::MultiFunctionExpression> source, const formalism::Repository& repository)
 {
-    ygg::Index<formalism::MultiFunctionExpression> out;
-    if (find_mapped(this->m_storage->multi_expressions, source, out)) return out;
     const auto& data = repository[source];
-    out = formalism::get_or_create<formalism::MultiFunctionExpression>(this->m_storage->repository, data.op, this->self().template copy_list<formalism::FunctionExpression>(data.expressions, repository)).get_index();
-    remember(this->m_storage->multi_expressions, source, out);
-    return out;
+    return formalism::get_or_create<formalism::MultiFunctionExpression>(this->m_storage->repository, data.op, this->self().template copy_list<formalism::FunctionExpression>(data.expressions, repository)).get_index();
 }
 
 template<typename Derived>
 ygg::Index<formalism::FunctionExpression> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::FunctionExpression> source, const formalism::Repository& repository)
 {
-    ygg::Index<formalism::FunctionExpression> out;
-    if (find_mapped(this->m_storage->function_expressions, source, out)) return out;
     auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::FunctionExpression>::Variant { return ygg::Data<formalism::FunctionExpression>::Variant(this->self().copy(arg, repository)); }, repository[source].value);
-    out = formalism::get_or_create<formalism::FunctionExpression>(this->m_storage->repository, std::move(value)).get_index();
-    remember(this->m_storage->function_expressions, source, out);
-    return out;
+    return formalism::get_or_create<formalism::FunctionExpression>(this->m_storage->repository, std::move(value)).get_index();
 }
 
 } // namespace loki::semantic::detail

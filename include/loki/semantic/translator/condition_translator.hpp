@@ -104,7 +104,7 @@ ygg::Index<formalism::ConditionNumericConstraint> ConditionTranslator<Derived>::
 template<typename Derived>
 ygg::Index<formalism::Condition> ConditionTranslator<Derived>::copy(ygg::Index<formalism::Condition> source, const formalism::Repository& repository)
 {
-    return this->self().to_dnf(std::visit([&](const auto& arg) { return this->self().copy_condition_node(arg, repository); }, repository[source].value));
+    return this->self().flatten_condition(this->self().to_dnf(std::visit([&](const auto& arg) { return this->self().copy_condition_node(arg, repository); }, repository[source].value)));
 }
 
 } // namespace loki::semantic::detail

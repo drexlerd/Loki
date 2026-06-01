@@ -88,6 +88,7 @@ public:
 
     using ConditionBuilderTranslator<CopyTranslator>::wrap_condition;
     using ConditionBuilderTranslator<CopyTranslator>::as_or;
+    using ConditionBuilderTranslator<CopyTranslator>::flatten_condition;
     using ConditionBuilderTranslator<CopyTranslator>::make_conjunction;
     using ConditionBuilderTranslator<CopyTranslator>::make_disjunction;
 

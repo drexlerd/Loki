@@ -56,7 +56,7 @@ ygg::Index<formalism::Condition> GoalSimplificationTranslator<Derived>::simplify
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto child : this->m_storage->repository[node].conditions)
         conditions.push_back(this->self().simplify_goal_condition(child));
-    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionAnd>(this->m_storage->repository, std::move(conditions)).get_index());
+    return this->self().make_conjunction(std::move(conditions));
 }
 
 template<typename Derived>

@@ -104,10 +104,10 @@ ygg::Index<formalism::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(yg
     {
         auto parts = ygg::IndexList<formalism::Condition> {};
         for (auto nested : this->m_storage->repository[*child_or].conditions)
-            parts.push_back(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, data.parameters, nested).get_index()));
+            parts.push_back(this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, data.parameters, nested).get_index())));
         return this->self().to_dnf(this->self().make_disjunction(std::move(parts)));
     }
-    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, data.parameters, child).get_index());
+    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, data.parameters, child).get_index()));
 }
 
 template<typename Derived>
