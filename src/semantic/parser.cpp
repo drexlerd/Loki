@@ -749,7 +749,12 @@ ygg::IndexList<formalism::Type> Parser::parse_type_expression_node(const ast::Ty
     else if (m_options.strict)
         throw_at(node.name, UndefinedTypeError(k));
     else
-        result.push_back(intern_type(k, {}));
+    {
+        auto bases = ygg::IndexList<formalism::Type> {};
+        if (k != "object" && k != "number")
+            bases.push_back(m_object_type);
+        result.push_back(intern_type(k, std::move(bases)));
+    }
     return result;
 }
 

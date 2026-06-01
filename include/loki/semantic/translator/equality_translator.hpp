@@ -7,6 +7,8 @@
 
 #include "loki/semantic/translator/copy_translator_component.hpp"
 
+#include <algorithm>
+
 namespace loki::semantic::detail
 {
 
@@ -22,6 +24,8 @@ public:
     ygg::Index<formalism::Literal> equality_literal(ygg::Index<formalism::Predicate> predicate, ygg::Index<formalism::Object> object);
     bool reflexive_equality_object_name(ygg::Index<formalism::Literal> literal, std::string& name) const;
     void compact_reflexive_equalities(ygg::Data<formalism::Task>& task) const;
+    bool domain_uses_equality() const;
+    void add_equality_predicate_to_domain(ygg::Data<formalism::Domain>& domain);
     void initialize_equality(ygg::Data<formalism::Task>& task);
 };
 
@@ -40,7 +44,7 @@ bool EqualityTranslator<Derived>::equality_required(const ygg::Data<formalism::T
     if (this->self().has_requirement(task.requirements, formalism::RequirementKind::Equality))
         return true;
     const auto& domain = this->m_storage->repository[this->m_storage->translated_domain];
-    return this->self().has_requirement(domain.requirements, formalism::RequirementKind::Equality);
+    return this->self().has_requirement(domain.requirements, formalism::RequirementKind::Equality) || this->self().domain_uses_equality();
 }
 
 template<typename Derived>
@@ -134,6 +138,64 @@ void EqualityTranslator<Derived>::compact_reflexive_equalities(ygg::Data<formali
         compacted.push_back(literal);
     }
     task.initial_literals = std::move(compacted);
+}
+
+template<typename Derived>
+bool EqualityTranslator<Derived>::domain_uses_equality() const
+{
+    for (ygg::uint_t i = 0; i < this->m_storage->repository.template size<formalism::Predicate>(); ++i)
+    {
+        if (std::string(this->m_storage->repository[ygg::Index<formalism::Predicate>(i)].name) == "=")
+            return true;
+    }
+    return false;
+}
+
+template<typename Derived>
+void EqualityTranslator<Derived>::add_equality_predicate_to_domain(ygg::Data<formalism::Domain>& domain)
+{
+    if (!this->self().has_requirement(domain.requirements, formalism::RequirementKind::Equality) && !this->self().domain_uses_equality())
+        return;
+
+    for (auto predicate : domain.predicates)
+    {
+        if (std::string(this->m_storage->repository[predicate].name) == "=")
+        {
+            this->m_equality_predicate = predicate;
+            return;
+        }
+    }
+
+    for (ygg::uint_t i = 0; i < this->m_storage->repository.template size<formalism::Predicate>(); ++i)
+    {
+        const auto predicate = ygg::Index<formalism::Predicate>(i);
+        if (std::string(this->m_storage->repository[predicate].name) == "=")
+        {
+            domain.predicates.push_back(predicate);
+            this->m_equality_predicate = predicate;
+            return;
+        }
+    }
+
+    auto object_types = ygg::IndexList<formalism::Type> {};
+    for (auto type : domain.types)
+    {
+        if (std::string(this->m_storage->repository[type].name) == "object")
+        {
+            object_types.push_back(type);
+            break;
+        }
+    }
+
+    auto parameters = ygg::IndexList<formalism::Parameter> {};
+    const auto left = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("lhs")).get_index();
+    const auto right = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("rhs")).get_index();
+    parameters.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, left, object_types).get_index());
+    parameters.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, right, std::move(object_types)).get_index());
+
+    const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, cista::offset::string("="), std::move(parameters)).get_index();
+    domain.predicates.push_back(predicate);
+    this->m_equality_predicate = predicate;
 }
 
 template<typename Derived>

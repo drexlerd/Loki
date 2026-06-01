@@ -101,6 +101,7 @@ formalism::DomainView CopyTranslatorFacade<Derived>::copy_domain(formalism::Doma
     data.actions = this->self().split_disjunctive_actions(this->self().template copy_list<formalism::Action>(data.actions, domain.get_context()));
     data.axioms = this->self().split_disjunctive_axioms(this->self().template copy_list<formalism::Axiom>(data.axioms, domain.get_context()));
     this->self().add_type_predicates_to_domain(data);
+    this->self().add_equality_predicate_to_domain(data);
     this->self().append_generated_domain_objects(data);
     auto view = formalism::get_or_create<formalism::Domain>(this->m_storage->repository, std::move(data));
     this->m_storage->translated_domain = view.get_index();

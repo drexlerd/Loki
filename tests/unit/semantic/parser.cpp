@@ -758,6 +758,7 @@ TEST(LokiSemanticTranslator, AddsTypePredicatesAndRemovesTypingByDefault)
     const auto& repository = translated_domain.get_context();
 
     EXPECT_TRUE(has_predicate_named(translated_domain, "thing"));
+    EXPECT_TRUE(has_predicate_named(translated_domain, "object"));
     EXPECT_FALSE(has_requirement_kind(translated_domain.get_data().requirements, formalism::RequirementKind::Typing, repository));
     EXPECT_TRUE(translated_domain.get_data().types.empty());
     ASSERT_EQ(translated_domain.get_data().actions.size(), 1);
@@ -771,6 +772,35 @@ TEST(LokiSemanticTranslator, AddsTypePredicatesAndRemovesTypingByDefault)
     const auto translated_task_result = semantic::translate(task, translation);
     const auto translated_task = translated_task_result.get_translated_task();
     EXPECT_GE(count_initial_literals_for_predicate(translated_task.get_data().initial_literals, translated_task.get_context(), "thing"), 2);
+    EXPECT_GE(count_initial_literals_for_predicate(translated_task.get_data().initial_literals, translated_task.get_context(), "object"), 2);
+}
+
+TEST(LokiSemanticTranslator, AddsEqualityPredicateWhenAdlDomainUsesEquality)
+{
+    const auto domain_source = std::string {
+        "(define (domain adl-equality)"
+        "(:requirements :adl)"
+        "(:predicates (p ?x))"
+        "(:action a :parameters (?x) "
+        ":precondition (= ?x ?x) "
+        ":effect (p ?x))"
+        ")" };
+    const auto task_source = std::string {
+        "(define (problem adl-equality-problem) (:domain adl-equality)"
+        "(:objects o)"
+        "(:init)"
+        "(:goal (p o))"
+        ")" };
+
+    semantic::Parser parser(domain_source);
+    const auto translation = semantic::translate(parser.get_domain());
+    EXPECT_TRUE(has_equality_predicate(translation.get_translated_domain()));
+
+    const auto translated_result = semantic::translate(parser.parse_task(task_source), translation);
+    const auto translated = translated_result.get_translated_task();
+    EXPECT_TRUE(has_equality_predicate(translated.get_domain()));
+    EXPECT_EQ(count_equality_literals(translated.get_data().initial_literals, translated.get_context()),
+              count_unique_object_names(translation.get_translated_domain(), translated));
 }
 
 TEST(LokiSemanticTranslator, InitializesEqualityForConstantsAndTaskObjects)
@@ -794,6 +824,8 @@ TEST(LokiSemanticTranslator, InitializesEqualityForConstantsAndTaskObjects)
 
     const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
+    EXPECT_TRUE(has_equality_predicate(translation.get_translated_domain()));
+
     const auto task = parser.parse_task(task_source);
     const auto translated_result = semantic::translate(task, translation);
     const auto translated = translated_result.get_translated_task();

@@ -119,6 +119,8 @@ public:
     using EqualityTranslator<CopyTranslator>::equality_literal;
     using EqualityTranslator<CopyTranslator>::reflexive_equality_object_name;
     using EqualityTranslator<CopyTranslator>::compact_reflexive_equalities;
+    using EqualityTranslator<CopyTranslator>::domain_uses_equality;
+    using EqualityTranslator<CopyTranslator>::add_equality_predicate_to_domain;
     using EqualityTranslator<CopyTranslator>::initialize_equality;
 
     using EffectNormalFormTranslator<CopyTranslator>::wrap_effect;
