@@ -1,0 +1,161 @@
+{
+    "cases": [
+        {
+            "name": "strict undefined predicate",
+            "entry": "domain",
+            "strict": true,
+            "domain": [
+                "(define (domain strict-undefined)",
+                "  (:predicates)",
+                "  (:action a :parameters () :precondition (missing) :effect (and))",
+                ")"
+            ]
+        },
+        {
+            "name": "duplicate predicate",
+            "entry": "domain",
+            "domain": [
+                "(define (domain duplicate-predicate)",
+                "  (:predicates (p) (p))",
+                ")"
+            ]
+        },
+        {
+            "name": "duplicate action",
+            "entry": "domain",
+            "domain": [
+                "(define (domain duplicate-action)",
+                "  (:predicates)",
+                "  (:action a :parameters () :effect (and))",
+                "  (:action a :parameters () :effect (and))",
+                ")"
+            ]
+        },
+        {
+            "name": "strict missing disjunction requirement",
+            "entry": "domain",
+            "strict": true,
+            "domain": [
+                "(define (domain missing-disjunction-requirement)",
+                "  (:predicates (p) (q))",
+                "  (:action a :parameters () :precondition (or (p) (q)) :effect (and))",
+                ")"
+            ]
+        },
+        {
+            "name": "strict missing equality requirement",
+            "entry": "domain",
+            "strict": true,
+            "domain": [
+                "(define (domain missing-equality-requirement)",
+                "  (:predicates)",
+                "  (:action a :parameters (?x ?y) :precondition (= ?x ?y) :effect (and))",
+                ")"
+            ]
+        },
+        {
+            "name": "invalid equality arity",
+            "entry": "domain",
+            "domain": [
+                "(define (domain invalid-equality)",
+                "  (:requirements :equality)",
+                "  (:predicates)",
+                "  (:action a :parameters (?x ?y ?z) :precondition (= ?x ?y ?z) :effect (and))",
+                ")"
+            ]
+        },
+        {
+            "name": "strict predicate type mismatch",
+            "entry": "domain",
+            "strict": true,
+            "domain": [
+                "(define (domain predicate-type-mismatch)",
+                "  (:requirements :typing)",
+                "  (:types room ball)",
+                "  (:constants b - ball)",
+                "  (:predicates (at ?r - room))",
+                "  (:action a :parameters () :precondition (at b) :effect (and))",
+                ")"
+            ]
+        },
+        {
+            "name": "invalid metric optimization",
+            "entry": "task",
+            "domain": [
+                "(define (domain metric-domain)",
+                "  (:requirements :numeric-fluents)",
+                "  (:predicates)",
+                "  (:functions (total-cost))",
+                ")"
+            ],
+            "task": [
+                "(define (problem metric-task)",
+                "  (:domain metric-domain)",
+                "  (:init)",
+                "  (:metric smallest (total-cost))",
+                ")"
+            ]
+        },
+        {
+            "name": "invalid numeric effect operator",
+            "entry": "domain",
+            "domain": [
+                "(define (domain invalid-numeric-effect)",
+                "  (:requirements :numeric-fluents)",
+                "  (:predicates)",
+                "  (:functions (total-cost))",
+                "  (:action a :parameters () :effect (= (total-cost) 1))",
+                ")"
+            ]
+        },
+        {
+            "name": "invalid numeric constraint comparator",
+            "entry": "domain",
+            "domain": [
+                "(define (domain invalid-numeric-constraint)",
+                "  (:requirements :numeric-fluents)",
+                "  (:predicates)",
+                "  (:functions (total-cost))",
+                "  (:action a :parameters () :precondition (assign (total-cost) 1) :effect (and))",
+                ")"
+            ]
+        },
+        {
+            "name": "probability out of range",
+            "entry": "domain",
+            "domain": [
+                "(define (domain invalid-probability)",
+                "  (:requirements :probabilistic-effects)",
+                "  (:predicates (p))",
+                "  (:action a :parameters () :effect (probabilistic 1.2 (p)))",
+                ")"
+            ]
+        },
+        {
+            "name": "probability total above one",
+            "entry": "domain",
+            "domain": [
+                "(define (domain invalid-probability-total)",
+                "  (:requirements :probabilistic-effects)",
+                "  (:predicates (p) (q))",
+                "  (:action a :parameters () :effect (probabilistic 0.7 (p) 0.6 (q)))",
+                ")"
+            ]
+        },
+        {
+            "name": "mismatched task domain",
+            "entry": "task",
+            "domain": [
+                "(define (domain expected-domain)",
+                "  (:predicates)",
+                ")"
+            ],
+            "task": [
+                "(define (problem wrong-domain-task)",
+                "  (:domain other-domain)",
+                "  (:init)",
+                ")"
+            ]
+        }
+    ]
+}

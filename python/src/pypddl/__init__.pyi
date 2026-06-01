@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ._pypddl import *
+from . import formalism as formalism
 
 __version__: str
 

@@ -16,32 +16,32 @@ class ConditionDnfTranslator : public CopyTranslatorComponent<Derived, Condition
 public:
     explicit ConditionDnfTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, ConditionDnfTranslator<Derived>>(context) {}
 
-    ygg::Index<pddl::Condition> to_dnf(ygg::Index<pddl::Condition> condition);
-    ygg::Index<pddl::Condition> to_dnf_node(ygg::Index<pddl::Condition> condition, ygg::Index<pddl::ConditionLiteral>);
-    ygg::Index<pddl::Condition> to_dnf_node(ygg::Index<pddl::Condition> condition, ygg::Index<pddl::ConditionNumericConstraint>);
-    ygg::Index<pddl::Condition> to_dnf_node(ygg::Index<pddl::Condition>, ygg::Index<pddl::ConditionOr> node);
-    ygg::Index<pddl::Condition> to_dnf_node(ygg::Index<pddl::Condition>, ygg::Index<pddl::ConditionAnd> node);
-    ygg::Index<pddl::Condition> to_dnf_node(ygg::Index<pddl::Condition>, ygg::Index<pddl::ConditionExists> node);
+    ygg::Index<formalism::Condition> to_dnf(ygg::Index<formalism::Condition> condition);
+    ygg::Index<formalism::Condition> to_dnf_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionLiteral>);
+    ygg::Index<formalism::Condition> to_dnf_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionNumericConstraint>);
+    ygg::Index<formalism::Condition> to_dnf_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionOr> node);
+    ygg::Index<formalism::Condition> to_dnf_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionAnd> node);
+    ygg::Index<formalism::Condition> to_dnf_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionExists> node);
     template<typename T>
-    ygg::Index<pddl::Condition> to_dnf_node(ygg::Index<pddl::Condition> condition, ygg::Index<T>);
+    ygg::Index<formalism::Condition> to_dnf_node(ygg::Index<formalism::Condition> condition, ygg::Index<T>);
 };
 
 template<typename Derived>
-ygg::Index<pddl::Condition> ConditionDnfTranslator<Derived>::to_dnf(ygg::Index<pddl::Condition> condition)
+ygg::Index<formalism::Condition> ConditionDnfTranslator<Derived>::to_dnf(ygg::Index<formalism::Condition> condition)
 {
     return std::visit([&](const auto& node) { return this->self().to_dnf_node(condition, node); }, this->m_storage->repository[condition].value);
 }
 
 template<typename Derived>
-ygg::Index<pddl::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index<pddl::Condition> condition, ygg::Index<pddl::ConditionLiteral>) { return condition; }
+ygg::Index<formalism::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionLiteral>) { return condition; }
 
 template<typename Derived>
-ygg::Index<pddl::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index<pddl::Condition> condition, ygg::Index<pddl::ConditionNumericConstraint>) { return condition; }
+ygg::Index<formalism::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionNumericConstraint>) { return condition; }
 
 template<typename Derived>
-ygg::Index<pddl::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index<pddl::Condition>, ygg::Index<pddl::ConditionOr> node)
+ygg::Index<formalism::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionOr> node)
 {
-    auto parts = ygg::IndexList<pddl::Condition> {};
+    auto parts = ygg::IndexList<formalism::Condition> {};
     for (auto child : this->m_storage->repository[node].conditions)
     {
         const auto dnf = this->self().to_dnf(child);
@@ -59,13 +59,13 @@ ygg::Index<pddl::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::In
 }
 
 template<typename Derived>
-ygg::Index<pddl::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index<pddl::Condition>, ygg::Index<pddl::ConditionAnd> node)
+ygg::Index<formalism::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionAnd> node)
 {
-    auto combinations = std::vector<ygg::IndexList<pddl::Condition>> { ygg::IndexList<pddl::Condition> {} };
+    auto combinations = std::vector<ygg::IndexList<formalism::Condition>> { ygg::IndexList<formalism::Condition> {} };
     for (auto child : this->m_storage->repository[node].conditions)
     {
         const auto dnf = this->self().to_dnf(child);
-        auto alternatives = ygg::IndexList<pddl::Condition> {};
+        auto alternatives = ygg::IndexList<formalism::Condition> {};
         if (const auto child_or = this->self().as_or(dnf))
         {
             for (auto nested : this->m_storage->repository[*child_or].conditions)
@@ -75,7 +75,7 @@ ygg::Index<pddl::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::In
         {
             alternatives.push_back(dnf);
         }
-        auto next = std::vector<ygg::IndexList<pddl::Condition>> {};
+        auto next = std::vector<ygg::IndexList<formalism::Condition>> {};
         for (const auto& combination : combinations)
         {
             for (auto alternative : alternatives)
@@ -89,30 +89,30 @@ ygg::Index<pddl::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::In
     }
     if (combinations.size() == 1)
         return this->self().make_conjunction(std::move(combinations.front()));
-    auto disjuncts = ygg::IndexList<pddl::Condition> {};
+    auto disjuncts = ygg::IndexList<formalism::Condition> {};
     for (auto& combination : combinations)
         disjuncts.push_back(this->self().make_conjunction(std::move(combination)));
     return this->self().make_disjunction(std::move(disjuncts));
 }
 
 template<typename Derived>
-ygg::Index<pddl::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index<pddl::Condition>, ygg::Index<pddl::ConditionExists> node)
+ygg::Index<formalism::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionExists> node)
 {
     const auto& data = this->m_storage->repository[node];
     const auto child = this->self().to_dnf(data.condition);
     if (const auto child_or = this->self().as_or(child))
     {
-        auto parts = ygg::IndexList<pddl::Condition> {};
+        auto parts = ygg::IndexList<formalism::Condition> {};
         for (auto nested : this->m_storage->repository[*child_or].conditions)
-            parts.push_back(this->self().wrap_condition(pddl::get_or_create<pddl::ConditionExists>(this->m_storage->repository, data.parameters, nested).get_index()));
+            parts.push_back(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, data.parameters, nested).get_index()));
         return this->self().to_dnf(this->self().make_disjunction(std::move(parts)));
     }
-    return this->self().wrap_condition(pddl::get_or_create<pddl::ConditionExists>(this->m_storage->repository, data.parameters, child).get_index());
+    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, data.parameters, child).get_index());
 }
 
 template<typename Derived>
 template<typename T>
-ygg::Index<pddl::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index<pddl::Condition> condition, ygg::Index<T>)
+ygg::Index<formalism::Condition> ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index<formalism::Condition> condition, ygg::Index<T>)
 {
     return condition;
 }

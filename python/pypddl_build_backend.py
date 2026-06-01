@@ -16,6 +16,14 @@ from scikit_build_core import build as scikit_build
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
 
+def _patch_stub_text(text: str) -> str:
+    import re
+
+    text = text.replace("pypddl._pypddl.", "pypddl.")
+    text = text.replace("pypddl._pypddl", "pypddl")
+    return re.sub(r"def __eq__\(self, arg: [^,\n]+, /\) -> bool", "def __eq__(self, arg: object, /) -> bool", text)
+
+
 def _num_jobs() -> int:
     return int(os.environ.get("PYPDDL_JOBS", "8"))
 
@@ -158,10 +166,7 @@ def _fix_wheel_stubs(wheel_path: Path) -> None:
                 return
 
             target.parent.mkdir(parents=True, exist_ok=True)
-            text = path.read_text(encoding="utf-8")
-            text = text.replace("pypddl._pypddl.", "pypddl.")
-            text = text.replace("pypddl._pypddl", "pypddl")
-            target.write_text(text, encoding="utf-8")
+            target.write_text(_patch_stub_text(path.read_text(encoding="utf-8")), encoding="utf-8")
 
         private_stub_root = wheel_root / "pypddl" / "_pypddl"
         if private_stub_root.is_dir():
@@ -169,6 +174,9 @@ def _fix_wheel_stubs(wheel_path: Path) -> None:
             for path in sorted(private_stub_root.rglob("*.pyi")):
                 install_stub(path, public_stub_root / path.relative_to(private_stub_root))
             shutil.rmtree(private_stub_root)
+
+        for path in sorted(wheel_root.rglob("*.pyi")):
+            path.write_text(_patch_stub_text(path.read_text(encoding="utf-8")), encoding="utf-8")
 
         _rewrite_record(wheel_root)
 

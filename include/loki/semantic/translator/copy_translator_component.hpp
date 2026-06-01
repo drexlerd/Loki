@@ -36,13 +36,13 @@ protected:
     CopyContext& m_context;
     std::shared_ptr<TranslationStorage>& m_storage;
     std::unordered_map<ygg::uint_t, size_t>& m_num_quantifications;
-    std::vector<ygg::IndexList<pddl::Parameter>>& m_active_parameters;
-    ygg::IndexList<pddl::Predicate>& m_generated_predicates;
-    ygg::IndexList<pddl::Axiom>& m_generated_axioms;
+    std::vector<ygg::IndexList<formalism::Parameter>>& m_active_parameters;
+    ygg::IndexList<formalism::Predicate>& m_generated_predicates;
+    ygg::IndexList<formalism::Axiom>& m_generated_axioms;
     size_t& m_num_generated_axioms;
     bool& m_append_generated_axioms_to_domain;
-    cista::optional<ygg::Index<pddl::Predicate>>& m_equality_predicate;
-    std::unordered_map<ygg::uint_t, ygg::Index<pddl::Predicate>>& m_type_predicates;
+    cista::optional<ygg::Index<formalism::Predicate>>& m_equality_predicate;
+    std::unordered_map<ygg::uint_t, ygg::Index<formalism::Predicate>>& m_type_predicates;
     bool& m_remove_typing;
     bool& m_renaming_enabled;
 };

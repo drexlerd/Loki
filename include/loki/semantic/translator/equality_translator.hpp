@@ -16,17 +16,17 @@ class EqualityTranslator : public CopyTranslatorComponent<Derived, EqualityTrans
 public:
     explicit EqualityTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, EqualityTranslator<Derived>>(context) {}
 
-    bool has_requirement(const ygg::IndexList<pddl::Requirement>& requirements, pddl::RequirementKind kind) const;
-    bool equality_required(const ygg::Data<pddl::Task>& task) const;
-    ygg::Index<pddl::Predicate> ensure_equality_predicate();
-    ygg::Index<pddl::Literal> equality_literal(ygg::Index<pddl::Predicate> predicate, ygg::Index<pddl::Object> object);
-    bool reflexive_equality_object_name(ygg::Index<pddl::Literal> literal, std::string& name) const;
-    void compact_reflexive_equalities(ygg::Data<pddl::Task>& task) const;
-    void initialize_equality(ygg::Data<pddl::Task>& task);
+    bool has_requirement(const ygg::IndexList<formalism::Requirement>& requirements, formalism::RequirementKind kind) const;
+    bool equality_required(const ygg::Data<formalism::Task>& task) const;
+    ygg::Index<formalism::Predicate> ensure_equality_predicate();
+    ygg::Index<formalism::Literal> equality_literal(ygg::Index<formalism::Predicate> predicate, ygg::Index<formalism::Object> object);
+    bool reflexive_equality_object_name(ygg::Index<formalism::Literal> literal, std::string& name) const;
+    void compact_reflexive_equalities(ygg::Data<formalism::Task>& task) const;
+    void initialize_equality(ygg::Data<formalism::Task>& task);
 };
 
 template<typename Derived>
-bool EqualityTranslator<Derived>::has_requirement(const ygg::IndexList<pddl::Requirement>& requirements, pddl::RequirementKind kind) const
+bool EqualityTranslator<Derived>::has_requirement(const ygg::IndexList<formalism::Requirement>& requirements, formalism::RequirementKind kind) const
 {
     for (auto requirement : requirements)
         if (this->m_storage->repository[requirement].kind == kind)
@@ -35,16 +35,16 @@ bool EqualityTranslator<Derived>::has_requirement(const ygg::IndexList<pddl::Req
 }
 
 template<typename Derived>
-bool EqualityTranslator<Derived>::equality_required(const ygg::Data<pddl::Task>& task) const
+bool EqualityTranslator<Derived>::equality_required(const ygg::Data<formalism::Task>& task) const
 {
-    if (this->self().has_requirement(task.requirements, pddl::RequirementKind::Equality))
+    if (this->self().has_requirement(task.requirements, formalism::RequirementKind::Equality))
         return true;
     const auto& domain = this->m_storage->repository[this->m_storage->translated_domain];
-    return this->self().has_requirement(domain.requirements, pddl::RequirementKind::Equality);
+    return this->self().has_requirement(domain.requirements, formalism::RequirementKind::Equality);
 }
 
 template<typename Derived>
-ygg::Index<pddl::Predicate> EqualityTranslator<Derived>::ensure_equality_predicate()
+ygg::Index<formalism::Predicate> EqualityTranslator<Derived>::ensure_equality_predicate()
 {
     if (this->m_equality_predicate)
         return *this->m_equality_predicate;
@@ -57,8 +57,8 @@ ygg::Index<pddl::Predicate> EqualityTranslator<Derived>::ensure_equality_predica
             return predicate;
         }
     }
-    auto parameters = ygg::IndexList<pddl::Parameter> {};
-    auto types = ygg::IndexList<pddl::Type> {};
+    auto parameters = ygg::IndexList<formalism::Parameter> {};
+    auto types = ygg::IndexList<formalism::Type> {};
     for (auto type : domain.types)
     {
         if (std::string(this->m_storage->repository[type].name) == "object")
@@ -67,30 +67,30 @@ ygg::Index<pddl::Predicate> EqualityTranslator<Derived>::ensure_equality_predica
             break;
         }
     }
-    const auto left = pddl::get_or_create<pddl::Variable>(this->m_storage->repository, cista::offset::string("lhs")).get_index();
-    const auto right = pddl::get_or_create<pddl::Variable>(this->m_storage->repository, cista::offset::string("rhs")).get_index();
-    parameters.push_back(pddl::get_or_create<pddl::Parameter>(this->m_storage->repository, left, types).get_index());
-    parameters.push_back(pddl::get_or_create<pddl::Parameter>(this->m_storage->repository, right, types).get_index());
-    const auto predicate = pddl::get_or_create<pddl::Predicate>(this->m_storage->repository, cista::offset::string("="), std::move(parameters)).get_index();
+    const auto left = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("lhs")).get_index();
+    const auto right = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("rhs")).get_index();
+    parameters.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, left, types).get_index());
+    parameters.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, right, types).get_index());
+    const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, cista::offset::string("="), std::move(parameters)).get_index();
     domain.predicates.push_back(predicate);
-    this->m_storage->translated_domain = pddl::get_or_create<pddl::Domain>(this->m_storage->repository, std::move(domain)).get_index();
+    this->m_storage->translated_domain = formalism::get_or_create<formalism::Domain>(this->m_storage->repository, std::move(domain)).get_index();
     this->m_equality_predicate = predicate;
     return predicate;
 }
 
 template<typename Derived>
-ygg::Index<pddl::Literal> EqualityTranslator<Derived>::equality_literal(ygg::Index<pddl::Predicate> predicate, ygg::Index<pddl::Object> object)
+ygg::Index<formalism::Literal> EqualityTranslator<Derived>::equality_literal(ygg::Index<formalism::Predicate> predicate, ygg::Index<formalism::Object> object)
 {
-    auto terms = ygg::IndexList<pddl::Term> {};
-    const auto term = pddl::get_or_create<pddl::Term>(this->m_storage->repository, ygg::Data<pddl::Term>::Variant(object)).get_index();
+    auto terms = ygg::IndexList<formalism::Term> {};
+    const auto term = formalism::get_or_create<formalism::Term>(this->m_storage->repository, ygg::Data<formalism::Term>::Variant(object)).get_index();
     terms.push_back(term);
     terms.push_back(term);
-    const auto atom = pddl::get_or_create<pddl::Atom>(this->m_storage->repository, predicate, std::move(terms)).get_index();
-    return pddl::get_or_create<pddl::Literal>(this->m_storage->repository, true, atom).get_index();
+    const auto atom = formalism::get_or_create<formalism::Atom>(this->m_storage->repository, predicate, std::move(terms)).get_index();
+    return formalism::get_or_create<formalism::Literal>(this->m_storage->repository, true, atom).get_index();
 }
 
 template<typename Derived>
-bool EqualityTranslator<Derived>::reflexive_equality_object_name(ygg::Index<pddl::Literal> literal, std::string& name) const
+bool EqualityTranslator<Derived>::reflexive_equality_object_name(ygg::Index<formalism::Literal> literal, std::string& name) const
 {
     const auto& literal_data = this->m_storage->repository[literal];
     if (!literal_data.positive)
@@ -103,13 +103,13 @@ bool EqualityTranslator<Derived>::reflexive_equality_object_name(ygg::Index<pddl
     std::visit([&](const auto& value)
     {
         using Value = std::decay_t<decltype(value)>;
-        if constexpr (std::is_same_v<Value, ygg::Index<pddl::Object>>)
+        if constexpr (std::is_same_v<Value, ygg::Index<formalism::Object>>)
             left_name = std::string(this->m_storage->repository[value].name);
     }, this->m_storage->repository[atom.terms[0]].value);
     std::visit([&](const auto& value)
     {
         using Value = std::decay_t<decltype(value)>;
-        if constexpr (std::is_same_v<Value, ygg::Index<pddl::Object>>)
+        if constexpr (std::is_same_v<Value, ygg::Index<formalism::Object>>)
             right_name = std::string(this->m_storage->repository[value].name);
     }, this->m_storage->repository[atom.terms[1]].value);
     if (left_name.empty() || left_name != right_name)
@@ -119,10 +119,10 @@ bool EqualityTranslator<Derived>::reflexive_equality_object_name(ygg::Index<pddl
 }
 
 template<typename Derived>
-void EqualityTranslator<Derived>::compact_reflexive_equalities(ygg::Data<pddl::Task>& task) const
+void EqualityTranslator<Derived>::compact_reflexive_equalities(ygg::Data<formalism::Task>& task) const
 {
     auto seen = std::unordered_set<std::string> {};
-    auto compacted = ygg::IndexList<pddl::Literal> {};
+    auto compacted = ygg::IndexList<formalism::Literal> {};
     for (auto literal : task.initial_literals)
     {
         auto name = std::string {};
@@ -137,7 +137,7 @@ void EqualityTranslator<Derived>::compact_reflexive_equalities(ygg::Data<pddl::T
 }
 
 template<typename Derived>
-void EqualityTranslator<Derived>::initialize_equality(ygg::Data<pddl::Task>& task)
+void EqualityTranslator<Derived>::initialize_equality(ygg::Data<formalism::Task>& task)
 {
     if (!this->self().equality_required(task))
         return;
@@ -157,19 +157,19 @@ void EqualityTranslator<Derived>::initialize_equality(ygg::Data<pddl::Task>& tas
         std::visit([&](const auto& value)
         {
             using Value = std::decay_t<decltype(value)>;
-            if constexpr (std::is_same_v<Value, ygg::Index<pddl::Object>>)
+            if constexpr (std::is_same_v<Value, ygg::Index<formalism::Object>>)
                 left_name = std::string(this->m_storage->repository[value].name);
         }, this->m_storage->repository[atom.terms[0]].value);
         std::visit([&](const auto& value)
         {
             using Value = std::decay_t<decltype(value)>;
-            if constexpr (std::is_same_v<Value, ygg::Index<pddl::Object>>)
+            if constexpr (std::is_same_v<Value, ygg::Index<formalism::Object>>)
                 right_name = std::string(this->m_storage->repository[value].name);
         }, this->m_storage->repository[atom.terms[1]].value);
         if (!left_name.empty() && left_name == right_name)
             seen.insert(left_name);
     }
-    auto add_object = [&](ygg::Index<pddl::Object> object)
+    auto add_object = [&](ygg::Index<formalism::Object> object)
     {
         if (seen.insert(std::string(this->m_storage->repository[object].name)).second)
             task.initial_literals.push_back(this->self().equality_literal(predicate, object));

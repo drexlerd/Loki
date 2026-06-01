@@ -16,26 +16,26 @@ class ConditionQuantifierTranslator : public CopyTranslatorComponent<Derived, Co
 public:
     explicit ConditionQuantifierTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, ConditionQuantifierTranslator<Derived>>(context) {}
 
-    ygg::Index<pddl::Condition> make_generated_axiom_condition(ygg::Index<pddl::Condition> condition);
-    cista::optional<ygg::Index<pddl::ConditionExists>> as_exists(ygg::Index<pddl::Condition> condition) const;
-    ygg::Index<pddl::Condition> move_existentials(ygg::Index<pddl::Condition> condition);
-    ygg::Index<pddl::Condition> move_existentials_node(ygg::Index<pddl::Condition> condition, ygg::Index<pddl::ConditionLiteral>);
-    ygg::Index<pddl::Condition> move_existentials_node(ygg::Index<pddl::Condition> condition, ygg::Index<pddl::ConditionNumericConstraint>);
-    ygg::Index<pddl::Condition> move_existentials_node(ygg::Index<pddl::Condition>, ygg::Index<pddl::ConditionAnd> node);
-    ygg::Index<pddl::Condition> move_existentials_node(ygg::Index<pddl::Condition>, ygg::Index<pddl::ConditionExists> node);
-    ygg::Index<pddl::Condition> move_existentials_node(ygg::Index<pddl::Condition>, ygg::Index<pddl::ConditionOr> node);
+    ygg::Index<formalism::Condition> make_generated_axiom_condition(ygg::Index<formalism::Condition> condition);
+    cista::optional<ygg::Index<formalism::ConditionExists>> as_exists(ygg::Index<formalism::Condition> condition) const;
+    ygg::Index<formalism::Condition> move_existentials(ygg::Index<formalism::Condition> condition);
+    ygg::Index<formalism::Condition> move_existentials_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionLiteral>);
+    ygg::Index<formalism::Condition> move_existentials_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionNumericConstraint>);
+    ygg::Index<formalism::Condition> move_existentials_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionAnd> node);
+    ygg::Index<formalism::Condition> move_existentials_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionExists> node);
+    ygg::Index<formalism::Condition> move_existentials_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionOr> node);
     template<typename T>
-    ygg::Index<pddl::Condition> move_existentials_node(ygg::Index<pddl::Condition> condition, ygg::Index<T>);
-    void lift_top_level_exists(ygg::IndexList<pddl::Parameter>& parameters, cista::optional<ygg::Index<pddl::Condition>>& condition);
-    void lift_top_level_exists(ygg::IndexList<pddl::Parameter>& parameters, ygg::Index<pddl::Condition>& condition);
+    ygg::Index<formalism::Condition> move_existentials_node(ygg::Index<formalism::Condition> condition, ygg::Index<T>);
+    void lift_top_level_exists(ygg::IndexList<formalism::Parameter>& parameters, cista::optional<ygg::Index<formalism::Condition>>& condition);
+    void lift_top_level_exists(ygg::IndexList<formalism::Parameter>& parameters, ygg::Index<formalism::Condition>& condition);
 };
 
 template<typename Derived>
-ygg::Index<pddl::Condition> ConditionQuantifierTranslator<Derived>::make_generated_axiom_condition(ygg::Index<pddl::Condition> condition)
+ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::make_generated_axiom_condition(ygg::Index<formalism::Condition> condition)
 {
     const auto free_parameters = this->self().free_parameters_in_scope(condition);
-    auto predicate_parameters = ygg::IndexList<pddl::Parameter> {};
-    auto terms = ygg::IndexList<pddl::Term> {};
+    auto predicate_parameters = ygg::IndexList<formalism::Parameter> {};
+    auto terms = ygg::IndexList<formalism::Term> {};
     for (auto parameter : free_parameters)
     {
         predicate_parameters.push_back(parameter);
@@ -43,46 +43,46 @@ ygg::Index<pddl::Condition> ConditionQuantifierTranslator<Derived>::make_generat
     }
 
     const auto name = cista::offset::string("_universal_" + std::to_string(this->m_num_generated_axioms++));
-    const auto predicate = pddl::get_or_create<pddl::Predicate>(this->m_storage->repository, name, predicate_parameters).get_index();
-    const auto atom = pddl::get_or_create<pddl::Atom>(this->m_storage->repository, predicate, terms).get_index();
-    const auto positive_head = pddl::get_or_create<pddl::Literal>(this->m_storage->repository, true, atom).get_index();
-    const auto negative_literal = pddl::get_or_create<pddl::Literal>(this->m_storage->repository, false, atom).get_index();
-    const auto axiom = pddl::get_or_create<pddl::Axiom>(this->m_storage->repository, free_parameters, positive_head, condition).get_index();
+    const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, name, predicate_parameters).get_index();
+    const auto atom = formalism::get_or_create<formalism::Atom>(this->m_storage->repository, predicate, terms).get_index();
+    const auto positive_head = formalism::get_or_create<formalism::Literal>(this->m_storage->repository, true, atom).get_index();
+    const auto negative_literal = formalism::get_or_create<formalism::Literal>(this->m_storage->repository, false, atom).get_index();
+    const auto axiom = formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, free_parameters, positive_head, condition).get_index();
     this->m_generated_predicates.push_back(predicate);
     this->m_generated_axioms.push_back(axiom);
-    return this->self().wrap_condition(pddl::get_or_create<pddl::ConditionLiteral>(this->m_storage->repository, negative_literal).get_index());
+    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, negative_literal).get_index());
 }
 
 template<typename Derived>
-cista::optional<ygg::Index<pddl::ConditionExists>> ConditionQuantifierTranslator<Derived>::as_exists(ygg::Index<pddl::Condition> condition) const
+cista::optional<ygg::Index<formalism::ConditionExists>> ConditionQuantifierTranslator<Derived>::as_exists(ygg::Index<formalism::Condition> condition) const
 {
-    auto result = cista::optional<ygg::Index<pddl::ConditionExists>> {};
+    auto result = cista::optional<ygg::Index<formalism::ConditionExists>> {};
     std::visit([&](const auto& node)
     {
         using Node = std::decay_t<decltype(node)>;
-        if constexpr (std::is_same_v<Node, ygg::Index<pddl::ConditionExists>>)
+        if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionExists>>)
             result = node;
     }, this->m_storage->repository[condition].value);
     return result;
 }
 
 template<typename Derived>
-ygg::Index<pddl::Condition> ConditionQuantifierTranslator<Derived>::move_existentials(ygg::Index<pddl::Condition> condition)
+ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::move_existentials(ygg::Index<formalism::Condition> condition)
 {
     return std::visit([&](const auto& node) { return this->self().move_existentials_node(condition, node); }, this->m_storage->repository[condition].value);
 }
 
 template<typename Derived>
-ygg::Index<pddl::Condition> ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<pddl::Condition> condition, ygg::Index<pddl::ConditionLiteral>) { return condition; }
+ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionLiteral>) { return condition; }
 
 template<typename Derived>
-ygg::Index<pddl::Condition> ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<pddl::Condition> condition, ygg::Index<pddl::ConditionNumericConstraint>) { return condition; }
+ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionNumericConstraint>) { return condition; }
 
 template<typename Derived>
-ygg::Index<pddl::Condition> ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<pddl::Condition>, ygg::Index<pddl::ConditionAnd> node)
+ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionAnd> node)
 {
-    auto parameters = ygg::IndexList<pddl::Parameter> {};
-    auto parts = ygg::IndexList<pddl::Condition> {};
+    auto parameters = ygg::IndexList<formalism::Parameter> {};
+    auto parts = ygg::IndexList<formalism::Condition> {};
     for (auto child : this->m_storage->repository[node].conditions)
     {
         const auto moved = this->self().move_existentials(child);
@@ -98,37 +98,37 @@ ygg::Index<pddl::Condition> ConditionQuantifierTranslator<Derived>::move_existen
             parts.push_back(moved);
         }
     }
-    auto conjunction = this->self().wrap_condition(pddl::get_or_create<pddl::ConditionAnd>(this->m_storage->repository, std::move(parts)).get_index());
+    auto conjunction = this->self().wrap_condition(formalism::get_or_create<formalism::ConditionAnd>(this->m_storage->repository, std::move(parts)).get_index());
     if (parameters.empty())
         return conjunction;
-    return this->self().wrap_condition(pddl::get_or_create<pddl::ConditionExists>(this->m_storage->repository, std::move(parameters), conjunction).get_index());
+    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), conjunction).get_index());
 }
 
 template<typename Derived>
-ygg::Index<pddl::Condition> ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<pddl::Condition>, ygg::Index<pddl::ConditionExists> node)
+ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionExists> node)
 {
     const auto& data = this->m_storage->repository[node];
-    return this->self().wrap_condition(pddl::get_or_create<pddl::ConditionExists>(this->m_storage->repository, data.parameters, this->self().move_existentials(data.condition)).get_index());
+    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, data.parameters, this->self().move_existentials(data.condition)).get_index());
 }
 
 template<typename Derived>
-ygg::Index<pddl::Condition> ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<pddl::Condition>, ygg::Index<pddl::ConditionOr> node)
+ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionOr> node)
 {
-    auto parts = ygg::IndexList<pddl::Condition> {};
+    auto parts = ygg::IndexList<formalism::Condition> {};
     for (auto child : this->m_storage->repository[node].conditions)
         parts.push_back(this->self().move_existentials(child));
-    return this->self().wrap_condition(pddl::get_or_create<pddl::ConditionOr>(this->m_storage->repository, std::move(parts)).get_index());
+    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionOr>(this->m_storage->repository, std::move(parts)).get_index());
 }
 
 template<typename Derived>
 template<typename T>
-ygg::Index<pddl::Condition> ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<pddl::Condition> condition, ygg::Index<T>)
+ygg::Index<formalism::Condition> ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition> condition, ygg::Index<T>)
 {
     return condition;
 }
 
 template<typename Derived>
-void ConditionQuantifierTranslator<Derived>::lift_top_level_exists(ygg::IndexList<pddl::Parameter>& parameters, cista::optional<ygg::Index<pddl::Condition>>& condition)
+void ConditionQuantifierTranslator<Derived>::lift_top_level_exists(ygg::IndexList<formalism::Parameter>& parameters, cista::optional<ygg::Index<formalism::Condition>>& condition)
 {
     if (!condition)
         return;
@@ -144,9 +144,9 @@ void ConditionQuantifierTranslator<Derived>::lift_top_level_exists(ygg::IndexLis
 }
 
 template<typename Derived>
-void ConditionQuantifierTranslator<Derived>::lift_top_level_exists(ygg::IndexList<pddl::Parameter>& parameters, ygg::Index<pddl::Condition>& condition)
+void ConditionQuantifierTranslator<Derived>::lift_top_level_exists(ygg::IndexList<formalism::Parameter>& parameters, ygg::Index<formalism::Condition>& condition)
 {
-    auto optional = cista::optional<ygg::Index<pddl::Condition>>(condition);
+    auto optional = cista::optional<ygg::Index<formalism::Condition>>(condition);
     this->self().lift_top_level_exists(parameters, optional);
     condition = *optional;
 }

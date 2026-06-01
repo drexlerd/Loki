@@ -14,13 +14,13 @@ struct CopyContext
 {
     std::shared_ptr<TranslationStorage> storage;
     std::unordered_map<ygg::uint_t, size_t> num_quantifications;
-    std::vector<ygg::IndexList<pddl::Parameter>> active_parameters;
-    ygg::IndexList<pddl::Predicate> generated_predicates;
-    ygg::IndexList<pddl::Axiom> generated_axioms;
+    std::vector<ygg::IndexList<formalism::Parameter>> active_parameters;
+    ygg::IndexList<formalism::Predicate> generated_predicates;
+    ygg::IndexList<formalism::Axiom> generated_axioms;
     size_t num_generated_axioms = 0;
     bool append_generated_axioms_to_domain = true;
-    cista::optional<ygg::Index<pddl::Predicate>> equality_predicate;
-    std::unordered_map<ygg::uint_t, ygg::Index<pddl::Predicate>> type_predicates;
+    cista::optional<ygg::Index<formalism::Predicate>> equality_predicate;
+    std::unordered_map<ygg::uint_t, ygg::Index<formalism::Predicate>> type_predicates;
     bool remove_typing = true;
     bool renaming_enabled = true;
 };

@@ -32,7 +32,7 @@ void compose_map(IndexMap<T>& out, const IndexMap<T>& source_to_middle, const In
     }
 }
 
-inline std::shared_ptr<TranslationStorage> canonicalize_domain_storage(pddl::DomainView original_domain, const std::shared_ptr<TranslationStorage>& middle)
+inline std::shared_ptr<TranslationStorage> canonicalize_domain_storage(formalism::DomainView original_domain, const std::shared_ptr<TranslationStorage>& middle)
 {
     auto canonical = std::make_shared<TranslationStorage>(middle->repository.get_index());
     auto copier = CanonicalCopyTranslator(canonical);
@@ -126,7 +126,7 @@ inline std::shared_ptr<TranslationStorage> canonicalize_domain_storage(pddl::Dom
     canonical->object_types_by_name.clear();
     for (const auto& [name, types] : middle->object_types_by_name)
     {
-        auto remapped = ygg::IndexList<pddl::Type> {};
+        auto remapped = ygg::IndexList<formalism::Type> {};
         for (auto type : types)
         {
             if (auto it = middle_types.find(type.get_value()); it != middle_types.end())
@@ -242,7 +242,7 @@ inline void inherit_domain_identity_mappings(TranslationStorage& problem, const 
     problem.translated_domain = domain.translated_domain;
 }
 
-inline std::shared_ptr<TranslationStorage> canonicalize_problem_storage(pddl::TaskView middle_task, const std::shared_ptr<TranslationStorage>& middle, const TranslationStorage& domain)
+inline std::shared_ptr<TranslationStorage> canonicalize_problem_storage(formalism::TaskView middle_task, const std::shared_ptr<TranslationStorage>& middle, const TranslationStorage& domain)
 {
     auto canonical = std::make_shared<TranslationStorage>(middle->repository.get_index(), &domain.repository);
     inherit_domain_identity_mappings(*canonical, domain);
@@ -258,72 +258,39 @@ inline std::shared_ptr<TranslationStorage> canonicalize_problem_storage(pddl::Ta
 class DomainTranslationResult
 {
 public:
-    DomainTranslationResult(pddl::DomainView original_domain_, std::shared_ptr<detail::TranslationStorage> storage_) :
-        m_original_domain(original_domain_),
-        m_storage(std::move(storage_))
-    {
-    }
+    DomainTranslationResult(formalism::DomainView original_domain_, std::shared_ptr<detail::TranslationStorage> storage_);
 
-    pddl::DomainView get_original_domain() const noexcept { return m_original_domain; }
-    pddl::DomainView get_translated_domain() const noexcept { return ygg::make_view(m_storage->translated_domain, m_storage->repository); }
-    const pddl::Repository& get_repository() const noexcept { return m_storage->repository; }
-    pddl::Repository& get_repository() noexcept { return m_storage->repository; }
+    formalism::DomainView get_original_domain() const noexcept;
+    formalism::DomainView get_translated_domain() const noexcept;
+    const formalism::Repository& get_repository() const noexcept;
+    formalism::Repository& get_repository() noexcept;
 
 private:
     friend class ProblemTranslationResult;
-    friend ProblemTranslationResult translate(pddl::TaskView task, const DomainTranslationResult& result, const TranslatorOptions& options);
+    friend ProblemTranslationResult translate(formalism::TaskView task, const DomainTranslationResult& result, const TranslatorOptions& options);
 
-    pddl::DomainView m_original_domain;
+    formalism::DomainView m_original_domain;
     std::shared_ptr<detail::TranslationStorage> m_storage;
 };
 
 class ProblemTranslationResult
 {
 public:
-    ProblemTranslationResult(pddl::TaskView original_task_, std::shared_ptr<detail::TranslationStorage> storage_, ygg::Index<pddl::Task> translated_task_) :
-        m_original_task(original_task_),
-        m_storage(std::move(storage_)),
-        m_translated_task(translated_task_)
-    {
-    }
+    ProblemTranslationResult(formalism::TaskView original_task_, std::shared_ptr<detail::TranslationStorage> storage_, ygg::Index<formalism::Task> translated_task_);
 
-    pddl::TaskView get_original_task() const noexcept { return m_original_task; }
-    pddl::TaskView get_translated_task() const noexcept { return ygg::make_view(m_translated_task, m_storage->repository); }
-    const pddl::Repository& get_repository() const noexcept { return m_storage->repository; }
-    pddl::Repository& get_repository() noexcept { return m_storage->repository; }
+    formalism::TaskView get_original_task() const noexcept;
+    formalism::TaskView get_translated_task() const noexcept;
+    const formalism::Repository& get_repository() const noexcept;
+    formalism::Repository& get_repository() noexcept;
 
 private:
-    pddl::TaskView m_original_task;
+    formalism::TaskView m_original_task;
     std::shared_ptr<detail::TranslationStorage> m_storage;
-    ygg::Index<pddl::Task> m_translated_task;
+    ygg::Index<formalism::Task> m_translated_task;
 };
 
-inline DomainTranslationResult translate(pddl::DomainView domain, const TranslatorOptions& options = {})
-{
-    auto middle = std::make_shared<detail::TranslationStorage>(1);
-    auto semantic_copier = detail::CopyTranslator(middle, options.remove_typing);
-    for ([[maybe_unused]] auto step : domain_translation_steps())
-    {
-    }
-    semantic_copier.copy_domain(domain);
-    return DomainTranslationResult(domain, detail::canonicalize_domain_storage(domain, middle));
-}
-
-inline ProblemTranslationResult translate(pddl::TaskView task, const DomainTranslationResult& result, const TranslatorOptions& options = {})
-{
-    if (task.get_data().domain != result.get_original_domain().get_index())
-        throw std::runtime_error("translate(task, result): task domain must match original domain in DomainTranslationResult.");
-
-    auto middle = std::make_shared<detail::TranslationStorage>(2, &result.m_storage->repository);
-    detail::inherit_domain_mappings(*middle, *result.m_storage);
-    auto semantic_copier = detail::CopyTranslator(middle, options.remove_typing);
-    for ([[maybe_unused]] auto step : task_translation_steps())
-    {
-    }
-    const auto middle_task = semantic_copier.copy_task(task);
-    const auto canonical = detail::canonicalize_problem_storage(middle_task, middle, *result.m_storage);
-    return ProblemTranslationResult(task, canonical, canonical->tasks.at(middle_task.get_index().get_value()));
-}
+DomainTranslationResult translate(formalism::DomainView domain, const TranslatorOptions& options = {});
+ProblemTranslationResult translate(formalism::TaskView task, const DomainTranslationResult& result, const TranslatorOptions& options = {});
 
 } // namespace loki::semantic
 

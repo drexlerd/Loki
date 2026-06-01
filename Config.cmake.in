@@ -8,18 +8,21 @@ include(CMakeFindDependencyMacro)
 ##############################################################
 
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/configure_yggdrasil.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/loki_native_dependencies.cmake")
 
 
 ##############################################################
 # Dependency Handling
 ##############################################################
 
+configure_yggdrasil()
+loki_register_native_dependency_prefix("${YGGDRASIL_NATIVE_PREFIX}")
+
 # -----
 # Boost
 # -----
 
 # Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
-configure_yggdrasil()
 find_dependency(Boost 1.74.0 REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})

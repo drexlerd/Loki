@@ -66,15 +66,7 @@ message("Build shared libraries enabled.")
 
 option(LOKI_BUILD_PYPDDL "Build Loki for the pypddl Python wheel." OFF)
 
-if(LOKI_BUILD_PYPDDL)
-  set(LOKI_INSTALL_PREFIX "pypddl/native/")
-  set(LOKI_INSTALL_COMPONENT pypddl)
-  set(LOKI_INSTALL_INTERFACE_INCLUDEDIR "${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_INCLUDEDIR}")
-else()
-  set(LOKI_INSTALL_PREFIX "")
-  set(LOKI_INSTALL_COMPONENT loki)
-  set(LOKI_INSTALL_INTERFACE_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}")
-endif()
+set(LOKI_INSTALL_INTERFACE_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}")
 
 
 set(DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/")
@@ -91,6 +83,7 @@ list(APPEND CMAKE_MODULE_PATH
   "${PROJECT_SOURCE_DIR}/cmake"
 )
 include("configure_yggdrasil")
+include("loki_native_dependencies")
 
 
 ##############################################################
@@ -100,6 +93,9 @@ include("configure_yggdrasil")
 # set(CMAKE_FIND_DEBUG_MODE ON)
 
 configure_yggdrasil()
+
+loki_register_native_dependency_prefix("${YGGDRASIL_NATIVE_PREFIX}")
+loki_register_python_native_runtime_prefix("pyyggdrasil")
 
 # -----
 # Boost
@@ -161,17 +157,19 @@ endif()
 # Install #
 ###########
 
-# Install header files
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/loki"
-    DESTINATION "${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_INCLUDEDIR}"
-    COMPONENT ${LOKI_INSTALL_COMPONENT})
+if(NOT LOKI_BUILD_PYPDDL)
+    # Install header files
+    install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/loki"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+        COMPONENT loki)
 
-# Install cmake scripts
-install(
-    DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/"
-    DESTINATION "${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_LIBDIR}/cmake/loki/cmake"
-    COMPONENT ${LOKI_INSTALL_COMPONENT}
-)
+    # Install cmake scripts
+    install(
+        DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/loki/cmake"
+        COMPONENT loki
+    )
+endif()
 
 
 ###########
@@ -198,11 +196,13 @@ configure_package_config_file("${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in"
   NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )
 
-# Install config files
-install(
-  FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/lokiConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/lokiConfigVersion.cmake"
-  DESTINATION "${LOKI_INSTALL_PREFIX}${CMAKE_INSTALL_LIBDIR}/cmake/loki"
-  COMPONENT ${LOKI_INSTALL_COMPONENT}
-)
+if(NOT LOKI_BUILD_PYPDDL)
+    # Install config files
+    install(
+      FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/lokiConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/lokiConfigVersion.cmake"
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/loki"
+      COMPONENT loki
+    )
+endif()

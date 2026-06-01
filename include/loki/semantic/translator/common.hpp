@@ -10,7 +10,7 @@
 #ifndef LOKI_SEMANTIC_TRANSLATOR_COMMON_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_COMMON_HPP_
 
-#include "loki/pddl/pddl.hpp"
+#include "loki/formalism/formalism.hpp"
 
 #include <cista/containers/optional.h>
 
@@ -73,53 +73,53 @@ using IndexMap = std::unordered_map<ygg::uint_t, ygg::Index<T>>;
 
 struct TranslationStorage
 {
-    pddl::Repository repository;
-    ygg::Index<pddl::Domain> original_domain;
-    ygg::Index<pddl::Domain> translated_domain;
+    formalism::Repository repository;
+    ygg::Index<formalism::Domain> original_domain;
+    ygg::Index<formalism::Domain> translated_domain;
 
-    IndexMap<pddl::Requirement> requirements;
-    IndexMap<pddl::Type> types;
-    IndexMap<pddl::Object> objects;
-    IndexMap<pddl::Variable> variables;
-    IndexMap<pddl::Parameter> parameters;
-    IndexMap<pddl::Predicate> predicates;
-    IndexMap<pddl::FunctionSkeleton> functions;
-    IndexMap<pddl::Term> terms;
-    IndexMap<pddl::Atom> atoms;
-    IndexMap<pddl::Literal> literals;
-    IndexMap<pddl::FunctionExpressionNumber> numbers;
-    IndexMap<pddl::FunctionTerm> function_terms;
-    IndexMap<pddl::UnaryFunctionExpression> unary_expressions;
-    IndexMap<pddl::BinaryFunctionExpression> binary_expressions;
-    IndexMap<pddl::MultiFunctionExpression> multi_expressions;
-    IndexMap<pddl::FunctionExpression> function_expressions;
-    IndexMap<pddl::ConditionLiteral> condition_literals;
-    IndexMap<pddl::ConditionAnd> condition_ands;
-    IndexMap<pddl::ConditionOr> condition_ors;
-    IndexMap<pddl::ConditionNot> condition_nots;
-    IndexMap<pddl::ConditionImply> condition_implies;
-    IndexMap<pddl::ConditionExists> condition_exists;
-    IndexMap<pddl::ConditionForall> condition_foralls;
-    IndexMap<pddl::ConditionNumericConstraint> condition_numeric_constraints;
-    IndexMap<pddl::Condition> conditions;
-    IndexMap<pddl::EffectLiteral> effect_literals;
-    IndexMap<pddl::EffectAnd> effect_ands;
-    IndexMap<pddl::EffectNumeric> effect_numerics;
-    IndexMap<pddl::EffectForall> effect_foralls;
-    IndexMap<pddl::EffectWhen> effect_whens;
-    IndexMap<pddl::EffectOneOf> effect_one_ofs;
-    IndexMap<pddl::EffectProbabilisticAlternative> effect_probabilistic_alternatives;
-    IndexMap<pddl::EffectProbabilistic> effect_probabilistics;
-    IndexMap<pddl::Effect> effects;
-    IndexMap<pddl::Action> actions;
-    IndexMap<pddl::Axiom> axioms;
-    IndexMap<pddl::Metric> metrics;
-    IndexMap<pddl::InitialFunctionValue> initial_function_values;
-    IndexMap<pddl::Domain> domains;
-    IndexMap<pddl::Task> tasks;
-    std::unordered_map<std::string, ygg::IndexList<pddl::Type>> object_types_by_name;
+    IndexMap<formalism::Requirement> requirements;
+    IndexMap<formalism::Type> types;
+    IndexMap<formalism::Object> objects;
+    IndexMap<formalism::Variable> variables;
+    IndexMap<formalism::Parameter> parameters;
+    IndexMap<formalism::Predicate> predicates;
+    IndexMap<formalism::FunctionSkeleton> functions;
+    IndexMap<formalism::Term> terms;
+    IndexMap<formalism::Atom> atoms;
+    IndexMap<formalism::Literal> literals;
+    IndexMap<formalism::FunctionExpressionNumber> numbers;
+    IndexMap<formalism::FunctionTerm> function_terms;
+    IndexMap<formalism::UnaryFunctionExpression> unary_expressions;
+    IndexMap<formalism::BinaryFunctionExpression> binary_expressions;
+    IndexMap<formalism::MultiFunctionExpression> multi_expressions;
+    IndexMap<formalism::FunctionExpression> function_expressions;
+    IndexMap<formalism::ConditionLiteral> condition_literals;
+    IndexMap<formalism::ConditionAnd> condition_ands;
+    IndexMap<formalism::ConditionOr> condition_ors;
+    IndexMap<formalism::ConditionNot> condition_nots;
+    IndexMap<formalism::ConditionImply> condition_implies;
+    IndexMap<formalism::ConditionExists> condition_exists;
+    IndexMap<formalism::ConditionForall> condition_foralls;
+    IndexMap<formalism::ConditionNumericConstraint> condition_numeric_constraints;
+    IndexMap<formalism::Condition> conditions;
+    IndexMap<formalism::EffectLiteral> effect_literals;
+    IndexMap<formalism::EffectAnd> effect_ands;
+    IndexMap<formalism::EffectNumeric> effect_numerics;
+    IndexMap<formalism::EffectForall> effect_foralls;
+    IndexMap<formalism::EffectWhen> effect_whens;
+    IndexMap<formalism::EffectOneOf> effect_one_ofs;
+    IndexMap<formalism::EffectProbabilisticAlternative> effect_probabilistic_alternatives;
+    IndexMap<formalism::EffectProbabilistic> effect_probabilistics;
+    IndexMap<formalism::Effect> effects;
+    IndexMap<formalism::Action> actions;
+    IndexMap<formalism::Axiom> axioms;
+    IndexMap<formalism::Metric> metrics;
+    IndexMap<formalism::InitialFunctionValue> initial_function_values;
+    IndexMap<formalism::Domain> domains;
+    IndexMap<formalism::Task> tasks;
+    std::unordered_map<std::string, ygg::IndexList<formalism::Type>> object_types_by_name;
 
-    explicit TranslationStorage(size_t index = 1, const pddl::Repository* parent = nullptr) : repository(index, parent) {}
+    explicit TranslationStorage(size_t index = 1, const formalism::Repository* parent = nullptr) : repository(index, parent) {}
 };
 
 template<typename T>

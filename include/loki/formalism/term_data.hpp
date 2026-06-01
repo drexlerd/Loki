@@ -1,0 +1,51 @@
+/*
+ * Copyright (C) 2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
+#ifndef LOKI_FORMALISM_TERM_DATA_HPP_
+#define LOKI_FORMALISM_TERM_DATA_HPP_
+
+#include <tuple>
+#include <utility>
+#include <optional>
+#include <string>
+#include <variant>
+#include <vector>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
+#include <cista/containers/variant.h>
+#include "loki/formalism/object_index.hpp"
+#include "loki/formalism/term_index.hpp"
+#include "loki/formalism/variable_index.hpp"
+
+namespace ygg
+{
+
+template<>
+struct Data<::loki::formalism::Term>
+{
+    using Variant = ::cista::offset::variant<ygg::Index<::loki::formalism::Variable>, ygg::Index<::loki::formalism::Object>>;
+    template<typename C>
+    using ViewVariant = std::variant<::ygg::View<ygg::Index<::loki::formalism::Variable>, C>, ::ygg::View<ygg::Index<::loki::formalism::Object>, C>>;
+
+    ygg::Index<::loki::formalism::Term> index;
+    Variant value;
+
+    Data() = default;
+    explicit Data(Variant value_) : index(), value(std::move(value_)) {}
+    template<typename C>
+    explicit Data(ViewVariant<C> value_) : index(), value(std::visit([](const auto& view) -> Variant { return Variant(view.get_index()); }, value_)) {}
+
+    void clear() noexcept { ygg::clear(index); ygg::clear(value); }
+    auto cista_members() const noexcept { return std::tie(index, value); }
+    auto identifying_members() const noexcept { return std::tie(value); }
+};
+
+}
+
+#endif

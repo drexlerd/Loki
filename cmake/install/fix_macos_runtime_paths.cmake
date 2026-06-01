@@ -29,7 +29,7 @@ foreach(native_library IN LISTS native_libraries)
         OUTPUT_QUIET
         ERROR_QUIET)
     execute_process(
-        COMMAND "${INSTALL_NAME_TOOL_EXECUTABLE}" -add_rpath "@loader_path" "${native_library}"
+        COMMAND "${INSTALL_NAME_TOOL_EXECUTABLE}" -add_rpath "${PYPDDL_PYTHON_NATIVE_LIBRARY_RPATHS}" "${native_library}"
         RESULT_VARIABLE rpath_result
         ERROR_VARIABLE rpath_error)
     if(NOT rpath_result EQUAL 0)

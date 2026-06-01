@@ -5,11 +5,11 @@ set(TEST_NAME ${CMAKE_PROJECT_NAME}_tests)
 
 set(SRC_FILES
     main.cpp
-    loki/parser_suite.cpp
-    loki/public_facade.cpp
-    loki/semantic_parser.cpp
-    pddl/parser.cpp
-    pddl/translator.cpp)
+    parser/suite.cpp
+    public_facade.cpp
+    semantic/parser.cpp
+    formalism/parser.cpp
+    formalism/translator.cpp)
 
 add_executable(${TEST_NAME} ${SRC_FILES})
 

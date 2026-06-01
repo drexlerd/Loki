@@ -15,7 +15,7 @@ file(GLOB_RECURSE native_libraries LIST_DIRECTORIES false
 
 foreach(native_library IN LISTS native_libraries)
     execute_process(
-        COMMAND "${PATCHELF_EXECUTABLE}" --set-rpath "$ORIGIN" "${native_library}"
+        COMMAND "${PATCHELF_EXECUTABLE}" --set-rpath "${PYPDDL_PYTHON_NATIVE_LIBRARY_RPATH}" "${native_library}"
         RESULT_VARIABLE rpath_result
         ERROR_VARIABLE rpath_error)
     if(NOT rpath_result EQUAL 0)
