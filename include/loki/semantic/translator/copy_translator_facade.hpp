@@ -106,7 +106,7 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjuncti
         auto precondition = data.precondition;
         if (precondition)
         {
-            precondition = this->self().flatten_condition(this->self().to_dnf(*precondition));
+            precondition = as_index(this->self().flatten_condition(as_index(this->self().to_dnf(*precondition))));
             if (const auto condition_or = this->self().public_as_or(*precondition))
             {
                 for (auto part : this->m_storage->repository[*condition_or].conditions)
@@ -141,7 +141,7 @@ ygg::IndexList<formalism::Axiom> CopyTranslatorFacade<Derived>::split_disjunctiv
     for (auto axiom : axioms)
     {
         const auto data = this->m_storage->repository[axiom];
-        const auto condition = this->self().flatten_condition(this->self().to_dnf(data.condition));
+        const auto condition = as_index(this->self().flatten_condition(as_index(this->self().to_dnf(data.condition))));
         if (const auto condition_or = this->self().public_as_or(condition))
         {
             for (auto part : this->m_storage->repository[*condition_or].conditions)
@@ -203,7 +203,7 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
     data.predicates = this->self().template copy_list<formalism::Predicate>(data.predicates, task.get_context());
     data.axioms = this->self().split_disjunctive_axioms(this->self().template copy_list<formalism::Axiom>(data.axioms, task.get_context()));
     if (data.goal)
-        data.goal = this->self().simplify_goal_condition(*data.goal);
+        data.goal = as_index(this->self().simplify_goal_condition(*data.goal));
     auto existing_predicates = std::unordered_set<ygg::uint_t> {};
     for (auto predicate : data.predicates)
         existing_predicates.insert(predicate.get_value());

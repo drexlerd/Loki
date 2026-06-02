@@ -16,17 +16,17 @@ class GoalSimplificationTranslator : public CopyTranslatorComponent<Derived, Goa
 public:
     explicit GoalSimplificationTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, GoalSimplificationTranslator<Derived>>(context) {}
 
-    ygg::Index<formalism::Condition> make_generated_goal_condition(ygg::Index<formalism::Condition> condition);
-    ygg::Index<formalism::Condition> simplify_goal_condition(ygg::Index<formalism::Condition> condition);
-    ygg::Index<formalism::Condition> simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionLiteral>);
-    ygg::Index<formalism::Condition> simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionNumericConstraint>);
-    ygg::Index<formalism::Condition> simplify_goal_condition_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionAnd> node);
+    formalism::ConditionView make_generated_goal_condition(ygg::Index<formalism::Condition> condition);
+    formalism::ConditionView simplify_goal_condition(ygg::Index<formalism::Condition> condition);
+    formalism::ConditionView simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionLiteral>);
+    formalism::ConditionView simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionNumericConstraint>);
+    formalism::ConditionView simplify_goal_condition_node(ygg::Index<formalism::Condition>,ygg::Index<formalism::ConditionAnd> node);
     template<typename T>
-    ygg::Index<formalism::Condition> simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<T>);
+    formalism::ConditionView simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<T>);
 };
 
 template<typename Derived>
-ygg::Index<formalism::Condition> GoalSimplificationTranslator<Derived>::make_generated_goal_condition(ygg::Index<formalism::Condition> condition)
+formalism::ConditionView GoalSimplificationTranslator<Derived>::make_generated_goal_condition(ygg::Index<formalism::Condition> condition)
 {
     const auto name = cista::offset::string("_goal_" + std::to_string(this->m_num_generated_axioms++));
     const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, name, ygg::IndexList<formalism::Parameter> {}).get_index();
@@ -39,29 +39,29 @@ ygg::Index<formalism::Condition> GoalSimplificationTranslator<Derived>::make_gen
 }
 
 template<typename Derived>
-ygg::Index<formalism::Condition> GoalSimplificationTranslator<Derived>::simplify_goal_condition(ygg::Index<formalism::Condition> condition)
+formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition(ygg::Index<formalism::Condition> condition)
 {
     return std::visit([&](const auto& node) { return this->self().simplify_goal_condition_node(condition, node); }, this->m_storage->repository[condition].value);
 }
 
 template<typename Derived>
-ygg::Index<formalism::Condition> GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionLiteral>) { return condition; }
+formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionLiteral>) { return ygg::make_view(condition, this->m_storage->repository); }
 
 template<typename Derived>
-ygg::Index<formalism::Condition> GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionNumericConstraint>) { return condition; }
+formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionNumericConstraint>) { return ygg::make_view(condition, this->m_storage->repository); }
 
 template<typename Derived>
-ygg::Index<formalism::Condition> GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionAnd> node)
+formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(ygg::Index<formalism::Condition>,ygg::Index<formalism::ConditionAnd> node)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto child : this->m_storage->repository[node].conditions)
-        conditions.push_back(this->self().simplify_goal_condition(child));
+        conditions.push_back(as_index(this->self().simplify_goal_condition(child)));
     return this->self().make_conjunction(std::move(conditions));
 }
 
 template<typename Derived>
 template<typename T>
-ygg::Index<formalism::Condition> GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<T>)
+formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<T>)
 {
     return this->self().make_generated_goal_condition(condition);
 }

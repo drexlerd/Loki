@@ -24,9 +24,10 @@ namespace detail
 std::shared_ptr<TranslationStorage> canonicalize_domain_storage(formalism::DomainView original_domain, const std::shared_ptr<TranslationStorage>& middle);
 void inherit_domain_mappings(TranslationStorage& problem, const TranslationStorage& domain);
 void inherit_domain_identity_mappings(TranslationStorage& problem, const TranslationStorage& domain);
-std::shared_ptr<TranslationStorage> canonicalize_problem_storage(formalism::TaskView middle_task, const std::shared_ptr<TranslationStorage>& middle, const TranslationStorage& domain);
+std::shared_ptr<TranslationStorage>
+canonicalize_problem_storage(formalism::TaskView middle_task, const std::shared_ptr<TranslationStorage>& middle, const TranslationStorage& domain);
 
-} // namespace detail
+}  // namespace detail
 
 class DomainTranslationResult
 {
@@ -49,7 +50,7 @@ private:
 class ProblemTranslationResult
 {
 public:
-    ProblemTranslationResult(formalism::TaskView original_task_, std::shared_ptr<detail::TranslationStorage> storage_, ygg::Index<formalism::Task> translated_task_);
+    ProblemTranslationResult(formalism::TaskView original_task_, std::shared_ptr<detail::TranslationStorage> storage_, formalism::TaskView translated_task_);
 
     formalism::TaskView get_original_task() const noexcept;
     formalism::TaskView get_translated_task() const noexcept;
@@ -59,12 +60,12 @@ public:
 private:
     formalism::TaskView m_original_task;
     std::shared_ptr<detail::TranslationStorage> m_storage;
-    ygg::Index<formalism::Task> m_translated_task;
+    formalism::TaskView m_translated_task;
 };
 
 DomainTranslationResult translate(formalism::DomainView domain, const TranslatorOptions& options = {});
 ProblemTranslationResult translate(formalism::TaskView task, const DomainTranslationResult& result, const TranslatorOptions& options = {});
 
-} // namespace loki::semantic
+}  // namespace loki::semantic
 
 #endif

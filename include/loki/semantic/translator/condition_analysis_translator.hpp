@@ -16,7 +16,7 @@ class ConditionAnalysisTranslator : public CopyTranslatorComponent<Derived, Cond
 public:
     explicit ConditionAnalysisTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, ConditionAnalysisTranslator<Derived>>(context) {}
 
-    ygg::Index<formalism::Term> term_from_variable(ygg::Index<formalism::Variable> variable);
+    formalism::TermView term_from_variable(ygg::Index<formalism::Variable> variable);
     void collect_free_variables(ygg::Index<formalism::Term> term, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
     void collect_free_variables(ygg::Index<formalism::Atom> atom, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
     void collect_free_variables(ygg::Index<formalism::Literal> literal, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
@@ -33,9 +33,9 @@ public:
 };
 
 template<typename Derived>
-ygg::Index<formalism::Term> ConditionAnalysisTranslator<Derived>::term_from_variable(ygg::Index<formalism::Variable> variable)
+formalism::TermView ConditionAnalysisTranslator<Derived>::term_from_variable(ygg::Index<formalism::Variable> variable)
 {
-    return formalism::get_or_create<formalism::Term>(this->m_storage->repository, ygg::Data<formalism::Term>::Variant(variable)).get_index();
+    return formalism::get_or_create<formalism::Term>(this->m_storage->repository, ygg::Data<formalism::Term>::Variant(variable));
 }
 
 template<typename Derived>

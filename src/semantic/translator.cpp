@@ -29,7 +29,8 @@ void compose_map(IndexMap<T>& out, const IndexMap<T>& source_to_middle, const In
     }
 }
 
-ygg::Index<formalism::Type> copy_type_for_metadata(TranslationStorage& target, const formalism::Repository& source_repository, ygg::Index<formalism::Type> source)
+ygg::Index<formalism::Type>
+copy_type_for_metadata(TranslationStorage& target, const formalism::Repository& source_repository, ygg::Index<formalism::Type> source)
 {
     ygg::Index<formalism::Type> out;
     if (find_mapped(target.types, source, out))
@@ -261,7 +262,8 @@ void inherit_domain_identity_mappings(TranslationStorage& problem, const Transla
     problem.translated_domain = domain.translated_domain;
 }
 
-std::shared_ptr<TranslationStorage> canonicalize_problem_storage(formalism::TaskView middle_task, const std::shared_ptr<TranslationStorage>& middle, const TranslationStorage& domain)
+std::shared_ptr<TranslationStorage>
+canonicalize_problem_storage(formalism::TaskView middle_task, const std::shared_ptr<TranslationStorage>& middle, const TranslationStorage& domain)
 {
     auto canonical = std::make_shared<TranslationStorage>(middle->repository.get_index(), &domain.repository);
     inherit_domain_identity_mappings(*canonical, domain);
@@ -272,7 +274,7 @@ std::shared_ptr<TranslationStorage> canonicalize_problem_storage(formalism::Task
     return canonical;
 }
 
-} // namespace detail
+}  // namespace detail
 
 DomainTranslationResult::DomainTranslationResult(formalism::DomainView original_domain_, std::shared_ptr<detail::TranslationStorage> storage_) :
     m_original_domain(original_domain_),
@@ -282,13 +284,18 @@ DomainTranslationResult::DomainTranslationResult(formalism::DomainView original_
 
 formalism::DomainView DomainTranslationResult::get_original_domain() const noexcept { return m_original_domain; }
 
-formalism::DomainView DomainTranslationResult::get_translated_domain() const noexcept { return ygg::make_view(m_storage->translated_domain, m_storage->repository); }
+formalism::DomainView DomainTranslationResult::get_translated_domain() const noexcept
+{
+    return ygg::make_view(m_storage->translated_domain, m_storage->repository);
+}
 
 const formalism::Repository& DomainTranslationResult::get_repository() const noexcept { return m_storage->repository; }
 
 formalism::Repository& DomainTranslationResult::get_repository() noexcept { return m_storage->repository; }
 
-ProblemTranslationResult::ProblemTranslationResult(formalism::TaskView original_task_, std::shared_ptr<detail::TranslationStorage> storage_, ygg::Index<formalism::Task> translated_task_) :
+ProblemTranslationResult::ProblemTranslationResult(formalism::TaskView original_task_,
+                                                   std::shared_ptr<detail::TranslationStorage> storage_,
+                                                   formalism::TaskView translated_task_) :
     m_original_task(original_task_),
     m_storage(std::move(storage_)),
     m_translated_task(translated_task_)
@@ -297,7 +304,7 @@ ProblemTranslationResult::ProblemTranslationResult(formalism::TaskView original_
 
 formalism::TaskView ProblemTranslationResult::get_original_task() const noexcept { return m_original_task; }
 
-formalism::TaskView ProblemTranslationResult::get_translated_task() const noexcept { return ygg::make_view(m_translated_task, m_storage->repository); }
+formalism::TaskView ProblemTranslationResult::get_translated_task() const noexcept { return m_translated_task; }
 
 const formalism::Repository& ProblemTranslationResult::get_repository() const noexcept { return m_storage->repository; }
 
@@ -307,9 +314,7 @@ DomainTranslationResult translate(formalism::DomainView domain, const Translator
 {
     auto middle = std::make_shared<detail::TranslationStorage>(1);
     auto semantic_copier = detail::CopyTranslator(middle, options.remove_typing);
-    for ([[maybe_unused]] auto step : domain_translation_steps())
-    {
-    }
+    for ([[maybe_unused]] auto step : domain_translation_steps()) {}
     semantic_copier.copy_domain(domain);
     return DomainTranslationResult(domain, detail::canonicalize_domain_storage(domain, middle));
 }
@@ -322,12 +327,11 @@ ProblemTranslationResult translate(formalism::TaskView task, const DomainTransla
     auto middle = std::make_shared<detail::TranslationStorage>(2, &result.m_storage->repository);
     detail::inherit_domain_mappings(*middle, *result.m_storage);
     auto semantic_copier = detail::CopyTranslator(middle, options.remove_typing);
-    for ([[maybe_unused]] auto step : task_translation_steps())
-    {
-    }
+    for ([[maybe_unused]] auto step : task_translation_steps()) {}
     const auto middle_task = semantic_copier.copy_task(task);
     const auto canonical = detail::canonicalize_problem_storage(middle_task, middle, *result.m_storage);
-    return ProblemTranslationResult(task, canonical, canonical->tasks.at(middle_task.get_index().get_value()));
+    auto translated_task = ygg::make_view(canonical->tasks.at(middle_task.get_index().get_value()), canonical->repository);
+    return ProblemTranslationResult(task, canonical, translated_task);
 }
 
-} // namespace loki::semantic
+}  // namespace loki::semantic

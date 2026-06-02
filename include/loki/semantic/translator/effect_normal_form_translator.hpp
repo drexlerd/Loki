@@ -16,23 +16,23 @@ class EffectNormalFormTranslator : public CopyTranslatorComponent<Derived, Effec
 public:
     explicit EffectNormalFormTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, EffectNormalFormTranslator<Derived>>(context) {}
 
-    ygg::Index<formalism::Effect> wrap_effect(ygg::Data<formalism::Effect>::Variant value);
+    formalism::EffectView wrap_effect(ygg::Data<formalism::Effect>::Variant value);
     template<typename T>
     cista::optional<ygg::Index<T>> as_effect(ygg::Index<formalism::Effect> effect) const;
-    ygg::Index<formalism::Effect> normalize_effect(ygg::Index<formalism::Effect> effect);
-    ygg::Index<formalism::Effect> normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectLiteral>);
-    ygg::Index<formalism::Effect> normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectNumeric>);
-    ygg::Index<formalism::Effect> normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectOneOf>);
-    ygg::Index<formalism::Effect> normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectProbabilistic>);
-    ygg::Index<formalism::Effect> normalize_effect_node(ygg::Index<formalism::Effect>, ygg::Index<formalism::EffectAnd> node);
-    ygg::Index<formalism::Effect> normalize_effect_node(ygg::Index<formalism::Effect>, ygg::Index<formalism::EffectForall> node);
-    ygg::Index<formalism::Effect> normalize_effect_node(ygg::Index<formalism::Effect>, ygg::Index<formalism::EffectWhen> node);
+    formalism::EffectView normalize_effect(ygg::Index<formalism::Effect> effect);
+    formalism::EffectView normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectLiteral>);
+    formalism::EffectView normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectNumeric>);
+    formalism::EffectView normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectOneOf>);
+    formalism::EffectView normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectProbabilistic>);
+    formalism::EffectView normalize_effect_node(ygg::Index<formalism::Effect>,ygg::Index<formalism::EffectAnd> node);
+    formalism::EffectView normalize_effect_node(ygg::Index<formalism::Effect>,ygg::Index<formalism::EffectForall> node);
+    formalism::EffectView normalize_effect_node(ygg::Index<formalism::Effect>,ygg::Index<formalism::EffectWhen> node);
 };
 
 template<typename Derived>
-ygg::Index<formalism::Effect> EffectNormalFormTranslator<Derived>::wrap_effect(ygg::Data<formalism::Effect>::Variant value)
+formalism::EffectView EffectNormalFormTranslator<Derived>::wrap_effect(ygg::Data<formalism::Effect>::Variant value)
 {
-    return formalism::get_or_create<formalism::Effect>(this->m_storage->repository, std::move(value)).get_index();
+    return formalism::get_or_create<formalism::Effect>(this->m_storage->repository, std::move(value));
 }
 
 template<typename Derived>
@@ -50,30 +50,30 @@ cista::optional<ygg::Index<T>> EffectNormalFormTranslator<Derived>::as_effect(yg
 }
 
 template<typename Derived>
-ygg::Index<formalism::Effect> EffectNormalFormTranslator<Derived>::normalize_effect(ygg::Index<formalism::Effect> effect)
+formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect(ygg::Index<formalism::Effect> effect)
 {
     return std::visit([&](const auto& node) { return this->self().normalize_effect_node(effect, node); }, this->m_storage->repository[effect].value);
 }
 
 template<typename Derived>
-ygg::Index<formalism::Effect> EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectLiteral>) { return effect; }
+formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectLiteral>) { return ygg::make_view(effect, this->m_storage->repository); }
 
 template<typename Derived>
-ygg::Index<formalism::Effect> EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectNumeric>) { return effect; }
+formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectNumeric>) { return ygg::make_view(effect, this->m_storage->repository); }
 
 template<typename Derived>
-ygg::Index<formalism::Effect> EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectOneOf>) { return effect; }
+formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectOneOf>) { return ygg::make_view(effect, this->m_storage->repository); }
 
 template<typename Derived>
-ygg::Index<formalism::Effect> EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectProbabilistic>) { return effect; }
+formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect> effect, ygg::Index<formalism::EffectProbabilistic>) { return ygg::make_view(effect, this->m_storage->repository); }
 
 template<typename Derived>
-ygg::Index<formalism::Effect> EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect>, ygg::Index<formalism::EffectAnd> node)
+formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect>,ygg::Index<formalism::EffectAnd> node)
 {
     auto effects = ygg::IndexList<formalism::Effect> {};
     for (auto child : this->m_storage->repository[node].effects)
     {
-        const auto normalized = this->self().normalize_effect(child);
+        const auto normalized = as_index(this->self().normalize_effect(child));
         if (const auto nested = this->self().template as_effect<formalism::EffectAnd>(normalized))
         {
             for (auto part : this->m_storage->repository[*nested].effects)
@@ -88,72 +88,102 @@ ygg::Index<formalism::Effect> EffectNormalFormTranslator<Derived>::normalize_eff
 }
 
 template<typename Derived>
-ygg::Index<formalism::Effect> EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect>, ygg::Index<formalism::EffectForall> node)
+formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect>,ygg::Index<formalism::EffectForall> node)
 {
     const auto& data = this->m_storage->repository[node];
-    const auto nested = this->self().normalize_effect(data.effect);
+    const auto nested = as_index(this->self().normalize_effect(data.effect));
     if (const auto nested_and = this->self().template as_effect<formalism::EffectAnd>(nested))
     {
         auto effects = ygg::IndexList<formalism::Effect> {};
         for (auto part : this->m_storage->repository[*nested_and].effects)
-            effects.push_back(this->self().normalize_effect(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, data.parameters, part).get_index()))));
-        return this->self().normalize_effect(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)).get_index())));
+        {
+            const auto wrapped = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+                formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, data.parameters, part).get_index())));
+            effects.push_back(as_index(this->self().normalize_effect(wrapped)));
+        }
+        const auto conjunction = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+            formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)).get_index())));
+        return this->self().normalize_effect(conjunction);
     }
     if (const auto nested_forall = this->self().template as_effect<formalism::EffectForall>(nested))
     {
         auto parameters = data.parameters;
         for (auto parameter : this->m_storage->repository[*nested_forall].parameters)
             parameters.push_back(parameter);
-        return this->self().normalize_effect(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, std::move(parameters), this->m_storage->repository[*nested_forall].effect).get_index())));
+        const auto wrapped = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+            formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, std::move(parameters), this->m_storage->repository[*nested_forall].effect).get_index())));
+        return this->self().normalize_effect(wrapped);
     }
-    return this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, data.parameters, nested).get_index()));
+    return this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+        formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, data.parameters, nested).get_index()));
 }
 
 template<typename Derived>
-ygg::Index<formalism::Effect> EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect>, ygg::Index<formalism::EffectWhen> node)
+formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect>,ygg::Index<formalism::EffectWhen> node)
 {
     const auto& data = this->m_storage->repository[node];
-    auto condition = this->self().flatten_condition(this->self().to_dnf(this->self().move_existentials(data.condition)));
-    const auto nested = this->self().normalize_effect(data.effect);
+    auto condition = as_index(this->self().flatten_condition(as_index(this->self().to_dnf(as_index(this->self().move_existentials(data.condition))))));
+    const auto nested = as_index(this->self().normalize_effect(data.effect));
 
     if (const auto condition_or = this->self().as_or(condition))
     {
         auto effects = ygg::IndexList<formalism::Effect> {};
         for (auto part : this->m_storage->repository[*condition_or].conditions)
-            effects.push_back(this->self().normalize_effect(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, part, nested).get_index()))));
-        return this->self().normalize_effect(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)).get_index())));
+        {
+            const auto wrapped = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+                formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, part, nested).get_index())));
+            effects.push_back(as_index(this->self().normalize_effect(wrapped)));
+        }
+        const auto conjunction = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+            formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)).get_index())));
+        return this->self().normalize_effect(conjunction);
     }
 
     if (this->self().as_exists(condition))
-        condition = this->self().make_generated_positive_condition(condition);
+        condition = as_index(this->self().make_generated_positive_condition(condition));
 
     if (const auto nested_when = this->self().template as_effect<formalism::EffectWhen>(nested))
     {
         auto conditions = ygg::IndexList<formalism::Condition> {};
         conditions.push_back(condition);
         conditions.push_back(this->m_storage->repository[*nested_when].condition);
-        const auto combined_condition = this->self().make_conjunction(std::move(conditions));
-        return this->self().normalize_effect(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, combined_condition, this->m_storage->repository[*nested_when].effect).get_index())));
+        const auto combined_condition = as_index(this->self().make_conjunction(std::move(conditions)));
+        const auto wrapped = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+            formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, combined_condition, this->m_storage->repository[*nested_when].effect).get_index())));
+        return this->self().normalize_effect(wrapped);
     }
     if (const auto nested_and = this->self().template as_effect<formalism::EffectAnd>(nested))
     {
         auto effects = ygg::IndexList<formalism::Effect> {};
         for (auto part : this->m_storage->repository[*nested_and].effects)
-            effects.push_back(this->self().normalize_effect(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition, part).get_index()))));
-        return this->self().normalize_effect(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)).get_index())));
+        {
+            const auto wrapped = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+                formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition, part).get_index())));
+            effects.push_back(as_index(this->self().normalize_effect(wrapped)));
+        }
+        const auto conjunction = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+            formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)).get_index())));
+        return this->self().normalize_effect(conjunction);
     }
     if (const auto nested_forall = this->self().template as_effect<formalism::EffectForall>(nested))
     {
-        const auto pushed_when = this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition, this->m_storage->repository[*nested_forall].effect).get_index()));
-        return this->self().normalize_effect(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, this->m_storage->repository[*nested_forall].parameters, pushed_when).get_index())));
+        const auto pushed_when = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+            formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition, this->m_storage->repository[*nested_forall].effect).get_index())));
+        const auto wrapped = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+            formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, this->m_storage->repository[*nested_forall].parameters, pushed_when).get_index())));
+        return this->self().normalize_effect(wrapped);
     }
     if (const auto exists = this->self().as_exists(condition))
     {
-        const auto pushed_when = this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, this->m_storage->repository[*exists].condition, nested).get_index()));
-        return this->self().normalize_effect(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, this->m_storage->repository[*exists].parameters, pushed_when).get_index())));
+        const auto pushed_when = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+            formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, this->m_storage->repository[*exists].condition, nested).get_index())));
+        const auto wrapped = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+            formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, this->m_storage->repository[*exists].parameters, pushed_when).get_index())));
+        return this->self().normalize_effect(wrapped);
     }
 
-    return this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition, nested).get_index()));
+    return this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+        formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition, nested).get_index()));
 }
 
 } // namespace loki::semantic::detail

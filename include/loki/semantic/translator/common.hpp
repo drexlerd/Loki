@@ -122,6 +122,19 @@ struct TranslationStorage
     explicit TranslationStorage(size_t index = 1, const formalism::Repository* parent = nullptr) : repository(index, parent) {}
 };
 
+
+template<typename T>
+ygg::Index<T> as_index(ygg::Index<T> index) noexcept
+{
+    return index;
+}
+
+template<typename T>
+ygg::Index<T> as_index(formalism::EntityView<T> view) noexcept
+{
+    return view.get_index();
+}
+
 template<typename T>
 bool find_mapped(const IndexMap<T>& map, ygg::Index<T> source, ygg::Index<T>& out)
 {

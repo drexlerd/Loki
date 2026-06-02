@@ -18,8 +18,8 @@ public:
 
     bool has_requirement(const ygg::IndexList<formalism::Requirement>& requirements, formalism::RequirementKind kind) const;
     bool equality_required(const ygg::Data<formalism::Task>& task) const;
-    ygg::Index<formalism::Predicate> ensure_equality_predicate();
-    ygg::Index<formalism::Literal> equality_literal(ygg::Index<formalism::Predicate> predicate, ygg::Index<formalism::Object> object);
+    formalism::PredicateView ensure_equality_predicate();
+    formalism::LiteralView equality_literal(ygg::Index<formalism::Predicate> predicate,ygg::Index<formalism::Object> object);
     bool domain_uses_equality() const;
     void add_equality_predicate_to_domain(ygg::Data<formalism::Domain>& domain);
     void initialize_equality(ygg::Data<formalism::Task>& task);
@@ -44,17 +44,17 @@ bool EqualityTranslator<Derived>::equality_required(const ygg::Data<formalism::T
 }
 
 template<typename Derived>
-ygg::Index<formalism::Predicate> EqualityTranslator<Derived>::ensure_equality_predicate()
+formalism::PredicateView EqualityTranslator<Derived>::ensure_equality_predicate()
 {
     if (this->m_equality_predicate)
-        return *this->m_equality_predicate;
+        return ygg::make_view(*this->m_equality_predicate, this->m_storage->repository);
     auto domain = this->m_storage->repository[this->m_storage->translated_domain];
     for (auto predicate : domain.predicates)
     {
         if (std::string(this->m_storage->repository[predicate].name) == "=")
         {
             this->m_equality_predicate = predicate;
-            return predicate;
+            return ygg::make_view(predicate, this->m_storage->repository);
         }
     }
     auto parameters = ygg::IndexList<formalism::Parameter> {};
@@ -76,18 +76,18 @@ ygg::Index<formalism::Predicate> EqualityTranslator<Derived>::ensure_equality_pr
     domain.predicates.push_back(predicate);
     this->m_storage->translated_domain = formalism::get_or_create<formalism::Domain>(this->m_storage->repository, std::move(domain)).get_index();
     this->m_equality_predicate = predicate;
-    return predicate;
+    return ygg::make_view(predicate, this->m_storage->repository);
 }
 
 template<typename Derived>
-ygg::Index<formalism::Literal> EqualityTranslator<Derived>::equality_literal(ygg::Index<formalism::Predicate> predicate, ygg::Index<formalism::Object> object)
+formalism::LiteralView EqualityTranslator<Derived>::equality_literal(ygg::Index<formalism::Predicate> predicate,ygg::Index<formalism::Object> object)
 {
     auto terms = ygg::IndexList<formalism::Term> {};
     const auto term = formalism::get_or_create<formalism::Term>(this->m_storage->repository, ygg::Data<formalism::Term>::Variant(object)).get_index();
     terms.push_back(term);
     terms.push_back(term);
     const auto atom = formalism::get_or_create<formalism::Atom>(this->m_storage->repository, predicate, std::move(terms)).get_index();
-    return formalism::get_or_create<formalism::Literal>(this->m_storage->repository, true, atom).get_index();
+    return formalism::get_or_create<formalism::Literal>(this->m_storage->repository, true, atom);
 }
 
 template<typename Derived>
@@ -154,12 +154,12 @@ void EqualityTranslator<Derived>::initialize_equality(ygg::Data<formalism::Task>
 {
     if (!this->self().equality_required(task))
         return;
-    const auto predicate = this->self().ensure_equality_predicate();
+    const auto predicate = as_index(this->self().ensure_equality_predicate());
     const auto& domain = this->m_storage->repository[this->m_storage->translated_domain];
     for (auto object : domain.constants)
-        task.initial_literals.push_back(this->self().equality_literal(predicate, object));
+        task.initial_literals.push_back(as_index(this->self().equality_literal(predicate, object)));
     for (auto object : task.objects)
-        task.initial_literals.push_back(this->self().equality_literal(predicate, object));
+        task.initial_literals.push_back(as_index(this->self().equality_literal(predicate, object)));
     task.domain = this->m_storage->translated_domain;
 }
 

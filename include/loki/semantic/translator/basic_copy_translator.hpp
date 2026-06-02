@@ -51,37 +51,37 @@ public:
     template<typename T>
     cista::optional<ygg::Index<T>> copy_optional(const cista::optional<ygg::Index<T>>& source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::Requirement> copy(ygg::Index<formalism::Requirement> source, const formalism::Repository& repository);
+    formalism::RequirementView copy(ygg::Index<formalism::Requirement> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::Type> copy(ygg::Index<formalism::Type> source, const formalism::Repository& repository);
+    formalism::TypeView copy(ygg::Index<formalism::Type> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::Object> copy(ygg::Index<formalism::Object> source, const formalism::Repository& repository);
+    formalism::ObjectView copy(ygg::Index<formalism::Object> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::Variable> copy(ygg::Index<formalism::Variable> source, const formalism::Repository& repository);
+    formalism::VariableView copy(ygg::Index<formalism::Variable> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::Parameter> copy(ygg::Index<formalism::Parameter> source, const formalism::Repository& repository);
+    formalism::ParameterView copy(ygg::Index<formalism::Parameter> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::Predicate> copy(ygg::Index<formalism::Predicate> source, const formalism::Repository& repository);
+    formalism::PredicateView copy(ygg::Index<formalism::Predicate> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::FunctionSkeleton> copy(ygg::Index<formalism::FunctionSkeleton> source, const formalism::Repository& repository);
+    formalism::FunctionSkeletonView copy(ygg::Index<formalism::FunctionSkeleton> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::Term> copy(ygg::Index<formalism::Term> source, const formalism::Repository& repository);
+    formalism::TermView copy(ygg::Index<formalism::Term> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::Atom> copy(ygg::Index<formalism::Atom> source, const formalism::Repository& repository);
+    formalism::AtomView copy(ygg::Index<formalism::Atom> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::Literal> copy(ygg::Index<formalism::Literal> source, const formalism::Repository& repository);
+    formalism::LiteralView copy(ygg::Index<formalism::Literal> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::FunctionExpressionNumber> copy(ygg::Index<formalism::FunctionExpressionNumber> source, const formalism::Repository& repository);
+    formalism::FunctionExpressionNumberView copy(ygg::Index<formalism::FunctionExpressionNumber> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::FunctionTerm> copy(ygg::Index<formalism::FunctionTerm> source, const formalism::Repository& repository);
+    formalism::FunctionTermView copy(ygg::Index<formalism::FunctionTerm> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::UnaryFunctionExpression> copy(ygg::Index<formalism::UnaryFunctionExpression> source, const formalism::Repository& repository);
+    formalism::UnaryFunctionExpressionView copy(ygg::Index<formalism::UnaryFunctionExpression> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::BinaryFunctionExpression> copy(ygg::Index<formalism::BinaryFunctionExpression> source, const formalism::Repository& repository);
+    formalism::BinaryFunctionExpressionView copy(ygg::Index<formalism::BinaryFunctionExpression> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::MultiFunctionExpression> copy(ygg::Index<formalism::MultiFunctionExpression> source, const formalism::Repository& repository);
+    formalism::MultiFunctionExpressionView copy(ygg::Index<formalism::MultiFunctionExpression> source, const formalism::Repository& repository);
 
-    ygg::Index<formalism::FunctionExpression> copy(ygg::Index<formalism::FunctionExpression> source, const formalism::Repository& repository);};
+    formalism::FunctionExpressionView copy(ygg::Index<formalism::FunctionExpression> source, const formalism::Repository& repository);};
 
 template<typename Derived>
 void BasicCopyTranslator<Derived>::increment_quantifications(const ygg::IndexList<formalism::Parameter>& parameters, const formalism::Repository& repository)
@@ -103,7 +103,7 @@ ygg::IndexList<T> BasicCopyTranslator<Derived>::copy_list(const ygg::IndexList<T
 {
     auto result = ygg::IndexList<T> {};
     for (auto index : source)
-        result.push_back(this->self().copy(index, repository));
+        result.push_back(as_index(this->self().copy(index, repository)));
     return result;
 }
 
@@ -172,46 +172,46 @@ cista::optional<ygg::Index<T>> BasicCopyTranslator<Derived>::copy_optional(const
 {
     if (!source)
         return {};
-    return this->self().copy(*source, repository);
+    return as_index(this->self().copy(*source, repository));
 }
 
 template<typename Derived>
-ygg::Index<formalism::Requirement> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Requirement> source, const formalism::Repository& repository)
+formalism::RequirementView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Requirement> source, const formalism::Repository& repository)
 {
     ygg::Index<formalism::Requirement> out;
-    if (find_mapped(this->m_storage->requirements, source, out)) return out;
+    if (find_mapped(this->m_storage->requirements, source, out)) return ygg::make_view(out, this->m_storage->repository);
     auto kind = repository[source].kind;
     out = formalism::get_or_create<formalism::Requirement>(this->m_storage->repository, kind).get_index();
     remember(this->m_storage->requirements, source, out);
-    return out;
+    return ygg::make_view(out, this->m_storage->repository);
 }
 
 template<typename Derived>
-ygg::Index<formalism::Type> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Type> source, const formalism::Repository& repository)
+formalism::TypeView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Type> source, const formalism::Repository& repository)
 {
     ygg::Index<formalism::Type> out;
-    if (find_mapped(this->m_storage->types, source, out)) return out;
+    if (find_mapped(this->m_storage->types, source, out)) return ygg::make_view(out, this->m_storage->repository);
     const auto& data = repository[source];
     out = formalism::get_or_create<formalism::Type>(this->m_storage->repository, data.name, this->self().template copy_list<formalism::Type>(data.bases, repository)).get_index();
     remember(this->m_storage->types, source, out);
-    return out;
+    return ygg::make_view(out, this->m_storage->repository);
 }
 
 template<typename Derived>
-ygg::Index<formalism::Object> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Object> source, const formalism::Repository& repository)
+formalism::ObjectView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Object> source, const formalism::Repository& repository)
 {
     ygg::Index<formalism::Object> out;
-    if (find_mapped(this->m_storage->objects, source, out)) return out;
+    if (find_mapped(this->m_storage->objects, source, out)) return ygg::make_view(out, this->m_storage->repository);
     const auto& data = repository[source];
     auto types = this->self().template copy_list<formalism::Type>(data.types, repository);
     this->m_storage->object_types_by_name[std::string(data.name)] = types;
     out = formalism::get_or_create<formalism::Object>(this->m_storage->repository, data.name, this->self().maybe_strip_types(types)).get_index();
     remember(this->m_storage->objects, source, out);
-    return out;
+    return ygg::make_view(out, this->m_storage->repository);
 }
 
 template<typename Derived>
-ygg::Index<formalism::Variable> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Variable> source, const formalism::Repository& repository)
+formalism::VariableView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Variable> source, const formalism::Repository& repository)
 {
     auto name = std::string(repository[source].name);
     if (this->m_renaming_enabled)
@@ -220,108 +220,108 @@ ygg::Index<formalism::Variable> BasicCopyTranslator<Derived>::copy(ygg::Index<fo
         if (auto it = this->m_num_quantifications.find(key); it != this->m_num_quantifications.end())
             name += "_" + std::to_string(it->second);
     }
-    return formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string(name)).get_index();
+    return formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string(name));
 }
 
 template<typename Derived>
-ygg::Index<formalism::Parameter> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Parameter> source, const formalism::Repository& repository)
+formalism::ParameterView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Parameter> source, const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, this->self().copy(data.variable, repository), this->self().template copy_list<formalism::Type>(data.types, repository)).get_index();
+    return formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, as_index(this->self().copy(data.variable, repository)), this->self().template copy_list<formalism::Type>(data.types, repository));
 }
 
 template<typename Derived>
-ygg::Index<formalism::Predicate> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Predicate> source, const formalism::Repository& repository)
+formalism::PredicateView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Predicate> source, const formalism::Repository& repository)
 {
     ygg::Index<formalism::Predicate> out;
-    if (find_mapped(this->m_storage->predicates, source, out)) return out;
+    if (find_mapped(this->m_storage->predicates, source, out)) return ygg::make_view(out, this->m_storage->repository);
     const auto& data = repository[source];
     const auto previous = this->m_renaming_enabled;
     this->m_renaming_enabled = false;
     out = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, data.name, this->self().template copy_list<formalism::Parameter>(data.parameters, repository)).get_index();
     this->m_renaming_enabled = previous;
     remember(this->m_storage->predicates, source, out);
-    return out;
+    return ygg::make_view(out, this->m_storage->repository);
 }
 
 template<typename Derived>
-ygg::Index<formalism::FunctionSkeleton> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::FunctionSkeleton> source, const formalism::Repository& repository)
+formalism::FunctionSkeletonView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::FunctionSkeleton> source, const formalism::Repository& repository)
 {
     ygg::Index<formalism::FunctionSkeleton> out;
-    if (find_mapped(this->m_storage->functions, source, out)) return out;
+    if (find_mapped(this->m_storage->functions, source, out)) return ygg::make_view(out, this->m_storage->repository);
     const auto& data = repository[source];
     const auto previous = this->m_renaming_enabled;
     this->m_renaming_enabled = false;
-    out = formalism::get_or_create<formalism::FunctionSkeleton>(this->m_storage->repository, data.name, this->self().template copy_list<formalism::Parameter>(data.parameters, repository), this->self().copy(data.type, repository)).get_index();
+    out = formalism::get_or_create<formalism::FunctionSkeleton>(this->m_storage->repository, data.name, this->self().template copy_list<formalism::Parameter>(data.parameters, repository), as_index(this->self().copy(data.type, repository))).get_index();
     this->m_renaming_enabled = previous;
     remember(this->m_storage->functions, source, out);
-    return out;
+    return ygg::make_view(out, this->m_storage->repository);
 }
 
 template<typename Derived>
-ygg::Index<formalism::Term> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Term> source, const formalism::Repository& repository)
+formalism::TermView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Term> source, const formalism::Repository& repository)
 {
-    auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::Term>::Variant { return ygg::Data<formalism::Term>::Variant(this->self().copy(arg, repository)); }, repository[source].value);
-    return formalism::get_or_create<formalism::Term>(this->m_storage->repository, std::move(value)).get_index();
+    auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::Term>::Variant { return ygg::Data<formalism::Term>::Variant(as_index(this->self().copy(arg, repository))); }, repository[source].value);
+    return formalism::get_or_create<formalism::Term>(this->m_storage->repository, std::move(value));
 }
 
 template<typename Derived>
-ygg::Index<formalism::Atom> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Atom> source, const formalism::Repository& repository)
-{
-    const auto& data = repository[source];
-    return formalism::get_or_create<formalism::Atom>(this->m_storage->repository, this->self().copy(data.predicate, repository), this->self().template copy_list<formalism::Term>(data.terms, repository)).get_index();
-}
-
-template<typename Derived>
-ygg::Index<formalism::Literal> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Literal> source, const formalism::Repository& repository)
+formalism::AtomView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Atom> source, const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return formalism::get_or_create<formalism::Literal>(this->m_storage->repository, data.positive, this->self().copy(data.atom, repository)).get_index();
+    return formalism::get_or_create<formalism::Atom>(this->m_storage->repository, as_index(this->self().copy(data.predicate, repository)), this->self().template copy_list<formalism::Term>(data.terms, repository));
 }
 
 template<typename Derived>
-ygg::Index<formalism::FunctionExpressionNumber> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::FunctionExpressionNumber> source, const formalism::Repository& repository)
+formalism::LiteralView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Literal> source, const formalism::Repository& repository)
+{
+    const auto& data = repository[source];
+    return formalism::get_or_create<formalism::Literal>(this->m_storage->repository, data.positive, as_index(this->self().copy(data.atom, repository)));
+}
+
+template<typename Derived>
+formalism::FunctionExpressionNumberView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::FunctionExpressionNumber> source, const formalism::Repository& repository)
 {
     ygg::Index<formalism::FunctionExpressionNumber> out;
-    if (find_mapped(this->m_storage->numbers, source, out)) return out;
+    if (find_mapped(this->m_storage->numbers, source, out)) return ygg::make_view(out, this->m_storage->repository);
     out = formalism::get_or_create<formalism::FunctionExpressionNumber>(this->m_storage->repository, repository[source].value).get_index();
     remember(this->m_storage->numbers, source, out);
-    return out;
+    return ygg::make_view(out, this->m_storage->repository);
 }
 
 template<typename Derived>
-ygg::Index<formalism::FunctionTerm> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::FunctionTerm> source, const formalism::Repository& repository)
+formalism::FunctionTermView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::FunctionTerm> source, const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return formalism::get_or_create<formalism::FunctionTerm>(this->m_storage->repository, this->self().copy(data.function, repository), this->self().template copy_list<formalism::Term>(data.terms, repository)).get_index();
+    return formalism::get_or_create<formalism::FunctionTerm>(this->m_storage->repository, as_index(this->self().copy(data.function, repository)), this->self().template copy_list<formalism::Term>(data.terms, repository));
 }
 
 template<typename Derived>
-ygg::Index<formalism::UnaryFunctionExpression> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::UnaryFunctionExpression> source, const formalism::Repository& repository)
+formalism::UnaryFunctionExpressionView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::UnaryFunctionExpression> source, const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return formalism::get_or_create<formalism::UnaryFunctionExpression>(this->m_storage->repository, data.op, this->self().copy(data.expression, repository)).get_index();
+    return formalism::get_or_create<formalism::UnaryFunctionExpression>(this->m_storage->repository, data.op, as_index(this->self().copy(data.expression, repository)));
 }
 
 template<typename Derived>
-ygg::Index<formalism::BinaryFunctionExpression> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::BinaryFunctionExpression> source, const formalism::Repository& repository)
+formalism::BinaryFunctionExpressionView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::BinaryFunctionExpression> source, const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return formalism::get_or_create<formalism::BinaryFunctionExpression>(this->m_storage->repository, data.op, this->self().copy(data.left, repository), this->self().copy(data.right, repository)).get_index();
+    return formalism::get_or_create<formalism::BinaryFunctionExpression>(this->m_storage->repository, data.op, as_index(this->self().copy(data.left, repository)), as_index(this->self().copy(data.right, repository)));
 }
 
 template<typename Derived>
-ygg::Index<formalism::MultiFunctionExpression> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::MultiFunctionExpression> source, const formalism::Repository& repository)
+formalism::MultiFunctionExpressionView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::MultiFunctionExpression> source, const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return formalism::get_or_create<formalism::MultiFunctionExpression>(this->m_storage->repository, data.op, this->self().template copy_list<formalism::FunctionExpression>(data.expressions, repository)).get_index();
+    return formalism::get_or_create<formalism::MultiFunctionExpression>(this->m_storage->repository, data.op, this->self().template copy_list<formalism::FunctionExpression>(data.expressions, repository));
 }
 
 template<typename Derived>
-ygg::Index<formalism::FunctionExpression> BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::FunctionExpression> source, const formalism::Repository& repository)
+formalism::FunctionExpressionView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::FunctionExpression> source, const formalism::Repository& repository)
 {
-    auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::FunctionExpression>::Variant { return ygg::Data<formalism::FunctionExpression>::Variant(this->self().copy(arg, repository)); }, repository[source].value);
-    return formalism::get_or_create<formalism::FunctionExpression>(this->m_storage->repository, std::move(value)).get_index();
+    auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::FunctionExpression>::Variant { return ygg::Data<formalism::FunctionExpression>::Variant(as_index(this->self().copy(arg, repository))); }, repository[source].value);
+    return formalism::get_or_create<formalism::FunctionExpression>(this->m_storage->repository, std::move(value));
 }
 
 } // namespace loki::semantic::detail
