@@ -7,6 +7,9 @@
 
 #include "loki/semantic/translator/copy_translator_component.hpp"
 
+#include <algorithm>
+#include <array>
+
 namespace loki::semantic::detail
 {
 
@@ -17,6 +20,11 @@ public:
     explicit CopyTranslatorFacade(CopyContext& context) : CopyTranslatorComponent<Derived, CopyTranslatorFacade<Derived>>(context) {}
 
     cista::optional<ygg::Index<formalism::ConditionOr>> public_as_or(ygg::Index<formalism::Condition> condition) const;
+
+    template<typename T>
+    void push_unique(ygg::IndexList<T>& list, std::unordered_set<ygg::uint_t>& seen, ygg::Index<T> value);
+
+    size_t next_generated_axiom_index() const;
 
     ygg::IndexList<formalism::Action> split_disjunctive_actions(const ygg::IndexList<formalism::Action>& actions);
 
@@ -47,9 +55,51 @@ cista::optional<ygg::Index<formalism::ConditionOr>> CopyTranslatorFacade<Derived
 }
 
 template<typename Derived>
+template<typename T>
+void CopyTranslatorFacade<Derived>::push_unique(ygg::IndexList<T>& list, std::unordered_set<ygg::uint_t>& seen, ygg::Index<T> value)
+{
+    if (seen.insert(value.get_value()).second)
+        list.push_back(value);
+}
+
+template<typename Derived>
+size_t CopyTranslatorFacade<Derived>::next_generated_axiom_index() const
+{
+    auto next = this->m_num_generated_axioms;
+    const auto prefixes = std::array<std::string_view, 3> { "_universal_", "_condition_", "_goal_" };
+
+    for (auto i = ygg::uint_t { 0 }; i < this->m_storage->repository.template size<formalism::Predicate>(); ++i)
+    {
+        const auto name = std::string_view(this->m_storage->repository[ygg::Index<formalism::Predicate>(i)].name);
+        for (const auto prefix : prefixes)
+        {
+            if (!name.starts_with(prefix))
+                continue;
+
+            auto value = size_t { 0 };
+            auto valid = name.size() > prefix.size();
+            for (auto c : name.substr(prefix.size()))
+            {
+                if (c < '0' || c > '9')
+                {
+                    valid = false;
+                    break;
+                }
+                value = value * 10 + static_cast<size_t>(c - '0');
+            }
+            if (valid)
+                next = std::max(next, value + 1);
+        }
+    }
+
+    return next;
+}
+
+template<typename Derived>
 ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjunctive_actions(const ygg::IndexList<formalism::Action>& actions)
 {
     auto result = ygg::IndexList<formalism::Action> {};
+    auto seen = std::unordered_set<ygg::uint_t> {};
     for (auto action : actions)
     {
         const auto data = this->m_storage->repository[action];
@@ -59,14 +109,12 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjuncti
             precondition = this->self().flatten_condition(this->self().to_dnf(*precondition));
             if (const auto condition_or = this->self().public_as_or(*precondition))
             {
-                auto split_index = size_t { 0 };
                 for (auto part : this->m_storage->repository[*condition_or].conditions)
                 {
                     auto parameters = data.parameters;
                     auto condition = part;
                     this->self().lift_top_level_exists(parameters, condition);
-                    auto name = cista::offset::string(std::string(data.name) + "_or_" + std::to_string(split_index++));
-                    result.push_back(formalism::get_or_create<formalism::Action>(this->m_storage->repository, std::move(name), this->self().maybe_strip_parameters(parameters), condition, data.effect).get_index());
+                    this->self().push_unique(result, seen, formalism::get_or_create<formalism::Action>(this->m_storage->repository, data.name, this->self().maybe_strip_parameters(parameters), condition, data.effect).get_index());
                 }
                 continue;
             }
@@ -75,11 +123,11 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjuncti
         {
             auto parameters = data.parameters;
             this->self().lift_top_level_exists(parameters, precondition);
-            result.push_back(formalism::get_or_create<formalism::Action>(this->m_storage->repository, data.name, this->self().maybe_strip_parameters(parameters), precondition, data.effect).get_index());
+            this->self().push_unique(result, seen, formalism::get_or_create<formalism::Action>(this->m_storage->repository, data.name, this->self().maybe_strip_parameters(parameters), precondition, data.effect).get_index());
         }
         else
         {
-            result.push_back(action);
+            this->self().push_unique(result, seen, action);
         }
     }
     return result;
@@ -89,6 +137,7 @@ template<typename Derived>
 ygg::IndexList<formalism::Axiom> CopyTranslatorFacade<Derived>::split_disjunctive_axioms(const ygg::IndexList<formalism::Axiom>& axioms)
 {
     auto result = ygg::IndexList<formalism::Axiom> {};
+    auto seen = std::unordered_set<ygg::uint_t> {};
     for (auto axiom : axioms)
     {
         const auto data = this->m_storage->repository[axiom];
@@ -100,7 +149,7 @@ ygg::IndexList<formalism::Axiom> CopyTranslatorFacade<Derived>::split_disjunctiv
                 auto parameters = data.parameters;
                 auto part_condition = part;
                 this->self().lift_top_level_exists(parameters, part_condition);
-                result.push_back(formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, this->self().maybe_strip_parameters(parameters), data.head, part_condition).get_index());
+                this->self().push_unique(result, seen, formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, this->self().maybe_strip_parameters(parameters), data.head, part_condition).get_index());
             }
         }
         else
@@ -108,7 +157,7 @@ ygg::IndexList<formalism::Axiom> CopyTranslatorFacade<Derived>::split_disjunctiv
             auto parameters = data.parameters;
             auto lifted_condition = condition;
             this->self().lift_top_level_exists(parameters, lifted_condition);
-            result.push_back(formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, this->self().maybe_strip_parameters(parameters), data.head, lifted_condition).get_index());
+            this->self().push_unique(result, seen, formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, this->self().maybe_strip_parameters(parameters), data.head, lifted_condition).get_index());
         }
     }
     return result;
@@ -141,6 +190,7 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
     auto data = task.get_data();
     const auto first_task_generated_axiom = this->m_generated_axioms.size();
     this->m_append_generated_axioms_to_domain = false;
+    this->m_num_generated_axioms = this->self().next_generated_axiom_index();
     data.index = {};
     data.domain = this->m_storage->translated_domain;
     data.requirements = this->self().template copy_list<formalism::Requirement>(data.requirements, task.get_context());

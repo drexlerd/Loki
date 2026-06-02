@@ -106,8 +106,9 @@ ygg::Index<formalism::Condition> ConditionNnfTranslator<Derived>::negate_conditi
     this->self().increment_quantifications(data.parameters, repository);
     auto parameters = this->self().copy_parameters(data.parameters, repository);
     this->self().enter_scope(parameters);
-    const auto condition = this->self().copy(data.condition, repository);
+    auto condition = this->self().copy(data.condition, repository);
     this->self().leave_scope();
+    this->self().prepend_type_conditions(condition, parameters);
     const auto exists = this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), condition).get_index()));
     return this->self().make_generated_axiom_condition(exists);
 }
@@ -119,8 +120,9 @@ ygg::Index<formalism::Condition> ConditionNnfTranslator<Derived>::negate_conditi
     this->self().increment_quantifications(data.parameters, repository);
     auto parameters = this->self().copy_parameters(data.parameters, repository);
     this->self().enter_scope(parameters);
-    const auto condition = this->self().negate_condition(data.condition, repository);
+    auto condition = this->self().negate_condition(data.condition, repository);
     this->self().leave_scope();
+    this->self().prepend_type_conditions(condition, parameters);
     return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), condition).get_index()));
 }
 
@@ -163,8 +165,9 @@ ygg::Index<formalism::Condition> ConditionNnfTranslator<Derived>::copy_condition
     this->self().increment_quantifications(data.parameters, repository);
     auto parameters = this->self().copy_parameters(data.parameters, repository);
     this->self().enter_scope(parameters);
-    const auto negated = this->self().negate_condition(data.condition, repository);
+    auto negated = this->self().negate_condition(data.condition, repository);
     this->self().leave_scope();
+    this->self().prepend_type_conditions(negated, parameters);
     const auto exists_not = this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), negated).get_index()));
     return this->self().make_generated_axiom_condition(exists_not);
 }
