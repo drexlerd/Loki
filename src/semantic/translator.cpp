@@ -29,6 +29,22 @@ void compose_map(IndexMap<T>& out, const IndexMap<T>& source_to_middle, const In
     }
 }
 
+ygg::Index<formalism::Type> copy_type_for_metadata(TranslationStorage& target, const formalism::Repository& source_repository, ygg::Index<formalism::Type> source)
+{
+    ygg::Index<formalism::Type> out;
+    if (find_mapped(target.types, source, out))
+        return out;
+
+    const auto& data = source_repository[source];
+    auto bases = ygg::IndexList<formalism::Type> {};
+    for (auto base : data.bases)
+        bases.push_back(copy_type_for_metadata(target, source_repository, base));
+
+    out = formalism::get_or_create<formalism::Type>(target.repository, data.name, std::move(bases)).get_index();
+    remember(target.types, source, out);
+    return out;
+}
+
 std::shared_ptr<TranslationStorage> canonicalize_domain_storage(formalism::DomainView original_domain, const std::shared_ptr<TranslationStorage>& middle)
 {
     auto canonical = std::make_shared<TranslationStorage>(middle->repository.get_index());
@@ -127,7 +143,13 @@ std::shared_ptr<TranslationStorage> canonicalize_domain_storage(formalism::Domai
         for (auto type : types)
         {
             if (auto it = middle_types.find(type.get_value()); it != middle_types.end())
+            {
                 remapped.push_back(it->second);
+            }
+            else
+            {
+                remapped.push_back(copy_type_for_metadata(*canonical, middle->repository, type));
+            }
         }
         canonical->object_types_by_name.emplace(name, std::move(remapped));
     }

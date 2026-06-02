@@ -929,7 +929,18 @@ TEST(LokiSemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
 
     ASSERT_TRUE(translated.get_data().goal.has_value());
     EXPECT_FALSE(contains_not_or_imply(*translated.get_data().goal, repository));
-    EXPECT_EQ(translated.get_data().axioms.size(), 1);
+    EXPECT_EQ(translated.get_data().axioms.size(), 2);
+    for (const auto axiom : translated.get_data().axioms)
+    {
+        const auto condition = repository[axiom].condition;
+        const auto is_disjunction = std::visit(
+            Overloaded {
+                [](ygg::Index<formalism::ConditionOr>) { return true; },
+                [](auto) { return false; },
+            },
+            repository[condition].value);
+        EXPECT_FALSE(is_disjunction);
+    }
     EXPECT_EQ(domain_translation.get_translated_domain().get_data().axioms.size(), original_translated_domain_axioms);
     EXPECT_GT(translated.get_domain().get_data().predicates.size(), domain.get_data().predicates.size());
 }

@@ -18,6 +18,7 @@ struct CopyContext
     ygg::IndexList<formalism::Predicate> generated_predicates;
     ygg::IndexList<formalism::Axiom> generated_axioms;
     std::unordered_map<ygg::uint_t, ygg::Index<formalism::Condition>> generated_axiom_conditions;
+    std::unordered_map<ygg::uint_t, ygg::Index<formalism::Condition>> generated_positive_conditions;
     size_t num_generated_axioms = 0;
     bool append_generated_axioms_to_domain = true;
     cista::optional<ygg::Index<formalism::Predicate>> equality_predicate;

@@ -113,7 +113,7 @@ template<typename Derived>
 ygg::Index<formalism::Effect> EffectNormalFormTranslator<Derived>::normalize_effect_node(ygg::Index<formalism::Effect>, ygg::Index<formalism::EffectWhen> node)
 {
     const auto& data = this->m_storage->repository[node];
-    const auto condition = data.condition;
+    auto condition = this->self().flatten_condition(this->self().to_dnf(this->self().move_existentials(data.condition)));
     const auto nested = this->self().normalize_effect(data.effect);
 
     if (const auto condition_or = this->self().as_or(condition))
@@ -123,6 +123,9 @@ ygg::Index<formalism::Effect> EffectNormalFormTranslator<Derived>::normalize_eff
             effects.push_back(this->self().normalize_effect(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, part, nested).get_index()))));
         return this->self().normalize_effect(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)).get_index())));
     }
+
+    if (this->self().as_exists(condition))
+        condition = this->self().make_generated_positive_condition(condition);
 
     if (const auto nested_when = this->self().template as_effect<formalism::EffectWhen>(nested))
     {

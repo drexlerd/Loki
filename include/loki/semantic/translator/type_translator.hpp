@@ -165,7 +165,7 @@ void TypeTranslator<Derived>::prepend_type_conditions(cista::optional<ygg::Index
         return;
     if (condition)
         parts.push_back(*condition);
-    condition = this->self().make_conjunction(std::move(parts));
+    condition = this->self().flatten_condition(this->self().to_dnf(this->self().make_conjunction(std::move(parts))));
 }
 
 template<typename Derived>
@@ -182,7 +182,23 @@ void TypeTranslator<Derived>::add_type_predicates_to_domain(ygg::Data<formalism:
     auto existing = std::unordered_set<std::string> {};
     for (auto predicate : data.predicates)
         existing.insert(std::string(this->m_storage->repository[predicate].name));
-    for (auto type : this->self().collect_type_hierarchy(data.types))
+    auto types = data.types;
+    for (auto object : data.constants)
+    {
+        const auto& object_data = this->m_storage->repository[object];
+        if (!object_data.types.empty())
+        {
+            types.insert(types.end(), object_data.types.begin(), object_data.types.end());
+        }
+        else if (auto it = this->m_storage->object_types_by_name.find(std::string(object_data.name)); it != this->m_storage->object_types_by_name.end())
+        {
+            types.insert(types.end(), it->second.begin(), it->second.end());
+        }
+    }
+    for (const auto& [_, object_types] : this->m_storage->object_types_by_name)
+        types.insert(types.end(), object_types.begin(), object_types.end());
+
+    for (auto type : this->self().collect_type_hierarchy(types))
     {
         const auto name = std::string(this->m_storage->repository[type].name);
         if (existing.insert(name).second)

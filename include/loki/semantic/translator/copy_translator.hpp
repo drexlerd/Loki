@@ -101,6 +101,7 @@ public:
     using ConditionNnfTranslator<CopyTranslator>::copy_condition_node;
 
     using ConditionQuantifierTranslator<CopyTranslator>::make_generated_axiom_condition;
+    using ConditionQuantifierTranslator<CopyTranslator>::make_generated_positive_condition;
     using ConditionQuantifierTranslator<CopyTranslator>::as_exists;
     using ConditionQuantifierTranslator<CopyTranslator>::move_existentials;
     using ConditionQuantifierTranslator<CopyTranslator>::move_existentials_node;

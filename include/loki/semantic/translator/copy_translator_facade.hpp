@@ -53,16 +53,34 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjuncti
     for (auto action : actions)
     {
         const auto data = this->m_storage->repository[action];
-        if (data.precondition)
+        auto precondition = data.precondition;
+        if (precondition)
         {
-            if (const auto condition_or = this->self().public_as_or(*data.precondition))
+            precondition = this->self().flatten_condition(this->self().to_dnf(*precondition));
+            if (const auto condition_or = this->self().public_as_or(*precondition))
             {
+                auto split_index = size_t { 0 };
                 for (auto part : this->m_storage->repository[*condition_or].conditions)
-                    result.push_back(formalism::get_or_create<formalism::Action>(this->m_storage->repository, data.name, data.parameters, part, data.effect).get_index());
+                {
+                    auto parameters = data.parameters;
+                    auto condition = part;
+                    this->self().lift_top_level_exists(parameters, condition);
+                    auto name = cista::offset::string(std::string(data.name) + "_or_" + std::to_string(split_index++));
+                    result.push_back(formalism::get_or_create<formalism::Action>(this->m_storage->repository, std::move(name), this->self().maybe_strip_parameters(parameters), condition, data.effect).get_index());
+                }
                 continue;
             }
         }
-        result.push_back(action);
+        if (precondition)
+        {
+            auto parameters = data.parameters;
+            this->self().lift_top_level_exists(parameters, precondition);
+            result.push_back(formalism::get_or_create<formalism::Action>(this->m_storage->repository, data.name, this->self().maybe_strip_parameters(parameters), precondition, data.effect).get_index());
+        }
+        else
+        {
+            result.push_back(action);
+        }
     }
     return result;
 }
@@ -74,14 +92,23 @@ ygg::IndexList<formalism::Axiom> CopyTranslatorFacade<Derived>::split_disjunctiv
     for (auto axiom : axioms)
     {
         const auto data = this->m_storage->repository[axiom];
-        if (const auto condition_or = this->self().public_as_or(data.condition))
+        const auto condition = this->self().flatten_condition(this->self().to_dnf(data.condition));
+        if (const auto condition_or = this->self().public_as_or(condition))
         {
             for (auto part : this->m_storage->repository[*condition_or].conditions)
-                result.push_back(formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, data.parameters, data.head, part).get_index());
+            {
+                auto parameters = data.parameters;
+                auto part_condition = part;
+                this->self().lift_top_level_exists(parameters, part_condition);
+                result.push_back(formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, this->self().maybe_strip_parameters(parameters), data.head, part_condition).get_index());
+            }
         }
         else
         {
-            result.push_back(axiom);
+            auto parameters = data.parameters;
+            auto lifted_condition = condition;
+            this->self().lift_top_level_exists(parameters, lifted_condition);
+            result.push_back(formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, this->self().maybe_strip_parameters(parameters), data.head, lifted_condition).get_index());
         }
     }
     return result;
@@ -112,6 +139,7 @@ template<typename Derived>
 formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView task)
 {
     auto data = task.get_data();
+    const auto first_task_generated_axiom = this->m_generated_axioms.size();
     this->m_append_generated_axioms_to_domain = false;
     data.index = {};
     data.domain = this->m_storage->translated_domain;
@@ -124,8 +152,16 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
     data.axioms = this->self().split_disjunctive_axioms(this->self().template copy_list<formalism::Axiom>(data.axioms, task.get_context()));
     if (data.goal)
         data.goal = this->self().simplify_goal_condition(*data.goal);
-    for (auto axiom : this->m_generated_axioms)
-        data.axioms.push_back(axiom);
+    auto existing_axioms = std::unordered_set<ygg::uint_t> {};
+    for (auto axiom : data.axioms)
+        existing_axioms.insert(axiom.get_value());
+    for (auto i = first_task_generated_axiom; i < this->m_generated_axioms.size(); ++i)
+    {
+        auto axiom = this->m_generated_axioms[i];
+        if (existing_axioms.insert(axiom.get_value()).second)
+            data.axioms.push_back(axiom);
+    }
+    data.axioms = this->self().split_disjunctive_axioms(data.axioms);
     if (!this->m_generated_predicates.empty() || !this->m_generated_axioms.empty())
     {
         this->self().update_translated_domain();
