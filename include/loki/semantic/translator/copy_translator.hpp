@@ -11,15 +11,15 @@
 #define LOKI_SEMANTIC_TRANSLATOR_COPY_TRANSLATOR_HPP_
 
 #include "loki/semantic/translator/basic_copy_translator.hpp"
-#include "loki/semantic/translator/condition_translator.hpp"
 #include "loki/semantic/translator/condition_analysis_translator.hpp"
 #include "loki/semantic/translator/condition_builder_translator.hpp"
 #include "loki/semantic/translator/condition_dnf_translator.hpp"
 #include "loki/semantic/translator/condition_nnf_translator.hpp"
 #include "loki/semantic/translator/condition_quantifier_translator.hpp"
+#include "loki/semantic/translator/condition_translator.hpp"
 #include "loki/semantic/translator/copy_translator_facade.hpp"
-#include "loki/semantic/translator/effect_translator.hpp"
 #include "loki/semantic/translator/effect_normal_form_translator.hpp"
+#include "loki/semantic/translator/effect_translator.hpp"
 #include "loki/semantic/translator/equality_translator.hpp"
 #include "loki/semantic/translator/goal_simplification_translator.hpp"
 #include "loki/semantic/translator/top_level_translator.hpp"
@@ -28,21 +28,22 @@
 namespace loki::semantic::detail
 {
 
-class CopyTranslator : private CopyContextOwner,
-                       public CopyTranslatorFacade<CopyTranslator>,
-                       public BasicCopyTranslator<CopyTranslator>,
-                       public ConditionTranslator<CopyTranslator>,
-                       public ConditionAnalysisTranslator<CopyTranslator>,
-                       public ConditionBuilderTranslator<CopyTranslator>,
-                       public ConditionDnfTranslator<CopyTranslator>,
-                       public ConditionNnfTranslator<CopyTranslator>,
-                       public ConditionQuantifierTranslator<CopyTranslator>,
-                       public EffectTranslator<CopyTranslator>,
-                       public EffectNormalFormTranslator<CopyTranslator>,
-                       public EqualityTranslator<CopyTranslator>,
-                       public GoalSimplificationTranslator<CopyTranslator>,
-                       public TopLevelTranslator<CopyTranslator>,
-                       public TypeTranslator<CopyTranslator>
+class CopyTranslator :
+    private CopyContextOwner,
+    public CopyTranslatorFacade<CopyTranslator>,
+    public BasicCopyTranslator<CopyTranslator>,
+    public ConditionTranslator<CopyTranslator>,
+    public ConditionAnalysisTranslator<CopyTranslator>,
+    public ConditionBuilderTranslator<CopyTranslator>,
+    public ConditionDnfTranslator<CopyTranslator>,
+    public ConditionNnfTranslator<CopyTranslator>,
+    public ConditionQuantifierTranslator<CopyTranslator>,
+    public EffectTranslator<CopyTranslator>,
+    public EffectNormalFormTranslator<CopyTranslator>,
+    public EqualityTranslator<CopyTranslator>,
+    public GoalSimplificationTranslator<CopyTranslator>,
+    public TopLevelTranslator<CopyTranslator>,
+    public TypeTranslator<CopyTranslator>
 {
 public:
     explicit CopyTranslator(std::shared_ptr<TranslationStorage> storage, bool remove_typing = true) :
@@ -113,13 +114,10 @@ public:
 
     using EffectTranslator<CopyTranslator>::copy;
 
-
     using EqualityTranslator<CopyTranslator>::has_requirement;
     using EqualityTranslator<CopyTranslator>::equality_required;
     using EqualityTranslator<CopyTranslator>::ensure_equality_predicate;
     using EqualityTranslator<CopyTranslator>::equality_literal;
-    using EqualityTranslator<CopyTranslator>::reflexive_equality_object_name;
-    using EqualityTranslator<CopyTranslator>::compact_reflexive_equalities;
     using EqualityTranslator<CopyTranslator>::domain_uses_equality;
     using EqualityTranslator<CopyTranslator>::add_equality_predicate_to_domain;
     using EqualityTranslator<CopyTranslator>::initialize_equality;
@@ -146,6 +144,6 @@ public:
     using TypeTranslator<CopyTranslator>::initialize_type_literals;
 };
 
-} // namespace loki::semantic::detail
+}  // namespace loki::semantic::detail
 
 #endif
