@@ -45,7 +45,6 @@ void bind_semantic_errors(nb::module_& m)
     nb::exception<semantic::DuplicateObjectError>(m, "DuplicateObjectError", duplicate_error.ptr());
     nb::exception<semantic::DuplicateVariableError>(m, "DuplicateVariableError", duplicate_error.ptr());
     nb::exception<semantic::DuplicateFunctionError>(m, "DuplicateFunctionError", duplicate_error.ptr());
-    nb::exception<semantic::DuplicateActionError>(m, "DuplicateActionError", duplicate_error.ptr());
 
     nb::exception<semantic::ArityMismatchError>(m, "ArityMismatchError", semantic_error.ptr());
     nb::exception<semantic::TypeMismatchError>(m, "TypeMismatchError", semantic_error.ptr());

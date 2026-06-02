@@ -942,7 +942,8 @@ TEST(LokiSemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
         EXPECT_FALSE(is_disjunction);
     }
     EXPECT_EQ(domain_translation.get_translated_domain().get_data().axioms.size(), original_translated_domain_axioms);
-    EXPECT_GT(translated.get_domain().get_data().predicates.size(), domain.get_data().predicates.size());
+    EXPECT_GT(translated.get_data().predicates.size(), 0);
+    EXPECT_EQ(translated.get_domain().get_data().predicates.size(), domain_translation.get_translated_domain().get_data().predicates.size());
 }
 
 
@@ -1030,28 +1031,26 @@ TEST(LokiSemanticParser, ReportsDuplicatePredicateDefinitions)
 }
 
 
-TEST(LokiSemanticParser, ReportsDuplicateActionDefinitions)
+TEST(LokiSemanticParser, AllowsDuplicateActionNamesAndInternsIdenticalBodies)
 {
     const auto domain = std::string { R"(
-(define (domain duplicate-action)
-  (:predicates)
+(define (domain duplicate-action-name)
+  (:predicates (p) (q))
   (:action a
     :parameters ()
-    :effect (and))
+    :effect (p))
   (:action a
     :parameters ()
-    :effect (and))
+    :effect (q))
+  (:action a
+    :parameters ()
+    :effect (p))
 )
 )" };
 
-    try
-    {
-        auto parser = semantic::Parser(domain);
-        FAIL() << "Expected duplicate action error";
-    }
-    catch (const semantic::DuplicateActionError&)
-    {
-    }
+    auto parser = semantic::Parser(domain);
+
+    EXPECT_EQ(parser.get_domain().get_actions().get_data().size(), 2);
 }
 
 

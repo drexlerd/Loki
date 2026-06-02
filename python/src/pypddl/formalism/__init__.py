@@ -134,7 +134,6 @@ from .._pypddl.formalism import (
     translate_domain,
     translate_task,
     ArityMismatchError,
-    DuplicateActionError,
     DuplicateDefinitionError,
     DuplicateFunctionError,
     DuplicateObjectError,

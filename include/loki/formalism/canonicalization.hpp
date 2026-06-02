@@ -237,7 +237,7 @@ inline std::string render(const Repository& repository, const ygg::Data<Task>& d
     if (data.goal) result += fmt::format("{}", ygg::make_view(*data.goal, repository));
     result += "|";
     if (data.metric) result += fmt::format("{}", ygg::make_view(*data.metric, repository));
-    return result + "|" + fmt::format("{}", ygg::make_view(data.axioms, repository));
+    return result + "|" + fmt::format("{}", ygg::make_view(data.predicates, repository)) + "|" + fmt::format("{}", ygg::make_view(data.axioms, repository));
 }
 
 } // namespace loki::formalism::detail
@@ -279,6 +279,7 @@ inline void canonicalize(Repository& repository, ygg::Data<Task>& data)
     ygg::canonicalize(repository, data.objects);
     ygg::canonicalize(repository, data.initial_literals);
     ygg::canonicalize(repository, data.initial_function_values);
+    ygg::canonicalize(repository, data.predicates);
     ygg::canonicalize(repository, data.axioms);
 }
 

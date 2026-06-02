@@ -76,7 +76,6 @@ private:
     std::unordered_set<std::string> m_declared_objects;
     std::unordered_set<std::string> m_declared_predicates;
     std::unordered_set<std::string> m_declared_functions;
-    std::unordered_set<std::string> m_declared_actions;
     std::unordered_set<formalism::RequirementKind> m_active_requirements;
     std::unordered_set<formalism::RequirementKind> m_domain_requirement_kinds;
     std::unordered_map<ygg::uint_t, ygg::IndexList<formalism::Type>> m_variable_types;

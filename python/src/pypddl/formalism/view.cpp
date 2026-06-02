@@ -441,11 +441,13 @@ void bind_task(nb::module_& m, const std::string& name)
         .def("get_initial_function_values", &V::get_initial_function_values)
         .def("get_goal", &V::get_goal)
         .def("get_metric", &V::get_metric)
+        .def("get_predicates", &V::get_predicates)
         .def("get_axioms", &V::get_axioms)
         .def("get_num_requirements", [](V self) { return self.get_data().requirements.size(); })
         .def("get_num_objects", [](V self) { return self.get_data().objects.size(); })
         .def("get_num_initial_literals", [](V self) { return self.get_data().initial_literals.size(); })
         .def("get_num_initial_function_values", [](V self) { return self.get_data().initial_function_values.size(); })
+        .def("get_num_predicates", [](V self) { return self.get_data().predicates.size(); })
         .def("get_num_axioms", [](V self) { return self.get_data().axioms.size(); });
     add_print(cls);
     add_hash(cls);

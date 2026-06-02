@@ -37,7 +37,6 @@ using DuplicatePredicateError = semantic::DuplicatePredicateError;
 using DuplicateObjectError = semantic::DuplicateObjectError;
 using DuplicateVariableError = semantic::DuplicateVariableError;
 using DuplicateFunctionError = semantic::DuplicateFunctionError;
-using DuplicateActionError = semantic::DuplicateActionError;
 using ArityMismatchError = semantic::ArityMismatchError;
 using TypeMismatchError = semantic::TypeMismatchError;
 using InvalidMetricError = semantic::InvalidMetricError;

@@ -355,6 +355,7 @@ void bind_datas(nb::module_& m)
                           const std::vector<formalism::InitialFunctionValueView>&,
                           const std::optional<formalism::ConditionView>&,
                           const std::optional<formalism::MetricView>&,
+                          const std::vector<formalism::PredicateView>&,
                           const std::vector<formalism::AxiomView>&>(),
                  "name"_a,
                  "domain"_a,
@@ -364,6 +365,7 @@ void bind_datas(nb::module_& m)
                  "initial_function_values"_a = std::vector<formalism::InitialFunctionValueView> {},
                  "goal"_a = std::optional<formalism::ConditionView> {},
                  "metric"_a = std::optional<formalism::MetricView> {},
+                 "predicates"_a = std::vector<formalism::PredicateView> {},
                  "axioms"_a = std::vector<formalism::AxiomView> {})
             .def_rw("name", &V::name)
             .def_rw("domain", &V::domain)
@@ -373,6 +375,7 @@ void bind_datas(nb::module_& m)
             .def_rw("initial_function_values", &V::initial_function_values)
             .def_rw("goal", &V::goal)
             .def_rw("metric", &V::metric)
+            .def_rw("predicates", &V::predicates)
             .def_rw("axioms", &V::axioms);
     }
 }

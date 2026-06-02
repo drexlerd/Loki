@@ -21,17 +21,6 @@
             ]
         },
         {
-            "name": "duplicate action",
-            "entry": "domain",
-            "domain": [
-                "(define (domain duplicate-action)",
-                "  (:predicates)",
-                "  (:action a :parameters () :effect (and))",
-                "  (:action a :parameters () :effect (and))",
-                ")"
-            ]
-        },
-        {
             "name": "strict missing disjunction requirement",
             "entry": "domain",
             "strict": true,

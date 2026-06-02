@@ -110,7 +110,6 @@ void Parser::rebuild_domain_symbols()
     m_declared_objects.clear();
     m_declared_predicates.clear();
     m_declared_functions.clear();
-    m_declared_actions.clear();
     m_active_requirements.clear();
     m_domain_requirement_kinds.clear();
     m_variable_types.clear();
@@ -153,9 +152,6 @@ void Parser::rebuild_domain_symbols()
         m_declared_functions.insert(std::string(data.name));
         remember_type(remember_type, data.type);
     }
-    for (auto action : domain.actions)
-        m_declared_actions.insert(std::string(repo()[action].name));
-
     if (auto it = m_types.find("object"); it != m_types.end())
         m_object_type = it->second;
     else
@@ -589,6 +585,7 @@ formalism::TaskView Parser::parse_task_ast(const ast::Task& task)
                                            std::move(initial_function_values),
                                            goal,
                                            metric,
+                                           ygg::IndexList<formalism::Predicate> {},
                                            std::move(axioms));
     auto view = formalism::get_or_create<formalism::Task>(repo(), std::move(data));
     return canonicalize_task(view, domain_storage);
@@ -637,7 +634,6 @@ void Parser::clear_domain_symbols()
     m_declared_objects.clear();
     m_declared_predicates.clear();
     m_declared_functions.clear();
-    m_declared_actions.clear();
     m_active_requirements.clear();
     m_domain_requirement_kinds.clear();
     m_variable_types.clear();
@@ -949,7 +945,6 @@ ygg::Index<formalism::Effect> Parser::parse_effect_node(const ast::EffectOneOf& 
 ygg::Index<formalism::Action> Parser::parse_action(const ast::Action& node)
 {
     const auto name = key(node.name.text);
-    ensure_new<DuplicateActionError>(m_declared_actions, name, node.name);
     m_variable_scopes.emplace_back();
     auto parameters = parse_parameters(node.parameters);
     auto precondition = cista::optional<ygg::Index<formalism::Condition>> {};

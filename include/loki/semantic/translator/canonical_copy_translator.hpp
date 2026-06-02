@@ -50,6 +50,7 @@ public:
         data.initial_function_values = copy_list(data.initial_function_values, source);
         data.goal = copy_optional(data.goal, source);
         data.metric = copy_optional(data.metric, source);
+        data.predicates = copy_list(data.predicates, source);
         data.axioms = copy_list(data.axioms, source);
         auto view = formalism::get_or_create<formalism::Task>(m_storage->repository, std::move(data));
         remember(m_storage->tasks, task.get_index(), view.get_index());

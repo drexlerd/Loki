@@ -118,6 +118,7 @@ TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
 
     const auto domain_translation = loki::translate(domain);
     const auto translated_domain = domain_translation.get_translated_domain();
+    const auto translated_domain_predicates = translated_domain.get_predicates().size();
     const auto task_translation = loki::translate(task, domain_translation);
     const auto translated_task = task_translation.get_translated_task();
 
@@ -130,7 +131,7 @@ TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
     }
 
     auto has_task_generated_name = false;
-    for (auto predicate : translated_task.get_domain().get_predicates())
+    for (auto predicate : translated_task.get_predicates())
     {
         const auto name = std::string(predicate.get_name());
         if ((generated_index(name, "_universal_") || generated_index(name, "_condition_") || generated_index(name, "_goal_"))
@@ -140,6 +141,7 @@ TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
         }
     }
 
+    EXPECT_EQ(translated_task.get_domain().get_predicates().size(), translated_domain_predicates);
     EXPECT_TRUE(has_task_generated_name);
 }
 
@@ -168,7 +170,6 @@ TEST(LokiTests, LokiPddlTranslatorTest)
 
     {
         EXPECT_EQ(translated_problem.get_domain().get_name(), translated_domain.get_name());
-        EXPECT_EQ(&translated_problem.get_domain().get_context(), &translated_domain.get_context());
     }
 
     {

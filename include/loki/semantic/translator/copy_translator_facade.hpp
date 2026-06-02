@@ -188,6 +188,7 @@ template<typename Derived>
 formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView task)
 {
     auto data = task.get_data();
+    const auto first_task_generated_predicate = this->m_generated_predicates.size();
     const auto first_task_generated_axiom = this->m_generated_axioms.size();
     this->m_append_generated_axioms_to_domain = false;
     this->m_num_generated_axioms = this->self().next_generated_axiom_index();
@@ -199,9 +200,20 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
     data.initial_function_values = this->self().template copy_list<formalism::InitialFunctionValue>(data.initial_function_values, task.get_context());
     data.goal = this->self().template copy_optional<formalism::Condition>(data.goal, task.get_context());
     data.metric = this->self().template copy_optional<formalism::Metric>(data.metric, task.get_context());
+    data.predicates = this->self().template copy_list<formalism::Predicate>(data.predicates, task.get_context());
     data.axioms = this->self().split_disjunctive_axioms(this->self().template copy_list<formalism::Axiom>(data.axioms, task.get_context()));
     if (data.goal)
         data.goal = this->self().simplify_goal_condition(*data.goal);
+    auto existing_predicates = std::unordered_set<ygg::uint_t> {};
+    for (auto predicate : data.predicates)
+        existing_predicates.insert(predicate.get_value());
+    for (auto i = first_task_generated_predicate; i < this->m_generated_predicates.size(); ++i)
+    {
+        auto predicate = this->m_generated_predicates[i];
+        if (existing_predicates.insert(predicate.get_value()).second)
+            data.predicates.push_back(predicate);
+    }
+
     auto existing_axioms = std::unordered_set<ygg::uint_t> {};
     for (auto axiom : data.axioms)
         existing_axioms.insert(axiom.get_value());
@@ -212,10 +224,19 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
             data.axioms.push_back(axiom);
     }
     data.axioms = this->self().split_disjunctive_axioms(data.axioms);
-    if (!this->m_generated_predicates.empty() || !this->m_generated_axioms.empty())
+    if (!data.predicates.empty() || !data.axioms.empty())
     {
-        this->self().update_translated_domain();
-        data.domain = this->m_storage->translated_domain;
+        auto has_derived_requirement = false;
+        for (auto requirement : data.requirements)
+        {
+            if (this->m_storage->repository[requirement].kind == formalism::RequirementKind::DerivedPredicates)
+            {
+                has_derived_requirement = true;
+                break;
+            }
+        }
+        if (!has_derived_requirement)
+            data.requirements.push_back(formalism::get_or_create<formalism::Requirement>(this->m_storage->repository, formalism::RequirementKind::DerivedPredicates).get_index());
     }
     this->self().initialize_type_literals(data);
     this->self().initialize_equality(data);

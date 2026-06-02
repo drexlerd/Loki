@@ -112,11 +112,6 @@ public:
     explicit DuplicateFunctionError(const std::string& name) : DuplicateDefinitionError("function", name) {}
 };
 
-class DuplicateActionError : public DuplicateDefinitionError
-{
-public:
-    explicit DuplicateActionError(const std::string& name) : DuplicateDefinitionError("action", name) {}
-};
 
 class ArityMismatchError : public SemanticError
 {
