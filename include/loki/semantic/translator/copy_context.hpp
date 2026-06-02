@@ -15,6 +15,7 @@ struct CopyContext
     std::shared_ptr<TranslationStorage> storage;
     std::unordered_map<ygg::uint_t, size_t> num_quantifications;
     std::vector<ygg::IndexList<formalism::Parameter>> active_parameters;
+    std::vector<std::unordered_map<ygg::uint_t, ygg::Index<formalism::Variable>>> variable_bindings;
     ygg::IndexList<formalism::Predicate> generated_predicates;
     ygg::IndexList<formalism::Axiom> generated_axioms;
     std::unordered_map<ygg::uint_t, ygg::Index<formalism::Condition>> generated_axiom_conditions;

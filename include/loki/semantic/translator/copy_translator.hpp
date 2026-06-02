@@ -24,6 +24,7 @@
 #include "loki/semantic/translator/goal_simplification_translator.hpp"
 #include "loki/semantic/translator/top_level_translator.hpp"
 #include "loki/semantic/translator/type_translator.hpp"
+#include "loki/semantic/translator/variable_renaming_translator.hpp"
 
 namespace loki::semantic::detail
 {
@@ -43,7 +44,8 @@ class CopyTranslator :
     public EqualityTranslator<CopyTranslator>,
     public GoalSimplificationTranslator<CopyTranslator>,
     public TopLevelTranslator<CopyTranslator>,
-    public TypeTranslator<CopyTranslator>
+    public TypeTranslator<CopyTranslator>,
+    public VariableRenamingTranslator<CopyTranslator>
 {
 public:
     explicit CopyTranslator(std::shared_ptr<TranslationStorage> storage, bool remove_typing = true) :
@@ -61,7 +63,8 @@ public:
         EqualityTranslator<CopyTranslator>(context()),
         GoalSimplificationTranslator<CopyTranslator>(context()),
         TopLevelTranslator<CopyTranslator>(context()),
-        TypeTranslator<CopyTranslator>(context())
+        TypeTranslator<CopyTranslator>(context()),
+        VariableRenamingTranslator<CopyTranslator>(context())
     {
     }
 
@@ -142,6 +145,14 @@ public:
     using TypeTranslator<CopyTranslator>::add_type_predicates_to_domain;
     using TypeTranslator<CopyTranslator>::add_type_literals_for_object;
     using TypeTranslator<CopyTranslator>::initialize_type_literals;
+
+    using VariableRenamingTranslator<CopyTranslator>::enter_variable_scope;
+    using VariableRenamingTranslator<CopyTranslator>::leave_variable_scope;
+    using VariableRenamingTranslator<CopyTranslator>::rename_parameter;
+    using VariableRenamingTranslator<CopyTranslator>::rename_parameters;
+    using VariableRenamingTranslator<CopyTranslator>::rename_variables;
+    using VariableRenamingTranslator<CopyTranslator>::rename_action_variables;
+    using VariableRenamingTranslator<CopyTranslator>::rename_axiom_variables;
 };
 
 }  // namespace loki::semantic::detail

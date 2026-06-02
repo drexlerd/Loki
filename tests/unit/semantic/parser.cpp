@@ -596,6 +596,37 @@ TEST(LokiSemanticTranslator, RenamesQuantifiedVariablesDeterministically)
     EXPECT_FALSE(contains_exists(*action.precondition, repository));
 }
 
+
+TEST(LokiSemanticTranslator, RenamesBeforeNegationNormalFormOnlyOnce)
+{
+    const auto domain_source = std::string {
+        "(define (domain rename-once)"
+        "(:requirements :typing :existential-preconditions)"
+        "(:predicates (p ?x - object ?y - object))"
+        "(:action a :parameters (?x - object) "
+        ":precondition (not (exists (?x - object) (p ?x ?x))) "
+        ":effect (and))"
+        ")" };
+
+    semantic::Parser parser(domain_source);
+
+    const auto translation = semantic::translate(parser.get_domain());
+    const auto translated_domain = translation.get_translated_domain();
+    const auto& repository = translated_domain.get_context();
+
+    ASSERT_EQ(translated_domain.get_data().axioms.size(), 1);
+    const auto& axiom = repository[translated_domain.get_data().axioms.front()];
+    ASSERT_EQ(axiom.parameters.size(), 1);
+    const auto axiom_variable = repository[axiom.parameters.front()].variable;
+    EXPECT_EQ(std::string(repository[axiom_variable].name), "x_1");
+
+    ASSERT_EQ(translated_domain.get_data().actions.size(), 1);
+    const auto& action = repository[translated_domain.get_data().actions.front()];
+    ASSERT_EQ(action.parameters.size(), 1);
+    const auto action_variable = repository[action.parameters.front()].variable;
+    EXPECT_EQ(std::string(repository[action_variable].name), "x_0");
+}
+
 TEST(LokiSemanticTranslator, RemovesUniversalQuantifiersWithDerivedAxioms)
 {
     const auto domain_source = std::string {
@@ -947,6 +978,34 @@ TEST(LokiSemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
 }
 
 
+
+
+TEST(LokiSemanticTranslator, RenamesTaskGoalVariablesBeforeGoalSimplificationOnlyOnce)
+{
+    const auto domain_source = std::string {
+        "(define (domain task-rename-once)"
+        "(:requirements :typing :existential-preconditions)"
+        "(:predicates (p ?x - object ?y - object))"
+        ")" };
+    const auto task_source = std::string {
+        "(define (problem task-rename-once-problem) (:domain task-rename-once)"
+        "(:objects o - object)"
+        "(:init)"
+        "(:goal (not (exists (?x - object) (p ?x ?x))))"
+        ")" };
+
+    semantic::Parser parser(domain_source);
+    const auto domain_translation = semantic::translate(parser.get_domain());
+    const auto translated_result = semantic::translate(parser.parse_task(task_source), domain_translation);
+    const auto translated = translated_result.get_translated_task();
+    const auto& repository = translated.get_context();
+
+    ASSERT_EQ(translated.get_data().axioms.size(), 1);
+    const auto& axiom = repository[translated.get_data().axioms.front()];
+    ASSERT_EQ(axiom.parameters.size(), 1);
+    const auto variable = repository[axiom.parameters.front()].variable;
+    EXPECT_EQ(std::string(repository[variable].name), "x_0");
+}
 
 TEST(LokiSemanticParser, JsonNegativeSuiteReportsExpectedSemanticErrors)
 {

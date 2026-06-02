@@ -19,6 +19,7 @@ protected:
         m_storage(context.storage),
         m_num_quantifications(context.num_quantifications),
         m_active_parameters(context.active_parameters),
+        m_variable_bindings(context.variable_bindings),
         m_generated_predicates(context.generated_predicates),
         m_generated_axioms(context.generated_axioms),
         m_num_generated_axioms(context.num_generated_axioms),
@@ -37,6 +38,7 @@ protected:
     std::shared_ptr<TranslationStorage>& m_storage;
     std::unordered_map<ygg::uint_t, size_t>& m_num_quantifications;
     std::vector<ygg::IndexList<formalism::Parameter>>& m_active_parameters;
+    std::vector<std::unordered_map<ygg::uint_t, ygg::Index<formalism::Variable>>>& m_variable_bindings;
     ygg::IndexList<formalism::Predicate>& m_generated_predicates;
     ygg::IndexList<formalism::Axiom>& m_generated_axioms;
     size_t& m_num_generated_axioms;

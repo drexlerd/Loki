@@ -29,6 +29,18 @@ template<typename Derived>
 formalism::ActionView TopLevelTranslator<Derived>::copy(ygg::Index<formalism::Action> source, const formalism::Repository& repository)
 {
     ygg::Index<formalism::Action> out;
+
+    if (this->m_renaming_enabled)
+    {
+        const auto renamed = as_index(this->self().rename_action_variables(source, repository));
+        const auto previous = this->m_renaming_enabled;
+        this->m_renaming_enabled = false;
+        out = as_index(this->self().copy(renamed, this->m_storage->repository));
+        this->m_renaming_enabled = previous;
+        remember(this->m_storage->actions, source, out);
+        return ygg::make_view(out, this->m_storage->repository);
+    }
+
     if (find_mapped(this->m_storage->actions, source, out)) return ygg::make_view(out, this->m_storage->repository);
     const auto& data = repository[source];
     this->m_num_quantifications.clear();
@@ -48,6 +60,18 @@ template<typename Derived>
 formalism::AxiomView TopLevelTranslator<Derived>::copy(ygg::Index<formalism::Axiom> source, const formalism::Repository& repository)
 {
     ygg::Index<formalism::Axiom> out;
+
+    if (this->m_renaming_enabled)
+    {
+        const auto renamed = as_index(this->self().rename_axiom_variables(source, repository));
+        const auto previous = this->m_renaming_enabled;
+        this->m_renaming_enabled = false;
+        out = as_index(this->self().copy(renamed, this->m_storage->repository));
+        this->m_renaming_enabled = previous;
+        remember(this->m_storage->axioms, source, out);
+        return ygg::make_view(out, this->m_storage->repository);
+    }
+
     if (find_mapped(this->m_storage->axioms, source, out)) return ygg::make_view(out, this->m_storage->repository);
     const auto& data = repository[source];
     this->m_num_quantifications.clear();

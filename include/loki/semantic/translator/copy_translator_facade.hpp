@@ -198,7 +198,17 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
     data.objects = this->self().template copy_list<formalism::Object>(data.objects, task.get_context());
     data.initial_literals = this->self().template copy_list<formalism::Literal>(data.initial_literals, task.get_context());
     data.initial_function_values = this->self().template copy_list<formalism::InitialFunctionValue>(data.initial_function_values, task.get_context());
-    data.goal = this->self().template copy_optional<formalism::Condition>(data.goal, task.get_context());
+    if (data.goal)
+    {
+        this->m_num_quantifications.clear();
+        this->self().enter_variable_scope();
+        const auto renamed_goal = as_index(this->self().rename_variables(*data.goal, task.get_context()));
+        this->self().leave_variable_scope();
+        const auto previous = this->m_renaming_enabled;
+        this->m_renaming_enabled = false;
+        data.goal = as_index(this->self().copy(renamed_goal, this->m_storage->repository));
+        this->m_renaming_enabled = previous;
+    }
     data.metric = this->self().template copy_optional<formalism::Metric>(data.metric, task.get_context());
     data.predicates = this->self().template copy_list<formalism::Predicate>(data.predicates, task.get_context());
     data.axioms = this->self().split_disjunctive_axioms(this->self().template copy_list<formalism::Axiom>(data.axioms, task.get_context()));
