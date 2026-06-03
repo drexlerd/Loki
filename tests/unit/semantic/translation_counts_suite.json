@@ -16,9 +16,9 @@
         {
             "name": "classical/airport",
             "translated_domain": {
-                "predicates": 26,
+                "predicates": 24,
                 "actions": 5,
-                "axioms": 4
+                "axioms": 2
             },
             "translated_task": {
                 "predicates": 0,
@@ -29,9 +29,9 @@
         {
             "name": "classical/assembly",
             "translated_domain": {
-                "predicates": 24,
+                "predicates": 23,
                 "actions": 6,
-                "axioms": 9
+                "axioms": 8
             },
             "translated_task": {
                 "predicates": 0,
@@ -250,9 +250,9 @@
         {
             "name": "classical/philosophers",
             "translated_domain": {
-                "predicates": 44,
+                "predicates": 43,
                 "actions": 7,
-                "axioms": 6
+                "axioms": 5
             },
             "translated_task": {
                 "predicates": 0,
@@ -263,9 +263,9 @@
         {
             "name": "classical/psr-middle",
             "translated_domain": {
-                "predicates": 17,
+                "predicates": 16,
                 "actions": 3,
-                "axioms": 15
+                "axioms": 14
             },
             "translated_task": {
                 "predicates": 1,

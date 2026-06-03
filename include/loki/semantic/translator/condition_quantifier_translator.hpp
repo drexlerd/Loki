@@ -43,6 +43,16 @@ template<typename Derived>
 formalism::ConditionView ConditionQuantifierTranslator<Derived>::make_generated_axiom_condition(ygg::Index<formalism::Condition> condition)
 {
     const auto free_parameters = this->self().free_parameters_in_scope(condition);
+
+    auto key = std::string("condition:") + std::to_string(condition.get_value());
+    for (auto parameter : free_parameters)
+    {
+        key += "|parameter:";
+        key += std::to_string(parameter.get_value());
+    }
+    if (auto it = this->m_generated_universal_conditions.find(key); it != this->m_generated_universal_conditions.end())
+        return ygg::make_view(it->second, this->m_storage->repository);
+
     auto predicate_parameters = ygg::IndexList<formalism::Parameter> {};
     auto terms = ygg::IndexList<formalism::Term> {};
     for (auto parameter : free_parameters)
@@ -61,6 +71,7 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::make_generated_
     this->m_generated_predicates.push_back(predicate);
     this->m_generated_axioms.push_back(axiom);
     const auto result = as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, negative_literal).get_index()));
+    this->m_generated_universal_conditions.emplace(std::move(key), result);
     return ygg::make_view(result, this->m_storage->repository);
 }
 

@@ -18,6 +18,7 @@ struct CopyContext
     std::vector<std::unordered_map<ygg::uint_t, ygg::Index<formalism::Variable>>> variable_bindings;
     ygg::IndexList<formalism::Predicate> generated_predicates;
     ygg::IndexList<formalism::Axiom> generated_axioms;
+    std::unordered_map<std::string, ygg::Index<formalism::Condition>> generated_universal_conditions;
     size_t num_generated_axioms = 0;
     bool append_generated_axioms_to_domain = true;
     std::unordered_map<ygg::uint_t, ygg::Index<formalism::Predicate>> type_predicates;

@@ -328,6 +328,36 @@ bool initial_literals_use_predicate(const ygg::IndexList<formalism::Literal>& li
     return found;
 }
 
+std::optional<std::string> object_term_name(ygg::Index<formalism::Term> term, const formalism::Repository& repository)
+{
+    return std::visit(
+        Overloaded {
+            [&](ygg::Index<formalism::Object> object) -> std::optional<std::string> { return std::string(repository[object].name); },
+            [&](auto) -> std::optional<std::string> { return std::nullopt; },
+        },
+        repository[term].value);
+}
+
+bool has_initial_unary_literal(const ygg::IndexList<formalism::Literal>& literals,
+                               const formalism::Repository& repository,
+                               const std::string& predicate_name,
+                               const std::string& object_name)
+{
+    for (auto literal : literals)
+    {
+        const auto& literal_data = repository[literal];
+        if (!literal_data.positive)
+            continue;
+        const auto& atom = repository[literal_data.atom];
+        if (atom.terms.size() != 1 || std::string(repository[atom.predicate].name) != predicate_name)
+            continue;
+        const auto object = object_term_name(atom.terms.front(), repository);
+        if (object && *object == object_name)
+            return true;
+    }
+    return false;
+}
+
 bool condition_mentions_predicate(ygg::Index<formalism::Condition> condition, const formalism::Repository& repository, const std::string& name)
 {
     return std::visit(
@@ -888,6 +918,24 @@ TEST(LokiSemanticTranslator, AddsTypePredicatesAndRemovesTypingByDefault)
     const auto thing_predicate = predicate_named(translated_domain, "thing");
     ASSERT_TRUE(thing_predicate.has_value());
     EXPECT_TRUE(initial_literals_use_predicate(translated_task.get_data().initial_literals, translated_task.get_context(), "thing", *thing_predicate));
+}
+
+TEST(LokiSemanticTranslator, PreservesTaskObjectTypesAfterDomainCanonicalization)
+{
+    const auto domain_path = fs::path(std::string(DATA_DIR)) / "planning-benchmarks/tests/classical/childsnack/domain.pddl";
+    const auto task_path = fs::path(std::string(DATA_DIR)) / "planning-benchmarks/tests/classical/childsnack/test-1.pddl";
+
+    semantic::Parser parser(domain_path);
+    const auto domain_translation = semantic::translate(parser.get_domain());
+    const auto translated_result = semantic::translate(parser.parse_task(task_path), domain_translation);
+    const auto translated = translated_result.get_translated_task();
+    const auto& repository = translated.get_context();
+    const auto& literals = translated.get_data().initial_literals;
+
+    EXPECT_TRUE(has_initial_unary_literal(literals, repository, "bread-portion", "bread1"));
+    EXPECT_TRUE(has_initial_unary_literal(literals, repository, "content-portion", "content1"));
+    EXPECT_TRUE(has_initial_unary_literal(literals, repository, "place", "table1"));
+    EXPECT_FALSE(has_initial_unary_literal(literals, repository, "place", "bread1"));
 }
 
 TEST(LokiSemanticTranslator, AddsEqualityPredicateWhenAdlDomainUsesEquality)

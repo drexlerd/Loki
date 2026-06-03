@@ -80,7 +80,6 @@ std::shared_ptr<TranslationStorage> canonicalize_domain_storage(formalism::Domai
 
     const auto middle_domains = canonical->domains;
     const auto middle_requirements = canonical->requirements;
-    const auto middle_types = canonical->types;
     const auto middle_objects = canonical->objects;
     const auto middle_variables = canonical->variables;
     const auto middle_parameters = canonical->parameters;
@@ -118,6 +117,10 @@ std::shared_ptr<TranslationStorage> canonicalize_domain_storage(formalism::Domai
     const auto middle_metrics = canonical->metrics;
     const auto middle_initial_function_values = canonical->initial_function_values;
     const auto middle_tasks = canonical->tasks;
+
+    auto middle_types = canonical->types;
+    remap_object_type_metadata(*canonical, *middle, middle->repository, middle_objects, middle_types);
+    middle_types = canonical->types;
 
     canonical->original_domain = original_domain.get_index();
     canonical->translated_domain = canonical_domain.get_index();
@@ -162,7 +165,6 @@ std::shared_ptr<TranslationStorage> canonicalize_domain_storage(formalism::Domai
     compose_map(canonical->metrics, middle->metrics, middle_metrics);
     compose_map(canonical->initial_function_values, middle->initial_function_values, middle_initial_function_values);
     compose_map(canonical->tasks, middle->tasks, middle_tasks);
-    remap_object_type_metadata(*canonical, *middle, middle->repository, middle_objects, middle_types);
     return canonical;
 }
 
@@ -214,6 +216,10 @@ const std::vector<PhaseStep>& task_phase_steps()
 
 void compose_storage_maps_from_previous(TranslationStorage& target, const TranslationStorage& previous)
 {
+    const auto precompose_objects = target.objects;
+    auto precompose_types = target.types;
+    remap_object_type_metadata(target, previous, previous.repository, precompose_objects, precompose_types);
+
     const auto requirements = target.requirements;
     const auto types = target.types;
     const auto objects = target.objects;
@@ -255,7 +261,6 @@ void compose_storage_maps_from_previous(TranslationStorage& target, const Transl
     const auto domains = target.domains;
     const auto tasks = target.tasks;
 
-    remap_object_type_metadata(target, previous, previous.repository, objects, types);
     target.original_domain = previous.original_domain;
 
     compose_map(target.requirements, previous.requirements, requirements);
