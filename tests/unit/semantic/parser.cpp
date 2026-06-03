@@ -682,6 +682,35 @@ TEST(LokiSemanticTranslator, LowersNegatedExistsWithoutNegatingInnerCondition)
 }
 
 
+TEST(LokiSemanticTranslator, GeneratedAxiomParametersMatchHeadPredicateArity)
+{
+    const auto domain_source = std::string {
+        "(define (domain generated-axiom-arity)"
+        "(:requirements :typing :existential-preconditions)"
+        "(:predicates (p ?x - object ?y - object))"
+        "(:action a :parameters (?x - object) "
+        ":precondition (not (exists (?y - object) (p ?x ?y))) "
+        ":effect (and))"
+        ")" };
+
+    semantic::Parser parser(domain_source);
+
+    const auto translation = semantic::translate(parser.get_domain());
+    const auto translated_domain = translation.get_translated_domain();
+    const auto& repository = translated_domain.get_context();
+
+    ASSERT_EQ(translated_domain.get_data().axioms.size(), 1);
+    const auto& axiom = repository[translated_domain.get_data().axioms.front()];
+    const auto& literal = repository[axiom.head];
+    const auto& atom = repository[literal.atom];
+    const auto& predicate = repository[atom.predicate];
+
+    EXPECT_EQ(predicate.parameters.size(), atom.terms.size());
+    EXPECT_GE(axiom.parameters.size(), atom.terms.size());
+    EXPECT_FALSE(contains_exists(axiom.condition, repository));
+}
+
+
 TEST(LokiSemanticTranslator, ReusesGeneratedAxiomsForIdenticalUniversalConditions)
 {
     const auto domain_source = std::string {
