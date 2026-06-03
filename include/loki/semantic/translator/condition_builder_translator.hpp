@@ -25,7 +25,7 @@ public:
     formalism::ConditionView wrap_condition(ygg::Index<formalism::ConditionExists> value);
     formalism::ConditionView wrap_condition(ygg::Index<formalism::ConditionForall> value);
     formalism::ConditionView wrap_condition(ygg::Index<formalism::ConditionNumericConstraint> value);
-    cista::optional<ygg::Index<formalism::ConditionOr>> as_or(ygg::Index<formalism::Condition> condition) const;
+    std::optional<formalism::ConditionOrView> as_or(ygg::Index<formalism::Condition> condition) const;
     formalism::ConditionView flatten_condition(ygg::Index<formalism::Condition> condition);
     formalism::ConditionView make_conjunction(ygg::IndexList<formalism::Condition> conditions);
     formalism::ConditionView make_disjunction(ygg::IndexList<formalism::Condition> conditions);
@@ -62,14 +62,14 @@ template<typename Derived>
 formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(ygg::Index<formalism::ConditionNumericConstraint> value) { return this->self().wrap_condition(ygg::Data<formalism::Condition>::Variant(value)); }
 
 template<typename Derived>
-cista::optional<ygg::Index<formalism::ConditionOr>> ConditionBuilderTranslator<Derived>::as_or(ygg::Index<formalism::Condition> condition) const
+std::optional<formalism::ConditionOrView> ConditionBuilderTranslator<Derived>::as_or(ygg::Index<formalism::Condition> condition) const
 {
-    auto result = cista::optional<ygg::Index<formalism::ConditionOr>> {};
+    auto result = std::optional<formalism::ConditionOrView> {};
     std::visit([&](const auto& node)
     {
         using Node = std::decay_t<decltype(node)>;
         if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionOr>>)
-            result = node;
+            result = ygg::make_view(node, this->m_storage->repository);
     }, this->m_storage->repository[condition].value);
     return result;
 }

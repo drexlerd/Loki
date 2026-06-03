@@ -22,6 +22,7 @@ public:
     formalism::ConditionView to_dnf_node(ygg::Index<formalism::Condition>,ygg::Index<formalism::ConditionOr> node);
     formalism::ConditionView to_dnf_node(ygg::Index<formalism::Condition>,ygg::Index<formalism::ConditionAnd> node);
     formalism::ConditionView to_dnf_node(ygg::Index<formalism::Condition>,ygg::Index<formalism::ConditionExists> node);
+    formalism::ConditionView to_dnf_node(ygg::Index<formalism::Condition>,ygg::Index<formalism::ConditionForall> node);
     template<typename T>
     formalism::ConditionView to_dnf_node(ygg::Index<formalism::Condition> condition, ygg::Index<T>);
 };
@@ -47,7 +48,7 @@ formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index
         const auto dnf = as_index(this->self().to_dnf(child));
         if (const auto child_or = this->self().as_or(dnf))
         {
-            for (auto nested : this->m_storage->repository[*child_or].conditions)
+            for (auto nested : child_or->get_data().conditions)
                 parts.push_back(nested);
         }
         else
@@ -68,7 +69,7 @@ formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index
         auto alternatives = ygg::IndexList<formalism::Condition> {};
         if (const auto child_or = this->self().as_or(dnf))
         {
-            for (auto nested : this->m_storage->repository[*child_or].conditions)
+            for (auto nested : child_or->get_data().conditions)
                 alternatives.push_back(nested);
         }
         else
@@ -103,7 +104,7 @@ formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index
     if (const auto child_or = this->self().as_or(child))
     {
         auto parts = ygg::IndexList<formalism::Condition> {};
-        for (auto nested : this->m_storage->repository[*child_or].conditions)
+        for (auto nested : child_or->get_data().conditions)
         {
             const auto exists = as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(
                 this->m_storage->repository, data.parameters, nested).get_index()));
@@ -114,6 +115,27 @@ formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index
     const auto exists = as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(
         this->m_storage->repository, data.parameters, child).get_index()));
     return this->self().flatten_condition(exists);
+}
+
+template<typename Derived>
+formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(ygg::Index<formalism::Condition>,ygg::Index<formalism::ConditionForall> node)
+{
+    const auto& data = this->m_storage->repository[node];
+    const auto child = as_index(this->self().to_dnf(data.condition));
+    if (const auto child_or = this->self().as_or(child))
+    {
+        auto parts = ygg::IndexList<formalism::Condition> {};
+        for (auto nested : child_or->get_data().conditions)
+        {
+            const auto forall = as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionForall>(
+                this->m_storage->repository, data.parameters, nested).get_index()));
+            parts.push_back(as_index(this->self().flatten_condition(forall)));
+        }
+        return this->self().to_dnf(as_index(this->self().make_disjunction(std::move(parts))));
+    }
+    const auto forall = as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionForall>(
+        this->m_storage->repository, data.parameters, child).get_index()));
+    return this->self().flatten_condition(forall);
 }
 
 template<typename Derived>

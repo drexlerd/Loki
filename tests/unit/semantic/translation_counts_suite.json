@@ -1,0 +1,693 @@
+{
+    "cases": [
+        {
+            "name": "classical/agricola",
+            "translated_domain": {
+                "predicates": 52,
+                "actions": 22,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 22,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/airport",
+            "translated_domain": {
+                "predicates": 26,
+                "actions": 5,
+                "axioms": 4
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 5,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/assembly",
+            "translated_domain": {
+                "predicates": 24,
+                "actions": 6,
+                "axioms": 9
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 6,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/barman",
+            "translated_domain": {
+                "predicates": 26,
+                "actions": 12,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 12,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/blocks_3",
+            "translated_domain": {
+                "predicates": 5,
+                "actions": 3,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 3,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/blocks_4",
+            "translated_domain": {
+                "predicates": 7,
+                "actions": 4,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 4,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/childsnack",
+            "translated_domain": {
+                "predicates": 22,
+                "actions": 6,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 6,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/delivery",
+            "translated_domain": {
+                "predicates": 11,
+                "actions": 3,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 3,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/driverlog",
+            "translated_domain": {
+                "predicates": 13,
+                "actions": 6,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 6,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/ferry",
+            "translated_domain": {
+                "predicates": 8,
+                "actions": 3,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 3,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/grid",
+            "translated_domain": {
+                "predicates": 14,
+                "actions": 5,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 5,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/gripper",
+            "translated_domain": {
+                "predicates": 9,
+                "actions": 3,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 3,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/hiking",
+            "translated_domain": {
+                "predicates": 16,
+                "actions": 7,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 7,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/logistics",
+            "translated_domain": {
+                "predicates": 11,
+                "actions": 6,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 6,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/miconic",
+            "translated_domain": {
+                "predicates": 10,
+                "actions": 4,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 4,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/miconic-fulladl",
+            "translated_domain": {
+                "predicates": 29,
+                "actions": 38,
+                "axioms": 15
+            },
+            "translated_task": {
+                "predicates": 1,
+                "actions": 38,
+                "axioms": 1
+            }
+        },
+        {
+            "name": "classical/miconic-simpleadl",
+            "translated_domain": {
+                "predicates": 10,
+                "actions": 3,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 3,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/parcprinter",
+            "translated_domain": {
+                "predicates": 20,
+                "actions": 23,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 23,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/pathways",
+            "translated_domain": {
+                "predicates": 15,
+                "actions": 7,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 7,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/philosophers",
+            "translated_domain": {
+                "predicates": 44,
+                "actions": 7,
+                "axioms": 6
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 7,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/psr-middle",
+            "translated_domain": {
+                "predicates": 17,
+                "actions": 3,
+                "axioms": 15
+            },
+            "translated_task": {
+                "predicates": 1,
+                "actions": 3,
+                "axioms": 1
+            }
+        },
+        {
+            "name": "classical/pushworld",
+            "translated_domain": {
+                "predicates": 13,
+                "actions": 2,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 2,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/reward",
+            "translated_domain": {
+                "predicates": 8,
+                "actions": 2,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 2,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/rovers",
+            "translated_domain": {
+                "predicates": 34,
+                "actions": 9,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 9,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/satellite",
+            "translated_domain": {
+                "predicates": 14,
+                "actions": 5,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 5,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/schedule",
+            "translated_domain": {
+                "predicates": 22,
+                "actions": 9,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 9,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/sokoban",
+            "translated_domain": {
+                "predicates": 9,
+                "actions": 2,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 2,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/spanner",
+            "translated_domain": {
+                "predicates": 13,
+                "actions": 3,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 3,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/transport",
+            "translated_domain": {
+                "predicates": 13,
+                "actions": 3,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 3,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/visitall",
+            "translated_domain": {
+                "predicates": 6,
+                "actions": 1,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 1,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "classical/woodworking",
+            "translated_domain": {
+                "predicates": 34,
+                "actions": 13,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 13,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/block-grouping",
+            "translated_domain": {
+                "predicates": 3,
+                "actions": 4,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 4,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/counters",
+            "translated_domain": {
+                "predicates": 4,
+                "actions": 2,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 2,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/delivery",
+            "translated_domain": {
+                "predicates": 13,
+                "actions": 5,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 5,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/drone",
+            "translated_domain": {
+                "predicates": 4,
+                "actions": 8,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 8,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/expedition",
+            "translated_domain": {
+                "predicates": 6,
+                "actions": 4,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 4,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/ext-plant-watering",
+            "translated_domain": {
+                "predicates": 7,
+                "actions": 10,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 10,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/farmland",
+            "translated_domain": {
+                "predicates": 5,
+                "actions": 2,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 2,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/fo-counters",
+            "translated_domain": {
+                "predicates": 4,
+                "actions": 4,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 4,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/fo-farmland",
+            "translated_domain": {
+                "predicates": 6,
+                "actions": 3,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 3,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/fo-sailing",
+            "translated_domain": {
+                "predicates": 6,
+                "actions": 10,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 10,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/hydropower",
+            "translated_domain": {
+                "predicates": 12,
+                "actions": 3,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 3,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/markettrader",
+            "translated_domain": {
+                "predicates": 9,
+                "actions": 4,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 4,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/mprime",
+            "translated_domain": {
+                "predicates": 9,
+                "actions": 4,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 4,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/pathwaysmetric",
+            "translated_domain": {
+                "predicates": 12,
+                "actions": 6,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 6,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/refuel",
+            "translated_domain": {
+                "predicates": 2,
+                "actions": 1,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 1,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/refuel-adl",
+            "translated_domain": {
+                "predicates": 6,
+                "actions": 2,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 1,
+                "actions": 2,
+                "axioms": 1
+            }
+        },
+        {
+            "name": "numeric/rover",
+            "translated_domain": {
+                "predicates": 35,
+                "actions": 10,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 10,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/sailing",
+            "translated_domain": {
+                "predicates": 5,
+                "actions": 8,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 8,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/settersnumeric",
+            "translated_domain": {
+                "predicates": 25,
+                "actions": 25,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 25,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/sugar",
+            "translated_domain": {
+                "predicates": 26,
+                "actions": 13,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 13,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/tpp",
+            "translated_domain": {
+                "predicates": 9,
+                "actions": 3,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 3,
+                "axioms": 0
+            }
+        },
+        {
+            "name": "numeric/zenotravel",
+            "translated_domain": {
+                "predicates": 8,
+                "actions": 5,
+                "axioms": 0
+            },
+            "translated_task": {
+                "predicates": 0,
+                "actions": 5,
+                "axioms": 0
+            }
+        }
+    ]
+}

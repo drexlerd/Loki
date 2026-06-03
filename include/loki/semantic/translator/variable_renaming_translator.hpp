@@ -54,8 +54,8 @@ public:
     formalism::AxiomView rename_axiom_variables(ygg::Index<formalism::Axiom> source, const formalism::Repository& repository);
 
 private:
-    ygg::Index<formalism::Variable> lookup_variable(ygg::Index<formalism::Variable> source, const formalism::Repository& repository);
-    ygg::Index<formalism::Variable> fresh_variable(ygg::Index<formalism::Variable> source, const formalism::Repository& repository);
+    formalism::VariableView lookup_variable(ygg::Index<formalism::Variable> source, const formalism::Repository& repository);
+    formalism::VariableView fresh_variable(ygg::Index<formalism::Variable> source, const formalism::Repository& repository);
 };
 
 template<typename Derived>
@@ -71,22 +71,22 @@ void VariableRenamingTranslator<Derived>::leave_variable_scope()
 }
 
 template<typename Derived>
-ygg::Index<formalism::Variable> VariableRenamingTranslator<Derived>::lookup_variable(ygg::Index<formalism::Variable> source, const formalism::Repository& repository)
+formalism::VariableView VariableRenamingTranslator<Derived>::lookup_variable(ygg::Index<formalism::Variable> source, const formalism::Repository& repository)
 {
     for (auto it = this->m_variable_bindings.rbegin(); it != this->m_variable_bindings.rend(); ++it)
     {
         if (auto mapped = it->find(source.get_value()); mapped != it->end())
-            return mapped->second;
+            return ygg::make_view(mapped->second, this->m_storage->repository);
     }
-    return as_index(this->self().copy(source, repository));
+    return this->self().copy(source, repository);
 }
 
 template<typename Derived>
-ygg::Index<formalism::Variable> VariableRenamingTranslator<Derived>::fresh_variable(ygg::Index<formalism::Variable> source, const formalism::Repository& repository)
+formalism::VariableView VariableRenamingTranslator<Derived>::fresh_variable(ygg::Index<formalism::Variable> source, const formalism::Repository& repository)
 {
     auto& counter = this->m_num_quantifications[source.get_value()];
     auto name = std::string(repository[source].name) + "_" + std::to_string(counter++);
-    return formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string(name)).get_index();
+    return formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string(name));
 }
 
 template<typename Derived>
@@ -94,8 +94,8 @@ formalism::ParameterView VariableRenamingTranslator<Derived>::rename_parameter(y
 {
     const auto& data = repository[source];
     const auto variable = this->self().fresh_variable(data.variable, repository);
-    this->m_variable_bindings.back().emplace(data.variable.get_value(), variable);
-    return formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, variable, this->self().template copy_list<formalism::Type>(data.types, repository));
+    this->m_variable_bindings.back().emplace(data.variable.get_value(), variable.get_index());
+    return formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, variable.get_index(), this->self().template copy_list<formalism::Type>(data.types, repository));
 }
 
 template<typename Derived>
@@ -115,7 +115,7 @@ formalism::TermView VariableRenamingTranslator<Derived>::rename_variables(ygg::I
         {
             using Arg = std::decay_t<decltype(arg)>;
             if constexpr (std::is_same_v<Arg, ygg::Index<formalism::Variable>>)
-                return this->self().lookup_variable(arg, repository);
+                return as_index(this->self().lookup_variable(arg, repository));
             else
                 return as_index(this->self().copy(arg, repository));
         },

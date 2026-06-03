@@ -76,8 +76,10 @@ formalism::ConditionExistsView ConditionTranslator<Derived>::copy(ygg::Index<for
     const auto condition = as_index(this->self().copy(data.condition, repository));
     this->self().leave_scope();
     auto typed_condition = condition;
-    this->self().prepend_type_conditions(typed_condition, parameters);
-    return formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, this->self().maybe_strip_parameters(parameters), typed_condition);
+    if (this->m_phase == TranslationPhase::AddTypePredicates)
+        this->self().prepend_type_conditions(typed_condition, parameters);
+    const auto out_parameters = this->m_phase == TranslationPhase::AddTypePredicates ? this->self().maybe_strip_parameters(parameters) : parameters;
+    return formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, out_parameters, typed_condition);
 }
 
 template<typename Derived>
@@ -90,8 +92,10 @@ formalism::ConditionForallView ConditionTranslator<Derived>::copy(ygg::Index<for
     const auto condition = as_index(this->self().copy(data.condition, repository));
     this->self().leave_scope();
     auto typed_condition = condition;
-    this->self().prepend_type_conditions(typed_condition, parameters);
-    return formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository, this->self().maybe_strip_parameters(parameters), typed_condition);
+    if (this->m_phase == TranslationPhase::AddTypePredicates)
+        this->self().prepend_type_conditions(typed_condition, parameters);
+    const auto out_parameters = this->m_phase == TranslationPhase::AddTypePredicates ? this->self().maybe_strip_parameters(parameters) : parameters;
+    return formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository, out_parameters, typed_condition);
 }
 
 template<typename Derived>
@@ -104,7 +108,20 @@ formalism::ConditionNumericConstraintView ConditionTranslator<Derived>::copy(ygg
 template<typename Derived>
 formalism::ConditionView ConditionTranslator<Derived>::copy(ygg::Index<formalism::Condition> source, const formalism::Repository& repository)
 {
-    return this->self().flatten_condition(as_index(this->self().to_dnf(as_index(std::visit([&](const auto& arg) { return this->self().copy_condition_node(arg, repository); }, repository[source].value)))));
+    switch (this->m_phase)
+    {
+        case TranslationPhase::ToNegationNormalForm:
+            return this->self().flatten_condition(as_index(std::visit([&](const auto& arg) { return this->self().copy_condition_node(arg, repository); }, repository[source].value)));
+        case TranslationPhase::RemoveUniversalQuantifiers:
+            return this->self().remove_universal_quantifiers(source, repository);
+        case TranslationPhase::ToDisjunctiveNormalForm:
+        {
+            const auto copied = as_index(std::visit([&](const auto& arg) { return this->self().wrap_condition(as_index(this->self().copy(arg, repository))); }, repository[source].value));
+            return this->self().flatten_condition(as_index(this->self().to_dnf(copied)));
+        }
+        default:
+            return this->self().flatten_condition(as_index(std::visit([&](const auto& arg) { return this->self().wrap_condition(as_index(this->self().copy(arg, repository))); }, repository[source].value)));
+    }
 }
 
 } // namespace loki::semantic::detail

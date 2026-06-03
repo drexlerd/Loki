@@ -41,6 +41,8 @@ public:
 
     void append_generated_domain_objects(ygg::Data<formalism::Domain>& data);
 
+    void ensure_derived_predicates_requirement(ygg::IndexList<formalism::Requirement>& requirements);
+
     void update_translated_domain();
 
     ygg::IndexList<formalism::Requirement> strip_typing_requirement(ygg::IndexList<formalism::Requirement> requirements);
@@ -133,8 +135,14 @@ void BasicCopyTranslator<Derived>::append_generated_domain_objects(ygg::Data<for
             data.axioms.push_back(axiom);
     }
 
+    this->self().ensure_derived_predicates_requirement(data.requirements);
+}
+
+template<typename Derived>
+void BasicCopyTranslator<Derived>::ensure_derived_predicates_requirement(ygg::IndexList<formalism::Requirement>& requirements)
+{
     auto has_derived_requirement = false;
-    for (auto requirement : data.requirements)
+    for (auto requirement : requirements)
     {
         if (this->m_storage->repository[requirement].kind == formalism::RequirementKind::DerivedPredicates)
         {
@@ -143,7 +151,7 @@ void BasicCopyTranslator<Derived>::append_generated_domain_objects(ygg::Data<for
         }
     }
     if (!has_derived_requirement)
-        data.requirements.push_back(formalism::get_or_create<formalism::Requirement>(this->m_storage->repository, formalism::RequirementKind::DerivedPredicates).get_index());
+        requirements.push_back(formalism::get_or_create<formalism::Requirement>(this->m_storage->repository, formalism::RequirementKind::DerivedPredicates).get_index());
 }
 
 template<typename Derived>
@@ -204,8 +212,8 @@ formalism::ObjectView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::O
     if (find_mapped(this->m_storage->objects, source, out)) return ygg::make_view(out, this->m_storage->repository);
     const auto& data = repository[source];
     auto types = this->self().template copy_list<formalism::Type>(data.types, repository);
-    this->m_storage->object_types_by_name[std::string(data.name)] = types;
     out = formalism::get_or_create<formalism::Object>(this->m_storage->repository, data.name, this->self().maybe_strip_types(types)).get_index();
+    this->m_storage->object_types[out.get_value()] = std::move(types);
     remember(this->m_storage->objects, source, out);
     return ygg::make_view(out, this->m_storage->repository);
 }
@@ -214,7 +222,7 @@ template<typename Derived>
 formalism::VariableView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Variable> source, const formalism::Repository& repository)
 {
     auto name = std::string(repository[source].name);
-    if (this->m_renaming_enabled)
+    if (this->m_phase == TranslationPhase::RenameQuantifiedVariables && this->m_renaming_enabled)
     {
         const auto key = source.get_value();
         if (auto it = this->m_num_quantifications.find(key); it != this->m_num_quantifications.end())
@@ -238,7 +246,10 @@ formalism::PredicateView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism
     const auto& data = repository[source];
     const auto previous = this->m_renaming_enabled;
     this->m_renaming_enabled = false;
-    out = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, data.name, this->self().template copy_list<formalism::Parameter>(data.parameters, repository)).get_index();
+    auto parameters = this->self().template copy_list<formalism::Parameter>(data.parameters, repository);
+    if (this->m_phase == TranslationPhase::AddTypePredicates)
+        parameters = this->self().maybe_strip_parameters(parameters);
+    out = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, data.name, std::move(parameters)).get_index();
     this->m_renaming_enabled = previous;
     remember(this->m_storage->predicates, source, out);
     return ygg::make_view(out, this->m_storage->repository);
@@ -252,7 +263,10 @@ formalism::FunctionSkeletonView BasicCopyTranslator<Derived>::copy(ygg::Index<fo
     const auto& data = repository[source];
     const auto previous = this->m_renaming_enabled;
     this->m_renaming_enabled = false;
-    out = formalism::get_or_create<formalism::FunctionSkeleton>(this->m_storage->repository, data.name, this->self().template copy_list<formalism::Parameter>(data.parameters, repository), as_index(this->self().copy(data.type, repository))).get_index();
+    auto parameters = this->self().template copy_list<formalism::Parameter>(data.parameters, repository);
+    if (this->m_phase == TranslationPhase::AddTypePredicates)
+        parameters = this->self().maybe_strip_parameters(parameters);
+    out = formalism::get_or_create<formalism::FunctionSkeleton>(this->m_storage->repository, data.name, std::move(parameters), as_index(this->self().copy(data.type, repository))).get_index();
     this->m_renaming_enabled = previous;
     remember(this->m_storage->functions, source, out);
     return ygg::make_view(out, this->m_storage->repository);

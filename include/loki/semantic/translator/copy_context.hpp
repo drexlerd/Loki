@@ -18,23 +18,22 @@ struct CopyContext
     std::vector<std::unordered_map<ygg::uint_t, ygg::Index<formalism::Variable>>> variable_bindings;
     ygg::IndexList<formalism::Predicate> generated_predicates;
     ygg::IndexList<formalism::Axiom> generated_axioms;
-    std::unordered_map<ygg::uint_t, ygg::Index<formalism::Condition>> generated_axiom_conditions;
-    std::unordered_map<ygg::uint_t, ygg::Index<formalism::Condition>> generated_positive_conditions;
     size_t num_generated_axioms = 0;
     bool append_generated_axioms_to_domain = true;
-    cista::optional<ygg::Index<formalism::Predicate>> equality_predicate;
     std::unordered_map<ygg::uint_t, ygg::Index<formalism::Predicate>> type_predicates;
     bool remove_typing = true;
     bool renaming_enabled = true;
+    TranslationPhase phase = TranslationPhase::ToNegationNormalForm;
 };
 
 class CopyContextOwner
 {
 public:
-    explicit CopyContextOwner(std::shared_ptr<TranslationStorage> storage, bool remove_typing)
+    explicit CopyContextOwner(std::shared_ptr<TranslationStorage> storage, bool remove_typing, TranslationPhase phase)
     {
         m_context.storage = std::move(storage);
         m_context.remove_typing = remove_typing;
+        m_context.phase = phase;
     }
 
     CopyContext& context() noexcept { return m_context; }

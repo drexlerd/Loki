@@ -15,6 +15,7 @@
 #include <cista/containers/optional.h>
 
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -30,6 +31,20 @@ namespace loki::semantic
 struct TranslatorOptions
 {
     bool remove_typing = true;
+};
+
+enum class TranslationPhase
+{
+    ToNegationNormalForm,
+    RenameQuantifiedVariables,
+    RemoveUniversalQuantifiers,
+    SimplifyGoal,
+    ToDisjunctiveNormalForm,
+    SplitDisjunctiveConditions,
+    MoveExistentialQuantifiers,
+    AddTypePredicates,
+    ToEffectNormalForm,
+    InitializeEquality,
 };
 
 inline const std::vector<std::string_view>& domain_translation_steps()
@@ -117,7 +132,7 @@ struct TranslationStorage
     IndexMap<formalism::InitialFunctionValue> initial_function_values;
     IndexMap<formalism::Domain> domains;
     IndexMap<formalism::Task> tasks;
-    std::unordered_map<std::string, ygg::IndexList<formalism::Type>> object_types_by_name;
+    std::unordered_map<ygg::uint_t, ygg::IndexList<formalism::Type>> object_types;
 
     explicit TranslationStorage(size_t index = 1, const formalism::Repository* parent = nullptr) : repository(index, parent) {}
 };

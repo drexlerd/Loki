@@ -16,6 +16,7 @@ class TypeTranslator : public CopyTranslatorComponent<Derived, TypeTranslator<De
 public:
     explicit TypeTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, TypeTranslator<Derived>>(context) {}
 
+    bool removes_typing_now() const noexcept;
     ygg::IndexList<formalism::Type> collect_type_hierarchy(ygg::Index<formalism::Type> type) const;
     ygg::IndexList<formalism::Type> collect_type_hierarchy(const ygg::IndexList<formalism::Type>& types) const;
     ygg::IndexList<formalism::Type> maybe_strip_types(const ygg::IndexList<formalism::Type>& types) const;
@@ -32,6 +33,12 @@ public:
     void add_type_literals_for_object(ygg::IndexList<formalism::Literal>& literals,ygg::Index<formalism::Object> object);
     void initialize_type_literals(ygg::Data<formalism::Task>& task);
 };
+
+template<typename Derived>
+bool TypeTranslator<Derived>::removes_typing_now() const noexcept
+{
+    return this->m_remove_typing && this->m_phase == TranslationPhase::AddTypePredicates;
+}
 
 template<typename Derived>
 ygg::IndexList<formalism::Type> TypeTranslator<Derived>::collect_type_hierarchy(ygg::Index<formalism::Type> type) const
@@ -69,13 +76,13 @@ ygg::IndexList<formalism::Type> TypeTranslator<Derived>::collect_type_hierarchy(
 template<typename Derived>
 ygg::IndexList<formalism::Type> TypeTranslator<Derived>::maybe_strip_types(const ygg::IndexList<formalism::Type>& types) const
 {
-    return this->m_remove_typing ? ygg::IndexList<formalism::Type> {} : types;
+    return this->self().removes_typing_now() ? ygg::IndexList<formalism::Type> {} : types;
 }
 
 template<typename Derived>
 formalism::ParameterView TypeTranslator<Derived>::maybe_strip_parameter(ygg::Index<formalism::Parameter> parameter)
 {
-    if (!this->m_remove_typing)
+    if (!this->self().removes_typing_now())
         return ygg::make_view(parameter, this->m_storage->repository);
     const auto& data = this->m_storage->repository[parameter];
     return formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, data.variable, ygg::IndexList<formalism::Type> {});
@@ -93,7 +100,7 @@ ygg::IndexList<formalism::Parameter> TypeTranslator<Derived>::maybe_strip_parame
 template<typename Derived>
 formalism::ObjectView TypeTranslator<Derived>::maybe_strip_object(ygg::Index<formalism::Object> object)
 {
-    if (!this->m_remove_typing)
+    if (!this->self().removes_typing_now())
         return ygg::make_view(object, this->m_storage->repository);
     const auto& data = this->m_storage->repository[object];
     return formalism::get_or_create<formalism::Object>(this->m_storage->repository, data.name, ygg::IndexList<formalism::Type> {});
@@ -104,26 +111,16 @@ formalism::PredicateView TypeTranslator<Derived>::type_predicate(ygg::Index<form
 {
     if (auto it = this->m_type_predicates.find(type.get_value()); it != this->m_type_predicates.end())
         return ygg::make_view(it->second, this->m_storage->repository);
-    const auto name = std::string(this->m_storage->repository[type].name);
-    if (this->m_storage->translated_domain != ygg::Index<formalism::Domain>::max())
-    {
-        const auto& domain = this->m_storage->repository[this->m_storage->translated_domain];
-        for (auto predicate : domain.predicates)
-        {
-            if (std::string(this->m_storage->repository[predicate].name) == name)
-            {
-                this->m_type_predicates.emplace(type.get_value(), predicate);
-                return ygg::make_view(predicate, this->m_storage->repository);
-            }
-        }
-    }
+
     auto parameters = ygg::IndexList<formalism::Parameter> {};
     const auto variable = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("arg")).get_index();
     auto parameter_types = ygg::IndexList<formalism::Type> {};
-    if (!this->m_remove_typing)
+    if (!this->self().removes_typing_now())
         parameter_types.push_back(type);
     parameters.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, variable, std::move(parameter_types)).get_index());
-    const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, cista::offset::string(name), std::move(parameters)).get_index();
+
+    const auto& type_data = this->m_storage->repository[type];
+    const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, type_data.name, std::move(parameters)).get_index();
     this->m_type_predicates.emplace(type.get_value(), predicate);
     return ygg::make_view(predicate, this->m_storage->repository);
 }
@@ -165,7 +162,7 @@ void TypeTranslator<Derived>::prepend_type_conditions(cista::optional<ygg::Index
         return;
     if (condition)
         parts.push_back(*condition);
-    condition = as_index(this->self().flatten_condition(as_index(this->self().to_dnf(as_index(this->self().make_conjunction(std::move(parts)))))));
+    condition = as_index(this->self().flatten_condition(as_index(this->self().make_conjunction(std::move(parts)))));
 }
 
 template<typename Derived>
@@ -179,9 +176,10 @@ void TypeTranslator<Derived>::prepend_type_conditions(ygg::Index<formalism::Cond
 template<typename Derived>
 void TypeTranslator<Derived>::add_type_predicates_to_domain(ygg::Data<formalism::Domain>& data)
 {
-    auto existing = std::unordered_set<std::string> {};
+    auto existing = std::unordered_set<ygg::uint_t> {};
     for (auto predicate : data.predicates)
-        existing.insert(std::string(this->m_storage->repository[predicate].name));
+        existing.insert(predicate.get_value());
+
     auto types = data.types;
     for (auto object : data.constants)
     {
@@ -190,22 +188,22 @@ void TypeTranslator<Derived>::add_type_predicates_to_domain(ygg::Data<formalism:
         {
             types.insert(types.end(), object_data.types.begin(), object_data.types.end());
         }
-        else if (auto it = this->m_storage->object_types_by_name.find(std::string(object_data.name)); it != this->m_storage->object_types_by_name.end())
+        else if (auto it = this->m_storage->object_types.find(object.get_value()); it != this->m_storage->object_types.end())
         {
             types.insert(types.end(), it->second.begin(), it->second.end());
         }
     }
-    for (const auto& [_, object_types] : this->m_storage->object_types_by_name)
+    for (const auto& [_, object_types] : this->m_storage->object_types)
         types.insert(types.end(), object_types.begin(), object_types.end());
 
     for (auto type : this->self().collect_type_hierarchy(types))
     {
-        const auto name = std::string(this->m_storage->repository[type].name);
-        if (existing.insert(name).second)
-            data.predicates.push_back(as_index(this->self().type_predicate(type)));
+        const auto predicate = as_index(this->self().type_predicate(type));
+        if (existing.insert(predicate.get_value()).second)
+            data.predicates.push_back(predicate);
     }
     data.requirements = this->self().strip_typing_requirement(data.requirements);
-    if (this->m_remove_typing)
+    if (this->self().removes_typing_now())
         data.types = {};
 }
 
@@ -217,7 +215,7 @@ void TypeTranslator<Derived>::add_type_literals_for_object(ygg::IndexList<formal
     auto types = data.types;
     if (types.empty())
     {
-        if (auto it = this->m_storage->object_types_by_name.find(std::string(data.name)); it != this->m_storage->object_types_by_name.end())
+        if (auto it = this->m_storage->object_types.find(object.get_value()); it != this->m_storage->object_types.end())
             types = it->second;
     }
     for (auto type : this->self().collect_type_hierarchy(types))

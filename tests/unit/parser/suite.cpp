@@ -12,7 +12,7 @@
 #include <loki/fmt.hpp>
 #include <loki/parser.hpp>
 
-#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -61,27 +61,16 @@ struct ParserSuiteCase
     fs::path task_file;
 };
 
-fs::path suite_root_path()
-{
-    return fs::path(std::string(DATA_DIR)) / "..";
-}
-
-fs::path suite_path(const boost::json::object& suite, const std::string& path)
-{
-    const auto prefix = ygg::common::find_string(suite, "prefix", "suite").value_or("");
-    return suite_root_path() / prefix / path;
-}
-
 ParserSuiteCase parse_case(const boost::json::object& suite, const boost::json::object& object)
 {
     return ParserSuiteCase { ygg::common::as_string(object, "name", "case"),
-                             suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
-                             suite_path(suite, ygg::common::as_string(object, "task_file", "case")) };
+                             ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
+                             ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")) };
 }
 
 std::vector<ParserSuiteCase> load_cases()
 {
-    const auto suite_value = ygg::common::load_json_file(suite_root_path() / "tests/unit/parser/suite.json");
+    const auto suite_value = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/parser/suite.json");
     const auto& suite = ygg::common::as_object(suite_value, "suite");
     auto result = std::vector<ParserSuiteCase> {};
     for (const auto& case_value : ygg::common::as_array(suite, "cases", "suite"))
@@ -91,10 +80,9 @@ std::vector<ParserSuiteCase> load_cases()
 
 TEST(LokiParserSuite, JsonSuiteCoversEveryBenchmarkProblem)
 {
-    const auto suite_value = ygg::common::load_json_file(suite_root_path() / "tests/unit/parser/suite.json");
+    const auto suite_value = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/parser/suite.json");
     const auto& suite = ygg::common::as_object(suite_value, "suite");
-    const auto prefix = ygg::common::find_string(suite, "prefix", "suite").value_or("");
-    const auto benchmark_root = suite_root_path() / prefix;
+    const auto benchmark_root = ygg::common::suite_prefix_path(suite);
 
     auto listed = std::set<std::string> {};
     for (const auto& item : load_cases())

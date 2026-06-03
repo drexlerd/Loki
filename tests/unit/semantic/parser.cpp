@@ -11,7 +11,7 @@
 
 #include <loki/semantic.hpp>
 
-#include <yggdrasil/serialization/json.hpp>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 #include <algorithm>
 #include <filesystem>
@@ -34,36 +34,16 @@ struct ParserSuiteCase
     fs::path task_file;
 };
 
-struct NegativeSuiteCase
-{
-    std::string name;
-    std::string entry;
-    bool strict = false;
-    std::string domain_source;
-    std::string task_source;
-};
-
-fs::path suite_root_path()
-{
-    return fs::path(std::string(DATA_DIR)) / "..";
-}
-
-fs::path suite_path(const boost::json::object& suite, const std::string& path)
-{
-    const auto prefix = ygg::common::find_string(suite, "prefix", "suite").value_or("");
-    return suite_root_path() / prefix / path;
-}
-
 ParserSuiteCase parse_case(const boost::json::object& suite, const boost::json::object& object)
 {
     return ParserSuiteCase { ygg::common::as_string(object, "name", "case"),
-                             suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
-                             suite_path(suite, ygg::common::as_string(object, "task_file", "case")) };
+                             ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
+                             ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")) };
 }
 
 std::vector<ParserSuiteCase> load_cases()
 {
-    const auto suite_value = ygg::common::load_json_file(suite_root_path() / "tests/unit/parser/suite.json");
+    const auto suite_value = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/parser/suite.json");
     const auto& suite = ygg::common::as_object(suite_value, "suite");
     auto result = std::vector<ParserSuiteCase> {};
     for (const auto& case_value : ygg::common::as_array(suite, "cases", "suite"))
@@ -71,38 +51,6 @@ std::vector<ParserSuiteCase> load_cases()
     return result;
 }
 
-std::string source_from_lines(const boost::json::object& object, const std::string& key)
-{
-    auto result = std::string {};
-    for (const auto& line : ygg::common::as_array(object, key, "case"))
-    {
-        result += std::string(line.as_string());
-        result += '\n';
-    }
-    return result;
-}
-
-NegativeSuiteCase parse_negative_case(const boost::json::object& object)
-{
-    auto result = NegativeSuiteCase {};
-    result.name = ygg::common::as_string(object, "name", "case");
-    result.entry = ygg::common::as_string(object, "entry", "case");
-    result.strict = ygg::common::find_bool(object, "strict", "case").value_or(false);
-    result.domain_source = source_from_lines(object, "domain");
-    if (object.if_contains("task"))
-        result.task_source = source_from_lines(object, "task");
-    return result;
-}
-
-std::vector<NegativeSuiteCase> load_negative_cases()
-{
-    const auto suite_value = ygg::common::load_json_file(suite_root_path() / "tests/unit/semantic/negative_suite.json");
-    const auto& suite = ygg::common::as_object(suite_value, "suite");
-    auto result = std::vector<NegativeSuiteCase> {};
-    for (const auto& case_value : ygg::common::as_array(suite, "cases", "suite"))
-        result.push_back(parse_negative_case(ygg::common::as_object(case_value, "case")));
-    return result;
-}
 
 } // namespace semantic_suite
 
@@ -353,6 +301,31 @@ bool has_predicate_named(formalism::DomainView domain, const std::string& name)
         if (std::string(repository[predicate].name) == name)
             return true;
     return false;
+}
+
+std::optional<ygg::Index<formalism::Predicate>> predicate_named(formalism::DomainView domain, const std::string& name)
+{
+    const auto& repository = domain.get_context();
+    for (auto predicate : domain.get_data().predicates)
+        if (std::string(repository[predicate].name) == name)
+            return predicate;
+    return std::nullopt;
+}
+
+bool initial_literals_use_predicate(const ygg::IndexList<formalism::Literal>& literals, const formalism::Repository& repository, const std::string& name, ygg::Index<formalism::Predicate> expected)
+{
+    auto found = false;
+    for (auto literal : literals)
+    {
+        const auto atom = repository[literal].atom;
+        const auto predicate = repository[atom].predicate;
+        if (std::string(repository[predicate].name) != name)
+            continue;
+        found = true;
+        if (predicate != expected)
+            return false;
+    }
+    return found;
 }
 
 bool condition_mentions_predicate(ygg::Index<formalism::Condition> condition, const formalism::Repository& repository, const std::string& name)
@@ -711,35 +684,46 @@ TEST(LokiSemanticTranslator, GeneratedAxiomParametersMatchHeadPredicateArity)
 }
 
 
-TEST(LokiSemanticTranslator, ReusesGeneratedAxiomsForIdenticalUniversalConditions)
+TEST(LokiSemanticTranslator, GeneratesFreshAxiomsForIdenticalUniversalConditions)
 {
     const auto domain_source = std::string {
         "(define (domain universal-cache)"
         "(:requirements :typing :universal-preconditions)"
+        "(:types left right)"
         "(:predicates (p ?x - object ?y - object))"
-        "(:action a :parameters (?x - object) "
+        "(:action a :parameters (?x - left) "
         ":precondition (forall (?y - object) (p ?x ?y)) "
         ":effect (and))"
-        "(:action b :parameters (?x - object) "
+        "(:action b :parameters (?x - right) "
         ":precondition (forall (?y - object) (p ?x ?y)) "
         ":effect (and))"
         ")" };
 
     semantic::Parser parser(domain_source);
 
-    const auto translation = semantic::translate(parser.get_domain());
+    const auto translation = semantic::translate(parser.get_domain(), semantic::TranslatorOptions { .remove_typing = false });
     const auto translated_domain = translation.get_translated_domain();
     const auto& repository = translated_domain.get_context();
 
     auto generated_predicates = std::size_t {};
+    auto generated_parameter_types = std::unordered_set<std::string> {};
     for (auto predicate : translated_domain.get_data().predicates)
     {
-        if (std::string(repository[predicate].name).starts_with("_universal_"))
-            ++generated_predicates;
+        const auto& predicate_data = repository[predicate];
+        if (!std::string(predicate_data.name).starts_with("_universal_"))
+            continue;
+        ++generated_predicates;
+        ASSERT_EQ(predicate_data.parameters.size(), std::size_t { 1 });
+        const auto& parameter = repository[predicate_data.parameters.front()];
+        ASSERT_EQ(parameter.types.size(), std::size_t { 1 });
+        generated_parameter_types.insert(std::string(repository[parameter.types.front()].name));
     }
 
-    EXPECT_EQ(generated_predicates, 1);
-    EXPECT_EQ(translated_domain.get_data().axioms.size(), 1);
+    EXPECT_EQ(generated_predicates, 2);
+    EXPECT_EQ(generated_parameter_types.size(), std::size_t { 2 });
+    EXPECT_TRUE(generated_parameter_types.contains("left"));
+    EXPECT_TRUE(generated_parameter_types.contains("right"));
+    EXPECT_EQ(translated_domain.get_data().axioms.size(), 2);
     ASSERT_EQ(translated_domain.get_data().actions.size(), 2);
     for (auto action_index : translated_domain.get_data().actions)
     {
@@ -900,6 +884,10 @@ TEST(LokiSemanticTranslator, AddsTypePredicatesAndRemovesTypingByDefault)
     const auto translated_task = translated_task_result.get_translated_task();
     EXPECT_GE(count_initial_literals_for_predicate(translated_task.get_data().initial_literals, translated_task.get_context(), "thing"), 2);
     EXPECT_GE(count_initial_literals_for_predicate(translated_task.get_data().initial_literals, translated_task.get_context(), "object"), 2);
+
+    const auto thing_predicate = predicate_named(translated_domain, "thing");
+    ASSERT_TRUE(thing_predicate.has_value());
+    EXPECT_TRUE(initial_literals_use_predicate(translated_task.get_data().initial_literals, translated_task.get_context(), "thing", *thing_predicate));
 }
 
 TEST(LokiSemanticTranslator, AddsEqualityPredicateWhenAdlDomainUsesEquality)
@@ -961,6 +949,57 @@ TEST(LokiSemanticTranslator, InitializesEqualityForConstantsAndTaskObjects)
     EXPECT_EQ(count_equality_literals(translated.get_data().initial_literals, translated.get_context()),
               count_unique_object_names(translation.get_translated_domain(), translated));
     EXPECT_EQ(&translated.get_domain().get_context().get_root(), &translation.get_translated_domain().get_context().get_root());
+}
+
+TEST(LokiSemanticTranslator, GeneratedGoalPredicateAvoidsExistingNames)
+{
+    const auto domain_source = std::string {
+        "(define (domain goal-name-collision)"
+        "(:requirements :disjunctive-preconditions)"
+        "(:predicates (_goal_0) (p) (q))"
+        ")" };
+    const auto task_source = std::string {
+        "(define (problem goal-name-collision-problem) (:domain goal-name-collision)"
+        "(:init)"
+        "(:goal (or (p) (q)))"
+        ")" };
+
+    semantic::Parser parser(domain_source);
+    const auto translation = semantic::translate(parser.get_domain());
+    const auto translated_result = semantic::translate(parser.parse_task(task_source), translation);
+    const auto translated = translated_result.get_translated_task();
+    const auto& repository = translated.get_context();
+
+    EXPECT_TRUE(has_predicate_named(translation.get_translated_domain(), "_goal_0"));
+
+    auto found_generated = false;
+    for (auto predicate : translated.get_data().predicates)
+        found_generated |= std::string(repository[predicate].name) == "_goal_1";
+
+    EXPECT_TRUE(found_generated);
+}
+
+TEST(LokiSemanticTranslator, TaskEqualityRequiresTranslatedDomainEqualityPredicate)
+{
+    const auto domain_source = std::string {
+        "(define (domain task-only-equality)"
+        "(:requirements :strips)"
+        "(:predicates (p))"
+        ")" };
+    const auto task_source = std::string {
+        "(define (problem task-only-equality-problem) (:domain task-only-equality)"
+        "(:requirements :equality)"
+        "(:objects o)"
+        "(:init)"
+        "(:goal (p))"
+        ")" };
+
+    semantic::Parser parser(domain_source);
+    const auto translation = semantic::translate(parser.get_domain());
+    ASSERT_FALSE(has_equality_predicate(translation.get_translated_domain()));
+
+    const auto task = parser.parse_task(task_source);
+    EXPECT_THROW(static_cast<void>(semantic::translate(task, translation)), std::runtime_error);
 }
 
 TEST(LokiSemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
@@ -1034,26 +1073,6 @@ TEST(LokiSemanticTranslator, RenamesTaskGoalVariablesBeforeGoalSimplificationOnl
     ASSERT_EQ(axiom.parameters.size(), 1);
     const auto variable = repository[axiom.parameters.front()].variable;
     EXPECT_EQ(std::string(repository[variable].name), "x_0");
-}
-
-TEST(LokiSemanticParser, JsonNegativeSuiteReportsExpectedSemanticErrors)
-{
-    for (const auto& item : semantic_suite::load_negative_cases())
-    {
-        SCOPED_TRACE(item.name);
-        auto options = parser::ParserOptions {};
-        options.strict = item.strict;
-        try
-        {
-            auto parser = semantic::Parser(item.domain_source, options);
-            if (item.entry == "task")
-                parser.parse_task(item.task_source);
-            FAIL() << "Expected semantic error";
-        }
-        catch (const semantic::SemanticError&)
-        {
-        }
-    }
 }
 
 TEST(LokiSemanticParser, ReportsSyntaxFailureMessage)

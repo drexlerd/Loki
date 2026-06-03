@@ -106,11 +106,9 @@ formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(
     this->self().increment_quantifications(data.parameters, repository);
     auto parameters = this->self().copy_parameters(data.parameters, repository);
     this->self().enter_scope(parameters);
-    auto condition = as_index(this->self().copy(data.condition, repository));
+    auto condition = as_index(this->self().negate_condition(data.condition, repository));
     this->self().leave_scope();
-    this->self().prepend_type_conditions(condition, parameters);
-    const auto exists = as_index(this->self().flatten_condition(as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), condition).get_index()))));
-    return this->self().make_generated_axiom_condition(exists);
+    return this->self().flatten_condition(as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository, std::move(parameters), condition).get_index())));
 }
 
 template<typename Derived>
@@ -122,7 +120,6 @@ formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(
     this->self().enter_scope(parameters);
     auto condition = as_index(this->self().negate_condition(data.condition, repository));
     this->self().leave_scope();
-    this->self().prepend_type_conditions(condition, parameters);
     return this->self().flatten_condition(as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), condition).get_index())));
 }
 
@@ -159,18 +156,7 @@ template<typename Derived>
 formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(ygg::Index<formalism::ConditionExists> source, const formalism::Repository& repository) { return this->self().wrap_condition(as_index(this->self().copy(source, repository))); }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(ygg::Index<formalism::ConditionForall> source, const formalism::Repository& repository)
-{
-    const auto& data = repository[source];
-    this->self().increment_quantifications(data.parameters, repository);
-    auto parameters = this->self().copy_parameters(data.parameters, repository);
-    this->self().enter_scope(parameters);
-    auto negated = as_index(this->self().negate_condition(data.condition, repository));
-    this->self().leave_scope();
-    this->self().prepend_type_conditions(negated, parameters);
-    const auto exists_not = as_index(this->self().flatten_condition(as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), negated).get_index()))));
-    return this->self().make_generated_axiom_condition(exists_not);
-}
+formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(ygg::Index<formalism::ConditionForall> source, const formalism::Repository& repository) { return this->self().wrap_condition(as_index(this->self().copy(source, repository))); }
 
 template<typename Derived>
 formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(ygg::Index<formalism::ConditionNumericConstraint> source, const formalism::Repository& repository) { return this->self().wrap_condition(as_index(this->self().copy(source, repository))); }

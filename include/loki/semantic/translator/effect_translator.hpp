@@ -63,13 +63,14 @@ formalism::EffectForallView EffectTranslator<Derived>::copy(ygg::Index<formalism
     auto parameters = this->self().copy_parameters(data.parameters, repository);
     this->self().enter_scope(parameters);
     auto effect = as_index(this->self().copy(data.effect, repository));
-    auto guard = this->self().type_conditions_for_parameters(parameters);
-    if (!guard.empty())
+    if (this->m_phase == TranslationPhase::AddTypePredicates)
     {
+        auto guard = this->self().type_conditions_for_parameters(parameters);
         const auto condition = this->self().make_conjunction(std::move(guard));
         effect = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, as_index(condition), effect).get_index())));
     }
-    const auto out = formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, this->self().maybe_strip_parameters(parameters), effect);
+    const auto out_parameters = this->m_phase == TranslationPhase::AddTypePredicates ? this->self().maybe_strip_parameters(parameters) : parameters;
+    const auto out = formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, out_parameters, effect);
     this->self().leave_scope();
     return out;
 }
@@ -103,8 +104,44 @@ formalism::EffectProbabilisticView EffectTranslator<Derived>::copy(ygg::Index<fo
 template<typename Derived>
 formalism::EffectView EffectTranslator<Derived>::copy(ygg::Index<formalism::Effect> source, const formalism::Repository& repository)
 {
+    if (this->m_phase == TranslationPhase::SplitDisjunctiveConditions)
+    {
+        auto split = cista::optional<ygg::Index<formalism::Effect>> {};
+        std::visit(
+            [&](const auto& arg)
+            {
+                using Node = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<Node, ygg::Index<formalism::EffectWhen>>)
+                {
+                    const auto& data = repository[arg];
+                    const auto condition = as_index(this->self().copy(data.condition, repository));
+                    const auto effect = as_index(this->self().copy(data.effect, repository));
+                    if (const auto condition_or = this->self().as_or(condition))
+                    {
+                        auto effects = ygg::IndexList<formalism::Effect> {};
+                        for (auto part : condition_or->get_data().conditions)
+                        {
+                            const auto when = formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, part, effect).get_index();
+                            effects.push_back(as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(when))));
+                        }
+                        split = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)).get_index())));
+                    }
+                    else
+                    {
+                        split = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition, effect).get_index())));
+                    }
+                }
+            },
+            repository[source].value);
+        if (split)
+            return ygg::make_view(*split, this->m_storage->repository);
+    }
+
     auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant { return ygg::Data<formalism::Effect>::Variant(as_index(this->self().copy(arg, repository))); }, repository[source].value);
-    return this->self().normalize_effect(formalism::get_or_create<formalism::Effect>(this->m_storage->repository, std::move(value)).get_index());
+    auto copied = formalism::get_or_create<formalism::Effect>(this->m_storage->repository, std::move(value));
+    if (this->m_phase == TranslationPhase::ToEffectNormalForm)
+        return this->self().normalize_effect(copied.get_index());
+    return copied;
 }
 
 } // namespace loki::semantic::detail

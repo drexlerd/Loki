@@ -24,10 +24,10 @@ protected:
         m_generated_axioms(context.generated_axioms),
         m_num_generated_axioms(context.num_generated_axioms),
         m_append_generated_axioms_to_domain(context.append_generated_axioms_to_domain),
-        m_equality_predicate(context.equality_predicate),
         m_type_predicates(context.type_predicates),
         m_remove_typing(context.remove_typing),
-        m_renaming_enabled(context.renaming_enabled)
+        m_renaming_enabled(context.renaming_enabled),
+        m_phase(context.phase)
     {
     }
 
@@ -43,10 +43,10 @@ protected:
     ygg::IndexList<formalism::Axiom>& m_generated_axioms;
     size_t& m_num_generated_axioms;
     bool& m_append_generated_axioms_to_domain;
-    cista::optional<ygg::Index<formalism::Predicate>>& m_equality_predicate;
     std::unordered_map<ygg::uint_t, ygg::Index<formalism::Predicate>>& m_type_predicates;
     bool& m_remove_typing;
     bool& m_renaming_enabled;
+    TranslationPhase& m_phase;
 };
 
 } // namespace loki::semantic::detail

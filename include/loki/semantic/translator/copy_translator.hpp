@@ -48,8 +48,8 @@ class CopyTranslator :
     public VariableRenamingTranslator<CopyTranslator>
 {
 public:
-    explicit CopyTranslator(std::shared_ptr<TranslationStorage> storage, bool remove_typing = true) :
-        CopyContextOwner(std::move(storage), remove_typing),
+    explicit CopyTranslator(std::shared_ptr<TranslationStorage> storage, bool remove_typing = true, TranslationPhase phase = TranslationPhase::ToNegationNormalForm) :
+        CopyContextOwner(std::move(storage), remove_typing, phase),
         CopyTranslatorFacade<CopyTranslator>(context()),
         BasicCopyTranslator<CopyTranslator>(context()),
         ConditionTranslator<CopyTranslator>(context()),
@@ -105,7 +105,8 @@ public:
     using ConditionNnfTranslator<CopyTranslator>::copy_condition_node;
 
     using ConditionQuantifierTranslator<CopyTranslator>::make_generated_axiom_condition;
-    using ConditionQuantifierTranslator<CopyTranslator>::make_generated_positive_condition;
+    using ConditionQuantifierTranslator<CopyTranslator>::remove_universal_quantifiers;
+    using ConditionQuantifierTranslator<CopyTranslator>::remove_universal_quantifiers_node;
     using ConditionQuantifierTranslator<CopyTranslator>::as_exists;
     using ConditionQuantifierTranslator<CopyTranslator>::move_existentials;
     using ConditionQuantifierTranslator<CopyTranslator>::move_existentials_node;
@@ -119,7 +120,7 @@ public:
 
     using EqualityTranslator<CopyTranslator>::has_requirement;
     using EqualityTranslator<CopyTranslator>::equality_required;
-    using EqualityTranslator<CopyTranslator>::ensure_equality_predicate;
+    using EqualityTranslator<CopyTranslator>::find_domain_equality_predicate;
     using EqualityTranslator<CopyTranslator>::equality_literal;
     using EqualityTranslator<CopyTranslator>::domain_uses_equality;
     using EqualityTranslator<CopyTranslator>::add_equality_predicate_to_domain;
