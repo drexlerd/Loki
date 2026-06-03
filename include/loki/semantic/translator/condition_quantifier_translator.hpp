@@ -51,7 +51,7 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::make_generated_
         key += std::to_string(parameter.get_value());
     }
     if (auto it = this->m_generated_universal_conditions.find(key); it != this->m_generated_universal_conditions.end())
-        return ygg::make_view(it->second, this->m_storage->repository);
+        return it->second;
 
     auto predicate_parameters = ygg::IndexList<formalism::Parameter> {};
     auto terms = ygg::IndexList<formalism::Term> {};
@@ -70,9 +70,9 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::make_generated_
 
     this->m_generated_predicates.push_back(predicate);
     this->m_generated_axioms.push_back(axiom);
-    const auto result = as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, negative_literal).get_index()));
+    auto result = this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, negative_literal));
     this->m_generated_universal_conditions.emplace(std::move(key), result);
-    return ygg::make_view(result, this->m_storage->repository);
+    return result;
 }
 
 

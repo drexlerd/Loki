@@ -177,7 +177,8 @@ formalism::DomainView CopyTranslatorFacade<Derived>::copy_domain(formalism::Doma
     }
 
     auto view = formalism::get_or_create<formalism::Domain>(this->m_storage->repository, std::move(data));
-    this->m_storage->translated_domain = view.get_index();
+    this->m_storage->translated_domain = view;
+    remember(this->m_storage->domains, domain.get_index(), view);
     return view;
 }
 
@@ -188,7 +189,7 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
     this->m_append_generated_axioms_to_domain = false;
     this->m_num_generated_axioms = this->self().next_generated_axiom_index();
     data.index = {};
-    data.domain = this->m_storage->translated_domain;
+    data.domain = this->m_storage->translated_domain->get_index();
     data.requirements = this->self().template copy_list<formalism::Requirement>(data.requirements, task.get_context());
     data.objects = this->self().template copy_list<formalism::Object>(data.objects, task.get_context());
     data.initial_literals = this->self().template copy_list<formalism::Literal>(data.initial_literals, task.get_context());
@@ -257,7 +258,7 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
     }
 
     auto view = formalism::get_or_create<formalism::Task>(this->m_storage->repository, std::move(data));
-    remember(this->m_storage->tasks, task.get_index(), view.get_index());
+    remember(this->m_storage->tasks, task.get_index(), view);
     return view;
 }
 

@@ -39,14 +39,14 @@ bool EqualityTranslator<Derived>::equality_required(const ygg::Data<formalism::T
 {
     if (this->self().has_requirement(task.requirements, formalism::RequirementKind::Equality))
         return true;
-    const auto& domain = this->m_storage->repository[this->m_storage->translated_domain];
+    const auto& domain = this->m_storage->translated_domain->get_data();
     return this->self().has_requirement(domain.requirements, formalism::RequirementKind::Equality) || this->self().domain_uses_equality();
 }
 
 template<typename Derived>
 std::optional<formalism::PredicateView> EqualityTranslator<Derived>::find_domain_equality_predicate() const
 {
-    const auto& domain = this->m_storage->repository[this->m_storage->translated_domain];
+    const auto& domain = this->m_storage->translated_domain->get_data();
     for (auto predicate : domain.predicates)
     {
         if (std::string_view(this->m_storage->repository[predicate].name) == "=")
@@ -130,12 +130,12 @@ void EqualityTranslator<Derived>::initialize_equality(ygg::Data<formalism::Task>
     const auto predicate = this->self().find_domain_equality_predicate();
     if (!predicate)
         throw std::runtime_error("InitializeEqualityTranslator: expected equality predicate to be declared in the translated domain.");
-    const auto& domain = this->m_storage->repository[this->m_storage->translated_domain];
+    const auto& domain = this->m_storage->translated_domain->get_data();
     for (auto object : domain.constants)
         task.initial_literals.push_back(as_index(this->self().equality_literal(*predicate, object)));
     for (auto object : task.objects)
         task.initial_literals.push_back(as_index(this->self().equality_literal(*predicate, object)));
-    task.domain = this->m_storage->translated_domain;
+    task.domain = this->m_storage->translated_domain->get_index();
 }
 
 }  // namespace loki::semantic::detail

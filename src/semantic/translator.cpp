@@ -19,12 +19,12 @@ namespace detail
 {
 
 template<typename T>
-void compose_map(IndexMap<T>& out, const IndexMap<T>& source_to_middle, const IndexMap<T>& middle_to_target)
+void compose_map(ViewMap<T>& out, const ViewMap<T>& source_to_middle, const ViewMap<T>& middle_to_target)
 {
     out.clear();
     for (const auto& [source, middle] : source_to_middle)
     {
-        if (auto it = middle_to_target.find(middle.get_value()); it != middle_to_target.end())
+        if (auto it = middle_to_target.find(middle.get_index().get_value()); it != middle_to_target.end())
             out.emplace(source, it->second);
     }
 }
@@ -32,25 +32,24 @@ void compose_map(IndexMap<T>& out, const IndexMap<T>& source_to_middle, const In
 ygg::Index<formalism::Type>
 copy_type_for_metadata(TranslationStorage& target, const formalism::Repository& source_repository, ygg::Index<formalism::Type> source)
 {
-    ygg::Index<formalism::Type> out;
-    if (find_mapped(target.types, source, out))
-        return out;
+    if (auto mapped = find_mapped(target.types, source))
+        return mapped->get_index();
 
     const auto& data = source_repository[source];
     auto bases = ygg::IndexList<formalism::Type> {};
     for (auto base : data.bases)
         bases.push_back(copy_type_for_metadata(target, source_repository, base));
 
-    out = formalism::get_or_create<formalism::Type>(target.repository, data.name, std::move(bases)).get_index();
+    auto out = formalism::get_or_create<formalism::Type>(target.repository, data.name, std::move(bases));
     remember(target.types, source, out);
-    return out;
+    return out.get_index();
 }
 
 void remap_object_type_metadata(TranslationStorage& target,
                                 const TranslationStorage& source,
                                 const formalism::Repository& source_repository,
-                                const IndexMap<formalism::Object>& object_map,
-                                const IndexMap<formalism::Type>& type_map)
+                                const ViewMap<formalism::Object>& object_map,
+                                const ViewMap<formalism::Type>& type_map)
 {
     target.object_types.clear();
     for (const auto& [source_object, types] : source.object_types)
@@ -63,11 +62,11 @@ void remap_object_type_metadata(TranslationStorage& target,
         for (auto type : types)
         {
             if (auto type_it = type_map.find(type.get_value()); type_it != type_map.end())
-                remapped.push_back(type_it->second);
+                remapped.push_back(type_it->second.get_index());
             else
                 remapped.push_back(copy_type_for_metadata(target, source_repository, type));
         }
-        target.object_types.emplace(object_it->second.get_value(), std::move(remapped));
+        target.object_types.emplace(object_it->second.get_index().get_value(), std::move(remapped));
     }
 }
 
@@ -75,7 +74,7 @@ std::shared_ptr<TranslationStorage> canonicalize_domain_storage(formalism::Domai
 {
     auto canonical = std::make_shared<TranslationStorage>(middle->repository.get_index());
     auto copier = CanonicalCopyTranslator(canonical);
-    const auto middle_domain = ygg::make_view(middle->translated_domain, middle->repository);
+    const auto middle_domain = middle->domains.at(original_domain.get_index().get_value());
     const auto canonical_domain = copier.copy_domain(middle_domain);
 
     const auto middle_domains = canonical->domains;
@@ -123,9 +122,9 @@ std::shared_ptr<TranslationStorage> canonicalize_domain_storage(formalism::Domai
     middle_types = canonical->types;
 
     canonical->original_domain = original_domain.get_index();
-    canonical->translated_domain = canonical_domain.get_index();
+    canonical->translated_domain = canonical_domain;
     canonical->domains.clear();
-    remember(canonical->domains, original_domain.get_index(), canonical_domain.get_index());
+    remember(canonical->domains, original_domain.get_index(), canonical_domain);
     compose_map(canonical->requirements, middle->requirements, middle_requirements);
     compose_map(canonical->types, middle->types, middle_types);
     compose_map(canonical->objects, middle->objects, middle_objects);
@@ -169,7 +168,7 @@ std::shared_ptr<TranslationStorage> canonicalize_domain_storage(formalism::Domai
 }
 
 template<typename T>
-void copy_map(IndexMap<T>& target, const IndexMap<T>& source)
+void copy_map(ViewMap<T>& target, const ViewMap<T>& source)
 {
     target = source;
 }
@@ -319,15 +318,24 @@ void inherit_domain_mappings(TranslationStorage& problem, const TranslationStora
 }
 
 template<typename T>
-void copy_identity_map(IndexMap<T>& target, const IndexMap<T>& source)
+void copy_identity_map(ViewMap<T>& target, const ViewMap<T>& source)
 {
-    for (const auto& [_, index] : source)
-        target.emplace(index.get_value(), index);
+    for (const auto& [_, view] : source)
+        target.emplace(view.get_index().get_value(), view);
+}
+
+template<typename T>
+formalism::EntityView<T> target_view(const ViewMap<T>& map, ygg::Index<T> target)
+{
+    for (const auto& [_, view] : map)
+        if (view.get_index() == target)
+            return view;
+    throw std::runtime_error("missing translated view in translation storage");
 }
 
 void inherit_domain_identity_mappings(TranslationStorage& problem, const TranslationStorage& domain)
 {
-    problem.domains.emplace(domain.translated_domain.get_value(), domain.translated_domain);
+    problem.domains.emplace(domain.translated_domain->get_index().get_value(), *domain.translated_domain);
     copy_identity_map(problem.requirements, domain.requirements);
     copy_identity_map(problem.types, domain.types);
     copy_identity_map(problem.objects, domain.objects);
@@ -343,8 +351,8 @@ canonicalize_problem_storage(formalism::TaskView middle_task, const std::shared_
 {
     auto canonical = std::make_shared<TranslationStorage>(middle->repository.get_index(), &domain.repository);
     inherit_domain_identity_mappings(*canonical, domain);
-    if (middle->translated_domain == domain.translated_domain)
-        remember(canonical->domains, middle->translated_domain, domain.translated_domain);
+    if (middle->translated_domain->get_index() == domain.translated_domain->get_index())
+        remember(canonical->domains, middle->translated_domain->get_index(), *domain.translated_domain);
     auto copier = CanonicalCopyTranslator(canonical);
     copier.copy_task(middle_task);
     compose_storage_maps_from_previous(*canonical, *middle);
@@ -363,7 +371,7 @@ formalism::DomainView DomainTranslationResult::get_original_domain() const noexc
 
 formalism::DomainView DomainTranslationResult::get_translated_domain() const noexcept
 {
-    return ygg::make_view(m_storage->translated_domain, m_storage->repository);
+    return *m_storage->translated_domain;
 }
 
 const formalism::Repository& DomainTranslationResult::get_repository() const noexcept { return m_storage->repository; }
@@ -431,7 +439,7 @@ ProblemTranslationResult translate(formalism::TaskView task, const DomainTransla
     }
 
     const auto canonical = detail::canonicalize_problem_storage(current_task, current_storage, *result.m_storage);
-    auto translated_task = ygg::make_view(canonical->tasks.at(task.get_index().get_value()), canonical->repository);
+    auto translated_task = canonical->tasks.at(task.get_index().get_value());
     return ProblemTranslationResult(task, canonical, translated_task);
 }
 

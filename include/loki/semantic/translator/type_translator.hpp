@@ -110,7 +110,7 @@ template<typename Derived>
 formalism::PredicateView TypeTranslator<Derived>::type_predicate(ygg::Index<formalism::Type> type)
 {
     if (auto it = this->m_type_predicates.find(type.get_value()); it != this->m_type_predicates.end())
-        return ygg::make_view(it->second, this->m_storage->repository);
+        return it->second;
 
     auto parameters = ygg::IndexList<formalism::Parameter> {};
     const auto variable = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("arg")).get_index();
@@ -120,9 +120,9 @@ formalism::PredicateView TypeTranslator<Derived>::type_predicate(ygg::Index<form
     parameters.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, variable, std::move(parameter_types)).get_index());
 
     const auto& type_data = this->m_storage->repository[type];
-    const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, type_data.name, std::move(parameters)).get_index();
+    auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, type_data.name, std::move(parameters));
     this->m_type_predicates.emplace(type.get_value(), predicate);
-    return ygg::make_view(predicate, this->m_storage->repository);
+    return predicate;
 }
 
 template<typename Derived>
@@ -225,7 +225,7 @@ void TypeTranslator<Derived>::add_type_literals_for_object(ygg::IndexList<formal
 template<typename Derived>
 void TypeTranslator<Derived>::initialize_type_literals(ygg::Data<formalism::Task>& task)
 {
-    const auto& domain = this->m_storage->repository[this->m_storage->translated_domain];
+    const auto& domain = this->m_storage->translated_domain->get_data();
     for (auto object : domain.constants)
         this->self().add_type_literals_for_object(task.initial_literals, object);
     for (auto object : task.objects)

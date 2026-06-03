@@ -7,6 +7,8 @@
 
 #include "loki/semantic/translator/copy_translator_component.hpp"
 
+#include <optional>
+
 namespace loki::semantic::detail
 {
 
@@ -106,7 +108,7 @@ formalism::EffectView EffectTranslator<Derived>::copy(ygg::Index<formalism::Effe
 {
     if (this->m_phase == TranslationPhase::SplitDisjunctiveConditions)
     {
-        auto split = cista::optional<ygg::Index<formalism::Effect>> {};
+        auto split = std::optional<formalism::EffectView> {};
         std::visit(
             [&](const auto& arg)
             {
@@ -124,23 +126,23 @@ formalism::EffectView EffectTranslator<Derived>::copy(ygg::Index<formalism::Effe
                             const auto when = formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, part, effect).get_index();
                             effects.push_back(as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(when))));
                         }
-                        split = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)).get_index())));
+                        split = this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)).get_index()));
                     }
                     else
                     {
-                        split = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition, effect).get_index())));
+                        split = this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition, effect).get_index()));
                     }
                 }
             },
             repository[source].value);
         if (split)
-            return ygg::make_view(*split, this->m_storage->repository);
+            return *split;
     }
 
     auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant { return ygg::Data<formalism::Effect>::Variant(as_index(this->self().copy(arg, repository))); }, repository[source].value);
     auto copied = formalism::get_or_create<formalism::Effect>(this->m_storage->repository, std::move(value));
     if (this->m_phase == TranslationPhase::ToEffectNormalForm)
-        return this->self().normalize_effect(copied.get_index());
+        return this->self().normalize_effect(copied);
     return copied;
 }
 

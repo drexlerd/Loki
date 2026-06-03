@@ -39,13 +39,13 @@ protected:
     std::shared_ptr<TranslationStorage>& m_storage;
     std::unordered_map<ygg::uint_t, size_t>& m_num_quantifications;
     std::vector<ygg::IndexList<formalism::Parameter>>& m_active_parameters;
-    std::vector<std::unordered_map<ygg::uint_t, ygg::Index<formalism::Variable>>>& m_variable_bindings;
+    std::vector<std::unordered_map<ygg::uint_t, formalism::VariableView>>& m_variable_bindings;
     ygg::IndexList<formalism::Predicate>& m_generated_predicates;
     ygg::IndexList<formalism::Axiom>& m_generated_axioms;
-    std::unordered_map<std::string, ygg::Index<formalism::Condition>>& m_generated_universal_conditions;
+    std::unordered_map<std::string, formalism::ConditionView>& m_generated_universal_conditions;
     size_t& m_num_generated_axioms;
     bool& m_append_generated_axioms_to_domain;
-    std::unordered_map<ygg::uint_t, ygg::Index<formalism::Predicate>>& m_type_predicates;
+    std::unordered_map<ygg::uint_t, formalism::PredicateView>& m_type_predicates;
     bool& m_remove_typing;
     bool& m_renaming_enabled;
     TranslationPhase& m_phase;

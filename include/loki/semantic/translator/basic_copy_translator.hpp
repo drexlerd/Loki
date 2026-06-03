@@ -157,9 +157,10 @@ void BasicCopyTranslator<Derived>::ensure_derived_predicates_requirement(ygg::In
 template<typename Derived>
 void BasicCopyTranslator<Derived>::update_translated_domain()
 {
-    auto data = this->m_storage->repository[this->m_storage->translated_domain];
+    auto data = this->m_storage->translated_domain->get_data();
     this->self().append_generated_domain_objects(data);
-    this->m_storage->translated_domain = formalism::get_or_create<formalism::Domain>(this->m_storage->repository, std::move(data)).get_index();
+    auto view = formalism::get_or_create<formalism::Domain>(this->m_storage->repository, std::move(data));
+    this->m_storage->translated_domain = view;
 }
 
 template<typename Derived>
@@ -186,36 +187,33 @@ cista::optional<ygg::Index<T>> BasicCopyTranslator<Derived>::copy_optional(const
 template<typename Derived>
 formalism::RequirementView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Requirement> source, const formalism::Repository& repository)
 {
-    ygg::Index<formalism::Requirement> out;
-    if (find_mapped(this->m_storage->requirements, source, out)) return ygg::make_view(out, this->m_storage->repository);
+    if (auto mapped = find_mapped(this->m_storage->requirements, source)) return *mapped;
     auto kind = repository[source].kind;
-    out = formalism::get_or_create<formalism::Requirement>(this->m_storage->repository, kind).get_index();
+    auto out = formalism::get_or_create<formalism::Requirement>(this->m_storage->repository, kind);
     remember(this->m_storage->requirements, source, out);
-    return ygg::make_view(out, this->m_storage->repository);
+    return out;
 }
 
 template<typename Derived>
 formalism::TypeView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Type> source, const formalism::Repository& repository)
 {
-    ygg::Index<formalism::Type> out;
-    if (find_mapped(this->m_storage->types, source, out)) return ygg::make_view(out, this->m_storage->repository);
+    if (auto mapped = find_mapped(this->m_storage->types, source)) return *mapped;
     const auto& data = repository[source];
-    out = formalism::get_or_create<formalism::Type>(this->m_storage->repository, data.name, this->self().template copy_list<formalism::Type>(data.bases, repository)).get_index();
+    auto out = formalism::get_or_create<formalism::Type>(this->m_storage->repository, data.name, this->self().template copy_list<formalism::Type>(data.bases, repository));
     remember(this->m_storage->types, source, out);
-    return ygg::make_view(out, this->m_storage->repository);
+    return out;
 }
 
 template<typename Derived>
 formalism::ObjectView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Object> source, const formalism::Repository& repository)
 {
-    ygg::Index<formalism::Object> out;
-    if (find_mapped(this->m_storage->objects, source, out)) return ygg::make_view(out, this->m_storage->repository);
+    if (auto mapped = find_mapped(this->m_storage->objects, source)) return *mapped;
     const auto& data = repository[source];
     auto types = this->self().template copy_list<formalism::Type>(data.types, repository);
-    out = formalism::get_or_create<formalism::Object>(this->m_storage->repository, data.name, this->self().maybe_strip_types(types)).get_index();
-    this->m_storage->object_types[out.get_value()] = std::move(types);
+    auto out = formalism::get_or_create<formalism::Object>(this->m_storage->repository, data.name, this->self().maybe_strip_types(types));
+    this->m_storage->object_types[out.get_index().get_value()] = std::move(types);
     remember(this->m_storage->objects, source, out);
-    return ygg::make_view(out, this->m_storage->repository);
+    return out;
 }
 
 template<typename Derived>
@@ -241,35 +239,33 @@ formalism::ParameterView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism
 template<typename Derived>
 formalism::PredicateView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::Predicate> source, const formalism::Repository& repository)
 {
-    ygg::Index<formalism::Predicate> out;
-    if (find_mapped(this->m_storage->predicates, source, out)) return ygg::make_view(out, this->m_storage->repository);
+    if (auto mapped = find_mapped(this->m_storage->predicates, source)) return *mapped;
     const auto& data = repository[source];
     const auto previous = this->m_renaming_enabled;
     this->m_renaming_enabled = false;
     auto parameters = this->self().template copy_list<formalism::Parameter>(data.parameters, repository);
     if (this->m_phase == TranslationPhase::AddTypePredicates)
         parameters = this->self().maybe_strip_parameters(parameters);
-    out = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, data.name, std::move(parameters)).get_index();
+    auto out = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, data.name, std::move(parameters));
     this->m_renaming_enabled = previous;
     remember(this->m_storage->predicates, source, out);
-    return ygg::make_view(out, this->m_storage->repository);
+    return out;
 }
 
 template<typename Derived>
 formalism::FunctionSkeletonView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::FunctionSkeleton> source, const formalism::Repository& repository)
 {
-    ygg::Index<formalism::FunctionSkeleton> out;
-    if (find_mapped(this->m_storage->functions, source, out)) return ygg::make_view(out, this->m_storage->repository);
+    if (auto mapped = find_mapped(this->m_storage->functions, source)) return *mapped;
     const auto& data = repository[source];
     const auto previous = this->m_renaming_enabled;
     this->m_renaming_enabled = false;
     auto parameters = this->self().template copy_list<formalism::Parameter>(data.parameters, repository);
     if (this->m_phase == TranslationPhase::AddTypePredicates)
         parameters = this->self().maybe_strip_parameters(parameters);
-    out = formalism::get_or_create<formalism::FunctionSkeleton>(this->m_storage->repository, data.name, std::move(parameters), as_index(this->self().copy(data.type, repository))).get_index();
+    auto out = formalism::get_or_create<formalism::FunctionSkeleton>(this->m_storage->repository, data.name, std::move(parameters), as_index(this->self().copy(data.type, repository)));
     this->m_renaming_enabled = previous;
     remember(this->m_storage->functions, source, out);
-    return ygg::make_view(out, this->m_storage->repository);
+    return out;
 }
 
 template<typename Derived>
@@ -296,11 +292,10 @@ formalism::LiteralView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::
 template<typename Derived>
 formalism::FunctionExpressionNumberView BasicCopyTranslator<Derived>::copy(ygg::Index<formalism::FunctionExpressionNumber> source, const formalism::Repository& repository)
 {
-    ygg::Index<formalism::FunctionExpressionNumber> out;
-    if (find_mapped(this->m_storage->numbers, source, out)) return ygg::make_view(out, this->m_storage->repository);
-    out = formalism::get_or_create<formalism::FunctionExpressionNumber>(this->m_storage->repository, repository[source].value).get_index();
+    if (auto mapped = find_mapped(this->m_storage->numbers, source)) return *mapped;
+    auto out = formalism::get_or_create<formalism::FunctionExpressionNumber>(this->m_storage->repository, repository[source].value);
     remember(this->m_storage->numbers, source, out);
-    return ygg::make_view(out, this->m_storage->repository);
+    return out;
 }
 
 template<typename Derived>

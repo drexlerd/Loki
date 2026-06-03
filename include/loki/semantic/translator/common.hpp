@@ -84,54 +84,54 @@ namespace detail
 {
 
 template<typename T>
-using IndexMap = std::unordered_map<ygg::uint_t, ygg::Index<T>>;
+using ViewMap = std::unordered_map<ygg::uint_t, formalism::EntityView<T>>;
 
 struct TranslationStorage
 {
     formalism::Repository repository;
     ygg::Index<formalism::Domain> original_domain;
-    ygg::Index<formalism::Domain> translated_domain;
+    std::optional<formalism::DomainView> translated_domain;
 
-    IndexMap<formalism::Requirement> requirements;
-    IndexMap<formalism::Type> types;
-    IndexMap<formalism::Object> objects;
-    IndexMap<formalism::Variable> variables;
-    IndexMap<formalism::Parameter> parameters;
-    IndexMap<formalism::Predicate> predicates;
-    IndexMap<formalism::FunctionSkeleton> functions;
-    IndexMap<formalism::Term> terms;
-    IndexMap<formalism::Atom> atoms;
-    IndexMap<formalism::Literal> literals;
-    IndexMap<formalism::FunctionExpressionNumber> numbers;
-    IndexMap<formalism::FunctionTerm> function_terms;
-    IndexMap<formalism::UnaryFunctionExpression> unary_expressions;
-    IndexMap<formalism::BinaryFunctionExpression> binary_expressions;
-    IndexMap<formalism::MultiFunctionExpression> multi_expressions;
-    IndexMap<formalism::FunctionExpression> function_expressions;
-    IndexMap<formalism::ConditionLiteral> condition_literals;
-    IndexMap<formalism::ConditionAnd> condition_ands;
-    IndexMap<formalism::ConditionOr> condition_ors;
-    IndexMap<formalism::ConditionNot> condition_nots;
-    IndexMap<formalism::ConditionImply> condition_implies;
-    IndexMap<formalism::ConditionExists> condition_exists;
-    IndexMap<formalism::ConditionForall> condition_foralls;
-    IndexMap<formalism::ConditionNumericConstraint> condition_numeric_constraints;
-    IndexMap<formalism::Condition> conditions;
-    IndexMap<formalism::EffectLiteral> effect_literals;
-    IndexMap<formalism::EffectAnd> effect_ands;
-    IndexMap<formalism::EffectNumeric> effect_numerics;
-    IndexMap<formalism::EffectForall> effect_foralls;
-    IndexMap<formalism::EffectWhen> effect_whens;
-    IndexMap<formalism::EffectOneOf> effect_one_ofs;
-    IndexMap<formalism::EffectProbabilisticAlternative> effect_probabilistic_alternatives;
-    IndexMap<formalism::EffectProbabilistic> effect_probabilistics;
-    IndexMap<formalism::Effect> effects;
-    IndexMap<formalism::Action> actions;
-    IndexMap<formalism::Axiom> axioms;
-    IndexMap<formalism::Metric> metrics;
-    IndexMap<formalism::InitialFunctionValue> initial_function_values;
-    IndexMap<formalism::Domain> domains;
-    IndexMap<formalism::Task> tasks;
+    ViewMap<formalism::Requirement> requirements;
+    ViewMap<formalism::Type> types;
+    ViewMap<formalism::Object> objects;
+    ViewMap<formalism::Variable> variables;
+    ViewMap<formalism::Parameter> parameters;
+    ViewMap<formalism::Predicate> predicates;
+    ViewMap<formalism::FunctionSkeleton> functions;
+    ViewMap<formalism::Term> terms;
+    ViewMap<formalism::Atom> atoms;
+    ViewMap<formalism::Literal> literals;
+    ViewMap<formalism::FunctionExpressionNumber> numbers;
+    ViewMap<formalism::FunctionTerm> function_terms;
+    ViewMap<formalism::UnaryFunctionExpression> unary_expressions;
+    ViewMap<formalism::BinaryFunctionExpression> binary_expressions;
+    ViewMap<formalism::MultiFunctionExpression> multi_expressions;
+    ViewMap<formalism::FunctionExpression> function_expressions;
+    ViewMap<formalism::ConditionLiteral> condition_literals;
+    ViewMap<formalism::ConditionAnd> condition_ands;
+    ViewMap<formalism::ConditionOr> condition_ors;
+    ViewMap<formalism::ConditionNot> condition_nots;
+    ViewMap<formalism::ConditionImply> condition_implies;
+    ViewMap<formalism::ConditionExists> condition_exists;
+    ViewMap<formalism::ConditionForall> condition_foralls;
+    ViewMap<formalism::ConditionNumericConstraint> condition_numeric_constraints;
+    ViewMap<formalism::Condition> conditions;
+    ViewMap<formalism::EffectLiteral> effect_literals;
+    ViewMap<formalism::EffectAnd> effect_ands;
+    ViewMap<formalism::EffectNumeric> effect_numerics;
+    ViewMap<formalism::EffectForall> effect_foralls;
+    ViewMap<formalism::EffectWhen> effect_whens;
+    ViewMap<formalism::EffectOneOf> effect_one_ofs;
+    ViewMap<formalism::EffectProbabilisticAlternative> effect_probabilistic_alternatives;
+    ViewMap<formalism::EffectProbabilistic> effect_probabilistics;
+    ViewMap<formalism::Effect> effects;
+    ViewMap<formalism::Action> actions;
+    ViewMap<formalism::Axiom> axioms;
+    ViewMap<formalism::Metric> metrics;
+    ViewMap<formalism::InitialFunctionValue> initial_function_values;
+    ViewMap<formalism::Domain> domains;
+    ViewMap<formalism::Task> tasks;
     std::unordered_map<ygg::uint_t, ygg::IndexList<formalism::Type>> object_types;
 
     explicit TranslationStorage(size_t index = 1, const formalism::Repository* parent = nullptr) : repository(index, parent) {}
@@ -150,19 +150,17 @@ ygg::Index<T> as_index(formalism::EntityView<T> view) noexcept
     return view.get_index();
 }
 
+
 template<typename T>
-bool find_mapped(const IndexMap<T>& map, ygg::Index<T> source, ygg::Index<T>& out)
+std::optional<formalism::EntityView<T>> find_mapped(const ViewMap<T>& map, ygg::Index<T> source)
 {
     if (auto it = map.find(source.get_value()); it != map.end())
-    {
-        out = it->second;
-        return true;
-    }
-    return false;
+        return it->second;
+    return std::nullopt;
 }
 
 template<typename T>
-void remember(IndexMap<T>& map, ygg::Index<T> source, ygg::Index<T> target)
+void remember(ViewMap<T>& map, ygg::Index<T> source, formalism::EntityView<T> target)
 {
     map.emplace(source.get_value(), target);
 }

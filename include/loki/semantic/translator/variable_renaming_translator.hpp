@@ -76,7 +76,7 @@ formalism::VariableView VariableRenamingTranslator<Derived>::lookup_variable(ygg
     for (auto it = this->m_variable_bindings.rbegin(); it != this->m_variable_bindings.rend(); ++it)
     {
         if (auto mapped = it->find(source.get_value()); mapped != it->end())
-            return ygg::make_view(mapped->second, this->m_storage->repository);
+            return mapped->second;
     }
     return this->self().copy(source, repository);
 }
@@ -94,7 +94,7 @@ formalism::ParameterView VariableRenamingTranslator<Derived>::rename_parameter(y
 {
     const auto& data = repository[source];
     const auto variable = this->self().fresh_variable(data.variable, repository);
-    this->m_variable_bindings.back().emplace(data.variable.get_value(), variable.get_index());
+    this->m_variable_bindings.back().emplace(data.variable.get_value(), variable);
     return formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, variable.get_index(), this->self().template copy_list<formalism::Type>(data.types, repository));
 }
 
