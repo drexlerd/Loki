@@ -19,6 +19,7 @@
 #include <fstream>
 #include <iostream>
 #include <loki/loki.hpp>
+#include <loki/formalism/formatter.hpp>
 
 #include <filesystem>
 
@@ -74,11 +75,11 @@ int main(int argc, char** argv)
     auto translator_options = loki::TranslatorOptions();
     translator_options.remove_typing = program.get<bool>("--remove-typing");
 
-    auto parser = loki::Parser(parser_options);
-    const auto domain = parser.parse_domain(domain_filepath);
+    auto parser = loki::Parser(domain_filepath, parser_options);
+    const auto domain = parser.get_domain();
 
     const auto domain_translation_result = loki::translate(domain, translator_options);
-    const auto translated_domain_text = loki::pddl::format::domain(domain_translation_result.get_translated_domain());
+    const auto translated_domain_text = loki::formalism::format::domain(domain_translation_result.get_translated_domain());
     if (verbose)
         std::cout << translated_domain_text << std::endl;
 
@@ -95,7 +96,7 @@ int main(int argc, char** argv)
         auto task = parser.parse_task(problem_filepath);
 
         const auto translated_task_result = loki::translate(task, domain_translation_result, translator_options);
-        const auto translated_task_text = loki::pddl::format::task(translated_task_result.get_translated_task());
+        const auto translated_task_text = loki::formalism::format::task(translated_task_result.get_translated_task());
         if (verbose)
             std::cout << translated_task_text << std::endl;
 
