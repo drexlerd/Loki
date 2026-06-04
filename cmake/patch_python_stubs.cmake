@@ -8,8 +8,9 @@ if(EXISTS "${PYPDDL_STUB_ROOT}")
         set(PYPDDL_PATCHED_STUB_CONTENT "${PYPDDL_STUB_CONTENT}")
 
         string(REPLACE "pypddl._pypddl." "pypddl." PYPDDL_PATCHED_STUB_CONTENT "${PYPDDL_PATCHED_STUB_CONTENT}")
+        string(REPLACE "pyyggdrasil._pyyggdrasil." "pyyggdrasil." PYPDDL_PATCHED_STUB_CONTENT "${PYPDDL_PATCHED_STUB_CONTENT}")
         string(REPLACE "pypddl._pypddl" "pypddl" PYPDDL_PATCHED_STUB_CONTENT "${PYPDDL_PATCHED_STUB_CONTENT}")
-        string(REGEX REPLACE "def __eq__\\(self, arg: [^,\\n]+, /\\) -> bool" "def __eq__(self, arg: object, /) -> bool" PYPDDL_PATCHED_STUB_CONTENT "${PYPDDL_PATCHED_STUB_CONTENT}")
+        string(REPLACE "pyyggdrasil._pyyggdrasil" "pyyggdrasil" PYPDDL_PATCHED_STUB_CONTENT "${PYPDDL_PATCHED_STUB_CONTENT}")
 
         if(NOT PYPDDL_STUB_CONTENT STREQUAL PYPDDL_PATCHED_STUB_CONTENT)
             file(WRITE "${PYPDDL_STUB_FILE}" "${PYPDDL_PATCHED_STUB_CONTENT}")

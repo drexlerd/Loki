@@ -17,11 +17,10 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 
 
 def _patch_stub_text(text: str) -> str:
-    import re
-
     text = text.replace("pypddl._pypddl.", "pypddl.")
+    text = text.replace("pyyggdrasil._pyyggdrasil.", "pyyggdrasil.")
     text = text.replace("pypddl._pypddl", "pypddl")
-    return re.sub(r"def __eq__\(self, arg: [^,\n]+, /\) -> bool", "def __eq__(self, arg: object, /) -> bool", text)
+    return text.replace("pyyggdrasil._pyyggdrasil", "pyyggdrasil")
 
 
 def _num_jobs() -> int:
