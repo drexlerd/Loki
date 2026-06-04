@@ -10,22 +10,28 @@
 #include <string>
 #include <utility>
 
+#if defined(__clang__) || defined(__GNUC__)
+#define LOKI_SEMANTIC_ERROR_API __attribute__((visibility("default")))
+#else
+#define LOKI_SEMANTIC_ERROR_API
+#endif
+
 namespace loki::semantic
 {
 
-class SemanticError : public std::runtime_error
+class LOKI_SEMANTIC_ERROR_API SemanticError : public std::runtime_error
 {
 public:
     explicit SemanticError(std::string message) : std::runtime_error(std::move(message)) {}
 };
 
-class ParseError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API ParseError : public SemanticError
 {
 public:
     explicit ParseError(std::string message) : SemanticError(std::move(message)) {}
 };
 
-class UnsupportedRequirementError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API UnsupportedRequirementError : public SemanticError
 {
 public:
     explicit UnsupportedRequirementError(const std::string& requirement) :
@@ -34,7 +40,7 @@ public:
     }
 };
 
-class MissingRequirementError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API MissingRequirementError : public SemanticError
 {
 public:
     explicit MissingRequirementError(const std::string& requirement) :
@@ -43,37 +49,37 @@ public:
     }
 };
 
-class UndefinedTypeError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API UndefinedTypeError : public SemanticError
 {
 public:
     explicit UndefinedTypeError(const std::string& name) : SemanticError("Undefined type: " + name) {}
 };
 
-class UndefinedPredicateError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API UndefinedPredicateError : public SemanticError
 {
 public:
     explicit UndefinedPredicateError(const std::string& name) : SemanticError("Undefined predicate: " + name) {}
 };
 
-class UndefinedObjectError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API UndefinedObjectError : public SemanticError
 {
 public:
     explicit UndefinedObjectError(const std::string& name) : SemanticError("Undefined object: " + name) {}
 };
 
-class UndefinedVariableError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API UndefinedVariableError : public SemanticError
 {
 public:
     explicit UndefinedVariableError(const std::string& name) : SemanticError("Undefined variable: ?" + name) {}
 };
 
-class UndefinedFunctionError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API UndefinedFunctionError : public SemanticError
 {
 public:
     explicit UndefinedFunctionError(const std::string& name) : SemanticError("Undefined function: " + name) {}
 };
 
-class DuplicateDefinitionError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API DuplicateDefinitionError : public SemanticError
 {
 protected:
     DuplicateDefinitionError(const std::string& kind, const std::string& name) :
@@ -82,38 +88,38 @@ protected:
     }
 };
 
-class DuplicateTypeError : public DuplicateDefinitionError
+class LOKI_SEMANTIC_ERROR_API DuplicateTypeError : public DuplicateDefinitionError
 {
 public:
     explicit DuplicateTypeError(const std::string& name) : DuplicateDefinitionError("type", name) {}
 };
 
-class DuplicatePredicateError : public DuplicateDefinitionError
+class LOKI_SEMANTIC_ERROR_API DuplicatePredicateError : public DuplicateDefinitionError
 {
 public:
     explicit DuplicatePredicateError(const std::string& name) : DuplicateDefinitionError("predicate", name) {}
 };
 
-class DuplicateObjectError : public DuplicateDefinitionError
+class LOKI_SEMANTIC_ERROR_API DuplicateObjectError : public DuplicateDefinitionError
 {
 public:
     explicit DuplicateObjectError(const std::string& name) : DuplicateDefinitionError("object", name) {}
 };
 
-class DuplicateVariableError : public DuplicateDefinitionError
+class LOKI_SEMANTIC_ERROR_API DuplicateVariableError : public DuplicateDefinitionError
 {
 public:
     explicit DuplicateVariableError(const std::string& name) : DuplicateDefinitionError("variable", name) {}
 };
 
-class DuplicateFunctionError : public DuplicateDefinitionError
+class LOKI_SEMANTIC_ERROR_API DuplicateFunctionError : public DuplicateDefinitionError
 {
 public:
     explicit DuplicateFunctionError(const std::string& name) : DuplicateDefinitionError("function", name) {}
 };
 
 
-class ArityMismatchError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API ArityMismatchError : public SemanticError
 {
 public:
     ArityMismatchError(const std::string& name, std::size_t expected, std::size_t actual) :
@@ -122,7 +128,7 @@ public:
     }
 };
 
-class TypeMismatchError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API TypeMismatchError : public SemanticError
 {
 public:
     explicit TypeMismatchError(const std::string& name) :
@@ -131,7 +137,7 @@ public:
     }
 };
 
-class InvalidMetricError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API InvalidMetricError : public SemanticError
 {
 public:
     explicit InvalidMetricError(const std::string& optimization) :
@@ -140,7 +146,7 @@ public:
     }
 };
 
-class InvalidNumericConstraintError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API InvalidNumericConstraintError : public SemanticError
 {
 public:
     explicit InvalidNumericConstraintError(const std::string& op) :
@@ -149,7 +155,7 @@ public:
     }
 };
 
-class InvalidNumericEffectError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API InvalidNumericEffectError : public SemanticError
 {
 public:
     explicit InvalidNumericEffectError(const std::string& op) :
@@ -158,7 +164,7 @@ public:
     }
 };
 
-class InvalidProbabilisticEffectError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API InvalidProbabilisticEffectError : public SemanticError
 {
 public:
     explicit InvalidProbabilisticEffectError(const std::string& message) :
@@ -167,7 +173,7 @@ public:
     }
 };
 
-class InvalidEqualityError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API InvalidEqualityError : public SemanticError
 {
 public:
     explicit InvalidEqualityError(const std::string& message) :
@@ -176,7 +182,7 @@ public:
     }
 };
 
-class MismatchedDomainError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API MismatchedDomainError : public SemanticError
 {
 public:
     MismatchedDomainError(const std::string& expected, const std::string& actual) :
@@ -185,12 +191,14 @@ public:
     }
 };
 
-class MissingDomainError : public SemanticError
+class LOKI_SEMANTIC_ERROR_API MissingDomainError : public SemanticError
 {
 public:
     explicit MissingDomainError(std::string message) : SemanticError(std::move(message)) {}
 };
 
 } // namespace loki::semantic
+
+#undef LOKI_SEMANTIC_ERROR_API
 
 #endif
