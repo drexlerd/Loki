@@ -27,11 +27,11 @@ The translator is based on the method presented in section four of the paper [*"
 
 ## Dependencies
 
-Loki depends on a fraction of [Boost's](boost.org) header-only libraries (Fusion, Spirit x3, Container), its performance benchmarking framework depends on [GoogleBenchmark](https://github.com/google/benchmark), and its testing framework depends on [GoogleTest](https://github.com/google/googletest).
+Loki depends on a fraction of [Boost's](https://www.boost.org) header-only libraries (Fusion, Spirit x3, Container), its performance benchmarking framework depends on [GoogleBenchmark](https://github.com/google/benchmark), and its testing framework depends on [GoogleTest](https://github.com/google/googletest).
 
 Loki consumes native dependencies from Python packages:
 
-- `pyyggdrasil >= 0.0.11` for shared third-party native dependencies.
+- `pyyggdrasil >= 0.0.13, < 0.1` for shared third-party native dependencies.
 
 The shared workspace layout and general Python/CMake integration pattern are
 documented in the
@@ -51,10 +51,18 @@ Install Loki's native dependency providers into the active Python environment,
 then configure CMake with their native prefixes:
 
 ```console
-python -m pip install 'pyyggdrasil>=0.0.11'
+python -m pip install 'pyyggdrasil>=0.0.13,<0.1'
 
+cmake -S . -B build
+```
+
+CMake discovers the installed `pyyggdrasil` automatically through
+`cmake/find_python_native_packages.cmake` and links against the
+`yggdrasil::yggdrasil` target. To point at a different prefix explicitly:
+
+```console
 cmake -S . -B build \
-  -DCMAKE_PREFIX_PATH="$(python -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')"
+  -DCMAKE_PREFIX_PATH="$(python -m pyyggdrasil --prefix)"
 
 cmake --build build -j4
 ```
@@ -86,26 +94,70 @@ cmake --install build --prefix=<path/to/installation-directory>
 python -m pip install .
 ```
 
+## Python API
+
+The Python package exposes the semantic parser, translator, and reparseable PDDL
+formatter through `pypddl.formalism`:
+
+```python
+from pypddl import formalism as pddl
+
+parser = pddl.Parser("""
+(define (domain ready-domain)
+  (:predicates (ready))
+)
+""")
+
+translation = pddl.translate_domain(parser.domain())
+domain_text = pddl.format_domain(translation.translated_domain)
+reparsed = pddl.Parser(domain_text)
+assert reparsed.domain().get_name() == "ready-domain"
+```
+
+## C++ API
+
+The umbrella header exposes the semantic parser, translator, and reparseable
+PDDL formatter through the top-level `loki` namespace:
+
+```cpp
+#include <loki/loki.hpp>
+
+#include <string>
+
+int main()
+{
+    auto parser = loki::Parser(std::string { "(define (domain ready-domain) (:predicates (ready)))" });
+    const auto translation = loki::translate_domain(parser.get_domain());
+    const auto domain_text = loki::format_domain(translation.get_translated_domain());
+    auto reparsed = loki::Parser(domain_text);
+    return reparsed.get_domain().get_name() == "ready-domain" ? 0 : 1;
+}
+```
+
 ## CMake Integration
 
 The Python package `pypddl` installs Loki's native headers, shared library, and
 CMake package config under `pypddl.native_prefix()`. It depends on
-`pyyggdrasil>=0.0.11` for third-party native dependencies:
+`pyyggdrasil>=0.0.13,<0.1` for third-party native dependencies:
 
 ```python
 import pypddl
 import pyyggdrasil
 
-print(pypddl.native_prefix())
-print(pyyggdrasil.native_prefix())
+print(pypddl.cmake_prefix())       # prefix to put on CMAKE_PREFIX_PATH
+print(pypddl.cmake_dir())          # directory containing lokiConfig.cmake
+print(pyyggdrasil.cmake_prefix())
 ```
+
+The same paths are available from the shell via `python -m pypddl --prefix`,
+`--cmake-dir`, `--include-dir`, and `--version`.
 
 Downstream CMake projects should include the native prefixes of `pypddl` and
 its native package dependencies in `CMAKE_PREFIX_PATH`:
 
 ```console
 cmake -S . -B build \
-  -DCMAKE_PREFIX_PATH="$(python -c 'import os, pyyggdrasil, pypddl; print(os.pathsep.join(map(str, [pyyggdrasil.native_prefix(), pypddl.native_prefix()])))')"
+  -DCMAKE_PREFIX_PATH="$(python -m pypddl --prefix);$(python -m pyyggdrasil --prefix)"
 ```
 
 Loki exports the `loki::parsers` target.
@@ -113,10 +165,17 @@ Loki exports the `loki::parsers` target.
 ## Running the Executables
 
 The executable illustrates how to use Loki. It is disabled by default and can be
-enabled with `-DLOKI_BUILD_EXECUTABLES=ON`.
+enabled with `-DLOKI_BUILD_EXECUTABLES=ON`. Example PDDL inputs are available
+from the benchmark submodule:
 
 ```console
-./build/exe/loki data/gripper/domain.pddl data/gripper/p-2-0.pddl
+git submodule update --init --recursive data/planning-benchmarks
+```
+
+```console
+./build/exe/loki \
+  data/planning-benchmarks/tests/classical/gripper/domain.pddl \
+  data/planning-benchmarks/tests/classical/gripper/test-1.pddl
 ```
 
 ## Citing Loki

@@ -1,4 +1,7 @@
-set(native_lib_dir "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/pypddl/native/lib")
+if(NOT PYPDDL_NATIVE_LIBDIR)
+    set(PYPDDL_NATIVE_LIBDIR "pypddl/native/lib")
+endif()
+set(native_lib_dir "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${PYPDDL_NATIVE_LIBDIR}")
 if(NOT EXISTS "${native_lib_dir}")
     return()
 endif()

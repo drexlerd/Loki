@@ -16,14 +16,19 @@
  */
 
 #include <argparse/argparse.hpp>
+#include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <loki/loki.hpp>
-#include <loki/formalism/formatter.hpp>
+#include <stdexcept>
+#include <string_view>
 
-#include <filesystem>
+#ifndef LOKI_VERSION
+#define LOKI_VERSION "unknown"
+#endif
 
-static constexpr std::string version = "1.0.0";
+static constexpr auto version = LOKI_VERSION;
 
 static void add_version(argparse::ArgumentParser& program)
 {
@@ -38,6 +43,59 @@ static void add_version(argparse::ArgumentParser& program)
         .help("Print version information and exit.");
 }
 
+static void write_file(const std::filesystem::path& path, std::string_view text)
+{
+    auto out = std::ofstream(path);
+    if (!out)
+        throw std::runtime_error("Could not open output file: " + path.string());
+
+    out << text;
+    if (!out)
+        throw std::runtime_error("Could not write output file: " + path.string());
+}
+
+static int run(const argparse::ArgumentParser& program)
+{
+    const auto domain_filepath = std::filesystem::path(program.get<std::string>("domain"));
+    const auto problem_filepath = std::filesystem::path(program.get<std::string>("problem"));
+    const auto verbose = program.get<bool>("--verbose");
+
+    if (problem_filepath.empty() && program.is_used("--out-problem"))
+        throw std::runtime_error("--out-problem requires a problem file.");
+
+    auto parser_options = loki::ParserOptions();
+    parser_options.strict = program.get<bool>("--strict");
+
+    auto translator_options = loki::TranslatorOptions();
+    translator_options.remove_typing = program.get<bool>("--remove-typing");
+
+    auto parser = loki::Parser(domain_filepath, parser_options);
+    const auto domain = parser.get_domain();
+
+    const auto domain_translation_result = loki::translate(domain, translator_options);
+    const auto translated_domain_text = loki::format_domain(domain_translation_result.get_translated_domain());
+    if (verbose)
+        std::cout << translated_domain_text << std::endl;
+
+    if (program.is_used("--out-domain"))
+        write_file(program.get<std::string>("--out-domain"), translated_domain_text);
+
+    if (!problem_filepath.empty())
+    {
+        auto task = parser.parse_task(problem_filepath);
+
+        const auto translated_task_result = loki::translate(task, domain_translation_result, translator_options);
+        const auto translated_task_text = loki::format_task(translated_task_result.get_translated_task());
+        if (verbose)
+            std::cout << translated_task_text << std::endl;
+
+        if (program.is_used("--out-problem"))
+            write_file(program.get<std::string>("--out-problem"), translated_task_text);
+    }
+
+    return 0;
+}
+
 int main(int argc, char** argv)
 {
     auto program = argparse::ArgumentParser("loki", version, argparse::default_arguments::help);
@@ -50,7 +108,7 @@ int main(int argc, char** argv)
     program.add_argument("-s", "--strict")
         .default_value(false)
         .implicit_value(true)
-        .help("Enable strict parsing mode to catch unused objects, predicates, functions, and parameters.");
+        .help("Enable strict semantic checks for requirements, arity, and type compatibility.");
     program.add_argument("-v", "--verbose").default_value(false).implicit_value(true).help("Enable verbose console prints.");
     program.add_argument("--remove-typing").default_value(false).implicit_value(true).help("Enable the removal of type annotations.");
 
@@ -62,52 +120,16 @@ int main(int argc, char** argv)
     {
         std::cerr << err.what() << "\n";
         std::cerr << program;
-        std::exit(1);
+        return 1;
     }
 
-    const auto domain_filepath = std::filesystem::path(program.get<std::string>("domain"));
-    const auto problem_filepath = std::filesystem::path(program.get<std::string>("problem"));
-    const auto verbose = program.get<bool>("--verbose");
-
-    auto parser_options = loki::ParserOptions();
-    parser_options.strict = program.get<bool>("--strict");
-
-    auto translator_options = loki::TranslatorOptions();
-    translator_options.remove_typing = program.get<bool>("--remove-typing");
-
-    auto parser = loki::Parser(domain_filepath, parser_options);
-    const auto domain = parser.get_domain();
-
-    const auto domain_translation_result = loki::translate(domain, translator_options);
-    const auto translated_domain_text = loki::formalism::format::domain(domain_translation_result.get_translated_domain());
-    if (verbose)
-        std::cout << translated_domain_text << std::endl;
-
-    if (program.is_used("--out-domain"))
+    try
     {
-        auto out_domain_filepath = program.get<std::string>("--out-domain");
-        auto out_domain_file = std::ofstream(out_domain_filepath);
-        out_domain_file << translated_domain_text;
-        out_domain_file.close();
+        return run(program);
     }
-
-    if (!problem_filepath.empty())
+    catch (const std::exception& err)
     {
-        auto task = parser.parse_task(problem_filepath);
-
-        const auto translated_task_result = loki::translate(task, domain_translation_result, translator_options);
-        const auto translated_task_text = loki::formalism::format::task(translated_task_result.get_translated_task());
-        if (verbose)
-            std::cout << translated_task_text << std::endl;
-
-        if (program.is_used("--out-problem"))
-        {
-            auto out_problem_filepath = program.get<std::string>("--out-problem");
-            auto out_problem_file = std::ofstream(out_problem_filepath);
-            out_problem_file << translated_task_text;
-            out_problem_file.close();
-        }
+        std::cerr << err.what() << "\n";
+        return 1;
     }
-
-    return 0;
 }

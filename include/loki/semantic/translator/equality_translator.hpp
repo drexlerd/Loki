@@ -5,6 +5,7 @@
 #ifndef LOKI_SEMANTIC_TRANSLATOR_EQUALITY_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_EQUALITY_TRANSLATOR_HPP_
 
+#include "loki/semantic/errors.hpp"
 #include "loki/semantic/translator/copy_translator_component.hpp"
 
 namespace loki::semantic::detail
@@ -129,7 +130,7 @@ void EqualityTranslator<Derived>::initialize_equality(ygg::Data<formalism::Task>
         return;
     const auto predicate = this->self().find_domain_equality_predicate();
     if (!predicate)
-        throw std::runtime_error("InitializeEqualityTranslator: expected equality predicate to be declared in the translated domain.");
+        throw InvalidEqualityError("expected equality predicate to be declared in the translated domain");
     const auto& domain = this->m_storage->translated_domain->get_data();
     for (auto object : domain.constants)
         task.initial_literals.push_back(as_index(this->self().equality_literal(*predicate, object)));

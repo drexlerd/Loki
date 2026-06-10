@@ -12,16 +12,19 @@
 
 #include "loki/ast.hpp"
 #include "loki/fmt.hpp"
-#include "loki/parser.hpp"
 #include "loki/formalism/formalism.hpp"
+#include "loki/parser.hpp"
 #include "loki/semantic.hpp"
 
+#include <string>
 
 namespace loki
 {
 
 using ParserOptions = parser::ParserOptions;
 using Parser = semantic::Parser;
+using SourcePosition = semantic::SourcePosition;
+using SourceRange = semantic::SourceRange;
 using SemanticError = semantic::SemanticError;
 using ParseError = semantic::ParseError;
 using UnsupportedRequirementError = semantic::UnsupportedRequirementError;
@@ -51,16 +54,28 @@ using TranslatorOptions = semantic::TranslatorOptions;
 using DomainTranslationResult = semantic::DomainTranslationResult;
 using ProblemTranslationResult = semantic::ProblemTranslationResult;
 
-inline DomainTranslationResult translate(formalism::DomainView domain, const TranslatorOptions& options = {})
-{
-    return semantic::translate(domain, options);
-}
+inline DomainTranslationResult translate(formalism::DomainView domain, const TranslatorOptions& options = {}) { return semantic::translate(domain, options); }
 
 inline ProblemTranslationResult translate(formalism::TaskView task, const DomainTranslationResult& domain_translation, const TranslatorOptions& options = {})
 {
     return semantic::translate(task, domain_translation, options);
 }
 
-} // namespace loki
+inline DomainTranslationResult translate_domain(formalism::DomainView domain, const TranslatorOptions& options = {})
+{
+    return semantic::translate(domain, options);
+}
+
+inline ProblemTranslationResult
+translate_task(formalism::TaskView task, const DomainTranslationResult& domain_translation, const TranslatorOptions& options = {})
+{
+    return semantic::translate(task, domain_translation, options);
+}
+
+inline std::string format_domain(formalism::DomainView domain) { return formalism::format::domain(domain); }
+
+inline std::string format_task(formalism::TaskView task) { return formalism::format::task(task); }
+
+}  // namespace loki
 
 #endif

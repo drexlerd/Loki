@@ -1,4 +1,4 @@
-find_package(Python 3.8 REQUIRED
+find_package(Python 3.9 REQUIRED
   COMPONENTS Interpreter Development.Module
   OPTIONAL_COMPONENTS Development.SABIModule)
 
@@ -75,20 +75,36 @@ install(DIRECTORY "${CMAKE_SOURCE_DIR}/cmake/"
 
 if(APPLE)
     install(CODE
-            "set(PYPDDL_PYTHON_NATIVE_LIBRARY_RPATHS \"${PYPDDL_INSTALL_NATIVE_LIBRARY_RPATHS}\")
+            "set(PYPDDL_NATIVE_LIBDIR \"${PYPDDL_NATIVE_LIBDIR}\")
+             set(PYPDDL_PYTHON_NATIVE_LIBRARY_RPATHS \"${PYPDDL_INSTALL_NATIVE_LIBRARY_RPATHS}\")
              include(\"${PROJECT_SOURCE_DIR}/cmake/install/fix_macos_runtime_paths.cmake\")"
             COMPONENT pypddl)
 elseif(UNIX)
     install(CODE
-            "set(PYPDDL_PYTHON_NATIVE_LIBRARY_RPATH \"${PYPDDL_INSTALL_NATIVE_LIBRARY_RPATH}\")
+            "set(PYPDDL_NATIVE_LIBDIR \"${PYPDDL_NATIVE_LIBDIR}\")
+             set(PYPDDL_PYTHON_NATIVE_LIBRARY_RPATH \"${PYPDDL_INSTALL_NATIVE_LIBRARY_RPATH}\")
              include(\"${PROJECT_SOURCE_DIR}/cmake/install/fix_unix_runtime_paths.cmake\")"
             COMPONENT pypddl)
 endif()
 
+set(PYPDDL_BUILD_TREE_PACKAGE_DIR "${CMAKE_CURRENT_BINARY_DIR}/pypddl")
+file(MAKE_DIRECTORY
+     "${PYPDDL_BUILD_TREE_PACKAGE_DIR}"
+     "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/formalism")
+
+set(PYPDDL_GENERATED_VERSION_FILE "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/_version.py")
+file(WRITE "${PYPDDL_GENERATED_VERSION_FILE}" "__version__ = \"${PROJECT_VERSION}\"\n")
+install(FILES "${PYPDDL_GENERATED_VERSION_FILE}"
+        DESTINATION "pypddl"
+        COMPONENT pypddl)
+
 set(PYPDDL_PYTHON_FILES
     pypddl/__init__.py
+    pypddl/__main__.py
     pypddl/__init__.pyi
+    pypddl/py.typed
     pypddl/formalism/__init__.py
+    pypddl/formalism/__init__.pyi
 )
 
 foreach(python_file IN LISTS PYPDDL_PYTHON_FILES)
@@ -97,6 +113,53 @@ foreach(python_file IN LISTS PYPDDL_PYTHON_FILES)
             DESTINATION "${python_file_directory}"
             COMPONENT pypddl)
 endforeach()
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/pypddl/__init__.py"
+               "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/__init__.py"
+               COPYONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/pypddl/__init__.pyi"
+               "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/__init__.pyi"
+               COPYONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/pypddl/py.typed"
+               "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/py.typed"
+               COPYONLY)
+configure_file("${PYPDDL_GENERATED_VERSION_FILE}"
+               "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/_version.py"
+               COPYONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/pypddl/formalism/__init__.py"
+               "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/formalism/__init__.py"
+               COPYONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/pypddl/formalism/__init__.pyi"
+               "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/formalism/__init__.pyi"
+               COPYONLY)
+add_custom_command(TARGET _pypddl POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:_pypddl>
+            "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/$<TARGET_FILE_NAME:_pypddl>"
+    VERBATIM
+)
+
+if(LOKI_BUILD_TESTS)
+    add_test(NAME pypddl_build_tree_package
+             COMMAND "${Python_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_build_tree_package.py")
+    set_tests_properties(pypddl_build_tree_package PROPERTIES
+        ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR};PYTHONDONTWRITEBYTECODE=1")
+
+    add_test(NAME pypddl_bindings
+             COMMAND "${Python_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_loki_bindings.py")
+    set_tests_properties(pypddl_bindings PROPERTIES
+        ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR};PYTHONDONTWRITEBYTECODE=1")
+
+    add_test(NAME pypddl_import
+             COMMAND "${Python_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_import.py")
+    set_tests_properties(pypddl_import PROPERTIES
+        ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR};PYTHONDONTWRITEBYTECODE=1")
+
+    add_test(NAME pypddl_build_backend
+             COMMAND "${Python_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_build_backend.py")
+    set_tests_properties(pypddl_build_backend PROPERTIES
+        ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1")
+endif()
 
 set(PYPDDL_INSTALL_LIBRARY_PATHS)
 foreach(native_prefix IN ITEMS "${YGGDRASIL_NATIVE_PREFIX}")

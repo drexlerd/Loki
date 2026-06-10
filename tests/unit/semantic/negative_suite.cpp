@@ -13,7 +13,9 @@
 
 #include <yggdrasil/serialization/json_suite.hpp>
 
+#include <optional>
 #include <string>
+#include <typeinfo>
 #include <vector>
 
 namespace loki::tests
@@ -28,6 +30,10 @@ struct NegativeSuiteCase
     bool strict = false;
     std::string domain_source;
     std::string task_source;
+    std::optional<std::string> expected_error;
+    std::optional<std::string> expected_message;
+    std::optional<std::size_t> expected_line;
+    std::optional<std::size_t> expected_column;
 };
 
 std::string source_from_lines(const boost::json::object& object, const std::string& key)
@@ -50,6 +56,14 @@ NegativeSuiteCase parse_case(const boost::json::object& object)
     result.domain_source = source_from_lines(object, "domain");
     if (object.if_contains("task"))
         result.task_source = source_from_lines(object, "task");
+    if (const auto* expected_error = object.if_contains("expected_error"))
+        result.expected_error = std::string(expected_error->as_string());
+    if (const auto* expected_message = object.if_contains("expected_message"))
+        result.expected_message = std::string(expected_message->as_string());
+    if (const auto* expected_line = object.if_contains("expected_line"))
+        result.expected_line = static_cast<std::size_t>(expected_line->as_int64());
+    if (const auto* expected_column = object.if_contains("expected_column"))
+        result.expected_column = static_cast<std::size_t>(expected_column->as_int64());
     return result;
 }
 
@@ -63,7 +77,37 @@ std::vector<NegativeSuiteCase> load_cases()
     return result;
 }
 
-} // namespace
+bool matches_error_type(const semantic::SemanticError& error, const std::string& expected_error)
+{
+    if (expected_error == "SemanticError") return true;
+    if (expected_error == "ParseError") return dynamic_cast<const semantic::ParseError*>(&error) != nullptr;
+    if (expected_error == "MissingDomainError") return dynamic_cast<const semantic::MissingDomainError*>(&error) != nullptr;
+    if (expected_error == "MismatchedDomainError") return dynamic_cast<const semantic::MismatchedDomainError*>(&error) != nullptr;
+    if (expected_error == "UnsupportedRequirementError") return dynamic_cast<const semantic::UnsupportedRequirementError*>(&error) != nullptr;
+    if (expected_error == "MissingRequirementError") return dynamic_cast<const semantic::MissingRequirementError*>(&error) != nullptr;
+    if (expected_error == "UndefinedTypeError") return dynamic_cast<const semantic::UndefinedTypeError*>(&error) != nullptr;
+    if (expected_error == "UndefinedPredicateError") return dynamic_cast<const semantic::UndefinedPredicateError*>(&error) != nullptr;
+    if (expected_error == "UndefinedObjectError") return dynamic_cast<const semantic::UndefinedObjectError*>(&error) != nullptr;
+    if (expected_error == "UndefinedVariableError") return dynamic_cast<const semantic::UndefinedVariableError*>(&error) != nullptr;
+    if (expected_error == "UndefinedFunctionError") return dynamic_cast<const semantic::UndefinedFunctionError*>(&error) != nullptr;
+    if (expected_error == "DuplicateDefinitionError") return dynamic_cast<const semantic::DuplicateDefinitionError*>(&error) != nullptr;
+    if (expected_error == "DuplicateTypeError") return dynamic_cast<const semantic::DuplicateTypeError*>(&error) != nullptr;
+    if (expected_error == "DuplicatePredicateError") return dynamic_cast<const semantic::DuplicatePredicateError*>(&error) != nullptr;
+    if (expected_error == "DuplicateObjectError") return dynamic_cast<const semantic::DuplicateObjectError*>(&error) != nullptr;
+    if (expected_error == "DuplicateVariableError") return dynamic_cast<const semantic::DuplicateVariableError*>(&error) != nullptr;
+    if (expected_error == "DuplicateFunctionError") return dynamic_cast<const semantic::DuplicateFunctionError*>(&error) != nullptr;
+    if (expected_error == "ArityMismatchError") return dynamic_cast<const semantic::ArityMismatchError*>(&error) != nullptr;
+    if (expected_error == "TypeMismatchError") return dynamic_cast<const semantic::TypeMismatchError*>(&error) != nullptr;
+    if (expected_error == "InvalidMetricError") return dynamic_cast<const semantic::InvalidMetricError*>(&error) != nullptr;
+    if (expected_error == "InvalidNumericConstraintError") return dynamic_cast<const semantic::InvalidNumericConstraintError*>(&error) != nullptr;
+    if (expected_error == "InvalidNumericEffectError") return dynamic_cast<const semantic::InvalidNumericEffectError*>(&error) != nullptr;
+    if (expected_error == "InvalidProbabilisticEffectError") return dynamic_cast<const semantic::InvalidProbabilisticEffectError*>(&error) != nullptr;
+    if (expected_error == "InvalidEqualityError") return dynamic_cast<const semantic::InvalidEqualityError*>(&error) != nullptr;
+    ADD_FAILURE() << "Unknown expected_error in negative suite: " << expected_error;
+    return false;
+}
+
+}  // namespace
 
 TEST(LokiSemanticNegativeSuite, ReportsExpectedSemanticErrors)
 {
@@ -79,10 +123,32 @@ TEST(LokiSemanticNegativeSuite, ReportsExpectedSemanticErrors)
                 parser.parse_task(item.task_source);
             FAIL() << "Expected semantic error";
         }
-        catch (const semantic::SemanticError&)
+        catch (const semantic::SemanticError& error)
         {
+            const auto message = std::string(error.what());
+            if (item.expected_error)
+            {
+                EXPECT_TRUE(matches_error_type(error, *item.expected_error)) << "expected " << *item.expected_error << ", got " << typeid(error).name();
+            }
+            if (item.expected_message)
+            {
+                EXPECT_NE(message.find(*item.expected_message), std::string::npos) << message;
+            }
+            if (item.expected_line || item.expected_column)
+            {
+                ASSERT_TRUE(error.has_source_range()) << message;
+                ASSERT_TRUE(error.source_range().has_value()) << message;
+                if (item.expected_line)
+                {
+                    EXPECT_EQ(error.source_range()->begin.line, *item.expected_line);
+                }
+                if (item.expected_column)
+                {
+                    EXPECT_EQ(error.source_range()->begin.column, *item.expected_column);
+                }
+            }
         }
     }
 }
 
-} // namespace loki::tests
+}  // namespace loki::tests

@@ -30,7 +30,8 @@ void bind_index(nb::module_& m, const std::string& name)
         .def("__le__", [](const V& lhs, const V& rhs) { return lhs <= rhs; })
         .def("__gt__", [](const V& lhs, const V& rhs) { return lhs > rhs; })
         .def("__ge__", [](const V& lhs, const V& rhs) { return lhs >= rhs; })
-        .def("__repr__", [name](const V& self) { return name + "(" + std::to_string(static_cast<ygg::uint_t>(self)) + ")"; });
+        .def("__repr__", [name](const V& self) { return name + "(" + std::to_string(static_cast<ygg::uint_t>(self)) + ")"; })
+        .def("__str__", [name](const V& self) { return name + "(" + std::to_string(static_cast<ygg::uint_t>(self)) + ")"; });
 }
 
 

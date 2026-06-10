@@ -9,6 +9,8 @@
 
 #include <gtest/gtest.h>
 
+#include "../benchmark_utils.hpp"
+
 #include <loki/semantic.hpp>
 
 #include <yggdrasil/serialization/json_suite.hpp>
@@ -88,6 +90,8 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
     const auto cases = load_parser_cases();
     const auto expectations = load_expectations();
     ASSERT_EQ(cases.size(), expectations.size());
+    if (!benchmark_suite_available(cases))
+        GTEST_SKIP() << "Benchmark data unavailable: " << cases.front().domain_file;
 
     for (auto i = std::size_t { 0 }; i < cases.size(); ++i)
     {
@@ -95,6 +99,8 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
         const auto& expected = expectations[i];
         SCOPED_TRACE(item.name);
         ASSERT_EQ(item.name, expected.name);
+        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.domain_file);
+        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.task_file);
 
         auto parser = semantic::Parser(item.domain_file);
         const auto domain_translation = semantic::translate(parser.get_domain());
@@ -102,12 +108,12 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
         const auto task_translation = semantic::translate(parser.parse_task(item.task_file), domain_translation);
         const auto translated_task = task_translation.get_translated_task();
 
-        EXPECT_EQ(translated_domain.get_data().predicates.size(), expected.domain_predicates);
-        EXPECT_EQ(translated_domain.get_data().actions.size(), expected.domain_actions);
-        EXPECT_EQ(translated_domain.get_data().axioms.size(), expected.domain_axioms);
-        EXPECT_EQ(translated_task.get_data().predicates.size(), expected.task_predicates);
-        EXPECT_EQ(translated_task.get_domain().get_data().actions.size(), expected.task_actions);
-        EXPECT_EQ(translated_task.get_data().axioms.size(), expected.task_axioms);
+        EXPECT_EQ(translated_domain.get_num_predicates(), expected.domain_predicates);
+        EXPECT_EQ(translated_domain.get_num_actions(), expected.domain_actions);
+        EXPECT_EQ(translated_domain.get_num_axioms(), expected.domain_axioms);
+        EXPECT_EQ(translated_task.get_num_predicates(), expected.task_predicates);
+        EXPECT_EQ(translated_task.get_domain().get_num_actions(), expected.task_actions);
+        EXPECT_EQ(translated_task.get_num_axioms(), expected.task_axioms);
     }
 }
 

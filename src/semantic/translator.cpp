@@ -9,7 +9,8 @@
 
 #include "loki/semantic/translator.hpp"
 
-#include <stdexcept>
+#include "loki/semantic/errors.hpp"
+
 #include <utility>
 
 namespace loki::semantic
@@ -330,7 +331,7 @@ formalism::EntityView<T> target_view(const ViewMap<T>& map, ygg::Index<T> target
     for (const auto& [_, view] : map)
         if (view.get_index() == target)
             return view;
-    throw std::runtime_error("missing translated view in translation storage");
+    throw SemanticError("Missing translated view in translation storage.");
 }
 
 void inherit_domain_identity_mappings(TranslationStorage& problem, const TranslationStorage& domain)
@@ -416,8 +417,10 @@ DomainTranslationResult translate(formalism::DomainView domain, const Translator
 
 ProblemTranslationResult translate(formalism::TaskView task, const DomainTranslationResult& result, const TranslatorOptions& options)
 {
-    if (task.get_data().domain != result.get_original_domain().get_index())
-        throw std::runtime_error("translate(task, result): task domain must match original domain in DomainTranslationResult.");
+    const auto expected_domain = result.get_original_domain();
+    const auto task_domain = task.get_domain();
+    if (task_domain.get_index() != expected_domain.get_index() || &task_domain.get_context().get_root() != &expected_domain.get_context().get_root())
+        throw MismatchedDomainError(std::string(expected_domain.get_name()), std::string(task_domain.get_name()));
 
     auto current_task = task;
     auto current_storage = std::shared_ptr<detail::TranslationStorage> {};

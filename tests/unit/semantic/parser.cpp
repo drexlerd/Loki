@@ -9,6 +9,8 @@
 
 #include <gtest/gtest.h>
 
+#include "../benchmark_utils.hpp"
+
 #include <loki/semantic.hpp>
 
 #include <yggdrasil/serialization/json_suite.hpp>
@@ -247,30 +249,29 @@ bool is_effect_and(ygg::Index<formalism::Effect> effect, const formalism::Reposi
     return std::visit(Overloaded { [&](ygg::Index<formalism::EffectAnd>) { return true; }, [&](auto) { return false; } }, repository[effect].value);
 }
 
-std::optional<ygg::Index<formalism::Object>> object_term(ygg::Index<formalism::Term> term, const formalism::Repository& repository)
+std::optional<ygg::Index<formalism::Object>> object_term(formalism::TermView term)
 {
-    return std::visit(
+    return ygg::visit(
         Overloaded {
-            [&](ygg::Index<formalism::Object> object) -> std::optional<ygg::Index<formalism::Object>> { return object; },
-            [&](auto) -> std::optional<ygg::Index<formalism::Object>> { return std::nullopt; },
+            [](formalism::ObjectView object) -> std::optional<ygg::Index<formalism::Object>> { return object.get_index(); },
+            [](auto) -> std::optional<ygg::Index<formalism::Object>> { return std::nullopt; },
         },
-        repository[term].value);
+        term.get_variant());
 }
 
-std::size_t count_equality_literals(const ygg::IndexList<formalism::Literal>& literals, const formalism::Repository& repository)
+template<typename LiteralRange>
+std::size_t count_equality_literals(const LiteralRange& literals)
 {
     auto result = std::size_t { 0 };
     for (auto literal : literals)
     {
-        const auto& literal_data = repository[literal];
-        if (!literal_data.positive)
+        if (!literal.is_positive())
             continue;
-        const auto& atom = repository[literal_data.atom];
-        const auto& predicate = repository[atom.predicate];
-        if (std::string(predicate.name) != "=" || atom.terms.size() != 2)
+        const auto atom = literal.get_atom();
+        if (std::string(atom.get_predicate().get_name()) != "=" || atom.get_num_terms() != 2)
             continue;
-        const auto left = object_term(atom.terms[0], repository);
-        const auto right = object_term(atom.terms[1], repository);
+        const auto left = object_term(atom.get_terms()[0]);
+        const auto right = object_term(atom.get_terms()[1]);
         if (left && right && left->get_value() == right->get_value())
             ++result;
     }
@@ -279,9 +280,8 @@ std::size_t count_equality_literals(const ygg::IndexList<formalism::Literal>& li
 
 bool has_equality_predicate(formalism::DomainView domain)
 {
-    const auto& repository = domain.get_context();
-    for (auto predicate : domain.get_data().predicates)
-        if (std::string(repository[predicate].name) == "=")
+    for (auto predicate : domain.get_predicates())
+        if (std::string(predicate.get_name()) == "=")
             return true;
     return false;
 }
@@ -296,62 +296,57 @@ bool has_requirement_kind(const ygg::IndexList<formalism::Requirement>& requirem
 
 bool has_predicate_named(formalism::DomainView domain, const std::string& name)
 {
-    const auto& repository = domain.get_context();
-    for (auto predicate : domain.get_data().predicates)
-        if (std::string(repository[predicate].name) == name)
+    for (auto predicate : domain.get_predicates())
+        if (std::string(predicate.get_name()) == name)
             return true;
     return false;
 }
 
 std::optional<ygg::Index<formalism::Predicate>> predicate_named(formalism::DomainView domain, const std::string& name)
 {
-    const auto& repository = domain.get_context();
-    for (auto predicate : domain.get_data().predicates)
-        if (std::string(repository[predicate].name) == name)
-            return predicate;
+    for (auto predicate : domain.get_predicates())
+        if (std::string(predicate.get_name()) == name)
+            return predicate.get_index();
     return std::nullopt;
 }
 
-bool initial_literals_use_predicate(const ygg::IndexList<formalism::Literal>& literals, const formalism::Repository& repository, const std::string& name, ygg::Index<formalism::Predicate> expected)
+template<typename LiteralRange>
+bool initial_literals_use_predicate(const LiteralRange& literals, const std::string& name, ygg::Index<formalism::Predicate> expected)
 {
     auto found = false;
     for (auto literal : literals)
     {
-        const auto atom = repository[literal].atom;
-        const auto predicate = repository[atom].predicate;
-        if (std::string(repository[predicate].name) != name)
+        const auto predicate = literal.get_atom().get_predicate();
+        if (std::string(predicate.get_name()) != name)
             continue;
         found = true;
-        if (predicate != expected)
+        if (predicate.get_index() != expected)
             return false;
     }
     return found;
 }
 
-std::optional<std::string> object_term_name(ygg::Index<formalism::Term> term, const formalism::Repository& repository)
+std::optional<std::string> object_term_name(formalism::TermView term)
 {
-    return std::visit(
+    return ygg::visit(
         Overloaded {
-            [&](ygg::Index<formalism::Object> object) -> std::optional<std::string> { return std::string(repository[object].name); },
-            [&](auto) -> std::optional<std::string> { return std::nullopt; },
+            [](formalism::ObjectView object) -> std::optional<std::string> { return std::string(object.get_name()); },
+            [](auto) -> std::optional<std::string> { return std::nullopt; },
         },
-        repository[term].value);
+        term.get_variant());
 }
 
-bool has_initial_unary_literal(const ygg::IndexList<formalism::Literal>& literals,
-                               const formalism::Repository& repository,
-                               const std::string& predicate_name,
-                               const std::string& object_name)
+template<typename LiteralRange>
+bool has_initial_unary_literal(const LiteralRange& literals, const std::string& predicate_name, const std::string& object_name)
 {
     for (auto literal : literals)
     {
-        const auto& literal_data = repository[literal];
-        if (!literal_data.positive)
+        if (!literal.is_positive())
             continue;
-        const auto& atom = repository[literal_data.atom];
-        if (atom.terms.size() != 1 || std::string(repository[atom.predicate].name) != predicate_name)
+        const auto atom = literal.get_atom();
+        if (atom.get_num_terms() != 1 || std::string(atom.get_predicate().get_name()) != predicate_name)
             continue;
-        const auto object = object_term_name(atom.terms.front(), repository);
+        const auto object = object_term_name(atom.get_terms()[0]);
         if (object && *object == object_name)
             return true;
     }
@@ -371,7 +366,10 @@ bool condition_mentions_predicate(ygg::Index<formalism::Condition> condition, co
             },
             [&](ygg::Index<formalism::ConditionNumericConstraint>) { return false; },
             [&](ygg::Index<formalism::ConditionNot> node) { return condition_mentions_predicate(repository[node].condition, repository, name); },
-            [&](ygg::Index<formalism::ConditionImply> node) { return condition_mentions_predicate(repository[node].left, repository, name) || condition_mentions_predicate(repository[node].right, repository, name); },
+            [&](ygg::Index<formalism::ConditionImply> node) {
+                return condition_mentions_predicate(repository[node].left, repository, name)
+                       || condition_mentions_predicate(repository[node].right, repository, name);
+            },
             [&](ygg::Index<formalism::ConditionAnd> node)
             {
                 for (auto child : repository[node].conditions)
@@ -391,7 +389,6 @@ bool condition_mentions_predicate(ygg::Index<formalism::Condition> condition, co
         },
         repository[condition].value);
 }
-
 
 std::optional<std::string> variable_term_name(ygg::Index<formalism::Term> term, const formalism::Repository& repository)
 {
@@ -436,14 +433,13 @@ bool has_top_level_effect_literal_with_terms(ygg::Index<formalism::Effect> effec
         repository[effect].value);
 }
 
-std::size_t count_initial_literals_for_predicate(const ygg::IndexList<formalism::Literal>& literals, const formalism::Repository& repository, const std::string& name)
+template<typename LiteralRange>
+std::size_t count_initial_literals_for_predicate(const LiteralRange& literals, const std::string& name)
 {
     auto result = std::size_t { 0 };
     for (auto literal : literals)
     {
-        const auto atom = repository[literal].atom;
-        const auto predicate = repository[atom].predicate;
-        if (std::string(repository[predicate].name) == name)
+        if (std::string(literal.get_atom().get_predicate().get_name()) == name)
             ++result;
     }
     return result;
@@ -452,11 +448,10 @@ std::size_t count_initial_literals_for_predicate(const ygg::IndexList<formalism:
 std::size_t count_unique_object_names(formalism::DomainView domain, formalism::TaskView task)
 {
     auto names = std::unordered_set<std::string> {};
-    const auto& repository = task.get_context();
-    for (auto object : domain.get_data().constants)
-        names.insert(std::string(repository[object].name));
-    for (auto object : task.get_data().objects)
-        names.insert(std::string(repository[object].name));
+    for (auto object : domain.get_constants())
+        names.insert(std::string(object.get_name()));
+    for (auto object : task.get_objects())
+        names.insert(std::string(object.get_name()));
     return names.size();
 }
 
@@ -560,12 +555,11 @@ TEST(LokiSemanticTranslator, RewritesConditionsToNegationNormalForm)
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
     const auto& translated_repository = translated_domain.get_context();
-    ASSERT_GT(translated_domain.get_data().actions.size(), 0);
-    for (auto action_index : translated_domain.get_data().actions)
+    ASSERT_GT(translated_domain.get_num_actions(), 0);
+    for (auto action : translated_domain.get_actions())
     {
-        const auto& action = translated_repository[action_index];
-        ASSERT_TRUE(action.precondition.has_value());
-        EXPECT_FALSE(contains_not_or_imply(*action.precondition, translated_repository));
+        ASSERT_TRUE(action.has_precondition());
+        EXPECT_FALSE(contains_not_or_imply(action.get_precondition().value().get_index(), translated_repository));
     }
 }
 
@@ -588,15 +582,13 @@ TEST(LokiSemanticTranslator, RenamesQuantifiedVariablesDeterministically)
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
     const auto& repository = translated_domain.get_context();
-    ASSERT_EQ(translated_domain.get_data().actions.size(), 1);
-    const auto& action = repository[translated_domain.get_data().actions.front()];
-    ASSERT_EQ(action.parameters.size(), 2);
-    const auto action_variable = repository[action.parameters.front()].variable;
-    const auto lifted_variable = repository[action.parameters.back()].variable;
-    EXPECT_EQ(std::string(repository[action_variable].name), "x_0");
-    EXPECT_EQ(std::string(repository[lifted_variable].name), "x_1");
-    ASSERT_TRUE(action.precondition.has_value());
-    EXPECT_FALSE(contains_exists(*action.precondition, repository));
+    ASSERT_EQ(translated_domain.get_num_actions(), 1);
+    const auto action = translated_domain.get_actions()[0];
+    ASSERT_EQ(action.get_num_parameters(), 2);
+    EXPECT_EQ(std::string(action.get_parameters()[0].get_variable().get_name()), "x_0");
+    EXPECT_EQ(std::string(action.get_parameters()[1].get_variable().get_name()), "x_1");
+    ASSERT_TRUE(action.has_precondition());
+    EXPECT_FALSE(contains_exists(action.get_precondition().value().get_index(), repository));
 }
 
 
@@ -615,19 +607,15 @@ TEST(LokiSemanticTranslator, RenamesBeforeNegationNormalFormOnlyOnce)
 
     const auto translation = semantic::translate(parser.get_domain());
     const auto translated_domain = translation.get_translated_domain();
-    const auto& repository = translated_domain.get_context();
+    ASSERT_EQ(translated_domain.get_num_axioms(), 1);
+    const auto axiom = translated_domain.get_axioms()[0];
+    ASSERT_EQ(axiom.get_num_parameters(), 1);
+    EXPECT_EQ(std::string(axiom.get_parameters()[0].get_variable().get_name()), "x_1");
 
-    ASSERT_EQ(translated_domain.get_data().axioms.size(), 1);
-    const auto& axiom = repository[translated_domain.get_data().axioms.front()];
-    ASSERT_EQ(axiom.parameters.size(), 1);
-    const auto axiom_variable = repository[axiom.parameters.front()].variable;
-    EXPECT_EQ(std::string(repository[axiom_variable].name), "x_1");
-
-    ASSERT_EQ(translated_domain.get_data().actions.size(), 1);
-    const auto& action = repository[translated_domain.get_data().actions.front()];
-    ASSERT_EQ(action.parameters.size(), 1);
-    const auto action_variable = repository[action.parameters.front()].variable;
-    EXPECT_EQ(std::string(repository[action_variable].name), "x_0");
+    ASSERT_EQ(translated_domain.get_num_actions(), 1);
+    const auto action = translated_domain.get_actions()[0];
+    ASSERT_EQ(action.get_num_parameters(), 1);
+    EXPECT_EQ(std::string(action.get_parameters()[0].get_variable().get_name()), "x_0");
 }
 
 TEST(LokiSemanticTranslator, RemovesUniversalQuantifiersWithDerivedAxioms)
@@ -645,16 +633,16 @@ TEST(LokiSemanticTranslator, RemovesUniversalQuantifiersWithDerivedAxioms)
 
 
     const auto domain = parser.get_domain();
-    const auto original_axioms = domain.get_data().axioms.size();
+    const auto original_axioms = domain.get_num_axioms();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
     const auto& repository = translated_domain.get_context();
 
-    EXPECT_GT(translated_domain.get_data().axioms.size(), original_axioms);
-    ASSERT_EQ(translated_domain.get_data().actions.size(), 1);
-    const auto& action = repository[translated_domain.get_data().actions.front()];
-    ASSERT_TRUE(action.precondition.has_value());
-    EXPECT_FALSE(contains_forall(*action.precondition, repository));
+    EXPECT_GT(translated_domain.get_num_axioms(), original_axioms);
+    ASSERT_EQ(translated_domain.get_num_actions(), 1);
+    const auto action = translated_domain.get_actions()[0];
+    ASSERT_TRUE(action.has_precondition());
+    EXPECT_FALSE(contains_forall(action.get_precondition().value().get_index(), repository));
 }
 
 TEST(LokiSemanticTranslator, LowersNegatedExistsWithoutNegatingInnerCondition)
@@ -673,15 +661,14 @@ TEST(LokiSemanticTranslator, LowersNegatedExistsWithoutNegatingInnerCondition)
     const auto translation = semantic::translate(parser.get_domain());
     const auto translated_domain = translation.get_translated_domain();
     const auto& repository = translated_domain.get_context();
-
-    ASSERT_EQ(translated_domain.get_data().axioms.size(), 1);
-    const auto& axiom = repository[translated_domain.get_data().axioms.front()];
-    EXPECT_TRUE(condition_mentions_predicate(axiom.condition, repository, "p"));
-    EXPECT_TRUE(condition_mentions_predicate(axiom.condition, repository, "object"));
-    ASSERT_EQ(translated_domain.get_data().actions.size(), 1);
-    const auto& action = repository[translated_domain.get_data().actions.front()];
-    ASSERT_TRUE(action.precondition.has_value());
-    EXPECT_FALSE(contains_exists(*action.precondition, repository));
+    ASSERT_EQ(translated_domain.get_num_axioms(), 1);
+    const auto axiom = translated_domain.get_axioms()[0];
+    EXPECT_TRUE(condition_mentions_predicate(axiom.get_condition().get_index(), repository, "p"));
+    EXPECT_TRUE(condition_mentions_predicate(axiom.get_condition().get_index(), repository, "object"));
+    ASSERT_EQ(translated_domain.get_num_actions(), 1);
+    const auto action = translated_domain.get_actions()[0];
+    ASSERT_TRUE(action.has_precondition());
+    EXPECT_FALSE(contains_exists(action.get_precondition().value().get_index(), repository));
 }
 
 
@@ -702,7 +689,7 @@ TEST(LokiSemanticTranslator, GeneratedAxiomParametersMatchHeadPredicateArity)
     const auto translated_domain = translation.get_translated_domain();
     const auto& repository = translated_domain.get_context();
 
-    ASSERT_EQ(translated_domain.get_data().axioms.size(), 1);
+    ASSERT_EQ(translated_domain.get_num_axioms(), 1);
     const auto& axiom = repository[translated_domain.get_data().axioms.front()];
     const auto& literal = repository[axiom.head];
     const auto& atom = repository[literal.atom];
@@ -753,8 +740,8 @@ TEST(LokiSemanticTranslator, GeneratesFreshAxiomsForIdenticalUniversalConditions
     EXPECT_EQ(generated_parameter_types.size(), std::size_t { 2 });
     EXPECT_TRUE(generated_parameter_types.contains("left"));
     EXPECT_TRUE(generated_parameter_types.contains("right"));
-    EXPECT_EQ(translated_domain.get_data().axioms.size(), 2);
-    ASSERT_EQ(translated_domain.get_data().actions.size(), 2);
+    EXPECT_EQ(translated_domain.get_num_axioms(), 2);
+    ASSERT_EQ(translated_domain.get_num_actions(), 2);
     for (auto action_index : translated_domain.get_data().actions)
     {
         const auto& action = repository[action_index];
@@ -783,7 +770,7 @@ TEST(LokiSemanticTranslator, SplitsDisjunctiveActionPreconditionsAfterDnf)
     const auto translated_domain = translation.get_translated_domain();
     const auto& repository = translated_domain.get_context();
 
-    ASSERT_EQ(translated_domain.get_data().actions.size(), 2);
+    ASSERT_EQ(translated_domain.get_num_actions(), 2);
     for (auto action_index : translated_domain.get_data().actions)
     {
         const auto& action = repository[action_index];
@@ -813,7 +800,7 @@ TEST(LokiSemanticTranslator, MovesExistentialPreconditionVariablesToActionParame
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
     const auto& repository = translated_domain.get_context();
-    ASSERT_EQ(translated_domain.get_data().actions.size(), 1);
+    ASSERT_EQ(translated_domain.get_num_actions(), 1);
     const auto& action = repository[translated_domain.get_data().actions.front()];
     EXPECT_EQ(action.parameters.size(), 2);
     ASSERT_TRUE(action.precondition.has_value());
@@ -839,7 +826,7 @@ TEST(LokiSemanticTranslator, SplitsDisjunctiveWhenEffectsAndFlattensConjunctions
     const auto translated_domain = translation.get_translated_domain();
     const auto& repository = translated_domain.get_context();
 
-    ASSERT_EQ(translated_domain.get_data().actions.size(), 1);
+    ASSERT_EQ(translated_domain.get_num_actions(), 1);
     const auto& action = repository[translated_domain.get_data().actions.front()];
     ASSERT_TRUE(action.effect.has_value());
     EXPECT_TRUE(is_effect_and(*action.effect, repository));
@@ -850,6 +837,8 @@ TEST(LokiSemanticTranslator, SplitsDisjunctiveWhenEffectsAndFlattensConjunctions
 TEST(LokiSemanticTranslator, KeepsActionScopedEffectVariablesAfterQuantifierRenaming)
 {
     const auto domain_path = fs::path(std::string(DATA_DIR)) / "planning-benchmarks/tests/classical/airport/domain.pddl";
+    LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(domain_path);
+
     semantic::Parser parser(domain_path);
 
     const auto translation = semantic::translate(parser.get_domain());
@@ -902,7 +891,7 @@ TEST(LokiSemanticTranslator, AddsTypePredicatesAndRemovesTypingByDefault)
     EXPECT_TRUE(has_predicate_named(translated_domain, "object"));
     EXPECT_FALSE(has_requirement_kind(translated_domain.get_data().requirements, formalism::RequirementKind::Typing, repository));
     EXPECT_TRUE(translated_domain.get_data().types.empty());
-    ASSERT_EQ(translated_domain.get_data().actions.size(), 1);
+    ASSERT_EQ(translated_domain.get_num_actions(), 1);
     const auto& action = repository[translated_domain.get_data().actions.front()];
     ASSERT_EQ(action.parameters.size(), 1);
     EXPECT_TRUE(repository[action.parameters.front()].types.empty());
@@ -912,48 +901,46 @@ TEST(LokiSemanticTranslator, AddsTypePredicatesAndRemovesTypingByDefault)
     const auto task = parser.parse_task(task_source);
     const auto translated_task_result = semantic::translate(task, translation);
     const auto translated_task = translated_task_result.get_translated_task();
-    EXPECT_GE(count_initial_literals_for_predicate(translated_task.get_data().initial_literals, translated_task.get_context(), "thing"), 2);
-    EXPECT_GE(count_initial_literals_for_predicate(translated_task.get_data().initial_literals, translated_task.get_context(), "object"), 2);
+    EXPECT_GE(count_initial_literals_for_predicate(translated_task.get_initial_literals(), "thing"), 2);
+    EXPECT_GE(count_initial_literals_for_predicate(translated_task.get_initial_literals(), "object"), 2);
 
     const auto thing_predicate = predicate_named(translated_domain, "thing");
     ASSERT_TRUE(thing_predicate.has_value());
-    EXPECT_TRUE(initial_literals_use_predicate(translated_task.get_data().initial_literals, translated_task.get_context(), "thing", *thing_predicate));
+    EXPECT_TRUE(initial_literals_use_predicate(translated_task.get_initial_literals(), "thing", *thing_predicate));
 }
 
 TEST(LokiSemanticTranslator, PreservesTaskObjectTypesAfterDomainCanonicalization)
 {
     const auto domain_path = fs::path(std::string(DATA_DIR)) / "planning-benchmarks/tests/classical/childsnack/domain.pddl";
     const auto task_path = fs::path(std::string(DATA_DIR)) / "planning-benchmarks/tests/classical/childsnack/test-1.pddl";
+    LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(domain_path);
+    LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(task_path);
 
     semantic::Parser parser(domain_path);
     const auto domain_translation = semantic::translate(parser.get_domain());
     const auto translated_result = semantic::translate(parser.parse_task(task_path), domain_translation);
     const auto translated = translated_result.get_translated_task();
-    const auto& repository = translated.get_context();
-    const auto& literals = translated.get_data().initial_literals;
 
-    EXPECT_TRUE(has_initial_unary_literal(literals, repository, "bread-portion", "bread1"));
-    EXPECT_TRUE(has_initial_unary_literal(literals, repository, "content-portion", "content1"));
-    EXPECT_TRUE(has_initial_unary_literal(literals, repository, "place", "table1"));
-    EXPECT_FALSE(has_initial_unary_literal(literals, repository, "place", "bread1"));
+    EXPECT_TRUE(has_initial_unary_literal(translated.get_initial_literals(), "bread-portion", "bread1"));
+    EXPECT_TRUE(has_initial_unary_literal(translated.get_initial_literals(), "content-portion", "content1"));
+    EXPECT_TRUE(has_initial_unary_literal(translated.get_initial_literals(), "place", "table1"));
+    EXPECT_FALSE(has_initial_unary_literal(translated.get_initial_literals(), "place", "bread1"));
 }
 
 TEST(LokiSemanticTranslator, AddsEqualityPredicateWhenAdlDomainUsesEquality)
 {
-    const auto domain_source = std::string {
-        "(define (domain adl-equality)"
-        "(:requirements :adl)"
-        "(:predicates (p ?x))"
-        "(:action a :parameters (?x) "
-        ":precondition (= ?x ?x) "
-        ":effect (p ?x))"
-        ")" };
-    const auto task_source = std::string {
-        "(define (problem adl-equality-problem) (:domain adl-equality)"
-        "(:objects o)"
-        "(:init)"
-        "(:goal (p o))"
-        ")" };
+    const auto domain_source = std::string { "(define (domain adl-equality)"
+                                             "(:requirements :adl)"
+                                             "(:predicates (p ?x))"
+                                             "(:action a :parameters (?x) "
+                                             ":precondition (= ?x ?x) "
+                                             ":effect (p ?x))"
+                                             ")" };
+    const auto task_source = std::string { "(define (problem adl-equality-problem) (:domain adl-equality)"
+                                           "(:objects o)"
+                                           "(:init)"
+                                           "(:goal (p o))"
+                                           ")" };
 
     semantic::Parser parser(domain_source);
     const auto translation = semantic::translate(parser.get_domain());
@@ -962,28 +949,24 @@ TEST(LokiSemanticTranslator, AddsEqualityPredicateWhenAdlDomainUsesEquality)
     const auto translated_result = semantic::translate(parser.parse_task(task_source), translation);
     const auto translated = translated_result.get_translated_task();
     EXPECT_TRUE(has_equality_predicate(translated.get_domain()));
-    EXPECT_EQ(count_equality_literals(translated.get_data().initial_literals, translated.get_context()),
-              count_unique_object_names(translation.get_translated_domain(), translated));
+    EXPECT_EQ(count_equality_literals(translated.get_initial_literals()), count_unique_object_names(translation.get_translated_domain(), translated));
 }
 
 TEST(LokiSemanticTranslator, InitializesEqualityForConstantsAndTaskObjects)
 {
-    const auto domain_source = std::string {
-        "(define (domain equality)"
-        "(:requirements :typing :equality)"
-        "(:types thing)"
-        "(:constants c - thing)"
-        "(:predicates (p))"
-        ")" };
-    const auto task_source = std::string {
-        "(define (problem equality-problem) (:domain equality)"
-        "(:objects o - thing)"
-        "(:init)"
-        "(:goal (p))"
-        ")" };
+    const auto domain_source = std::string { "(define (domain equality)"
+                                             "(:requirements :typing :equality)"
+                                             "(:types thing)"
+                                             "(:constants c - thing)"
+                                             "(:predicates (p))"
+                                             ")" };
+    const auto task_source = std::string { "(define (problem equality-problem) (:domain equality)"
+                                           "(:objects o - thing)"
+                                           "(:init)"
+                                           "(:goal (p))"
+                                           ")" };
 
     semantic::Parser parser(domain_source);
-
 
     const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
@@ -994,8 +977,7 @@ TEST(LokiSemanticTranslator, InitializesEqualityForConstantsAndTaskObjects)
     const auto translated = translated_result.get_translated_task();
 
     EXPECT_TRUE(has_equality_predicate(translated.get_domain()));
-    EXPECT_EQ(count_equality_literals(translated.get_data().initial_literals, translated.get_context()),
-              count_unique_object_names(translation.get_translated_domain(), translated));
+    EXPECT_EQ(count_equality_literals(translated.get_initial_literals()), count_unique_object_names(translation.get_translated_domain(), translated));
     EXPECT_EQ(&translated.get_domain().get_context().get_root(), &translation.get_translated_domain().get_context().get_root());
 }
 
@@ -1027,6 +1009,41 @@ TEST(LokiSemanticTranslator, GeneratedGoalPredicateAvoidsExistingNames)
     EXPECT_TRUE(found_generated);
 }
 
+TEST(LokiSemanticTranslator, RejectsTaskFromDifferentDomainTranslationRepository)
+{
+    auto first_parser = semantic::Parser(std::string { R"(
+(define (domain first-translation-domain)
+  (:predicates (p))
+)
+)" });
+    auto second_parser = semantic::Parser(std::string { R"(
+(define (domain second-translation-domain)
+  (:predicates (q))
+)
+)" });
+
+    const auto first_translation = semantic::translate(first_parser.get_domain());
+    const auto second_task = second_parser.parse_task(std::string { R"(
+(define (problem second-translation-task)
+  (:domain second-translation-domain)
+  (:init)
+  (:goal (q))
+)
+)" });
+
+    try
+    {
+        static_cast<void>(semantic::translate(second_task, first_translation));
+        FAIL() << "Expected mismatched domain diagnostic";
+    }
+    catch (const semantic::MismatchedDomainError& error)
+    {
+        const auto message = std::string(error.what());
+        EXPECT_NE(message.find("first-translation-domain"), std::string::npos);
+        EXPECT_NE(message.find("second-translation-domain"), std::string::npos);
+    }
+}
+
 TEST(LokiSemanticTranslator, TaskEqualityRequiresTranslatedDomainEqualityPredicate)
 {
     const auto domain_source = std::string {
@@ -1047,7 +1064,7 @@ TEST(LokiSemanticTranslator, TaskEqualityRequiresTranslatedDomainEqualityPredica
     ASSERT_FALSE(has_equality_predicate(translation.get_translated_domain()));
 
     const auto task = parser.parse_task(task_source);
-    EXPECT_THROW(static_cast<void>(semantic::translate(task, translation)), std::runtime_error);
+    EXPECT_THROW(static_cast<void>(semantic::translate(task, translation)), semantic::InvalidEqualityError);
 }
 
 TEST(LokiSemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
@@ -1068,7 +1085,7 @@ TEST(LokiSemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
 
     const auto domain = parser.get_domain();
     const auto domain_translation = semantic::translate(domain);
-    const auto original_translated_domain_axioms = domain_translation.get_translated_domain().get_data().axioms.size();
+    const auto original_translated_domain_axioms = domain_translation.get_translated_domain().get_num_axioms();
     const auto task = parser.parse_task(task_source);
     const auto translated_result = semantic::translate(task, domain_translation);
     const auto translated = translated_result.get_translated_task();
@@ -1076,7 +1093,7 @@ TEST(LokiSemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
 
     ASSERT_TRUE(translated.get_data().goal.has_value());
     EXPECT_FALSE(contains_not_or_imply(*translated.get_data().goal, repository));
-    EXPECT_EQ(translated.get_data().axioms.size(), 2);
+    EXPECT_EQ(translated.get_num_axioms(), 2);
     for (const auto axiom : translated.get_data().axioms)
     {
         const auto condition = repository[axiom].condition;
@@ -1088,9 +1105,9 @@ TEST(LokiSemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
             repository[condition].value);
         EXPECT_FALSE(is_disjunction);
     }
-    EXPECT_EQ(domain_translation.get_translated_domain().get_data().axioms.size(), original_translated_domain_axioms);
-    EXPECT_GT(translated.get_data().predicates.size(), 0);
-    EXPECT_EQ(translated.get_domain().get_data().predicates.size(), domain_translation.get_translated_domain().get_data().predicates.size());
+    EXPECT_EQ(domain_translation.get_translated_domain().get_num_axioms(), original_translated_domain_axioms);
+    EXPECT_GT(translated.get_num_predicates(), 0);
+    EXPECT_EQ(translated.get_domain().get_num_predicates(), domain_translation.get_translated_domain().get_num_predicates());
 }
 
 
@@ -1116,7 +1133,7 @@ TEST(LokiSemanticTranslator, RenamesTaskGoalVariablesBeforeGoalSimplificationOnl
     const auto translated = translated_result.get_translated_task();
     const auto& repository = translated.get_context();
 
-    ASSERT_EQ(translated.get_data().axioms.size(), 1);
+    ASSERT_EQ(translated.get_num_axioms(), 1);
     const auto& axiom = repository[translated.get_data().axioms.front()];
     ASSERT_EQ(axiom.parameters.size(), 1);
     const auto variable = repository[axiom.parameters.front()].variable;
@@ -1138,7 +1155,14 @@ TEST(LokiSemanticParser, ReportsSyntaxFailureMessage)
     }
     catch (const semantic::ParseError& error)
     {
-        EXPECT_NE(std::string(error.what()).find("Could not parse PDDL domain"), std::string::npos);
+        const auto message = std::string(error.what());
+        EXPECT_NE(message.find("Could not parse PDDL domain"), std::string::npos);
+        EXPECT_NE(message.find("line 2, column"), std::string::npos);
+        ASSERT_TRUE(error.has_source_range());
+        ASSERT_TRUE(error.source_range().has_value());
+        EXPECT_EQ(error.source_range()->begin.line, 2);
+        EXPECT_EQ(error.source_range()->begin.line, error.source_range()->end.line);
+        EXPECT_EQ(error.source_range()->begin.column, error.source_range()->end.column);
     }
 }
 
@@ -1205,7 +1229,7 @@ TEST(LokiSemanticParser, AllowsDuplicateActionNamesAndInternsIdenticalBodies)
 
     auto parser = semantic::Parser(domain);
 
-    EXPECT_EQ(parser.get_domain().get_actions().get_data().size(), 2);
+    EXPECT_EQ(parser.get_domain().get_num_actions(), 2);
 }
 
 
@@ -1232,6 +1256,10 @@ TEST(LokiSemanticParser, StrictModeRejectsMissingRequirements)
     catch (const semantic::MissingRequirementError& error)
     {
         EXPECT_NE(std::string(error.what()).find(":disjunctive-preconditions"), std::string::npos);
+        ASSERT_TRUE(error.has_source_range());
+        ASSERT_TRUE(error.source_range().has_value());
+        EXPECT_EQ(error.source_range()->begin.line, 6);
+        EXPECT_EQ(error.source_range()->begin.column, 19);
     }
 }
 
@@ -1542,6 +1570,35 @@ TEST(LokiSemanticParser, ReportsDeclaredPredicateArityMismatch)
     }
 }
 
+TEST(LokiSemanticParser, ReportsMismatchedTaskDomain)
+{
+    const auto domain = std::string { R"(
+(define (domain expected-domain)
+  (:predicates (p))
+)
+)" };
+    const auto task = std::string { R"(
+(define (problem mismatched-domain-task)
+  (:domain actual-domain)
+  (:init)
+  (:goal (and))
+)
+)" };
+
+    auto parser = semantic::Parser(domain);
+    try
+    {
+        parser.parse_task(task);
+        FAIL() << "Expected mismatched domain diagnostic";
+    }
+    catch (const semantic::MismatchedDomainError& error)
+    {
+        const auto message = std::string(error.what());
+        EXPECT_NE(message.find("actual-domain"), std::string::npos);
+        EXPECT_NE(message.find("expected-domain"), std::string::npos);
+    }
+}
+
 TEST(LokiSemanticParser, PermissiveModeKeepsImplicitPredicateCompatibility)
 {
     const auto domain = std::string { R"(
@@ -1564,10 +1621,14 @@ TEST(LokiSemanticParser, ParsesAndTranslatesAllSuiteCases)
 {
     const auto cases = semantic_suite::load_cases();
     ASSERT_FALSE(cases.empty());
+    if (!benchmark_suite_available(cases))
+        GTEST_SKIP() << "Benchmark data unavailable: " << cases.front().domain_file;
 
     for (const auto& item : cases)
     {
         SCOPED_TRACE(item.name);
+        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.domain_file);
+        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.task_file);
         try
         {
             semantic::Parser parser(item.domain_file);
@@ -1590,10 +1651,14 @@ TEST(LokiSemanticParser, ParsesAllSuiteCasesWithContiguousTopLevelIndices)
 {
     const auto cases = semantic_suite::load_cases();
     ASSERT_FALSE(cases.empty());
+    if (!benchmark_suite_available(cases))
+        GTEST_SKIP() << "Benchmark data unavailable: " << cases.front().domain_file;
 
     for (const auto& item : cases)
     {
         SCOPED_TRACE(item.name);
+        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.domain_file);
+        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.task_file);
         try
         {
             semantic::Parser parser(item.domain_file);
@@ -1614,13 +1679,15 @@ TEST(LokiSemanticParser, ParsesAllSuiteCasesWithContiguousTopLevelIndices)
 TEST(LokiSemanticParser, ParsesDomainAndManyTasks)
 {
     const auto root = fs::path(std::string(DATA_DIR)) / "planning-benchmarks" / "tests" / "classical" / "gripper";
+    LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(root / "domain.pddl");
+    LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(root / "test-1.pddl");
 
     semantic::Parser parser(root / "domain.pddl");
 
 
     const auto domain = parser.get_domain();
     EXPECT_EQ(std::string(domain.get_name()), "gripper-strips");
-    EXPECT_GT(domain.get_actions().get_data().size(), 0);
+    EXPECT_GT(domain.get_num_actions(), 0);
 
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
@@ -1634,7 +1701,7 @@ TEST(LokiSemanticParser, ParsesDomainAndManyTasks)
     EXPECT_EQ(std::string(translated1.get_domain().get_name()), "gripper-strips");
     EXPECT_NE(translated1.get_context().get_index(), translated_domain.get_context().get_index());
     EXPECT_EQ(&translated1.get_domain().get_context().get_root(), &translated_domain.get_context().get_root());
-    EXPECT_GT(translated1.get_initial_literals().get_data().size(), 0);
+    EXPECT_GT(translated1.get_num_initial_literals(), 0);
 
     const auto task2 = parser.parse_task(root / "test-1.pddl");
     const auto translated2_result = semantic::translate(task2, translation);
@@ -1642,7 +1709,7 @@ TEST(LokiSemanticParser, ParsesDomainAndManyTasks)
     EXPECT_EQ(std::string(translated2.get_domain().get_name()), "gripper-strips");
     EXPECT_NE(translated2.get_context().get_index(), translated_domain.get_context().get_index());
     EXPECT_EQ(&translated2.get_domain().get_context().get_root(), &translated_domain.get_context().get_root());
-    EXPECT_GT(translated2.get_initial_literals().get_data().size(), 0);
+    EXPECT_GT(translated2.get_num_initial_literals(), 0);
 }
 
 TEST(LokiSemanticParser, ParsesAndTranslatesDistinctTasksAfterOneDomain)

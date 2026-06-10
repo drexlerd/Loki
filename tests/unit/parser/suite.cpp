@@ -9,17 +9,21 @@
 
 #include <gtest/gtest.h>
 
+#include "../benchmark_utils.hpp"
+
 #include <loki/fmt.hpp>
 #include <loki/parser.hpp>
 
 #include <yggdrasil/serialization/json_suite.hpp>
 
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <set>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace loki::tests
@@ -83,6 +87,8 @@ TEST(LokiParserSuite, JsonSuiteCoversEveryBenchmarkProblem)
     const auto suite_value = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/parser/suite.json");
     const auto& suite = ygg::common::as_object(suite_value, "suite");
     const auto benchmark_root = ygg::common::suite_prefix_path(suite);
+    if (!benchmark_tree_available(benchmark_root / "tests"))
+        GTEST_SKIP() << "Benchmark data unavailable: " << benchmark_root / "tests";
 
     auto listed = std::set<std::string> {};
     for (const auto& item : load_cases())
@@ -110,9 +116,12 @@ TEST(LokiParserSuite, ParsesAllBenchmarkDomainAsts)
 {
     const auto cases = load_cases();
     ASSERT_FALSE(cases.empty());
+    if (!benchmark_suite_available(cases))
+        GTEST_SKIP() << "Benchmark data unavailable: " << cases.front().domain_file;
 
     for (const auto& item : cases)
     {
+        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.domain_file);
         const auto source = read_file(item.domain_file);
         auto first = source.cbegin();
         parser::ErrorHandlerType error_handler(first, source.cend(), std::cerr);
@@ -125,15 +134,96 @@ TEST(LokiParserSuite, ParsesAllBenchmarkTaskAsts)
 {
     const auto cases = load_cases();
     ASSERT_FALSE(cases.empty());
+    if (!benchmark_suite_available(cases))
+        GTEST_SKIP() << "Benchmark data unavailable: " << cases.front().task_file;
 
     for (const auto& item : cases)
     {
+        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.task_file);
         const auto source = read_file(item.task_file);
         auto first = source.cbegin();
         parser::ErrorHandlerType error_handler(first, source.cend(), std::cerr);
         ast::Task ast;
         EXPECT_TRUE(parser::parse_task(source, ast, error_handler)) << item.name << ": " << item.task_file;
     }
+}
+
+
+TEST(LokiParserSuite, FormatterSanitizesConstructedAstIntoParseablePddl)
+{
+    const auto identifier = [](std::string text)
+    {
+        auto result = ast::Identifier {};
+        result.text = std::move(text);
+        return result;
+    };
+    const auto type_reference = [&](std::string name)
+    {
+        auto result = ast::TypeReference {};
+        result.name = identifier(std::move(name));
+        return ast::TypeExpression { result };
+    };
+
+    auto domain = ast::Domain {};
+    domain.name = identifier("bad domain;name");
+
+    auto strips = ast::Requirement {};
+    strips.name = identifier("strips");
+    domain.requirements.push_back(strips);
+
+    auto item_type = ast::TypedName {};
+    item_type.name = identifier("item type");
+    item_type.type = type_reference("object");
+    domain.types.push_back(item_type);
+
+    auto parameter = ast::TypedVariable {};
+    parameter.variable = identifier("x y");
+    parameter.type = type_reference("item type");
+
+    auto predicate = ast::PredicateDeclaration {};
+    predicate.name = identifier("ready;predicate");
+    predicate.parameters.push_back(parameter);
+    domain.predicates.push_back(predicate);
+
+    auto literal = ast::Literal {};
+    literal.atom.predicate = identifier("ready;predicate");
+    auto term = ast::Term {};
+    term.name = identifier("x y");
+    term.variable = true;
+    literal.atom.terms.push_back(term);
+
+    auto precondition = ast::ConditionLiteral {};
+    precondition.literal = literal;
+
+    auto number = ast::FunctionExpressionNumber {};
+    number.value = std::numeric_limits<double>::infinity();
+    auto number_expression = ast::FunctionExpression {};
+    number_expression = number;
+
+    auto numeric_effect = ast::EffectNumeric {};
+    numeric_effect.op = "not-an-effect-op";
+    numeric_effect.function.function = identifier("");
+    numeric_effect.expression = number_expression;
+
+    auto action = ast::Action {};
+    action.name = identifier("act ion");
+    action.parameters.push_back(parameter);
+    action.precondition = ast::Condition { precondition };
+    action.effect = ast::Effect { numeric_effect };
+    domain.actions.push_back(action);
+
+    const auto printed = format::domain(domain);
+
+    EXPECT_NE(printed.find("bad_domain_name"), std::string::npos);
+    EXPECT_NE(printed.find("item_type - object"), std::string::npos);
+    EXPECT_NE(printed.find("?x_y - item_type"), std::string::npos);
+    EXPECT_NE(printed.find("(ready_predicate ?x_y)"), std::string::npos);
+    EXPECT_NE(printed.find("(assign (_) 0)"), std::string::npos);
+
+    auto reparsed = ast::Domain {};
+    auto first = printed.cbegin();
+    parser::ErrorHandlerType error_handler(first, printed.cend(), std::cerr);
+    EXPECT_TRUE(parser::parse_domain(printed, reparsed, error_handler)) << printed;
 }
 
 TEST(LokiParserSuite, ParsesAndReparsesRepresentativeBenchmarkDomains)
@@ -145,9 +235,11 @@ TEST(LokiParserSuite, ParsesAndReparsesRepresentativeBenchmarkDomains)
         root / "numeric" / "delivery" / "domain.pddl",
     };
 
+    LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(domains.front());
+
     for (const auto& path : domains)
     {
-        ASSERT_TRUE(fs::exists(path)) << path;
+        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(path);
         expect_parse_format_reparse<ast::Domain>(path, parser::parse_domain, format::domain);
     }
 }
@@ -161,9 +253,11 @@ TEST(LokiParserSuite, ParsesAndReparsesRepresentativeBenchmarkTasks)
         root / "numeric" / "delivery" / "test-1.pddl",
     };
 
+    LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(tasks.front());
+
     for (const auto& path : tasks)
     {
-        ASSERT_TRUE(fs::exists(path)) << path;
+        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(path);
         expect_parse_format_reparse<ast::Task>(path, parser::parse_task, format::task);
     }
 }

@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include "../benchmark_utils.hpp"
+
 #include <loki/loki.hpp>
 #include <loki/formalism/formatter.hpp>
 #include <loki/semantic/translator/copy_translator.hpp>
@@ -187,6 +189,9 @@ std::size_t count_condition_nodes(ygg::Index<formalism::Condition> condition, co
 
 void expect_translated_pddl_reparses(const fs::path& domain_file, const fs::path& problem_file)
 {
+    LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(domain_file);
+    LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(problem_file);
+
     auto parser = loki::Parser(domain_file);
 
     const auto domain = parser.get_domain();
@@ -213,7 +218,10 @@ void expect_translated_pddl_reparses(const fs::path& domain_file, const fs::path
 
 TEST(LokiTests, LokiPddlTranslatorReparseTest)
 {
-    expect_translated_pddl_reparses(fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/domain.pddl"),
+    const auto first_domain_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/domain.pddl");
+    LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(first_domain_file);
+
+    expect_translated_pddl_reparses(first_domain_file,
                                     fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/test-1.pddl"));
     expect_translated_pddl_reparses(fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/domain.pddl"),
                                     fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/test-1.pddl"));
@@ -248,7 +256,7 @@ TEST(LokiTests, GeneratedUniversalPredicateKeepsNumericFreeVariables)
             continue;
 
         found = true;
-        EXPECT_EQ(predicate.get_parameters().size(), std::size_t { 1 });
+        EXPECT_EQ(predicate.get_num_parameters(), std::size_t { 1 });
     }
     EXPECT_TRUE(found);
 }
@@ -444,7 +452,7 @@ TEST(LokiTests, SplitDisjunctiveActionPreconditions)
     const auto domain = translation.get_translated_domain();
     const auto& repository = domain.get_context();
 
-    ASSERT_EQ(domain.get_actions().size(), std::size_t { 2 });
+    ASSERT_EQ(domain.get_num_actions(), std::size_t { 2 });
     for (auto action_view : domain.get_actions())
     {
         const auto& action = repository[action_view.get_index()];
@@ -473,7 +481,7 @@ TEST(LokiTests, SplitDisjunctiveAxiomConditions)
     const auto domain = translation.get_translated_domain();
     const auto& repository = domain.get_context();
 
-    ASSERT_EQ(domain.get_axioms().size(), std::size_t { 2 });
+    ASSERT_EQ(domain.get_num_axioms(), std::size_t { 2 });
     for (auto axiom_view : domain.get_axioms())
     {
         const auto& axiom = repository[axiom_view.get_index()];
@@ -658,6 +666,8 @@ TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
 {
     const auto domain_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/domain.pddl");
     const auto problem_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/test-1.pddl");
+    LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(domain_file);
+    LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(problem_file);
 
     auto parser = loki::Parser(domain_file);
     const auto domain = parser.get_domain();
@@ -665,7 +675,7 @@ TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
 
     const auto domain_translation = loki::translate(domain);
     const auto translated_domain = domain_translation.get_translated_domain();
-    const auto translated_domain_predicates = translated_domain.get_predicates().size();
+    const auto translated_domain_predicates = translated_domain.get_num_predicates();
     const auto task_translation = loki::translate(task, domain_translation);
     const auto translated_task = task_translation.get_translated_task();
 
@@ -688,7 +698,7 @@ TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
         }
     }
 
-    EXPECT_EQ(translated_task.get_domain().get_predicates().size(), translated_domain_predicates);
+    EXPECT_EQ(translated_task.get_domain().get_num_predicates(), translated_domain_predicates);
     EXPECT_TRUE(has_task_generated_name);
 }
 
@@ -913,6 +923,8 @@ TEST(LokiTests, LokiPddlTranslatorTest)
 {
     const auto domain_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/domain.pddl");
     const auto problem_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/test-1.pddl");
+    LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(domain_file);
+    LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(problem_file);
 
     auto parser = loki::Parser(domain_file);
 

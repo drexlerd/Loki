@@ -10,13 +10,13 @@
 #ifndef LOKI_FORMALISM_ACTION_VIEW_HPP_
 #define LOKI_FORMALISM_ACTION_VIEW_HPP_
 
+#include "loki/formalism/action_data.hpp"
+
 #include <tuple>
-#include <utility>
 #include <yggdrasil/containers/optional.hpp>
 #include <yggdrasil/containers/variant.hpp>
 #include <yggdrasil/containers/vector.hpp>
 #include <yggdrasil/core/types.hpp>
-#include "loki/formalism/action_data.hpp"
 
 namespace ygg
 {
@@ -35,13 +35,16 @@ public:
     const auto& get_context() const noexcept { return *m_context; }
     const auto& get_handle() const noexcept { return m_handle; }
     auto get_index() const noexcept { return m_handle; }
-    
+
     const auto& get_name() const noexcept { return get_data().name; }
     auto get_parameters() const noexcept { return ygg::make_view(get_data().parameters, *m_context); }
+    auto get_num_parameters() const noexcept { return get_data().parameters.size(); }
+    auto has_precondition() const noexcept { return get_data().precondition.has_value(); }
     auto get_precondition() const noexcept { return ygg::make_view(get_data().precondition, *m_context); }
+    auto has_effect() const noexcept { return get_data().effect.has_value(); }
     auto get_effect() const noexcept { return ygg::make_view(get_data().effect, *m_context); }
 
-    auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
+    auto identifying_members() const noexcept { return std::tie(m_handle, m_context); }
 };
 
 }

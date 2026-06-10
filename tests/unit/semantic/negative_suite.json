@@ -3,6 +3,8 @@
         {
             "name": "strict undefined predicate",
             "entry": "domain",
+            "expected_error": "UndefinedPredicateError",
+            "expected_message": "Undefined predicate: missing",
             "strict": true,
             "domain": [
                 "(define (domain strict-undefined)",
@@ -14,6 +16,8 @@
         {
             "name": "duplicate predicate",
             "entry": "domain",
+            "expected_error": "DuplicatePredicateError",
+            "expected_message": "Duplicate predicate definition: p",
             "domain": [
                 "(define (domain duplicate-predicate)",
                 "  (:predicates (p) (p))",
@@ -23,7 +27,11 @@
         {
             "name": "strict missing disjunction requirement",
             "entry": "domain",
+            "expected_error": "MissingRequirementError",
             "strict": true,
+            "expected_message": "Missing required PDDL requirement: :disjunctive-preconditions",
+            "expected_line": 3,
+            "expected_column": 43,
             "domain": [
                 "(define (domain missing-disjunction-requirement)",
                 "  (:predicates (p) (q))",
@@ -34,6 +42,8 @@
         {
             "name": "strict missing equality requirement",
             "entry": "domain",
+            "expected_error": "MissingRequirementError",
+            "expected_message": "Missing required PDDL requirement: :equality",
             "strict": true,
             "domain": [
                 "(define (domain missing-equality-requirement)",
@@ -45,6 +55,8 @@
         {
             "name": "invalid equality arity",
             "entry": "domain",
+            "expected_error": "InvalidEqualityError",
+            "expected_message": "Invalid equality expression: expected 2 terms, got 3",
             "domain": [
                 "(define (domain invalid-equality)",
                 "  (:requirements :equality)",
@@ -56,6 +68,7 @@
         {
             "name": "strict predicate type mismatch",
             "entry": "domain",
+            "expected_error": "TypeMismatchError",
             "strict": true,
             "domain": [
                 "(define (domain predicate-type-mismatch)",
@@ -70,6 +83,8 @@
         {
             "name": "invalid metric optimization",
             "entry": "task",
+            "expected_error": "InvalidMetricError",
+            "expected_message": "Invalid metric optimization: smallest",
             "domain": [
                 "(define (domain metric-domain)",
                 "  (:requirements :numeric-fluents)",
@@ -88,6 +103,7 @@
         {
             "name": "invalid numeric effect operator",
             "entry": "domain",
+            "expected_error": "InvalidNumericEffectError",
             "domain": [
                 "(define (domain invalid-numeric-effect)",
                 "  (:requirements :numeric-fluents)",
@@ -100,6 +116,7 @@
         {
             "name": "invalid numeric constraint comparator",
             "entry": "domain",
+            "expected_error": "InvalidNumericConstraintError",
             "domain": [
                 "(define (domain invalid-numeric-constraint)",
                 "  (:requirements :numeric-fluents)",
@@ -112,6 +129,7 @@
         {
             "name": "probability out of range",
             "entry": "domain",
+            "expected_error": "InvalidProbabilisticEffectError",
             "domain": [
                 "(define (domain invalid-probability)",
                 "  (:requirements :probabilistic-effects)",
@@ -123,6 +141,7 @@
         {
             "name": "probability total above one",
             "entry": "domain",
+            "expected_error": "InvalidProbabilisticEffectError",
             "domain": [
                 "(define (domain invalid-probability-total)",
                 "  (:requirements :probabilistic-effects)",
@@ -134,6 +153,10 @@
         {
             "name": "mismatched task domain",
             "entry": "task",
+            "expected_error": "MismatchedDomainError",
+            "expected_message": "Task references domain 'other-domain' but parser holds domain 'expected-domain'.",
+            "expected_line": 2,
+            "expected_column": 12,
             "domain": [
                 "(define (domain expected-domain)",
                 "  (:predicates)",

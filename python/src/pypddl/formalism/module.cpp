@@ -4,14 +4,13 @@
 #include "index.hpp"
 #include "view.hpp"
 
+#include <filesystem>
+#include <loki/formalism/formatter.hpp>
 #include <loki/semantic.hpp>
-
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/filesystem.h>
 #include <nanobind/stl/shared_ptr.h>
 #include <nanobind/stl/string.h>
-
-#include <filesystem>
 #include <string>
 
 namespace nb = nanobind;
@@ -58,33 +57,54 @@ void bind_semantic_errors(nb::module_& m)
 
 void bind_semantic(nb::module_& m)
 {
-    nb::class_<parser::ParserOptions>(m, "ParserOptions")
+    nb::class_<parser::ParserOptions>(m, "ParserOptions", "Options controlling semantic parser validation.")
         .def(nb::init<>())
-        .def_rw("strict", &parser::ParserOptions::strict);
+        .def_rw("strict", &parser::ParserOptions::strict, "Enable stricter semantic validation for requirements, arity, and type compatibility.");
 
-    nb::class_<semantic::Parser>(m, "Parser")
-        .def(nb::init<const std::string&, parser::ParserOptions>(), "domain_source"_a, "options"_a = parser::ParserOptions {})
-        .def(nb::init<const std::filesystem::path&, parser::ParserOptions>(), "domain_path"_a, "options"_a = parser::ParserOptions {})
-        .def("domain", &semantic::Parser::get_domain)
-        .def("repository", nb::overload_cast<>(&semantic::Parser::repository), nb::rv_policy::reference_internal)
-        .def("parse_task", nb::overload_cast<const std::string&>(&semantic::Parser::parse_task), "source"_a)
-        .def("parse_task", nb::overload_cast<const std::filesystem::path&>(&semantic::Parser::parse_task), "path"_a);
+    nb::class_<semantic::TranslatorOptions>(m, "TranslatorOptions", "Options controlling PDDL normalization and translation.")
+        .def(nb::init<>())
+        .def_rw("remove_typing", &semantic::TranslatorOptions::remove_typing, "Remove type annotations during translation.");
 
-    nb::class_<semantic::DomainTranslationResult>(m, "DomainTranslationResult")
-        .def_prop_ro("original_domain", &semantic::DomainTranslationResult::get_original_domain)
-        .def_prop_ro("translated_domain", &semantic::DomainTranslationResult::get_translated_domain)
+    nb::class_<semantic::Parser>(m, "Parser", "Parse a PDDL domain once and parse matching tasks against it.")
+        .def(nb::init<const std::string&, parser::ParserOptions>(), "domain_source"_a, "options"_a = parser::ParserOptions {}, "Parse a PDDL domain from a source string.")
+        .def(nb::init<const std::filesystem::path&, parser::ParserOptions>(), "domain_path"_a, "options"_a = parser::ParserOptions {}, "Parse a PDDL domain from a filesystem path.")
+        .def("domain", &semantic::Parser::get_domain, nb::keep_alive<0, 1>(), "Return the parsed domain view.")
+        .def("repository", nb::overload_cast<>(&semantic::Parser::repository), nb::rv_policy::reference_internal, "Return the repository that owns parsed domain and task objects.")
+        .def("parse_task", nb::overload_cast<const std::string&>(&semantic::Parser::parse_task), "source"_a, nb::keep_alive<0, 1>(), "Parse a PDDL problem from a source string using this parser domain.")
+        .def("parse_task", nb::overload_cast<const std::filesystem::path&>(&semantic::Parser::parse_task), "path"_a, nb::keep_alive<0, 1>(), "Parse a PDDL problem from a filesystem path using this parser domain.");
+
+    nb::class_<semantic::DomainTranslationResult>(m, "DomainTranslationResult", "Owns the original and translated domain views produced by translate_domain.")
+        .def_prop_ro("original_domain", &semantic::DomainTranslationResult::get_original_domain, nb::keep_alive<0, 1>())
+        .def_prop_ro("translated_domain", &semantic::DomainTranslationResult::get_translated_domain, nb::keep_alive<0, 1>())
         .def("repository", nb::overload_cast<>(&semantic::DomainTranslationResult::get_repository), nb::rv_policy::reference_internal);
 
-    nb::class_<semantic::ProblemTranslationResult>(m, "ProblemTranslationResult")
-        .def_prop_ro("original_task", &semantic::ProblemTranslationResult::get_original_task)
-        .def_prop_ro("translated_task", &semantic::ProblemTranslationResult::get_translated_task)
+    nb::class_<semantic::ProblemTranslationResult>(m, "ProblemTranslationResult", "Owns the original and translated task views produced by translate_task.")
+        .def_prop_ro("original_task", &semantic::ProblemTranslationResult::get_original_task, nb::keep_alive<0, 1>())
+        .def_prop_ro("translated_task", &semantic::ProblemTranslationResult::get_translated_task, nb::keep_alive<0, 1>())
         .def("repository", nb::overload_cast<>(&semantic::ProblemTranslationResult::get_repository), nb::rv_policy::reference_internal);
 
-    m.def("translate_domain", [](DomainView domain) { return semantic::translate(domain); }, "domain"_a);
-    m.def("translate_task", [](TaskView task, const semantic::DomainTranslationResult& domain_translation) { return semantic::translate(task, domain_translation); }, "task"_a, "domain_translation"_a);
+    m.def(
+        "translate_domain",
+        [](DomainView domain, const semantic::TranslatorOptions& options) { return semantic::translate(domain, options); },
+        "domain"_a,
+        "options"_a = semantic::TranslatorOptions {},
+        nb::keep_alive<0, 1>(),
+        "Translate and normalize a parsed domain.");
+    m.def(
+        "translate_task",
+        [](TaskView task, const semantic::DomainTranslationResult& domain_translation, const semantic::TranslatorOptions& options)
+        { return semantic::translate(task, domain_translation, options); },
+        "task"_a,
+        "domain_translation"_a,
+        "options"_a = semantic::TranslatorOptions {},
+        nb::keep_alive<0, 1>(),
+        nb::keep_alive<0, 2>(),
+        "Translate and normalize a parsed task with a matching domain translation.");
+    m.def("format_domain", [](DomainView domain) { return format::domain(domain); }, "domain"_a, "Format a domain view as reparseable PDDL text.");
+    m.def("format_task", [](TaskView task) { return format::task(task); }, "task"_a, "Format a task view as reparseable PDDL text.");
 }
 
-} // namespace
+}  // namespace
 
 void bind_module_definitions(nb::module_& m)
 {
@@ -97,5 +117,4 @@ void bind_module_definitions(nb::module_& m)
     bind_semantic(m);
 }
 
-} // namespace loki::formalism
-
+}  // namespace loki::formalism

@@ -22,7 +22,6 @@
 #include <sstream>
 #include <string>
 #include <string_view>
-#include <type_traits>
 
 
 #ifndef LOKI_ENABLE_FMT_FORMATTERS

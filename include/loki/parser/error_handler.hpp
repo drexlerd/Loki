@@ -26,12 +26,16 @@ struct SourcePosition
     std::size_t line = 1;
     std::size_t column = 1;
     std::size_t offset = 0;
+
+    friend bool operator==(const SourcePosition&, const SourcePosition&) = default;
 };
 
 struct SourceRange
 {
     SourcePosition begin;
     SourcePosition end;
+
+    friend bool operator==(const SourceRange&, const SourceRange&) = default;
 };
 
 template<typename Iterator>

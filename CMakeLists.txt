@@ -13,11 +13,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Establish project
 ##############################################################
 
-file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml" LOKI_PROJECT_VERSION_LINE REGEX "^version[ \t]*=" LIMIT_COUNT 1)
-if(NOT LOKI_PROJECT_VERSION_LINE)
-    message(FATAL_ERROR "Could not read project version from pyproject.toml")
-endif()
-string(REGEX REPLACE "^version[ \t]*=[ \t]*\"([^\"]+)\".*$" "\\1" LOKI_PROJECT_VERSION "${LOKI_PROJECT_VERSION_LINE}")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/read_project_version.cmake")
+loki_read_project_version(LOKI_PROJECT_VERSION "${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml")
 
 project(loki VERSION "${LOKI_PROJECT_VERSION}" LANGUAGES C CXX)
 
@@ -82,7 +79,7 @@ message("DATA_DIR: ${DATA_DIR}")
 list(APPEND CMAKE_MODULE_PATH
   "${PROJECT_SOURCE_DIR}/cmake"
 )
-include("configure_yggdrasil")
+include("find_python_native_packages")
 include("loki_native_dependencies")
 
 
@@ -92,10 +89,19 @@ include("loki_native_dependencies")
 
 # set(CMAKE_FIND_DEBUG_MODE ON)
 
-configure_yggdrasil()
+loki_find_python_native_prefix(pyyggdrasil YGGDRASIL_NATIVE_PREFIX)
 
 loki_register_native_dependency_prefix("${YGGDRASIL_NATIVE_PREFIX}")
-loki_register_python_native_runtime_prefix("pyyggdrasil")
+loki_register_python_native_runtime_prefix("pyyggdrasil" "${YGGDRASIL_NATIVE_PREFIX}")
+
+# ---------
+# yggdrasil
+# ---------
+
+find_package(yggdrasil 0.0.13 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+if(yggdrasil_FOUND)
+  message(STATUS "Found yggdrasil: ${yggdrasil_DIR} (found version ${yggdrasil_VERSION})")
+endif()
 
 # -----
 # Boost
@@ -184,7 +190,7 @@ include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/lokiConfigVersion.cmake"
   VERSION ${loki_VERSION}
-  COMPATIBILITY ExactVersion
+  COMPATIBILITY SameMinorVersion
 )
 
 # Create config file

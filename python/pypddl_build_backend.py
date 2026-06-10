@@ -24,7 +24,14 @@ def _patch_stub_text(text: str) -> str:
 
 
 def _num_jobs() -> int:
-    return int(os.environ.get("PYPDDL_JOBS", "8"))
+    raw_jobs = os.environ.get("PYPDDL_JOBS", "8")
+    try:
+        jobs = int(raw_jobs)
+    except ValueError as err:
+        raise ValueError("PYPDDL_JOBS must be a positive integer") from err
+    if jobs <= 0:
+        raise ValueError("PYPDDL_JOBS must be a positive integer")
+    return jobs
 
 
 def _prepend_cmake_args(*args: str) -> None:
@@ -161,7 +168,7 @@ def _fix_wheel_stubs(wheel_path: Path) -> None:
             if package_dir.is_dir():
                 target = package_dir / "__init__.pyi"
 
-            if target.exists():
+            if target == wheel_root / "pypddl" / "__init__.pyi" and target.exists():
                 return
 
             target.parent.mkdir(parents=True, exist_ok=True)

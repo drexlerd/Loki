@@ -593,11 +593,20 @@ formalism::TaskView Parser::parse_task_ast(const ast::Task& task)
 
 formalism::Repository& Parser::repo() noexcept { return m_storage->repository; }
 
-ParseError Parser::parse_error(const parser::ErrorHandlerType& error_handler, const std::string& fallback, parser::Iterator)
+ParseError Parser::parse_error(const parser::ErrorHandlerType& error_handler, const std::string& fallback, parser::Iterator position)
 {
+    auto error = ParseError(fallback);
+    auto error_position = position;
     if (const auto& diagnostic = error_handler.last_error())
-        return ParseError(diagnostic->message);
-    return ParseError(fallback);
+    {
+        error = ParseError(diagnostic->message);
+        error_position = diagnostic->position;
+    }
+
+    const auto source_position = parser::source_position(error_handler, error_position);
+    error.set_source_range(SourceRange { SourcePosition { source_position.line, source_position.column, source_position.offset },
+                                         SourcePosition { source_position.line, source_position.column, source_position.offset } });
+    return error;
 }
 
 Parser::ErrorHandlerScope::ErrorHandlerScope(Parser& parser_, const parser::ErrorHandlerType& error_handler) :

@@ -29,8 +29,14 @@ target_compile_definitions(parsers
         BOOST_MPL_LIMIT_LIST_SIZE=50
 )
 
+target_compile_features(parsers
+    PUBLIC
+        cxx_std_20
+)
+
 target_link_libraries(parsers
     PUBLIC
+        yggdrasil::yggdrasil
         gtl::gtl
         fmt::fmt)
 
@@ -46,9 +52,9 @@ if(NOT LOKI_BUILD_PYPDDL)
     install(
         TARGETS parsers
         EXPORT lokiparsersTargets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT loki
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT loki
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT loki
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     )
 

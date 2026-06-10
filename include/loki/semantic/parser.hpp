@@ -13,25 +13,19 @@
 #include "loki/ast.hpp"
 #include "loki/formalism/formalism.hpp"
 #include "loki/parser.hpp"
+#include "loki/parser/error_handler.hpp"
 #include "loki/semantic/errors.hpp"
 #include "loki/semantic/translator.hpp"
 
 #include <boost/optional.hpp>
-#include <boost/variant/apply_visitor.hpp>
 #include <cista/containers/optional.h>
 #include <cista/containers/string.h>
-#include <cmath>
+#include <cstddef>
 #include <filesystem>
-#include <fstream>
-#include <iostream>
 #include <memory>
-#include <sstream>
-#include <stdexcept>
 #include <string>
-#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
-#include <utility>
 #include <vector>
 
 namespace loki::semantic
@@ -99,8 +93,16 @@ private:
     };
 
     template<typename Node, typename Error>
-    [[noreturn]] void throw_at(const Node&, Error error) const
+    [[noreturn]] void throw_at(const Node& node, Error error) const
     {
+        if (m_error_handler)
+        {
+            if (auto range = parser::source_range(*m_error_handler, node))
+            {
+                error.set_source_range(SourceRange { SourcePosition { range->begin.line, range->begin.column, range->begin.offset },
+                                                     SourcePosition { range->end.line, range->end.column, range->end.offset } });
+            }
+        }
         throw error;
     }
 

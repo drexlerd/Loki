@@ -23,6 +23,32 @@ endfunction()
 
 add_gtest(parser_suite                         "parser/suite.cpp")
 add_gtest(public_facade                        "public_facade.cpp")
+add_gtest(public_headers                       "public_headers.cpp")
+
+file(GLOB_RECURSE LOKI_DIRECT_PUBLIC_HEADERS
+    CONFIGURE_DEPENDS
+    RELATIVE "${CMAKE_SOURCE_DIR}/include"
+    "${CMAKE_SOURCE_DIR}/include/loki/*.hpp"
+)
+list(SORT LOKI_DIRECT_PUBLIC_HEADERS)
+
+set(LOKI_PUBLIC_HEADER_TARGETS)
+foreach(header IN LISTS LOKI_DIRECT_PUBLIC_HEADERS)
+    string(REGEX REPLACE "[^A-Za-z0-9_]+" "_" header_target_name "${header}")
+    set(header_target "public_header_${header_target_name}")
+    set(header_test_source "${CMAKE_CURRENT_BINARY_DIR}/${header_target}.cpp")
+    file(GENERATE
+        OUTPUT "${header_test_source}"
+        CONTENT "#include <${header}>
+int main() { return 0; }
+")
+    add_executable(${header_target} "${header_test_source}")
+    target_link_libraries(${header_target} PRIVATE loki::parsers)
+    list(APPEND LOKI_PUBLIC_HEADER_TARGETS ${header_target})
+endforeach()
+if(LOKI_PUBLIC_HEADER_TARGETS)
+    add_dependencies(public_headers ${LOKI_PUBLIC_HEADER_TARGETS})
+endif()
 add_gtest(semantic_parser                      "semantic/parser.cpp")
 add_gtest(semantic_negative_suite              "semantic/negative_suite.cpp")
 add_gtest(semantic_translation_counts_suite    "semantic/translation_counts_suite.cpp")

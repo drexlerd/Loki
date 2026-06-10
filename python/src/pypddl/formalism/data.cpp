@@ -2,15 +2,13 @@
 
 #include <loki/formalism/builder.hpp>
 #include <loki/semantic.hpp>
-
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/optional.h>
 #include <nanobind/stl/shared_ptr.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
-#include <yggdrasil/python/type_casters.hpp>
-
 #include <utility>
+#include <yggdrasil/python/type_casters.hpp>
 
 namespace nb = nanobind;
 using namespace nb::literals;
@@ -29,7 +27,7 @@ auto get_or_create_data()
     return [](formalism::Repository& self, Data<T> data) { return formalism::get_or_create<T>(self, std::move(data)); };
 }
 
-} // namespace
+}  // namespace
 
 void bind_formalism_enums(nb::module_& m)
 {
@@ -41,8 +39,7 @@ void bind_formalism_enums(nb::module_& m)
         .value("Greater", formalism::BinaryComparator::Greater)
         .value("GreaterEqual", formalism::BinaryComparator::GreaterEqual);
 
-    nb::enum_<formalism::UnaryArithmeticOperator>(m, "UnaryArithmeticOperator")
-        .value("Minus", formalism::UnaryArithmeticOperator::Minus);
+    nb::enum_<formalism::UnaryArithmeticOperator>(m, "UnaryArithmeticOperator").value("Minus", formalism::UnaryArithmeticOperator::Minus);
 
     nb::enum_<formalism::BinaryArithmeticOperator>(m, "BinaryArithmeticOperator")
         .value("Add", formalism::BinaryArithmeticOperator::Add)
@@ -113,7 +110,9 @@ void bind_datas(nb::module_& m)
     {
         using V = Data<formalism::Predicate>;
         nb::class_<V>(m, "PredicateBuilder")
-            .def(nb::init<const std::string&, const std::vector<formalism::ParameterView>&>(), "name"_a, "parameters"_a = std::vector<formalism::ParameterView> {})
+            .def(nb::init<const std::string&, const std::vector<formalism::ParameterView>&>(),
+                 "name"_a,
+                 "parameters"_a = std::vector<formalism::ParameterView> {})
             .def_rw("name", &V::name)
             .def_rw("parameters", &V::parameters);
     }
@@ -150,7 +149,9 @@ void bind_datas(nb::module_& m)
     {
         using V = Data<formalism::FunctionTerm>;
         nb::class_<V>(m, "FunctionTermBuilder")
-            .def(nb::init<formalism::FunctionSkeletonView, const std::vector<formalism::TermView>&>(), "function"_a, "terms"_a = std::vector<formalism::TermView> {})
+            .def(nb::init<formalism::FunctionSkeletonView, const std::vector<formalism::TermView>&>(),
+                 "function"_a,
+                 "terms"_a = std::vector<formalism::TermView> {})
             .def_rw("function", &V::function)
             .def_rw("terms", &V::terms);
     }
@@ -164,7 +165,10 @@ void bind_datas(nb::module_& m)
     {
         using V = Data<formalism::BinaryFunctionExpression>;
         nb::class_<V>(m, "BinaryFunctionExpressionBuilder")
-            .def(nb::init<formalism::BinaryArithmeticOperator, formalism::FunctionExpressionView, formalism::FunctionExpressionView>(), "operator"_a, "left"_a, "right"_a)
+            .def(nb::init<formalism::BinaryArithmeticOperator, formalism::FunctionExpressionView, formalism::FunctionExpressionView>(),
+                 "operator"_a,
+                 "left"_a,
+                 "right"_a)
             .def_rw("operator", &V::op)
             .def_rw("left", &V::left)
             .def_rw("right", &V::right);
@@ -178,7 +182,9 @@ void bind_datas(nb::module_& m)
     }
     {
         using V = Data<formalism::FunctionExpression>;
-        nb::class_<V>(m, "FunctionExpressionBuilder").def(nb::init<typename V::template ViewVariant<formalism::Repository>>(), "value"_a).def_rw("value", &V::value);
+        nb::class_<V>(m, "FunctionExpressionBuilder")
+            .def(nb::init<typename V::template ViewVariant<formalism::Repository>>(), "value"_a)
+            .def_rw("value", &V::value);
     }
     {
         using V = Data<formalism::ConditionLiteral>;
@@ -186,11 +192,15 @@ void bind_datas(nb::module_& m)
     }
     {
         using V = Data<formalism::ConditionAnd>;
-        nb::class_<V>(m, "ConditionAndBuilder").def(nb::init<const std::vector<formalism::ConditionView>&>(), "conditions"_a).def_rw("conditions", &V::conditions);
+        nb::class_<V>(m, "ConditionAndBuilder")
+            .def(nb::init<const std::vector<formalism::ConditionView>&>(), "conditions"_a)
+            .def_rw("conditions", &V::conditions);
     }
     {
         using V = Data<formalism::ConditionOr>;
-        nb::class_<V>(m, "ConditionOrBuilder").def(nb::init<const std::vector<formalism::ConditionView>&>(), "conditions"_a).def_rw("conditions", &V::conditions);
+        nb::class_<V>(m, "ConditionOrBuilder")
+            .def(nb::init<const std::vector<formalism::ConditionView>&>(), "conditions"_a)
+            .def_rw("conditions", &V::conditions);
     }
     {
         using V = Data<formalism::ConditionNot>;
@@ -220,7 +230,10 @@ void bind_datas(nb::module_& m)
     {
         using V = Data<formalism::ConditionNumericConstraint>;
         nb::class_<V>(m, "ConditionNumericConstraintBuilder")
-            .def(nb::init<formalism::BinaryComparator, formalism::FunctionExpressionView, formalism::FunctionExpressionView>(), "comparator"_a, "left"_a, "right"_a)
+            .def(nb::init<formalism::BinaryComparator, formalism::FunctionExpressionView, formalism::FunctionExpressionView>(),
+                 "comparator"_a,
+                 "left"_a,
+                 "right"_a)
             .def_rw("comparator", &V::comparator)
             .def_rw("left", &V::left)
             .def_rw("right", &V::right);
@@ -240,7 +253,14 @@ void bind_datas(nb::module_& m)
     {
         using V = Data<formalism::EffectNumeric>;
         nb::class_<V>(m, "EffectNumericBuilder")
-            .def(nb::init<formalism::NumericEffectOperator, formalism::FunctionSkeletonView, const std::vector<formalism::TermView>&, formalism::FunctionExpressionView>(), "operator"_a, "function"_a, "terms"_a, "expression"_a)
+            .def(nb::init<formalism::NumericEffectOperator,
+                          formalism::FunctionSkeletonView,
+                          const std::vector<formalism::TermView>&,
+                          formalism::FunctionExpressionView>(),
+                 "operator"_a,
+                 "function"_a,
+                 "terms"_a,
+                 "expression"_a)
             .def_rw("operator", &V::op)
             .def_rw("function", &V::function)
             .def_rw("terms", &V::terms)
@@ -284,7 +304,10 @@ void bind_datas(nb::module_& m)
     {
         using V = Data<formalism::Action>;
         nb::class_<V>(m, "ActionBuilder")
-            .def(nb::init<const std::string&, const std::vector<formalism::ParameterView>&, const std::optional<formalism::ConditionView>&, const std::optional<formalism::EffectView>&>(),
+            .def(nb::init<const std::string&,
+                          const std::vector<formalism::ParameterView>&,
+                          const std::optional<formalism::ConditionView>&,
+                          const std::optional<formalism::EffectView>&>(),
                  "name"_a,
                  "parameters"_a = std::vector<formalism::ParameterView> {},
                  "precondition"_a = std::optional<formalism::ConditionView> {},
@@ -297,7 +320,10 @@ void bind_datas(nb::module_& m)
     {
         using V = Data<formalism::Axiom>;
         nb::class_<V>(m, "AxiomBuilder")
-            .def(nb::init<const std::vector<formalism::ParameterView>&, formalism::LiteralView, formalism::ConditionView>(), "parameters"_a, "head"_a, "condition"_a)
+            .def(nb::init<const std::vector<formalism::ParameterView>&, formalism::LiteralView, formalism::ConditionView>(),
+                 "parameters"_a,
+                 "head"_a,
+                 "condition"_a)
             .def_rw("parameters", &V::parameters)
             .def_rw("head", &V::head)
             .def_rw("condition", &V::condition);
@@ -382,51 +408,51 @@ void bind_datas(nb::module_& m)
 
 void bind_repository(nb::module_& m)
 {
-    nb::class_<formalism::Repository>(m, "Repository")
-        .def("get_or_create", get_or_create_data<formalism::Requirement>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Type>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Object>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Variable>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Parameter>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Predicate>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::FunctionSkeleton>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Term>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Atom>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Literal>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::FunctionExpressionNumber>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::FunctionTerm>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::UnaryFunctionExpression>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::BinaryFunctionExpression>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::MultiFunctionExpression>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::FunctionExpression>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::ConditionLiteral>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::ConditionAnd>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::ConditionOr>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::ConditionNot>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::ConditionImply>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::ConditionExists>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::ConditionForall>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::ConditionNumericConstraint>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Condition>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::EffectLiteral>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::EffectAnd>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::EffectNumeric>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::EffectForall>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::EffectWhen>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::EffectOneOf>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::EffectProbabilisticAlternative>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::EffectProbabilistic>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Effect>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Action>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Axiom>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Metric>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::InitialFunctionValue>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Domain>(), "data"_a)
-        .def("get_or_create", get_or_create_data<formalism::Task>(), "data"_a);
+    nb::class_<formalism::Repository>(m, "Repository", "Owns interned formalism objects created from builder data.")
+        .def("get_or_create", get_or_create_data<formalism::Requirement>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Type>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Object>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Variable>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Parameter>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Predicate>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::FunctionSkeleton>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Term>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Atom>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Literal>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::FunctionExpressionNumber>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::FunctionTerm>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::UnaryFunctionExpression>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::BinaryFunctionExpression>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::MultiFunctionExpression>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::FunctionExpression>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::ConditionLiteral>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::ConditionAnd>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::ConditionOr>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::ConditionNot>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::ConditionImply>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::ConditionExists>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::ConditionForall>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::ConditionNumericConstraint>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Condition>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::EffectLiteral>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::EffectAnd>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::EffectNumeric>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::EffectForall>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::EffectWhen>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::EffectOneOf>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::EffectProbabilisticAlternative>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::EffectProbabilistic>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Effect>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Action>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Axiom>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Metric>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::InitialFunctionValue>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Domain>(), "data"_a, nb::keep_alive<0, 1>())
+        .def("get_or_create", get_or_create_data<formalism::Task>(), "data"_a, nb::keep_alive<0, 1>());
 
-    nb::class_<formalism::RepositoryFactory>(m, "RepositoryFactory")
+    nb::class_<formalism::RepositoryFactory>(m, "RepositoryFactory", "Factory for creating shared formalism repositories.")
         .def(nb::init<>())
-        .def("create", [](formalism::RepositoryFactory& self) { return self.create_shared(); });
+        .def("create", [](formalism::RepositoryFactory& self) { return self.create_shared(); }, "Create a repository that owns interned formalism objects.");
 }
 
-} // namespace loki::formalism
+}  // namespace loki::formalism

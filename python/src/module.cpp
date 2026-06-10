@@ -11,4 +11,4 @@ NB_MODULE(_pypddl, m)
     formalism::bind_module_definitions(formalism_module);
 }
 
-} // namespace loki
+}  // namespace loki

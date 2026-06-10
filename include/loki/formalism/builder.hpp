@@ -13,6 +13,7 @@
 #include <cista/containers/optional.h>
 #include <cista/containers/string.h>
 
+#include "loki/formalism/canonicalization.hpp"
 #include "loki/formalism/repository.hpp"
 
 #include <utility>
