@@ -10,6 +10,7 @@
 #ifndef LOKI_FORMALISM_CANONICALIZATION_HPP_
 #define LOKI_FORMALISM_CANONICALIZATION_HPP_
 
+#include "loki/config.hpp"
 #include "loki/formalism/datas.hpp"
 #include "loki/formalism/declarations.hpp"
 #include "loki/formalism/repository.hpp"
@@ -156,6 +157,7 @@ inline std::string render(const Repository&, const ygg::Data<Task>&);
 
 } // namespace loki::formalism::detail
 
+#if LOKI_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -181,6 +183,7 @@ struct formatter<ygg::View<ygg::Index<T>, ::loki::formalism::Repository>, char> 
 };
 
 } // namespace fmt
+#endif
 
 namespace loki::formalism::detail
 {

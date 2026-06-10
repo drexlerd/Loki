@@ -11,6 +11,7 @@
 #define LOKI_FMT_FORMATTER_HPP_
 
 #include "loki/ast/ast.hpp"
+#include "loki/config.hpp"
 
 #include <fmt/format.h>
 
@@ -22,11 +23,6 @@
 #include <sstream>
 #include <string>
 #include <string_view>
-
-
-#ifndef LOKI_ENABLE_FMT_FORMATTERS
-#define LOKI_ENABLE_FMT_FORMATTERS 1
-#endif
 
 namespace loki::format
 {

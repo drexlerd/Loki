@@ -63,6 +63,13 @@ message("Build shared libraries enabled.")
 
 option(LOKI_BUILD_PYPDDL "Build Loki for the pypddl Python wheel." OFF)
 
+option(LOKI_ENABLE_FMT_FORMATTERS "Enable Loki's public fmt::formatter specializations." ON)
+if(LOKI_ENABLE_FMT_FORMATTERS)
+  add_compile_definitions(LOKI_ENABLE_FMT_FORMATTERS=1 YGG_ENABLE_FMT_FORMATTERS=1)
+else()
+  add_compile_definitions(LOKI_ENABLE_FMT_FORMATTERS=0 YGG_ENABLE_FMT_FORMATTERS=0)
+endif()
+
 set(LOKI_INSTALL_INTERFACE_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}")
 
 
@@ -98,7 +105,7 @@ loki_register_python_native_runtime_prefix("pyyggdrasil" "${YGGDRASIL_NATIVE_PRE
 # yggdrasil
 # ---------
 
-find_package(yggdrasil 0.0.13 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_package(yggdrasil 0.0.14 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(yggdrasil_FOUND)
   message(STATUS "Found yggdrasil: ${yggdrasil_DIR} (found version ${yggdrasil_VERSION})")
 endif()

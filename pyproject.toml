@@ -1,7 +1,7 @@
 [build-system]
 requires = [
     "scikit-build-core>=0.10",
-    "pyyggdrasil>=0.0.13,<0.1",
+    "pyyggdrasil>=0.0.14,<0.1",
 ]
 build-backend = "pypddl_build_backend"
 backend-path = ["python"]
@@ -17,7 +17,7 @@ authors = [
     {name = "Dominik Drexler", email = "dominik.drexler@liu.se"},
 ]
 dependencies = [
-    "pyyggdrasil>=0.0.13,<0.1",
+    "pyyggdrasil>=0.0.14,<0.1",
 ]
 
 [project.optional-dependencies]
@@ -60,7 +60,7 @@ CMAKE_INSTALL_LIBDIR = "lib"
 
 [tool.cibuildwheel]
 container-engine = "docker"
-before-build = "python -m pip install --no-cache-dir 'pyyggdrasil>=0.0.13,<0.1'"
+before-build = "python -m pip install --no-cache-dir 'pyyggdrasil>=0.0.14,<0.1'"
 
 [tool.cibuildwheel.linux]
 repair-wheel-command = "LD_LIBRARY_PATH=$(python -c 'import os, pyyggdrasil; print(os.pathsep.join(str(path) for path in sorted(pyyggdrasil.native_prefix().glob(\"lib*\")) if path.is_dir()))') auditwheel repair -w {dest_dir} {wheel}"

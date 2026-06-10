@@ -21,7 +21,8 @@ function(pypddl_install_public_stub private_stub_file public_stub_file)
         set(public_stub_file "${PYPDDL_PUBLIC_PACKAGE_DIR}/__init__.pyi")
     endif()
 
-    if(public_stub_file STREQUAL "${PYPDDL_STUB_ROOT}/__init__.pyi" AND EXISTS "${public_stub_file}")
+    # Handwritten stubs win over generated ones, like in the sibling projects.
+    if(EXISTS "${public_stub_file}")
         return()
     endif()
 
