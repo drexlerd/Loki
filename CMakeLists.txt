@@ -105,7 +105,7 @@ loki_register_python_native_runtime_prefix("pyyggdrasil" "${YGGDRASIL_NATIVE_PRE
 # yggdrasil
 # ---------
 
-find_package(yggdrasil 0.0.14 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_package(yggdrasil 0.0.15 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(yggdrasil_FOUND)
   message(STATUS "Found yggdrasil: ${yggdrasil_DIR} (found version ${yggdrasil_VERSION})")
 endif()
