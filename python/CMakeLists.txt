@@ -13,7 +13,7 @@ set(PYPDDL_NATIVE_LIBDIR "${PYPDDL_NATIVE_DIR}/${CMAKE_INSTALL_LIBDIR}")
 set(PYPDDL_NATIVE_BINDIR "${PYPDDL_NATIVE_DIR}/${CMAKE_INSTALL_BINDIR}")
 set(PYPDDL_NATIVE_CMAKEDIR "${PYPDDL_NATIVE_LIBDIR}/cmake")
 
-nanobind_add_module(_pypddl
+nanobind_add_module(_pypddl NB_SHARED
     src/module.cpp
     src/pypddl/formalism/module.cpp
     src/pypddl/formalism/data.cpp
@@ -24,15 +24,15 @@ target_link_libraries(_pypddl PRIVATE loki::parsers)
 target_include_directories(_pypddl PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 if(APPLE)
-    loki_make_python_native_runtime_rpaths(PYPDDL_MODULE_RPATH "@loader_path" "../")
+    yggdrasil_make_python_native_runtime_rpaths(PYPDDL_MODULE_RPATH "@loader_path" "../")
     list(APPEND PYPDDL_MODULE_RPATH "@loader_path/native/${CMAKE_INSTALL_LIBDIR}")
-    loki_make_python_native_runtime_rpaths(PYPDDL_PARSERS_RPATH "@loader_path" "../../../")
-    loki_make_python_native_runtime_rpaths(PYPDDL_INSTALL_NATIVE_LIBRARY_RPATHS "@loader_path" "../../../")
+    yggdrasil_make_python_native_runtime_rpaths(PYPDDL_PARSERS_RPATH "@loader_path" "../../../")
+    yggdrasil_make_python_native_runtime_rpaths(PYPDDL_INSTALL_NATIVE_LIBRARY_RPATHS "@loader_path" "../../../")
 elseif(UNIX)
-    loki_make_python_native_runtime_rpaths(PYPDDL_MODULE_RPATH "$ORIGIN" "../")
+    yggdrasil_make_python_native_runtime_rpaths(PYPDDL_MODULE_RPATH "$ORIGIN" "../")
     list(APPEND PYPDDL_MODULE_RPATH "$ORIGIN/native/${CMAKE_INSTALL_LIBDIR}")
-    loki_make_python_native_runtime_rpaths(PYPDDL_PARSERS_RPATH "$ORIGIN" "../../../")
-    loki_make_python_native_runtime_rpath_string(PYPDDL_INSTALL_NATIVE_LIBRARY_RPATH "$ORIGIN" "../../../")
+    yggdrasil_make_python_native_runtime_rpaths(PYPDDL_PARSERS_RPATH "$ORIGIN" "../../../")
+    yggdrasil_make_python_native_runtime_rpath_string(PYPDDL_INSTALL_NATIVE_LIBRARY_RPATH "$ORIGIN" "../../../")
 endif()
 
 if(PYPDDL_MODULE_RPATH)
@@ -44,7 +44,7 @@ endif()
 install(TARGETS _pypddl DESTINATION "pypddl" COMPONENT pypddl)
 set_property(TARGET parsers PROPERTY INTERFACE_INCLUDE_DIRECTORIES
     "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-    "$<BUILD_INTERFACE:${LOKI_NATIVE_DEPENDENCY_INCLUDE_DIRECTORIES}>")
+    "$<BUILD_INTERFACE:${YGGDRASIL_NATIVE_DEPENDENCY_INCLUDE_DIRECTORIES}>")
 set_property(TARGET parsers PROPERTY INSTALL_RPATH "${PYPDDL_PARSERS_RPATH}")
 install(TARGETS parsers
         EXPORT pypddlLokiparsersTargets

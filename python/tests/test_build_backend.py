@@ -135,15 +135,17 @@ def test_python_native_runtime_rpaths_use_dependency_libdir(tmp_path):
 
     dependency_prefix = tmp_path / "dependency"
     (dependency_prefix / "lib").mkdir(parents=True)
-    helper = Path(__file__).resolve().parents[2] / "cmake" / "loki_native_dependencies.cmake"
+    import pyyggdrasil
+
+    helper = Path(pyyggdrasil.cmake_dir()) / "yggdrasilPythonHelpers.cmake"
     script = tmp_path / "check_runtime_rpaths.cmake"
     script.write_text(
         "\n".join(
             [
                 "set(CMAKE_INSTALL_LIBDIR lib64)",
                 f"include(\"{helper.as_posix()}\")",
-                f"loki_register_python_native_runtime_prefix(\"pyyggdrasil\" \"{dependency_prefix.as_posix()}\")",
-                "loki_make_python_native_runtime_rpath_string(runtime_rpath \"$ORIGIN\" \"../\")",
+                f"yggdrasil_register_python_native_runtime_prefix(\"pyyggdrasil\" \"{dependency_prefix.as_posix()}\")",
+                "yggdrasil_make_python_native_runtime_rpath_string(runtime_rpath \"$ORIGIN\" \"../\")",
                 "if(NOT runtime_rpath STREQUAL \"$ORIGIN:$ORIGIN/../pyyggdrasil/lib\")",
                 "    message(FATAL_ERROR \"unexpected runtime rpath: ${runtime_rpath}\")",
                 "endif()",

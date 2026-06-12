@@ -83,32 +83,48 @@ message("DATA_DIR: ${DATA_DIR}")
 # CMake modules and macro files
 ##############################################################
 
-list(APPEND CMAKE_MODULE_PATH
-  "${PROJECT_SOURCE_DIR}/cmake"
-)
-include("find_python_native_packages")
-include("loki_native_dependencies")
-
-
 ##############################################################
 # Dependency Handling
 ##############################################################
 
 # set(CMAKE_FIND_DEBUG_MODE ON)
 
-loki_find_python_native_prefix(pyyggdrasil YGGDRASIL_NATIVE_PREFIX)
-
-loki_register_native_dependency_prefix("${YGGDRASIL_NATIVE_PREFIX}")
-loki_register_python_native_runtime_prefix("pyyggdrasil" "${YGGDRASIL_NATIVE_PREFIX}")
+# Bootstrap: locate the pyyggdrasil prefix; find_package(yggdrasil) then
+# provides the yggdrasil_* python-native helper functions.
+if(NOT YGGDRASIL_NATIVE_PREFIX)
+  if(NOT Python3_EXECUTABLE AND Python_EXECUTABLE)
+    set(Python3_EXECUTABLE "${Python_EXECUTABLE}")
+  endif()
+  find_package(Python3 QUIET COMPONENTS Interpreter)
+  if(Python3_Interpreter_FOUND)
+    execute_process(
+      COMMAND "${Python3_EXECUTABLE}" -c
+              "import pyyggdrasil as m; print(getattr(m, 'cmake_prefix', m.native_prefix)())"
+      RESULT_VARIABLE _pyyggdrasil_result
+      OUTPUT_VARIABLE _pyyggdrasil_prefix
+      ERROR_QUIET
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(_pyyggdrasil_result EQUAL 0 AND EXISTS "${_pyyggdrasil_prefix}")
+      set(YGGDRASIL_NATIVE_PREFIX "${_pyyggdrasil_prefix}")
+      message(STATUS "Found pyyggdrasil native prefix: ${YGGDRASIL_NATIVE_PREFIX}")
+    endif()
+  endif()
+endif()
+if(YGGDRASIL_NATIVE_PREFIX AND NOT "${YGGDRASIL_NATIVE_PREFIX}" IN_LIST CMAKE_PREFIX_PATH)
+  list(PREPEND CMAKE_PREFIX_PATH "${YGGDRASIL_NATIVE_PREFIX}")
+endif()
 
 # ---------
 # yggdrasil
 # ---------
 
-find_package(yggdrasil 0.0.15 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_package(yggdrasil 0.0.17 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(yggdrasil_FOUND)
   message(STATUS "Found yggdrasil: ${yggdrasil_DIR} (found version ${yggdrasil_VERSION})")
 endif()
+
+yggdrasil_register_native_dependency_prefix("${YGGDRASIL_NATIVE_PREFIX}")
+yggdrasil_register_python_native_runtime_prefix("pyyggdrasil" "${YGGDRASIL_NATIVE_PREFIX}")
 
 # -----
 # Boost
