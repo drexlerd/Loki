@@ -60,7 +60,7 @@ CMAKE_INSTALL_LIBDIR = "lib"
 
 [tool.cibuildwheel]
 container-engine = "docker"
-before-build = "python -m pip install --no-cache-dir 'pyyggdrasil>=0.0.17,<0.1'"
+before-build = "n=0; until python -m pip install --no-cache-dir 'pyyggdrasil>=0.0.17,<0.1'; do n=$((n+1)); [ $n -ge 30 ] && exit 1; echo 'provider wheels not on the index yet; retrying in 60s'; sleep 60; done"
 
 [tool.cibuildwheel.linux]
 repair-wheel-command = "python -m pyyggdrasil.repair --providers pyyggdrasil --dest-dir {dest_dir} {wheel}"
