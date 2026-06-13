@@ -4,6 +4,15 @@ on:
   push:
     branches:
       - test-pypi
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Staging version to build (e.g. 999.0.3)."
+        required: true
+      pyyggdrasil:
+        description: "Staged pyyggdrasil version to pin (build dependency)."
+        required: false
+        default: ""
 
 jobs:
   build_wheel_linux:
@@ -19,6 +28,15 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
+
+      - name: Stage TestPyPI version
+        if: github.event_name == 'workflow_dispatch'
+        uses: planning-and-learning/.github/actions/stage-version@main
+        with:
+          version: ${{ inputs.version }}
+          pins: |
+            pyyggdrasil=${{ inputs.pyyggdrasil }}
+            yggdrasil=${{ inputs.pyyggdrasil }}
 
       - name: Install cibuildwheel
         run: |
@@ -56,6 +74,15 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
+
+      - name: Stage TestPyPI version
+        if: github.event_name == 'workflow_dispatch'
+        uses: planning-and-learning/.github/actions/stage-version@main
+        with:
+          version: ${{ inputs.version }}
+          pins: |
+            pyyggdrasil=${{ inputs.pyyggdrasil }}
+            yggdrasil=${{ inputs.pyyggdrasil }}
 
       - name: Install cibuildwheel
         run: |
