@@ -213,8 +213,21 @@ def test_install_time_stub_patch_script_publishes_generated_stubs(tmp_path):
         encoding="utf-8",
     )
 
-    script = Path(__file__).resolve().parents[2] / "cmake" / "patch_python_stubs.cmake"
-    subprocess.run([cmake, f"-DCMAKE_INSTALL_PREFIX={install_prefix}", "-P", str(script)], check=True)
+    import pyyggdrasil
+
+    module = Path(pyyggdrasil.cmake_dir()) / "yggdrasilPatchPythonStubs.cmake"
+    driver = tmp_path / "driver.cmake"
+    driver.write_text(
+        "\n".join(
+            [
+                f"include(\"{module.as_posix()}\")",
+                "yggdrasil_patch_python_stubs(PACKAGE pypddl PRIVATE_MODULE _pypddl RENAME_PACKAGES pypddl pyyggdrasil)",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    subprocess.run([cmake, f"-DCMAKE_INSTALL_PREFIX={install_prefix}", "-P", str(driver)], check=True)
 
     public_stub = formalism_dir / "__init__.pyi"
     assert (package_dir / "__init__.pyi").read_text(encoding="utf-8") == "from . import formalism as formalism\n"
