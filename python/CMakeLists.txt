@@ -2,7 +2,7 @@ find_package(Python 3.9 REQUIRED
   COMPONENTS Interpreter Development.Module
   OPTIONAL_COMPONENTS Development.SABIModule)
 
-find_package(nanobind CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH})
+find_package(nanobind CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 message(STATUS "Found nanobind: ${nanobind_DIR} (found version ${nanobind_VERSION})")
 
 yggdrasil_python_package_init(PYPDDL pypddl)
