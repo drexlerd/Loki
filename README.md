@@ -24,7 +24,6 @@ The translator is based on the method presented in section four of the paper [*"
 - [x] :non-deterministic (unsupported in the translator)
 - [x] :probabilistic-effects (unsupported in the translator)
 
-
 ## Dependencies
 
 Loki depends on a fraction of [Boost's](https://www.boost.org) header-only libraries (Fusion, Spirit x3, Container), its performance benchmarking framework depends on [GoogleBenchmark](https://github.com/google/benchmark), and its testing framework depends on [GoogleTest](https://github.com/google/googletest).
