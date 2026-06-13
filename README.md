@@ -31,11 +31,12 @@ Loki depends on a fraction of [Boost's](https://www.boost.org) header-only libra
 
 Loki consumes native dependencies from Python packages:
 
-- `pyyggdrasil >= 0.0.15, < 0.1` for shared third-party native dependencies.
+- `pyyggdrasil >= 0.0.17, < 0.1` for shared third-party native dependencies.
 
-The shared workspace layout and general Python/CMake integration pattern are
-documented in the
-[Planning and Learning build instructions](https://github.com/planning-and-learning/.github/blob/main/profile/README.md#local-development).
+The shared workspace layout, layered install order, and the common
+build-from-source and CMake-integration patterns are documented in the
+[Planning and Learning build instructions](https://github.com/planning-and-learning/.github/blob/main/profile/README.md#building-from-source);
+the sections below cover `loki`/`pypddl`-specific details.
 
 For offline/local development, install `pyyggdrasil` from the sibling source
 checkout instead:
@@ -57,7 +58,9 @@ cmake -S . -B build
 ```
 
 CMake discovers the installed `pyyggdrasil` automatically through
-`cmake/find_python_native_packages.cmake` and links against the
+`cmake/bootstrap_pyyggdrasil.cmake` (which locates the package and adds its
+native prefix to `CMAKE_PREFIX_PATH`, after which `find_package(yggdrasil)`
+provides the shared helper functions) and links against the
 `yggdrasil::yggdrasil` target. To point at a different prefix explicitly:
 
 ```console
@@ -136,6 +139,10 @@ int main()
 ```
 
 ## CMake Integration
+
+This section covers `pypddl`-specific paths and targets; the general pattern for
+consuming the native prefixes from CMake is in the
+[common CMake integration instructions](https://github.com/planning-and-learning/.github/blob/main/profile/README.md#cmake-integration).
 
 The Python package `pypddl` installs Loki's native headers, shared library, and
 CMake package config under `pypddl.native_prefix()`. It depends on
