@@ -6,7 +6,6 @@ import pyyggdrasil as pyyggdrasil
 from . import formalism as formalism
 
 __version__: str
-__all__: tuple[str, ...]
 
 def native_prefix() -> Path: ...
 def native_include_dir() -> Path: ...

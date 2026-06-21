@@ -5,10 +5,10 @@ import pypddl
 
 def project_version():
     pyproject = Path(__file__).resolve().parents[2] / "pyproject.toml"
-    parsed_version = pypddl._version_from_pyproject(pyproject)
-    if parsed_version is None:
-        raise AssertionError("project version not found")
-    return parsed_version
+    for line in pyproject.read_text(encoding="utf-8").splitlines():
+        if line.startswith("version"):
+            return line.split("=", maxsplit=1)[1].strip().strip("\"")
+    raise AssertionError("project version not found")
 
 
 def test_build_tree_package_exposes_current_extension_and_public_stub():
@@ -25,10 +25,10 @@ def test_build_tree_package_exposes_current_extension_and_public_stub():
     assert pypddl.formalism.Parser is not None
 
     package_stub = (package_dir / "__init__.pyi").read_text(encoding="utf-8")
-    assert "__all__: tuple[str, ...]" in package_stub
+    assert "from . import formalism as formalism" in package_stub
+    assert "__all__" not in package_stub
 
     formalism_stub = (package_dir / "formalism" / "__init__.pyi").read_text(encoding="utf-8")
-    assert "__all__: tuple[str, ...]" in formalism_stub
     assert "Parser" in formalism_stub
     assert "DomainTranslationResult" in formalism_stub
     assert "ProblemTranslationResult" in formalism_stub

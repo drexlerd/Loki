@@ -167,13 +167,9 @@ def check_fix_wheel_stubs_preserves_existing_and_publishes_new(tmp_path):
             "pypddl/__init__.pyi": "from . import formalism as formalism\n",
             "pypddl/py.typed": "",
             "pypddl/formalism/__init__.py": "",
-            # Pre-existing public stub: preserved (handwritten wins), only its
-            # stale private reference is text-patched — NOT overwritten by the
-            # migrated private stub below.
-            "pypddl/formalism/__init__.pyi": "handwritten: pypddl._pypddl.formalism.Parser\n",
             "pypddl/_pypddl/__init__.pyi": "private top-level should not replace public\n",
             "pypddl/_pypddl/formalism.pyi": "class Parser: ... # pypddl._pypddl.formalism pyyggdrasil._pyyggdrasil\n",
-            # Private stub with no public counterpart: published.
+            # Private stubs with no public counterpart are published.
             "pypddl/_pypddl/extra.pyi": "class Extra: ... # pypddl._pypddl.extra\n",
             "pypddl-1.0.0.dist-info/RECORD": "",
         },
@@ -182,16 +178,17 @@ def check_fix_wheel_stubs_preserves_existing_and_publishes_new(tmp_path):
     backend._fix_wheel_stubs(wheel_path)
 
     files = read_wheel(wheel_path)
-    # Top-level and nested handwritten public stubs survive.
+    # The root handwritten public stub survives. Nested native stubs are generated.
     assert files["pypddl/__init__.pyi"] == "from . import formalism as formalism\n"
     assert files["pypddl/py.typed"] == ""
     # Private package fully removed.
     assert "pypddl/_pypddl/__init__.pyi" not in files
     assert "pypddl/_pypddl/formalism.pyi" not in files
     assert "pypddl/_pypddl/extra.pyi" not in files
-    # Existing nested stub preserved (handwritten wins), private ref rewritten.
-    assert files["pypddl/formalism/__init__.pyi"] == "handwritten: pypddl.formalism.Parser\n"
-    assert "class Parser" not in files["pypddl/formalism/__init__.pyi"]
+    # Nested native stub published + patched because no handwritten formalism stub exists.
+    assert "class Parser" in files["pypddl/formalism/__init__.pyi"]
+    assert "pypddl._pypddl" not in files["pypddl/formalism/__init__.pyi"]
+    assert "pyyggdrasil._pyyggdrasil" not in files["pypddl/formalism/__init__.pyi"]
     # Private stub with no public counterpart published + patched.
     assert "class Extra" in files["pypddl/extra.pyi"]
     assert "pypddl._pypddl" not in files["pypddl/extra.pyi"]
@@ -199,6 +196,7 @@ def check_fix_wheel_stubs_preserves_existing_and_publishes_new(tmp_path):
     record = read_record(files)
     assert "pypddl/_pypddl/__init__.pyi" not in record
     assert "pypddl/_pypddl/formalism.pyi" not in record
+    assert record["pypddl/formalism/__init__.pyi"][0].startswith("sha256=")
     assert record["pypddl/py.typed"][0].startswith("sha256=")
     assert record["pypddl/py.typed"][1] == "0"
     assert record["pypddl/extra.pyi"][0].startswith("sha256=")
