@@ -22,8 +22,11 @@
 #include <yggdrasil/semantics/canonicalization.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <string>
+#include <utility>
 #include <variant>
+#include <vector>
 
 namespace ygg
 {
@@ -243,6 +246,60 @@ inline std::string render(const Repository& repository, const ygg::Data<Task>& d
     return result + "|" + fmt::format("{}", ygg::make_view(data.predicates, repository)) + "|" + fmt::format("{}", ygg::make_view(data.axioms, repository));
 }
 
+// Canonicalize a list (sort + deduplicate) by each element's rendered string key.
+//
+// This mirrors yggdrasil's context-aware ygg::canonicalize(context, list), but renders each element's
+// key exactly once (Schwartzian transform) instead of recomputing it on every comparison. That turns
+// O(n log n) string renders into O(n), which matters for problems with large :init lists.
+//
+// The key is computed with ygg::detail::fmt_key (the very function the original comparator used), so the
+// resulting order and deduplication are byte-for-byte identical to the previous behavior.
+template<typename ListT>
+void canonicalize_list(const Repository& repository, ListT& list)
+{
+    const auto n = list.size();
+    if (n < 2)
+        return; // 0 or 1 element: already canonical, no duplicates possible.
+
+    auto keyed = std::vector<std::pair<std::string, std::size_t>> {}; // (render key, original position)
+    keyed.reserve(n);
+    for (std::size_t i = 0; i < n; ++i)
+        keyed.emplace_back(ygg::detail::fmt_key(repository, list[i]), i); // render once each: O(n)
+
+    const auto by_key = [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; };
+    if (!std::is_sorted(keyed.begin(), keyed.end(), by_key)) // skip the sort when already canonical (e.g. across translation phases)
+        std::sort(keyed.begin(), keyed.end(), by_key);
+
+    auto result = ListT {};
+    for (std::size_t k = 0; k < n; ++k)
+    {
+        if (k > 0 && keyed[k].first == keyed[k - 1].first)
+            continue; // drop duplicate (equal key == identical entity within one repository)
+        result.push_back(list[keyed[k].second]);
+    }
+    list = std::move(result);
+}
+
+// Read-only counterpart of canonicalize_list: returns whether the list is already canonical, i.e. its
+// elements' render keys are strictly increasing (sorted and free of duplicates). Renders each key once.
+template<typename ListT>
+bool is_canonical_list(const Repository& repository, const ListT& list)
+{
+    const auto n = list.size();
+    if (n < 2)
+        return true;
+
+    auto previous = ygg::detail::fmt_key(repository, list[0]);
+    for (std::size_t i = 1; i < n; ++i)
+    {
+        auto current = ygg::detail::fmt_key(repository, list[i]);
+        if (!(previous < current)) // not strictly increasing => unsorted or duplicate
+            return false;
+        previous = std::move(current);
+    }
+    return true;
+}
+
 } // namespace loki::formalism::detail
 
 namespace loki::formalism
@@ -253,37 +310,73 @@ inline void canonicalize(Repository&, ygg::Data<T>&) noexcept
 {
 }
 
-inline void canonicalize(Repository& repository, ygg::Data<Type>& data) { ygg::canonicalize(repository, data.bases); }
-inline void canonicalize(Repository& repository, ygg::Data<Object>& data) { ygg::canonicalize(repository, data.types); }
-inline void canonicalize(Repository& repository, ygg::Data<Parameter>& data) { ygg::canonicalize(repository, data.types); }
-inline void canonicalize(Repository& repository, ygg::Data<MultiFunctionExpression>& data) { ygg::canonicalize(repository, data.expressions); }
-inline void canonicalize(Repository& repository, ygg::Data<ConditionAnd>& data) { ygg::canonicalize(repository, data.conditions); }
-inline void canonicalize(Repository& repository, ygg::Data<ConditionOr>& data) { ygg::canonicalize(repository, data.conditions); }
-inline void canonicalize(Repository& repository, ygg::Data<ConditionExists>& data) { ygg::canonicalize(repository, data.parameters); }
-inline void canonicalize(Repository& repository, ygg::Data<ConditionForall>& data) { ygg::canonicalize(repository, data.parameters); }
-inline void canonicalize(Repository& repository, ygg::Data<EffectAnd>& data) { ygg::canonicalize(repository, data.effects); }
-inline void canonicalize(Repository& repository, ygg::Data<EffectOneOf>& data) { ygg::canonicalize(repository, data.effects); }
-inline void canonicalize(Repository& repository, ygg::Data<EffectProbabilistic>& data) { ygg::canonicalize(repository, data.alternatives); }
+inline void canonicalize(Repository& repository, ygg::Data<Type>& data) { detail::canonicalize_list(repository, data.bases); }
+inline void canonicalize(Repository& repository, ygg::Data<Object>& data) { detail::canonicalize_list(repository, data.types); }
+inline void canonicalize(Repository& repository, ygg::Data<Parameter>& data) { detail::canonicalize_list(repository, data.types); }
+inline void canonicalize(Repository& repository, ygg::Data<MultiFunctionExpression>& data) { detail::canonicalize_list(repository, data.expressions); }
+inline void canonicalize(Repository& repository, ygg::Data<ConditionAnd>& data) { detail::canonicalize_list(repository, data.conditions); }
+inline void canonicalize(Repository& repository, ygg::Data<ConditionOr>& data) { detail::canonicalize_list(repository, data.conditions); }
+inline void canonicalize(Repository& repository, ygg::Data<ConditionExists>& data) { detail::canonicalize_list(repository, data.parameters); }
+inline void canonicalize(Repository& repository, ygg::Data<ConditionForall>& data) { detail::canonicalize_list(repository, data.parameters); }
+inline void canonicalize(Repository& repository, ygg::Data<EffectAnd>& data) { detail::canonicalize_list(repository, data.effects); }
+inline void canonicalize(Repository& repository, ygg::Data<EffectOneOf>& data) { detail::canonicalize_list(repository, data.effects); }
+inline void canonicalize(Repository& repository, ygg::Data<EffectProbabilistic>& data) { detail::canonicalize_list(repository, data.alternatives); }
 
 inline void canonicalize(Repository& repository, ygg::Data<Domain>& data)
 {
-    ygg::canonicalize(repository, data.requirements);
-    ygg::canonicalize(repository, data.types);
-    ygg::canonicalize(repository, data.constants);
-    ygg::canonicalize(repository, data.predicates);
-    ygg::canonicalize(repository, data.functions);
-    ygg::canonicalize(repository, data.actions);
-    ygg::canonicalize(repository, data.axioms);
+    detail::canonicalize_list(repository, data.requirements);
+    detail::canonicalize_list(repository, data.types);
+    detail::canonicalize_list(repository, data.constants);
+    detail::canonicalize_list(repository, data.predicates);
+    detail::canonicalize_list(repository, data.functions);
+    detail::canonicalize_list(repository, data.actions);
+    detail::canonicalize_list(repository, data.axioms);
 }
 
 inline void canonicalize(Repository& repository, ygg::Data<Task>& data)
 {
-    ygg::canonicalize(repository, data.requirements);
-    ygg::canonicalize(repository, data.objects);
-    ygg::canonicalize(repository, data.initial_literals);
-    ygg::canonicalize(repository, data.initial_function_values);
-    ygg::canonicalize(repository, data.predicates);
-    ygg::canonicalize(repository, data.axioms);
+    detail::canonicalize_list(repository, data.requirements);
+    detail::canonicalize_list(repository, data.objects);
+    detail::canonicalize_list(repository, data.initial_literals);
+    detail::canonicalize_list(repository, data.initial_function_values);
+    detail::canonicalize_list(repository, data.predicates);
+    detail::canonicalize_list(repository, data.axioms);
+}
+
+// Context-aware is_canonical: the safety-check counterpart of canonicalize(Repository&, Data<T>&).
+// Types without sortable list members are canonical by construction (generic overload). The remaining
+// types verify each list member with detail::is_canonical_list instead of blindly returning true.
+template<typename T>
+inline bool is_canonical(const Repository&, const ygg::Data<T>&) noexcept
+{
+    return true;
+}
+
+inline bool is_canonical(const Repository& repository, const ygg::Data<Type>& data) { return detail::is_canonical_list(repository, data.bases); }
+inline bool is_canonical(const Repository& repository, const ygg::Data<Object>& data) { return detail::is_canonical_list(repository, data.types); }
+inline bool is_canonical(const Repository& repository, const ygg::Data<Parameter>& data) { return detail::is_canonical_list(repository, data.types); }
+inline bool is_canonical(const Repository& repository, const ygg::Data<MultiFunctionExpression>& data) { return detail::is_canonical_list(repository, data.expressions); }
+inline bool is_canonical(const Repository& repository, const ygg::Data<ConditionAnd>& data) { return detail::is_canonical_list(repository, data.conditions); }
+inline bool is_canonical(const Repository& repository, const ygg::Data<ConditionOr>& data) { return detail::is_canonical_list(repository, data.conditions); }
+inline bool is_canonical(const Repository& repository, const ygg::Data<ConditionExists>& data) { return detail::is_canonical_list(repository, data.parameters); }
+inline bool is_canonical(const Repository& repository, const ygg::Data<ConditionForall>& data) { return detail::is_canonical_list(repository, data.parameters); }
+inline bool is_canonical(const Repository& repository, const ygg::Data<EffectAnd>& data) { return detail::is_canonical_list(repository, data.effects); }
+inline bool is_canonical(const Repository& repository, const ygg::Data<EffectOneOf>& data) { return detail::is_canonical_list(repository, data.effects); }
+inline bool is_canonical(const Repository& repository, const ygg::Data<EffectProbabilistic>& data) { return detail::is_canonical_list(repository, data.alternatives); }
+
+inline bool is_canonical(const Repository& repository, const ygg::Data<Domain>& data)
+{
+    return detail::is_canonical_list(repository, data.requirements) && detail::is_canonical_list(repository, data.types)
+        && detail::is_canonical_list(repository, data.constants) && detail::is_canonical_list(repository, data.predicates)
+        && detail::is_canonical_list(repository, data.functions) && detail::is_canonical_list(repository, data.actions)
+        && detail::is_canonical_list(repository, data.axioms);
+}
+
+inline bool is_canonical(const Repository& repository, const ygg::Data<Task>& data)
+{
+    return detail::is_canonical_list(repository, data.requirements) && detail::is_canonical_list(repository, data.objects)
+        && detail::is_canonical_list(repository, data.initial_literals) && detail::is_canonical_list(repository, data.initial_function_values)
+        && detail::is_canonical_list(repository, data.predicates) && detail::is_canonical_list(repository, data.axioms);
 }
 
 } // namespace loki::formalism
