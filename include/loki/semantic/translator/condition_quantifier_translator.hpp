@@ -30,15 +30,15 @@ public:
     explicit ConditionQuantifierTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, ConditionQuantifierTranslator<Derived>>(context) {}
 
     formalism::ConditionView make_generated_axiom_condition(formalism::ConditionView condition);
-    formalism::ConditionView remove_universal_quantifiers(formalism::ConditionView condition, const formalism::Repository& repository);
-    formalism::ConditionView remove_universal_quantifiers_node(formalism::ConditionAndView source, const formalism::Repository& repository);
-    formalism::ConditionView remove_universal_quantifiers_node(formalism::ConditionOrView source, const formalism::Repository& repository);
-    formalism::ConditionView remove_universal_quantifiers_node(formalism::ConditionNotView source, const formalism::Repository& repository);
-    formalism::ConditionView remove_universal_quantifiers_node(formalism::ConditionImplyView source, const formalism::Repository& repository);
-    formalism::ConditionView remove_universal_quantifiers_node(formalism::ConditionExistsView source, const formalism::Repository& repository);
-    formalism::ConditionView remove_universal_quantifiers_node(formalism::ConditionForallView source, const formalism::Repository& repository);
+    formalism::ConditionView remove_universal_quantifiers(formalism::ConditionView condition);
+    formalism::ConditionView remove_universal_quantifiers_node(formalism::ConditionAndView source);
+    formalism::ConditionView remove_universal_quantifiers_node(formalism::ConditionOrView source);
+    formalism::ConditionView remove_universal_quantifiers_node(formalism::ConditionNotView source);
+    formalism::ConditionView remove_universal_quantifiers_node(formalism::ConditionImplyView source);
+    formalism::ConditionView remove_universal_quantifiers_node(formalism::ConditionExistsView source);
+    formalism::ConditionView remove_universal_quantifiers_node(formalism::ConditionForallView source);
     template<typename T>
-    formalism::ConditionView remove_universal_quantifiers_node(formalism::EntityView<T> source, const formalism::Repository& repository);
+    formalism::ConditionView remove_universal_quantifiers_node(formalism::EntityView<T> source);
     std::optional<formalism::ConditionExistsView> as_exists(formalism::ConditionView condition) const;
     formalism::ConditionView move_existentials(formalism::ConditionView condition);
     formalism::ConditionView move_existentials_node(formalism::ConditionView condition, formalism::ConditionAndView node);
@@ -87,85 +87,77 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::make_generated_
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers(formalism::ConditionView condition,
-                                                                                              const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers(formalism::ConditionView condition)
 {
-    return ygg::visit([&](const auto& node) { return this->self().remove_universal_quantifiers_node(node, repository); }, condition.get_value());
+    return ygg::visit([&](const auto& node) { return this->self().remove_universal_quantifiers_node(node); }, condition.get_value());
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionAndView source,
-                                                                                                   const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionAndView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : source.get_conditions())
-        conditions.push_back(as_index(this->self().remove_universal_quantifiers(condition, repository)));
+        conditions.push_back(as_index(this->self().remove_universal_quantifiers(condition)));
     return this->self().make_conjunction(std::move(conditions));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionOrView source,
-                                                                                                   const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionOrView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : source.get_conditions())
-        conditions.push_back(as_index(this->self().remove_universal_quantifiers(condition, repository)));
+        conditions.push_back(as_index(this->self().remove_universal_quantifiers(condition)));
     return this->self().make_disjunction(std::move(conditions));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionNotView source,
-                                                                                                   const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionNotView source)
 {
     return this->self().wrap_condition(
         formalism::get_or_create<formalism::ConditionNot>(this->m_storage->repository,
-                                                          as_index(this->self().remove_universal_quantifiers(source.get_condition(), repository))));
+                                                          as_index(this->self().remove_universal_quantifiers(source.get_condition()))));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionImplyView source,
-                                                                                                   const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionImplyView source)
 {
     return this->self().wrap_condition(
         formalism::get_or_create<formalism::ConditionImply>(this->m_storage->repository,
-                                                            as_index(this->self().remove_universal_quantifiers(source.get_left(), repository)),
-                                                            as_index(this->self().remove_universal_quantifiers(source.get_right(), repository))));
+                                                            as_index(this->self().remove_universal_quantifiers(source.get_left())),
+                                                            as_index(this->self().remove_universal_quantifiers(source.get_right()))));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionExistsView source,
-                                                                                                   const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionExistsView source)
 {
     this->self().increment_quantifications(source.get_parameters());
     auto parameters = this->self().copy_parameters(source.get_parameters());
     this->self().enter_scope(parameters, source.get_parameters());
-    auto condition = as_index(this->self().remove_universal_quantifiers(source.get_condition(), repository));
+    auto condition = as_index(this->self().remove_universal_quantifiers(source.get_condition()));
     this->self().leave_scope();
     return this->self().flatten_condition(
         this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), condition)));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionForallView source,
-                                                                                                   const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionForallView source)
 {
     this->self().increment_quantifications(source.get_parameters());
     auto parameters = this->self().copy_parameters(source.get_parameters());
     this->self().enter_scope(parameters, source.get_parameters());
-    auto negated = as_index(this->self().negate_condition(source.get_condition(), repository));
+    auto negated = as_index(this->self().negate_condition(source.get_condition()));
     this->self().leave_scope();
     const auto exists_not = this->self().flatten_condition(
         this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), negated)));
-    const auto translated_exists_not = this->self().remove_universal_quantifiers(exists_not, this->m_storage->repository);
+    const auto translated_exists_not = this->self().remove_universal_quantifiers(exists_not);
     return this->self().make_generated_axiom_condition(translated_exists_not);
 }
 
 template<typename Derived>
 template<typename T>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::EntityView<T> source,
-                                                                                                   const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::EntityView<T> source)
 {
-    return this->self().wrap_condition(this->self().copy(source, repository));
+    return this->self().wrap_condition(this->self().copy(source));
 }
 
 template<typename Derived>

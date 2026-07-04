@@ -30,19 +30,19 @@ public:
     explicit ConditionNnfTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, ConditionNnfTranslator<Derived>>(context) {}
 
     formalism::BinaryComparator negate_comparator(formalism::BinaryComparator comparator);
-    formalism::ConditionView negate_condition(formalism::ConditionView source, const formalism::Repository& repository);
-    formalism::ConditionView negate_condition_node(formalism::ConditionLiteralView source, const formalism::Repository& repository);
-    formalism::ConditionView negate_condition_node(formalism::ConditionAndView source, const formalism::Repository& repository);
-    formalism::ConditionView negate_condition_node(formalism::ConditionOrView source, const formalism::Repository& repository);
-    formalism::ConditionView negate_condition_node(formalism::ConditionNotView source, const formalism::Repository& repository);
-    formalism::ConditionView negate_condition_node(formalism::ConditionImplyView source, const formalism::Repository& repository);
-    formalism::ConditionView negate_condition_node(formalism::ConditionExistsView source, const formalism::Repository& repository);
-    formalism::ConditionView negate_condition_node(formalism::ConditionForallView source, const formalism::Repository& repository);
-    formalism::ConditionView negate_condition_node(formalism::ConditionNumericConstraintView source, const formalism::Repository& repository);
-    formalism::ConditionView copy_condition_node(formalism::ConditionNotView source, const formalism::Repository& repository);
-    formalism::ConditionView copy_condition_node(formalism::ConditionImplyView source, const formalism::Repository& repository);
+    formalism::ConditionView negate_condition(formalism::ConditionView source);
+    formalism::ConditionView negate_condition_node(formalism::ConditionLiteralView source);
+    formalism::ConditionView negate_condition_node(formalism::ConditionAndView source);
+    formalism::ConditionView negate_condition_node(formalism::ConditionOrView source);
+    formalism::ConditionView negate_condition_node(formalism::ConditionNotView source);
+    formalism::ConditionView negate_condition_node(formalism::ConditionImplyView source);
+    formalism::ConditionView negate_condition_node(formalism::ConditionExistsView source);
+    formalism::ConditionView negate_condition_node(formalism::ConditionForallView source);
+    formalism::ConditionView negate_condition_node(formalism::ConditionNumericConstraintView source);
+    formalism::ConditionView copy_condition_node(formalism::ConditionNotView source);
+    formalism::ConditionView copy_condition_node(formalism::ConditionImplyView source);
     template<typename T>
-    formalism::ConditionView copy_condition_node(formalism::EntityView<T> source, const formalism::Repository& repository);
+    formalism::ConditionView copy_condition_node(formalism::EntityView<T> source);
 };
 
 template<typename Derived>
@@ -67,110 +67,107 @@ formalism::BinaryComparator ConditionNnfTranslator<Derived>::negate_comparator(f
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition(formalism::ConditionView source, const formalism::Repository& repository)
+formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition(formalism::ConditionView source)
 {
-    return ygg::visit([&](const auto& arg) { return this->self().negate_condition_node(arg, repository); }, source.get_value());
+    return ygg::visit([&](const auto& arg) { return this->self().negate_condition_node(arg); }, source.get_value());
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionLiteralView source, const formalism::Repository& repository)
+formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionLiteralView source)
 {
     const auto literal = source.get_literal();
-    const auto negated_literal = formalism::get_or_create<formalism::Literal>(this->m_storage->repository,
-                                                                              as_index(this->self().copy(literal.get_atom(), repository)),
-                                                                              !literal.get_polarity());
+    const auto negated_literal =
+        formalism::get_or_create<formalism::Literal>(this->m_storage->repository, as_index(this->self().copy(literal.get_atom())), !literal.get_polarity());
     return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, negated_literal));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionAndView source, const formalism::Repository& repository)
+formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionAndView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : source.get_conditions())
-        conditions.push_back(as_index(this->self().negate_condition(condition, repository)));
+        conditions.push_back(as_index(this->self().negate_condition(condition)));
     return this->self().make_disjunction(std::move(conditions));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionOrView source, const formalism::Repository& repository)
+formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionOrView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : source.get_conditions())
-        conditions.push_back(as_index(this->self().negate_condition(condition, repository)));
+        conditions.push_back(as_index(this->self().negate_condition(condition)));
     return this->self().make_conjunction(std::move(conditions));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionNotView source, const formalism::Repository& repository)
+formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionNotView source)
 {
-    return this->self().copy(source.get_condition(), repository);
+    return this->self().copy(source.get_condition());
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionImplyView source, const formalism::Repository& repository)
+formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionImplyView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
-    conditions.push_back(as_index(this->self().copy(source.get_left(), repository)));
-    conditions.push_back(as_index(this->self().negate_condition(source.get_right(), repository)));
+    conditions.push_back(as_index(this->self().copy(source.get_left())));
+    conditions.push_back(as_index(this->self().negate_condition(source.get_right())));
     return this->self().make_conjunction(std::move(conditions));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionExistsView source, const formalism::Repository& repository)
+formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionExistsView source)
 {
     this->self().increment_quantifications(source.get_parameters());
     auto parameters = this->self().copy_parameters(source.get_parameters());
     this->self().enter_scope(parameters, source.get_parameters());
-    auto condition = as_index(this->self().negate_condition(source.get_condition(), repository));
+    auto condition = as_index(this->self().negate_condition(source.get_condition()));
     this->self().leave_scope();
     return this->self().flatten_condition(
         this->self().wrap_condition(formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository, std::move(parameters), condition)));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionForallView source, const formalism::Repository& repository)
+formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionForallView source)
 {
     this->self().increment_quantifications(source.get_parameters());
     auto parameters = this->self().copy_parameters(source.get_parameters());
     this->self().enter_scope(parameters, source.get_parameters());
-    auto condition = as_index(this->self().negate_condition(source.get_condition(), repository));
+    auto condition = as_index(this->self().negate_condition(source.get_condition()));
     this->self().leave_scope();
     return this->self().flatten_condition(
         this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), condition)));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionNumericConstraintView source,
-                                                                                const formalism::Repository& repository)
+formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionNumericConstraintView source)
 {
     const auto& data = source.get_data();
-    return this->self().wrap_condition(
-        formalism::get_or_create<formalism::ConditionNumericConstraint>(this->m_storage->repository,
-                                                                        this->self().negate_comparator(data.comparator),
-                                                                        as_index(this->self().copy(source.get_left(), repository)),
-                                                                        as_index(this->self().copy(source.get_right(), repository))));
+    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionNumericConstraint>(this->m_storage->repository,
+                                                                                                       this->self().negate_comparator(data.comparator),
+                                                                                                       as_index(this->self().copy(source.get_left())),
+                                                                                                       as_index(this->self().copy(source.get_right()))));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(formalism::ConditionNotView source, const formalism::Repository& repository)
+formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(formalism::ConditionNotView source)
 {
-    return this->self().negate_condition(source.get_condition(), repository);
+    return this->self().negate_condition(source.get_condition());
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(formalism::ConditionImplyView source, const formalism::Repository& repository)
+formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(formalism::ConditionImplyView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
-    conditions.push_back(as_index(this->self().negate_condition(source.get_left(), repository)));
-    conditions.push_back(as_index(this->self().copy(source.get_right(), repository)));
+    conditions.push_back(as_index(this->self().negate_condition(source.get_left())));
+    conditions.push_back(as_index(this->self().copy(source.get_right())));
     return this->self().make_disjunction(std::move(conditions));
 }
 
 template<typename Derived>
 template<typename T>
-formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(formalism::EntityView<T> source, const formalism::Repository& repository)
+formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(formalism::EntityView<T> source)
 {
-    return this->self().wrap_condition(this->self().copy(source, repository));
+    return this->self().wrap_condition(this->self().copy(source));
 }
 
 }  // namespace loki::semantic::detail

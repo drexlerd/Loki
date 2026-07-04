@@ -184,7 +184,7 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::multiply_condit
                 }
                 else
                 {
-                    conditions.push_back(as_index(this->self().negate_condition(conditional[i].condition, this->m_storage->repository)));
+                    conditions.push_back(as_index(this->self().negate_condition(conditional[i].condition)));
                 }
             }
 
@@ -314,16 +314,16 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
         {
             this->m_num_quantifications.clear();
             this->self().enter_variable_scope();
-            const auto renamed_goal = this->self().rename_variables(goal.value(), task.get_context());
+            const auto renamed_goal = this->self().rename_variables(goal.value());
             this->self().leave_variable_scope();
             const auto previous = this->m_renaming_enabled;
             this->m_renaming_enabled = false;
-            data.goal = as_index(this->self().copy(renamed_goal, this->m_storage->repository));
+            data.goal = as_index(this->self().copy(renamed_goal));
             this->m_renaming_enabled = previous;
         }
         else
         {
-            data.goal = as_index(this->self().copy(goal.value(), task.get_context()));
+            data.goal = as_index(this->self().copy(goal.value()));
         }
     }
     else
@@ -332,7 +332,7 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
     }
 
     if (const auto metric = task.get_metric())
-        data.metric = as_index(this->self().copy(metric.value(), task.get_context()));
+        data.metric = as_index(this->self().copy(metric.value()));
     else
         data.metric = {};
     data.predicates = this->self().template copy_list<formalism::Predicate>(task.get_predicates());

@@ -29,70 +29,70 @@ class ConditionTranslator : public CopyTranslatorComponent<Derived, ConditionTra
 public:
     explicit ConditionTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, ConditionTranslator<Derived>>(context) {}
 
-    formalism::ConditionLiteralView copy(formalism::ConditionLiteralView source, const formalism::Repository& repository);
+    formalism::ConditionLiteralView copy(formalism::ConditionLiteralView source);
 
-    formalism::ConditionAndView copy(formalism::ConditionAndView source, const formalism::Repository& repository);
+    formalism::ConditionAndView copy(formalism::ConditionAndView source);
 
-    formalism::ConditionOrView copy(formalism::ConditionOrView source, const formalism::Repository& repository);
+    formalism::ConditionOrView copy(formalism::ConditionOrView source);
 
-    formalism::ConditionNotView copy(formalism::ConditionNotView source, const formalism::Repository& repository);
+    formalism::ConditionNotView copy(formalism::ConditionNotView source);
 
-    formalism::ConditionImplyView copy(formalism::ConditionImplyView source, const formalism::Repository& repository);
+    formalism::ConditionImplyView copy(formalism::ConditionImplyView source);
 
-    formalism::ConditionExistsView copy(formalism::ConditionExistsView source, const formalism::Repository& repository);
+    formalism::ConditionExistsView copy(formalism::ConditionExistsView source);
 
-    formalism::ConditionForallView copy(formalism::ConditionForallView source, const formalism::Repository& repository);
+    formalism::ConditionForallView copy(formalism::ConditionForallView source);
 
-    formalism::ConditionNumericConstraintView copy(formalism::ConditionNumericConstraintView source, const formalism::Repository& repository);
+    formalism::ConditionNumericConstraintView copy(formalism::ConditionNumericConstraintView source);
 
-    formalism::ConditionView copy(formalism::ConditionView source, const formalism::Repository& repository);
+    formalism::ConditionView copy(formalism::ConditionView source);
 };
 
 template<typename Derived>
-formalism::ConditionLiteralView ConditionTranslator<Derived>::copy(formalism::ConditionLiteralView source, const formalism::Repository& repository)
+formalism::ConditionLiteralView ConditionTranslator<Derived>::copy(formalism::ConditionLiteralView source)
 {
-    return formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, as_index(this->self().copy(source.get_literal(), repository)));
+    return formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, as_index(this->self().copy(source.get_literal())));
 }
 
 template<typename Derived>
-formalism::ConditionAndView ConditionTranslator<Derived>::copy(formalism::ConditionAndView source, const formalism::Repository& repository)
+formalism::ConditionAndView ConditionTranslator<Derived>::copy(formalism::ConditionAndView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : source.get_conditions())
-        conditions.push_back(as_index(this->self().copy(condition, repository)));
+        conditions.push_back(as_index(this->self().copy(condition)));
     return formalism::get_or_create<formalism::ConditionAnd>(this->m_storage->repository, std::move(conditions));
 }
 
 template<typename Derived>
-formalism::ConditionOrView ConditionTranslator<Derived>::copy(formalism::ConditionOrView source, const formalism::Repository& repository)
+formalism::ConditionOrView ConditionTranslator<Derived>::copy(formalism::ConditionOrView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : source.get_conditions())
-        conditions.push_back(as_index(this->self().copy(condition, repository)));
+        conditions.push_back(as_index(this->self().copy(condition)));
     return formalism::get_or_create<formalism::ConditionOr>(this->m_storage->repository, std::move(conditions));
 }
 
 template<typename Derived>
-formalism::ConditionNotView ConditionTranslator<Derived>::copy(formalism::ConditionNotView source, const formalism::Repository& repository)
+formalism::ConditionNotView ConditionTranslator<Derived>::copy(formalism::ConditionNotView source)
 {
-    return formalism::get_or_create<formalism::ConditionNot>(this->m_storage->repository, as_index(this->self().copy(source.get_condition(), repository)));
+    return formalism::get_or_create<formalism::ConditionNot>(this->m_storage->repository, as_index(this->self().copy(source.get_condition())));
 }
 
 template<typename Derived>
-formalism::ConditionImplyView ConditionTranslator<Derived>::copy(formalism::ConditionImplyView source, const formalism::Repository& repository)
+formalism::ConditionImplyView ConditionTranslator<Derived>::copy(formalism::ConditionImplyView source)
 {
     return formalism::get_or_create<formalism::ConditionImply>(this->m_storage->repository,
-                                                               as_index(this->self().copy(source.get_left(), repository)),
-                                                               as_index(this->self().copy(source.get_right(), repository)));
+                                                               as_index(this->self().copy(source.get_left())),
+                                                               as_index(this->self().copy(source.get_right())));
 }
 
 template<typename Derived>
-formalism::ConditionExistsView ConditionTranslator<Derived>::copy(formalism::ConditionExistsView source, const formalism::Repository& repository)
+formalism::ConditionExistsView ConditionTranslator<Derived>::copy(formalism::ConditionExistsView source)
 {
     this->self().increment_quantifications(source.get_parameters());
     auto parameters = this->self().copy_parameters(source.get_parameters());
     this->self().enter_scope(parameters, source.get_parameters());
-    const auto condition = as_index(this->self().copy(source.get_condition(), repository));
+    const auto condition = as_index(this->self().copy(source.get_condition()));
     this->self().leave_scope();
     auto typed_condition = condition;
     if (this->m_phase == TranslationPhase::AddTypePredicates)
@@ -102,12 +102,12 @@ formalism::ConditionExistsView ConditionTranslator<Derived>::copy(formalism::Con
 }
 
 template<typename Derived>
-formalism::ConditionForallView ConditionTranslator<Derived>::copy(formalism::ConditionForallView source, const formalism::Repository& repository)
+formalism::ConditionForallView ConditionTranslator<Derived>::copy(formalism::ConditionForallView source)
 {
     this->self().increment_quantifications(source.get_parameters());
     auto parameters = this->self().copy_parameters(source.get_parameters());
     this->self().enter_scope(parameters, source.get_parameters());
-    const auto condition = as_index(this->self().copy(source.get_condition(), repository));
+    const auto condition = as_index(this->self().copy(source.get_condition()));
     this->self().leave_scope();
     auto typed_condition = condition;
     if (this->m_phase == TranslationPhase::AddTypePredicates)
@@ -117,35 +117,32 @@ formalism::ConditionForallView ConditionTranslator<Derived>::copy(formalism::Con
 }
 
 template<typename Derived>
-formalism::ConditionNumericConstraintView ConditionTranslator<Derived>::copy(formalism::ConditionNumericConstraintView source,
-                                                                             const formalism::Repository& repository)
+formalism::ConditionNumericConstraintView ConditionTranslator<Derived>::copy(formalism::ConditionNumericConstraintView source)
 {
     const auto& data = source.get_data();
     return formalism::get_or_create<formalism::ConditionNumericConstraint>(this->m_storage->repository,
                                                                            data.comparator,
-                                                                           as_index(this->self().copy(source.get_left(), repository)),
-                                                                           as_index(this->self().copy(source.get_right(), repository)));
+                                                                           as_index(this->self().copy(source.get_left())),
+                                                                           as_index(this->self().copy(source.get_right())));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionTranslator<Derived>::copy(formalism::ConditionView source, const formalism::Repository& repository)
+formalism::ConditionView ConditionTranslator<Derived>::copy(formalism::ConditionView source)
 {
     switch (this->m_phase)
     {
         case TranslationPhase::ToNegationNormalForm:
-            return this->self().flatten_condition(
-                ygg::visit([&](const auto& arg) { return this->self().copy_condition_node(arg, repository); }, source.get_value()));
+            return this->self().flatten_condition(ygg::visit([&](const auto& arg) { return this->self().copy_condition_node(arg); }, source.get_value()));
         case TranslationPhase::RemoveUniversalQuantifiers:
-            return this->self().remove_universal_quantifiers(source, repository);
+            return this->self().remove_universal_quantifiers(source);
         case TranslationPhase::ToDisjunctiveNormalForm:
         {
-            const auto copied =
-                ygg::visit([&](const auto& arg) { return this->self().wrap_condition(this->self().copy(arg, repository)); }, source.get_value());
+            const auto copied = ygg::visit([&](const auto& arg) { return this->self().wrap_condition(this->self().copy(arg)); }, source.get_value());
             return this->self().flatten_condition(this->self().to_dnf(copied));
         }
         default:
             return this->self().flatten_condition(
-                ygg::visit([&](const auto& arg) { return this->self().wrap_condition(this->self().copy(arg, repository)); }, source.get_value()));
+                ygg::visit([&](const auto& arg) { return this->self().wrap_condition(this->self().copy(arg)); }, source.get_value()));
     }
 }
 

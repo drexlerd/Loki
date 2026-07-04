@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include "loki/semantic/parser.hpp"
 
 #include <fstream>
@@ -53,7 +52,7 @@ Parser::Parser(const std::string& domain_source, parser::ParserOptions options) 
 Parser::Parser(const fs::path& domain_path, parser::ParserOptions options) : Parser(read_file(domain_path), options) {}
 const formalism::Repository& Parser::repository() const noexcept { return repo(); }
 formalism::Repository& Parser::repository() noexcept { return repo(); }
-formalism::DomainView Parser::get_domain() const noexcept { return ygg::make_view(*m_domain, repo()); }
+formalism::DomainView Parser::get_domain() const noexcept { return *m_domain; }
 formalism::TaskView Parser::parse_task(const std::string& source)
 {
     auto first = source.cbegin();
@@ -134,7 +133,7 @@ void Parser::rebuild_domain_symbols()
             self(self, base);
     };
 
-    const auto& domain = repo()[*m_domain];
+    const auto& domain = m_domain->get_data();
     for (auto requirement : domain.requirements)
         remember_requirement(repo()[requirement].kind);
     m_domain_requirement_kinds = m_active_requirements;
@@ -178,7 +177,7 @@ formalism::TaskView Parser::canonicalize_task(formalism::TaskView task, const st
     auto copier = detail::CanonicalCopyTranslator(canonical);
     auto copied = copier.copy_task(task);
     m_task_storages.push_back(canonical);
-    return ygg::make_view(copied.get_index(), m_task_storages.back()->repository);
+    return copied;
 }
 std::string Parser::key(std::string text)
 {
@@ -587,7 +586,7 @@ formalism::TaskView Parser::parse_task_ast(const ast::Task& task)
     }
 
     auto data = ygg::Data<formalism::Task>(to_cista(task.name.text),
-                                           *m_domain,
+                                           m_domain->get_index(),
                                            std::move(requirements),
                                            std::move(objects),
                                            std::move(initial_literals),
@@ -634,7 +633,7 @@ void Parser::canonicalize_domain(formalism::DomainView domain)
     auto copied = copier.copy_domain(domain);
     m_storage = std::move(canonical);
     m_task_storages.clear();
-    m_domain = copied.get_index();
+    m_domain = copied;
     rebuild_domain_symbols();
 }
 

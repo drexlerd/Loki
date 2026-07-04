@@ -31,61 +31,61 @@ class EffectTranslator : public CopyTranslatorComponent<Derived, EffectTranslato
 public:
     explicit EffectTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, EffectTranslator<Derived>>(context) {}
 
-    formalism::EffectLiteralView copy(formalism::EffectLiteralView source, const formalism::Repository& repository);
+    formalism::EffectLiteralView copy(formalism::EffectLiteralView source);
 
-    formalism::EffectAndView copy(formalism::EffectAndView source, const formalism::Repository& repository);
+    formalism::EffectAndView copy(formalism::EffectAndView source);
 
-    formalism::EffectNumericView copy(formalism::EffectNumericView source, const formalism::Repository& repository);
+    formalism::EffectNumericView copy(formalism::EffectNumericView source);
 
-    formalism::EffectForallView copy(formalism::EffectForallView source, const formalism::Repository& repository);
+    formalism::EffectForallView copy(formalism::EffectForallView source);
 
-    formalism::EffectWhenView copy(formalism::EffectWhenView source, const formalism::Repository& repository);
+    formalism::EffectWhenView copy(formalism::EffectWhenView source);
 
-    formalism::EffectOneOfView copy(formalism::EffectOneOfView source, const formalism::Repository& repository);
+    formalism::EffectOneOfView copy(formalism::EffectOneOfView source);
 
-    formalism::EffectProbabilisticAlternativeView copy(formalism::EffectProbabilisticAlternativeView source, const formalism::Repository& repository);
+    formalism::EffectProbabilisticAlternativeView copy(formalism::EffectProbabilisticAlternativeView source);
 
-    formalism::EffectProbabilisticView copy(formalism::EffectProbabilisticView source, const formalism::Repository& repository);
+    formalism::EffectProbabilisticView copy(formalism::EffectProbabilisticView source);
 
-    formalism::EffectView copy(formalism::EffectView source, const formalism::Repository& repository);
+    formalism::EffectView copy(formalism::EffectView source);
 };
 
 template<typename Derived>
-formalism::EffectLiteralView EffectTranslator<Derived>::copy(formalism::EffectLiteralView source, const formalism::Repository& repository)
+formalism::EffectLiteralView EffectTranslator<Derived>::copy(formalism::EffectLiteralView source)
 {
-    return formalism::get_or_create<formalism::EffectLiteral>(this->m_storage->repository, as_index(this->self().copy(source.get_literal(), repository)));
+    return formalism::get_or_create<formalism::EffectLiteral>(this->m_storage->repository, as_index(this->self().copy(source.get_literal())));
 }
 
 template<typename Derived>
-formalism::EffectAndView EffectTranslator<Derived>::copy(formalism::EffectAndView source, const formalism::Repository& repository)
+formalism::EffectAndView EffectTranslator<Derived>::copy(formalism::EffectAndView source)
 {
     auto effects = ygg::IndexList<formalism::Effect> {};
     for (auto effect : source.get_effects())
-        effects.push_back(as_index(this->self().copy(effect, repository)));
+        effects.push_back(as_index(this->self().copy(effect)));
     return formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects));
 }
 
 template<typename Derived>
-formalism::EffectNumericView EffectTranslator<Derived>::copy(formalism::EffectNumericView source, const formalism::Repository& repository)
+formalism::EffectNumericView EffectTranslator<Derived>::copy(formalism::EffectNumericView source)
 {
     const auto& data = source.get_data();
     auto terms = ygg::IndexList<formalism::Term> {};
     for (auto term : source.get_terms())
-        terms.push_back(as_index(this->self().copy(term, repository)));
+        terms.push_back(as_index(this->self().copy(term)));
     return formalism::get_or_create<formalism::EffectNumeric>(this->m_storage->repository,
                                                               data.op,
-                                                              as_index(this->self().copy(source.get_function(), repository)),
+                                                              as_index(this->self().copy(source.get_function())),
                                                               std::move(terms),
-                                                              as_index(this->self().copy(source.get_expression(), repository)));
+                                                              as_index(this->self().copy(source.get_expression())));
 }
 
 template<typename Derived>
-formalism::EffectForallView EffectTranslator<Derived>::copy(formalism::EffectForallView source, const formalism::Repository& repository)
+formalism::EffectForallView EffectTranslator<Derived>::copy(formalism::EffectForallView source)
 {
     this->self().increment_quantifications(source.get_parameters());
     auto parameters = this->self().copy_parameters(source.get_parameters());
     this->self().enter_scope(parameters, source.get_parameters());
-    auto effect = as_index(this->self().copy(source.get_effect(), repository));
+    auto effect = as_index(this->self().copy(source.get_effect()));
     if (this->m_phase == TranslationPhase::AddTypePredicates)
     {
         auto guard = this->self().type_conditions_for_parameters(source.get_parameters());
@@ -100,43 +100,42 @@ formalism::EffectForallView EffectTranslator<Derived>::copy(formalism::EffectFor
 }
 
 template<typename Derived>
-formalism::EffectWhenView EffectTranslator<Derived>::copy(formalism::EffectWhenView source, const formalism::Repository& repository)
+formalism::EffectWhenView EffectTranslator<Derived>::copy(formalism::EffectWhenView source)
 {
     return formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository,
-                                                           as_index(this->self().copy(source.get_condition(), repository)),
-                                                           as_index(this->self().copy(source.get_effect(), repository)));
+                                                           as_index(this->self().copy(source.get_condition())),
+                                                           as_index(this->self().copy(source.get_effect())));
 }
 
 template<typename Derived>
-formalism::EffectOneOfView EffectTranslator<Derived>::copy(formalism::EffectOneOfView source, const formalism::Repository& repository)
+formalism::EffectOneOfView EffectTranslator<Derived>::copy(formalism::EffectOneOfView source)
 {
     auto effects = ygg::IndexList<formalism::Effect> {};
     for (auto effect : source.get_effects())
-        effects.push_back(as_index(this->self().copy(effect, repository)));
+        effects.push_back(as_index(this->self().copy(effect)));
     return formalism::get_or_create<formalism::EffectOneOf>(this->m_storage->repository, std::move(effects));
 }
 
 template<typename Derived>
-formalism::EffectProbabilisticAlternativeView EffectTranslator<Derived>::copy(formalism::EffectProbabilisticAlternativeView source,
-                                                                              const formalism::Repository& repository)
+formalism::EffectProbabilisticAlternativeView EffectTranslator<Derived>::copy(formalism::EffectProbabilisticAlternativeView source)
 {
     const auto& data = source.get_data();
     return formalism::get_or_create<formalism::EffectProbabilisticAlternative>(this->m_storage->repository,
                                                                                data.probability,
-                                                                               as_index(this->self().copy(source.get_effect(), repository)));
+                                                                               as_index(this->self().copy(source.get_effect())));
 }
 
 template<typename Derived>
-formalism::EffectProbabilisticView EffectTranslator<Derived>::copy(formalism::EffectProbabilisticView source, const formalism::Repository& repository)
+formalism::EffectProbabilisticView EffectTranslator<Derived>::copy(formalism::EffectProbabilisticView source)
 {
     auto alternatives = ygg::IndexList<formalism::EffectProbabilisticAlternative> {};
     for (auto alternative : source.get_alternatives())
-        alternatives.push_back(as_index(this->self().copy(alternative, repository)));
+        alternatives.push_back(as_index(this->self().copy(alternative)));
     return formalism::get_or_create<formalism::EffectProbabilistic>(this->m_storage->repository, std::move(alternatives));
 }
 
 template<typename Derived>
-formalism::EffectView EffectTranslator<Derived>::copy(formalism::EffectView source, const formalism::Repository& repository)
+formalism::EffectView EffectTranslator<Derived>::copy(formalism::EffectView source)
 {
     if (this->m_phase == TranslationPhase::SplitDisjunctiveConditions)
     {
@@ -147,8 +146,8 @@ formalism::EffectView EffectTranslator<Derived>::copy(formalism::EffectView sour
                 using Node = std::decay_t<decltype(arg)>;
                 if constexpr (std::is_same_v<Node, formalism::EffectWhenView>)
                 {
-                    const auto condition = this->self().copy(arg.get_condition(), repository);
-                    const auto effect = as_index(this->self().copy(arg.get_effect(), repository));
+                    const auto condition = this->self().copy(arg.get_condition());
+                    const auto effect = as_index(this->self().copy(arg.get_effect()));
                     if (const auto condition_or = this->self().as_or(condition))
                     {
                         auto effects = ygg::IndexList<formalism::Effect> {};
@@ -172,7 +171,7 @@ formalism::EffectView EffectTranslator<Derived>::copy(formalism::EffectView sour
     }
 
     auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant
-                            { return ygg::Data<formalism::Effect>::Variant(as_index(this->self().copy(arg, repository))); },
+                            { return ygg::Data<formalism::Effect>::Variant(as_index(this->self().copy(arg))); },
                             source.get_value());
     auto copied = formalism::get_or_create<formalism::Effect>(this->m_storage->repository, std::move(value));
     if (this->m_phase == TranslationPhase::ToEffectNormalForm)

@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_PARSER_HPP_
 #define LOKI_SEMANTIC_PARSER_HPP_
 
@@ -66,7 +65,7 @@ private:
     const parser::ErrorHandlerType* m_error_handler = nullptr;
     std::shared_ptr<detail::TranslationStorage> m_storage;
     std::vector<std::shared_ptr<detail::TranslationStorage>> m_task_storages;
-    cista::optional<ygg::Index<formalism::Domain>> m_domain;
+    std::optional<formalism::DomainView> m_domain;
     std::string m_domain_name;
 
     ygg::Index<formalism::Type> m_object_type;
