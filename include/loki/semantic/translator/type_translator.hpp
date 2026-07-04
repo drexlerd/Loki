@@ -30,8 +30,8 @@ public:
     explicit TypeTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, TypeTranslator<Derived>>(context) {}
 
     bool removes_typing_now() const noexcept;
-    ygg::IndexList<formalism::Type> collect_type_hierarchy(formalism::TypeView type);
-    ygg::IndexList<formalism::Type> collect_type_hierarchy(formalism::EntityListView<formalism::Type> types);
+    std::vector<formalism::TypeView> collect_type_hierarchy(formalism::TypeView type);
+    ygg::IndexList<formalism::Type> copy_type_hierarchy(formalism::EntityListView<formalism::Type> types);
     ygg::IndexList<formalism::Type> maybe_strip_types(const ygg::IndexList<formalism::Type>& types) const;
     ygg::IndexList<formalism::Parameter> copy_parameters_without_types(formalism::EntityListView<formalism::Parameter> parameters);
     formalism::PredicateView type_predicate(formalism::TypeView type);
@@ -52,15 +52,15 @@ bool TypeTranslator<Derived>::removes_typing_now() const noexcept
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Type> TypeTranslator<Derived>::collect_type_hierarchy(formalism::TypeView type)
+std::vector<formalism::TypeView> TypeTranslator<Derived>::collect_type_hierarchy(formalism::TypeView type)
 {
-    auto result = ygg::IndexList<formalism::Type> {};
-    auto seen = std::unordered_set<ygg::uint_t> {};
+    auto result = std::vector<formalism::TypeView> {};
+    auto seen = ygg::UnorderedSet<formalism::TypeView> {};
     auto visit = [&](auto&& self, formalism::TypeView current) -> void
     {
-        if (!seen.insert(current.get_index().get_value()).second)
+        if (!seen.insert(current).second)
             return;
-        result.push_back(as_index(this->self().copy(current)));
+        result.push_back(current);
         for (auto base : current.get_bases())
             self(self, base);
     };
@@ -69,16 +69,16 @@ ygg::IndexList<formalism::Type> TypeTranslator<Derived>::collect_type_hierarchy(
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Type> TypeTranslator<Derived>::collect_type_hierarchy(formalism::EntityListView<formalism::Type> types)
+ygg::IndexList<formalism::Type> TypeTranslator<Derived>::copy_type_hierarchy(formalism::EntityListView<formalism::Type> types)
 {
     auto result = ygg::IndexList<formalism::Type> {};
-    auto seen = std::unordered_set<ygg::uint_t> {};
+    auto seen = ygg::UnorderedSet<formalism::TypeView> {};
     for (auto type : types)
     {
         for (auto collected : this->self().collect_type_hierarchy(type))
         {
-            if (seen.insert(collected.get_value()).second)
-                result.push_back(collected);
+            if (seen.insert(collected).second)
+                result.push_back(as_index(this->self().copy(collected)));
         }
     }
     return result;
@@ -107,7 +107,7 @@ ygg::IndexList<formalism::Parameter> TypeTranslator<Derived>::copy_parameters_wi
 template<typename Derived>
 formalism::PredicateView TypeTranslator<Derived>::type_predicate(formalism::TypeView type)
 {
-    if (auto it = this->m_type_predicates.find(type.get_index().get_value()); it != this->m_type_predicates.end())
+    if (auto it = this->m_type_predicates.find(type); it != this->m_type_predicates.end())
         return it->second;
 
     auto parameter_types = ygg::IndexList<formalism::Type> {};
@@ -118,7 +118,7 @@ formalism::PredicateView TypeTranslator<Derived>::type_predicate(formalism::Type
     parameters.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, variable, std::move(parameter_types)).get_index());
 
     auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, type.get_name(), std::move(parameters));
-    this->m_type_predicates.emplace(type.get_index().get_value(), predicate);
+    this->m_type_predicates.emplace(type, predicate);
     this->m_used_predicate_names.insert(std::string(type.get_name()));
     return predicate;
 }
@@ -182,15 +182,15 @@ void TypeTranslator<Derived>::prepend_type_conditions(ygg::Index<formalism::Cond
 template<typename Derived>
 void TypeTranslator<Derived>::add_type_predicates_to_domain(ygg::Data<formalism::Domain>& data, formalism::DomainView domain)
 {
-    auto existing = std::unordered_set<ygg::uint_t> {};
-    for (auto predicate : data.predicates)
-        existing.insert(predicate.get_value());
+    auto existing = ygg::UnorderedSet<formalism::PredicateView> {};
+    for (auto predicate : domain.get_predicates())
+        existing.insert(predicate);
 
     auto add_type = [&](auto&& self, formalism::TypeView type) -> void
     {
-        const auto predicate = as_index(this->self().type_predicate(type));
-        if (existing.insert(predicate.get_value()).second)
-            data.predicates.push_back(predicate);
+        const auto predicate = this->self().type_predicate(type);
+        if (existing.insert(predicate).second)
+            data.predicates.push_back(predicate.get_index());
         for (auto base : type.get_bases())
             self(self, base);
     };
@@ -209,8 +209,9 @@ void TypeTranslator<Derived>::add_type_predicates_to_domain(ygg::Data<formalism:
 template<typename Derived>
 void TypeTranslator<Derived>::add_type_literals_for_object(ygg::IndexList<formalism::Literal>& literals, formalism::ObjectView object)
 {
-    const auto copied_object = as_index(this->self().copy(object));
-    const auto term = formalism::get_or_create<formalism::Term>(this->m_storage->repository, ygg::Data<formalism::Term>::Variant(copied_object)).get_index();
+    const auto copied_object = this->self().copy(object);
+    const auto term =
+        formalism::get_or_create<formalism::Term>(this->m_storage->repository, ygg::Data<formalism::Term>::Variant(copied_object.get_index())).get_index();
     auto add_literal = [&](auto&& self, formalism::TypeView type) -> void
     {
         literals.push_back(as_index(this->self().type_literal(type, term)));
@@ -225,7 +226,7 @@ void TypeTranslator<Derived>::add_type_literals_for_object(ygg::IndexList<formal
     }
     if (!has_source_types)
     {
-        if (auto it = this->m_storage->object_type_views.find(copied_object.get_value()); it != this->m_storage->object_type_views.end())
+        if (auto it = this->m_storage->object_type_views.find(copied_object); it != this->m_storage->object_type_views.end())
         {
             for (auto type : it->second)
                 add_literal(add_literal, type);

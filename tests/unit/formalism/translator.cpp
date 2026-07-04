@@ -30,7 +30,9 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
-#include <unordered_set>
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace loki::tests
 {
@@ -40,9 +42,9 @@ namespace
 {
 
 template<typename ObjectList>
-std::unordered_set<std::string> object_names(ObjectList objects)
+ygg::UnorderedSet<std::string> object_names(ObjectList objects)
 {
-    auto result = std::unordered_set<std::string> {};
+    auto result = ygg::UnorderedSet<std::string> {};
     for (auto object : objects)
         result.insert(std::string(object.get_name()));
     return result;
@@ -240,7 +242,7 @@ TEST(LokiTests, GeneratedUniversalPredicateAvoidsExistingPredicateName)
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
 
-    auto predicate_names = std::unordered_set<std::string> {};
+    auto predicate_names = ygg::UnorderedSet<std::string> {};
     for (auto predicate : domain.get_predicates())
         predicate_names.insert(std::string(predicate.get_name()));
 
@@ -658,7 +660,7 @@ TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
     const auto task_translation = loki::translate(task, domain_translation);
     const auto translated_task = task_translation.get_translated_task();
 
-    auto domain_generated_names = std::unordered_set<std::string> {};
+    auto domain_generated_names = ygg::UnorderedSet<std::string> {};
     for (auto predicate : translated_domain.get_predicates())
     {
         const auto name = std::string(predicate.get_name());
@@ -912,7 +914,7 @@ TEST(LokiTests, LokiPddlTranslatorTest)
     }
 
     {
-        auto names = std::unordered_set<std::string> {};
+        auto names = ygg::UnorderedSet<std::string> {};
         for (auto object : translated_problem.get_objects())
         {
             EXPECT_TRUE(names.insert(std::string(object.get_name())).second);

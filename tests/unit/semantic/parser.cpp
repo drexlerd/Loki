@@ -73,23 +73,27 @@ void expect_contiguous_indices(Views views, const std::string& label, bool requi
 {
     SCOPED_TRACE(label);
 
-    auto values = std::vector<ygg::uint_t> {};
-    values.reserve(views.size());
+    auto local = std::vector<typename Views::value_type> {};
+    local.reserve(views.size());
     for (auto view : views)
-    {
         if (&views.get_context().get_canonical_context(view.get_index()) == &views.get_context())
-            values.push_back(view.get_index().get_value());
-    }
-    if (values.empty())
+            local.push_back(view);
+    if (local.empty())
         return;
 
-    auto sorted = values;
-    std::sort(sorted.begin(), sorted.end());
+    auto follows = [](auto previous, auto current)
+    {
+        using Index = decltype(previous.get_index());
+        return current.get_index() == Index(previous.get_index().get_value() + 1);
+    };
+
+    auto sorted = local;
+    std::sort(sorted.begin(), sorted.end(), [](auto lhs, auto rhs) { return lhs.get_index() < rhs.get_index(); });
     for (size_t i = 1; i < sorted.size(); ++i)
     {
-        if (sorted[i] != sorted[i - 1] + 1)
+        if (!follows(sorted[i - 1], sorted[i]))
         {
-            ADD_FAILURE() << label << " has a local index gap between " << sorted[i - 1] << " and " << sorted[i];
+            ADD_FAILURE() << label << " has a local index gap between " << sorted[i - 1].get_index() << " and " << sorted[i].get_index();
             break;
         }
     }
@@ -97,12 +101,12 @@ void expect_contiguous_indices(Views views, const std::string& label, bool requi
     if (!require_order)
         return;
 
-    for (size_t i = 1; i < values.size(); ++i)
+    for (size_t i = 1; i < local.size(); ++i)
     {
-        if (values[i] != values[i - 1] + 1)
+        if (!follows(local[i - 1], local[i]))
         {
-            ADD_FAILURE() << label << " is not stored in contiguous local canonical index order at offset " << i << ": previous=" << values[i - 1]
-                          << ", current=" << values[i];
+            ADD_FAILURE() << label << " is not stored in contiguous local canonical index order at offset " << i << ": previous=" << local[i - 1].get_index()
+                          << ", current=" << local[i].get_index();
             break;
         }
     }
@@ -434,7 +438,7 @@ std::size_t count_initial_literals_for_predicate(const LiteralRange& literals, c
 
 std::size_t count_unique_object_names(formalism::DomainView domain, formalism::TaskView task)
 {
-    auto names = std::unordered_set<std::string> {};
+    auto names = ygg::UnorderedSet<std::string> {};
     for (auto object : domain.get_constants())
         names.insert(std::string(object.get_name()));
     for (auto object : task.get_objects())
@@ -711,7 +715,7 @@ TEST(LokiSemanticTranslator, GeneratesFreshAxiomsForIdenticalUniversalConditions
     const auto translated_domain = translation.get_translated_domain();
 
     auto generated_predicates = std::size_t {};
-    auto generated_parameter_types = std::unordered_set<std::string> {};
+    auto generated_parameter_types = ygg::UnorderedSet<std::string> {};
     for (auto predicate : translated_domain.get_predicates())
     {
         if (!std::string(predicate.get_name()).starts_with("loki-universal-"))

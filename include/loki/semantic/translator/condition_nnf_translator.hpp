@@ -118,8 +118,9 @@ template<typename Derived>
 formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionExistsView source)
 {
     this->self().increment_quantifications(source.get_parameters());
-    auto parameters = this->self().copy_parameters(source.get_parameters());
-    this->self().enter_scope(parameters, source.get_parameters());
+    auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
+    auto parameters = this->self().parameter_indices(parameter_views);
+    this->self().enter_scope(parameter_views);
     auto condition = as_index(this->self().negate_condition(source.get_condition()));
     this->self().leave_scope();
     return this->self().flatten_condition(
@@ -130,8 +131,9 @@ template<typename Derived>
 formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionForallView source)
 {
     this->self().increment_quantifications(source.get_parameters());
-    auto parameters = this->self().copy_parameters(source.get_parameters());
-    this->self().enter_scope(parameters, source.get_parameters());
+    auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
+    auto parameters = this->self().parameter_indices(parameter_views);
+    this->self().enter_scope(parameter_views);
     auto condition = as_index(this->self().negate_condition(source.get_condition()));
     this->self().leave_scope();
     return this->self().flatten_condition(

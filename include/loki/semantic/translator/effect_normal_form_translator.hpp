@@ -180,10 +180,10 @@ formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node
     if (const auto nested_forall = this->self().template as_effect<formalism::EffectForall>(nested))
     {
         auto parameters = data.parameters;
-        for (auto parameter : nested_forall->get_data().parameters)
-            parameters.push_back(parameter);
+        for (auto parameter : nested_forall->get_parameters())
+            parameters.push_back(parameter.get_index());
         const auto wrapped = this->self().wrap_effect(
-            formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, std::move(parameters), nested_forall->get_data().effect));
+            formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, std::move(parameters), nested_forall->get_effect().get_index()));
         return this->self().normalize_effect(wrapped);
     }
     return this->self().wrap_effect(formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, data.parameters, nested.get_index()));
@@ -213,10 +213,10 @@ formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node
     {
         auto conditions = ygg::IndexList<formalism::Condition> {};
         conditions.push_back(condition.get_index());
-        conditions.push_back(nested_when->get_data().condition);
+        conditions.push_back(nested_when->get_condition().get_index());
         const auto combined_condition = as_index(this->self().make_conjunction(std::move(conditions)));
         const auto wrapped = this->self().wrap_effect(
-            formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, combined_condition, nested_when->get_data().effect));
+            formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, combined_condition, nested_when->get_effect().get_index()));
         return this->self().normalize_effect(wrapped);
     }
     if (const auto nested_and = this->self().template as_effect<formalism::EffectAnd>(nested))
@@ -233,23 +233,30 @@ formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node
     }
     if (const auto nested_forall = this->self().template as_effect<formalism::EffectForall>(nested))
     {
-        const auto pushed_when =
-            this->self()
-                .wrap_effect(
-                    formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition.get_index(), nested_forall->get_data().effect))
-                .get_index();
-        const auto wrapped = this->self().wrap_effect(
-            formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, nested_forall->get_data().parameters, pushed_when));
+        auto parameters = ygg::IndexList<formalism::Parameter> {};
+        for (auto parameter : nested_forall->get_parameters())
+            parameters.push_back(parameter.get_index());
+        const auto pushed_when = this->self()
+                                     .wrap_effect(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository,
+                                                                                                  condition.get_index(),
+                                                                                                  nested_forall->get_effect().get_index()))
+                                     .get_index();
+        const auto wrapped =
+            this->self().wrap_effect(formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, std::move(parameters), pushed_when));
         return this->self().normalize_effect(wrapped);
     }
     if (const auto exists = this->self().as_exists(condition))
     {
+        auto parameters = ygg::IndexList<formalism::Parameter> {};
+        for (auto parameter : exists->get_parameters())
+            parameters.push_back(parameter.get_index());
         const auto pushed_when =
             this->self()
-                .wrap_effect(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, exists->get_data().condition, nested.get_index()))
+                .wrap_effect(
+                    formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, exists->get_condition().get_index(), nested.get_index()))
                 .get_index();
-        const auto wrapped = this->self().wrap_effect(
-            formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, exists->get_data().parameters, pushed_when));
+        const auto wrapped =
+            this->self().wrap_effect(formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, std::move(parameters), pushed_when));
         return this->self().normalize_effect(wrapped);
     }
 

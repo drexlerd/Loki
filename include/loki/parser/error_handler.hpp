@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_PARSER_ERROR_HANDLER_HPP_
 #define LOKI_PARSER_ERROR_HANDLER_HPP_
 
@@ -24,7 +23,9 @@
 #include <cstddef>
 #include <optional>
 #include <string>
-#include <unordered_map>
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace loki::parser
 {
@@ -79,7 +80,7 @@ std::optional<SourceRange> source_range(const ErrorHandler<Iterator>& error_hand
 
 struct ErrorHandlerBase
 {
-    std::unordered_map<std::string, std::string> id_map;
+    ygg::UnorderedMap<std::string, std::string> id_map;
 
     template<typename Iterator, typename Ast, typename Context>
     void on_success(Iterator const& first, Iterator const& last, Ast& ast, Context const& context)
@@ -103,6 +104,6 @@ struct ErrorHandlerBase
     }
 };
 
-} // namespace loki::parser
+}  // namespace loki::parser
 
 #endif

@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_FORMALISM_FORMATTER_HPP_
 #define LOKI_FORMALISM_FORMATTER_HPP_
 
@@ -30,9 +29,11 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
-#include <unordered_set>
 #include <variant>
 #include <vector>
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace loki::formalism::format
 {
@@ -513,7 +514,7 @@ inline void action(ActionView action, std::ostream& out, Options options)
 
 inline void axiom(AxiomView axiom, std::ostream& out, Options options)
 {
-    auto head_variables = std::unordered_set<ygg::uint_t> {};
+    auto head_variables = ygg::UnorderedSet<ygg::uint_t> {};
     for (auto term_view : axiom.get_head().get_atom().get_terms())
     {
         std::visit(

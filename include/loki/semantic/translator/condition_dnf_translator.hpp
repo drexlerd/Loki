@@ -53,8 +53,8 @@ formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism:
         const auto dnf = this->self().to_dnf(child);
         if (const auto child_or = this->self().as_or(dnf))
         {
-            for (auto nested : child_or->get_data().conditions)
-                parts.push_back(nested);
+            for (auto nested : child_or->get_conditions())
+                parts.push_back(nested.get_index());
         }
         else
         {
@@ -67,21 +67,29 @@ formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism:
 template<typename Derived>
 formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism::ConditionView, formalism::ConditionAndView node)
 {
-    auto combinations = std::vector<ygg::IndexList<formalism::Condition>> { ygg::IndexList<formalism::Condition> {} };
+    auto as_indices = [](const std::vector<formalism::ConditionView>& views)
+    {
+        auto result = ygg::IndexList<formalism::Condition> {};
+        for (auto view : views)
+            result.push_back(view.get_index());
+        return result;
+    };
+
+    auto combinations = std::vector<std::vector<formalism::ConditionView>> { {} };
     for (auto child : node.get_conditions())
     {
         const auto dnf = this->self().to_dnf(child);
-        auto alternatives = ygg::IndexList<formalism::Condition> {};
+        auto alternatives = std::vector<formalism::ConditionView> {};
         if (const auto child_or = this->self().as_or(dnf))
         {
-            for (auto nested : child_or->get_data().conditions)
+            for (auto nested : child_or->get_conditions())
                 alternatives.push_back(nested);
         }
         else
         {
-            alternatives.push_back(dnf.get_index());
+            alternatives.push_back(dnf);
         }
-        auto next = std::vector<ygg::IndexList<formalism::Condition>> {};
+        auto next = std::vector<std::vector<formalism::ConditionView>> {};
         for (const auto& combination : combinations)
         {
             for (auto alternative : alternatives)
@@ -94,10 +102,10 @@ formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism:
         combinations = std::move(next);
     }
     if (combinations.size() == 1)
-        return this->self().make_conjunction(std::move(combinations.front()));
+        return this->self().make_conjunction(as_indices(combinations.front()));
     auto disjuncts = ygg::IndexList<formalism::Condition> {};
-    for (auto& combination : combinations)
-        disjuncts.push_back(as_index(this->self().make_conjunction(std::move(combination))));
+    for (const auto& combination : combinations)
+        disjuncts.push_back(as_index(this->self().make_conjunction(as_indices(combination))));
     return this->self().make_disjunction(std::move(disjuncts));
 }
 
@@ -109,10 +117,10 @@ formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism:
     if (const auto child_or = this->self().as_or(child))
     {
         auto parts = ygg::IndexList<formalism::Condition> {};
-        for (auto nested : child_or->get_data().conditions)
+        for (auto nested : child_or->get_conditions())
         {
-            const auto exists =
-                this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, data.parameters, nested));
+            const auto exists = this->self().wrap_condition(
+                formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, data.parameters, nested.get_index()));
             parts.push_back(as_index(this->self().flatten_condition(exists)));
         }
         return this->self().to_dnf(this->self().make_disjunction(std::move(parts)));
@@ -130,10 +138,10 @@ formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism:
     if (const auto child_or = this->self().as_or(child))
     {
         auto parts = ygg::IndexList<formalism::Condition> {};
-        for (auto nested : child_or->get_data().conditions)
+        for (auto nested : child_or->get_conditions())
         {
-            const auto forall =
-                this->self().wrap_condition(formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository, data.parameters, nested));
+            const auto forall = this->self().wrap_condition(
+                formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository, data.parameters, nested.get_index()));
             parts.push_back(as_index(this->self().flatten_condition(forall)));
         }
         return this->self().to_dnf(this->self().make_disjunction(std::move(parts)));

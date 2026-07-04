@@ -42,12 +42,11 @@ template<typename Derived>
 formalism::ConditionView GoalSimplificationTranslator<Derived>::make_generated_goal_condition(ygg::Index<formalism::Condition> condition)
 {
     const auto name = cista::offset::string(this->self().next_generated_predicate_name("loki-goal-"));
-    const auto predicate =
-        formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, name, ygg::IndexList<formalism::Parameter> {}).get_index();
-    const auto atom = formalism::get_or_create<formalism::Atom>(this->m_storage->repository, predicate, ygg::IndexList<formalism::Term> {}).get_index();
+    const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, name, ygg::IndexList<formalism::Parameter> {});
+    const auto atom =
+        formalism::get_or_create<formalism::Atom>(this->m_storage->repository, predicate.get_index(), ygg::IndexList<formalism::Term> {}).get_index();
     const auto literal = formalism::get_or_create<formalism::Literal>(this->m_storage->repository, atom, true).get_index();
-    const auto axiom =
-        formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, ygg::IndexList<formalism::Parameter> {}, literal, condition).get_index();
+    const auto axiom = formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, ygg::IndexList<formalism::Parameter> {}, literal, condition);
     this->m_generated_predicates.push_back(predicate);
     this->m_generated_axioms.push_back(axiom);
     return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, literal));

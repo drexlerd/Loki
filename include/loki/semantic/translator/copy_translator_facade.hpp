@@ -35,7 +35,7 @@ public:
     explicit CopyTranslatorFacade(CopyContext& context) : CopyTranslatorComponent<Derived, CopyTranslatorFacade<Derived>>(context) {}
 
     template<typename T>
-    void push_unique(ygg::IndexList<T>& list, std::unordered_set<ygg::uint_t>& seen, ygg::Index<T> value);
+    void push_unique(ygg::IndexList<T>& list, ygg::UnorderedSet<formalism::EntityView<T>>& seen, formalism::EntityView<T> value);
 
     ygg::UnorderedSet<std::string> used_predicate_names() const;
 
@@ -54,10 +54,10 @@ public:
 
 template<typename Derived>
 template<typename T>
-void CopyTranslatorFacade<Derived>::push_unique(ygg::IndexList<T>& list, std::unordered_set<ygg::uint_t>& seen, ygg::Index<T> value)
+void CopyTranslatorFacade<Derived>::push_unique(ygg::IndexList<T>& list, ygg::UnorderedSet<formalism::EntityView<T>>& seen, formalism::EntityView<T> value)
 {
-    if (seen.insert(value.get_value()).second)
-        list.push_back(value);
+    if (seen.insert(value).second)
+        list.push_back(value.get_index());
 }
 
 template<typename Derived>
@@ -91,7 +91,7 @@ template<typename Derived>
 ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjunctive_actions(formalism::EntityListView<formalism::Action> actions)
 {
     auto result = ygg::IndexList<formalism::Action> {};
-    auto seen = std::unordered_set<ygg::uint_t> {};
+    auto seen = ygg::UnorderedSet<formalism::ActionView> {};
     for (auto action : actions)
     {
         const auto data = action.get_data();
@@ -100,7 +100,7 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjuncti
             const auto precondition = this->self().flatten_condition(precondition_view.value());
             if (const auto condition_or = this->self().as_or(precondition))
             {
-                for (auto part : condition_or->get_data().conditions)
+                for (auto part : condition_or->get_conditions())
                     this->self().push_unique(result,
                                              seen,
                                              formalism::get_or_create<formalism::Action>(this->m_storage->repository,
@@ -108,13 +108,12 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjuncti
                                                                                          data.original_name,
                                                                                          data.parameters,
                                                                                          data.original_arity,
-                                                                                         part,
-                                                                                         data.effect)
-                                                 .get_index());
+                                                                                         part.get_index(),
+                                                                                         data.effect));
                 continue;
             }
         }
-        this->self().push_unique(result, seen, action.get_index());
+        this->self().push_unique(result, seen, action);
     }
     return result;
 }
@@ -130,7 +129,7 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::multiply_condit
     };
 
     auto result = ygg::IndexList<formalism::Action> {};
-    auto seen = std::unordered_set<ygg::uint_t> {};
+    auto seen = ygg::UnorderedSet<formalism::ActionView> {};
 
     for (auto action : actions)
     {
@@ -159,7 +158,7 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::multiply_condit
 
         if (conditional.empty())
         {
-            this->self().push_unique(result, seen, action.get_index());
+            this->self().push_unique(result, seen, action);
             continue;
         }
 
@@ -213,8 +212,7 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::multiply_condit
                                                                                  data.parameters,
                                                                                  data.original_arity,
                                                                                  precondition,
-                                                                                 effect)
-                                         .get_index());
+                                                                                 effect));
         }
     }
 
@@ -225,22 +223,22 @@ template<typename Derived>
 ygg::IndexList<formalism::Axiom> CopyTranslatorFacade<Derived>::split_disjunctive_axioms(formalism::EntityListView<formalism::Axiom> axioms)
 {
     auto result = ygg::IndexList<formalism::Axiom> {};
-    auto seen = std::unordered_set<ygg::uint_t> {};
+    auto seen = ygg::UnorderedSet<formalism::AxiomView> {};
     for (auto axiom : axioms)
     {
         const auto data = axiom.get_data();
         const auto condition = this->self().flatten_condition(axiom.get_condition());
         if (const auto condition_or = this->self().as_or(condition))
         {
-            for (auto part : condition_or->get_data().conditions)
+            for (auto part : condition_or->get_conditions())
                 this->self().push_unique(
                     result,
                     seen,
-                    formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, data.parameters, data.original_arity, data.head, part).get_index());
+                    formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, data.parameters, data.original_arity, data.head, part.get_index()));
         }
         else
         {
-            this->self().push_unique(result, seen, axiom.get_index());
+            this->self().push_unique(result, seen, axiom);
         }
     }
     return result;
@@ -249,7 +247,6 @@ ygg::IndexList<formalism::Axiom> CopyTranslatorFacade<Derived>::split_disjunctiv
 template<typename Derived>
 formalism::DomainView CopyTranslatorFacade<Derived>::copy_domain(formalism::DomainView domain)
 {
-    this->m_storage->original_domain = domain.get_index();
     auto data = domain.get_data();
     data.index = {};
     data.requirements = this->self().template copy_list<formalism::Requirement>(domain.get_requirements());
@@ -292,7 +289,7 @@ formalism::DomainView CopyTranslatorFacade<Derived>::copy_domain(formalism::Doma
 
     auto view = formalism::get_or_create<formalism::Domain>(this->m_storage->repository, std::move(data));
     this->m_storage->translated_domain = view;
-    remember(this->m_storage->domains, domain.get_index(), view);
+    remember(this->m_storage->domains, domain, view);
     return view;
 }
 
@@ -300,7 +297,6 @@ template<typename Derived>
 formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView task)
 {
     auto data = task.get_data();
-    this->m_append_generated_axioms_to_domain = false;
     data.index = {};
     data.domain = this->m_storage->translated_domain->get_index();
     data.requirements = this->self().template copy_list<formalism::Requirement>(task.get_requirements());
@@ -350,19 +346,19 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
             if (this->m_phase == TranslationPhase::SimplifyGoal && data.goal)
                 data.goal = as_index(this->self().simplify_goal_condition(copied_task.get_goal().value()));
 
-            auto existing_predicates = std::unordered_set<ygg::uint_t> {};
-            for (auto predicate : data.predicates)
-                existing_predicates.insert(predicate.get_value());
+            auto existing_predicates = ygg::UnorderedSet<formalism::PredicateView> {};
+            for (auto predicate : copied_task.get_predicates())
+                existing_predicates.insert(predicate);
             for (auto predicate : this->m_generated_predicates)
-                if (existing_predicates.insert(predicate.get_value()).second)
-                    data.predicates.push_back(predicate);
+                if (existing_predicates.insert(predicate).second)
+                    data.predicates.push_back(predicate.get_index());
 
-            auto existing_axioms = std::unordered_set<ygg::uint_t> {};
-            for (auto axiom : data.axioms)
-                existing_axioms.insert(axiom.get_value());
+            auto existing_axioms = ygg::UnorderedSet<formalism::AxiomView> {};
+            for (auto axiom : copied_task.get_axioms())
+                existing_axioms.insert(axiom);
             for (auto axiom : this->m_generated_axioms)
-                if (existing_axioms.insert(axiom.get_value()).second)
-                    data.axioms.push_back(axiom);
+                if (existing_axioms.insert(axiom).second)
+                    data.axioms.push_back(axiom.get_index());
 
             if (!data.axioms.empty())
                 this->self().ensure_derived_predicates_requirement(copied_task.get_requirements(), data.requirements);
@@ -382,7 +378,7 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
     }
 
     auto view = formalism::get_or_create<formalism::Task>(this->m_storage->repository, std::move(data));
-    remember(this->m_storage->tasks, task.get_index(), view);
+    remember(this->m_storage->tasks, task, view);
     return view;
 }
 

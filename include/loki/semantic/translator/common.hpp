@@ -26,11 +26,12 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <variant>
 #include <vector>
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace loki::semantic
 {
@@ -79,12 +80,11 @@ namespace detail
 {
 
 template<typename T>
-using ViewMap = std::unordered_map<ygg::uint_t, formalism::EntityView<T>>;
+using ViewMap = ygg::UnorderedMap<formalism::EntityView<T>, formalism::EntityView<T>>;
 
 struct TranslationStorage
 {
     formalism::Repository repository;
-    ygg::Index<formalism::Domain> original_domain;
     std::optional<formalism::DomainView> translated_domain;
 
     ViewMap<formalism::Requirement> requirements;
@@ -127,8 +127,7 @@ struct TranslationStorage
     ViewMap<formalism::InitialFunctionValue> initial_function_values;
     ViewMap<formalism::Domain> domains;
     ViewMap<formalism::Task> tasks;
-    std::unordered_map<ygg::uint_t, ygg::IndexList<formalism::Type>> object_types;
-    std::unordered_map<ygg::uint_t, std::vector<formalism::TypeView>> object_type_views;
+    ygg::UnorderedMap<formalism::ObjectView, std::vector<formalism::TypeView>> object_type_views;
 
     explicit TranslationStorage(size_t index = 1, const formalism::Repository* parent = nullptr) : repository(index, parent) {}
 };
@@ -146,17 +145,17 @@ ygg::Index<T> as_index(formalism::EntityView<T> view) noexcept
 }
 
 template<typename T>
-std::optional<formalism::EntityView<T>> find_mapped(const ViewMap<T>& map, ygg::Index<T> source)
+std::optional<formalism::EntityView<T>> find_mapped(const ViewMap<T>& map, formalism::EntityView<T> source)
 {
-    if (auto it = map.find(source.get_value()); it != map.end())
+    if (auto it = map.find(source); it != map.end())
         return it->second;
     return std::nullopt;
 }
 
 template<typename T>
-void remember(ViewMap<T>& map, ygg::Index<T> source, formalism::EntityView<T> target)
+void remember(ViewMap<T>& map, formalism::EntityView<T> source, formalism::EntityView<T> target)
 {
-    map.emplace(source.get_value(), target);
+    map.emplace(source, target);
 }
 
 }  // namespace detail

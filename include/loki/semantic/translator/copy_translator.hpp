@@ -146,6 +146,7 @@ public:
     using TopLevelTranslator<CopyTranslator>::copy;
 
     using TypeTranslator<CopyTranslator>::collect_type_hierarchy;
+    using TypeTranslator<CopyTranslator>::copy_type_hierarchy;
     using TypeTranslator<CopyTranslator>::maybe_strip_types;
     using TypeTranslator<CopyTranslator>::copy_parameters_without_types;
     using TypeTranslator<CopyTranslator>::type_predicate;

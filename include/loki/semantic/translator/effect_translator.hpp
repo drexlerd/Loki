@@ -83,8 +83,9 @@ template<typename Derived>
 formalism::EffectForallView EffectTranslator<Derived>::copy(formalism::EffectForallView source)
 {
     this->self().increment_quantifications(source.get_parameters());
-    auto parameters = this->self().copy_parameters(source.get_parameters());
-    this->self().enter_scope(parameters, source.get_parameters());
+    auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
+    auto parameters = this->self().parameter_indices(parameter_views);
+    this->self().enter_scope(parameter_views);
     auto effect = as_index(this->self().copy(source.get_effect()));
     if (this->m_phase == TranslationPhase::AddTypePredicates)
     {
@@ -151,9 +152,9 @@ formalism::EffectView EffectTranslator<Derived>::copy(formalism::EffectView sour
                     if (const auto condition_or = this->self().as_or(condition))
                     {
                         auto effects = ygg::IndexList<formalism::Effect> {};
-                        for (auto part : condition_or->get_data().conditions)
+                        for (auto part : condition_or->get_conditions())
                         {
-                            const auto when = formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, part, effect);
+                            const auto when = formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, part.get_index(), effect);
                             effects.push_back(this->self().wrap_effect(when).get_index());
                         }
                         split = this->self().wrap_effect(formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)));

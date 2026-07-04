@@ -90,8 +90,9 @@ template<typename Derived>
 formalism::ConditionExistsView ConditionTranslator<Derived>::copy(formalism::ConditionExistsView source)
 {
     this->self().increment_quantifications(source.get_parameters());
-    auto parameters = this->self().copy_parameters(source.get_parameters());
-    this->self().enter_scope(parameters, source.get_parameters());
+    auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
+    auto parameters = this->self().parameter_indices(parameter_views);
+    this->self().enter_scope(parameter_views);
     const auto condition = as_index(this->self().copy(source.get_condition()));
     this->self().leave_scope();
     auto typed_condition = condition;
@@ -105,8 +106,9 @@ template<typename Derived>
 formalism::ConditionForallView ConditionTranslator<Derived>::copy(formalism::ConditionForallView source)
 {
     this->self().increment_quantifications(source.get_parameters());
-    auto parameters = this->self().copy_parameters(source.get_parameters());
-    this->self().enter_scope(parameters, source.get_parameters());
+    auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
+    auto parameters = this->self().parameter_indices(parameter_views);
+    this->self().enter_scope(parameter_views);
     const auto condition = as_index(this->self().copy(source.get_condition()));
     this->self().leave_scope();
     auto typed_condition = condition;

@@ -32,9 +32,10 @@
 #include <filesystem>
 #include <memory>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 #include <vector>
+#include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/semantics/equal_to.hpp>
+#include <yggdrasil/semantics/hash.hpp>
 
 namespace loki::semantic
 {
@@ -70,19 +71,19 @@ private:
 
     ygg::Index<formalism::Type> m_object_type;
     ygg::Index<formalism::Type> m_number_type;
-    std::unordered_map<std::string, ygg::Index<formalism::Type>> m_types;
-    std::unordered_map<std::string, ygg::Index<formalism::Object>> m_objects;
-    std::unordered_map<std::string, ygg::Index<formalism::Predicate>> m_predicates;
-    std::unordered_map<std::string, ygg::Index<formalism::FunctionSkeleton>> m_functions;
-    std::unordered_set<std::string> m_declared_types;
-    std::unordered_set<std::string> m_declared_objects;
-    std::unordered_set<std::string> m_declared_predicates;
-    std::unordered_set<std::string> m_declared_functions;
-    std::unordered_set<formalism::RequirementKind> m_active_requirements;
-    std::unordered_set<formalism::RequirementKind> m_domain_requirement_kinds;
-    std::unordered_map<ygg::uint_t, ygg::IndexList<formalism::Type>> m_variable_types;
-    std::vector<std::unordered_map<std::string, ygg::Index<formalism::Variable>>> m_variable_scopes;
-    std::unordered_map<std::string, ygg::Index<formalism::Object>>* m_task_objects = nullptr;
+    ygg::UnorderedMap<std::string, formalism::TypeView> m_types;
+    ygg::UnorderedMap<std::string, formalism::ObjectView> m_objects;
+    ygg::UnorderedMap<std::string, formalism::PredicateView> m_predicates;
+    ygg::UnorderedMap<std::string, formalism::FunctionSkeletonView> m_functions;
+    ygg::UnorderedSet<std::string> m_declared_types;
+    ygg::UnorderedSet<std::string> m_declared_objects;
+    ygg::UnorderedSet<std::string> m_declared_predicates;
+    ygg::UnorderedSet<std::string> m_declared_functions;
+    ygg::UnorderedSet<formalism::RequirementKind> m_active_requirements;
+    ygg::UnorderedSet<formalism::RequirementKind> m_domain_requirement_kinds;
+    ygg::UnorderedMap<formalism::VariableView, std::vector<formalism::TypeView>> m_variable_types;
+    std::vector<ygg::UnorderedMap<std::string, formalism::VariableView>> m_variable_scopes;
+    ygg::UnorderedMap<std::string, formalism::ObjectView>* m_task_objects = nullptr;
 
     static cista::offset::string to_cista(const std::string& text);
 
@@ -141,17 +142,17 @@ private:
 
     void require_typing_if_needed(const boost::optional<ast::TypeExpression>& type, const boost::spirit::x3::position_tagged& node) const;
 
-    bool is_subtype(ygg::Index<formalism::Type> actual, ygg::Index<formalism::Type> expected) const;
+    bool is_subtype(formalism::TypeView actual, formalism::TypeView expected) const;
 
-    bool is_subtype(ygg::Index<formalism::Type> actual, ygg::Index<formalism::Type> expected, std::unordered_set<ygg::uint_t>& seen) const;
+    bool is_subtype(formalism::TypeView actual, formalism::TypeView expected, ygg::UnorderedSet<formalism::TypeView>& seen) const;
 
-    bool types_compatible(const ygg::IndexList<formalism::Type>& actual_types, const ygg::IndexList<formalism::Type>& expected_types) const;
+    bool types_compatible(const std::vector<formalism::TypeView>& actual_types, formalism::EntityListView<formalism::Type> expected_types) const;
 
-    ygg::IndexList<formalism::Type> term_types(const ast::Term& term) const;
+    std::vector<formalism::TypeView> term_types(const ast::Term& term) const;
 
     template<typename Node>
     void check_argument_types(const std::string& name,
-                              const ygg::IndexList<formalism::Parameter>& parameters,
+                              formalism::EntityListView<formalism::Parameter> parameters,
                               const std::vector<ast::Term>& terms,
                               const Node& node) const
     {
@@ -160,14 +161,13 @@ private:
         for (auto i = std::size_t { 0 }; i < terms.size(); ++i)
         {
             const auto actual = term_types(terms[i]);
-            const auto& expected = repo()[parameters[i]].types;
-            if (!types_compatible(actual, expected))
+            if (!types_compatible(actual, parameters[i].get_types()))
                 throw_at(node, TypeMismatchError(name));
         }
     }
 
     template<typename Error, typename Node>
-    void ensure_new(std::unordered_set<std::string>& names, std::string name, const Node& node) const
+    void ensure_new(ygg::UnorderedSet<std::string>& names, std::string name, const Node& node) const
     {
         if (!names.insert(name).second)
             throw_at(node, Error(name));
@@ -194,8 +194,7 @@ private:
 
     ygg::IndexList<formalism::Type> parse_type_expression_node(const ast::EitherType& node);
 
-    ygg::IndexList<formalism::Object> parse_objects(const std::vector<ast::TypedName>& nodes,
-                                                    std::unordered_map<std::string, ygg::Index<formalism::Object>>& table);
+    ygg::IndexList<formalism::Object> parse_objects(const std::vector<ast::TypedName>& nodes, ygg::UnorderedMap<std::string, formalism::ObjectView>& table);
 
     ygg::IndexList<formalism::Parameter> parse_parameters(const std::vector<ast::TypedVariable>& nodes);
 
@@ -203,15 +202,15 @@ private:
 
     ygg::IndexList<formalism::FunctionSkeleton> parse_functions(const std::vector<ast::FunctionDeclaration>& nodes);
 
-    ygg::Index<formalism::Predicate> predicate(const ast::Identifier& identifier, size_t arity);
+    formalism::PredicateView predicate(const ast::Identifier& identifier, size_t arity);
 
-    ygg::Index<formalism::Predicate> equality_predicate(const ast::Identifier& identifier, size_t arity);
+    formalism::PredicateView equality_predicate(const ast::Identifier& identifier, size_t arity);
 
-    ygg::Index<formalism::FunctionSkeleton> function(const ast::Identifier& identifier, size_t arity);
+    formalism::FunctionSkeletonView function(const ast::Identifier& identifier, size_t arity);
 
-    ygg::Index<formalism::Variable> variable(const ast::Identifier& identifier) const;
+    formalism::VariableView variable(const ast::Identifier& identifier) const;
 
-    ygg::Index<formalism::Object> object(const ast::Identifier& identifier) const;
+    formalism::ObjectView object(const ast::Identifier& identifier) const;
 
     ygg::Index<formalism::Term> parse_term(const ast::Term& node);
 

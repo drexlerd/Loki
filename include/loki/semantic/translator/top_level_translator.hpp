@@ -48,27 +48,28 @@ formalism::ActionView TopLevelTranslator<Derived>::copy(formalism::ActionView so
         this->m_renaming_enabled = false;
         auto out = this->self().copy(renamed);
         this->m_renaming_enabled = previous;
-        remember(this->m_storage->actions, source.get_index(), out);
+        remember(this->m_storage->actions, source, out);
         return out;
     }
 
-    if (auto mapped = find_mapped(this->m_storage->actions, source.get_index()))
+    if (auto mapped = find_mapped(this->m_storage->actions, source))
         return *mapped;
     const auto& data = source.get_data();
     this->m_num_quantifications.clear();
     this->self().increment_quantifications(source.get_parameters());
-    auto parameters = this->self().copy_parameters(source.get_parameters());
-    this->self().enter_scope(parameters, source.get_parameters());
+    auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
+    this->self().enter_scope(parameter_views);
     auto precondition = cista::optional<ygg::Index<formalism::Condition>> {};
     if (const auto condition = source.get_precondition())
     {
         auto copied_condition = this->self().copy(condition.value());
         if (this->m_phase == TranslationPhase::MoveExistentialQuantifiers)
-            copied_condition = this->self().lift_top_level_exists(parameters, copied_condition);
+            copied_condition = this->self().lift_top_level_exists(parameter_views, copied_condition);
         precondition = as_index(copied_condition);
     }
     if (this->m_phase == TranslationPhase::AddTypePredicates)
         this->self().prepend_type_conditions(precondition, source.get_parameters());
+    const auto parameters = this->self().parameter_indices(parameter_views);
     const auto out_parameters = this->self().removes_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
     auto effect = cista::optional<ygg::Index<formalism::Effect>> {};
     if (const auto effect_view = source.get_effect())
@@ -81,7 +82,7 @@ formalism::ActionView TopLevelTranslator<Derived>::copy(formalism::ActionView so
                                                            precondition,
                                                            effect);
     this->self().leave_scope();
-    remember(this->m_storage->actions, source.get_index(), out);
+    remember(this->m_storage->actions, source, out);
     return out;
 }
 
@@ -95,23 +96,24 @@ formalism::AxiomView TopLevelTranslator<Derived>::copy(formalism::AxiomView sour
         this->m_renaming_enabled = false;
         auto out = this->self().copy(renamed);
         this->m_renaming_enabled = previous;
-        remember(this->m_storage->axioms, source.get_index(), out);
+        remember(this->m_storage->axioms, source, out);
         return out;
     }
 
-    if (auto mapped = find_mapped(this->m_storage->axioms, source.get_index()))
+    if (auto mapped = find_mapped(this->m_storage->axioms, source))
         return *mapped;
     const auto& data = source.get_data();
     this->m_num_quantifications.clear();
     this->self().increment_quantifications(source.get_parameters());
-    auto parameters = this->self().copy_parameters(source.get_parameters());
-    this->self().enter_scope(parameters, source.get_parameters());
+    auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
+    this->self().enter_scope(parameter_views);
     auto copied_condition = this->self().copy(source.get_condition());
     if (this->m_phase == TranslationPhase::MoveExistentialQuantifiers)
-        copied_condition = this->self().lift_top_level_exists(parameters, copied_condition);
+        copied_condition = this->self().lift_top_level_exists(parameter_views, copied_condition);
     auto condition = as_index(copied_condition);
     if (this->m_phase == TranslationPhase::AddTypePredicates)
         this->self().prepend_type_conditions(condition, source.get_parameters());
+    const auto parameters = this->self().parameter_indices(parameter_views);
     const auto out_parameters = this->self().removes_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
     auto out = formalism::get_or_create<formalism::Axiom>(this->m_storage->repository,
                                                           out_parameters,
@@ -119,30 +121,30 @@ formalism::AxiomView TopLevelTranslator<Derived>::copy(formalism::AxiomView sour
                                                           as_index(this->self().copy(source.get_head())),
                                                           condition);
     this->self().leave_scope();
-    remember(this->m_storage->axioms, source.get_index(), out);
+    remember(this->m_storage->axioms, source, out);
     return out;
 }
 
 template<typename Derived>
 formalism::MetricView TopLevelTranslator<Derived>::copy(formalism::MetricView source)
 {
-    if (auto mapped = find_mapped(this->m_storage->metrics, source.get_index()))
+    if (auto mapped = find_mapped(this->m_storage->metrics, source))
         return *mapped;
     auto out =
         formalism::get_or_create<formalism::Metric>(this->m_storage->repository, source.is_minimize(), as_index(this->self().copy(source.get_expression())));
-    remember(this->m_storage->metrics, source.get_index(), out);
+    remember(this->m_storage->metrics, source, out);
     return out;
 }
 
 template<typename Derived>
 formalism::InitialFunctionValueView TopLevelTranslator<Derived>::copy(formalism::InitialFunctionValueView source)
 {
-    if (auto mapped = find_mapped(this->m_storage->initial_function_values, source.get_index()))
+    if (auto mapped = find_mapped(this->m_storage->initial_function_values, source))
         return *mapped;
     auto out = formalism::get_or_create<formalism::InitialFunctionValue>(this->m_storage->repository,
                                                                          as_index(this->self().copy(source.get_function())),
                                                                          as_index(this->self().copy(source.get_value())));
-    remember(this->m_storage->initial_function_values, source.get_index(), out);
+    remember(this->m_storage->initial_function_values, source, out);
     return out;
 }
 

@@ -39,7 +39,6 @@ protected:
         m_generated_axioms(context.generated_axioms),
         m_generated_universal_conditions(context.generated_universal_conditions),
         m_num_generated_axioms(context.num_generated_axioms),
-        m_append_generated_axioms_to_domain(context.append_generated_axioms_to_domain),
         m_type_predicates(context.type_predicates),
         m_remove_typing(context.remove_typing),
         m_renaming_enabled(context.renaming_enabled),
@@ -52,17 +51,16 @@ protected:
 
     CopyContext& m_context;
     std::shared_ptr<TranslationStorage>& m_storage;
-    std::unordered_map<ygg::uint_t, size_t>& m_num_quantifications;
-    std::vector<ygg::IndexList<formalism::Parameter>>& m_active_parameters;
-    std::vector<ygg::IndexList<formalism::Variable>>& m_active_parameter_variables;
-    std::vector<std::unordered_map<ygg::uint_t, formalism::VariableView>>& m_variable_bindings;
+    ygg::UnorderedMap<formalism::VariableView, size_t>& m_num_quantifications;
+    std::vector<std::vector<formalism::ParameterView>>& m_active_parameters;
+    std::vector<std::vector<formalism::VariableView>>& m_active_parameter_variables;
+    std::vector<ygg::UnorderedMap<formalism::VariableView, formalism::VariableView>>& m_variable_bindings;
     ygg::UnorderedSet<std::string>& m_used_predicate_names;
-    ygg::IndexList<formalism::Predicate>& m_generated_predicates;
-    ygg::IndexList<formalism::Axiom>& m_generated_axioms;
-    std::unordered_map<std::string, formalism::ConditionView>& m_generated_universal_conditions;
+    std::vector<formalism::PredicateView>& m_generated_predicates;
+    std::vector<formalism::AxiomView>& m_generated_axioms;
+    ygg::UnorderedMap<formalism::ConditionView, formalism::ConditionView>& m_generated_universal_conditions;
     size_t& m_num_generated_axioms;
-    bool& m_append_generated_axioms_to_domain;
-    std::unordered_map<ygg::uint_t, formalism::PredicateView>& m_type_predicates;
+    ygg::UnorderedMap<formalism::TypeView, formalism::PredicateView>& m_type_predicates;
     bool& m_remove_typing;
     bool& m_renaming_enabled;
     TranslationPhase& m_phase;

@@ -46,7 +46,7 @@ public:
     formalism::ConditionView move_existentials_node(formalism::ConditionView condition, formalism::ConditionOrView node);
     template<typename T>
     formalism::ConditionView move_existentials_node(formalism::ConditionView condition, formalism::EntityView<T>);
-    formalism::ConditionView lift_top_level_exists(ygg::IndexList<formalism::Parameter>& parameters, formalism::ConditionView condition);
+    formalism::ConditionView lift_top_level_exists(std::vector<formalism::ParameterView>& parameters, formalism::ConditionView condition);
 };
 
 template<typename Derived>
@@ -54,35 +54,28 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::make_generated_
 {
     const auto free_parameters = this->self().free_parameters_in_scope(condition);
 
-    auto key = std::string("condition:") + std::to_string(condition.get_index().get_value());
-    for (auto [parameter, variable] : free_parameters)
-    {
-        key += "|parameter:";
-        key += std::to_string(parameter.get_value());
-    }
-    if (auto it = this->m_generated_universal_conditions.find(key); it != this->m_generated_universal_conditions.end())
+    if (auto it = this->m_generated_universal_conditions.find(condition); it != this->m_generated_universal_conditions.end())
         return it->second;
 
     auto predicate_parameters = ygg::IndexList<formalism::Parameter> {};
     auto terms = ygg::IndexList<formalism::Term> {};
     for (auto [parameter, variable] : free_parameters)
     {
-        predicate_parameters.push_back(parameter);
+        predicate_parameters.push_back(parameter.get_index());
         terms.push_back(as_index(this->self().term_from_variable(variable)));
     }
 
     const auto name = cista::offset::string(this->self().next_generated_predicate_name("loki-universal-"));
-    const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, name, predicate_parameters).get_index();
-    const auto atom = formalism::get_or_create<formalism::Atom>(this->m_storage->repository, predicate, terms).get_index();
+    const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, name, predicate_parameters);
+    const auto atom = formalism::get_or_create<formalism::Atom>(this->m_storage->repository, predicate.get_index(), terms).get_index();
     const auto positive_head = formalism::get_or_create<formalism::Literal>(this->m_storage->repository, atom, true).get_index();
     const auto negative_literal = formalism::get_or_create<formalism::Literal>(this->m_storage->repository, atom, false).get_index();
-    const auto axiom =
-        formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, predicate_parameters, positive_head, condition.get_index()).get_index();
+    const auto axiom = formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, predicate_parameters, positive_head, condition.get_index());
 
     this->m_generated_predicates.push_back(predicate);
     this->m_generated_axioms.push_back(axiom);
     auto result = this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, negative_literal));
-    this->m_generated_universal_conditions.emplace(std::move(key), result);
+    this->m_generated_universal_conditions.emplace(condition, result);
     return result;
 }
 
@@ -131,8 +124,9 @@ template<typename Derived>
 formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionExistsView source)
 {
     this->self().increment_quantifications(source.get_parameters());
-    auto parameters = this->self().copy_parameters(source.get_parameters());
-    this->self().enter_scope(parameters, source.get_parameters());
+    auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
+    auto parameters = this->self().parameter_indices(parameter_views);
+    this->self().enter_scope(parameter_views);
     auto condition = as_index(this->self().remove_universal_quantifiers(source.get_condition()));
     this->self().leave_scope();
     return this->self().flatten_condition(
@@ -143,8 +137,9 @@ template<typename Derived>
 formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionForallView source)
 {
     this->self().increment_quantifications(source.get_parameters());
-    auto parameters = this->self().copy_parameters(source.get_parameters());
-    this->self().enter_scope(parameters, source.get_parameters());
+    auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
+    auto parameters = this->self().parameter_indices(parameter_views);
+    this->self().enter_scope(parameter_views);
     auto negated = as_index(this->self().negate_condition(source.get_condition()));
     this->self().leave_scope();
     const auto exists_not = this->self().flatten_condition(
@@ -185,20 +180,19 @@ template<typename Derived>
 formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentials_node(formalism::ConditionView, formalism::ConditionAndView node)
 {
     auto parameters = ygg::IndexList<formalism::Parameter> {};
-    auto seen_parameters = std::unordered_set<ygg::uint_t> {};
+    auto seen_parameters = ygg::UnorderedSet<formalism::ParameterView> {};
     auto parts = ygg::IndexList<formalism::Condition> {};
     for (auto child : node.get_conditions())
     {
         const auto moved = this->self().move_existentials(child);
         if (const auto exists = this->self().as_exists(moved))
         {
-            const auto& exists_data = exists->get_data();
-            for (auto parameter : exists_data.parameters)
+            for (auto parameter : exists->get_parameters())
             {
-                if (seen_parameters.insert(parameter.get_value()).second)
-                    parameters.push_back(parameter);
+                if (seen_parameters.insert(parameter).second)
+                    parameters.push_back(parameter.get_index());
             }
-            parts.push_back(exists_data.condition);
+            parts.push_back(exists->get_condition().get_index());
         }
         else
         {
@@ -238,20 +232,20 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentia
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::lift_top_level_exists(ygg::IndexList<formalism::Parameter>& parameters,
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::lift_top_level_exists(std::vector<formalism::ParameterView>& parameters,
                                                                                        formalism::ConditionView condition)
 {
     auto moved = this->self().move_existentials(condition);
     if (const auto exists = this->self().as_exists(moved))
     {
-        auto seen_parameters = std::unordered_set<ygg::uint_t> {};
+        auto seen_parameters = ygg::UnorderedSet<formalism::ParameterView> {};
         for (auto parameter : parameters)
-            seen_parameters.insert(parameter.get_value());
+            seen_parameters.insert(parameter);
 
         for (auto parameter : exists->get_parameters())
         {
-            if (seen_parameters.insert(parameter.get_index().get_value()).second)
-                parameters.push_back(parameter.get_index());
+            if (seen_parameters.insert(parameter).second)
+                parameters.push_back(parameter);
         }
         moved = exists->get_condition();
     }

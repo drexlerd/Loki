@@ -87,9 +87,14 @@ formalism::DomainView Parser::parse_domain_ast(const ast::Domain& domain)
     for (const auto& action : domain.actions)
         actions.push_back(parse_action(action));
 
+    auto all_types = std::vector<formalism::TypeView> {};
+    for (const auto& [_, type] : m_types)
+        all_types.push_back(type);
+    std::sort(all_types.begin(), all_types.end(), [](auto lhs, auto rhs) { return lhs.get_index() < rhs.get_index(); });
+
     types.clear();
-    for (auto i = ygg::uint_t { 0 }; i < repo().size<formalism::Type>(); ++i)
-        types.push_back(ygg::Index<formalism::Type>(i));
+    for (auto type : all_types)
+        types.push_back(type.get_index());
     auto data = ygg::Data<formalism::Domain>(to_cista(domain.name.text),
                                              std::move(requirements),
                                              std::move(types),
@@ -124,49 +129,45 @@ void Parser::rebuild_domain_symbols()
     if (!m_domain)
         return;
 
-    auto remember_type = [&](auto&& self, ygg::Index<formalism::Type> type) -> void
+    auto remember_type = [&](auto&& self, formalism::TypeView type) -> void
     {
-        const auto& data = repo()[type];
-        m_types[std::string(data.name)] = type;
-        m_declared_types.insert(std::string(data.name));
-        for (auto base : data.bases)
+        m_types[std::string(type.get_name())] = type;
+        m_declared_types.insert(std::string(type.get_name()));
+        for (auto base : type.get_bases())
             self(self, base);
     };
 
-    const auto& domain = m_domain->get_data();
-    for (auto requirement : domain.requirements)
-        remember_requirement(repo()[requirement].kind);
+    for (auto requirement : m_domain->get_requirements())
+        remember_requirement(requirement.get_kind());
     m_domain_requirement_kinds = m_active_requirements;
-    for (auto type : domain.types)
+    for (auto type : m_domain->get_types())
         remember_type(remember_type, type);
-    for (auto object : domain.constants)
+    for (auto object : m_domain->get_constants())
     {
-        const auto& data = repo()[object];
-        m_objects[std::string(data.name)] = object;
-        m_declared_objects.insert(std::string(data.name));
-        for (auto type : data.types)
+        m_objects[std::string(object.get_name())] = object;
+        m_declared_objects.insert(std::string(object.get_name()));
+        for (auto type : object.get_types())
             remember_type(remember_type, type);
     }
-    for (auto predicate : domain.predicates)
+    for (auto predicate : m_domain->get_predicates())
     {
-        const auto name = std::string(repo()[predicate].name);
+        const auto name = std::string(predicate.get_name());
         m_predicates[name] = predicate;
         m_declared_predicates.insert(name);
     }
-    for (auto function : domain.functions)
+    for (auto function : m_domain->get_functions())
     {
-        const auto& data = repo()[function];
-        m_functions[std::string(data.name)] = function;
-        m_declared_functions.insert(std::string(data.name));
-        remember_type(remember_type, data.type);
+        m_functions[std::string(function.get_name())] = function;
+        m_declared_functions.insert(std::string(function.get_name()));
+        remember_type(remember_type, function.get_type());
     }
     if (auto it = m_types.find("object"); it != m_types.end())
-        m_object_type = it->second;
+        m_object_type = it->second.get_index();
     else
         m_object_type = intern_type("object", {});
 
     if (auto it = m_types.find("number"); it != m_types.end())
-        m_number_type = it->second;
+        m_number_type = it->second.get_index();
     else
         m_number_type = intern_type("number", {});
 }
@@ -204,33 +205,40 @@ void Parser::require_typing_if_needed(const boost::optional<ast::TypeExpression>
     if (type)
         require_requirement(formalism::RequirementKind::Typing, node);
 }
-bool Parser::is_subtype(ygg::Index<formalism::Type> actual, ygg::Index<formalism::Type> expected, std::unordered_set<ygg::uint_t>& seen) const
+bool Parser::is_subtype(formalism::TypeView actual, formalism::TypeView expected, ygg::UnorderedSet<formalism::TypeView>& seen) const
 {
     if (actual == expected)
         return true;
-    if (!seen.insert(ygg::uint_t(actual)).second)
+    if (!seen.insert(actual).second)
         return false;
-    for (auto base : repo()[actual].bases)
+    for (auto base : actual.get_bases())
         if (is_subtype(base, expected, seen))
             return true;
     return false;
 }
-ygg::IndexList<formalism::Type> Parser::term_types(const ast::Term& term) const
+std::vector<formalism::TypeView> Parser::term_types(const ast::Term& term) const
 {
     if (!term.variable)
-        return repo()[object(term.name)].types;
-    auto variable_index = variable(term.name);
-    if (auto it = m_variable_types.find(ygg::uint_t(variable_index)); it != m_variable_types.end())
+    {
+        auto result = std::vector<formalism::TypeView> {};
+        for (auto type : object(term.name).get_types())
+            result.push_back(type);
+        return result;
+    }
+    auto variable_view = variable(term.name);
+    if (auto it = m_variable_types.find(variable_view); it != m_variable_types.end())
+    {
         return it->second;
-    return ygg::IndexList<formalism::Type> { m_object_type };
+    }
+    return std::vector<formalism::TypeView> { m_types.at("object") };
 }
 ygg::Index<formalism::Type> Parser::intern_type(const std::string& name, ygg::IndexList<formalism::Type> bases)
 {
     auto k = key(name);
     if (auto it = m_types.find(k); it != m_types.end() && bases.empty())
-        return it->second;
+        return it->second.get_index();
     auto view = formalism::get_or_create<formalism::Type>(repo(), to_cista(k), std::move(bases));
-    m_types[k] = view.get_index();
+    m_types[k] = view;
     return view.get_index();
 }
 formalism::RequirementKind Parser::requirement_kind(const ast::Requirement& node) const
@@ -294,13 +302,16 @@ ygg::IndexList<formalism::Parameter> Parser::parse_parameters(const std::vector<
         const auto name = key(node.variable.text);
         if (!m_variable_scopes.empty() && m_variable_scopes.back().contains(name))
             throw_at(node.variable, DuplicateVariableError(name));
-        auto variable = formalism::get_or_create<formalism::Variable>(repo(), to_cista(name)).get_index();
+        auto variable = formalism::get_or_create<formalism::Variable>(repo(), to_cista(name));
         if (!m_variable_scopes.empty())
             m_variable_scopes.back()[name] = variable;
         require_typing_if_needed(node.type, node.variable);
         auto types = node.type ? parse_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_object_type };
-        m_variable_types[ygg::uint_t(variable)] = types;
-        result.push_back(formalism::get_or_create<formalism::Parameter>(repo(), variable, std::move(types)).get_index());
+        auto type_views = std::vector<formalism::TypeView> {};
+        for (auto type : types)
+            type_views.emplace_back(type, repo());
+        m_variable_types[variable] = std::move(type_views);
+        result.push_back(formalism::get_or_create<formalism::Parameter>(repo(), variable.get_index(), std::move(types)).get_index());
     }
     return result;
 }
@@ -318,12 +329,12 @@ ygg::IndexList<formalism::FunctionSkeleton> Parser::parse_functions(const std::v
         require_typing_if_needed(node.type, node.name);
         auto type = node.type ? parse_type_expression(*node.type).front() : m_number_type;
         auto view = formalism::get_or_create<formalism::FunctionSkeleton>(repo(), to_cista(name), std::move(parameters), type);
-        m_functions[name] = view.get_index();
+        m_functions[name] = view;
         result.push_back(view.get_index());
     }
     return result;
 }
-ygg::Index<formalism::Predicate> Parser::equality_predicate(const ast::Identifier& identifier, size_t arity)
+formalism::PredicateView Parser::equality_predicate(const ast::Identifier& identifier, size_t arity)
 {
     require_requirement(formalism::RequirementKind::Equality, identifier);
     if (arity != 2)
@@ -333,7 +344,7 @@ ygg::Index<formalism::Predicate> Parser::equality_predicate(const ast::Identifie
     if (auto it = m_predicates.find(name); it != m_predicates.end())
     {
         if (m_declared_predicates.contains(name))
-            ensure_arity(name, repo()[it->second].parameters.size(), arity, identifier);
+            ensure_arity(name, it->second.get_parameters().size(), arity, identifier);
         return it->second;
     }
 
@@ -344,10 +355,10 @@ ygg::Index<formalism::Predicate> Parser::equality_predicate(const ast::Identifie
     parameters.push_back(formalism::get_or_create<formalism::Parameter>(repo(), left, types).get_index());
     parameters.push_back(formalism::get_or_create<formalism::Parameter>(repo(), right, std::move(types)).get_index());
     auto view = formalism::get_or_create<formalism::Predicate>(repo(), cista::offset::string("="), std::move(parameters));
-    m_predicates[name] = view.get_index();
-    return view.get_index();
+    m_predicates[name] = view;
+    return view;
 }
-ygg::Index<formalism::Variable> Parser::variable(const ast::Identifier& identifier) const
+formalism::VariableView Parser::variable(const ast::Identifier& identifier) const
 {
     const auto name = key(identifier.text);
     for (auto it = m_variable_scopes.rbegin(); it != m_variable_scopes.rend(); ++it)
@@ -358,17 +369,17 @@ ygg::Index<formalism::Variable> Parser::variable(const ast::Identifier& identifi
 ygg::Index<formalism::Term> Parser::parse_term(const ast::Term& node)
 {
     if (node.variable)
-        return formalism::get_or_create<formalism::Term>(repo(), ygg::Data<formalism::Term>::Variant(variable(node.name))).get_index();
-    return formalism::get_or_create<formalism::Term>(repo(), ygg::Data<formalism::Term>::Variant(object(node.name))).get_index();
+        return formalism::get_or_create<formalism::Term>(repo(), ygg::Data<formalism::Term>::Variant(variable(node.name).get_index())).get_index();
+    return formalism::get_or_create<formalism::Term>(repo(), ygg::Data<formalism::Term>::Variant(object(node.name).get_index())).get_index();
 }
 ygg::Index<formalism::Atom> Parser::parse_atom(const ast::Atom& node)
 {
     const auto name = key(node.predicate.text);
     auto pred = name == "=" ? equality_predicate(node.predicate, node.terms.size()) : predicate(node.predicate, node.terms.size());
     if (m_declared_predicates.contains(name))
-        check_argument_types(name, repo()[pred].parameters, node.terms, node.predicate);
+        check_argument_types(name, pred.get_parameters(), node.terms, node.predicate);
     auto terms = parse_terms(node.terms);
-    return formalism::get_or_create<formalism::Atom>(repo(), pred, std::move(terms)).get_index();
+    return formalism::get_or_create<formalism::Atom>(repo(), pred.get_index(), std::move(terms)).get_index();
 }
 ygg::Index<formalism::Condition> Parser::parse_condition(const ast::Condition& condition)
 {
@@ -404,9 +415,9 @@ ygg::Index<formalism::FunctionTerm> Parser::parse_function_term(const ast::Funct
 {
     auto skeleton = function(node.function, node.terms.size());
     if (m_declared_functions.contains(key(node.function.text)))
-        check_argument_types(key(node.function.text), repo()[skeleton].parameters, node.terms, node.function);
+        check_argument_types(key(node.function.text), skeleton.get_parameters(), node.terms, node.function);
     auto terms = parse_terms(node.terms);
-    return formalism::get_or_create<formalism::FunctionTerm>(repo(), skeleton, std::move(terms)).get_index();
+    return formalism::get_or_create<formalism::FunctionTerm>(repo(), skeleton.get_index(), std::move(terms)).get_index();
 }
 ygg::Index<formalism::FunctionExpression> Parser::wrap_function_expression(ygg::Data<formalism::FunctionExpression>::Variant value)
 {
@@ -437,10 +448,10 @@ ygg::Index<formalism::Effect> Parser::parse_effect_node(const ast::EffectNumeric
     require_requirement(formalism::RequirementKind::NumericFluents, node);
     auto skeleton = function(node.function.function, node.function.terms.size());
     if (m_declared_functions.contains(key(node.function.function.text)))
-        check_argument_types(key(node.function.function.text), repo()[skeleton].parameters, node.function.terms, node.function.function);
+        check_argument_types(key(node.function.function.text), skeleton.get_parameters(), node.function.terms, node.function.function);
     return wrap_effect(formalism::get_or_create<formalism::EffectNumeric>(repo(),
                                                                           numeric_effect_operator(node),
-                                                                          skeleton,
+                                                                          skeleton.get_index(),
                                                                           parse_terms(node.function.terms),
                                                                           parse_function_expression(node.expression.get()))
                            .get_index());
@@ -536,11 +547,11 @@ formalism::TaskView Parser::parse_task_ast(const ast::Task& task)
     StorageScope storage_scope { *this, m_storage };
     m_storage = std::move(parse_storage);
 
-    auto task_objects = std::unordered_map<std::string, ygg::Index<formalism::Object>> {};
+    auto task_objects = ygg::UnorderedMap<std::string, formalism::ObjectView> {};
     struct TaskObjectScope
     {
         Parser& parser;
-        std::unordered_map<std::string, ygg::Index<formalism::Object>>* previous;
+        ygg::UnorderedMap<std::string, formalism::ObjectView>* previous;
         ~TaskObjectScope() { parser.m_task_objects = previous; }
     };
     TaskObjectScope task_object_scope { *this, m_task_objects };
@@ -549,7 +560,7 @@ formalism::TaskView Parser::parse_task_ast(const ast::Task& task)
     struct ObjectDeclarationScope
     {
         Parser& parser;
-        std::unordered_set<std::string> previous;
+        ygg::UnorderedSet<std::string> previous;
         ~ObjectDeclarationScope() { parser.m_declared_objects = std::move(previous); }
     };
     ObjectDeclarationScope object_declaration_scope { *this, m_declared_objects };
@@ -557,7 +568,7 @@ formalism::TaskView Parser::parse_task_ast(const ast::Task& task)
     struct RequirementScope
     {
         Parser& parser;
-        std::unordered_set<formalism::RequirementKind> previous;
+        ygg::UnorderedSet<formalism::RequirementKind> previous;
         ~RequirementScope() { parser.m_active_requirements = std::move(previous); }
     };
     RequirementScope requirement_scope { *this, m_active_requirements };
@@ -706,13 +717,13 @@ void Parser::remember_adl_requirements()
     remember_requirement(formalism::RequirementKind::ConditionalEffects);
 }
 
-bool Parser::is_subtype(ygg::Index<formalism::Type> actual, ygg::Index<formalism::Type> expected) const
+bool Parser::is_subtype(formalism::TypeView actual, formalism::TypeView expected) const
 {
-    auto seen = std::unordered_set<ygg::uint_t> {};
+    auto seen = ygg::UnorderedSet<formalism::TypeView> {};
     return is_subtype(actual, expected, seen);
 }
 
-bool Parser::types_compatible(const ygg::IndexList<formalism::Type>& actual_types, const ygg::IndexList<formalism::Type>& expected_types) const
+bool Parser::types_compatible(const std::vector<formalism::TypeView>& actual_types, formalism::EntityListView<formalism::Type> expected_types) const
 {
     if (expected_types.empty() || actual_types.empty())
         return true;
@@ -758,7 +769,7 @@ ygg::IndexList<formalism::Type> Parser::parse_type_expression_node(const ast::Ty
     auto result = ygg::IndexList<formalism::Type> {};
     auto k = key(node.name.text);
     if (auto it = m_types.find(k); it != m_types.end())
-        result.push_back(it->second);
+        result.push_back(it->second.get_index());
     else if (m_options.strict)
         throw_at(node.name, UndefinedTypeError(k));
     else
@@ -771,8 +782,7 @@ ygg::IndexList<formalism::Type> Parser::parse_type_expression_node(const ast::Ty
     return result;
 }
 
-ygg::IndexList<formalism::Object> Parser::parse_objects(const std::vector<ast::TypedName>& nodes,
-                                                        std::unordered_map<std::string, ygg::Index<formalism::Object>>& table)
+ygg::IndexList<formalism::Object> Parser::parse_objects(const std::vector<ast::TypedName>& nodes, ygg::UnorderedMap<std::string, formalism::ObjectView>& table)
 {
     auto result = ygg::IndexList<formalism::Object> {};
     for (const auto& node : nodes)
@@ -782,7 +792,7 @@ ygg::IndexList<formalism::Object> Parser::parse_objects(const std::vector<ast::T
         require_typing_if_needed(node.type, node.name);
         auto types = node.type ? parse_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_object_type };
         auto view = formalism::get_or_create<formalism::Object>(repo(), to_cista(name), std::move(types));
-        table[name] = view.get_index();
+        table[name] = view;
         result.push_back(view.get_index());
     }
     return result;
@@ -799,45 +809,45 @@ ygg::IndexList<formalism::Predicate> Parser::parse_predicates(const std::vector<
         const auto name = key(node.name.text);
         ensure_new<DuplicatePredicateError>(m_declared_predicates, name, node.name);
         auto view = formalism::get_or_create<formalism::Predicate>(repo(), to_cista(name), std::move(parameters));
-        m_predicates[name] = view.get_index();
+        m_predicates[name] = view;
         result.push_back(view.get_index());
     }
     return result;
 }
 
-ygg::Index<formalism::Predicate> Parser::predicate(const ast::Identifier& identifier, size_t arity)
+formalism::PredicateView Parser::predicate(const ast::Identifier& identifier, size_t arity)
 {
     const auto name = key(identifier.text);
     if (auto it = m_predicates.find(name); it != m_predicates.end())
     {
         if (m_declared_predicates.contains(name))
-            ensure_arity(name, repo()[it->second].parameters.size(), arity, identifier);
+            ensure_arity(name, it->second.get_parameters().size(), arity, identifier);
         return it->second;
     }
     if (m_options.strict)
         throw_at(identifier, UndefinedPredicateError(name));
     auto view = formalism::get_or_create<formalism::Predicate>(repo(), to_cista(name), ygg::IndexList<formalism::Parameter> {});
-    m_predicates[name] = view.get_index();
-    return view.get_index();
+    m_predicates[name] = view;
+    return view;
 }
 
-ygg::Index<formalism::FunctionSkeleton> Parser::function(const ast::Identifier& identifier, size_t arity)
+formalism::FunctionSkeletonView Parser::function(const ast::Identifier& identifier, size_t arity)
 {
     const auto name = key(identifier.text);
     if (auto it = m_functions.find(name); it != m_functions.end())
     {
         if (m_declared_functions.contains(name))
-            ensure_arity(name, repo()[it->second].parameters.size(), arity, identifier);
+            ensure_arity(name, it->second.get_parameters().size(), arity, identifier);
         return it->second;
     }
     if (m_options.strict)
         throw_at(identifier, UndefinedFunctionError(name));
     auto view = formalism::get_or_create<formalism::FunctionSkeleton>(repo(), to_cista(name), ygg::IndexList<formalism::Parameter> {}, m_number_type);
-    m_functions[name] = view.get_index();
-    return view.get_index();
+    m_functions[name] = view;
+    return view;
 }
 
-ygg::Index<formalism::Object> Parser::object(const ast::Identifier& identifier) const
+formalism::ObjectView Parser::object(const ast::Identifier& identifier) const
 {
     const auto name = key(identifier.text);
     if (m_task_objects)

@@ -88,7 +88,7 @@ formalism::VariableView VariableRenamingTranslator<Derived>::lookup_variable(for
 {
     for (auto it = this->m_variable_bindings.rbegin(); it != this->m_variable_bindings.rend(); ++it)
     {
-        if (auto mapped = it->find(source.get_index().get_value()); mapped != it->end())
+        if (auto mapped = it->find(source); mapped != it->end())
             return mapped->second;
     }
     return this->self().copy(source);
@@ -97,7 +97,7 @@ formalism::VariableView VariableRenamingTranslator<Derived>::lookup_variable(for
 template<typename Derived>
 formalism::VariableView VariableRenamingTranslator<Derived>::fresh_variable(formalism::VariableView source)
 {
-    auto& counter = this->m_num_quantifications[source.get_index().get_value()];
+    auto& counter = this->m_num_quantifications[source];
     auto name = std::string(source.get_name()) + "_" + std::to_string(counter++);
     return formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string(name));
 }
@@ -106,7 +106,7 @@ template<typename Derived>
 formalism::ParameterView VariableRenamingTranslator<Derived>::rename_parameter(formalism::ParameterView source)
 {
     const auto variable = this->self().fresh_variable(source.get_variable());
-    this->m_variable_bindings.back().emplace(source.get_variable().get_index().get_value(), variable);
+    this->m_variable_bindings.back().emplace(source.get_variable(), variable);
     return formalism::get_or_create<formalism::Parameter>(this->m_storage->repository,
                                                           variable.get_index(),
                                                           this->self().template copy_list<formalism::Type>(source.get_types()));
