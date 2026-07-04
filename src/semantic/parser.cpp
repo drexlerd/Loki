@@ -312,7 +312,8 @@ ygg::IndexList<formalism::Parameter> Parser::parse_parameters(const std::vector<
         auto type_views = std::vector<formalism::TypeView> {};
         for (auto type : types)
             type_views.emplace_back(type, repo());
-        m_variable_types.emplace(variable, std::move(type_views));
+        if (auto [it, inserted] = m_variable_types.emplace(variable, type_views); !inserted)
+            it->second = std::move(type_views);
         result.push_back(formalism::get_or_create<formalism::Parameter>(repo(), variable.get_index(), std::move(types)).get_index());
     }
     return result;
