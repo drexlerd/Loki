@@ -69,6 +69,7 @@ static int run(const argparse::ArgumentParser& program)
 
     auto translator_options = loki::TranslatorOptions();
     translator_options.remove_typing = program.get<bool>("--remove-typing");
+    translator_options.multiply_conditional_effects = program.get<bool>("--multiply-conditional-effects");
 
     auto parser = loki::Parser(domain_filepath, parser_options);
     const auto domain = parser.get_domain();
@@ -112,6 +113,10 @@ int main(int argc, char** argv)
         .help("Enable strict semantic checks for requirements, arity, and type compatibility.");
     program.add_argument("-v", "--verbose").default_value(false).implicit_value(true).help("Enable verbose console prints.");
     program.add_argument("--remove-typing").default_value(false).implicit_value(true).help("Enable the removal of type annotations.");
+    program.add_argument("--multiply-conditional-effects")
+        .default_value(false)
+        .implicit_value(true)
+        .help("Split actions to eliminate top-level conditional effects after effect normalization.");
 
     try
     {

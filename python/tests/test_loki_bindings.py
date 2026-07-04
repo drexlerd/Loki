@@ -292,6 +292,30 @@ def test_translator_options_control_typing_removal():
         for parameter in predicate.get_parameters():
             assert len(parameter.get_types()) == 0
 
+def test_translator_options_multiply_conditional_effects():
+    parser = pypddl.Parser(
+        """
+(define (domain py-conditional-multiply)
+  (:requirements :strips :conditional-effects :negative-preconditions)
+  (:predicates (p) (q) (r) (s) (t))
+  (:action a
+    :parameters ()
+    :precondition (p)
+    :effect (and (when (q) (r)) (when (s) (t))))
+)
+"""
+    )
+
+    options = pypddl.TranslatorOptions()
+    assert options.multiply_conditional_effects is False
+    options.multiply_conditional_effects = True
+
+    translated = pypddl.translate_domain(parser.domain(), options).translated_domain
+
+    assert len(translated.get_actions()) == 4
+    assert all(action.get_name().startswith("a__ce_") for action in translated.get_actions())
+    assert all(action.get_original_name() == "a" for action in translated.get_actions())
+
 
 def test_repository_factory_binding_creates_repositories():
     factory = pypddl.RepositoryFactory()

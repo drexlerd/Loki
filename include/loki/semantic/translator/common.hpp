@@ -40,6 +40,7 @@ namespace loki::semantic
 struct TranslatorOptions
 {
     bool remove_typing = true;
+    bool multiply_conditional_effects = false;
 };
 
 enum class TranslationPhase
@@ -53,6 +54,7 @@ enum class TranslationPhase
     MoveExistentialQuantifiers,
     AddTypePredicates,
     ToEffectNormalForm,
+    MultiplyConditionalEffects,
     InitializeEquality,
 };
 

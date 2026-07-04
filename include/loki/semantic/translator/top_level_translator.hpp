@@ -68,6 +68,7 @@ formalism::ActionView TopLevelTranslator<Derived>::copy(ygg::Index<formalism::Ac
     const auto out_parameters = this->m_phase == TranslationPhase::AddTypePredicates ? this->self().maybe_strip_parameters(parameters) : parameters;
     auto out = formalism::get_or_create<formalism::Action>(this->m_storage->repository,
                                                            data.name,
+                                                           data.original_name,
                                                            out_parameters,
                                                            data.original_arity,
                                                            precondition,

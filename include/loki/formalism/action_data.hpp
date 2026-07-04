@@ -43,6 +43,7 @@ struct Data<::loki::formalism::Action>
 {
     ygg::Index<::loki::formalism::Action> index;
     ::cista::offset::string name;
+    ::cista::offset::string original_name;
     ygg::IndexList<::loki::formalism::Parameter> parameters;
     ygg::uint_t original_arity;
     ::cista::optional<ygg::Index<::loki::formalism::Condition>> precondition;
@@ -55,6 +56,7 @@ struct Data<::loki::formalism::Action>
          ::cista::optional<ygg::Index<::loki::formalism::Effect>> effect_) :
         index(),
         name(std::move(name_)),
+        original_name(name),
         parameters(std::move(parameters_)),
         original_arity(parameters.size()),
         precondition(precondition_),
@@ -68,6 +70,22 @@ struct Data<::loki::formalism::Action>
          ::cista::optional<ygg::Index<::loki::formalism::Effect>> effect_) :
         index(),
         name(std::move(name_)),
+        original_name(name),
+        parameters(std::move(parameters_)),
+        original_arity(original_arity_),
+        precondition(precondition_),
+        effect(effect_)
+    {
+    }
+    Data(::cista::offset::string name_,
+         ::cista::offset::string original_name_,
+         ygg::IndexList<::loki::formalism::Parameter> parameters_,
+         ygg::uint_t original_arity_,
+         ::cista::optional<ygg::Index<::loki::formalism::Condition>> precondition_,
+         ::cista::optional<ygg::Index<::loki::formalism::Effect>> effect_) :
+        index(),
+        name(std::move(name_)),
+        original_name(std::move(original_name_)),
         parameters(std::move(parameters_)),
         original_arity(original_arity_),
         precondition(precondition_),
@@ -81,6 +99,7 @@ struct Data<::loki::formalism::Action>
          const std::optional<::ygg::View<ygg::Index<::loki::formalism::Effect>, C>>& effect_) :
         index(),
         name(name_),
+        original_name(name_),
         parameters(),
         original_arity(parameters_.size()),
         precondition(),
@@ -95,13 +114,14 @@ struct Data<::loki::formalism::Action>
     {
         ygg::clear(index);
         ygg::clear(name);
+        ygg::clear(original_name);
         ygg::clear(parameters);
         ygg::clear(original_arity);
         ygg::clear(precondition);
         ygg::clear(effect);
     }
-    auto cista_members() const noexcept { return std::tie(index, name, parameters, original_arity, precondition, effect); }
-    auto identifying_members() const noexcept { return std::tie(name, parameters, original_arity, precondition, effect); }
+    auto cista_members() const noexcept { return std::tie(index, name, original_name, parameters, original_arity, precondition, effect); }
+    auto identifying_members() const noexcept { return std::tie(name, original_name, parameters, original_arity, precondition, effect); }
 };
 
 }

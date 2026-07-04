@@ -42,6 +42,8 @@ public:
 
     ygg::IndexList<formalism::Action> split_disjunctive_actions(const ygg::IndexList<formalism::Action>& actions);
 
+    ygg::IndexList<formalism::Action> multiply_conditional_effect_actions(const ygg::IndexList<formalism::Action>& actions);
+
     ygg::IndexList<formalism::Axiom> split_disjunctive_axioms(const ygg::IndexList<formalism::Axiom>& axioms);
 
     formalism::DomainView copy_domain(formalism::DomainView domain);
@@ -123,6 +125,7 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjuncti
                                              seen,
                                              formalism::get_or_create<formalism::Action>(this->m_storage->repository,
                                                                                          data.name,
+                                                                                         data.original_name,
                                                                                          data.parameters,
                                                                                          data.original_arity,
                                                                                          part,
@@ -133,6 +136,97 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjuncti
         }
         this->self().push_unique(result, seen, action);
     }
+    return result;
+}
+
+
+template<typename Derived>
+ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::multiply_conditional_effect_actions(const ygg::IndexList<formalism::Action>& actions)
+{
+    struct ConditionalEffect
+    {
+        ygg::Index<formalism::Condition> condition;
+        ygg::Index<formalism::Effect> effect;
+    };
+
+    auto result = ygg::IndexList<formalism::Action> {};
+    auto seen = std::unordered_set<ygg::uint_t> {};
+
+    for (auto action : actions)
+    {
+        const auto data = this->m_storage->repository[action];
+        auto unconditional = ygg::IndexList<formalism::Effect> {};
+        auto conditional = std::vector<ConditionalEffect> {};
+
+        if (data.effect)
+        {
+            auto effects = ygg::IndexList<formalism::Effect> { *data.effect };
+            if (const auto effect_and = this->self().template as_effect<formalism::EffectAnd>(*data.effect))
+                effects = effect_and->get_data().effects;
+
+            for (auto effect : effects)
+            {
+                if (const auto effect_when = this->self().template as_effect<formalism::EffectWhen>(effect))
+                    conditional.push_back({ effect_when->get_data().condition, effect_when->get_data().effect });
+                else
+                    unconditional.push_back(effect);
+            }
+        }
+
+        if (conditional.empty())
+        {
+            this->self().push_unique(result, seen, action);
+            continue;
+        }
+
+        const auto num_variants = size_t { 1 } << conditional.size();
+        for (auto mask = size_t { 0 }; mask < num_variants; ++mask)
+        {
+            auto conditions = ygg::IndexList<formalism::Condition> {};
+            if (data.precondition)
+                conditions.push_back(*data.precondition);
+
+            auto effects = unconditional;
+            for (auto i = size_t { 0 }; i < conditional.size(); ++i)
+            {
+                const auto selected = (mask & (size_t { 1 } << i)) != 0;
+                if (selected)
+                {
+                    conditions.push_back(conditional[i].condition);
+                    effects.push_back(conditional[i].effect);
+                }
+                else
+                {
+                    conditions.push_back(as_index(this->self().negate_condition(conditional[i].condition, this->m_storage->repository)));
+                }
+            }
+
+            auto precondition = cista::optional<ygg::Index<formalism::Condition>> {};
+            if (conditions.size() == 1)
+                precondition = conditions.front();
+            else if (!conditions.empty())
+                precondition = as_index(this->self().make_conjunction(std::move(conditions)));
+
+            auto effect = cista::optional<ygg::Index<formalism::Effect>> {};
+            if (effects.size() == 1)
+                effect = effects.front();
+            else if (!effects.empty())
+                effect = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
+                    formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)).get_index())));
+
+            this->self().push_unique(result,
+                                     seen,
+                                     formalism::get_or_create<formalism::Action>(this->m_storage->repository,
+                                                                                 std::string(data.name) + "__ce_" + std::to_string(mask),
+                                                                                 data.original_name,
+                                                                                 data.parameters,
+                                                                                 data.original_arity,
+                                                                                 precondition,
+                                                                                 effect)
+                                         .get_index());
+        }
+    }
+
     return result;
 }
 
@@ -186,6 +280,9 @@ formalism::DomainView CopyTranslatorFacade<Derived>::copy_domain(formalism::Doma
         case TranslationPhase::SplitDisjunctiveConditions:
             data.actions = this->self().split_disjunctive_actions(data.actions);
             data.axioms = this->self().split_disjunctive_axioms(data.axioms);
+            break;
+        case TranslationPhase::MultiplyConditionalEffects:
+            data.actions = this->self().multiply_conditional_effect_actions(data.actions);
             break;
         case TranslationPhase::AddTypePredicates:
             this->self().add_type_predicates_to_domain(data);

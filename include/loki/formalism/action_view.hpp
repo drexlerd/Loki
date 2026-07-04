@@ -46,6 +46,7 @@ public:
     auto get_index() const noexcept { return m_handle; }
 
     const auto& get_name() const noexcept { return get_data().name; }
+    const auto& get_original_name() const noexcept { return get_data().original_name; }
     auto get_parameters() const noexcept { return ygg::make_view(get_data().parameters, *m_context); }
     auto get_arity() const noexcept { return get_data().parameters.size(); }
     auto get_original_arity() const noexcept { return get_data().original_arity; }

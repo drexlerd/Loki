@@ -333,6 +333,7 @@ void bind_datas(nb::module_& m)
                  "precondition"_a = std::optional<formalism::ConditionView> {},
                  "effect"_a = std::optional<formalism::EffectView> {})
             .def_rw("name", &V::name)
+            .def_rw("original_name", &V::original_name)
             .def_rw("parameters", &V::parameters)
             .def_rw("precondition", &V::precondition)
             .def_rw("effect", &V::effect);

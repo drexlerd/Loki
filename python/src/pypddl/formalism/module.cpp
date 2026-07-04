@@ -79,7 +79,10 @@ void bind_semantic(nb::module_& m)
 
     nb::class_<semantic::TranslatorOptions>(m, "TranslatorOptions", "Options controlling PDDL normalization and translation.")
         .def(nb::init<>())
-        .def_rw("remove_typing", &semantic::TranslatorOptions::remove_typing, "Remove type annotations during translation.");
+        .def_rw("remove_typing", &semantic::TranslatorOptions::remove_typing, "Remove type annotations during translation.")
+        .def_rw("multiply_conditional_effects",
+                &semantic::TranslatorOptions::multiply_conditional_effects,
+                "Split actions to eliminate top-level conditional effects after effect normalization.");
 
     nb::class_<semantic::Parser>(m, "Parser", "Parse a PDDL domain once and parse matching tasks against it.")
         .def(nb::init<const std::string&, parser::ParserOptions>(),

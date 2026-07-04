@@ -459,6 +459,7 @@ private:
         const auto& data = repository[source];
         auto out = formalism::get_or_create<formalism::Action>(m_storage->repository,
                                                                data.name,
+                                                               data.original_name,
                                                                copy_list(data.parameters, repository),
                                                                data.original_arity,
                                                                copy_optional(data.precondition, repository),

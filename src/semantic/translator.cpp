@@ -201,6 +201,7 @@ const std::vector<PhaseStep>& domain_phase_steps()
         { TranslationPhase::MoveExistentialQuantifiers, "move-existential-quantifiers" },
         { TranslationPhase::AddTypePredicates, "add-type-predicates" },
         { TranslationPhase::ToEffectNormalForm, "to-effect-normal-form" },
+        { TranslationPhase::MultiplyConditionalEffects, "multiply-conditional-effects" },
         { TranslationPhase::InitializeEquality, "initialize-equality" },
     };
     return steps;
@@ -413,6 +414,9 @@ DomainTranslationResult translate(formalism::DomainView domain, const Translator
 
     for (const auto& step : detail::domain_phase_steps())
     {
+        if (step.phase == TranslationPhase::MultiplyConditionalEffects && !options.multiply_conditional_effects)
+            continue;
+
         auto phase_storage = std::make_shared<detail::TranslationStorage>(phase_index++);
         auto semantic_copier = detail::CopyTranslator(phase_storage, options.remove_typing, step.phase);
         current_domain = semantic_copier.copy_domain(current_domain);

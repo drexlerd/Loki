@@ -394,6 +394,7 @@ void bind_action(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index)
         .def("get_name", &V::get_name)
+        .def("get_original_name", &V::get_original_name)
         .def("get_parameters", &V::get_parameters)
         .def("get_arity", &V::get_arity)
         .def("get_original_arity", &V::get_original_arity)

@@ -424,6 +424,7 @@ formalism::ActionView VariableRenamingTranslator<Derived>::rename_action_variabl
     this->self().leave_variable_scope();
     return formalism::get_or_create<formalism::Action>(this->m_storage->repository,
                                                        data.name,
+                                                       data.original_name,
                                                        std::move(parameters),
                                                        data.original_arity,
                                                        precondition,

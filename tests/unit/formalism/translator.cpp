@@ -288,6 +288,41 @@ TEST(LokiTests, GeneratedUniversalPredicateAvoidsExistingPredicateName)
     EXPECT_TRUE(predicate_names.contains("_universal_1"));
 }
 
+TEST(LokiTests, MultiplyConditionalEffectsSplitsActions)
+{
+    const auto domain_source = std::string(R"PDDL(
+(define (domain conditional-multiply)
+  (:requirements :strips :conditional-effects :negative-preconditions)
+  (:predicates (p) (q) (r) (s) (t))
+  (:action a
+    :parameters ()
+    :precondition (p)
+    :effect (and (when (q) (r)) (when (s) (t))))
+)
+)PDDL");
+
+    auto parser = loki::Parser(domain_source);
+    auto options = loki::TranslatorOptions {};
+    options.multiply_conditional_effects = true;
+
+    const auto translation = loki::translate(parser.get_domain(), options);
+    const auto domain = translation.get_translated_domain();
+    const auto& repository = domain.get_context();
+
+    ASSERT_EQ(domain.get_actions().size(), std::size_t { 4 });
+    for (auto action : domain.get_actions())
+    {
+        const auto& data = repository[action.get_index()];
+        EXPECT_TRUE(std::string_view(data.name).starts_with("a__ce_"));
+        EXPECT_EQ(std::string_view(data.original_name), "a");
+        ASSERT_TRUE(data.precondition.has_value());
+        EXPECT_EQ(count_condition_nodes<formalism::ConditionLiteral>(*data.precondition, repository), std::size_t { 3 });
+        if (data.effect)
+        {
+            EXPECT_EQ(count_effect_nodes<formalism::EffectWhen>(*data.effect, repository), std::size_t { 0 });
+        }
+    }
+}
 
 TEST(LokiTests, ExistentialConditionalEffectBecomesUniversalEffect)
 {

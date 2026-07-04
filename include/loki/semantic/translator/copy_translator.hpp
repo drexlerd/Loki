@@ -81,6 +81,7 @@ public:
     using CopyTranslatorFacade<CopyTranslator>::copy_task;
     using CopyTranslatorFacade<CopyTranslator>::public_as_or;
     using CopyTranslatorFacade<CopyTranslator>::split_disjunctive_actions;
+    using CopyTranslatorFacade<CopyTranslator>::multiply_conditional_effect_actions;
     using CopyTranslatorFacade<CopyTranslator>::split_disjunctive_axioms;
 
     using BasicCopyTranslator<CopyTranslator>::copy;
