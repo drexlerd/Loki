@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_TRANSLATOR_GOAL_SIMPLIFICATION_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_GOAL_SIMPLIFICATION_TRANSLATOR_HPP_
 
@@ -31,18 +30,18 @@ public:
     explicit GoalSimplificationTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, GoalSimplificationTranslator<Derived>>(context) {}
 
     formalism::ConditionView make_generated_goal_condition(ygg::Index<formalism::Condition> condition);
-    formalism::ConditionView simplify_goal_condition(ygg::Index<formalism::Condition> condition);
-    formalism::ConditionView simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionLiteral>);
-    formalism::ConditionView simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionNumericConstraint>);
-    formalism::ConditionView simplify_goal_condition_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionAnd> node);
+    formalism::ConditionView simplify_goal_condition(formalism::ConditionView condition);
+    formalism::ConditionView simplify_goal_condition_node(formalism::ConditionView condition, formalism::ConditionLiteralView);
+    formalism::ConditionView simplify_goal_condition_node(formalism::ConditionView condition, formalism::ConditionNumericConstraintView);
+    formalism::ConditionView simplify_goal_condition_node(formalism::ConditionView, formalism::ConditionAndView node);
     template<typename T>
-    formalism::ConditionView simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<T>);
+    formalism::ConditionView simplify_goal_condition_node(formalism::ConditionView condition, T);
 };
 
 template<typename Derived>
 formalism::ConditionView GoalSimplificationTranslator<Derived>::make_generated_goal_condition(ygg::Index<formalism::Condition> condition)
 {
-    const auto name = cista::offset::string("_goal_" + std::to_string(this->m_num_generated_axioms++));
+    const auto name = cista::offset::string(this->self().next_generated_predicate_name("loki-goal-"));
     const auto predicate =
         formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, name, ygg::IndexList<formalism::Parameter> {}).get_index();
     const auto atom = formalism::get_or_create<formalism::Atom>(this->m_storage->repository, predicate, ygg::IndexList<formalism::Term> {}).get_index();
@@ -51,45 +50,43 @@ formalism::ConditionView GoalSimplificationTranslator<Derived>::make_generated_g
         formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, ygg::IndexList<formalism::Parameter> {}, literal, condition).get_index();
     this->m_generated_predicates.push_back(predicate);
     this->m_generated_axioms.push_back(axiom);
-    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, literal).get_index());
+    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, literal));
 }
 
 template<typename Derived>
-formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition(ygg::Index<formalism::Condition> condition)
+formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition(formalism::ConditionView condition)
 {
-    return std::visit([&](const auto& node) { return this->self().simplify_goal_condition_node(condition, node); },
-                      this->m_storage->repository[condition].value);
+    return ygg::visit([&](const auto& node) { return this->self().simplify_goal_condition_node(condition, node); }, condition.get_value());
 }
 
 template<typename Derived>
-formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(ygg::Index<formalism::Condition> condition,
-                                                                                             ygg::Index<formalism::ConditionLiteral>)
+formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(formalism::ConditionView condition,
+                                                                                             formalism::ConditionLiteralView)
 {
-    return ygg::make_view(condition, this->m_storage->repository);
+    return condition;
 }
 
 template<typename Derived>
-formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(ygg::Index<formalism::Condition> condition,
-                                                                                             ygg::Index<formalism::ConditionNumericConstraint>)
+formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(formalism::ConditionView condition,
+                                                                                             formalism::ConditionNumericConstraintView)
 {
-    return ygg::make_view(condition, this->m_storage->repository);
+    return condition;
 }
 
 template<typename Derived>
-formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(ygg::Index<formalism::Condition>,
-                                                                                             ygg::Index<formalism::ConditionAnd> node)
+formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(formalism::ConditionView, formalism::ConditionAndView node)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
-    for (auto child : this->m_storage->repository[node].conditions)
-        conditions.push_back(as_index(this->self().simplify_goal_condition(child)));
+    for (auto child : node.get_conditions())
+        conditions.push_back(this->self().simplify_goal_condition(child).get_index());
     return this->self().make_conjunction(std::move(conditions));
 }
 
 template<typename Derived>
 template<typename T>
-formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(ygg::Index<formalism::Condition> condition, ygg::Index<T>)
+formalism::ConditionView GoalSimplificationTranslator<Derived>::simplify_goal_condition_node(formalism::ConditionView condition, T)
 {
-    return this->self().make_generated_goal_condition(condition);
+    return this->self().make_generated_goal_condition(condition.get_index());
 }
 
 }  // namespace loki::semantic::detail

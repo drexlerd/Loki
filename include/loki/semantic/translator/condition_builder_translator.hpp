@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_TRANSLATOR_CONDITION_BUILDER_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_CONDITION_BUILDER_TRANSLATOR_HPP_
 
@@ -33,18 +32,10 @@ public:
     formalism::ConditionView wrap_condition(ygg::Data<formalism::Condition>::Variant value);
     template<typename T>
     formalism::ConditionView wrap_condition(formalism::EntityView<T> value);
-    formalism::ConditionView wrap_condition(ygg::Index<formalism::ConditionLiteral> value);
-    formalism::ConditionView wrap_condition(ygg::Index<formalism::ConditionAnd> value);
-    formalism::ConditionView wrap_condition(ygg::Index<formalism::ConditionOr> value);
-    formalism::ConditionView wrap_condition(ygg::Index<formalism::ConditionNot> value);
-    formalism::ConditionView wrap_condition(ygg::Index<formalism::ConditionImply> value);
-    formalism::ConditionView wrap_condition(ygg::Index<formalism::ConditionExists> value);
-    formalism::ConditionView wrap_condition(ygg::Index<formalism::ConditionForall> value);
-    formalism::ConditionView wrap_condition(ygg::Index<formalism::ConditionNumericConstraint> value);
+    template<typename T>
+    formalism::ConditionView wrap_condition(ygg::Index<T> value);
     std::optional<formalism::ConditionOrView> as_or(formalism::ConditionView condition) const;
-    std::optional<formalism::ConditionOrView> as_or(ygg::Index<formalism::Condition> condition) const;
     formalism::ConditionView flatten_condition(formalism::ConditionView condition);
-    formalism::ConditionView flatten_condition(ygg::Index<formalism::Condition> condition);
     formalism::ConditionView make_conjunction(ygg::IndexList<formalism::Condition> conditions);
     formalism::ConditionView make_disjunction(ygg::IndexList<formalism::Condition> conditions);
 };
@@ -59,50 +50,30 @@ template<typename Derived>
 template<typename T>
 formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(formalism::EntityView<T> value)
 {
-    return formalism::get_or_create<formalism::Condition>(this->m_storage->repository, typename ygg::Data<formalism::Condition>::template ViewVariant<formalism::Repository>(value));
+    return formalism::get_or_create<formalism::Condition>(this->m_storage->repository,
+                                                          typename ygg::Data<formalism::Condition>::template ViewVariant<formalism::Repository>(value));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(ygg::Index<formalism::ConditionLiteral> value) { return this->self().wrap_condition(ygg::Data<formalism::Condition>::Variant(value)); }
-
-template<typename Derived>
-formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(ygg::Index<formalism::ConditionAnd> value) { return this->self().wrap_condition(ygg::Data<formalism::Condition>::Variant(value)); }
-
-template<typename Derived>
-formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(ygg::Index<formalism::ConditionOr> value) { return this->self().wrap_condition(ygg::Data<formalism::Condition>::Variant(value)); }
-
-template<typename Derived>
-formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(ygg::Index<formalism::ConditionNot> value) { return this->self().wrap_condition(ygg::Data<formalism::Condition>::Variant(value)); }
-
-template<typename Derived>
-formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(ygg::Index<formalism::ConditionImply> value) { return this->self().wrap_condition(ygg::Data<formalism::Condition>::Variant(value)); }
-
-template<typename Derived>
-formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(ygg::Index<formalism::ConditionExists> value) { return this->self().wrap_condition(ygg::Data<formalism::Condition>::Variant(value)); }
-
-template<typename Derived>
-formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(ygg::Index<formalism::ConditionForall> value) { return this->self().wrap_condition(ygg::Data<formalism::Condition>::Variant(value)); }
-
-template<typename Derived>
-formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(ygg::Index<formalism::ConditionNumericConstraint> value) { return this->self().wrap_condition(ygg::Data<formalism::Condition>::Variant(value)); }
+template<typename T>
+formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(ygg::Index<T> value)
+{
+    return this->self().wrap_condition(ygg::Data<formalism::Condition>::Variant(value));
+}
 
 template<typename Derived>
 std::optional<formalism::ConditionOrView> ConditionBuilderTranslator<Derived>::as_or(formalism::ConditionView condition) const
 {
     auto result = std::optional<formalism::ConditionOrView> {};
-    ygg::visit([&](const auto& node)
-    {
-        using Node = std::decay_t<decltype(node)>;
-        if constexpr (std::is_same_v<Node, formalism::ConditionOrView>)
-            result = node;
-    }, condition.get_value());
+    ygg::visit(
+        [&](const auto& node)
+        {
+            using Node = std::decay_t<decltype(node)>;
+            if constexpr (std::is_same_v<Node, formalism::ConditionOrView>)
+                result = node;
+        },
+        condition.get_value());
     return result;
-}
-
-template<typename Derived>
-std::optional<formalism::ConditionOrView> ConditionBuilderTranslator<Derived>::as_or(ygg::Index<formalism::Condition> condition) const
-{
-    return as_or(ygg::make_view(condition, this->m_storage->repository));
 }
 
 template<typename Derived>
@@ -174,14 +145,17 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                                 parameters.push_back(parameter);
                             for (auto parameter : flat_node.get_parameters())
                                 parameters.push_back(parameter);
-                            return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), flat_node.get_condition()));
+                            return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository,
+                                                                                                                    std::move(parameters),
+                                                                                                                    flat_node.get_condition()));
                         }
                         else
                         {
                             auto parameters = std::vector<formalism::ParameterView> {};
                             for (auto parameter : node.get_parameters())
                                 parameters.push_back(parameter);
-                            return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), flat));
+                            return this->self().wrap_condition(
+                                formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), flat));
                         }
                     },
                     flat.get_value());
@@ -200,14 +174,17 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                                 parameters.push_back(parameter);
                             for (auto parameter : flat_node.get_parameters())
                                 parameters.push_back(parameter);
-                            return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository, std::move(parameters), flat_node.get_condition()));
+                            return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository,
+                                                                                                                    std::move(parameters),
+                                                                                                                    flat_node.get_condition()));
                         }
                         else
                         {
                             auto parameters = std::vector<formalism::ParameterView> {};
                             for (auto parameter : node.get_parameters())
                                 parameters.push_back(parameter);
-                            return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository, std::move(parameters), flat));
+                            return this->self().wrap_condition(
+                                formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository, std::move(parameters), flat));
                         }
                     },
                     flat.get_value());
@@ -221,23 +198,19 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(ygg::Index<formalism::Condition> condition)
-{
-    return flatten_condition(ygg::make_view(condition, this->m_storage->repository));
-}
-
-template<typename Derived>
 formalism::ConditionView ConditionBuilderTranslator<Derived>::make_conjunction(ygg::IndexList<formalism::Condition> conditions)
 {
-    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionAnd>(this->m_storage->repository, std::move(conditions))));
+    return this->self().flatten_condition(
+        this->self().wrap_condition(formalism::get_or_create<formalism::ConditionAnd>(this->m_storage->repository, std::move(conditions))));
 }
 
 template<typename Derived>
 formalism::ConditionView ConditionBuilderTranslator<Derived>::make_disjunction(ygg::IndexList<formalism::Condition> conditions)
 {
-    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionOr>(this->m_storage->repository, std::move(conditions))));
+    return this->self().flatten_condition(
+        this->self().wrap_condition(formalism::get_or_create<formalism::ConditionOr>(this->m_storage->repository, std::move(conditions))));
 }
 
-} // namespace loki::semantic::detail
+}  // namespace loki::semantic::detail
 
 #endif

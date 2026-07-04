@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_TRANSLATOR_TOP_LEVEL_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_TOP_LEVEL_TRANSLATOR_HPP_
 
@@ -30,114 +29,121 @@ class TopLevelTranslator : public CopyTranslatorComponent<Derived, TopLevelTrans
 public:
     explicit TopLevelTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, TopLevelTranslator<Derived>>(context) {}
 
-    formalism::ActionView copy(ygg::Index<formalism::Action> source, const formalism::Repository& repository);
+    formalism::ActionView copy(formalism::ActionView source, const formalism::Repository& repository);
 
-    formalism::AxiomView copy(ygg::Index<formalism::Axiom> source, const formalism::Repository& repository);
+    formalism::AxiomView copy(formalism::AxiomView source, const formalism::Repository& repository);
 
-    formalism::MetricView copy(ygg::Index<formalism::Metric> source, const formalism::Repository& repository);
+    formalism::MetricView copy(formalism::MetricView source, const formalism::Repository& repository);
 
-    formalism::InitialFunctionValueView copy(ygg::Index<formalism::InitialFunctionValue> source, const formalism::Repository& repository);
+    formalism::InitialFunctionValueView copy(formalism::InitialFunctionValueView source, const formalism::Repository& repository);
 };
 
 template<typename Derived>
-formalism::ActionView TopLevelTranslator<Derived>::copy(ygg::Index<formalism::Action> source, const formalism::Repository& repository)
+formalism::ActionView TopLevelTranslator<Derived>::copy(formalism::ActionView source, const formalism::Repository& repository)
 {
     if (this->m_phase == TranslationPhase::RenameQuantifiedVariables && this->m_renaming_enabled)
     {
         const auto renamed = this->self().rename_action_variables(source, repository);
         const auto previous = this->m_renaming_enabled;
         this->m_renaming_enabled = false;
-        auto out = this->self().copy(renamed.get_index(), this->m_storage->repository);
+        auto out = this->self().copy(renamed, this->m_storage->repository);
         this->m_renaming_enabled = previous;
-        remember(this->m_storage->actions, source, out);
+        remember(this->m_storage->actions, source.get_index(), out);
         return out;
     }
 
-    if (auto mapped = find_mapped(this->m_storage->actions, source))
+    if (auto mapped = find_mapped(this->m_storage->actions, source.get_index()))
         return *mapped;
-    const auto& data = repository[source];
+    const auto& data = source.get_data();
     this->m_num_quantifications.clear();
-    this->self().increment_quantifications(data.parameters, repository);
-    auto parameters = this->self().copy_parameters(data.parameters, repository);
-    this->self().enter_scope(parameters);
-    auto precondition = this->self().template copy_optional<formalism::Condition>(data.precondition, repository);
-    if (this->m_phase == TranslationPhase::MoveExistentialQuantifiers)
-        this->self().lift_top_level_exists(parameters, precondition);
+    this->self().increment_quantifications(source.get_parameters());
+    auto parameters = this->self().copy_parameters(source.get_parameters());
+    this->self().enter_scope(parameters, source.get_parameters());
+    auto precondition = cista::optional<ygg::Index<formalism::Condition>> {};
+    if (const auto condition = source.get_precondition())
+    {
+        auto copied_condition = this->self().copy(condition.value(), repository);
+        if (this->m_phase == TranslationPhase::MoveExistentialQuantifiers)
+            copied_condition = this->self().lift_top_level_exists(parameters, copied_condition);
+        precondition = as_index(copied_condition);
+    }
     if (this->m_phase == TranslationPhase::AddTypePredicates)
-        this->self().prepend_type_conditions(precondition, parameters);
-    const auto out_parameters = this->m_phase == TranslationPhase::AddTypePredicates ? this->self().maybe_strip_parameters(parameters) : parameters;
+        this->self().prepend_type_conditions(precondition, source.get_parameters());
+    const auto out_parameters = this->self().removes_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
+    auto effect = cista::optional<ygg::Index<formalism::Effect>> {};
+    if (const auto effect_view = source.get_effect())
+        effect = as_index(this->self().copy(effect_view.value(), repository));
     auto out = formalism::get_or_create<formalism::Action>(this->m_storage->repository,
                                                            data.name,
                                                            data.original_name,
                                                            out_parameters,
                                                            data.original_arity,
                                                            precondition,
-                                                           this->self().template copy_optional<formalism::Effect>(data.effect, repository));
+                                                           effect);
     this->self().leave_scope();
-    remember(this->m_storage->actions, source, out);
+    remember(this->m_storage->actions, source.get_index(), out);
     return out;
 }
 
 template<typename Derived>
-formalism::AxiomView TopLevelTranslator<Derived>::copy(ygg::Index<formalism::Axiom> source, const formalism::Repository& repository)
+formalism::AxiomView TopLevelTranslator<Derived>::copy(formalism::AxiomView source, const formalism::Repository& repository)
 {
     if (this->m_phase == TranslationPhase::RenameQuantifiedVariables && this->m_renaming_enabled)
     {
         const auto renamed = this->self().rename_axiom_variables(source, repository);
         const auto previous = this->m_renaming_enabled;
         this->m_renaming_enabled = false;
-        auto out = this->self().copy(renamed.get_index(), this->m_storage->repository);
+        auto out = this->self().copy(renamed, this->m_storage->repository);
         this->m_renaming_enabled = previous;
-        remember(this->m_storage->axioms, source, out);
+        remember(this->m_storage->axioms, source.get_index(), out);
         return out;
     }
 
-    if (auto mapped = find_mapped(this->m_storage->axioms, source))
+    if (auto mapped = find_mapped(this->m_storage->axioms, source.get_index()))
         return *mapped;
-    const auto& data = repository[source];
+    const auto& data = source.get_data();
     this->m_num_quantifications.clear();
-    this->self().increment_quantifications(data.parameters, repository);
-    auto parameters = this->self().copy_parameters(data.parameters, repository);
-    this->self().enter_scope(parameters);
-    auto condition = as_index(this->self().copy(data.condition, repository));
+    this->self().increment_quantifications(source.get_parameters());
+    auto parameters = this->self().copy_parameters(source.get_parameters());
+    this->self().enter_scope(parameters, source.get_parameters());
+    auto copied_condition = this->self().copy(source.get_condition(), repository);
     if (this->m_phase == TranslationPhase::MoveExistentialQuantifiers)
-        this->self().lift_top_level_exists(parameters, condition);
+        copied_condition = this->self().lift_top_level_exists(parameters, copied_condition);
+    auto condition = as_index(copied_condition);
     if (this->m_phase == TranslationPhase::AddTypePredicates)
-        this->self().prepend_type_conditions(condition, parameters);
-    const auto out_parameters = this->m_phase == TranslationPhase::AddTypePredicates ? this->self().maybe_strip_parameters(parameters) : parameters;
+        this->self().prepend_type_conditions(condition, source.get_parameters());
+    const auto out_parameters = this->self().removes_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
     auto out = formalism::get_or_create<formalism::Axiom>(this->m_storage->repository,
                                                           out_parameters,
                                                           data.original_arity,
-                                                          as_index(this->self().copy(data.head, repository)),
+                                                          as_index(this->self().copy(source.get_head(), repository)),
                                                           condition);
     this->self().leave_scope();
-    remember(this->m_storage->axioms, source, out);
+    remember(this->m_storage->axioms, source.get_index(), out);
     return out;
 }
 
 template<typename Derived>
-formalism::MetricView TopLevelTranslator<Derived>::copy(ygg::Index<formalism::Metric> source, const formalism::Repository& repository)
+formalism::MetricView TopLevelTranslator<Derived>::copy(formalism::MetricView source, const formalism::Repository& repository)
 {
-    if (auto mapped = find_mapped(this->m_storage->metrics, source))
+    if (auto mapped = find_mapped(this->m_storage->metrics, source.get_index()))
         return *mapped;
-    const auto& data = repository[source];
-    auto out =
-        formalism::get_or_create<formalism::Metric>(this->m_storage->repository, data.minimize, as_index(this->self().copy(data.expression, repository)));
-    remember(this->m_storage->metrics, source, out);
+    auto out = formalism::get_or_create<formalism::Metric>(this->m_storage->repository,
+                                                           source.is_minimize(),
+                                                           as_index(this->self().copy(source.get_expression(), repository)));
+    remember(this->m_storage->metrics, source.get_index(), out);
     return out;
 }
 
 template<typename Derived>
-formalism::InitialFunctionValueView TopLevelTranslator<Derived>::copy(ygg::Index<formalism::InitialFunctionValue> source,
-                                                                      const formalism::Repository& repository)
+formalism::InitialFunctionValueView TopLevelTranslator<Derived>::copy(formalism::InitialFunctionValueView source, const formalism::Repository& repository)
 {
-    if (auto mapped = find_mapped(this->m_storage->initial_function_values, source))
+    if (auto mapped = find_mapped(this->m_storage->initial_function_values, source.get_index()))
         return *mapped;
-    const auto& data = repository[source];
     auto out = formalism::get_or_create<formalism::InitialFunctionValue>(this->m_storage->repository,
-                                                                         as_index(this->self().copy(data.function, repository)),
-                                                                         as_index(this->self().copy(data.value, repository)));
-    remember(this->m_storage->initial_function_values, source, out);
+                                                                         as_index(this->self().copy(source.get_function(), repository)),
+                                                                         as_index(this->self().copy(source.get_value(), repository)));
+    remember(this->m_storage->initial_function_values, source.get_index(), out);
     return out;
 }
 

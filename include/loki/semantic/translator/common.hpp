@@ -15,14 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_TRANSLATOR_COMMON_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_COMMON_HPP_
 
 #include "loki/formalism/formalism.hpp"
 
 #include <cista/containers/optional.h>
-
 #include <memory>
 #include <optional>
 #include <stdexcept>
@@ -61,15 +59,9 @@ enum class TranslationPhase
 inline const std::vector<std::string_view>& domain_translation_steps()
 {
     static const auto steps = std::vector<std::string_view> {
-        "to-negation-normal-form",
-        "rename-quantified-variables",
-        "remove-universal-quantifiers",
-        "to-disjunctive-normal-form",
-        "split-disjunctive-conditions",
-        "move-existential-quantifiers",
-        "add-type-predicates",
-        "to-effect-normal-form",
-        "initialize-equality",
+        "to-negation-normal-form",    "rename-quantified-variables",  "remove-universal-quantifiers",
+        "to-disjunctive-normal-form", "split-disjunctive-conditions", "move-existential-quantifiers",
+        "add-type-predicates",        "to-effect-normal-form",        "initialize-equality",
     };
     return steps;
 }
@@ -77,16 +69,8 @@ inline const std::vector<std::string_view>& domain_translation_steps()
 inline const std::vector<std::string_view>& task_translation_steps()
 {
     static const auto steps = std::vector<std::string_view> {
-        "to-negation-normal-form",
-        "rename-quantified-variables",
-        "remove-universal-quantifiers",
-        "simplify-goal",
-        "to-disjunctive-normal-form",
-        "split-disjunctive-conditions",
-        "move-existential-quantifiers",
-        "to-effect-normal-form",
-        "initialize-equality",
-        "add-type-predicates",
+        "to-negation-normal-form",      "rename-quantified-variables",  "remove-universal-quantifiers", "simplify-goal",       "to-disjunctive-normal-form",
+        "split-disjunctive-conditions", "move-existential-quantifiers", "to-effect-normal-form",        "initialize-equality", "add-type-predicates",
     };
     return steps;
 }
@@ -144,10 +128,10 @@ struct TranslationStorage
     ViewMap<formalism::Domain> domains;
     ViewMap<formalism::Task> tasks;
     std::unordered_map<ygg::uint_t, ygg::IndexList<formalism::Type>> object_types;
+    std::unordered_map<ygg::uint_t, std::vector<formalism::TypeView>> object_type_views;
 
     explicit TranslationStorage(size_t index = 1, const formalism::Repository* parent = nullptr) : repository(index, parent) {}
 };
-
 
 template<typename T>
 ygg::Index<T> as_index(ygg::Index<T> index) noexcept
@@ -160,7 +144,6 @@ ygg::Index<T> as_index(formalism::EntityView<T> view) noexcept
 {
     return view.get_index();
 }
-
 
 template<typename T>
 std::optional<formalism::EntityView<T>> find_mapped(const ViewMap<T>& map, ygg::Index<T> source)
@@ -176,7 +159,7 @@ void remember(ViewMap<T>& map, ygg::Index<T> source, formalism::EntityView<T> ta
     map.emplace(source.get_value(), target);
 }
 
-} // namespace detail
-} // namespace loki::semantic
+}  // namespace detail
+}  // namespace loki::semantic
 
 #endif

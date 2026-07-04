@@ -24,7 +24,6 @@
 #include <nanobind/stl/shared_ptr.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
-#include <type_traits>
 #include <utility>
 #include <yggdrasil/python/type_casters.hpp>
 
@@ -42,8 +41,6 @@ using Data = ygg::Data<T>;
 template<typename T>
 auto get_or_create_data(formalism::Repository& self, Data<T> data)
 {
-    if constexpr (std::is_same_v<T, formalism::Action> || std::is_same_v<T, formalism::Axiom>)
-        data.original_arity = data.parameters.size();
     return formalism::get_or_create<T>(self, std::move(data));
 }
 
@@ -332,9 +329,22 @@ void bind_datas(nb::module_& m)
                  "parameters"_a = std::vector<formalism::ParameterView> {},
                  "precondition"_a = std::optional<formalism::ConditionView> {},
                  "effect"_a = std::optional<formalism::EffectView> {})
+            .def(nb::init<const std::string&,
+                          const std::string&,
+                          const std::vector<formalism::ParameterView>&,
+                          ygg::uint_t,
+                          const std::optional<formalism::ConditionView>&,
+                          const std::optional<formalism::EffectView>&>(),
+                 "name"_a,
+                 "original_name"_a,
+                 "parameters"_a,
+                 "original_arity"_a,
+                 "precondition"_a = std::optional<formalism::ConditionView> {},
+                 "effect"_a = std::optional<formalism::EffectView> {})
             .def_rw("name", &V::name)
             .def_rw("original_name", &V::original_name)
             .def_rw("parameters", &V::parameters)
+            .def_rw("original_arity", &V::original_arity)
             .def_rw("precondition", &V::precondition)
             .def_rw("effect", &V::effect);
     }

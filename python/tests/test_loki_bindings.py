@@ -313,7 +313,7 @@ def test_translator_options_multiply_conditional_effects():
     translated = pypddl.translate_domain(parser.domain(), options).translated_domain
 
     assert len(translated.get_actions()) == 4
-    assert all(action.get_name().startswith("a__ce_") for action in translated.get_actions())
+    assert all(action.get_name().startswith("a_") for action in translated.get_actions())
     assert all(action.get_original_name() == "a" for action in translated.get_actions())
 
 
@@ -423,8 +423,18 @@ def test_builders_expose_defaulted_mutable_fields():
     assert action_builder.parameters == []
     assert action_builder.precondition is None
     assert action_builder.effect is None
+
+    explicit_action_builder = pypddl.ActionData("generated-action", "original-action", [parameter], 3, condition, effect)
+    assert explicit_action_builder.name == "generated-action"
+    assert explicit_action_builder.original_name == "original-action"
+    assert explicit_action_builder.parameters == [parameter.get_index()]
+    assert explicit_action_builder.original_arity == 3
+    assert explicit_action_builder.precondition == condition.get_index()
+    assert explicit_action_builder.effect == effect.get_index()
+
     action_builder.name = "mutated-action"
     action_builder.parameters = [parameter.get_index()]
+    action_builder.original_arity = len(action_builder.parameters)
     action_builder.precondition = condition.get_index()
     action_builder.effect = effect.get_index()
     assert action_builder.parameters == [parameter.get_index()]

@@ -26,6 +26,7 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <sstream>
@@ -70,7 +71,7 @@ size_t next_universal_index(auto predicates)
 {
     auto next = size_t { 0 };
     for (auto predicate : predicates)
-        if (const auto index = generated_index(std::string_view(predicate.get_name()), "_universal_"))
+        if (const auto index = generated_index(std::string_view(predicate.get_name()), "loki-universal-"))
             next = std::max(next, *index + 1);
     return next;
 }
@@ -253,7 +254,7 @@ TEST(LokiTests, GeneratedUniversalPredicateKeepsNumericFreeVariables)
     for (auto predicate : domain.get_predicates())
     {
         const auto name = std::string(predicate.get_name());
-        if (!name.starts_with("_universal_"))
+        if (!name.starts_with("loki-universal-"))
             continue;
 
         found = true;
@@ -269,7 +270,7 @@ TEST(LokiTests, GeneratedUniversalPredicateAvoidsExistingPredicateName)
 (define (domain universal-name-collision)
   (:requirements :strips :typing :universal-preconditions)
   (:types thing)
-  (:predicates (_universal_0) (p ?x - thing) (done))
+  (:predicates (loki-universal-0) (p ?x - thing) (done))
   (:action a
     :parameters ()
     :precondition (forall (?x - thing) (p ?x))
@@ -284,8 +285,8 @@ TEST(LokiTests, GeneratedUniversalPredicateAvoidsExistingPredicateName)
     for (auto predicate : domain.get_predicates())
         predicate_names.insert(std::string(predicate.get_name()));
 
-    EXPECT_TRUE(predicate_names.contains("_universal_0"));
-    EXPECT_TRUE(predicate_names.contains("_universal_1"));
+    EXPECT_TRUE(predicate_names.contains("loki-universal-0"));
+    EXPECT_TRUE(predicate_names.contains("loki-universal-1"));
 }
 
 TEST(LokiTests, MultiplyConditionalEffectsSplitsActions)
@@ -309,11 +310,16 @@ TEST(LokiTests, MultiplyConditionalEffectsSplitsActions)
     const auto domain = translation.get_translated_domain();
     const auto& repository = domain.get_context();
 
+    auto has_conditional_effects_requirement = false;
+    for (auto requirement : domain.get_requirements())
+        has_conditional_effects_requirement |= repository[requirement.get_index()].kind == formalism::RequirementKind::ConditionalEffects;
+    EXPECT_FALSE(has_conditional_effects_requirement);
+
     ASSERT_EQ(domain.get_actions().size(), std::size_t { 4 });
     for (auto action : domain.get_actions())
     {
         const auto& data = repository[action.get_index()];
-        EXPECT_TRUE(std::string_view(data.name).starts_with("a__ce_"));
+        EXPECT_TRUE(std::string_view(data.name).starts_with("a_"));
         EXPECT_EQ(std::string_view(data.original_name), "a");
         ASSERT_TRUE(data.precondition.has_value());
         EXPECT_EQ(count_condition_nodes<formalism::ConditionLiteral>(*data.precondition, repository), std::size_t { 3 });
@@ -322,6 +328,27 @@ TEST(LokiTests, MultiplyConditionalEffectsSplitsActions)
             EXPECT_EQ(count_effect_nodes<formalism::EffectWhen>(*data.effect, repository), std::size_t { 0 });
         }
     }
+}
+
+TEST(LokiTests, MultiplyConditionalEffectsThrowsOnOverflow)
+{
+    auto domain_source = std::ostringstream {};
+    domain_source << "(define (domain conditional-overflow)\n";
+    domain_source << "  (:requirements :strips :conditional-effects)\n";
+    domain_source << "  (:predicates (p)";
+    for (auto i = std::size_t { 0 }; i < std::numeric_limits<std::size_t>::digits; ++i)
+        domain_source << " (c" << i << ")";
+    domain_source << ")\n";
+    domain_source << "  (:action a :parameters () :precondition (p) :effect (and";
+    for (auto i = std::size_t { 0 }; i < std::numeric_limits<std::size_t>::digits; ++i)
+        domain_source << " (when (c" << i << ") (p))";
+    domain_source << "))\n)";
+
+    auto parser = loki::Parser(domain_source.str());
+    auto options = loki::TranslatorOptions {};
+    options.multiply_conditional_effects = true;
+
+    EXPECT_THROW(loki::translate(parser.get_domain(), options), loki::SemanticError);
 }
 
 TEST(LokiTests, ExistentialConditionalEffectBecomesUniversalEffect)
@@ -390,7 +417,7 @@ TEST(LokiTests, NestedUniversalRemovalEliminatesGeneratedForalls)
 
     auto num_generated_universal_predicates = std::size_t {};
     for (auto predicate : domain.get_predicates())
-        if (std::string_view(predicate.get_name()).starts_with("_universal_"))
+        if (std::string_view(predicate.get_name()).starts_with("loki-universal-"))
             ++num_generated_universal_predicates;
 
     EXPECT_EQ(count_condition_nodes<formalism::ConditionForall>(repository), std::size_t { 0 });
@@ -719,7 +746,7 @@ TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
     for (auto predicate : translated_domain.get_predicates())
     {
         const auto name = std::string(predicate.get_name());
-        if (generated_index(name, "_universal_") || generated_index(name, "_goal_"))
+        if (generated_index(name, "loki-universal-") || generated_index(name, "loki-goal-"))
             domain_generated_names.insert(name);
     }
 
@@ -727,7 +754,7 @@ TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
     for (auto predicate : translated_task.get_predicates())
     {
         const auto name = std::string(predicate.get_name());
-        if ((generated_index(name, "_universal_") || generated_index(name, "_goal_"))
+        if ((generated_index(name, "loki-universal-") || generated_index(name, "loki-goal-"))
             && !domain_generated_names.contains(name))
         {
             has_task_generated_name = true;

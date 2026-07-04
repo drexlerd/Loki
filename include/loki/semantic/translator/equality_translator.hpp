@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_TRANSLATOR_EQUALITY_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_EQUALITY_TRANSLATOR_HPP_
 
@@ -31,41 +30,128 @@ class EqualityTranslator : public CopyTranslatorComponent<Derived, EqualityTrans
 public:
     explicit EqualityTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, EqualityTranslator<Derived>>(context) {}
 
-    bool has_requirement(const ygg::IndexList<formalism::Requirement>& requirements, formalism::RequirementKind kind) const;
-    bool equality_required(const ygg::Data<formalism::Task>& task) const;
+    bool has_requirement(formalism::EntityListView<formalism::Requirement> requirements, formalism::RequirementKind kind) const;
+    bool literal_uses_equality(formalism::LiteralView literal) const;
+    bool condition_uses_equality(formalism::ConditionView condition) const;
+    bool effect_uses_equality(formalism::EffectView effect) const;
+    bool equality_required(formalism::TaskView task) const;
     std::optional<formalism::PredicateView> find_domain_equality_predicate() const;
     formalism::LiteralView equality_literal(formalism::PredicateView predicate, ygg::Index<formalism::Object> object);
-    bool domain_uses_equality() const;
-    void add_equality_predicate_to_domain(ygg::Data<formalism::Domain>& domain);
-    void initialize_equality(ygg::Data<formalism::Task>& task);
+    bool domain_uses_equality(formalism::DomainView domain) const;
+    void add_equality_predicate_to_domain(ygg::Data<formalism::Domain>& data, formalism::DomainView domain);
+    void initialize_equality(ygg::Data<formalism::Task>& data, formalism::TaskView task);
 };
 
 template<typename Derived>
-bool EqualityTranslator<Derived>::has_requirement(const ygg::IndexList<formalism::Requirement>& requirements, formalism::RequirementKind kind) const
+bool EqualityTranslator<Derived>::has_requirement(formalism::EntityListView<formalism::Requirement> requirements, formalism::RequirementKind kind) const
 {
     for (auto requirement : requirements)
-        if (this->m_storage->repository[requirement].kind == kind)
+        if (requirement.get_kind() == kind)
             return true;
     return false;
 }
 
 template<typename Derived>
-bool EqualityTranslator<Derived>::equality_required(const ygg::Data<formalism::Task>& task) const
+bool EqualityTranslator<Derived>::literal_uses_equality(formalism::LiteralView literal) const
 {
-    if (this->self().has_requirement(task.requirements, formalism::RequirementKind::Equality))
+    return std::string_view(literal.get_atom().get_predicate().get_name()) == "=";
+}
+
+template<typename Derived>
+bool EqualityTranslator<Derived>::condition_uses_equality(formalism::ConditionView condition) const
+{
+    return ygg::visit(
+        [&](const auto& node) -> bool
+        {
+            using Node = std::decay_t<decltype(node)>;
+            if constexpr (std::is_same_v<Node, formalism::ConditionLiteralView>)
+                return this->self().literal_uses_equality(node.get_literal());
+            else if constexpr (std::is_same_v<Node, formalism::ConditionAndView> || std::is_same_v<Node, formalism::ConditionOrView>)
+            {
+                for (auto child : node.get_conditions())
+                    if (this->self().condition_uses_equality(child))
+                        return true;
+                return false;
+            }
+            else if constexpr (std::is_same_v<Node, formalism::ConditionNotView>)
+            {
+                return this->self().condition_uses_equality(node.get_condition());
+            }
+            else if constexpr (std::is_same_v<Node, formalism::ConditionImplyView>)
+            {
+                return this->self().condition_uses_equality(node.get_left()) || this->self().condition_uses_equality(node.get_right());
+            }
+            else if constexpr (std::is_same_v<Node, formalism::ConditionExistsView> || std::is_same_v<Node, formalism::ConditionForallView>)
+            {
+                return this->self().condition_uses_equality(node.get_condition());
+            }
+            else
+            {
+                return false;
+            }
+        },
+        condition.get_value());
+}
+
+template<typename Derived>
+bool EqualityTranslator<Derived>::effect_uses_equality(formalism::EffectView effect) const
+{
+    return ygg::visit(
+        [&](const auto& node) -> bool
+        {
+            using Node = std::decay_t<decltype(node)>;
+            if constexpr (std::is_same_v<Node, formalism::EffectLiteralView>)
+                return this->self().literal_uses_equality(node.get_literal());
+            else if constexpr (std::is_same_v<Node, formalism::EffectAndView> || std::is_same_v<Node, formalism::EffectOneOfView>)
+            {
+                for (auto child : node.get_effects())
+                    if (this->self().effect_uses_equality(child))
+                        return true;
+                return false;
+            }
+            else if constexpr (std::is_same_v<Node, formalism::EffectForallView>)
+            {
+                return this->self().effect_uses_equality(node.get_effect());
+            }
+            else if constexpr (std::is_same_v<Node, formalism::EffectWhenView>)
+            {
+                return this->self().condition_uses_equality(node.get_condition()) || this->self().effect_uses_equality(node.get_effect());
+            }
+            else if constexpr (std::is_same_v<Node, formalism::EffectProbabilisticView>)
+            {
+                for (auto alternative : node.get_alternatives())
+                    if (this->self().effect_uses_equality(alternative.get_effect()))
+                        return true;
+                return false;
+            }
+            else if constexpr (std::is_same_v<Node, formalism::EffectProbabilisticAlternativeView>)
+            {
+                return this->self().effect_uses_equality(node.get_effect());
+            }
+            else
+            {
+                return false;
+            }
+        },
+        effect.get_value());
+}
+
+template<typename Derived>
+bool EqualityTranslator<Derived>::equality_required(formalism::TaskView task) const
+{
+    if (this->self().has_requirement(task.get_requirements(), formalism::RequirementKind::Equality))
         return true;
-    const auto& domain = this->m_storage->translated_domain->get_data();
-    return this->self().has_requirement(domain.requirements, formalism::RequirementKind::Equality) || this->self().domain_uses_equality();
+    return this->self().has_requirement(this->m_storage->translated_domain->get_requirements(), formalism::RequirementKind::Equality)
+           || this->self().domain_uses_equality(*this->m_storage->translated_domain);
 }
 
 template<typename Derived>
 std::optional<formalism::PredicateView> EqualityTranslator<Derived>::find_domain_equality_predicate() const
 {
-    const auto& domain = this->m_storage->translated_domain->get_data();
-    for (auto predicate : domain.predicates)
+    for (auto predicate : this->m_storage->translated_domain->get_predicates())
     {
-        if (std::string_view(this->m_storage->repository[predicate].name) == "=")
-            return ygg::make_view(predicate, this->m_storage->repository);
+        if (std::string_view(predicate.get_name()) == "=")
+            return predicate;
     }
     return {};
 }
@@ -82,46 +168,51 @@ formalism::LiteralView EqualityTranslator<Derived>::equality_literal(formalism::
 }
 
 template<typename Derived>
-bool EqualityTranslator<Derived>::domain_uses_equality() const
+bool EqualityTranslator<Derived>::domain_uses_equality(formalism::DomainView domain) const
 {
-    for (ygg::uint_t i = 0; i < this->m_storage->repository.template size<formalism::Predicate>(); ++i)
+    for (auto predicate : domain.get_predicates())
     {
-        if (std::string_view(this->m_storage->repository[ygg::Index<formalism::Predicate>(i)].name) == "=")
+        if (std::string_view(predicate.get_name()) == "=")
+            return true;
+    }
+    for (auto action : domain.get_actions())
+    {
+        if (const auto precondition = action.get_precondition())
+            if (this->self().condition_uses_equality(precondition.value()))
+                return true;
+        if (const auto effect = action.get_effect())
+            if (this->self().effect_uses_equality(effect.value()))
+                return true;
+    }
+    for (auto axiom : domain.get_axioms())
+    {
+        if (this->self().literal_uses_equality(axiom.get_head()) || this->self().condition_uses_equality(axiom.get_condition()))
             return true;
     }
     return false;
 }
 
 template<typename Derived>
-void EqualityTranslator<Derived>::add_equality_predicate_to_domain(ygg::Data<formalism::Domain>& domain)
+void EqualityTranslator<Derived>::add_equality_predicate_to_domain(ygg::Data<formalism::Domain>& data, formalism::DomainView domain)
 {
-    if (!this->self().has_requirement(domain.requirements, formalism::RequirementKind::Equality) && !this->self().domain_uses_equality())
+    if (!this->self().has_requirement(domain.get_requirements(), formalism::RequirementKind::Equality) && !this->self().domain_uses_equality(domain))
         return;
 
-    for (auto predicate : domain.predicates)
+    for (auto predicate : domain.get_predicates())
     {
-        if (std::string_view(this->m_storage->repository[predicate].name) == "=")
+        if (std::string_view(predicate.get_name()) == "=")
         {
-            return;
-        }
-    }
-
-    for (ygg::uint_t i = 0; i < this->m_storage->repository.template size<formalism::Predicate>(); ++i)
-    {
-        const auto predicate = ygg::Index<formalism::Predicate>(i);
-        if (std::string_view(this->m_storage->repository[predicate].name) == "=")
-        {
-            domain.predicates.push_back(predicate);
+            data.predicates.push_back(predicate.get_index());
             return;
         }
     }
 
     auto object_types = ygg::IndexList<formalism::Type> {};
-    for (auto type : domain.types)
+    for (auto type : domain.get_types())
     {
-        if (std::string_view(this->m_storage->repository[type].name) == "object")
+        if (std::string_view(type.get_name()) == "object")
         {
-            object_types.push_back(type);
+            object_types.push_back(type.get_index());
             break;
         }
     }
@@ -134,23 +225,22 @@ void EqualityTranslator<Derived>::add_equality_predicate_to_domain(ygg::Data<for
 
     const auto predicate =
         formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, cista::offset::string("="), std::move(parameters)).get_index();
-    domain.predicates.push_back(predicate);
+    data.predicates.push_back(predicate);
 }
 
 template<typename Derived>
-void EqualityTranslator<Derived>::initialize_equality(ygg::Data<formalism::Task>& task)
+void EqualityTranslator<Derived>::initialize_equality(ygg::Data<formalism::Task>& data, formalism::TaskView task)
 {
     if (!this->self().equality_required(task))
         return;
     const auto predicate = this->self().find_domain_equality_predicate();
     if (!predicate)
         throw InvalidEqualityError("expected equality predicate to be declared in the translated domain");
-    const auto& domain = this->m_storage->translated_domain->get_data();
-    for (auto object : domain.constants)
-        task.initial_literals.push_back(as_index(this->self().equality_literal(*predicate, object)));
-    for (auto object : task.objects)
-        task.initial_literals.push_back(as_index(this->self().equality_literal(*predicate, object)));
-    task.domain = this->m_storage->translated_domain->get_index();
+    for (auto object : this->m_storage->translated_domain->get_constants())
+        data.initial_literals.push_back(as_index(this->self().equality_literal(*predicate, object.get_index())));
+    for (auto object : data.objects)
+        data.initial_literals.push_back(as_index(this->self().equality_literal(*predicate, object)));
+    data.domain = this->m_storage->translated_domain->get_index();
 }
 
 }  // namespace loki::semantic::detail

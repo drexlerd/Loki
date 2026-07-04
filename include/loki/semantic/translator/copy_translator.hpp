@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_TRANSLATOR_COPY_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_COPY_TRANSLATOR_HPP_
 
@@ -57,7 +56,9 @@ class CopyTranslator :
     public VariableRenamingTranslator<CopyTranslator>
 {
 public:
-    explicit CopyTranslator(std::shared_ptr<TranslationStorage> storage, bool remove_typing = true, TranslationPhase phase = TranslationPhase::ToNegationNormalForm) :
+    explicit CopyTranslator(std::shared_ptr<TranslationStorage> storage,
+                            bool remove_typing = true,
+                            TranslationPhase phase = TranslationPhase::ToNegationNormalForm) :
         CopyContextOwner(std::move(storage), remove_typing, phase),
         CopyTranslatorFacade<CopyTranslator>(context()),
         BasicCopyTranslator<CopyTranslator>(context()),
@@ -79,20 +80,21 @@ public:
 
     using CopyTranslatorFacade<CopyTranslator>::copy_domain;
     using CopyTranslatorFacade<CopyTranslator>::copy_task;
-    using CopyTranslatorFacade<CopyTranslator>::public_as_or;
+    using CopyTranslatorFacade<CopyTranslator>::used_predicate_names;
+    using CopyTranslatorFacade<CopyTranslator>::next_generated_predicate_name;
     using CopyTranslatorFacade<CopyTranslator>::split_disjunctive_actions;
     using CopyTranslatorFacade<CopyTranslator>::multiply_conditional_effect_actions;
     using CopyTranslatorFacade<CopyTranslator>::split_disjunctive_axioms;
 
     using BasicCopyTranslator<CopyTranslator>::copy;
     using BasicCopyTranslator<CopyTranslator>::copy_list;
-    using BasicCopyTranslator<CopyTranslator>::copy_optional;
     using BasicCopyTranslator<CopyTranslator>::copy_parameters;
     using BasicCopyTranslator<CopyTranslator>::increment_quantifications;
     using BasicCopyTranslator<CopyTranslator>::enter_scope;
     using BasicCopyTranslator<CopyTranslator>::leave_scope;
     using BasicCopyTranslator<CopyTranslator>::append_generated_domain_objects;
     using BasicCopyTranslator<CopyTranslator>::update_translated_domain;
+    using BasicCopyTranslator<CopyTranslator>::strip_requirement;
     using BasicCopyTranslator<CopyTranslator>::strip_typing_requirement;
     using ConditionTranslator<CopyTranslator>::copy;
 
@@ -145,9 +147,7 @@ public:
 
     using TypeTranslator<CopyTranslator>::collect_type_hierarchy;
     using TypeTranslator<CopyTranslator>::maybe_strip_types;
-    using TypeTranslator<CopyTranslator>::maybe_strip_parameter;
-    using TypeTranslator<CopyTranslator>::maybe_strip_parameters;
-    using TypeTranslator<CopyTranslator>::maybe_strip_object;
+    using TypeTranslator<CopyTranslator>::copy_parameters_without_types;
     using TypeTranslator<CopyTranslator>::type_predicate;
     using TypeTranslator<CopyTranslator>::type_literal;
     using TypeTranslator<CopyTranslator>::type_condition;

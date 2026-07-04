@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_TRANSLATOR_CANONICAL_COPY_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_CANONICAL_COPY_TRANSLATOR_HPP_
 
@@ -32,35 +31,40 @@ public:
     formalism::DomainView copy_domain(formalism::DomainView domain)
     {
         m_storage->original_domain = domain.get_index();
-        const auto& source = domain.get_context();
         auto data = domain.get_data();
         data.index = {};
-        data.requirements = copy_list(data.requirements, source);
-        data.types = copy_list(data.types, source);
-        data.constants = copy_list(data.constants, source);
-        data.predicates = copy_list(data.predicates, source);
-        data.functions = copy_list(data.functions, source);
-        data.actions = copy_list(data.actions, source);
-        data.axioms = copy_list(data.axioms, source);
+        data.requirements = copy_list(domain.get_requirements());
+        data.types = copy_list(domain.get_types());
+        data.constants = copy_list(domain.get_constants());
+        data.predicates = copy_list(domain.get_predicates());
+        data.functions = copy_list(domain.get_functions());
+        data.actions = copy_list(domain.get_actions());
+        data.axioms = copy_list(domain.get_axioms());
         auto view = formalism::get_or_create<formalism::Domain>(m_storage->repository, std::move(data));
         m_storage->translated_domain = view;
+        remember(m_storage->domains, domain.get_index(), view);
         return view;
     }
 
     formalism::TaskView copy_task(formalism::TaskView task)
     {
-        const auto& source = task.get_context();
         auto data = task.get_data();
         data.index = {};
-        data.domain = as_index(copy(data.domain, source));
-        data.requirements = copy_list(data.requirements, source);
-        data.objects = copy_list(data.objects, source);
-        data.initial_literals = copy_list(data.initial_literals, source);
-        data.initial_function_values = copy_list(data.initial_function_values, source);
-        data.goal = copy_optional(data.goal, source);
-        data.metric = copy_optional(data.metric, source);
-        data.predicates = copy_list(data.predicates, source);
-        data.axioms = copy_list(data.axioms, source);
+        data.domain = m_storage->translated_domain ? m_storage->translated_domain->get_index() : as_index(copy_domain(task.get_domain()));
+        data.requirements = copy_list(task.get_requirements());
+        data.objects = copy_list(task.get_objects());
+        data.initial_literals = copy_list(task.get_initial_literals());
+        data.initial_function_values = copy_list(task.get_initial_function_values());
+        if (const auto goal = task.get_goal())
+            data.goal = as_index(copy(goal.value()));
+        else
+            data.goal = {};
+        if (const auto metric = task.get_metric())
+            data.metric = as_index(copy(metric.value()));
+        else
+            data.metric = {};
+        data.predicates = copy_list(task.get_predicates());
+        data.axioms = copy_list(task.get_axioms());
         auto view = formalism::get_or_create<formalism::Task>(m_storage->repository, std::move(data));
         remember(m_storage->tasks, task.get_index(), view);
         return view;
@@ -70,457 +74,401 @@ private:
     std::shared_ptr<TranslationStorage> m_storage;
 
     template<typename T>
-    ygg::IndexList<T> copy_list(const ygg::IndexList<T>& source, const formalism::Repository& repository)
+    ygg::IndexList<T> copy_list(formalism::EntityListView<T> source)
     {
         auto result = ygg::IndexList<T> {};
-        for (auto index : source)
-            result.push_back(as_index(copy(index, repository)));
+        for (auto view : source)
+            result.push_back(as_index(copy(view)));
         return result;
     }
 
-    template<typename T>
-    cista::optional<ygg::Index<T>> copy_optional(const cista::optional<ygg::Index<T>>& source, const formalism::Repository& repository)
+    formalism::RequirementView copy(formalism::RequirementView source)
     {
-        if (!source)
-            return {};
-        return as_index(copy(*source, repository));
-    }
-
-    formalism::RequirementView copy(ygg::Index<formalism::Requirement> source, const formalism::Repository& repository)
-    {
-        if (auto mapped = find_mapped(m_storage->requirements, source))
+        if (auto mapped = find_mapped(m_storage->requirements, source.get_index()))
             return *mapped;
-        auto out = formalism::get_or_create<formalism::Requirement>(m_storage->repository, repository[source].kind);
-        remember(m_storage->requirements, source, out);
+        auto out = formalism::get_or_create<formalism::Requirement>(m_storage->repository, source.get_kind());
+        remember(m_storage->requirements, source.get_index(), out);
         return out;
     }
 
-    formalism::TypeView copy(ygg::Index<formalism::Type> source, const formalism::Repository& repository)
+    formalism::TypeView copy(formalism::TypeView source)
     {
-        if (auto mapped = find_mapped(m_storage->types, source))
+        if (auto mapped = find_mapped(m_storage->types, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
-        auto out = formalism::get_or_create<formalism::Type>(m_storage->repository, data.name, copy_list(data.bases, repository));
-        remember(m_storage->types, source, out);
+        auto out = formalism::get_or_create<formalism::Type>(m_storage->repository, source.get_name(), copy_list(source.get_bases()));
+        remember(m_storage->types, source.get_index(), out);
         return out;
     }
 
-    formalism::ObjectView copy(ygg::Index<formalism::Object> source, const formalism::Repository& repository)
+    formalism::ObjectView copy(formalism::ObjectView source)
     {
-        if (auto mapped = find_mapped(m_storage->objects, source))
+        if (auto mapped = find_mapped(m_storage->objects, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
-        auto out = formalism::get_or_create<formalism::Object>(m_storage->repository, data.name, copy_list(data.types, repository));
-        remember(m_storage->objects, source, out);
+        auto out = formalism::get_or_create<formalism::Object>(m_storage->repository, source.get_name(), copy_list(source.get_types()));
+        remember(m_storage->objects, source.get_index(), out);
         return out;
     }
 
-    formalism::VariableView copy(ygg::Index<formalism::Variable> source, const formalism::Repository& repository)
+    formalism::VariableView copy(formalism::VariableView source)
     {
-        if (auto mapped = find_mapped(m_storage->variables, source))
+        if (auto mapped = find_mapped(m_storage->variables, source.get_index()))
             return *mapped;
-        auto out = formalism::get_or_create<formalism::Variable>(m_storage->repository, repository[source].name);
-        remember(m_storage->variables, source, out);
+        auto out = formalism::get_or_create<formalism::Variable>(m_storage->repository, source.get_name());
+        remember(m_storage->variables, source.get_index(), out);
         return out;
     }
 
-    formalism::ParameterView copy(ygg::Index<formalism::Parameter> source, const formalism::Repository& repository)
+    formalism::ParameterView copy(formalism::ParameterView source)
     {
-        if (auto mapped = find_mapped(m_storage->parameters, source))
+        if (auto mapped = find_mapped(m_storage->parameters, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
-        auto out =
-            formalism::get_or_create<formalism::Parameter>(m_storage->repository, as_index(copy(data.variable, repository)), copy_list(data.types, repository));
-        remember(m_storage->parameters, source, out);
+        auto out = formalism::get_or_create<formalism::Parameter>(m_storage->repository, as_index(copy(source.get_variable())), copy_list(source.get_types()));
+        remember(m_storage->parameters, source.get_index(), out);
         return out;
     }
 
-    formalism::PredicateView copy(ygg::Index<formalism::Predicate> source, const formalism::Repository& repository)
+    formalism::PredicateView copy(formalism::PredicateView source)
     {
-        if (auto mapped = find_mapped(m_storage->predicates, source))
+        if (auto mapped = find_mapped(m_storage->predicates, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
-        auto out = formalism::get_or_create<formalism::Predicate>(m_storage->repository, data.name, copy_list(data.parameters, repository));
-        remember(m_storage->predicates, source, out);
+        auto out = formalism::get_or_create<formalism::Predicate>(m_storage->repository, source.get_name(), copy_list(source.get_parameters()));
+        remember(m_storage->predicates, source.get_index(), out);
         return out;
     }
 
-    formalism::FunctionSkeletonView copy(ygg::Index<formalism::FunctionSkeleton> source, const formalism::Repository& repository)
+    formalism::FunctionSkeletonView copy(formalism::FunctionSkeletonView source)
     {
-        if (auto mapped = find_mapped(m_storage->functions, source))
+        if (auto mapped = find_mapped(m_storage->functions, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
         auto out = formalism::get_or_create<formalism::FunctionSkeleton>(m_storage->repository,
-                                                                         data.name,
-                                                                         copy_list(data.parameters, repository),
-                                                                         as_index(copy(data.type, repository)));
-        remember(m_storage->functions, source, out);
+                                                                         source.get_name(),
+                                                                         copy_list(source.get_parameters()),
+                                                                         as_index(copy(source.get_type())));
+        remember(m_storage->functions, source.get_index(), out);
         return out;
     }
 
-    formalism::TermView copy(ygg::Index<formalism::Term> source, const formalism::Repository& repository)
+    formalism::TermView copy(formalism::TermView source)
     {
-        if (auto mapped = find_mapped(m_storage->terms, source))
+        if (auto mapped = find_mapped(m_storage->terms, source.get_index()))
             return *mapped;
-        auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::Term>::Variant
-                                { return ygg::Data<formalism::Term>::Variant(as_index(copy(arg, repository))); },
-                                repository[source].value);
+        auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Term>::Variant { return as_index(copy(arg)); }, source.get_value());
         auto out = formalism::get_or_create<formalism::Term>(m_storage->repository, std::move(value));
-        remember(m_storage->terms, source, out);
+        remember(m_storage->terms, source.get_index(), out);
         return out;
     }
 
-    formalism::AtomView copy(ygg::Index<formalism::Atom> source, const formalism::Repository& repository)
+    formalism::AtomView copy(formalism::AtomView source)
     {
-        if (auto mapped = find_mapped(m_storage->atoms, source))
+        if (auto mapped = find_mapped(m_storage->atoms, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
+        auto out = formalism::get_or_create<formalism::Atom>(m_storage->repository, as_index(copy(source.get_predicate())), copy_list(source.get_terms()));
+        remember(m_storage->atoms, source.get_index(), out);
+        return out;
+    }
+
+    formalism::LiteralView copy(formalism::LiteralView source)
+    {
+        if (auto mapped = find_mapped(m_storage->literals, source.get_index()))
+            return *mapped;
+        auto out = formalism::get_or_create<formalism::Literal>(m_storage->repository, as_index(copy(source.get_atom())), source.get_polarity());
+        remember(m_storage->literals, source.get_index(), out);
+        return out;
+    }
+
+    formalism::FunctionExpressionNumberView copy(formalism::FunctionExpressionNumberView source)
+    {
+        if (auto mapped = find_mapped(m_storage->numbers, source.get_index()))
+            return *mapped;
+        auto out = formalism::get_or_create<formalism::FunctionExpressionNumber>(m_storage->repository, source.get_value());
+        remember(m_storage->numbers, source.get_index(), out);
+        return out;
+    }
+
+    formalism::FunctionTermView copy(formalism::FunctionTermView source)
+    {
+        if (auto mapped = find_mapped(m_storage->function_terms, source.get_index()))
+            return *mapped;
         auto out =
-            formalism::get_or_create<formalism::Atom>(m_storage->repository, as_index(copy(data.predicate, repository)), copy_list(data.terms, repository));
-        remember(m_storage->atoms, source, out);
+            formalism::get_or_create<formalism::FunctionTerm>(m_storage->repository, as_index(copy(source.get_function())), copy_list(source.get_terms()));
+        remember(m_storage->function_terms, source.get_index(), out);
         return out;
     }
 
-    formalism::LiteralView copy(ygg::Index<formalism::Literal> source, const formalism::Repository& repository)
+    formalism::UnaryFunctionExpressionView copy(formalism::UnaryFunctionExpressionView source)
     {
-        if (auto mapped = find_mapped(m_storage->literals, source))
+        if (auto mapped = find_mapped(m_storage->unary_expressions, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
-        auto out = formalism::get_or_create<formalism::Literal>(m_storage->repository, as_index(copy(data.atom, repository)), data.m_polarity);
-        remember(m_storage->literals, source, out);
+        auto out =
+            formalism::get_or_create<formalism::UnaryFunctionExpression>(m_storage->repository, source.get_data().op, as_index(copy(source.get_expression())));
+        remember(m_storage->unary_expressions, source.get_index(), out);
         return out;
     }
 
-    formalism::FunctionExpressionNumberView copy(ygg::Index<formalism::FunctionExpressionNumber> source, const formalism::Repository& repository)
+    formalism::BinaryFunctionExpressionView copy(formalism::BinaryFunctionExpressionView source)
     {
-        if (auto mapped = find_mapped(m_storage->numbers, source))
+        if (auto mapped = find_mapped(m_storage->binary_expressions, source.get_index()))
             return *mapped;
-        auto out = formalism::get_or_create<formalism::FunctionExpressionNumber>(m_storage->repository, repository[source].value);
-        remember(m_storage->numbers, source, out);
-        return out;
-    }
-
-    formalism::FunctionTermView copy(ygg::Index<formalism::FunctionTerm> source, const formalism::Repository& repository)
-    {
-        if (auto mapped = find_mapped(m_storage->function_terms, source))
-            return *mapped;
-        const auto& data = repository[source];
-        auto out = formalism::get_or_create<formalism::FunctionTerm>(m_storage->repository,
-                                                                     as_index(copy(data.function, repository)),
-                                                                     copy_list(data.terms, repository));
-        remember(m_storage->function_terms, source, out);
-        return out;
-    }
-
-    formalism::UnaryFunctionExpressionView copy(ygg::Index<formalism::UnaryFunctionExpression> source, const formalism::Repository& repository)
-    {
-        if (auto mapped = find_mapped(m_storage->unary_expressions, source))
-            return *mapped;
-        const auto& data = repository[source];
-        auto out = formalism::get_or_create<formalism::UnaryFunctionExpression>(m_storage->repository, data.op, as_index(copy(data.expression, repository)));
-        remember(m_storage->unary_expressions, source, out);
-        return out;
-    }
-
-    formalism::BinaryFunctionExpressionView copy(ygg::Index<formalism::BinaryFunctionExpression> source, const formalism::Repository& repository)
-    {
-        if (auto mapped = find_mapped(m_storage->binary_expressions, source))
-            return *mapped;
-        const auto& data = repository[source];
         auto out = formalism::get_or_create<formalism::BinaryFunctionExpression>(m_storage->repository,
-                                                                                 data.op,
-                                                                                 as_index(copy(data.left, repository)),
-                                                                                 as_index(copy(data.right, repository)));
-        remember(m_storage->binary_expressions, source, out);
+                                                                                 source.get_data().op,
+                                                                                 as_index(copy(source.get_left())),
+                                                                                 as_index(copy(source.get_right())));
+        remember(m_storage->binary_expressions, source.get_index(), out);
         return out;
     }
 
-    formalism::MultiFunctionExpressionView copy(ygg::Index<formalism::MultiFunctionExpression> source, const formalism::Repository& repository)
+    formalism::MultiFunctionExpressionView copy(formalism::MultiFunctionExpressionView source)
     {
-        if (auto mapped = find_mapped(m_storage->multi_expressions, source))
+        if (auto mapped = find_mapped(m_storage->multi_expressions, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
-        auto out = formalism::get_or_create<formalism::MultiFunctionExpression>(m_storage->repository, data.op, copy_list(data.expressions, repository));
-        remember(m_storage->multi_expressions, source, out);
+        auto out =
+            formalism::get_or_create<formalism::MultiFunctionExpression>(m_storage->repository, source.get_data().op, copy_list(source.get_expressions()));
+        remember(m_storage->multi_expressions, source.get_index(), out);
         return out;
     }
 
-    formalism::FunctionExpressionView copy(ygg::Index<formalism::FunctionExpression> source, const formalism::Repository& repository)
+    formalism::FunctionExpressionView copy(formalism::FunctionExpressionView source)
     {
-        if (auto mapped = find_mapped(m_storage->function_expressions, source))
+        if (auto mapped = find_mapped(m_storage->function_expressions, source.get_index()))
             return *mapped;
-        auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::FunctionExpression>::Variant
-                                { return ygg::Data<formalism::FunctionExpression>::Variant(as_index(copy(arg, repository))); },
-                                repository[source].value);
+        auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::FunctionExpression>::Variant { return as_index(copy(arg)); }, source.get_value());
         auto out = formalism::get_or_create<formalism::FunctionExpression>(m_storage->repository, std::move(value));
-        remember(m_storage->function_expressions, source, out);
+        remember(m_storage->function_expressions, source.get_index(), out);
         return out;
     }
 
-    formalism::ConditionLiteralView copy(ygg::Index<formalism::ConditionLiteral> source, const formalism::Repository& repository)
+    formalism::ConditionLiteralView copy(formalism::ConditionLiteralView source)
     {
-        if (auto mapped = find_mapped(m_storage->condition_literals, source))
+        if (auto mapped = find_mapped(m_storage->condition_literals, source.get_index()))
             return *mapped;
-        auto out = formalism::get_or_create<formalism::ConditionLiteral>(m_storage->repository, as_index(copy(repository[source].literal, repository)));
-        remember(m_storage->condition_literals, source, out);
+        auto out = formalism::get_or_create<formalism::ConditionLiteral>(m_storage->repository, as_index(copy(source.get_literal())));
+        remember(m_storage->condition_literals, source.get_index(), out);
         return out;
     }
 
-    formalism::ConditionAndView copy(ygg::Index<formalism::ConditionAnd> source, const formalism::Repository& repository)
+    formalism::ConditionAndView copy(formalism::ConditionAndView source)
     {
-        if (auto mapped = find_mapped(m_storage->condition_ands, source))
+        if (auto mapped = find_mapped(m_storage->condition_ands, source.get_index()))
             return *mapped;
-        auto out = formalism::get_or_create<formalism::ConditionAnd>(m_storage->repository, copy_list(repository[source].conditions, repository));
-        remember(m_storage->condition_ands, source, out);
+        auto out = formalism::get_or_create<formalism::ConditionAnd>(m_storage->repository, copy_list(source.get_conditions()));
+        remember(m_storage->condition_ands, source.get_index(), out);
         return out;
     }
 
-    formalism::ConditionOrView copy(ygg::Index<formalism::ConditionOr> source, const formalism::Repository& repository)
+    formalism::ConditionOrView copy(formalism::ConditionOrView source)
     {
-        if (auto mapped = find_mapped(m_storage->condition_ors, source))
+        if (auto mapped = find_mapped(m_storage->condition_ors, source.get_index()))
             return *mapped;
-        auto out = formalism::get_or_create<formalism::ConditionOr>(m_storage->repository, copy_list(repository[source].conditions, repository));
-        remember(m_storage->condition_ors, source, out);
+        auto out = formalism::get_or_create<formalism::ConditionOr>(m_storage->repository, copy_list(source.get_conditions()));
+        remember(m_storage->condition_ors, source.get_index(), out);
         return out;
     }
 
-    formalism::ConditionNotView copy(ygg::Index<formalism::ConditionNot> source, const formalism::Repository& repository)
+    formalism::ConditionNotView copy(formalism::ConditionNotView source)
     {
-        if (auto mapped = find_mapped(m_storage->condition_nots, source))
+        if (auto mapped = find_mapped(m_storage->condition_nots, source.get_index()))
             return *mapped;
-        auto out = formalism::get_or_create<formalism::ConditionNot>(m_storage->repository, as_index(copy(repository[source].condition, repository)));
-        remember(m_storage->condition_nots, source, out);
+        auto out = formalism::get_or_create<formalism::ConditionNot>(m_storage->repository, as_index(copy(source.get_condition())));
+        remember(m_storage->condition_nots, source.get_index(), out);
         return out;
     }
 
-    formalism::ConditionImplyView copy(ygg::Index<formalism::ConditionImply> source, const formalism::Repository& repository)
+    formalism::ConditionImplyView copy(formalism::ConditionImplyView source)
     {
-        if (auto mapped = find_mapped(m_storage->condition_implies, source))
+        if (auto mapped = find_mapped(m_storage->condition_implies, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
-        auto out = formalism::get_or_create<formalism::ConditionImply>(m_storage->repository,
-                                                                       as_index(copy(data.left, repository)),
-                                                                       as_index(copy(data.right, repository)));
-        remember(m_storage->condition_implies, source, out);
+        auto out =
+            formalism::get_or_create<formalism::ConditionImply>(m_storage->repository, as_index(copy(source.get_left())), as_index(copy(source.get_right())));
+        remember(m_storage->condition_implies, source.get_index(), out);
         return out;
     }
 
-    formalism::ConditionExistsView copy(ygg::Index<formalism::ConditionExists> source, const formalism::Repository& repository)
+    formalism::ConditionExistsView copy(formalism::ConditionExistsView source)
     {
-        if (auto mapped = find_mapped(m_storage->condition_exists, source))
+        if (auto mapped = find_mapped(m_storage->condition_exists, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
         auto out = formalism::get_or_create<formalism::ConditionExists>(m_storage->repository,
-                                                                        copy_list(data.parameters, repository),
-                                                                        as_index(copy(data.condition, repository)));
-        remember(m_storage->condition_exists, source, out);
+                                                                        copy_list(source.get_parameters()),
+                                                                        as_index(copy(source.get_condition())));
+        remember(m_storage->condition_exists, source.get_index(), out);
         return out;
     }
 
-    formalism::ConditionForallView copy(ygg::Index<formalism::ConditionForall> source, const formalism::Repository& repository)
+    formalism::ConditionForallView copy(formalism::ConditionForallView source)
     {
-        if (auto mapped = find_mapped(m_storage->condition_foralls, source))
+        if (auto mapped = find_mapped(m_storage->condition_foralls, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
         auto out = formalism::get_or_create<formalism::ConditionForall>(m_storage->repository,
-                                                                        copy_list(data.parameters, repository),
-                                                                        as_index(copy(data.condition, repository)));
-        remember(m_storage->condition_foralls, source, out);
+                                                                        copy_list(source.get_parameters()),
+                                                                        as_index(copy(source.get_condition())));
+        remember(m_storage->condition_foralls, source.get_index(), out);
         return out;
     }
 
-    formalism::ConditionNumericConstraintView copy(ygg::Index<formalism::ConditionNumericConstraint> source, const formalism::Repository& repository)
+    formalism::ConditionNumericConstraintView copy(formalism::ConditionNumericConstraintView source)
     {
-        if (auto mapped = find_mapped(m_storage->condition_numeric_constraints, source))
+        if (auto mapped = find_mapped(m_storage->condition_numeric_constraints, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
         auto out = formalism::get_or_create<formalism::ConditionNumericConstraint>(m_storage->repository,
-                                                                                   data.comparator,
-                                                                                   as_index(copy(data.left, repository)),
-                                                                                   as_index(copy(data.right, repository)));
-        remember(m_storage->condition_numeric_constraints, source, out);
+                                                                                   source.get_data().comparator,
+                                                                                   as_index(copy(source.get_left())),
+                                                                                   as_index(copy(source.get_right())));
+        remember(m_storage->condition_numeric_constraints, source.get_index(), out);
         return out;
     }
 
-    formalism::ConditionView copy(ygg::Index<formalism::Condition> source, const formalism::Repository& repository)
+    formalism::ConditionView copy(formalism::ConditionView source)
     {
-        if (auto mapped = find_mapped(m_storage->conditions, source))
+        if (auto mapped = find_mapped(m_storage->conditions, source.get_index()))
             return *mapped;
-        auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::Condition>::Variant
-                                { return ygg::Data<formalism::Condition>::Variant(as_index(copy(arg, repository))); },
-                                repository[source].value);
+        auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Condition>::Variant { return as_index(copy(arg)); }, source.get_value());
         auto out = formalism::get_or_create<formalism::Condition>(m_storage->repository, std::move(value));
-        remember(m_storage->conditions, source, out);
+        remember(m_storage->conditions, source.get_index(), out);
         return out;
     }
 
-    formalism::EffectLiteralView copy(ygg::Index<formalism::EffectLiteral> source, const formalism::Repository& repository)
+    formalism::EffectLiteralView copy(formalism::EffectLiteralView source)
     {
-        if (auto mapped = find_mapped(m_storage->effect_literals, source))
+        if (auto mapped = find_mapped(m_storage->effect_literals, source.get_index()))
             return *mapped;
-        auto out = formalism::get_or_create<formalism::EffectLiteral>(m_storage->repository, as_index(copy(repository[source].literal, repository)));
-        remember(m_storage->effect_literals, source, out);
+        auto out = formalism::get_or_create<formalism::EffectLiteral>(m_storage->repository, as_index(copy(source.get_literal())));
+        remember(m_storage->effect_literals, source.get_index(), out);
         return out;
     }
 
-    formalism::EffectAndView copy(ygg::Index<formalism::EffectAnd> source, const formalism::Repository& repository)
+    formalism::EffectAndView copy(formalism::EffectAndView source)
     {
-        if (auto mapped = find_mapped(m_storage->effect_ands, source))
+        if (auto mapped = find_mapped(m_storage->effect_ands, source.get_index()))
             return *mapped;
-        auto out = formalism::get_or_create<formalism::EffectAnd>(m_storage->repository, copy_list(repository[source].effects, repository));
-        remember(m_storage->effect_ands, source, out);
+        auto out = formalism::get_or_create<formalism::EffectAnd>(m_storage->repository, copy_list(source.get_effects()));
+        remember(m_storage->effect_ands, source.get_index(), out);
         return out;
     }
 
-    formalism::EffectNumericView copy(ygg::Index<formalism::EffectNumeric> source, const formalism::Repository& repository)
+    formalism::EffectNumericView copy(formalism::EffectNumericView source)
     {
-        if (auto mapped = find_mapped(m_storage->effect_numerics, source))
+        if (auto mapped = find_mapped(m_storage->effect_numerics, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
         auto out = formalism::get_or_create<formalism::EffectNumeric>(m_storage->repository,
-                                                                      data.op,
-                                                                      as_index(copy(data.function, repository)),
-                                                                      copy_list(data.terms, repository),
-                                                                      as_index(copy(data.expression, repository)));
-        remember(m_storage->effect_numerics, source, out);
+                                                                      source.get_data().op,
+                                                                      as_index(copy(source.get_function())),
+                                                                      copy_list(source.get_terms()),
+                                                                      as_index(copy(source.get_expression())));
+        remember(m_storage->effect_numerics, source.get_index(), out);
         return out;
     }
 
-    formalism::EffectForallView copy(ygg::Index<formalism::EffectForall> source, const formalism::Repository& repository)
+    formalism::EffectForallView copy(formalism::EffectForallView source)
     {
-        if (auto mapped = find_mapped(m_storage->effect_foralls, source))
+        if (auto mapped = find_mapped(m_storage->effect_foralls, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
-        auto out = formalism::get_or_create<formalism::EffectForall>(m_storage->repository,
-                                                                     copy_list(data.parameters, repository),
-                                                                     as_index(copy(data.effect, repository)));
-        remember(m_storage->effect_foralls, source, out);
+        auto out =
+            formalism::get_or_create<formalism::EffectForall>(m_storage->repository, copy_list(source.get_parameters()), as_index(copy(source.get_effect())));
+        remember(m_storage->effect_foralls, source.get_index(), out);
         return out;
     }
 
-    formalism::EffectWhenView copy(ygg::Index<formalism::EffectWhen> source, const formalism::Repository& repository)
+    formalism::EffectWhenView copy(formalism::EffectWhenView source)
     {
-        if (auto mapped = find_mapped(m_storage->effect_whens, source))
+        if (auto mapped = find_mapped(m_storage->effect_whens, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
-        auto out = formalism::get_or_create<formalism::EffectWhen>(m_storage->repository,
-                                                                   as_index(copy(data.condition, repository)),
-                                                                   as_index(copy(data.effect, repository)));
-        remember(m_storage->effect_whens, source, out);
+        auto out =
+            formalism::get_or_create<formalism::EffectWhen>(m_storage->repository, as_index(copy(source.get_condition())), as_index(copy(source.get_effect())));
+        remember(m_storage->effect_whens, source.get_index(), out);
         return out;
     }
 
-    formalism::EffectOneOfView copy(ygg::Index<formalism::EffectOneOf> source, const formalism::Repository& repository)
+    formalism::EffectOneOfView copy(formalism::EffectOneOfView source)
     {
-        if (auto mapped = find_mapped(m_storage->effect_one_ofs, source))
+        if (auto mapped = find_mapped(m_storage->effect_one_ofs, source.get_index()))
             return *mapped;
-        auto out = formalism::get_or_create<formalism::EffectOneOf>(m_storage->repository, copy_list(repository[source].effects, repository));
-        remember(m_storage->effect_one_ofs, source, out);
+        auto out = formalism::get_or_create<formalism::EffectOneOf>(m_storage->repository, copy_list(source.get_effects()));
+        remember(m_storage->effect_one_ofs, source.get_index(), out);
         return out;
     }
 
-    formalism::EffectProbabilisticAlternativeView copy(ygg::Index<formalism::EffectProbabilisticAlternative> source, const formalism::Repository& repository)
+    formalism::EffectProbabilisticAlternativeView copy(formalism::EffectProbabilisticAlternativeView source)
     {
-        if (auto mapped = find_mapped(m_storage->effect_probabilistic_alternatives, source))
+        if (auto mapped = find_mapped(m_storage->effect_probabilistic_alternatives, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
         auto out = formalism::get_or_create<formalism::EffectProbabilisticAlternative>(m_storage->repository,
-                                                                                       data.probability,
-                                                                                       as_index(copy(data.effect, repository)));
-        remember(m_storage->effect_probabilistic_alternatives, source, out);
+                                                                                       source.get_data().probability,
+                                                                                       as_index(copy(source.get_effect())));
+        remember(m_storage->effect_probabilistic_alternatives, source.get_index(), out);
         return out;
     }
 
-    formalism::EffectProbabilisticView copy(ygg::Index<formalism::EffectProbabilistic> source, const formalism::Repository& repository)
+    formalism::EffectProbabilisticView copy(formalism::EffectProbabilisticView source)
     {
-        if (auto mapped = find_mapped(m_storage->effect_probabilistics, source))
+        if (auto mapped = find_mapped(m_storage->effect_probabilistics, source.get_index()))
             return *mapped;
-        auto out = formalism::get_or_create<formalism::EffectProbabilistic>(m_storage->repository, copy_list(repository[source].alternatives, repository));
-        remember(m_storage->effect_probabilistics, source, out);
+        auto out = formalism::get_or_create<formalism::EffectProbabilistic>(m_storage->repository, copy_list(source.get_alternatives()));
+        remember(m_storage->effect_probabilistics, source.get_index(), out);
         return out;
     }
 
-    formalism::EffectView copy(ygg::Index<formalism::Effect> source, const formalism::Repository& repository)
+    formalism::EffectView copy(formalism::EffectView source)
     {
-        if (auto mapped = find_mapped(m_storage->effects, source))
+        if (auto mapped = find_mapped(m_storage->effects, source.get_index()))
             return *mapped;
-        auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant
-                                { return ygg::Data<formalism::Effect>::Variant(as_index(copy(arg, repository))); },
-                                repository[source].value);
+        auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant { return as_index(copy(arg)); }, source.get_value());
         auto out = formalism::get_or_create<formalism::Effect>(m_storage->repository, std::move(value));
-        remember(m_storage->effects, source, out);
+        remember(m_storage->effects, source.get_index(), out);
         return out;
     }
 
-    formalism::ActionView copy(ygg::Index<formalism::Action> source, const formalism::Repository& repository)
+    formalism::ActionView copy(formalism::ActionView source)
     {
-        if (auto mapped = find_mapped(m_storage->actions, source))
+        if (auto mapped = find_mapped(m_storage->actions, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
+        const auto& data = source.get_data();
+        auto precondition = cista::optional<ygg::Index<formalism::Condition>> {};
+        if (const auto condition = source.get_precondition())
+            precondition = as_index(copy(condition.value()));
+        auto effect = cista::optional<ygg::Index<formalism::Effect>> {};
+        if (const auto effect_view = source.get_effect())
+            effect = as_index(copy(effect_view.value()));
         auto out = formalism::get_or_create<formalism::Action>(m_storage->repository,
                                                                data.name,
                                                                data.original_name,
-                                                               copy_list(data.parameters, repository),
+                                                               copy_list(source.get_parameters()),
                                                                data.original_arity,
-                                                               copy_optional(data.precondition, repository),
-                                                               copy_optional(data.effect, repository));
-        remember(m_storage->actions, source, out);
+                                                               precondition,
+                                                               effect);
+        remember(m_storage->actions, source.get_index(), out);
         return out;
     }
 
-    formalism::AxiomView copy(ygg::Index<formalism::Axiom> source, const formalism::Repository& repository)
+    formalism::AxiomView copy(formalism::AxiomView source)
     {
-        if (auto mapped = find_mapped(m_storage->axioms, source))
+        if (auto mapped = find_mapped(m_storage->axioms, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
         auto out = formalism::get_or_create<formalism::Axiom>(m_storage->repository,
-                                                              copy_list(data.parameters, repository),
-                                                              data.original_arity,
-                                                              as_index(copy(data.head, repository)),
-                                                              as_index(copy(data.condition, repository)));
-        remember(m_storage->axioms, source, out);
+                                                              copy_list(source.get_parameters()),
+                                                              source.get_data().original_arity,
+                                                              as_index(copy(source.get_head())),
+                                                              as_index(copy(source.get_condition())));
+        remember(m_storage->axioms, source.get_index(), out);
         return out;
     }
 
-    formalism::MetricView copy(ygg::Index<formalism::Metric> source, const formalism::Repository& repository)
+    formalism::MetricView copy(formalism::MetricView source)
     {
-        if (auto mapped = find_mapped(m_storage->metrics, source))
+        if (auto mapped = find_mapped(m_storage->metrics, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
-        auto out = formalism::get_or_create<formalism::Metric>(m_storage->repository, data.minimize, as_index(copy(data.expression, repository)));
-        remember(m_storage->metrics, source, out);
+        auto out = formalism::get_or_create<formalism::Metric>(m_storage->repository, source.is_minimize(), as_index(copy(source.get_expression())));
+        remember(m_storage->metrics, source.get_index(), out);
         return out;
     }
 
-    formalism::InitialFunctionValueView copy(ygg::Index<formalism::InitialFunctionValue> source, const formalism::Repository& repository)
+    formalism::InitialFunctionValueView copy(formalism::InitialFunctionValueView source)
     {
-        if (auto mapped = find_mapped(m_storage->initial_function_values, source))
+        if (auto mapped = find_mapped(m_storage->initial_function_values, source.get_index()))
             return *mapped;
-        const auto& data = repository[source];
         auto out = formalism::get_or_create<formalism::InitialFunctionValue>(m_storage->repository,
-                                                                             as_index(copy(data.function, repository)),
-                                                                             as_index(copy(data.value, repository)));
-        remember(m_storage->initial_function_values, source, out);
-        return out;
-    }
-
-    formalism::DomainView copy(ygg::Index<formalism::Domain> source, const formalism::Repository& repository)
-    {
-        if (auto mapped = find_mapped(m_storage->domains, source))
-            return *mapped;
-        const auto& data = repository[source];
-        auto copied = data;
-        copied.index = {};
-        copied.requirements = copy_list(data.requirements, repository);
-        copied.types = copy_list(data.types, repository);
-        copied.constants = copy_list(data.constants, repository);
-        copied.predicates = copy_list(data.predicates, repository);
-        copied.functions = copy_list(data.functions, repository);
-        copied.actions = copy_list(data.actions, repository);
-        copied.axioms = copy_list(data.axioms, repository);
-        auto out = formalism::get_or_create<formalism::Domain>(m_storage->repository, std::move(copied));
-        remember(m_storage->domains, source, out);
-        m_storage->translated_domain = out;
+                                                                             as_index(copy(source.get_function())),
+                                                                             as_index(copy(source.get_value())));
+        remember(m_storage->initial_function_values, source.get_index(), out);
         return out;
     }
 };

@@ -15,11 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_TRANSLATOR_COPY_CONTEXT_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_COPY_CONTEXT_HPP_
 
 #include "loki/semantic/translator/common.hpp"
+
+#include <yggdrasil/containers/unordered_set.hpp>
 
 namespace loki::semantic::detail
 {
@@ -29,7 +30,9 @@ struct CopyContext
     std::shared_ptr<TranslationStorage> storage;
     std::unordered_map<ygg::uint_t, size_t> num_quantifications;
     std::vector<ygg::IndexList<formalism::Parameter>> active_parameters;
+    std::vector<ygg::IndexList<formalism::Variable>> active_parameter_variables;
     std::vector<std::unordered_map<ygg::uint_t, formalism::VariableView>> variable_bindings;
+    ygg::UnorderedSet<std::string> used_predicate_names;
     ygg::IndexList<formalism::Predicate> generated_predicates;
     ygg::IndexList<formalism::Axiom> generated_axioms;
     std::unordered_map<std::string, formalism::ConditionView> generated_universal_conditions;
@@ -58,6 +61,6 @@ private:
     CopyContext m_context;
 };
 
-} // namespace loki::semantic::detail
+}  // namespace loki::semantic::detail
 
 #endif

@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_TRANSLATOR_COPY_TRANSLATOR_COMPONENT_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_COPY_TRANSLATOR_COMPONENT_HPP_
 
@@ -33,7 +32,9 @@ protected:
         m_storage(context.storage),
         m_num_quantifications(context.num_quantifications),
         m_active_parameters(context.active_parameters),
+        m_active_parameter_variables(context.active_parameter_variables),
         m_variable_bindings(context.variable_bindings),
+        m_used_predicate_names(context.used_predicate_names),
         m_generated_predicates(context.generated_predicates),
         m_generated_axioms(context.generated_axioms),
         m_generated_universal_conditions(context.generated_universal_conditions),
@@ -53,7 +54,9 @@ protected:
     std::shared_ptr<TranslationStorage>& m_storage;
     std::unordered_map<ygg::uint_t, size_t>& m_num_quantifications;
     std::vector<ygg::IndexList<formalism::Parameter>>& m_active_parameters;
+    std::vector<ygg::IndexList<formalism::Variable>>& m_active_parameter_variables;
     std::vector<std::unordered_map<ygg::uint_t, formalism::VariableView>>& m_variable_bindings;
+    ygg::UnorderedSet<std::string>& m_used_predicate_names;
     ygg::IndexList<formalism::Predicate>& m_generated_predicates;
     ygg::IndexList<formalism::Axiom>& m_generated_axioms;
     std::unordered_map<std::string, formalism::ConditionView>& m_generated_universal_conditions;
@@ -65,6 +68,6 @@ protected:
     TranslationPhase& m_phase;
 };
 
-} // namespace loki::semantic::detail
+}  // namespace loki::semantic::detail
 
 #endif

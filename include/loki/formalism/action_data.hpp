@@ -97,11 +97,21 @@ struct Data<::loki::formalism::Action>
          const std::vector<::ygg::View<ygg::Index<::loki::formalism::Parameter>, C>>& parameters_,
          const std::optional<::ygg::View<ygg::Index<::loki::formalism::Condition>, C>>& precondition_,
          const std::optional<::ygg::View<ygg::Index<::loki::formalism::Effect>, C>>& effect_) :
+        Data(name_, name_, parameters_, parameters_.size(), precondition_, effect_)
+    {
+    }
+    template<typename C>
+    Data(const std::string& name_,
+         const std::string& original_name_,
+         const std::vector<::ygg::View<ygg::Index<::loki::formalism::Parameter>, C>>& parameters_,
+         ygg::uint_t original_arity_,
+         const std::optional<::ygg::View<ygg::Index<::loki::formalism::Condition>, C>>& precondition_,
+         const std::optional<::ygg::View<ygg::Index<::loki::formalism::Effect>, C>>& effect_) :
         index(),
         name(name_),
-        original_name(name_),
+        original_name(original_name_),
         parameters(),
-        original_arity(parameters_.size()),
+        original_arity(original_arity_),
         precondition(),
         effect()
     {
@@ -121,7 +131,7 @@ struct Data<::loki::formalism::Action>
         ygg::clear(effect);
     }
     auto cista_members() const noexcept { return std::tie(index, name, original_name, parameters, original_arity, precondition, effect); }
-    auto identifying_members() const noexcept { return std::tie(name, original_name, parameters, original_arity, precondition, effect); }
+    auto identifying_members() const noexcept { return std::tie(original_name, parameters, original_arity, precondition, effect); }
 };
 
 }

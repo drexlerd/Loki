@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_TRANSLATOR_CONDITION_ANALYSIS_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_CONDITION_ANALYSIS_TRANSLATOR_HPP_
 
@@ -31,25 +30,34 @@ public:
     explicit ConditionAnalysisTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, ConditionAnalysisTranslator<Derived>>(context) {}
 
     formalism::TermView term_from_variable(ygg::Index<formalism::Variable> variable);
-    void collect_free_variables(ygg::Index<formalism::Term> term, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::Atom> atom, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::Literal> literal, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::FunctionTerm> term, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::FunctionExpressionNumber>, std::unordered_set<ygg::uint_t>&, std::unordered_set<ygg::uint_t>&) const;
-    void collect_free_variables(ygg::Index<formalism::UnaryFunctionExpression> expression, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::BinaryFunctionExpression> expression, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::MultiFunctionExpression> expression, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::FunctionExpression> expression, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::Condition> condition, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::ConditionLiteral> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::ConditionNumericConstraint>, std::unordered_set<ygg::uint_t>&, std::unordered_set<ygg::uint_t>&) const;
-    void collect_free_variables(ygg::Index<formalism::ConditionNot> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::ConditionImply> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::ConditionAnd> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::ConditionOr> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::ConditionExists> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    void collect_free_variables(ygg::Index<formalism::ConditionForall> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
-    ygg::IndexList<formalism::Parameter> free_parameters_in_scope(ygg::Index<formalism::Condition> condition) const;
+    void collect_free_variables(formalism::TermView term, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::AtomView atom, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::LiteralView literal, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::FunctionTermView term, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::FunctionExpressionNumberView, std::unordered_set<ygg::uint_t>&, std::unordered_set<ygg::uint_t>&) const;
+    void collect_free_variables(formalism::UnaryFunctionExpressionView expression,
+                                std::unordered_set<ygg::uint_t>& bound,
+                                std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::BinaryFunctionExpressionView expression,
+                                std::unordered_set<ygg::uint_t>& bound,
+                                std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::MultiFunctionExpressionView expression,
+                                std::unordered_set<ygg::uint_t>& bound,
+                                std::unordered_set<ygg::uint_t>& free) const;
+    void
+    collect_free_variables(formalism::FunctionExpressionView expression, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::ConditionView condition, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::ConditionLiteralView node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    void
+    collect_free_variables(formalism::ConditionNumericConstraintView node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::ConditionNotView node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::ConditionImplyView node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::ConditionAndView node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::ConditionOrView node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::ConditionExistsView node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    void collect_free_variables(formalism::ConditionForallView node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const;
+    std::vector<std::pair<ygg::Index<formalism::Parameter>, ygg::Index<formalism::Variable>>>
+    free_parameters_in_scope(formalism::ConditionView condition) const;
 };
 
 template<typename Derived>
@@ -59,151 +67,196 @@ formalism::TermView ConditionAnalysisTranslator<Derived>::term_from_variable(ygg
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::Term> term, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::TermView term,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    std::visit([&](const auto& value)
-    {
-        using Value = std::decay_t<decltype(value)>;
-        if constexpr (std::is_same_v<Value, ygg::Index<formalism::Variable>>)
+    ygg::visit(
+        [&](const auto& value)
         {
-            if (!bound.contains(value.get_value()))
-                free.insert(value.get_value());
-        }
-    }, this->m_storage->repository[term].value);
+            using Value = std::decay_t<decltype(value)>;
+            if constexpr (std::is_same_v<Value, formalism::VariableView>)
+            {
+                if (!bound.contains(value.get_index().get_value()))
+                    free.insert(value.get_index().get_value());
+            }
+        },
+        term.get_value());
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::Atom> atom, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::AtomView atom,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    for (auto term : this->m_storage->repository[atom].terms)
+    for (auto term : atom.get_terms())
         this->self().collect_free_variables(term, bound, free);
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::Literal> literal, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::LiteralView literal,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    this->self().collect_free_variables(this->m_storage->repository[literal].atom, bound, free);
+    this->self().collect_free_variables(literal.get_atom(), bound, free);
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::FunctionTerm> term, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::FunctionTermView term,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    for (auto argument : this->m_storage->repository[term].terms)
+    for (auto argument : term.get_terms())
         this->self().collect_free_variables(argument, bound, free);
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::FunctionExpressionNumber>, std::unordered_set<ygg::uint_t>&, std::unordered_set<ygg::uint_t>&) const {}
-
-template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::UnaryFunctionExpression> expression, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::FunctionExpressionNumberView,
+                                                                  std::unordered_set<ygg::uint_t>&,
+                                                                  std::unordered_set<ygg::uint_t>&) const
 {
-    this->self().collect_free_variables(this->m_storage->repository[expression].expression, bound, free);
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::BinaryFunctionExpression> expression, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::UnaryFunctionExpressionView expression,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    const auto& data = this->m_storage->repository[expression];
-    this->self().collect_free_variables(data.left, bound, free);
-    this->self().collect_free_variables(data.right, bound, free);
+    this->self().collect_free_variables(expression.get_expression(), bound, free);
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::MultiFunctionExpression> expression, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::BinaryFunctionExpressionView expression,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    for (auto part : this->m_storage->repository[expression].expressions)
+    this->self().collect_free_variables(expression.get_left(), bound, free);
+    this->self().collect_free_variables(expression.get_right(), bound, free);
+}
+
+template<typename Derived>
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::MultiFunctionExpressionView expression,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
+{
+    for (auto part : expression.get_expressions())
         this->self().collect_free_variables(part, bound, free);
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::FunctionExpression> expression, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::FunctionExpressionView expression,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    std::visit([&](const auto& node) { this->self().collect_free_variables(node, bound, free); }, this->m_storage->repository[expression].value);
+    ygg::visit([&](const auto& node) { this->self().collect_free_variables(node, bound, free); }, expression.get_value());
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::Condition> condition, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::ConditionView condition,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    std::visit([&](const auto& node) { this->self().collect_free_variables(node, bound, free); }, this->m_storage->repository[condition].value);
+    ygg::visit([&](const auto& node) { this->self().collect_free_variables(node, bound, free); }, condition.get_value());
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::ConditionLiteral> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const { this->self().collect_free_variables(this->m_storage->repository[node].literal, bound, free); }
-
-template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::ConditionNumericConstraint> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::ConditionLiteralView node,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    const auto& data = this->m_storage->repository[node];
-    this->self().collect_free_variables(data.left, bound, free);
-    this->self().collect_free_variables(data.right, bound, free);
+    this->self().collect_free_variables(node.get_literal(), bound, free);
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::ConditionNot> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const { this->self().collect_free_variables(this->m_storage->repository[node].condition, bound, free); }
-
-template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::ConditionImply> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::ConditionNumericConstraintView node,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    this->self().collect_free_variables(this->m_storage->repository[node].left, bound, free);
-    this->self().collect_free_variables(this->m_storage->repository[node].right, bound, free);
+    this->self().collect_free_variables(node.get_left(), bound, free);
+    this->self().collect_free_variables(node.get_right(), bound, free);
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::ConditionAnd> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::ConditionNotView node,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    for (auto condition : this->m_storage->repository[node].conditions)
+    this->self().collect_free_variables(node.get_condition(), bound, free);
+}
+
+template<typename Derived>
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::ConditionImplyView node,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
+{
+    this->self().collect_free_variables(node.get_left(), bound, free);
+    this->self().collect_free_variables(node.get_right(), bound, free);
+}
+
+template<typename Derived>
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::ConditionAndView node,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
+{
+    for (auto condition : node.get_conditions())
         this->self().collect_free_variables(condition, bound, free);
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::ConditionOr> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::ConditionOrView node,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    for (auto condition : this->m_storage->repository[node].conditions)
+    for (auto condition : node.get_conditions())
         this->self().collect_free_variables(condition, bound, free);
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::ConditionExists> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::ConditionExistsView node,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    const auto& data = this->m_storage->repository[node];
-    for (auto parameter : data.parameters)
-        bound.insert(this->m_storage->repository[parameter].variable.get_value());
-    this->self().collect_free_variables(data.condition, bound, free);
-    for (auto parameter : data.parameters)
-        bound.erase(this->m_storage->repository[parameter].variable.get_value());
+    for (auto parameter : node.get_parameters())
+        bound.insert(parameter.get_variable().get_index().get_value());
+    this->self().collect_free_variables(node.get_condition(), bound, free);
+    for (auto parameter : node.get_parameters())
+        bound.erase(parameter.get_variable().get_index().get_value());
 }
 
 template<typename Derived>
-void ConditionAnalysisTranslator<Derived>::collect_free_variables(ygg::Index<formalism::ConditionForall> node, std::unordered_set<ygg::uint_t>& bound, std::unordered_set<ygg::uint_t>& free) const
+void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::ConditionForallView node,
+                                                                  std::unordered_set<ygg::uint_t>& bound,
+                                                                  std::unordered_set<ygg::uint_t>& free) const
 {
-    const auto& data = this->m_storage->repository[node];
-    for (auto parameter : data.parameters)
-        bound.insert(this->m_storage->repository[parameter].variable.get_value());
-    this->self().collect_free_variables(data.condition, bound, free);
-    for (auto parameter : data.parameters)
-        bound.erase(this->m_storage->repository[parameter].variable.get_value());
+    for (auto parameter : node.get_parameters())
+        bound.insert(parameter.get_variable().get_index().get_value());
+    this->self().collect_free_variables(node.get_condition(), bound, free);
+    for (auto parameter : node.get_parameters())
+        bound.erase(parameter.get_variable().get_index().get_value());
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Parameter> ConditionAnalysisTranslator<Derived>::free_parameters_in_scope(ygg::Index<formalism::Condition> condition) const
+std::vector<std::pair<ygg::Index<formalism::Parameter>, ygg::Index<formalism::Variable>>>
+ConditionAnalysisTranslator<Derived>::free_parameters_in_scope(formalism::ConditionView condition) const
 {
     auto bound = std::unordered_set<ygg::uint_t> {};
     auto free = std::unordered_set<ygg::uint_t> {};
     this->self().collect_free_variables(condition, bound, free);
 
-    auto result = ygg::IndexList<formalism::Parameter> {};
-    for (const auto& scope : this->m_active_parameters)
+    auto result = std::vector<std::pair<ygg::Index<formalism::Parameter>, ygg::Index<formalism::Variable>>> {};
+    for (size_t scope_index = 0; scope_index < this->m_active_parameters.size(); ++scope_index)
     {
-        for (auto parameter : scope)
+        const auto& parameters = this->m_active_parameters[scope_index];
+        const auto& variables = this->m_active_parameter_variables[scope_index];
+        for (size_t i = 0; i < parameters.size(); ++i)
         {
-            if (free.contains(this->m_storage->repository[parameter].variable.get_value()))
-                result.push_back(parameter);
+            if (free.contains(variables[i].get_value()))
+                result.emplace_back(parameters[i], variables[i]);
         }
     }
     return result;
 }
 
-} // namespace loki::semantic::detail
+}  // namespace loki::semantic::detail
 
 #endif

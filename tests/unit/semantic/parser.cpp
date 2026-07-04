@@ -744,7 +744,7 @@ TEST(LokiSemanticTranslator, GeneratesFreshAxiomsForIdenticalUniversalConditions
     for (auto predicate : translated_domain.get_data().predicates)
     {
         const auto& predicate_data = repository[predicate];
-        if (!std::string(predicate_data.name).starts_with("_universal_"))
+        if (!std::string(predicate_data.name).starts_with("loki-universal-"))
             continue;
         ++generated_predicates;
         ASSERT_EQ(predicate_data.parameters.size(), std::size_t { 1 });
@@ -996,7 +996,7 @@ TEST(LokiSemanticTranslator, GeneratedGoalPredicateAvoidsExistingNames)
 {
     const auto domain_source = std::string { "(define (domain goal-name-collision)"
                                              "(:requirements :disjunctive-preconditions)"
-                                             "(:predicates (_goal_0) (p) (q))"
+                                             "(:predicates (loki-goal-0) (p) (q))"
                                              ")" };
     const auto task_source = std::string { "(define (problem goal-name-collision-problem) (:domain goal-name-collision)"
                                            "(:init)"
@@ -1009,11 +1009,11 @@ TEST(LokiSemanticTranslator, GeneratedGoalPredicateAvoidsExistingNames)
     const auto translated = translated_result.get_translated_task();
     const auto& repository = translated.get_context();
 
-    EXPECT_TRUE(has_predicate_named(translation.get_translated_domain(), "_goal_0"));
+    EXPECT_TRUE(has_predicate_named(translation.get_translated_domain(), "loki-goal-0"));
 
     auto found_generated = false;
     for (auto predicate : translated.get_data().predicates)
-        found_generated |= std::string(repository[predicate].name) == "_goal_1";
+        found_generated |= std::string(repository[predicate].name) == "loki-goal-1";
 
     EXPECT_TRUE(found_generated);
 }

@@ -15,14 +15,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_TRANSLATOR_COPY_TRANSLATOR_FACADE_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_COPY_TRANSLATOR_FACADE_HPP_
 
+#include "loki/semantic/errors.hpp"
 #include "loki/semantic/translator/copy_translator_component.hpp"
 
 #include <algorithm>
-#include <array>
+#include <limits>
+#include <yggdrasil/containers/unordered_set.hpp>
 
 namespace loki::semantic::detail
 {
@@ -33,38 +34,23 @@ class CopyTranslatorFacade : public CopyTranslatorComponent<Derived, CopyTransla
 public:
     explicit CopyTranslatorFacade(CopyContext& context) : CopyTranslatorComponent<Derived, CopyTranslatorFacade<Derived>>(context) {}
 
-    std::optional<formalism::ConditionOrView> public_as_or(ygg::Index<formalism::Condition> condition) const;
-
     template<typename T>
     void push_unique(ygg::IndexList<T>& list, std::unordered_set<ygg::uint_t>& seen, ygg::Index<T> value);
 
-    size_t next_generated_axiom_index() const;
+    ygg::UnorderedSet<std::string> used_predicate_names() const;
 
-    ygg::IndexList<formalism::Action> split_disjunctive_actions(const ygg::IndexList<formalism::Action>& actions);
+    std::string next_generated_predicate_name(std::string_view prefix);
 
-    ygg::IndexList<formalism::Action> multiply_conditional_effect_actions(const ygg::IndexList<formalism::Action>& actions);
+    ygg::IndexList<formalism::Action> split_disjunctive_actions(formalism::EntityListView<formalism::Action> actions);
 
-    ygg::IndexList<formalism::Axiom> split_disjunctive_axioms(const ygg::IndexList<formalism::Axiom>& axioms);
+    ygg::IndexList<formalism::Action> multiply_conditional_effect_actions(formalism::EntityListView<formalism::Action> actions);
+
+    ygg::IndexList<formalism::Axiom> split_disjunctive_axioms(formalism::EntityListView<formalism::Axiom> axioms);
 
     formalism::DomainView copy_domain(formalism::DomainView domain);
 
     formalism::TaskView copy_task(formalism::TaskView task);
 };
-
-template<typename Derived>
-std::optional<formalism::ConditionOrView> CopyTranslatorFacade<Derived>::public_as_or(ygg::Index<formalism::Condition> condition) const
-{
-    auto result = std::optional<formalism::ConditionOrView> {};
-    std::visit(
-        [&](const auto& node)
-        {
-            using Node = std::decay_t<decltype(node)>;
-            if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionOr>>)
-                result = ygg::make_view(node, this->m_storage->repository);
-        },
-        this->m_storage->repository[condition].value);
-    return result;
-}
 
 template<typename Derived>
 template<typename T>
@@ -75,50 +61,44 @@ void CopyTranslatorFacade<Derived>::push_unique(ygg::IndexList<T>& list, std::un
 }
 
 template<typename Derived>
-size_t CopyTranslatorFacade<Derived>::next_generated_axiom_index() const
+ygg::UnorderedSet<std::string> CopyTranslatorFacade<Derived>::used_predicate_names() const
 {
-    auto next = this->m_num_generated_axioms;
-    const auto prefixes = std::array<std::string_view, 2> { "_universal_", "_goal_" };
-
-    for (auto i = ygg::uint_t { 0 }; i < this->m_storage->repository.template size<formalism::Predicate>(); ++i)
+    auto names = this->m_used_predicate_names;
+    if (this->m_storage->translated_domain)
     {
-        const auto name = std::string_view(this->m_storage->repository[ygg::Index<formalism::Predicate>(i)].name);
-        for (const auto prefix : prefixes)
-        {
-            if (!name.starts_with(prefix))
-                continue;
-
-            auto value = size_t { 0 };
-            auto valid = name.size() > prefix.size();
-            for (auto c : name.substr(prefix.size()))
-            {
-                if (c < '0' || c > '9')
-                {
-                    valid = false;
-                    break;
-                }
-                value = value * 10 + static_cast<size_t>(c - '0');
-            }
-            if (valid)
-                next = std::max(next, value + 1);
-        }
+        for (auto predicate : this->m_storage->translated_domain->get_predicates())
+            names.insert(std::string(predicate.get_name()));
     }
-
-    return next;
+    return names;
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjunctive_actions(const ygg::IndexList<formalism::Action>& actions)
+std::string CopyTranslatorFacade<Derived>::next_generated_predicate_name(std::string_view prefix)
+{
+    auto used = this->self().used_predicate_names();
+    while (true)
+    {
+        auto name = std::string(prefix) + std::to_string(this->m_num_generated_axioms++);
+        if (used.insert(name).second)
+        {
+            this->m_used_predicate_names.insert(name);
+            return name;
+        }
+    }
+}
+
+template<typename Derived>
+ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjunctive_actions(formalism::EntityListView<formalism::Action> actions)
 {
     auto result = ygg::IndexList<formalism::Action> {};
     auto seen = std::unordered_set<ygg::uint_t> {};
     for (auto action : actions)
     {
-        const auto data = this->m_storage->repository[action];
-        if (data.precondition)
+        const auto data = action.get_data();
+        if (const auto precondition_view = action.get_precondition())
         {
-            const auto precondition = as_index(this->self().flatten_condition(*data.precondition));
-            if (const auto condition_or = this->self().public_as_or(precondition))
+            const auto precondition = this->self().flatten_condition(precondition_view.value());
+            if (const auto condition_or = this->self().as_or(precondition))
             {
                 for (auto part : condition_or->get_data().conditions)
                     this->self().push_unique(result,
@@ -134,19 +114,19 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjuncti
                 continue;
             }
         }
-        this->self().push_unique(result, seen, action);
+        this->self().push_unique(result, seen, action.get_index());
     }
     return result;
 }
 
-
 template<typename Derived>
-ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::multiply_conditional_effect_actions(const ygg::IndexList<formalism::Action>& actions)
+ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::multiply_conditional_effect_actions(formalism::EntityListView<formalism::Action> actions)
 {
     struct ConditionalEffect
     {
-        ygg::Index<formalism::Condition> condition;
-        ygg::Index<formalism::Effect> effect;
+        formalism::EffectWhenView when;
+        formalism::ConditionView condition;
+        formalism::EffectView effect;
     };
 
     auto result = ygg::IndexList<formalism::Action> {};
@@ -154,30 +134,37 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::multiply_condit
 
     for (auto action : actions)
     {
-        const auto data = this->m_storage->repository[action];
+        const auto data = action.get_data();
         auto unconditional = ygg::IndexList<formalism::Effect> {};
         auto conditional = std::vector<ConditionalEffect> {};
 
-        if (data.effect)
+        if (const auto effect_view = action.get_effect())
         {
-            auto effects = ygg::IndexList<formalism::Effect> { *data.effect };
-            if (const auto effect_and = this->self().template as_effect<formalism::EffectAnd>(*data.effect))
-                effects = effect_and->get_data().effects;
+            auto effects = std::vector<formalism::EffectView> { effect_view.value() };
+            if (const auto effect_and = this->self().template as_effect<formalism::EffectAnd>(effect_view.value()))
+            {
+                effects.clear();
+                for (auto effect : effect_and->get_effects())
+                    effects.push_back(effect);
+            }
 
             for (auto effect : effects)
             {
                 if (const auto effect_when = this->self().template as_effect<formalism::EffectWhen>(effect))
-                    conditional.push_back({ effect_when->get_data().condition, effect_when->get_data().effect });
+                    conditional.push_back({ *effect_when, effect_when->get_condition(), effect_when->get_effect() });
                 else
-                    unconditional.push_back(effect);
+                    unconditional.push_back(effect.get_index());
             }
         }
 
         if (conditional.empty())
         {
-            this->self().push_unique(result, seen, action);
+            this->self().push_unique(result, seen, action.get_index());
             continue;
         }
+
+        if (conditional.size() >= std::numeric_limits<size_t>::digits)
+            throw SemanticError("Too many conditional effects to multiply.");
 
         const auto num_variants = size_t { 1 } << conditional.size();
         for (auto mask = size_t { 0 }; mask < num_variants; ++mask)
@@ -192,8 +179,8 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::multiply_condit
                 const auto selected = (mask & (size_t { 1 } << i)) != 0;
                 if (selected)
                 {
-                    conditions.push_back(conditional[i].condition);
-                    effects.push_back(conditional[i].effect);
+                    conditions.push_back(conditional[i].condition.get_index());
+                    effects.push_back(conditional[i].effect.get_index());
                 }
                 else
                 {
@@ -211,13 +198,17 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::multiply_condit
             if (effects.size() == 1)
                 effect = effects.front();
             else if (!effects.empty())
-                effect = as_index(this->self().wrap_effect(ygg::Data<formalism::Effect>::Variant(
-                    formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)).get_index())));
+                effect = this->self().wrap_effect(formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects))).get_index();
+
+            auto name = std::string(data.name) + "_" + std::to_string(action.get_index().get_value());
+            for (const auto& item : conditional)
+                name += "_" + std::to_string(item.when.get_index().get_value());
+            name += "_" + std::to_string(mask);
 
             this->self().push_unique(result,
                                      seen,
                                      formalism::get_or_create<formalism::Action>(this->m_storage->repository,
-                                                                                 std::string(data.name) + "__ce_" + std::to_string(mask),
+                                                                                 std::move(name),
                                                                                  data.original_name,
                                                                                  data.parameters,
                                                                                  data.original_arity,
@@ -231,15 +222,15 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::multiply_condit
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Axiom> CopyTranslatorFacade<Derived>::split_disjunctive_axioms(const ygg::IndexList<formalism::Axiom>& axioms)
+ygg::IndexList<formalism::Axiom> CopyTranslatorFacade<Derived>::split_disjunctive_axioms(formalism::EntityListView<formalism::Axiom> axioms)
 {
     auto result = ygg::IndexList<formalism::Axiom> {};
     auto seen = std::unordered_set<ygg::uint_t> {};
     for (auto axiom : axioms)
     {
-        const auto data = this->m_storage->repository[axiom];
-        const auto condition = as_index(this->self().flatten_condition(data.condition));
-        if (const auto condition_or = this->self().public_as_or(condition))
+        const auto data = axiom.get_data();
+        const auto condition = this->self().flatten_condition(axiom.get_condition());
+        if (const auto condition_or = this->self().as_or(condition))
         {
             for (auto part : condition_or->get_data().conditions)
                 this->self().push_unique(
@@ -249,7 +240,7 @@ ygg::IndexList<formalism::Axiom> CopyTranslatorFacade<Derived>::split_disjunctiv
         }
         else
         {
-            this->self().push_unique(result, seen, axiom);
+            this->self().push_unique(result, seen, axiom.get_index());
         }
     }
     return result;
@@ -261,34 +252,39 @@ formalism::DomainView CopyTranslatorFacade<Derived>::copy_domain(formalism::Doma
     this->m_storage->original_domain = domain.get_index();
     auto data = domain.get_data();
     data.index = {};
-    data.requirements = this->self().template copy_list<formalism::Requirement>(data.requirements, domain.get_context());
-    data.types = this->self().template copy_list<formalism::Type>(data.types, domain.get_context());
-    data.constants = this->self().template copy_list<formalism::Object>(data.constants, domain.get_context());
-    data.predicates = this->self().template copy_list<formalism::Predicate>(data.predicates, domain.get_context());
-    this->m_num_generated_axioms = this->self().next_generated_axiom_index();
-    data.functions = this->self().template copy_list<formalism::FunctionSkeleton>(data.functions, domain.get_context());
-    data.actions = this->self().template copy_list<formalism::Action>(data.actions, domain.get_context());
-    data.axioms = this->self().template copy_list<formalism::Axiom>(data.axioms, domain.get_context());
+    data.requirements = this->self().template copy_list<formalism::Requirement>(domain.get_requirements());
+    data.types = this->self().template copy_list<formalism::Type>(domain.get_types());
+    data.constants = this->self().template copy_list<formalism::Object>(domain.get_constants());
+    data.predicates = this->self().template copy_list<formalism::Predicate>(domain.get_predicates());
+    data.functions = this->self().template copy_list<formalism::FunctionSkeleton>(domain.get_functions());
+    data.actions = this->self().template copy_list<formalism::Action>(domain.get_actions());
+    data.axioms = this->self().template copy_list<formalism::Axiom>(domain.get_axioms());
+
+    auto copied_domain = formalism::get_or_create<formalism::Domain>(this->m_storage->repository, data);
+    this->m_storage->translated_domain = copied_domain;
+    data = copied_domain.get_data();
+    data.index = {};
 
     switch (this->m_phase)
     {
         case TranslationPhase::RemoveUniversalQuantifiers:
-            this->self().append_generated_domain_objects(data);
+            this->self().append_generated_domain_objects(data, copied_domain.get_requirements());
             if (!data.axioms.empty())
-                this->self().ensure_derived_predicates_requirement(data.requirements);
+                this->self().ensure_derived_predicates_requirement(copied_domain.get_requirements(), data.requirements);
             break;
         case TranslationPhase::SplitDisjunctiveConditions:
-            data.actions = this->self().split_disjunctive_actions(data.actions);
-            data.axioms = this->self().split_disjunctive_axioms(data.axioms);
+            data.actions = this->self().split_disjunctive_actions(copied_domain.get_actions());
+            data.axioms = this->self().split_disjunctive_axioms(copied_domain.get_axioms());
             break;
         case TranslationPhase::MultiplyConditionalEffects:
-            data.actions = this->self().multiply_conditional_effect_actions(data.actions);
+            data.actions = this->self().multiply_conditional_effect_actions(copied_domain.get_actions());
+            data.requirements = this->self().strip_requirement(copied_domain.get_requirements(), formalism::RequirementKind::ConditionalEffects);
             break;
         case TranslationPhase::AddTypePredicates:
-            this->self().add_type_predicates_to_domain(data);
+            this->self().add_type_predicates_to_domain(data, copied_domain);
             break;
         case TranslationPhase::InitializeEquality:
-            this->self().add_equality_predicate_to_domain(data);
+            this->self().add_equality_predicate_to_domain(data, copied_domain);
             break;
         default:
             break;
@@ -305,21 +301,20 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
 {
     auto data = task.get_data();
     this->m_append_generated_axioms_to_domain = false;
-    this->m_num_generated_axioms = this->self().next_generated_axiom_index();
     data.index = {};
     data.domain = this->m_storage->translated_domain->get_index();
-    data.requirements = this->self().template copy_list<formalism::Requirement>(data.requirements, task.get_context());
-    data.objects = this->self().template copy_list<formalism::Object>(data.objects, task.get_context());
-    data.initial_literals = this->self().template copy_list<formalism::Literal>(data.initial_literals, task.get_context());
-    data.initial_function_values = this->self().template copy_list<formalism::InitialFunctionValue>(data.initial_function_values, task.get_context());
+    data.requirements = this->self().template copy_list<formalism::Requirement>(task.get_requirements());
+    data.objects = this->self().template copy_list<formalism::Object>(task.get_objects());
+    data.initial_literals = this->self().template copy_list<formalism::Literal>(task.get_initial_literals());
+    data.initial_function_values = this->self().template copy_list<formalism::InitialFunctionValue>(task.get_initial_function_values());
 
-    if (data.goal)
+    if (const auto goal = task.get_goal())
     {
         if (this->m_phase == TranslationPhase::RenameQuantifiedVariables)
         {
             this->m_num_quantifications.clear();
             this->self().enter_variable_scope();
-            const auto renamed_goal = as_index(this->self().rename_variables(*data.goal, task.get_context()));
+            const auto renamed_goal = this->self().rename_variables(goal.value(), task.get_context());
             this->self().leave_variable_scope();
             const auto previous = this->m_renaming_enabled;
             this->m_renaming_enabled = false;
@@ -328,13 +323,24 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
         }
         else
         {
-            data.goal = as_index(this->self().copy(*data.goal, task.get_context()));
+            data.goal = as_index(this->self().copy(goal.value(), task.get_context()));
         }
     }
+    else
+    {
+        data.goal = {};
+    }
 
-    data.metric = this->self().template copy_optional<formalism::Metric>(data.metric, task.get_context());
-    data.predicates = this->self().template copy_list<formalism::Predicate>(data.predicates, task.get_context());
-    data.axioms = this->self().template copy_list<formalism::Axiom>(data.axioms, task.get_context());
+    if (const auto metric = task.get_metric())
+        data.metric = as_index(this->self().copy(metric.value(), task.get_context()));
+    else
+        data.metric = {};
+    data.predicates = this->self().template copy_list<formalism::Predicate>(task.get_predicates());
+    data.axioms = this->self().template copy_list<formalism::Axiom>(task.get_axioms());
+
+    auto copied_task = formalism::get_or_create<formalism::Task>(this->m_storage->repository, data);
+    data = copied_task.get_data();
+    data.index = {};
 
     switch (this->m_phase)
     {
@@ -342,7 +348,7 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
         case TranslationPhase::SimplifyGoal:
         {
             if (this->m_phase == TranslationPhase::SimplifyGoal && data.goal)
-                data.goal = as_index(this->self().simplify_goal_condition(*data.goal));
+                data.goal = as_index(this->self().simplify_goal_condition(copied_task.get_goal().value()));
 
             auto existing_predicates = std::unordered_set<ygg::uint_t> {};
             for (auto predicate : data.predicates)
@@ -359,17 +365,17 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
                     data.axioms.push_back(axiom);
 
             if (!data.axioms.empty())
-                this->self().ensure_derived_predicates_requirement(data.requirements);
+                this->self().ensure_derived_predicates_requirement(copied_task.get_requirements(), data.requirements);
             break;
         }
         case TranslationPhase::SplitDisjunctiveConditions:
-            data.axioms = this->self().split_disjunctive_axioms(data.axioms);
+            data.axioms = this->self().split_disjunctive_axioms(copied_task.get_axioms());
             break;
         case TranslationPhase::InitializeEquality:
-            this->self().initialize_equality(data);
+            this->self().initialize_equality(data, task);
             break;
         case TranslationPhase::AddTypePredicates:
-            this->self().initialize_type_literals(data);
+            this->self().initialize_type_literals(data, task);
             break;
         default:
             break;
