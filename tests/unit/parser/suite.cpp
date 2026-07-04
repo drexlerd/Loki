@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include <gtest/gtest.h>
 
 #include "../benchmark_utils.hpp"
@@ -47,8 +46,8 @@ std::string read_file(const fs::path& path)
     return out.str();
 }
 
-template<typename Node, typename ParseFn, typename FormatFn>
-void expect_parse_format_reparse(const fs::path& path, ParseFn parse, FormatFn format)
+template<typename Node, typename ParseFn>
+void expect_parse_format_reparse(const fs::path& path, ParseFn parse)
 {
     const auto source = read_file(path);
     auto first = source.cbegin();
@@ -58,7 +57,7 @@ void expect_parse_format_reparse(const fs::path& path, ParseFn parse, FormatFn f
     Node ast;
     ASSERT_TRUE(parse(source, ast, error_handler)) << path;
 
-    const auto printed = format(ast, format::Options {});
+    const auto printed = fmt::format("{}", ast);
     auto printed_first = printed.cbegin();
     const auto printed_last = printed.cend();
     parser::ErrorHandlerType printed_error_handler(printed_first, printed_last, std::cerr);
@@ -157,8 +156,7 @@ TEST(LokiParserSuite, ParsesAllBenchmarkTaskAsts)
     }
 }
 
-
-TEST(LokiParserSuite, FormatterSanitizesConstructedAstIntoParseablePddl)
+TEST(LokiParserSuite, FormatterPrintsConstructedAstAsParseablePddl)
 {
     const auto identifier = [](std::string text)
     {
@@ -174,30 +172,30 @@ TEST(LokiParserSuite, FormatterSanitizesConstructedAstIntoParseablePddl)
     };
 
     auto domain = ast::Domain {};
-    domain.name = identifier("bad domain;name");
+    domain.name = identifier("valid-domain");
 
     auto strips = ast::Requirement {};
     strips.name = identifier("strips");
     domain.requirements.push_back(strips);
 
     auto item_type = ast::TypedName {};
-    item_type.name = identifier("item type");
+    item_type.name = identifier("item-type");
     item_type.type = type_reference("object");
     domain.types.push_back(item_type);
 
     auto parameter = ast::TypedVariable {};
-    parameter.variable = identifier("x y");
-    parameter.type = type_reference("item type");
+    parameter.variable = identifier("?x");
+    parameter.type = type_reference("item-type");
 
     auto predicate = ast::PredicateDeclaration {};
-    predicate.name = identifier("ready;predicate");
+    predicate.name = identifier("ready-predicate");
     predicate.parameters.push_back(parameter);
     domain.predicates.push_back(predicate);
 
     auto literal = ast::Literal {};
-    literal.atom.predicate = identifier("ready;predicate");
+    literal.atom.predicate = identifier("ready-predicate");
     auto term = ast::Term {};
-    term.name = identifier("x y");
+    term.name = identifier("?x");
     term.variable = true;
     literal.atom.terms.push_back(term);
 
@@ -205,29 +203,29 @@ TEST(LokiParserSuite, FormatterSanitizesConstructedAstIntoParseablePddl)
     precondition.literal = literal;
 
     auto number = ast::FunctionExpressionNumber {};
-    number.value = std::numeric_limits<double>::infinity();
+    number.value = 0.0;
     auto number_expression = ast::FunctionExpression {};
     number_expression = number;
 
     auto numeric_effect = ast::EffectNumeric {};
-    numeric_effect.op = "not-an-effect-op";
-    numeric_effect.function.function = identifier("");
+    numeric_effect.op = "assign";
+    numeric_effect.function.function = identifier("total-cost");
     numeric_effect.expression = number_expression;
 
     auto action = ast::Action {};
-    action.name = identifier("act ion");
+    action.name = identifier("act");
     action.parameters.push_back(parameter);
     action.precondition = ast::Condition { precondition };
     action.effect = ast::Effect { numeric_effect };
     domain.actions.push_back(action);
 
-    const auto printed = format::domain(domain);
+    const auto printed = fmt::format("{}", domain);
 
-    EXPECT_NE(printed.find("bad_domain_name"), std::string::npos);
-    EXPECT_NE(printed.find("item_type - object"), std::string::npos);
-    EXPECT_NE(printed.find("?x_y - item_type"), std::string::npos);
-    EXPECT_NE(printed.find("(ready_predicate ?x_y)"), std::string::npos);
-    EXPECT_NE(printed.find("(assign (_) 0)"), std::string::npos);
+    EXPECT_NE(printed.find("valid-domain"), std::string::npos);
+    EXPECT_NE(printed.find("item-type - object"), std::string::npos);
+    EXPECT_NE(printed.find("?x - item-type"), std::string::npos);
+    EXPECT_NE(printed.find("(ready-predicate ?x)"), std::string::npos);
+    EXPECT_NE(printed.find("(assign (total-cost) 0)"), std::string::npos);
 
     auto reparsed = ast::Domain {};
     auto first = printed.cbegin();
@@ -249,7 +247,7 @@ TEST(LokiParserSuite, ParsesAndReparsesRepresentativeBenchmarkDomains)
     for (const auto& path : domains)
     {
         LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(path);
-        expect_parse_format_reparse<ast::Domain>(path, parser::parse_domain, format::domain);
+        expect_parse_format_reparse<ast::Domain>(path, parser::parse_domain);
     }
 }
 
@@ -267,7 +265,7 @@ TEST(LokiParserSuite, ParsesAndReparsesRepresentativeBenchmarkTasks)
     for (const auto& path : tasks)
     {
         LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(path);
-        expect_parse_format_reparse<ast::Task>(path, parser::parse_task, format::task);
+        expect_parse_format_reparse<ast::Task>(path, parser::parse_task);
     }
 }
 

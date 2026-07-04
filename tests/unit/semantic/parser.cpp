@@ -24,6 +24,7 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 #include <yggdrasil/semantics/equal_to.hpp>
 #include <yggdrasil/serialization/json_suite.hpp>
@@ -73,7 +74,8 @@ void expect_contiguous_indices(Views views, const std::string& label, bool requi
 {
     SCOPED_TRACE(label);
 
-    auto local = std::vector<typename Views::value_type> {};
+    using View = std::remove_cvref_t<decltype(*views.begin())>;
+    auto local = std::vector<View> {};
     local.reserve(views.size());
     for (auto view : views)
         if (&views.get_context().get_canonical_context(view.get_index()) == &views.get_context())
@@ -93,7 +95,8 @@ void expect_contiguous_indices(Views views, const std::string& label, bool requi
     {
         if (!follows(sorted[i - 1], sorted[i]))
         {
-            ADD_FAILURE() << label << " has a local index gap between " << sorted[i - 1].get_index() << " and " << sorted[i].get_index();
+            ADD_FAILURE() << label << " has a local index gap between " << sorted[i - 1].get_index().get_value() << " and "
+                          << sorted[i].get_index().get_value();
             break;
         }
     }
@@ -105,8 +108,8 @@ void expect_contiguous_indices(Views views, const std::string& label, bool requi
     {
         if (!follows(local[i - 1], local[i]))
         {
-            ADD_FAILURE() << label << " is not stored in contiguous local canonical index order at offset " << i << ": previous=" << local[i - 1].get_index()
-                          << ", current=" << local[i].get_index();
+            ADD_FAILURE() << label << " is not stored in contiguous local canonical index order at offset " << i
+                          << ": previous=" << local[i - 1].get_index().get_value() << ", current=" << local[i].get_index().get_value();
             break;
         }
     }

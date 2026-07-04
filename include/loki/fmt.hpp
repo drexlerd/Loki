@@ -15,10 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_FMT_HPP_
 #define LOKI_FMT_HPP_
 
-#include "loki/fmt/formatter.hpp"
+#include "loki/ast/formatter.hpp"
 
 #endif

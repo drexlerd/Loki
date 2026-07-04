@@ -20,8 +20,8 @@
 #include <loki/ast.hpp>
 #include <loki/ast/ast.hpp>
 #include <loki/ast/ast_fwd.hpp>
+#include <loki/ast/formatter.hpp>
 #include <loki/fmt.hpp>
-#include <loki/fmt/formatter.hpp>
 #include <loki/formalism/builder.hpp>
 #include <loki/formalism/canonicalization.hpp>
 #include <loki/formalism/datas.hpp>
@@ -68,7 +68,7 @@ TEST(LokiPublicHeaders, ParserAndFormatterHeadersAreSelfContained)
     auto ast_domain = ast::Domain {};
 
     ASSERT_TRUE(parser::parse_domain(domain_source, ast_domain, error_handler));
-    EXPECT_EQ(format::domain(ast_domain).find("direct") != std::string::npos, true);
+    EXPECT_EQ(fmt::format("{}", ast_domain).find("direct") != std::string::npos, true);
 }
 
 TEST(LokiPublicHeaders, LokiUmbrellaHeaderExposesFacadeHelpers)
