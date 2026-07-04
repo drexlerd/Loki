@@ -21,16 +21,6 @@ def test_public_stubs_describe_public_api():
     assert "def native_prefix() -> Path: ..." in package_stub
     assert "__all__" not in package_stub
 
-    formalism_stub = (package_dir / "formalism" / "__init__.pyi").read_text(encoding="utf-8")
-    for name in (
-        "Parser",
-        "DomainTranslationResult",
-        "ProblemTranslationResult",
-        "UndefinedTypeError",
-        "DuplicateTypeError",
-        "InvalidMetricError",
-    ):
-        assert name in formalism_stub
 
 
 def test_native_prefix_layout():
@@ -51,12 +41,10 @@ def test_native_prefix_layout():
         assert native_include_dir.is_dir()
         assert native_lib_dir.is_dir()
         assert (native_lib_dir / "cmake" / "loki").is_dir()
-        assert (package_dir / "formalism" / "__init__.pyi").is_file()
         assert (package_dir / "py.typed").is_file()
     else:
         assert (package_dir / "__init__.pyi").is_file()
         assert (package_dir / "py.typed").is_file()
-        assert (package_dir / "formalism" / "__init__.pyi").is_file()
         assert (package_dir / "_version.py").is_file()
         assert (package_dir / "_pypddl").is_file() or any(package_dir.glob("_pypddl*.so"))
 

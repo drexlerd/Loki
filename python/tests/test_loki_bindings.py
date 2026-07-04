@@ -300,15 +300,8 @@ def test_repository_factory_binding_creates_repositories():
     assert isinstance(repository, pypddl.Repository)
 
 
-def test_repository_init_creates_repository():
-    repository = pypddl.Repository()
-    view = repository.get_or_create(pypddl.TypeBuilder("direct-repository"))
-
-    assert view.get_name() == "direct-repository"
-
-
 def test_repository_view_keeps_temporary_repository_alive():
-    view = pypddl.RepositoryFactory().create().get_or_create(pypddl.TypeBuilder("temporary-type"))
+    view = pypddl.RepositoryFactory().create().get_or_create(pypddl.TypeData("temporary-type"))
 
     assert view.get_name() == "temporary-type"
 
@@ -354,54 +347,54 @@ def build(repository, builder):
 
 
 def make_literal(repository, predicate, terms, positive=True):
-    atom = build(repository, pypddl.AtomBuilder(predicate, list(terms)))
-    return build(repository, pypddl.LiteralBuilder(atom, positive))
+    atom = build(repository, pypddl.AtomData(predicate, list(terms)))
+    return build(repository, pypddl.LiteralData(atom, positive))
 
 
 def make_condition(repository, predicate, terms, positive=True):
-    condition_literal = build(repository, pypddl.ConditionLiteralBuilder(make_literal(repository, predicate, terms, positive)))
-    return build(repository, pypddl.ConditionBuilder(condition_literal))
+    condition_literal = build(repository, pypddl.ConditionLiteralData(make_literal(repository, predicate, terms, positive)))
+    return build(repository, pypddl.ConditionData(condition_literal))
 
 
 def make_effect(repository, literal):
-    effect_literal = build(repository, pypddl.EffectLiteralBuilder(literal))
-    return build(repository, pypddl.EffectBuilder(effect_literal))
+    effect_literal = build(repository, pypddl.EffectLiteralData(literal))
+    return build(repository, pypddl.EffectData(effect_literal))
 
 
 def make_condition_and(repository, conditions):
-    conjunction = build(repository, pypddl.ConditionAndBuilder(list(conditions)))
-    return build(repository, pypddl.ConditionBuilder(conjunction))
+    conjunction = build(repository, pypddl.ConditionAndData(list(conditions)))
+    return build(repository, pypddl.ConditionData(conjunction))
 
 
 def make_effect_and(repository, effects):
-    conjunction = build(repository, pypddl.EffectAndBuilder(list(effects)))
-    return build(repository, pypddl.EffectBuilder(conjunction))
+    conjunction = build(repository, pypddl.EffectAndData(list(effects)))
+    return build(repository, pypddl.EffectData(conjunction))
 
 
 def make_number_expression(repository, value):
-    number = build(repository, pypddl.FunctionExpressionNumberBuilder(value))
-    return build(repository, pypddl.FunctionExpressionBuilder(number))
+    number = build(repository, pypddl.FunctionExpressionNumberData(value))
+    return build(repository, pypddl.FunctionExpressionData(number))
 
 
 def test_builders_expose_defaulted_mutable_fields():
-    repository = pypddl.Repository()
+    repository = pypddl.RepositoryFactory().create()
 
-    object_type = build(repository, pypddl.TypeBuilder("object"))
-    variable = build(repository, pypddl.VariableBuilder("x"))
-    parameter = build(repository, pypddl.ParameterBuilder(variable))
-    predicate = build(repository, pypddl.PredicateBuilder("p"))
-    term = build(repository, pypddl.TermBuilder(variable))
+    object_type = build(repository, pypddl.TypeData("object"))
+    variable = build(repository, pypddl.VariableData("x"))
+    parameter = build(repository, pypddl.ParameterData(variable))
+    predicate = build(repository, pypddl.PredicateData("p"))
+    term = build(repository, pypddl.TermData(variable))
     literal = make_literal(repository, predicate, [term])
     condition = make_condition(repository, predicate, [term])
     effect = make_effect(repository, literal)
 
-    parameter_builder = pypddl.ParameterBuilder(variable)
+    parameter_builder = pypddl.ParameterData(variable)
     assert parameter_builder.variable == variable.get_index()
     assert parameter_builder.types == []
     parameter_builder.types = [object_type.get_index()]
     assert parameter_builder.types == [object_type.get_index()]
 
-    action_builder = pypddl.ActionBuilder("a")
+    action_builder = pypddl.ActionData("a")
     assert action_builder.name == "a"
     assert action_builder.parameters == []
     assert action_builder.precondition is None
@@ -415,7 +408,7 @@ def test_builders_expose_defaulted_mutable_fields():
     assert action_builder.effect == effect.get_index()
     action = build(repository, action_builder)
 
-    domain_builder = pypddl.DomainBuilder("d")
+    domain_builder = pypddl.DomainData("d")
     assert domain_builder.requirements == []
     assert domain_builder.types == []
     assert domain_builder.constants == []
@@ -432,7 +425,7 @@ def test_builders_expose_defaulted_mutable_fields():
     assert domain_builder.actions == [action.get_index()]
     domain = build(repository, domain_builder)
 
-    task_builder = pypddl.TaskBuilder("t", domain)
+    task_builder = pypddl.TaskData("t", domain)
     assert task_builder.name == "t"
     assert task_builder.domain == domain.get_index()
     assert task_builder.requirements == []
@@ -464,21 +457,21 @@ def test_builders_expose_defaulted_mutable_fields():
 
 
 def test_repository_constructs_domain_and_task_programmatically():
-    repository = pypddl.Repository()
-    strips = build(repository, pypddl.RequirementBuilder(pypddl.RequirementKind.Strips))
-    object_type = build(repository, pypddl.TypeBuilder("object"))
-    ball = build(repository, pypddl.ObjectBuilder("ball", [object_type]))
-    variable = build(repository, pypddl.VariableBuilder("x"))
-    parameter = build(repository, pypddl.ParameterBuilder(variable, [object_type]))
-    predicate = build(repository, pypddl.PredicateBuilder("holding", [parameter]))
-    variable_term = build(repository, pypddl.TermBuilder(variable))
+    repository = pypddl.RepositoryFactory().create()
+    strips = build(repository, pypddl.RequirementData(pypddl.RequirementKind.Strips))
+    object_type = build(repository, pypddl.TypeData("object"))
+    ball = build(repository, pypddl.ObjectData("ball", [object_type]))
+    variable = build(repository, pypddl.VariableData("x"))
+    parameter = build(repository, pypddl.ParameterData(variable, [object_type]))
+    predicate = build(repository, pypddl.PredicateData("holding", [parameter]))
+    variable_term = build(repository, pypddl.TermData(variable))
     literal = make_literal(repository, predicate, [variable_term])
     precondition = make_condition(repository, predicate, [variable_term])
     effect = make_effect(repository, literal)
-    action = build(repository, pypddl.ActionBuilder("pick", [parameter], precondition, effect))
+    action = build(repository, pypddl.ActionData("pick", [parameter], precondition, effect))
     domain = build(
         repository,
-        pypddl.DomainBuilder(
+        pypddl.DomainData(
             "programmatic",
             requirements=[strips],
             types=[object_type],
@@ -487,7 +480,7 @@ def test_repository_constructs_domain_and_task_programmatically():
             actions=[action],
         ),
     )
-    task = build(repository, pypddl.TaskBuilder("programmatic-task", domain))
+    task = build(repository, pypddl.TaskData("programmatic-task", domain))
 
     assert domain.get_name() == "programmatic"
     assert len(domain.get_requirements()) == 1
@@ -527,28 +520,28 @@ def test_repository_constructs_domain_and_task_programmatically():
 
 
 def test_repository_constructs_numeric_function_task_bits():
-    repository = pypddl.Repository()
-    numeric = build(repository, pypddl.RequirementBuilder(pypddl.RequirementKind.NumericFluents))
-    object_type = build(repository, pypddl.TypeBuilder("object"))
-    number_type = build(repository, pypddl.TypeBuilder("number"))
-    variable = build(repository, pypddl.VariableBuilder("x"))
-    parameter = build(repository, pypddl.ParameterBuilder(variable, [object_type]))
-    location = build(repository, pypddl.ObjectBuilder("l1", [object_type]))
-    fluent = build(repository, pypddl.FunctionSkeletonBuilder("fuel", [parameter], number_type))
-    term = build(repository, pypddl.TermBuilder(variable))
-    function_term = build(repository, pypddl.FunctionTermBuilder(fluent, [term]))
+    repository = pypddl.RepositoryFactory().create()
+    numeric = build(repository, pypddl.RequirementData(pypddl.RequirementKind.NumericFluents))
+    object_type = build(repository, pypddl.TypeData("object"))
+    number_type = build(repository, pypddl.TypeData("number"))
+    variable = build(repository, pypddl.VariableData("x"))
+    parameter = build(repository, pypddl.ParameterData(variable, [object_type]))
+    location = build(repository, pypddl.ObjectData("l1", [object_type]))
+    fluent = build(repository, pypddl.FunctionSkeletonData("fuel", [parameter], number_type))
+    term = build(repository, pypddl.TermData(variable))
+    function_term = build(repository, pypddl.FunctionTermData(fluent, [term]))
     zero = make_number_expression(repository, 0.0)
     one = make_number_expression(repository, 1.0)
-    numeric_node = build(repository, pypddl.ConditionNumericConstraintBuilder(pypddl.BinaryComparator.GreaterEqual, zero, zero))
-    condition = build(repository, pypddl.ConditionBuilder(numeric_node))
-    numeric_effect_node = build(repository, pypddl.EffectNumericBuilder(pypddl.NumericEffectOperator.Assign, fluent, [term], one))
-    effect = build(repository, pypddl.EffectBuilder(numeric_effect_node))
-    action = build(repository, pypddl.ActionBuilder("refuel", [parameter], condition, effect))
-    initial_value = build(repository, pypddl.InitialFunctionValueBuilder(function_term, zero))
-    metric = build(repository, pypddl.MetricBuilder(True, one))
+    numeric_node = build(repository, pypddl.ConditionNumericConstraintData(pypddl.BinaryComparator.GreaterEqual, zero, zero))
+    condition = build(repository, pypddl.ConditionData(numeric_node))
+    numeric_effect_node = build(repository, pypddl.EffectNumericData(pypddl.NumericEffectOperator.Assign, fluent, [term], one))
+    effect = build(repository, pypddl.EffectData(numeric_effect_node))
+    action = build(repository, pypddl.ActionData("refuel", [parameter], condition, effect))
+    initial_value = build(repository, pypddl.InitialFunctionValueData(function_term, zero))
+    metric = build(repository, pypddl.MetricData(True, one))
     domain = build(
         repository,
-        pypddl.DomainBuilder(
+        pypddl.DomainData(
             "numeric-programmatic",
             requirements=[numeric],
             types=[object_type, number_type],
@@ -558,7 +551,7 @@ def test_repository_constructs_numeric_function_task_bits():
     )
     task = build(
         repository,
-        pypddl.TaskBuilder(
+        pypddl.TaskData(
             "numeric-programmatic-task",
             domain,
             objects=[location],
@@ -825,7 +818,7 @@ def test_recursive_variant_views_are_inspectable():
 
 
 def test_numeric_expression_variant_views_are_inspectable():
-    repository = pypddl.Repository()
+    repository = pypddl.RepositoryFactory().create()
     number = make_number_expression(repository, 2.0)
 
     assert isinstance(number.get_value(), pypddl.FunctionExpressionNumber)
@@ -834,56 +827,56 @@ def test_numeric_expression_variant_views_are_inspectable():
 
 
 def test_repository_exposes_recursive_constructors_and_accessors():
-    repository = pypddl.Repository()
-    object_type = build(repository, pypddl.TypeBuilder("object"))
-    number_type = build(repository, pypddl.TypeBuilder("number"))
-    variable = build(repository, pypddl.VariableBuilder("x"))
-    parameter = build(repository, pypddl.ParameterBuilder(variable, [object_type]))
-    predicate = build(repository, pypddl.PredicateBuilder("p", [parameter]))
-    term = build(repository, pypddl.TermBuilder(variable))
+    repository = pypddl.RepositoryFactory().create()
+    object_type = build(repository, pypddl.TypeData("object"))
+    number_type = build(repository, pypddl.TypeData("number"))
+    variable = build(repository, pypddl.VariableData("x"))
+    parameter = build(repository, pypddl.ParameterData(variable, [object_type]))
+    predicate = build(repository, pypddl.PredicateData("p", [parameter]))
+    term = build(repository, pypddl.TermData(variable))
     assert term.get_value() == term.get_variant()
     assert term.get_value().get_name() == "x"
     literal = make_literal(repository, predicate, [term])
     base_condition = make_condition(repository, predicate, [term])
-    condition_not_node = build(repository, pypddl.ConditionNotBuilder(base_condition))
-    condition_not = build(repository, pypddl.ConditionBuilder(condition_not_node))
-    condition_or_node = build(repository, pypddl.ConditionOrBuilder([base_condition, condition_not]))
-    condition_or = build(repository, pypddl.ConditionBuilder(condition_or_node))
-    condition_and_node = build(repository, pypddl.ConditionAndBuilder([base_condition, condition_not]))
-    condition_and = build(repository, pypddl.ConditionBuilder(condition_and_node))
-    condition_imply_node = build(repository, pypddl.ConditionImplyBuilder(base_condition, condition_or))
-    condition_imply = build(repository, pypddl.ConditionBuilder(condition_imply_node))
-    condition_exists_node = build(repository, pypddl.ConditionExistsBuilder([parameter], condition_imply))
-    condition_exists = build(repository, pypddl.ConditionBuilder(condition_exists_node))
-    condition_forall_node = build(repository, pypddl.ConditionForallBuilder([parameter], condition_exists))
-    condition_forall = build(repository, pypddl.ConditionBuilder(condition_forall_node))
+    condition_not_node = build(repository, pypddl.ConditionNotData(base_condition))
+    condition_not = build(repository, pypddl.ConditionData(condition_not_node))
+    condition_or_node = build(repository, pypddl.ConditionOrData([base_condition, condition_not]))
+    condition_or = build(repository, pypddl.ConditionData(condition_or_node))
+    condition_and_node = build(repository, pypddl.ConditionAndData([base_condition, condition_not]))
+    condition_and = build(repository, pypddl.ConditionData(condition_and_node))
+    condition_imply_node = build(repository, pypddl.ConditionImplyData(base_condition, condition_or))
+    condition_imply = build(repository, pypddl.ConditionData(condition_imply_node))
+    condition_exists_node = build(repository, pypddl.ConditionExistsData([parameter], condition_imply))
+    condition_exists = build(repository, pypddl.ConditionData(condition_exists_node))
+    condition_forall_node = build(repository, pypddl.ConditionForallData([parameter], condition_exists))
+    condition_forall = build(repository, pypddl.ConditionData(condition_forall_node))
 
     number = make_number_expression(repository, 1.0)
-    unary_node = build(repository, pypddl.UnaryFunctionExpressionBuilder(pypddl.UnaryArithmeticOperator.Minus, number))
-    unary = build(repository, pypddl.FunctionExpressionBuilder(unary_node))
-    binary_node = build(repository, pypddl.BinaryFunctionExpressionBuilder(pypddl.BinaryArithmeticOperator.Add, number, unary))
-    binary = build(repository, pypddl.FunctionExpressionBuilder(binary_node))
-    multi_node = build(repository, pypddl.MultiFunctionExpressionBuilder(pypddl.MultiArithmeticOperator.Add, [number, binary]))
-    multi = build(repository, pypddl.FunctionExpressionBuilder(multi_node))
+    unary_node = build(repository, pypddl.UnaryFunctionExpressionData(pypddl.UnaryArithmeticOperator.Minus, number))
+    unary = build(repository, pypddl.FunctionExpressionData(unary_node))
+    binary_node = build(repository, pypddl.BinaryFunctionExpressionData(pypddl.BinaryArithmeticOperator.Add, number, unary))
+    binary = build(repository, pypddl.FunctionExpressionData(binary_node))
+    multi_node = build(repository, pypddl.MultiFunctionExpressionData(pypddl.MultiArithmeticOperator.Add, [number, binary]))
+    multi = build(repository, pypddl.FunctionExpressionData(multi_node))
 
-    fluent = build(repository, pypddl.FunctionSkeletonBuilder("f", [parameter], number_type))
-    numeric_effect_node = build(repository, pypddl.EffectNumericBuilder(pypddl.NumericEffectOperator.Assign, fluent, [term], multi))
-    numeric_effect = build(repository, pypddl.EffectBuilder(numeric_effect_node))
+    fluent = build(repository, pypddl.FunctionSkeletonData("f", [parameter], number_type))
+    numeric_effect_node = build(repository, pypddl.EffectNumericData(pypddl.NumericEffectOperator.Assign, fluent, [term], multi))
+    numeric_effect = build(repository, pypddl.EffectData(numeric_effect_node))
     literal_effect = make_effect(repository, literal)
-    effect_when_node = build(repository, pypddl.EffectWhenBuilder(condition_forall, literal_effect))
-    effect_when = build(repository, pypddl.EffectBuilder(effect_when_node))
-    effect_forall_node = build(repository, pypddl.EffectForallBuilder([parameter], effect_when))
-    effect_forall = build(repository, pypddl.EffectBuilder(effect_forall_node))
-    effect_one_of_node = build(repository, pypddl.EffectOneOfBuilder([literal_effect, numeric_effect]))
-    effect_one_of = build(repository, pypddl.EffectBuilder(effect_one_of_node))
-    alt1 = build(repository, pypddl.EffectProbabilisticAlternativeBuilder(0.4, literal_effect))
-    alt2 = build(repository, pypddl.EffectProbabilisticAlternativeBuilder(0.6, effect_one_of))
-    effect_probabilistic_node = build(repository, pypddl.EffectProbabilisticBuilder([alt1, alt2]))
-    effect_probabilistic = build(repository, pypddl.EffectBuilder(effect_probabilistic_node))
-    axiom = build(repository, pypddl.AxiomBuilder([parameter], literal, condition_forall))
-    action = build(repository, pypddl.ActionBuilder("a", [parameter], condition_forall, effect_probabilistic))
-    domain = build(repository, pypddl.DomainBuilder("full-builder", types=[object_type, number_type], predicates=[predicate], functions=[fluent], actions=[action], axioms=[axiom]))
-    task = build(repository, pypddl.TaskBuilder("full-builder-task", domain, goal=condition_forall, axioms=[axiom]))
+    effect_when_node = build(repository, pypddl.EffectWhenData(condition_forall, literal_effect))
+    effect_when = build(repository, pypddl.EffectData(effect_when_node))
+    effect_forall_node = build(repository, pypddl.EffectForallData([parameter], effect_when))
+    effect_forall = build(repository, pypddl.EffectData(effect_forall_node))
+    effect_one_of_node = build(repository, pypddl.EffectOneOfData([literal_effect, numeric_effect]))
+    effect_one_of = build(repository, pypddl.EffectData(effect_one_of_node))
+    alt1 = build(repository, pypddl.EffectProbabilisticAlternativeData(0.4, literal_effect))
+    alt2 = build(repository, pypddl.EffectProbabilisticAlternativeData(0.6, effect_one_of))
+    effect_probabilistic_node = build(repository, pypddl.EffectProbabilisticData([alt1, alt2]))
+    effect_probabilistic = build(repository, pypddl.EffectData(effect_probabilistic_node))
+    axiom = build(repository, pypddl.AxiomData([parameter], literal, condition_forall))
+    action = build(repository, pypddl.ActionData("a", [parameter], condition_forall, effect_probabilistic))
+    domain = build(repository, pypddl.DomainData("full-builder", types=[object_type, number_type], predicates=[predicate], functions=[fluent], actions=[action], axioms=[axiom]))
+    task = build(repository, pypddl.TaskData("full-builder-task", domain, goal=condition_forall, axioms=[axiom]))
 
     assert isinstance(condition_forall.get_variant(), pypddl.ConditionForall)
     assert len(condition_forall.get_variant().get_parameters()) == 1

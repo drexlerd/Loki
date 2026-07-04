@@ -100,36 +100,36 @@ void bind_datas(nb::module_& m)
 {
     {
         using V = Data<formalism::Requirement>;
-        nb::class_<V>(m, "RequirementBuilder").def(nb::init<formalism::RequirementKind>(), "kind"_a).def_rw("kind", &V::kind);
+        nb::class_<V>(m, "RequirementData").def(nb::init<formalism::RequirementKind>(), "kind"_a).def_rw("kind", &V::kind);
     }
     {
         using V = Data<formalism::Type>;
-        nb::class_<V>(m, "TypeBuilder")
+        nb::class_<V>(m, "TypeData")
             .def(nb::init<const std::string&, const std::vector<formalism::TypeView>&>(), "name"_a, "bases"_a = std::vector<formalism::TypeView> {})
             .def_rw("name", &V::name)
             .def_rw("bases", &V::bases);
     }
     {
         using V = Data<formalism::Object>;
-        nb::class_<V>(m, "ObjectBuilder")
+        nb::class_<V>(m, "ObjectData")
             .def(nb::init<const std::string&, const std::vector<formalism::TypeView>&>(), "name"_a, "types"_a = std::vector<formalism::TypeView> {})
             .def_rw("name", &V::name)
             .def_rw("types", &V::types);
     }
     {
         using V = Data<formalism::Variable>;
-        nb::class_<V>(m, "VariableBuilder").def(nb::init<cista::offset::string>(), "name"_a).def_rw("name", &V::name);
+        nb::class_<V>(m, "VariableData").def(nb::init<cista::offset::string>(), "name"_a).def_rw("name", &V::name);
     }
     {
         using V = Data<formalism::Parameter>;
-        nb::class_<V>(m, "ParameterBuilder")
+        nb::class_<V>(m, "ParameterData")
             .def(nb::init<formalism::VariableView, const std::vector<formalism::TypeView>&>(), "variable"_a, "types"_a = std::vector<formalism::TypeView> {})
             .def_rw("variable", &V::variable)
             .def_rw("types", &V::types);
     }
     {
         using V = Data<formalism::Predicate>;
-        nb::class_<V>(m, "PredicateBuilder")
+        nb::class_<V>(m, "PredicateData")
             .def(nb::init<const std::string&, const std::vector<formalism::ParameterView>&>(),
                  "name"_a,
                  "parameters"_a = std::vector<formalism::ParameterView> {})
@@ -138,7 +138,7 @@ void bind_datas(nb::module_& m)
     }
     {
         using V = Data<formalism::FunctionSkeleton>;
-        nb::class_<V>(m, "FunctionSkeletonBuilder")
+        nb::class_<V>(m, "FunctionSkeletonData")
             .def(nb::init<const std::string&, const std::vector<formalism::ParameterView>&, formalism::TypeView>(), "name"_a, "parameters"_a, "type"_a)
             .def_rw("name", &V::name)
             .def_rw("parameters", &V::parameters)
@@ -146,29 +146,29 @@ void bind_datas(nb::module_& m)
     }
     {
         using V = Data<formalism::Term>;
-        nb::class_<V>(m, "TermBuilder").def(nb::init<typename V::template ViewVariant<formalism::Repository>>(), "value"_a).def_rw("value", &V::value);
+        nb::class_<V>(m, "TermData").def(nb::init<typename V::template ViewVariant<formalism::Repository>>(), "value"_a).def_rw("value", &V::value);
     }
     {
         using V = Data<formalism::Atom>;
-        nb::class_<V>(m, "AtomBuilder")
+        nb::class_<V>(m, "AtomData")
             .def(nb::init<formalism::PredicateView, const std::vector<formalism::TermView>&>(), "predicate"_a, "terms"_a = std::vector<formalism::TermView> {})
             .def_rw("predicate", &V::predicate)
             .def_rw("terms", &V::terms);
     }
     {
         using V = Data<formalism::Literal>;
-        nb::class_<V>(m, "LiteralBuilder")
+        nb::class_<V>(m, "LiteralData")
             .def(nb::init<formalism::AtomView, bool>(), "atom"_a, "polarity"_a = true)
             .def_rw("atom", &V::atom)
             .def_rw("polarity", &V::m_polarity);
     }
     {
         using V = Data<formalism::FunctionExpressionNumber>;
-        nb::class_<V>(m, "FunctionExpressionNumberBuilder").def(nb::init<double>(), "value"_a).def_rw("value", &V::value);
+        nb::class_<V>(m, "FunctionExpressionNumberData").def(nb::init<double>(), "value"_a).def_rw("value", &V::value);
     }
     {
         using V = Data<formalism::FunctionTerm>;
-        nb::class_<V>(m, "FunctionTermBuilder")
+        nb::class_<V>(m, "FunctionTermData")
             .def(nb::init<formalism::FunctionSkeletonView, const std::vector<formalism::TermView>&>(),
                  "function"_a,
                  "terms"_a = std::vector<formalism::TermView> {})
@@ -177,14 +177,14 @@ void bind_datas(nb::module_& m)
     }
     {
         using V = Data<formalism::UnaryFunctionExpression>;
-        nb::class_<V>(m, "UnaryFunctionExpressionBuilder")
+        nb::class_<V>(m, "UnaryFunctionExpressionData")
             .def(nb::init<formalism::UnaryArithmeticOperator, formalism::FunctionExpressionView>(), "operator"_a, "expression"_a)
             .def_rw("operator", &V::op)
             .def_rw("expression", &V::expression);
     }
     {
         using V = Data<formalism::BinaryFunctionExpression>;
-        nb::class_<V>(m, "BinaryFunctionExpressionBuilder")
+        nb::class_<V>(m, "BinaryFunctionExpressionData")
             .def(nb::init<formalism::BinaryArithmeticOperator, formalism::FunctionExpressionView, formalism::FunctionExpressionView>(),
                  "operator"_a,
                  "left"_a,
@@ -195,61 +195,61 @@ void bind_datas(nb::module_& m)
     }
     {
         using V = Data<formalism::MultiFunctionExpression>;
-        nb::class_<V>(m, "MultiFunctionExpressionBuilder")
+        nb::class_<V>(m, "MultiFunctionExpressionData")
             .def(nb::init<formalism::MultiArithmeticOperator, const std::vector<formalism::FunctionExpressionView>&>(), "operator"_a, "expressions"_a)
             .def_rw("operator", &V::op)
             .def_rw("expressions", &V::expressions);
     }
     {
         using V = Data<formalism::FunctionExpression>;
-        nb::class_<V>(m, "FunctionExpressionBuilder")
+        nb::class_<V>(m, "FunctionExpressionData")
             .def(nb::init<typename V::template ViewVariant<formalism::Repository>>(), "value"_a)
             .def_rw("value", &V::value);
     }
     {
         using V = Data<formalism::ConditionLiteral>;
-        nb::class_<V>(m, "ConditionLiteralBuilder").def(nb::init<formalism::LiteralView>(), "literal"_a).def_rw("literal", &V::literal);
+        nb::class_<V>(m, "ConditionLiteralData").def(nb::init<formalism::LiteralView>(), "literal"_a).def_rw("literal", &V::literal);
     }
     {
         using V = Data<formalism::ConditionAnd>;
-        nb::class_<V>(m, "ConditionAndBuilder")
+        nb::class_<V>(m, "ConditionAndData")
             .def(nb::init<const std::vector<formalism::ConditionView>&>(), "conditions"_a)
             .def_rw("conditions", &V::conditions);
     }
     {
         using V = Data<formalism::ConditionOr>;
-        nb::class_<V>(m, "ConditionOrBuilder")
+        nb::class_<V>(m, "ConditionOrData")
             .def(nb::init<const std::vector<formalism::ConditionView>&>(), "conditions"_a)
             .def_rw("conditions", &V::conditions);
     }
     {
         using V = Data<formalism::ConditionNot>;
-        nb::class_<V>(m, "ConditionNotBuilder").def(nb::init<formalism::ConditionView>(), "condition"_a).def_rw("condition", &V::condition);
+        nb::class_<V>(m, "ConditionNotData").def(nb::init<formalism::ConditionView>(), "condition"_a).def_rw("condition", &V::condition);
     }
     {
         using V = Data<formalism::ConditionImply>;
-        nb::class_<V>(m, "ConditionImplyBuilder")
+        nb::class_<V>(m, "ConditionImplyData")
             .def(nb::init<formalism::ConditionView, formalism::ConditionView>(), "left"_a, "right"_a)
             .def_rw("left", &V::left)
             .def_rw("right", &V::right);
     }
     {
         using V = Data<formalism::ConditionExists>;
-        nb::class_<V>(m, "ConditionExistsBuilder")
+        nb::class_<V>(m, "ConditionExistsData")
             .def(nb::init<const std::vector<formalism::ParameterView>&, formalism::ConditionView>(), "parameters"_a, "condition"_a)
             .def_rw("parameters", &V::parameters)
             .def_rw("condition", &V::condition);
     }
     {
         using V = Data<formalism::ConditionForall>;
-        nb::class_<V>(m, "ConditionForallBuilder")
+        nb::class_<V>(m, "ConditionForallData")
             .def(nb::init<const std::vector<formalism::ParameterView>&, formalism::ConditionView>(), "parameters"_a, "condition"_a)
             .def_rw("parameters", &V::parameters)
             .def_rw("condition", &V::condition);
     }
     {
         using V = Data<formalism::ConditionNumericConstraint>;
-        nb::class_<V>(m, "ConditionNumericConstraintBuilder")
+        nb::class_<V>(m, "ConditionNumericConstraintData")
             .def(nb::init<formalism::BinaryComparator, formalism::FunctionExpressionView, formalism::FunctionExpressionView>(),
                  "comparator"_a,
                  "left"_a,
@@ -260,19 +260,19 @@ void bind_datas(nb::module_& m)
     }
     {
         using V = Data<formalism::Condition>;
-        nb::class_<V>(m, "ConditionBuilder").def(nb::init<typename V::template ViewVariant<formalism::Repository>>(), "value"_a).def_rw("value", &V::value);
+        nb::class_<V>(m, "ConditionData").def(nb::init<typename V::template ViewVariant<formalism::Repository>>(), "value"_a).def_rw("value", &V::value);
     }
     {
         using V = Data<formalism::EffectLiteral>;
-        nb::class_<V>(m, "EffectLiteralBuilder").def(nb::init<formalism::LiteralView>(), "literal"_a).def_rw("literal", &V::literal);
+        nb::class_<V>(m, "EffectLiteralData").def(nb::init<formalism::LiteralView>(), "literal"_a).def_rw("literal", &V::literal);
     }
     {
         using V = Data<formalism::EffectAnd>;
-        nb::class_<V>(m, "EffectAndBuilder").def(nb::init<const std::vector<formalism::EffectView>&>(), "effects"_a).def_rw("effects", &V::effects);
+        nb::class_<V>(m, "EffectAndData").def(nb::init<const std::vector<formalism::EffectView>&>(), "effects"_a).def_rw("effects", &V::effects);
     }
     {
         using V = Data<formalism::EffectNumeric>;
-        nb::class_<V>(m, "EffectNumericBuilder")
+        nb::class_<V>(m, "EffectNumericData")
             .def(nb::init<formalism::NumericEffectOperator,
                           formalism::FunctionSkeletonView,
                           const std::vector<formalism::TermView>&,
@@ -288,42 +288,42 @@ void bind_datas(nb::module_& m)
     }
     {
         using V = Data<formalism::EffectForall>;
-        nb::class_<V>(m, "EffectForallBuilder")
+        nb::class_<V>(m, "EffectForallData")
             .def(nb::init<const std::vector<formalism::ParameterView>&, formalism::EffectView>(), "parameters"_a, "effect"_a)
             .def_rw("parameters", &V::parameters)
             .def_rw("effect", &V::effect);
     }
     {
         using V = Data<formalism::EffectWhen>;
-        nb::class_<V>(m, "EffectWhenBuilder")
+        nb::class_<V>(m, "EffectWhenData")
             .def(nb::init<formalism::ConditionView, formalism::EffectView>(), "condition"_a, "effect"_a)
             .def_rw("condition", &V::condition)
             .def_rw("effect", &V::effect);
     }
     {
         using V = Data<formalism::EffectOneOf>;
-        nb::class_<V>(m, "EffectOneOfBuilder").def(nb::init<const std::vector<formalism::EffectView>&>(), "effects"_a).def_rw("effects", &V::effects);
+        nb::class_<V>(m, "EffectOneOfData").def(nb::init<const std::vector<formalism::EffectView>&>(), "effects"_a).def_rw("effects", &V::effects);
     }
     {
         using V = Data<formalism::EffectProbabilisticAlternative>;
-        nb::class_<V>(m, "EffectProbabilisticAlternativeBuilder")
+        nb::class_<V>(m, "EffectProbabilisticAlternativeData")
             .def(nb::init<double, formalism::EffectView>(), "probability"_a, "effect"_a)
             .def_rw("probability", &V::probability)
             .def_rw("effect", &V::effect);
     }
     {
         using V = Data<formalism::EffectProbabilistic>;
-        nb::class_<V>(m, "EffectProbabilisticBuilder")
+        nb::class_<V>(m, "EffectProbabilisticData")
             .def(nb::init<const std::vector<formalism::EffectProbabilisticAlternativeView>&>(), "alternatives"_a)
             .def_rw("alternatives", &V::alternatives);
     }
     {
         using V = Data<formalism::Effect>;
-        nb::class_<V>(m, "EffectBuilder").def(nb::init<typename V::template ViewVariant<formalism::Repository>>(), "value"_a).def_rw("value", &V::value);
+        nb::class_<V>(m, "EffectData").def(nb::init<typename V::template ViewVariant<formalism::Repository>>(), "value"_a).def_rw("value", &V::value);
     }
     {
         using V = Data<formalism::Action>;
-        nb::class_<V>(m, "ActionBuilder")
+        nb::class_<V>(m, "ActionData")
             .def(nb::init<const std::string&,
                           const std::vector<formalism::ParameterView>&,
                           const std::optional<formalism::ConditionView>&,
@@ -339,7 +339,7 @@ void bind_datas(nb::module_& m)
     }
     {
         using V = Data<formalism::Axiom>;
-        nb::class_<V>(m, "AxiomBuilder")
+        nb::class_<V>(m, "AxiomData")
             .def(nb::init<const std::vector<formalism::ParameterView>&, formalism::LiteralView, formalism::ConditionView>(),
                  "parameters"_a,
                  "head"_a,
@@ -350,21 +350,21 @@ void bind_datas(nb::module_& m)
     }
     {
         using V = Data<formalism::Metric>;
-        nb::class_<V>(m, "MetricBuilder")
+        nb::class_<V>(m, "MetricData")
             .def(nb::init<bool, formalism::FunctionExpressionView>(), "minimize"_a, "expression"_a)
             .def_rw("minimize", &V::minimize)
             .def_rw("expression", &V::expression);
     }
     {
         using V = Data<formalism::InitialFunctionValue>;
-        nb::class_<V>(m, "InitialFunctionValueBuilder")
+        nb::class_<V>(m, "InitialFunctionValueData")
             .def(nb::init<formalism::FunctionTermView, formalism::FunctionExpressionView>(), "function"_a, "value"_a)
             .def_rw("function", &V::function)
             .def_rw("value", &V::value);
     }
     {
         using V = Data<formalism::Domain>;
-        nb::class_<V>(m, "DomainBuilder")
+        nb::class_<V>(m, "DomainData")
             .def(nb::init<const std::string&,
                           const std::vector<formalism::RequirementView>&,
                           const std::vector<formalism::TypeView>&,
@@ -392,7 +392,7 @@ void bind_datas(nb::module_& m)
     }
     {
         using V = Data<formalism::Task>;
-        nb::class_<V>(m, "TaskBuilder")
+        nb::class_<V>(m, "TaskData")
             .def(nb::init<const std::string&,
                           formalism::DomainView,
                           const std::vector<formalism::RequirementView>&,
@@ -429,7 +429,6 @@ void bind_datas(nb::module_& m)
 void bind_repository(nb::module_& m)
 {
     nb::class_<formalism::Repository>(m, "Repository", "Owns interned formalism objects created from builder data.")
-        .def(nb::init<size_t>(), "index"_a = 0)
         .def("get_or_create", &get_or_create_data<formalism::Requirement>, "data"_a, nb::keep_alive<0, 1>())
         .def("get_or_create", &get_or_create_data<formalism::Type>, "data"_a, nb::keep_alive<0, 1>())
         .def("get_or_create", &get_or_create_data<formalism::Object>, "data"_a, nb::keep_alive<0, 1>())
@@ -475,5 +474,6 @@ void bind_repository(nb::module_& m)
         .def(nb::init<>())
         .def("create", [](formalism::RepositoryFactory& self) { return self.create_shared(); }, "Create a repository that owns interned formalism objects.");
 }
+
 
 }  // namespace loki::formalism
