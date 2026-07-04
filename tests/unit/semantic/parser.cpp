@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include "../benchmark_utils.hpp"
 
 #include <algorithm>
@@ -26,6 +25,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <yggdrasil/semantics/equal_to.hpp>
 #include <yggdrasil/serialization/json_suite.hpp>
 
 namespace loki::tests
@@ -68,17 +68,17 @@ struct Overloaded : Ts...
 template<class... Ts>
 Overloaded(Ts...) -> Overloaded<Ts...>;
 
-template<typename T>
-void expect_contiguous_indices(const ygg::IndexList<T>& indices, const std::string& label, const formalism::Repository& repository, bool require_order = true)
+template<typename Views>
+void expect_contiguous_indices(Views views, const std::string& label, bool require_order = true)
 {
     SCOPED_TRACE(label);
 
     auto values = std::vector<ygg::uint_t> {};
-    values.reserve(indices.size());
-    for (auto index : indices)
+    values.reserve(views.size());
+    for (auto view : views)
     {
-        if (&repository.get_canonical_context(index) == &repository)
-            values.push_back(index.get_value());
+        if (&views.get_context().get_canonical_context(view.get_index()) == &views.get_context())
+            values.push_back(view.get_index().get_value());
     }
     if (values.empty())
         return;
@@ -110,149 +110,142 @@ void expect_contiguous_indices(const ygg::IndexList<T>& indices, const std::stri
 
 void expect_contiguous_domain_indices(formalism::DomainView domain)
 {
-    const auto& data = domain.get_data();
-    expect_contiguous_indices(data.requirements, "domain.requirements", domain.get_context());
-    expect_contiguous_indices(data.types, "domain.types", domain.get_context(), false);
-    expect_contiguous_indices(data.constants, "domain.constants", domain.get_context());
-    expect_contiguous_indices(data.predicates, "domain.predicates", domain.get_context());
-    expect_contiguous_indices(data.functions, "domain.functions", domain.get_context());
-    expect_contiguous_indices(data.actions, "domain.actions", domain.get_context());
-    expect_contiguous_indices(data.axioms, "domain.axioms", domain.get_context());
+    expect_contiguous_indices(domain.get_requirements(), "domain.requirements");
+    expect_contiguous_indices(domain.get_types(), "domain.types", false);
+    expect_contiguous_indices(domain.get_constants(), "domain.constants");
+    expect_contiguous_indices(domain.get_predicates(), "domain.predicates");
+    expect_contiguous_indices(domain.get_functions(), "domain.functions");
+    expect_contiguous_indices(domain.get_actions(), "domain.actions");
+    expect_contiguous_indices(domain.get_axioms(), "domain.axioms");
 }
 
 void expect_contiguous_task_indices(formalism::TaskView task)
 {
-    const auto& data = task.get_data();
-    expect_contiguous_indices(data.requirements, "task.requirements", task.get_context());
-    expect_contiguous_indices(data.objects, "task.objects", task.get_context());
-    expect_contiguous_indices(data.initial_literals, "task.initial_literals", task.get_context());
-    expect_contiguous_indices(data.initial_function_values, "task.initial_function_values", task.get_context());
-    expect_contiguous_indices(data.axioms, "task.axioms", task.get_context());
+    expect_contiguous_indices(task.get_requirements(), "task.requirements");
+    expect_contiguous_indices(task.get_objects(), "task.objects");
+    expect_contiguous_indices(task.get_initial_literals(), "task.initial_literals");
+    expect_contiguous_indices(task.get_initial_function_values(), "task.initial_function_values");
+    expect_contiguous_indices(task.get_axioms(), "task.axioms");
 }
 
-bool contains_not_or_imply(ygg::Index<formalism::Condition> condition, const formalism::Repository& repository)
+bool contains_not_or_imply(formalism::ConditionView condition)
 {
-    return std::visit(
+    return ygg::visit(
         Overloaded {
-            [&](ygg::Index<formalism::ConditionLiteral>) { return false; },
-            [&](ygg::Index<formalism::ConditionNumericConstraint>) { return false; },
-            [&](ygg::Index<formalism::ConditionNot>) { return true; },
-            [&](ygg::Index<formalism::ConditionImply>) { return true; },
-            [&](ygg::Index<formalism::ConditionAnd> node)
+            [&](formalism::ConditionLiteralView) { return false; },
+            [&](formalism::ConditionNumericConstraintView) { return false; },
+            [&](formalism::ConditionNotView) { return true; },
+            [&](formalism::ConditionImplyView) { return true; },
+            [&](formalism::ConditionAndView node)
             {
-                for (auto child : repository[node].conditions)
-                    if (contains_not_or_imply(child, repository))
+                for (auto child : node.get_conditions())
+                    if (contains_not_or_imply(child))
                         return true;
                 return false;
             },
-            [&](ygg::Index<formalism::ConditionOr> node)
+            [&](formalism::ConditionOrView node)
             {
-                for (auto child : repository[node].conditions)
-                    if (contains_not_or_imply(child, repository))
+                for (auto child : node.get_conditions())
+                    if (contains_not_or_imply(child))
                         return true;
                 return false;
             },
-            [&](ygg::Index<formalism::ConditionExists> node) { return contains_not_or_imply(repository[node].condition, repository); },
-            [&](ygg::Index<formalism::ConditionForall> node) { return contains_not_or_imply(repository[node].condition, repository); },
+            [&](formalism::ConditionExistsView node) { return contains_not_or_imply(node.get_condition()); },
+            [&](formalism::ConditionForallView node) { return contains_not_or_imply(node.get_condition()); },
         },
-        repository[condition].value);
+        condition.get_variant());
 }
 
-bool contains_forall(ygg::Index<formalism::Condition> condition, const formalism::Repository& repository)
+bool contains_forall(formalism::ConditionView condition)
 {
-    return std::visit(
+    return ygg::visit(
         Overloaded {
-            [&](ygg::Index<formalism::ConditionLiteral>) { return false; },
-            [&](ygg::Index<formalism::ConditionNumericConstraint>) { return false; },
-            [&](ygg::Index<formalism::ConditionForall>) { return true; },
-            [&](ygg::Index<formalism::ConditionNot> node) { return contains_forall(repository[node].condition, repository); },
-            [&](ygg::Index<formalism::ConditionImply> node)
-            { return contains_forall(repository[node].left, repository) || contains_forall(repository[node].right, repository); },
-            [&](ygg::Index<formalism::ConditionAnd> node)
+            [&](formalism::ConditionLiteralView) { return false; },
+            [&](formalism::ConditionNumericConstraintView) { return false; },
+            [&](formalism::ConditionForallView) { return true; },
+            [&](formalism::ConditionNotView node) { return contains_forall(node.get_condition()); },
+            [&](formalism::ConditionImplyView node) { return contains_forall(node.get_left()) || contains_forall(node.get_right()); },
+            [&](formalism::ConditionAndView node)
             {
-                for (auto child : repository[node].conditions)
-                    if (contains_forall(child, repository))
+                for (auto child : node.get_conditions())
+                    if (contains_forall(child))
                         return true;
                 return false;
             },
-            [&](ygg::Index<formalism::ConditionOr> node)
+            [&](formalism::ConditionOrView node)
             {
-                for (auto child : repository[node].conditions)
-                    if (contains_forall(child, repository))
+                for (auto child : node.get_conditions())
+                    if (contains_forall(child))
                         return true;
                 return false;
             },
-            [&](ygg::Index<formalism::ConditionExists> node) { return contains_forall(repository[node].condition, repository); },
+            [&](formalism::ConditionExistsView node) { return contains_forall(node.get_condition()); },
         },
-        repository[condition].value);
+        condition.get_variant());
 }
 
-bool contains_exists(ygg::Index<formalism::Condition> condition, const formalism::Repository& repository)
+bool contains_exists(formalism::ConditionView condition)
 {
-    return std::visit(
+    return ygg::visit(
         Overloaded {
-            [&](ygg::Index<formalism::ConditionLiteral>) { return false; },
-            [&](ygg::Index<formalism::ConditionNumericConstraint>) { return false; },
-            [&](ygg::Index<formalism::ConditionExists>) { return true; },
-            [&](ygg::Index<formalism::ConditionNot> node) { return contains_exists(repository[node].condition, repository); },
-            [&](ygg::Index<formalism::ConditionImply> node)
-            { return contains_exists(repository[node].left, repository) || contains_exists(repository[node].right, repository); },
-            [&](ygg::Index<formalism::ConditionAnd> node)
+            [&](formalism::ConditionLiteralView) { return false; },
+            [&](formalism::ConditionNumericConstraintView) { return false; },
+            [&](formalism::ConditionExistsView) { return true; },
+            [&](formalism::ConditionNotView node) { return contains_exists(node.get_condition()); },
+            [&](formalism::ConditionImplyView node) { return contains_exists(node.get_left()) || contains_exists(node.get_right()); },
+            [&](formalism::ConditionAndView node)
             {
-                for (auto child : repository[node].conditions)
-                    if (contains_exists(child, repository))
+                for (auto child : node.get_conditions())
+                    if (contains_exists(child))
                         return true;
                 return false;
             },
-            [&](ygg::Index<formalism::ConditionOr> node)
+            [&](formalism::ConditionOrView node)
             {
-                for (auto child : repository[node].conditions)
-                    if (contains_exists(child, repository))
+                for (auto child : node.get_conditions())
+                    if (contains_exists(child))
                         return true;
                 return false;
             },
-            [&](ygg::Index<formalism::ConditionForall> node) { return contains_exists(repository[node].condition, repository); },
+            [&](formalism::ConditionForallView node) { return contains_exists(node.get_condition()); },
         },
-        repository[condition].value);
+        condition.get_variant());
 }
 
-std::size_t count_effect_when(ygg::Index<formalism::Effect> effect, const formalism::Repository& repository)
+std::size_t count_effect_when(formalism::EffectView effect)
 {
-    return std::visit(
+    return ygg::visit(
         Overloaded {
-            [&](ygg::Index<formalism::EffectLiteral>) -> std::size_t { return 0; },
-            [&](ygg::Index<formalism::EffectNumeric>) -> std::size_t { return 0; },
-            [&](ygg::Index<formalism::EffectOneOf> node) -> std::size_t
+            [&](formalism::EffectLiteralView) -> std::size_t { return 0; },
+            [&](formalism::EffectNumericView) -> std::size_t { return 0; },
+            [&](formalism::EffectOneOfView node) -> std::size_t
             {
                 std::size_t result = 0;
-                for (auto child : repository[node].effects)
-                    result += count_effect_when(child, repository);
+                for (auto child : node.get_effects())
+                    result += count_effect_when(child);
                 return result;
             },
-            [&](ygg::Index<formalism::EffectProbabilistic> node) -> std::size_t
+            [&](formalism::EffectProbabilisticView node) -> std::size_t
             {
                 std::size_t result = 0;
-                for (auto alternative : repository[node].alternatives)
-                    result += count_effect_when(repository[alternative].effect, repository);
+                for (auto alternative : node.get_alternatives())
+                    result += count_effect_when(alternative.get_effect());
                 return result;
             },
-            [&](ygg::Index<formalism::EffectAnd> node) -> std::size_t
+            [&](formalism::EffectAndView node) -> std::size_t
             {
                 std::size_t result = 0;
-                for (auto child : repository[node].effects)
-                    result += count_effect_when(child, repository);
+                for (auto child : node.get_effects())
+                    result += count_effect_when(child);
                 return result;
             },
-            [&](ygg::Index<formalism::EffectForall> node) { return count_effect_when(repository[node].effect, repository); },
-            [&](ygg::Index<formalism::EffectWhen> node) { return std::size_t { 1 } + count_effect_when(repository[node].effect, repository); },
+            [&](formalism::EffectForallView node) { return count_effect_when(node.get_effect()); },
+            [&](formalism::EffectWhenView node) { return std::size_t { 1 } + count_effect_when(node.get_effect()); },
         },
-        repository[effect].value);
+        effect.get_variant());
 }
 
-bool is_effect_and(ygg::Index<formalism::Effect> effect, const formalism::Repository& repository)
-{
-    return std::visit(Overloaded { [&](ygg::Index<formalism::EffectAnd>) { return true; }, [&](auto) { return false; } }, repository[effect].value);
-}
+bool is_effect_and(formalism::EffectView effect) { return effect.get_variant().is<ygg::Index<formalism::EffectAnd>>(); }
 
 std::optional<ygg::Index<formalism::Object>> object_term(formalism::TermView term)
 {
@@ -291,10 +284,10 @@ bool has_equality_predicate(formalism::DomainView domain)
     return false;
 }
 
-bool has_requirement_kind(const ygg::IndexList<formalism::Requirement>& requirements, formalism::RequirementKind kind, const formalism::Repository& repository)
+bool has_requirement_kind(formalism::DomainView domain, formalism::RequirementKind kind)
 {
-    for (auto requirement : requirements)
-        if (repository[requirement].kind == kind)
+    for (auto requirement : domain.get_requirements())
+        if (requirement.get_kind() == kind)
             return true;
     return false;
 }
@@ -358,84 +351,73 @@ bool has_initial_unary_literal(const LiteralRange& literals, const std::string& 
     return false;
 }
 
-bool condition_mentions_predicate(ygg::Index<formalism::Condition> condition, const formalism::Repository& repository, const std::string& name)
+bool condition_mentions_predicate(formalism::ConditionView condition, const std::string& name)
 {
-    return std::visit(
+    return ygg::visit(
         Overloaded {
-            [&](ygg::Index<formalism::ConditionLiteral> node)
+            [&](formalism::ConditionLiteralView node) { return std::string(node.get_literal().get_atom().get_predicate().get_name()) == name; },
+            [&](formalism::ConditionNumericConstraintView) { return false; },
+            [&](formalism::ConditionNotView node) { return condition_mentions_predicate(node.get_condition(), name); },
+            [&](formalism::ConditionImplyView node)
+            { return condition_mentions_predicate(node.get_left(), name) || condition_mentions_predicate(node.get_right(), name); },
+            [&](formalism::ConditionAndView node)
             {
-                const auto literal = repository[node].literal;
-                const auto atom = repository[literal].atom;
-                const auto predicate = repository[atom].predicate;
-                return std::string(repository[predicate].name) == name;
-            },
-            [&](ygg::Index<formalism::ConditionNumericConstraint>) { return false; },
-            [&](ygg::Index<formalism::ConditionNot> node) { return condition_mentions_predicate(repository[node].condition, repository, name); },
-            [&](ygg::Index<formalism::ConditionImply> node) {
-                return condition_mentions_predicate(repository[node].left, repository, name)
-                       || condition_mentions_predicate(repository[node].right, repository, name);
-            },
-            [&](ygg::Index<formalism::ConditionAnd> node)
-            {
-                for (auto child : repository[node].conditions)
-                    if (condition_mentions_predicate(child, repository, name))
+                for (auto child : node.get_conditions())
+                    if (condition_mentions_predicate(child, name))
                         return true;
                 return false;
             },
-            [&](ygg::Index<formalism::ConditionOr> node)
+            [&](formalism::ConditionOrView node)
             {
-                for (auto child : repository[node].conditions)
-                    if (condition_mentions_predicate(child, repository, name))
+                for (auto child : node.get_conditions())
+                    if (condition_mentions_predicate(child, name))
                         return true;
                 return false;
             },
-            [&](ygg::Index<formalism::ConditionExists> node) { return condition_mentions_predicate(repository[node].condition, repository, name); },
-            [&](ygg::Index<formalism::ConditionForall> node) { return condition_mentions_predicate(repository[node].condition, repository, name); },
+            [&](formalism::ConditionExistsView node) { return condition_mentions_predicate(node.get_condition(), name); },
+            [&](formalism::ConditionForallView node) { return condition_mentions_predicate(node.get_condition(), name); },
         },
-        repository[condition].value);
+        condition.get_variant());
 }
 
-std::optional<std::string> variable_term_name(ygg::Index<formalism::Term> term, const formalism::Repository& repository)
+std::optional<std::string> variable_term_name(formalism::TermView term)
 {
-    return std::visit(
+    return ygg::visit(
         Overloaded {
-            [&](ygg::Index<formalism::Variable> variable) -> std::optional<std::string> { return std::string(repository[variable].name); },
+            [&](formalism::VariableView variable) -> std::optional<std::string> { return std::string(variable.get_name()); },
             [&](auto) -> std::optional<std::string> { return std::nullopt; },
         },
-        repository[term].value);
+        term.get_variant());
 }
 
-bool has_top_level_effect_literal_with_terms(ygg::Index<formalism::Effect> effect,
-                                             const formalism::Repository& repository,
+bool has_top_level_effect_literal_with_terms(formalism::EffectView effect,
                                              const std::string& predicate_name,
                                              const std::string& first_variable,
                                              const std::string& second_variable)
 {
-    return std::visit(
+    return ygg::visit(
         Overloaded {
-            [&](ygg::Index<formalism::EffectLiteral> node)
+            [&](formalism::EffectLiteralView node)
             {
-                const auto literal = repository[node].literal;
-                const auto atom = repository[repository[literal].atom];
-                const auto predicate = atom.predicate;
-                if (std::string(repository[predicate].name) != predicate_name || atom.terms.size() != 2)
+                const auto atom = node.get_literal().get_atom();
+                if (std::string(atom.get_predicate().get_name()) != predicate_name || atom.get_terms().size() != 2)
                     return false;
-                const auto first = variable_term_name(atom.terms[0], repository);
-                const auto second = variable_term_name(atom.terms[1], repository);
+                const auto first = variable_term_name(atom.get_terms()[0]);
+                const auto second = variable_term_name(atom.get_terms()[1]);
                 return first && second && *first == first_variable && *second == second_variable;
             },
-            [&](ygg::Index<formalism::EffectAnd> node)
+            [&](formalism::EffectAndView node)
             {
-                for (auto child : repository[node].effects)
+                for (auto child : node.get_effects())
                 {
-                    if (has_top_level_effect_literal_with_terms(child, repository, predicate_name, first_variable, second_variable))
+                    if (has_top_level_effect_literal_with_terms(child, predicate_name, first_variable, second_variable))
                         return true;
                 }
                 return false;
             },
             [&](auto) { return false; },
         },
-        repository[effect].value);
+        effect.get_variant());
 }
 
 template<typename LiteralRange>
@@ -460,80 +442,78 @@ std::size_t count_unique_object_names(formalism::DomainView domain, formalism::T
     return names.size();
 }
 
-std::optional<std::string> first_exists_parameter_name(ygg::Index<formalism::Condition> condition, const formalism::Repository& repository)
+std::optional<std::string> first_exists_parameter_name(formalism::ConditionView condition)
 {
-    return std::visit(
+    return ygg::visit(
         Overloaded {
-            [&](ygg::Index<formalism::ConditionLiteral>) -> std::optional<std::string> { return std::nullopt; },
-            [&](ygg::Index<formalism::ConditionNumericConstraint>) -> std::optional<std::string> { return std::nullopt; },
-            [&](ygg::Index<formalism::ConditionNot> node) { return first_exists_parameter_name(repository[node].condition, repository); },
-            [&](ygg::Index<formalism::ConditionImply> node) -> std::optional<std::string>
+            [&](formalism::ConditionLiteralView) -> std::optional<std::string> { return std::nullopt; },
+            [&](formalism::ConditionNumericConstraintView) -> std::optional<std::string> { return std::nullopt; },
+            [&](formalism::ConditionNotView node) { return first_exists_parameter_name(node.get_condition()); },
+            [&](formalism::ConditionImplyView node) -> std::optional<std::string>
             {
-                if (auto result = first_exists_parameter_name(repository[node].left, repository))
+                if (auto result = first_exists_parameter_name(node.get_left()))
                     return result;
-                return first_exists_parameter_name(repository[node].right, repository);
+                return first_exists_parameter_name(node.get_right());
             },
-            [&](ygg::Index<formalism::ConditionAnd> node) -> std::optional<std::string>
+            [&](formalism::ConditionAndView node) -> std::optional<std::string>
             {
-                for (auto child : repository[node].conditions)
-                    if (auto result = first_exists_parameter_name(child, repository))
+                for (auto child : node.get_conditions())
+                    if (auto result = first_exists_parameter_name(child))
                         return result;
                 return std::nullopt;
             },
-            [&](ygg::Index<formalism::ConditionOr> node) -> std::optional<std::string>
+            [&](formalism::ConditionOrView node) -> std::optional<std::string>
             {
-                for (auto child : repository[node].conditions)
-                    if (auto result = first_exists_parameter_name(child, repository))
+                for (auto child : node.get_conditions())
+                    if (auto result = first_exists_parameter_name(child))
                         return result;
                 return std::nullopt;
             },
-            [&](ygg::Index<formalism::ConditionExists> node) -> std::optional<std::string>
+            [&](formalism::ConditionExistsView node) -> std::optional<std::string>
             {
-                const auto& exists = repository[node];
-                if (exists.parameters.empty())
+                if (node.get_parameters().empty())
                     return std::nullopt;
-                const auto variable = repository[exists.parameters.front()].variable;
-                return std::string(repository[variable].name);
+                return std::string(node.get_parameters().front().get_variable().get_name());
             },
-            [&](ygg::Index<formalism::ConditionForall> node) { return first_exists_parameter_name(repository[node].condition, repository); },
+            [&](formalism::ConditionForallView node) { return first_exists_parameter_name(node.get_condition()); },
         },
-        repository[condition].value);
+        condition.get_variant());
 }
 
 TEST(LokiCanonicalization, SortsSemanticFreeListsLexicographicallyBeforeInterning)
 {
     auto repository = formalism::Repository(0);
-    const auto p = formalism::get_or_create<formalism::Predicate>(repository, cista::offset::string("p"), ygg::IndexList<formalism::Parameter> {}).get_index();
-    const auto q = formalism::get_or_create<formalism::Predicate>(repository, cista::offset::string("q"), ygg::IndexList<formalism::Parameter> {}).get_index();
+    const auto p_predicate = formalism::get_or_create<formalism::Predicate>(repository, cista::offset::string("p"), ygg::IndexList<formalism::Parameter> {});
+    const auto q_predicate = formalism::get_or_create<formalism::Predicate>(repository, cista::offset::string("q"), ygg::IndexList<formalism::Parameter> {});
+    const auto p = p_predicate.get_index();
+    const auto q = q_predicate.get_index();
     const auto p_atom = formalism::get_or_create<formalism::Atom>(repository, p, ygg::IndexList<formalism::Term> {}).get_index();
     const auto q_atom = formalism::get_or_create<formalism::Atom>(repository, q, ygg::IndexList<formalism::Term> {}).get_index();
     const auto p_literal = formalism::get_or_create<formalism::Literal>(repository, p_atom, true).get_index();
     const auto q_literal = formalism::get_or_create<formalism::Literal>(repository, q_atom, true).get_index();
-    const auto p_condition =
-        formalism::get_or_create<formalism::Condition>(
-            repository,
-            ygg::Data<formalism::Condition>::Variant(formalism::get_or_create<formalism::ConditionLiteral>(repository, p_literal).get_index()))
-            .get_index();
-    const auto q_condition =
-        formalism::get_or_create<formalism::Condition>(
-            repository,
-            ygg::Data<formalism::Condition>::Variant(formalism::get_or_create<formalism::ConditionLiteral>(repository, q_literal).get_index()))
-            .get_index();
+    const auto p_condition_view = formalism::get_or_create<formalism::Condition>(
+        repository,
+        ygg::Data<formalism::Condition>::Variant(formalism::get_or_create<formalism::ConditionLiteral>(repository, p_literal).get_index()));
+    const auto q_condition_view = formalism::get_or_create<formalism::Condition>(
+        repository,
+        ygg::Data<formalism::Condition>::Variant(formalism::get_or_create<formalism::ConditionLiteral>(repository, q_literal).get_index()));
+    const auto p_condition = p_condition_view.get_index();
+    const auto q_condition = q_condition_view.get_index();
 
     auto first_conditions = ygg::IndexList<formalism::Condition> {};
     first_conditions.push_back(q_condition);
     first_conditions.push_back(p_condition);
-    const auto first = formalism::get_or_create<formalism::ConditionAnd>(repository, std::move(first_conditions)).get_index();
+    const auto first = formalism::get_or_create<formalism::ConditionAnd>(repository, std::move(first_conditions));
 
     auto second_conditions = ygg::IndexList<formalism::Condition> {};
     second_conditions.push_back(p_condition);
     second_conditions.push_back(q_condition);
-    const auto second = formalism::get_or_create<formalism::ConditionAnd>(repository, std::move(second_conditions)).get_index();
+    const auto second = formalism::get_or_create<formalism::ConditionAnd>(repository, std::move(second_conditions));
 
-    EXPECT_EQ(first, second);
-    ASSERT_EQ(repository[first].conditions.size(), 2);
-    EXPECT_EQ(repository[first].conditions[0], p_condition);
-    EXPECT_EQ(repository[first].conditions[1], q_condition);
+    EXPECT_TRUE(ygg::EqualTo<formalism::ConditionAndView> {}(first, second));
+    ASSERT_EQ(first.get_conditions().size(), 2);
+    EXPECT_TRUE(ygg::EqualTo<formalism::ConditionView> {}(first.get_conditions()[0], p_condition_view));
+    EXPECT_TRUE(ygg::EqualTo<formalism::ConditionView> {}(first.get_conditions()[1], q_condition_view));
 
     auto first_predicates = ygg::IndexList<formalism::Predicate> {};
     first_predicates.push_back(q);
@@ -546,8 +526,7 @@ TEST(LokiCanonicalization, SortsSemanticFreeListsLexicographicallyBeforeInternin
                                                                                                        std::move(first_predicates),
                                                                                                        ygg::IndexList<formalism::FunctionSkeleton> {},
                                                                                                        ygg::IndexList<formalism::Action> {},
-                                                                                                       ygg::IndexList<formalism::Axiom> {}))
-                                  .get_index();
+                                                                                                       ygg::IndexList<formalism::Axiom> {}));
 
     auto second_predicates = ygg::IndexList<formalism::Predicate> {};
     second_predicates.push_back(p);
@@ -560,13 +539,12 @@ TEST(LokiCanonicalization, SortsSemanticFreeListsLexicographicallyBeforeInternin
                                                                                                         std::move(second_predicates),
                                                                                                         ygg::IndexList<formalism::FunctionSkeleton> {},
                                                                                                         ygg::IndexList<formalism::Action> {},
-                                                                                                        ygg::IndexList<formalism::Axiom> {}))
-                                   .get_index();
+                                                                                                        ygg::IndexList<formalism::Axiom> {}));
 
-    EXPECT_EQ(first_domain, second_domain);
-    ASSERT_EQ(repository[first_domain].predicates.size(), 2);
-    EXPECT_EQ(repository[first_domain].predicates[0], p);
-    EXPECT_EQ(repository[first_domain].predicates[1], q);
+    EXPECT_TRUE(ygg::EqualTo<formalism::DomainView> {}(first_domain, second_domain));
+    ASSERT_EQ(first_domain.get_predicates().size(), 2);
+    EXPECT_TRUE(ygg::EqualTo<formalism::PredicateView> {}(first_domain.get_predicates()[0], p_predicate));
+    EXPECT_TRUE(ygg::EqualTo<formalism::PredicateView> {}(first_domain.get_predicates()[1], q_predicate));
 }
 
 TEST(LokiSemanticTranslator, RewritesConditionsToNegationNormalForm)
@@ -583,12 +561,11 @@ TEST(LokiSemanticTranslator, RewritesConditionsToNegationNormalForm)
     const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
-    const auto& translated_repository = translated_domain.get_context();
     ASSERT_GT(translated_domain.get_actions().size(), 0);
     for (auto action : translated_domain.get_actions())
     {
         ASSERT_TRUE(action.get_precondition().has_value());
-        EXPECT_FALSE(contains_not_or_imply(action.get_precondition().value().get_index(), translated_repository));
+        EXPECT_FALSE(contains_not_or_imply(action.get_precondition().value()));
     }
 }
 
@@ -607,14 +584,13 @@ TEST(LokiSemanticTranslator, RenamesQuantifiedVariablesDeterministically)
     const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
-    const auto& repository = translated_domain.get_context();
     ASSERT_EQ(translated_domain.get_actions().size(), 1);
     const auto action = translated_domain.get_actions()[0];
     ASSERT_EQ(action.get_parameters().size(), 2);
     EXPECT_EQ(std::string(action.get_parameters()[0].get_variable().get_name()), "x_0");
     EXPECT_EQ(std::string(action.get_parameters()[1].get_variable().get_name()), "x_1");
     ASSERT_TRUE(action.get_precondition().has_value());
-    EXPECT_FALSE(contains_exists(action.get_precondition().value().get_index(), repository));
+    EXPECT_FALSE(contains_exists(action.get_precondition().value()));
 }
 
 TEST(LokiSemanticTranslator, RenamesBeforeNegationNormalFormOnlyOnce)
@@ -658,13 +634,12 @@ TEST(LokiSemanticTranslator, RemovesUniversalQuantifiersWithDerivedAxioms)
     const auto original_axioms = domain.get_axioms().size();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
-    const auto& repository = translated_domain.get_context();
 
     EXPECT_GT(translated_domain.get_axioms().size(), original_axioms);
     ASSERT_EQ(translated_domain.get_actions().size(), 1);
     const auto action = translated_domain.get_actions()[0];
     ASSERT_TRUE(action.get_precondition().has_value());
-    EXPECT_FALSE(contains_forall(action.get_precondition().value().get_index(), repository));
+    EXPECT_FALSE(contains_forall(action.get_precondition().value()));
 }
 
 TEST(LokiSemanticTranslator, LowersNegatedExistsWithoutNegatingInnerCondition)
@@ -681,15 +656,14 @@ TEST(LokiSemanticTranslator, LowersNegatedExistsWithoutNegatingInnerCondition)
 
     const auto translation = semantic::translate(parser.get_domain());
     const auto translated_domain = translation.get_translated_domain();
-    const auto& repository = translated_domain.get_context();
     ASSERT_EQ(translated_domain.get_axioms().size(), 1);
     const auto axiom = translated_domain.get_axioms()[0];
-    EXPECT_TRUE(condition_mentions_predicate(axiom.get_condition().get_index(), repository, "p"));
-    EXPECT_TRUE(condition_mentions_predicate(axiom.get_condition().get_index(), repository, "object"));
+    EXPECT_TRUE(condition_mentions_predicate(axiom.get_condition(), "p"));
+    EXPECT_TRUE(condition_mentions_predicate(axiom.get_condition(), "object"));
     ASSERT_EQ(translated_domain.get_actions().size(), 1);
     const auto action = translated_domain.get_actions()[0];
     ASSERT_TRUE(action.get_precondition().has_value());
-    EXPECT_FALSE(contains_exists(action.get_precondition().value().get_index(), repository));
+    EXPECT_FALSE(contains_exists(action.get_precondition().value()));
 }
 
 TEST(LokiSemanticTranslator, GeneratedAxiomParametersMatchHeadPredicateArity)
@@ -706,17 +680,15 @@ TEST(LokiSemanticTranslator, GeneratedAxiomParametersMatchHeadPredicateArity)
 
     const auto translation = semantic::translate(parser.get_domain());
     const auto translated_domain = translation.get_translated_domain();
-    const auto& repository = translated_domain.get_context();
-
     ASSERT_EQ(translated_domain.get_axioms().size(), 1);
-    const auto& axiom = repository[translated_domain.get_data().axioms.front()];
-    const auto& literal = repository[axiom.head];
-    const auto& atom = repository[literal.atom];
-    const auto& predicate = repository[atom.predicate];
+    const auto axiom = translated_domain.get_axioms().front();
+    const auto literal = axiom.get_head();
+    const auto atom = literal.get_atom();
+    const auto predicate = atom.get_predicate();
 
-    EXPECT_EQ(predicate.parameters.size(), atom.terms.size());
-    EXPECT_GE(axiom.parameters.size(), atom.terms.size());
-    EXPECT_FALSE(contains_exists(axiom.condition, repository));
+    EXPECT_EQ(predicate.get_parameters().size(), atom.get_terms().size());
+    EXPECT_GE(axiom.get_parameters().size(), atom.get_terms().size());
+    EXPECT_FALSE(contains_exists(axiom.get_condition()));
 }
 
 TEST(LokiSemanticTranslator, GeneratesFreshAxiomsForIdenticalUniversalConditions)
@@ -737,20 +709,18 @@ TEST(LokiSemanticTranslator, GeneratesFreshAxiomsForIdenticalUniversalConditions
 
     const auto translation = semantic::translate(parser.get_domain(), semantic::TranslatorOptions { .remove_typing = false });
     const auto translated_domain = translation.get_translated_domain();
-    const auto& repository = translated_domain.get_context();
 
     auto generated_predicates = std::size_t {};
     auto generated_parameter_types = std::unordered_set<std::string> {};
-    for (auto predicate : translated_domain.get_data().predicates)
+    for (auto predicate : translated_domain.get_predicates())
     {
-        const auto& predicate_data = repository[predicate];
-        if (!std::string(predicate_data.name).starts_with("loki-universal-"))
+        if (!std::string(predicate.get_name()).starts_with("loki-universal-"))
             continue;
         ++generated_predicates;
-        ASSERT_EQ(predicate_data.parameters.size(), std::size_t { 1 });
-        const auto& parameter = repository[predicate_data.parameters.front()];
-        ASSERT_EQ(parameter.types.size(), std::size_t { 1 });
-        generated_parameter_types.insert(std::string(repository[parameter.types.front()].name));
+        ASSERT_EQ(predicate.get_parameters().size(), std::size_t { 1 });
+        const auto parameter = predicate.get_parameters().front();
+        ASSERT_EQ(parameter.get_types().size(), std::size_t { 1 });
+        generated_parameter_types.insert(std::string(parameter.get_types().front().get_name()));
     }
 
     EXPECT_EQ(generated_predicates, 2);
@@ -759,11 +729,10 @@ TEST(LokiSemanticTranslator, GeneratesFreshAxiomsForIdenticalUniversalConditions
     EXPECT_TRUE(generated_parameter_types.contains("right"));
     EXPECT_EQ(translated_domain.get_axioms().size(), 2);
     ASSERT_EQ(translated_domain.get_actions().size(), 2);
-    for (auto action_index : translated_domain.get_data().actions)
+    for (auto action : translated_domain.get_actions())
     {
-        const auto& action = repository[action_index];
-        ASSERT_TRUE(action.precondition.has_value());
-        EXPECT_FALSE(contains_forall(*action.precondition, repository));
+        ASSERT_TRUE(action.get_precondition().has_value());
+        EXPECT_FALSE(contains_forall(action.get_precondition().value()));
     }
 }
 
@@ -782,19 +751,17 @@ TEST(LokiSemanticTranslator, SplitsDisjunctiveActionPreconditionsAfterDnf)
     const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
-    const auto& repository = translated_domain.get_context();
 
     ASSERT_EQ(translated_domain.get_actions().size(), 2);
-    for (auto action_index : translated_domain.get_data().actions)
+    for (auto action : translated_domain.get_actions())
     {
-        const auto& action = repository[action_index];
-        ASSERT_TRUE(action.precondition.has_value());
-        EXPECT_FALSE(std::visit(
+        ASSERT_TRUE(action.get_precondition().has_value());
+        EXPECT_FALSE(ygg::visit(
             Overloaded {
-                [&](ygg::Index<formalism::ConditionOr>) { return true; },
+                [&](formalism::ConditionOrView) { return true; },
                 [&](auto) { return false; },
             },
-            repository[*action.precondition].value));
+            action.get_precondition().value().get_variant()));
     }
 }
 
@@ -813,15 +780,13 @@ TEST(LokiSemanticTranslator, MovesExistentialPreconditionVariablesToActionParame
     const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
-    const auto& repository = translated_domain.get_context();
     ASSERT_EQ(translated_domain.get_actions().size(), 1);
-    const auto action_view = translated_domain.get_actions()[0];
-    EXPECT_EQ(action_view.get_arity(), 2);
-    EXPECT_EQ(action_view.get_original_arity(), 1);
-    const auto& action = repository[translated_domain.get_data().actions.front()];
-    EXPECT_EQ(action.parameters.size(), 2);
-    ASSERT_TRUE(action.precondition.has_value());
-    EXPECT_FALSE(contains_exists(*action.precondition, repository));
+    const auto action = translated_domain.get_actions()[0];
+    EXPECT_EQ(action.get_arity(), 2);
+    EXPECT_EQ(action.get_original_arity(), 1);
+    EXPECT_EQ(action.get_parameters().size(), 2);
+    ASSERT_TRUE(action.get_precondition().has_value());
+    EXPECT_FALSE(contains_exists(action.get_precondition().value()));
 }
 
 TEST(LokiSemanticTranslator, SplitsDisjunctiveWhenEffectsAndFlattensConjunctions)
@@ -839,13 +804,12 @@ TEST(LokiSemanticTranslator, SplitsDisjunctiveWhenEffectsAndFlattensConjunctions
     const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
-    const auto& repository = translated_domain.get_context();
 
     ASSERT_EQ(translated_domain.get_actions().size(), 1);
-    const auto& action = repository[translated_domain.get_data().actions.front()];
-    ASSERT_TRUE(action.effect.has_value());
-    EXPECT_TRUE(is_effect_and(*action.effect, repository));
-    EXPECT_EQ(count_effect_when(*action.effect, repository), 4);
+    const auto action = translated_domain.get_actions().front();
+    ASSERT_TRUE(action.get_effect().has_value());
+    EXPECT_TRUE(is_effect_and(action.get_effect().value()));
+    EXPECT_EQ(count_effect_when(action.get_effect().value()), 4);
 }
 
 TEST(LokiSemanticTranslator, KeepsActionScopedEffectVariablesAfterQuantifierRenaming)
@@ -857,19 +821,17 @@ TEST(LokiSemanticTranslator, KeepsActionScopedEffectVariablesAfterQuantifierRena
 
     const auto translation = semantic::translate(parser.get_domain());
     const auto translated_domain = translation.get_translated_domain();
-    const auto& repository = translated_domain.get_context();
 
     auto found_takeoff = false;
-    for (auto action_index : translated_domain.get_data().actions)
+    for (auto action : translated_domain.get_actions())
     {
-        const auto& action = repository[action_index];
-        if (std::string(action.name) != "takeoff")
+        if (std::string(action.get_name()) != "takeoff")
             continue;
 
         found_takeoff = true;
-        ASSERT_TRUE(action.effect.has_value());
-        EXPECT_TRUE(has_top_level_effect_literal_with_terms(*action.effect, repository, "blocked", "s_0", "a_0"));
-        EXPECT_FALSE(has_top_level_effect_literal_with_terms(*action.effect, repository, "blocked", "s_2", "a_0"));
+        ASSERT_TRUE(action.get_effect().has_value());
+        EXPECT_TRUE(has_top_level_effect_literal_with_terms(action.get_effect().value(), "blocked", "s_0", "a_0"));
+        EXPECT_FALSE(has_top_level_effect_literal_with_terms(action.get_effect().value(), "blocked", "s_2", "a_0"));
     }
     EXPECT_TRUE(found_takeoff);
 }
@@ -896,18 +858,17 @@ TEST(LokiSemanticTranslator, AddsTypePredicatesAndRemovesTypingByDefault)
     const auto domain = parser.get_domain();
     const auto translation = semantic::translate(domain);
     const auto translated_domain = translation.get_translated_domain();
-    const auto& repository = translated_domain.get_context();
 
     EXPECT_TRUE(has_predicate_named(translated_domain, "thing"));
     EXPECT_TRUE(has_predicate_named(translated_domain, "object"));
-    EXPECT_FALSE(has_requirement_kind(translated_domain.get_data().requirements, formalism::RequirementKind::Typing, repository));
-    EXPECT_TRUE(translated_domain.get_data().types.empty());
+    EXPECT_FALSE(has_requirement_kind(translated_domain, formalism::RequirementKind::Typing));
+    EXPECT_TRUE(translated_domain.get_types().empty());
     ASSERT_EQ(translated_domain.get_actions().size(), 1);
-    const auto& action = repository[translated_domain.get_data().actions.front()];
-    ASSERT_EQ(action.parameters.size(), 1);
-    EXPECT_TRUE(repository[action.parameters.front()].types.empty());
-    ASSERT_TRUE(action.precondition.has_value());
-    EXPECT_TRUE(condition_mentions_predicate(*action.precondition, repository, "thing"));
+    const auto action = translated_domain.get_actions().front();
+    ASSERT_EQ(action.get_parameters().size(), 1);
+    EXPECT_TRUE(action.get_parameters().front().get_types().empty());
+    ASSERT_TRUE(action.get_precondition().has_value());
+    EXPECT_TRUE(condition_mentions_predicate(action.get_precondition().value(), "thing"));
 
     const auto task = parser.parse_task(task_source);
     const auto translated_task_result = semantic::translate(task, translation);
@@ -1007,13 +968,11 @@ TEST(LokiSemanticTranslator, GeneratedGoalPredicateAvoidsExistingNames)
     const auto translation = semantic::translate(parser.get_domain());
     const auto translated_result = semantic::translate(parser.parse_task(task_source), translation);
     const auto translated = translated_result.get_translated_task();
-    const auto& repository = translated.get_context();
-
     EXPECT_TRUE(has_predicate_named(translation.get_translated_domain(), "loki-goal-0"));
 
     auto found_generated = false;
-    for (auto predicate : translated.get_data().predicates)
-        found_generated |= std::string(repository[predicate].name) == "loki-goal-1";
+    for (auto predicate : translated.get_predicates())
+        found_generated |= std::string(predicate.get_name()) == "loki-goal-1";
 
     EXPECT_TRUE(found_generated);
 }
@@ -1093,20 +1052,18 @@ TEST(LokiSemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
     const auto task = parser.parse_task(task_source);
     const auto translated_result = semantic::translate(task, domain_translation);
     const auto translated = translated_result.get_translated_task();
-    const auto& repository = translated.get_context();
 
-    ASSERT_TRUE(translated.get_data().goal.has_value());
-    EXPECT_FALSE(contains_not_or_imply(*translated.get_data().goal, repository));
+    ASSERT_TRUE(translated.get_goal().has_value());
+    EXPECT_FALSE(contains_not_or_imply(translated.get_goal().value()));
     EXPECT_EQ(translated.get_axioms().size(), 2);
-    for (const auto axiom : translated.get_data().axioms)
+    for (auto axiom : translated.get_axioms())
     {
-        const auto condition = repository[axiom].condition;
-        const auto is_disjunction = std::visit(
+        const auto is_disjunction = ygg::visit(
             Overloaded {
-                [](ygg::Index<formalism::ConditionOr>) { return true; },
+                [](formalism::ConditionOrView) { return true; },
                 [](auto) { return false; },
             },
-            repository[condition].value);
+            axiom.get_condition().get_variant());
         EXPECT_FALSE(is_disjunction);
     }
     EXPECT_EQ(domain_translation.get_translated_domain().get_axioms().size(), original_translated_domain_axioms);
@@ -1130,13 +1087,10 @@ TEST(LokiSemanticTranslator, RenamesTaskGoalVariablesBeforeGoalSimplificationOnl
     const auto domain_translation = semantic::translate(parser.get_domain());
     const auto translated_result = semantic::translate(parser.parse_task(task_source), domain_translation);
     const auto translated = translated_result.get_translated_task();
-    const auto& repository = translated.get_context();
-
     ASSERT_EQ(translated.get_axioms().size(), 1);
-    const auto& axiom = repository[translated.get_data().axioms.front()];
-    ASSERT_EQ(axiom.parameters.size(), 1);
-    const auto variable = repository[axiom.parameters.front()].variable;
-    EXPECT_EQ(std::string(repository[variable].name), "x_0");
+    const auto axiom = translated.get_axioms().front();
+    ASSERT_EQ(axiom.get_parameters().size(), 1);
+    EXPECT_EQ(std::string(axiom.get_parameters().front().get_variable().get_name()), "x_0");
 }
 
 TEST(LokiSemanticParser, ReportsSyntaxFailureMessage)
@@ -1658,7 +1612,7 @@ TEST(LokiSemanticParser, ParsesAllSuiteCasesWithContiguousTopLevelIndices)
 
             const auto domain = parser.get_domain();
             const auto task = parser.parse_task(item.task_file);
-            EXPECT_EQ(task.get_domain().get_index(), domain.get_index());
+            EXPECT_TRUE(ygg::EqualTo<formalism::DomainView> {}(task.get_domain(), domain));
             expect_contiguous_domain_indices(domain);
             expect_contiguous_task_indices(task);
         }
@@ -1734,9 +1688,8 @@ TEST(LokiSemanticParser, ParsesAndTranslatesDistinctTasksAfterOneDomain)
 
     auto has_object = [](formalism::TaskView task, const std::string& name)
     {
-        const auto& repository = task.get_context();
-        for (auto object : task.get_data().objects)
-            if (std::string(repository[object].name) == name)
+        for (auto object : task.get_objects())
+            if (std::string(object.get_name()) == name)
                 return true;
         return false;
     };

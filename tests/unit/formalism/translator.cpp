@@ -15,18 +15,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-#include <gtest/gtest.h>
-
 #include "../benchmark_utils.hpp"
-
-#include <loki/loki.hpp>
-#include <loki/formalism/formatter.hpp>
-#include <loki/semantic/translator/copy_translator.hpp>
 
 #include <algorithm>
 #include <filesystem>
+#include <gtest/gtest.h>
 #include <limits>
+#include <loki/formalism/formatter.hpp>
+#include <loki/loki.hpp>
+#include <loki/semantic/translator/copy_translator.hpp>
 #include <memory>
 #include <optional>
 #include <sstream>
@@ -50,7 +47,6 @@ std::unordered_set<std::string> object_names(ObjectList objects)
         result.insert(std::string(object.get_name()));
     return result;
 }
-
 
 std::optional<size_t> generated_index(std::string_view name, std::string_view prefix)
 {
@@ -76,40 +72,28 @@ size_t next_universal_index(auto predicates)
     return next;
 }
 
-
 template<typename Target>
-std::size_t count_effect_nodes(ygg::Index<formalism::Effect> effect, const formalism::Repository& repository);
+std::size_t count_effect_nodes(formalism::EffectView effect);
 
 template<typename Target, typename Node>
-std::size_t count_nested_effect_nodes(const Node& node, const formalism::Repository& repository)
+std::size_t count_nested_effect_nodes(const Node& node)
 {
-    if constexpr (std::is_same_v<Node, ygg::Index<formalism::EffectAnd>>)
+    if constexpr (std::is_same_v<Node, formalism::EffectAndView> || std::is_same_v<Node, formalism::EffectOneOfView>)
     {
         auto result = std::size_t {};
-        for (auto child : repository[node].effects)
-            result += count_effect_nodes<Target>(child, repository);
+        for (auto child : node.get_effects())
+            result += count_effect_nodes<Target>(child);
         return result;
     }
-    else if constexpr (std::is_same_v<Node, ygg::Index<formalism::EffectForall>>)
+    else if constexpr (std::is_same_v<Node, formalism::EffectForallView> || std::is_same_v<Node, formalism::EffectWhenView>)
     {
-        return count_effect_nodes<Target>(repository[node].effect, repository);
+        return count_effect_nodes<Target>(node.get_effect());
     }
-    else if constexpr (std::is_same_v<Node, ygg::Index<formalism::EffectWhen>>)
-    {
-        return count_effect_nodes<Target>(repository[node].effect, repository);
-    }
-    else if constexpr (std::is_same_v<Node, ygg::Index<formalism::EffectOneOf>>)
+    else if constexpr (std::is_same_v<Node, formalism::EffectProbabilisticView>)
     {
         auto result = std::size_t {};
-        for (auto child : repository[node].effects)
-            result += count_effect_nodes<Target>(child, repository);
-        return result;
-    }
-    else if constexpr (std::is_same_v<Node, ygg::Index<formalism::EffectProbabilistic>>)
-    {
-        auto result = std::size_t {};
-        for (auto alternative : repository[node].alternatives)
-            result += count_effect_nodes<Target>(repository[alternative].effect, repository);
+        for (auto alternative : node.get_alternatives())
+            result += count_effect_nodes<Target>(alternative.get_effect());
         return result;
     }
     else
@@ -119,75 +103,54 @@ std::size_t count_nested_effect_nodes(const Node& node, const formalism::Reposit
 }
 
 template<typename Target>
-std::size_t count_effect_nodes(ygg::Index<formalism::Effect> effect, const formalism::Repository& repository)
+std::size_t count_effect_nodes(formalism::EffectView effect)
 {
-    return std::visit(
+    return ygg::visit(
         [&](const auto& node) -> std::size_t
         {
             using Node = std::decay_t<decltype(node)>;
-            auto result = count_nested_effect_nodes<Target>(node, repository);
-            if constexpr (std::is_same_v<Node, ygg::Index<Target>>)
+            auto result = count_nested_effect_nodes<Target>(node);
+            if constexpr (std::is_same_v<Node, formalism::EntityView<Target>>)
                 ++result;
             return result;
         },
-        repository[effect].value);
+        effect.get_variant());
 }
 
-
 template<typename Target>
-std::size_t count_condition_nodes(const formalism::Repository& repository)
+std::size_t count_condition_nodes(formalism::ConditionView condition)
 {
-    auto result = std::size_t {};
-    for (auto i = ygg::uint_t { 0 }; i < repository.size<formalism::Condition>(); ++i)
-    {
-        std::visit(
-            [&](const auto& node)
-            {
-                using Node = std::decay_t<decltype(node)>;
-                if constexpr (std::is_same_v<Node, ygg::Index<Target>>)
-                    ++result;
-            },
-            repository[ygg::Index<formalism::Condition>(i)].value);
-    }
-    return result;
-}
-
-
-template<typename Target>
-std::size_t count_condition_nodes(ygg::Index<formalism::Condition> condition, const formalism::Repository& repository)
-{
-    return std::visit(
+    return ygg::visit(
         [&](const auto& node) -> std::size_t
         {
             using Node = std::decay_t<decltype(node)>;
             auto result = std::size_t {};
-            if constexpr (std::is_same_v<Node, ygg::Index<Target>>)
+            if constexpr (std::is_same_v<Node, formalism::EntityView<Target>>)
             {
                 ++result;
             }
-            if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionAnd>> || std::is_same_v<Node, ygg::Index<formalism::ConditionOr>>)
+            if constexpr (std::is_same_v<Node, formalism::ConditionAndView> || std::is_same_v<Node, formalism::ConditionOrView>)
             {
-                for (auto child : repository[node].conditions)
-                    result += count_condition_nodes<Target>(child, repository);
+                for (auto child : node.get_conditions())
+                    result += count_condition_nodes<Target>(child);
             }
-            else if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionNot>>)
+            else if constexpr (std::is_same_v<Node, formalism::ConditionNotView>)
             {
-                result += count_condition_nodes<Target>(repository[node].condition, repository);
+                result += count_condition_nodes<Target>(node.get_condition());
             }
-            else if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionImply>>)
+            else if constexpr (std::is_same_v<Node, formalism::ConditionImplyView>)
             {
-                result += count_condition_nodes<Target>(repository[node].left, repository);
-                result += count_condition_nodes<Target>(repository[node].right, repository);
+                result += count_condition_nodes<Target>(node.get_left());
+                result += count_condition_nodes<Target>(node.get_right());
             }
-            else if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionExists>> || std::is_same_v<Node, ygg::Index<formalism::ConditionForall>>)
+            else if constexpr (std::is_same_v<Node, formalism::ConditionExistsView> || std::is_same_v<Node, formalism::ConditionForallView>)
             {
-                result += count_condition_nodes<Target>(repository[node].condition, repository);
+                result += count_condition_nodes<Target>(node.get_condition());
             }
             return result;
         },
-        repository[condition].value);
+        condition.get_variant());
 }
-
 
 void expect_translated_pddl_reparses(const fs::path& domain_file, const fs::path& problem_file)
 {
@@ -207,7 +170,6 @@ void expect_translated_pddl_reparses(const fs::path& domain_file, const fs::path
 
     auto reparsed = loki::Parser(domain_text);
 
-
     const auto reparsed_domain = reparsed.get_domain();
     const auto reparsed_task = reparsed.parse_task(task_text);
 
@@ -216,21 +178,19 @@ void expect_translated_pddl_reparses(const fs::path& domain_file, const fs::path
     EXPECT_EQ(reparsed_task.get_domain().get_name(), reparsed_domain.get_name());
 }
 
-} // namespace
+}  // namespace
 
 TEST(LokiTests, LokiPddlTranslatorReparseTest)
 {
     const auto first_domain_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/domain.pddl");
     LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(first_domain_file);
 
-    expect_translated_pddl_reparses(first_domain_file,
-                                    fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/test-1.pddl"));
+    expect_translated_pddl_reparses(first_domain_file, fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/test-1.pddl"));
     expect_translated_pddl_reparses(fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/domain.pddl"),
                                     fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/test-1.pddl"));
     expect_translated_pddl_reparses(fs::path(std::string(DATA_DIR) + "planning-benchmarks/profiling/ipc2023-numeric/delivery/domain.pddl"),
                                     fs::path(std::string(DATA_DIR) + "planning-benchmarks/profiling/ipc2023-numeric/delivery/pfile1.pddl"));
 }
-
 
 TEST(LokiTests, GeneratedUniversalPredicateKeepsNumericFreeVariables)
 {
@@ -262,7 +222,6 @@ TEST(LokiTests, GeneratedUniversalPredicateKeepsNumericFreeVariables)
     }
     EXPECT_TRUE(found);
 }
-
 
 TEST(LokiTests, GeneratedUniversalPredicateAvoidsExistingPredicateName)
 {
@@ -308,24 +267,22 @@ TEST(LokiTests, MultiplyConditionalEffectsSplitsActions)
 
     const auto translation = loki::translate(parser.get_domain(), options);
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
 
     auto has_conditional_effects_requirement = false;
     for (auto requirement : domain.get_requirements())
-        has_conditional_effects_requirement |= repository[requirement.get_index()].kind == formalism::RequirementKind::ConditionalEffects;
+        has_conditional_effects_requirement |= requirement.get_kind() == formalism::RequirementKind::ConditionalEffects;
     EXPECT_FALSE(has_conditional_effects_requirement);
 
     ASSERT_EQ(domain.get_actions().size(), std::size_t { 4 });
     for (auto action : domain.get_actions())
     {
-        const auto& data = repository[action.get_index()];
-        EXPECT_TRUE(std::string_view(data.name).starts_with("a_"));
-        EXPECT_EQ(std::string_view(data.original_name), "a");
-        ASSERT_TRUE(data.precondition.has_value());
-        EXPECT_EQ(count_condition_nodes<formalism::ConditionLiteral>(*data.precondition, repository), std::size_t { 3 });
-        if (data.effect)
+        EXPECT_TRUE(std::string_view(action.get_name()).starts_with("a_"));
+        EXPECT_EQ(std::string_view(action.get_original_name()), "a");
+        ASSERT_TRUE(action.get_precondition().has_value());
+        EXPECT_EQ(count_condition_nodes<formalism::ConditionLiteral>(action.get_precondition().value()), std::size_t { 3 });
+        if (const auto effect = action.get_effect())
         {
-            EXPECT_EQ(count_effect_nodes<formalism::EffectWhen>(*data.effect, repository), std::size_t { 0 });
+            EXPECT_EQ(count_effect_nodes<formalism::EffectWhen>(effect.value()), std::size_t { 0 });
         }
     }
 }
@@ -367,34 +324,19 @@ TEST(LokiTests, ExistentialConditionalEffectBecomesUniversalEffect)
     auto parser = loki::Parser(domain_source);
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
 
     for (auto predicate : domain.get_predicates())
         EXPECT_FALSE(std::string_view(predicate.get_name()).starts_with("_condition_"));
 
     ASSERT_FALSE(domain.get_actions().empty());
-    const auto& action = repository[domain.get_actions().front().get_index()];
-    ASSERT_TRUE(action.effect.has_value());
-    EXPECT_EQ(count_effect_nodes<formalism::EffectForall>(*action.effect, repository), std::size_t { 1 });
-    EXPECT_EQ(count_effect_nodes<formalism::EffectWhen>(*action.effect, repository), std::size_t { 1 });
+    const auto action = domain.get_actions().front();
+    ASSERT_TRUE(action.get_effect().has_value());
+    EXPECT_EQ(count_effect_nodes<formalism::EffectForall>(action.get_effect().value()), std::size_t { 1 });
+    EXPECT_EQ(count_effect_nodes<formalism::EffectWhen>(action.get_effect().value()), std::size_t { 1 });
 
-    auto checked_forall = false;
-    for (auto i = ygg::uint_t { 0 }; i < repository.size<formalism::EffectForall>(); ++i)
-    {
-        const auto& effect_forall = repository[ygg::Index<formalism::EffectForall>(i)];
-        std::visit(
-            [&](const auto& node)
-            {
-                using Node = std::decay_t<decltype(node)>;
-                if constexpr (std::is_same_v<Node, ygg::Index<formalism::EffectWhen>>)
-                {
-                    checked_forall = true;
-                    EXPECT_EQ(count_condition_nodes<formalism::ConditionExists>(repository[node].condition, repository), std::size_t { 0 });
-                }
-            },
-            repository[effect_forall.effect].value);
-    }
-    EXPECT_TRUE(checked_forall);
+    const auto effect_forall = action.get_effect().value().get_variant().get<ygg::Index<formalism::EffectForall>>();
+    const auto effect_when = effect_forall.get_effect().get_variant().get<ygg::Index<formalism::EffectWhen>>();
+    EXPECT_EQ(count_condition_nodes<formalism::ConditionExists>(effect_when.get_condition()), std::size_t { 0 });
 }
 
 TEST(LokiTests, NestedUniversalRemovalEliminatesGeneratedForalls)
@@ -413,14 +355,21 @@ TEST(LokiTests, NestedUniversalRemovalEliminatesGeneratedForalls)
     auto parser = loki::Parser(domain_source);
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
 
     auto num_generated_universal_predicates = std::size_t {};
     for (auto predicate : domain.get_predicates())
         if (std::string_view(predicate.get_name()).starts_with("loki-universal-"))
             ++num_generated_universal_predicates;
 
-    EXPECT_EQ(count_condition_nodes<formalism::ConditionForall>(repository), std::size_t { 0 });
+    for (auto action : domain.get_actions())
+    {
+        if (const auto precondition = action.get_precondition())
+        {
+            EXPECT_EQ(count_condition_nodes<formalism::ConditionForall>(precondition.value()), std::size_t { 0 });
+        }
+    }
+    for (auto axiom : domain.get_axioms())
+        EXPECT_EQ(count_condition_nodes<formalism::ConditionForall>(axiom.get_condition()), std::size_t { 0 });
     EXPECT_GE(num_generated_universal_predicates, std::size_t { 2 });
 }
 
@@ -441,23 +390,22 @@ TEST(LokiTests, DnfDistributesUniversalOverDisjunction)
     auto storage = std::make_shared<semantic::detail::TranslationStorage>(1);
     auto translator = semantic::detail::CopyTranslator(storage, true, semantic::TranslationPhase::ToDisjunctiveNormalForm);
     const auto domain = translator.copy_domain(parser.get_domain());
-    const auto& repository = domain.get_context();
 
     ASSERT_FALSE(domain.get_actions().empty());
-    const auto& action = repository[domain.get_actions().front().get_index()];
-    ASSERT_TRUE(action.precondition.has_value());
+    const auto action = domain.get_actions().front();
+    ASSERT_TRUE(action.get_precondition().has_value());
 
-    const auto condition_or = std::get<ygg::Index<formalism::ConditionOr>>(repository[*action.precondition].value);
-    ASSERT_EQ(repository[condition_or].conditions.size(), std::size_t { 2 });
-    for (auto condition : repository[condition_or].conditions)
+    const auto condition_or = action.get_precondition().value().get_variant().get<ygg::Index<formalism::ConditionOr>>();
+    ASSERT_EQ(condition_or.get_conditions().size(), std::size_t { 2 });
+    for (auto condition : condition_or.get_conditions())
     {
-        std::visit(
+        ygg::visit(
             [](const auto& node)
             {
                 using Node = std::decay_t<decltype(node)>;
-                EXPECT_TRUE((std::is_same_v<Node, ygg::Index<formalism::ConditionForall>>));
+                EXPECT_TRUE((std::is_same_v<Node, formalism::ConditionForallView>) );
             },
-            repository[condition].value);
+            condition.get_variant());
     }
 }
 
@@ -476,27 +424,20 @@ TEST(LokiTests, SplitDisjunctiveConditionalEffects)
     auto parser = loki::Parser(domain_source);
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
 
     ASSERT_FALSE(domain.get_actions().empty());
-    const auto& action = repository[domain.get_actions().front().get_index()];
-    ASSERT_TRUE(action.effect.has_value());
-    EXPECT_EQ(count_effect_nodes<formalism::EffectWhen>(*action.effect, repository), std::size_t { 2 });
+    const auto action = domain.get_actions().front();
+    ASSERT_TRUE(action.get_effect().has_value());
+    EXPECT_EQ(count_effect_nodes<formalism::EffectWhen>(action.get_effect().value()), std::size_t { 2 });
 
-    for (auto i = ygg::uint_t { 0 }; i < repository.size<formalism::EffectWhen>(); ++i)
+    const auto effect_and = action.get_effect().value().get_variant().get<ygg::Index<formalism::EffectAnd>>();
+    ASSERT_EQ(effect_and.get_effects().size(), std::size_t { 2 });
+    for (auto effect : effect_and.get_effects())
     {
-        const auto& effect_when = repository[ygg::Index<formalism::EffectWhen>(i)];
-        const auto& condition = repository[effect_when.condition];
-        std::visit(
-            [](const auto& node)
-            {
-                using Node = std::decay_t<decltype(node)>;
-                EXPECT_FALSE((std::is_same_v<Node, ygg::Index<formalism::ConditionOr>>));
-            },
-            condition.value);
+        const auto effect_when = effect.get_variant().get<ygg::Index<formalism::EffectWhen>>();
+        EXPECT_FALSE(effect_when.get_condition().get_variant().is<ygg::Index<formalism::ConditionOr>>());
     }
 }
-
 
 TEST(LokiTests, SplitDisjunctiveActionPreconditions)
 {
@@ -513,20 +454,18 @@ TEST(LokiTests, SplitDisjunctiveActionPreconditions)
     auto parser = loki::Parser(domain_source);
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
 
     ASSERT_EQ(domain.get_actions().size(), std::size_t { 2 });
-    for (auto action_view : domain.get_actions())
+    for (auto action : domain.get_actions())
     {
-        const auto& action = repository[action_view.get_index()];
-        ASSERT_TRUE(action.precondition.has_value());
-        std::visit(
+        ASSERT_TRUE(action.get_precondition().has_value());
+        ygg::visit(
             [](const auto& node)
             {
                 using Node = std::decay_t<decltype(node)>;
-                EXPECT_FALSE((std::is_same_v<Node, ygg::Index<formalism::ConditionOr>>));
+                EXPECT_FALSE((std::is_same_v<Node, formalism::ConditionOrView>) );
             },
-            repository[*action.precondition].value);
+            action.get_precondition().value().get_variant());
     }
 }
 
@@ -542,19 +481,17 @@ TEST(LokiTests, SplitDisjunctiveAxiomConditions)
     auto parser = loki::Parser(domain_source);
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
 
     ASSERT_EQ(domain.get_axioms().size(), std::size_t { 2 });
-    for (auto axiom_view : domain.get_axioms())
+    for (auto axiom : domain.get_axioms())
     {
-        const auto& axiom = repository[axiom_view.get_index()];
-        std::visit(
+        ygg::visit(
             [](const auto& node)
             {
                 using Node = std::decay_t<decltype(node)>;
-                EXPECT_FALSE((std::is_same_v<Node, ygg::Index<formalism::ConditionOr>>));
+                EXPECT_FALSE((std::is_same_v<Node, formalism::ConditionOrView>) );
             },
-            repository[axiom.condition].value);
+            axiom.get_condition().get_variant());
     }
 }
 
@@ -575,15 +512,12 @@ TEST(LokiTests, AggregatesNumericEffectsWithSameTarget)
     auto parser = loki::Parser(domain_source);
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
 
     ASSERT_FALSE(domain.get_actions().empty());
-    const auto& action = repository[domain.get_actions().front().get_index()];
-    ASSERT_TRUE(action.effect.has_value());
-    EXPECT_EQ(count_effect_nodes<formalism::EffectNumeric>(*action.effect, repository), std::size_t { 1 });
+    const auto action = domain.get_actions().front();
+    ASSERT_TRUE(action.get_effect().has_value());
+    EXPECT_EQ(count_effect_nodes<formalism::EffectNumeric>(action.get_effect().value()), std::size_t { 1 });
 }
-
-
 
 TEST(LokiTests, FlattenCanonicalizesDuplicateConditionsAndEffects)
 {
@@ -600,39 +534,38 @@ TEST(LokiTests, FlattenCanonicalizesDuplicateConditionsAndEffects)
     auto parser = loki::Parser(domain_source);
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
 
     ASSERT_FALSE(domain.get_actions().empty());
-    const auto& action = repository[domain.get_actions().front().get_index()];
-    ASSERT_TRUE(action.precondition.has_value());
-    ASSERT_TRUE(action.effect.has_value());
+    const auto action = domain.get_actions().front();
+    ASSERT_TRUE(action.get_precondition().has_value());
+    ASSERT_TRUE(action.get_effect().has_value());
 
     auto checked_precondition = false;
-    std::visit(
+    ygg::visit(
         [&](const auto& node)
         {
             using Node = std::decay_t<decltype(node)>;
-            if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionAnd>>)
+            if constexpr (std::is_same_v<Node, formalism::ConditionAndView>)
             {
                 checked_precondition = true;
-                EXPECT_EQ(repository[node].conditions.size(), std::size_t { 1 });
+                EXPECT_EQ(node.get_conditions().size(), std::size_t { 1 });
             }
         },
-        repository[*action.precondition].value);
+        action.get_precondition().value().get_variant());
     EXPECT_TRUE(checked_precondition);
 
     auto checked_effect = false;
-    std::visit(
+    ygg::visit(
         [&](const auto& node)
         {
             using Node = std::decay_t<decltype(node)>;
-            if constexpr (std::is_same_v<Node, ygg::Index<formalism::EffectAnd>>)
+            if constexpr (std::is_same_v<Node, formalism::EffectAndView>)
             {
                 checked_effect = true;
-                EXPECT_EQ(repository[node].effects.size(), std::size_t { 1 });
+                EXPECT_EQ(node.get_effects().size(), std::size_t { 1 });
             }
         },
-        repository[*action.effect].value);
+        action.get_effect().value().get_variant());
     EXPECT_TRUE(checked_effect);
 }
 
@@ -651,30 +584,15 @@ TEST(LokiTests, NestedConditionalEffectsAreMerged)
     auto parser = loki::Parser(domain_source);
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
 
     ASSERT_FALSE(domain.get_actions().empty());
-    const auto& action = repository[domain.get_actions().front().get_index()];
-    ASSERT_TRUE(action.effect.has_value());
-    EXPECT_EQ(count_effect_nodes<formalism::EffectWhen>(*action.effect, repository), std::size_t { 1 });
+    const auto action = domain.get_actions().front();
+    ASSERT_TRUE(action.get_effect().has_value());
+    EXPECT_EQ(count_effect_nodes<formalism::EffectWhen>(action.get_effect().value()), std::size_t { 1 });
 
-    auto checked_when = false;
-    for (auto i = ygg::uint_t { 0 }; i < repository.size<formalism::EffectWhen>(); ++i)
-    {
-        const auto& effect_when = repository[ygg::Index<formalism::EffectWhen>(i)];
-        std::visit(
-            [&](const auto& node)
-            {
-                using Node = std::decay_t<decltype(node)>;
-                if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionAnd>>)
-                {
-                    checked_when = true;
-                    EXPECT_EQ(repository[node].conditions.size(), std::size_t { 2 });
-                }
-            },
-            repository[effect_when.condition].value);
-    }
-    EXPECT_TRUE(checked_when);
+    const auto effect_when = action.get_effect().value().get_variant().get<ygg::Index<formalism::EffectWhen>>();
+    const auto condition_and = effect_when.get_condition().get_variant().get<ygg::Index<formalism::ConditionAnd>>();
+    EXPECT_EQ(condition_and.get_conditions().size(), std::size_t { 2 });
 }
 
 TEST(LokiTests, UniversalEffectDistributesOverConjunction)
@@ -693,12 +611,11 @@ TEST(LokiTests, UniversalEffectDistributesOverConjunction)
     auto parser = loki::Parser(domain_source);
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
 
     ASSERT_FALSE(domain.get_actions().empty());
-    const auto& action = repository[domain.get_actions().front().get_index()];
-    ASSERT_TRUE(action.effect.has_value());
-    EXPECT_EQ(count_effect_nodes<formalism::EffectForall>(*action.effect, repository), std::size_t { 2 });
+    const auto action = domain.get_actions().front();
+    ASSERT_TRUE(action.get_effect().has_value());
+    EXPECT_EQ(count_effect_nodes<formalism::EffectForall>(action.get_effect().value()), std::size_t { 2 });
 }
 
 TEST(LokiTests, UntypedUniversalEffectKeepsEmptyGuardWhen)
@@ -716,13 +633,12 @@ TEST(LokiTests, UntypedUniversalEffectKeepsEmptyGuardWhen)
     auto parser = loki::Parser(domain_source);
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
 
     ASSERT_FALSE(domain.get_actions().empty());
-    const auto& action = repository[domain.get_actions().front().get_index()];
-    ASSERT_TRUE(action.effect.has_value());
-    EXPECT_EQ(count_effect_nodes<formalism::EffectForall>(*action.effect, repository), std::size_t { 1 });
-    EXPECT_EQ(count_effect_nodes<formalism::EffectWhen>(*action.effect, repository), std::size_t { 1 });
+    const auto action = domain.get_actions().front();
+    ASSERT_TRUE(action.get_effect().has_value());
+    EXPECT_EQ(count_effect_nodes<formalism::EffectForall>(action.get_effect().value()), std::size_t { 1 });
+    EXPECT_EQ(count_effect_nodes<formalism::EffectWhen>(action.get_effect().value()), std::size_t { 1 });
 }
 
 TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
@@ -754,8 +670,7 @@ TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
     for (auto predicate : translated_task.get_predicates())
     {
         const auto name = std::string(predicate.get_name());
-        if ((generated_index(name, "loki-universal-") || generated_index(name, "loki-goal-"))
-            && !domain_generated_names.contains(name))
+        if ((generated_index(name, "loki-universal-") || generated_index(name, "loki-goal-")) && !domain_generated_names.contains(name))
         {
             has_task_generated_name = true;
         }
@@ -764,9 +679,6 @@ TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
     EXPECT_EQ(translated_task.get_domain().get_predicates().size(), translated_domain_predicates);
     EXPECT_TRUE(has_task_generated_name);
 }
-
-
-
 
 TEST(LokiTests, SimplifiedTaskGoalAddsDerivedRequirement)
 {
@@ -789,13 +701,11 @@ TEST(LokiTests, SimplifiedTaskGoalAddsDerivedRequirement)
     const auto domain_translation = loki::translate(parser.get_domain());
     const auto task_translation = loki::translate(parser.parse_task(task_source), domain_translation);
     const auto task = task_translation.get_translated_task();
-    const auto& repository = task.get_context();
-
     ASSERT_FALSE(task.get_axioms().empty());
     auto has_derived_requirement = false;
     for (auto requirement : task.get_requirements())
     {
-        if (repository[requirement.get_index()].kind == formalism::RequirementKind::DerivedPredicates)
+        if (requirement.get_kind() == formalism::RequirementKind::DerivedPredicates)
         {
             has_derived_requirement = true;
             break;
@@ -820,13 +730,11 @@ TEST(LokiTests, ExistingDomainAxiomsAddDerivedRequirement)
     auto parser = loki::Parser(domain_source);
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
-
     ASSERT_FALSE(domain.get_axioms().empty());
     auto has_derived_requirement = false;
     for (auto requirement : domain.get_requirements())
     {
-        if (repository[requirement.get_index()].kind == formalism::RequirementKind::DerivedPredicates)
+        if (requirement.get_kind() == formalism::RequirementKind::DerivedPredicates)
         {
             has_derived_requirement = true;
             break;
@@ -852,35 +760,34 @@ TEST(LokiTests, KeepTypingPreservesPersistentParameters)
     auto parser = loki::Parser(domain_source);
     const auto translation = loki::translate(parser.get_domain(), loki::TranslatorOptions { .remove_typing = false });
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
 
     ASSERT_FALSE(domain.get_types().empty());
 
     auto has_typing_requirement = false;
     for (auto requirement : domain.get_requirements())
-        has_typing_requirement |= repository[requirement.get_index()].kind == formalism::RequirementKind::Typing;
+        has_typing_requirement |= requirement.get_kind() == formalism::RequirementKind::Typing;
     EXPECT_TRUE(has_typing_requirement);
 
     for (auto predicate : domain.get_predicates())
     {
         if (std::string(predicate.get_name()) == "thing")
             continue;
-        for (auto parameter : repository[predicate.get_index()].parameters)
-            EXPECT_FALSE(repository[parameter].types.empty());
+        for (auto parameter : predicate.get_parameters())
+            EXPECT_FALSE(parameter.get_types().empty());
     }
 
     for (auto function : domain.get_functions())
     {
-        for (auto parameter : repository[function.get_index()].parameters)
-            EXPECT_FALSE(repository[parameter].types.empty());
+        for (auto parameter : function.get_parameters())
+            EXPECT_FALSE(parameter.get_types().empty());
     }
 
     for (auto action : domain.get_actions())
     {
-        for (auto parameter : repository[action.get_index()].parameters)
-            EXPECT_FALSE(repository[parameter].types.empty());
-        ASSERT_TRUE(repository[action.get_index()].precondition.has_value());
-        EXPECT_GT(count_condition_nodes<formalism::ConditionLiteral>(repository), std::size_t { 1 });
+        for (auto parameter : action.get_parameters())
+            EXPECT_FALSE(parameter.get_types().empty());
+        ASSERT_TRUE(action.get_precondition().has_value());
+        EXPECT_GT(count_condition_nodes<formalism::ConditionLiteral>(action.get_precondition().value()), std::size_t { 1 });
     }
 }
 
@@ -901,26 +808,24 @@ TEST(LokiTests, RemoveTypingStripsPersistentParameters)
     auto parser = loki::Parser(domain_source);
     const auto translation = loki::translate(parser.get_domain(), loki::TranslatorOptions { .remove_typing = true });
     const auto domain = translation.get_translated_domain();
-    const auto& repository = domain.get_context();
-
     EXPECT_TRUE(domain.get_types().empty());
 
     for (auto predicate : domain.get_predicates())
     {
-        for (auto parameter : repository[predicate.get_index()].parameters)
-            EXPECT_TRUE(repository[parameter].types.empty());
+        for (auto parameter : predicate.get_parameters())
+            EXPECT_TRUE(parameter.get_types().empty());
     }
 
     for (auto function : domain.get_functions())
     {
-        for (auto parameter : repository[function.get_index()].parameters)
-            EXPECT_TRUE(repository[parameter].types.empty());
+        for (auto parameter : function.get_parameters())
+            EXPECT_TRUE(parameter.get_types().empty());
     }
 
     for (auto action : domain.get_actions())
     {
-        for (auto parameter : repository[action.get_index()].parameters)
-            EXPECT_TRUE(repository[parameter].types.empty());
+        for (auto parameter : action.get_parameters())
+            EXPECT_TRUE(parameter.get_types().empty());
     }
 }
 
@@ -941,45 +846,41 @@ TEST(LokiTests, RenameQuantifiedVariablesSeparatesNestedBinders)
     auto storage = std::make_shared<semantic::detail::TranslationStorage>(1);
     auto translator = semantic::detail::CopyTranslator(storage, true, semantic::TranslationPhase::RenameQuantifiedVariables);
     const auto domain = translator.copy_domain(parser.get_domain());
-    const auto& repository = domain.get_context();
-
-    const auto variable_name = [&](ygg::Index<formalism::Parameter> parameter) {
-        return std::string(repository[repository[parameter].variable].name);
-    };
+    const auto variable_name = [](formalism::ParameterView parameter) { return std::string(parameter.get_variable().get_name()); };
 
     ASSERT_FALSE(domain.get_actions().empty());
-    const auto& action = repository[domain.get_actions().front().get_index()];
-    ASSERT_EQ(action.parameters.size(), std::size_t { 1 });
-    EXPECT_EQ(variable_name(action.parameters.front()), "x_0");
+    const auto action = domain.get_actions().front();
+    ASSERT_EQ(action.get_parameters().size(), std::size_t { 1 });
+    EXPECT_EQ(variable_name(action.get_parameters().front()), "x_0");
 
-    ASSERT_TRUE(action.precondition.has_value());
-    const auto exists = std::get<ygg::Index<formalism::ConditionExists>>(repository[*action.precondition].value);
-    ASSERT_EQ(repository[exists].parameters.size(), std::size_t { 1 });
-    EXPECT_EQ(variable_name(repository[exists].parameters.front()), "x_1");
+    ASSERT_TRUE(action.get_precondition().has_value());
+    const auto exists = action.get_precondition().value().get_variant().get<ygg::Index<formalism::ConditionExists>>();
+    ASSERT_EQ(exists.get_parameters().size(), std::size_t { 1 });
+    EXPECT_EQ(variable_name(exists.get_parameters().front()), "x_1");
 
-    const auto conjunction = std::get<ygg::Index<formalism::ConditionAnd>>(repository[repository[exists].condition].value);
+    const auto conjunction = exists.get_condition().get_variant().get<ygg::Index<formalism::ConditionAnd>>();
     auto checked_forall = false;
-    for (auto child : repository[conjunction].conditions)
+    for (auto child : conjunction.get_conditions())
     {
-        std::visit(
+        ygg::visit(
             [&](const auto& node)
             {
                 using Node = std::decay_t<decltype(node)>;
-                if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionForall>>)
+                if constexpr (std::is_same_v<Node, formalism::ConditionForallView>)
                 {
                     checked_forall = true;
-                    ASSERT_EQ(repository[node].parameters.size(), std::size_t { 1 });
-                    EXPECT_EQ(variable_name(repository[node].parameters.front()), "x_2");
+                    ASSERT_EQ(node.get_parameters().size(), std::size_t { 1 });
+                    EXPECT_EQ(variable_name(node.get_parameters().front()), "x_2");
                 }
             },
-            repository[child].value);
+            child.get_variant());
     }
     EXPECT_TRUE(checked_forall);
 
-    ASSERT_TRUE(action.effect.has_value());
-    const auto effect_forall = std::get<ygg::Index<formalism::EffectForall>>(repository[*action.effect].value);
-    ASSERT_EQ(repository[effect_forall].parameters.size(), std::size_t { 1 });
-    EXPECT_EQ(variable_name(repository[effect_forall].parameters.front()), "x_3");
+    ASSERT_TRUE(action.get_effect().has_value());
+    const auto effect_forall = action.get_effect().value().get_variant().get<ygg::Index<formalism::EffectForall>>();
+    ASSERT_EQ(effect_forall.get_parameters().size(), std::size_t { 1 });
+    EXPECT_EQ(variable_name(effect_forall.get_parameters().front()), "x_3");
 }
 
 TEST(LokiTests, LokiPddlTranslatorTest)
@@ -990,7 +891,6 @@ TEST(LokiTests, LokiPddlTranslatorTest)
     LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(problem_file);
 
     auto parser = loki::Parser(domain_file);
-
 
     const auto domain = parser.get_domain();
     const auto problem = parser.parse_task(problem_file);
@@ -1026,4 +926,4 @@ TEST(LokiTests, LokiPddlTranslatorTest)
     }
 }
 
-} // namespace loki::tests
+}  // namespace loki::tests
