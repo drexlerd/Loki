@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2024-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include "module.hpp"
 
 #include "data.hpp"
@@ -5,8 +22,7 @@
 #include "view.hpp"
 
 #include <filesystem>
-#include <loki/formalism/formatter.hpp>
-#include <loki/semantic.hpp>
+#include <loki/loki.hpp>
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/filesystem.h>
 #include <nanobind/stl/shared_ptr.h>
@@ -66,12 +82,29 @@ void bind_semantic(nb::module_& m)
         .def_rw("remove_typing", &semantic::TranslatorOptions::remove_typing, "Remove type annotations during translation.");
 
     nb::class_<semantic::Parser>(m, "Parser", "Parse a PDDL domain once and parse matching tasks against it.")
-        .def(nb::init<const std::string&, parser::ParserOptions>(), "domain_source"_a, "options"_a = parser::ParserOptions {}, "Parse a PDDL domain from a source string.")
-        .def(nb::init<const std::filesystem::path&, parser::ParserOptions>(), "domain_path"_a, "options"_a = parser::ParserOptions {}, "Parse a PDDL domain from a filesystem path.")
+        .def(nb::init<const std::string&, parser::ParserOptions>(),
+             "domain_source"_a,
+             "options"_a = parser::ParserOptions {},
+             "Parse a PDDL domain from a source string.")
+        .def(nb::init<const std::filesystem::path&, parser::ParserOptions>(),
+             "domain_path"_a,
+             "options"_a = parser::ParserOptions {},
+             "Parse a PDDL domain from a filesystem path.")
         .def("domain", &semantic::Parser::get_domain, nb::keep_alive<0, 1>(), "Return the parsed domain view.")
-        .def("repository", nb::overload_cast<>(&semantic::Parser::repository), nb::rv_policy::reference_internal, "Return the repository that owns parsed domain and task objects.")
-        .def("parse_task", nb::overload_cast<const std::string&>(&semantic::Parser::parse_task), "source"_a, nb::keep_alive<0, 1>(), "Parse a PDDL problem from a source string using this parser domain.")
-        .def("parse_task", nb::overload_cast<const std::filesystem::path&>(&semantic::Parser::parse_task), "path"_a, nb::keep_alive<0, 1>(), "Parse a PDDL problem from a filesystem path using this parser domain.");
+        .def("repository",
+             nb::overload_cast<>(&semantic::Parser::repository),
+             nb::rv_policy::reference_internal,
+             "Return the repository that owns parsed domain and task objects.")
+        .def("parse_task",
+             nb::overload_cast<const std::string&>(&semantic::Parser::parse_task),
+             "source"_a,
+             nb::keep_alive<0, 1>(),
+             "Parse a PDDL problem from a source string using this parser domain.")
+        .def("parse_task",
+             nb::overload_cast<const std::filesystem::path&>(&semantic::Parser::parse_task),
+             "path"_a,
+             nb::keep_alive<0, 1>(),
+             "Parse a PDDL problem from a filesystem path using this parser domain.");
 
     nb::class_<semantic::DomainTranslationResult>(m, "DomainTranslationResult", "Owns the original and translated domain views produced by translate_domain.")
         .def_prop_ro("original_domain", &semantic::DomainTranslationResult::get_original_domain, nb::keep_alive<0, 1>())
@@ -83,25 +116,22 @@ void bind_semantic(nb::module_& m)
         .def_prop_ro("translated_task", &semantic::ProblemTranslationResult::get_translated_task, nb::keep_alive<0, 1>())
         .def("repository", nb::overload_cast<>(&semantic::ProblemTranslationResult::get_repository), nb::rv_policy::reference_internal);
 
-    m.def(
-        "translate_domain",
-        [](DomainView domain, const semantic::TranslatorOptions& options) { return semantic::translate(domain, options); },
-        "domain"_a,
-        "options"_a = semantic::TranslatorOptions {},
-        nb::keep_alive<0, 1>(),
-        "Translate and normalize a parsed domain.");
-    m.def(
-        "translate_task",
-        [](TaskView task, const semantic::DomainTranslationResult& domain_translation, const semantic::TranslatorOptions& options)
-        { return semantic::translate(task, domain_translation, options); },
-        "task"_a,
-        "domain_translation"_a,
-        "options"_a = semantic::TranslatorOptions {},
-        nb::keep_alive<0, 1>(),
-        nb::keep_alive<0, 2>(),
-        "Translate and normalize a parsed task with a matching domain translation.");
-    m.def("format_domain", [](DomainView domain) { return format::domain(domain); }, "domain"_a, "Format a domain view as reparseable PDDL text.");
-    m.def("format_task", [](TaskView task) { return format::task(task); }, "task"_a, "Format a task view as reparseable PDDL text.");
+    m.def("translate_domain",
+          &::loki::translate_domain,
+          "domain"_a,
+          "options"_a = semantic::TranslatorOptions {},
+          nb::keep_alive<0, 1>(),
+          "Translate and normalize a parsed domain.");
+    m.def("translate_task",
+          &::loki::translate_task,
+          "task"_a,
+          "domain_translation"_a,
+          "options"_a = semantic::TranslatorOptions {},
+          nb::keep_alive<0, 1>(),
+          nb::keep_alive<0, 2>(),
+          "Translate and normalize a parsed task with a matching domain translation.");
+    m.def("format_domain", &::loki::format_domain, "domain"_a, "Format a domain view as reparseable PDDL text.");
+    m.def("format_task", &::loki::format_task, "task"_a, "Format a task view as reparseable PDDL text.");
 }
 
 }  // namespace

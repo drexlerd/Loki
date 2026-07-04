@@ -28,7 +28,7 @@ def test_parser_binding_parses_domain_and_task():
     )
 
     assert domain.get_name() == "py-gripper"
-    assert domain.get_num_actions() == 1
+    assert len(domain.get_actions()) == 1
     assert [action.get_name() for action in domain.get_actions()] == ["move"]
     assert domain.get_predicates()[0].get_parameters()[0].get_variable().get_name() == "x"
     assert task.get_name() == "py-gripper-task"
@@ -87,7 +87,7 @@ def test_format_bindings_emit_reparseable_pddl():
 
     assert reparsed.domain().get_name() == parser.domain().get_name()
     assert reparsed_task.get_name() == task.get_name()
-    assert reparsed_task.has_metric()
+    assert reparsed_task.get_metric() is not None
 
 
 def test_parser_views_keep_temporary_parser_alive():
@@ -251,7 +251,6 @@ def test_translation_bindings_return_translated_views():
     temporary_translated_task = pypddl.translate_task(task, domain_translation, options).translated_task
 
     assert domain_translation.original_domain.get_name() == "py-translate"
-    assert domain_translation.translated_domain.get_num_actions() >= 1
     assert len(domain_translation.translated_domain.get_actions()) >= 1
     assert problem_translation.original_task.get_name() == "py-translate-task"
     assert problem_translation.translated_task.get_domain().get_name() == domain_translation.translated_domain.get_name()
@@ -280,18 +279,18 @@ def test_translator_options_control_typing_removal():
     kept = pypddl.translate_domain(parser.domain(), keep_typing).translated_domain
     stripped = pypddl.translate_domain(parser.domain()).translated_domain
 
-    assert kept.get_num_types() > 0
-    assert stripped.get_num_types() == 0
+    assert len(kept.get_types()) > 0
+    assert len(stripped.get_types()) == 0
 
     for predicate in kept.get_predicates():
         if predicate.get_name() == "thing":
             continue
         for parameter in predicate.get_parameters():
-            assert parameter.get_num_types() > 0
+            assert len(parameter.get_types()) > 0
 
     for predicate in stripped.get_predicates():
         for parameter in predicate.get_parameters():
-            assert parameter.get_num_types() == 0
+            assert len(parameter.get_types()) == 0
 
 
 def test_repository_factory_binding_creates_repositories():
@@ -299,6 +298,13 @@ def test_repository_factory_binding_creates_repositories():
     repository = factory.create()
 
     assert isinstance(repository, pypddl.Repository)
+
+
+def test_repository_init_creates_repository():
+    repository = pypddl.Repository()
+    view = repository.get_or_create(pypddl.TypeBuilder("direct-repository"))
+
+    assert view.get_name() == "direct-repository"
 
 
 def test_repository_view_keeps_temporary_repository_alive():
@@ -349,7 +355,7 @@ def build(repository, builder):
 
 def make_literal(repository, predicate, terms, positive=True):
     atom = build(repository, pypddl.AtomBuilder(predicate, list(terms)))
-    return build(repository, pypddl.LiteralBuilder(positive, atom))
+    return build(repository, pypddl.LiteralBuilder(atom, positive))
 
 
 def make_condition(repository, predicate, terms, positive=True):
@@ -378,8 +384,7 @@ def make_number_expression(repository, value):
 
 
 def test_builders_expose_defaulted_mutable_fields():
-    factory = pypddl.RepositoryFactory()
-    repository = factory.create()
+    repository = pypddl.Repository()
 
     object_type = build(repository, pypddl.TypeBuilder("object"))
     variable = build(repository, pypddl.VariableBuilder("x"))
@@ -444,21 +449,22 @@ def test_builders_expose_defaulted_mutable_fields():
     task = build(repository, task_builder)
 
     assert action.get_name() == "mutated-action"
-    assert action.get_num_parameters() == 1
-    assert action.has_precondition()
-    assert action.has_effect()
+    assert len(action.get_parameters()) == 1
+    assert action.get_arity() == 1
+    assert action.get_original_arity() == 1
+    assert action.get_precondition() is not None
+    assert action.get_effect() is not None
     assert domain.get_name() == "mutated-domain"
-    assert domain.get_num_types() == 1
-    assert domain.get_num_predicates() == 1
-    assert domain.get_num_actions() == 1
+    assert len(domain.get_types()) == 1
+    assert len(domain.get_predicates()) == 1
+    assert len(domain.get_actions()) == 1
     assert task.get_name() == "mutated-task"
     assert task.get_domain() == domain
-    assert task.has_goal()
+    assert task.get_goal() is not None
 
 
 def test_repository_constructs_domain_and_task_programmatically():
-    factory = pypddl.RepositoryFactory()
-    repository = factory.create()
+    repository = pypddl.Repository()
     strips = build(repository, pypddl.RequirementBuilder(pypddl.RequirementKind.Strips))
     object_type = build(repository, pypddl.TypeBuilder("object"))
     ball = build(repository, pypddl.ObjectBuilder("ball", [object_type]))
@@ -484,44 +490,44 @@ def test_repository_constructs_domain_and_task_programmatically():
     task = build(repository, pypddl.TaskBuilder("programmatic-task", domain))
 
     assert domain.get_name() == "programmatic"
-    assert domain.get_num_requirements() == 1
-    assert domain.get_num_types() == 1
-    assert domain.get_num_constants() == 1
-    assert domain.get_num_predicates() == 1
-    assert domain.get_num_actions() == 1
+    assert len(domain.get_requirements()) == 1
+    assert len(domain.get_types()) == 1
+    assert len(domain.get_constants()) == 1
+    assert len(domain.get_predicates()) == 1
+    assert len(domain.get_actions()) == 1
     assert [action.get_name() for action in domain.get_actions()] == ["pick"]
     assert domain.get_types()[0].get_name() == "object"
-    assert domain.get_types()[0].get_num_bases() == 0
+    assert len(domain.get_types()[0].get_bases()) == 0
     assert domain.get_constants()[0].get_name() == "ball"
-    assert domain.get_constants()[0].get_num_types() == 1
+    assert len(domain.get_constants()[0].get_types()) == 1
     assert predicate.get_name() == "holding"
-    assert predicate.get_num_parameters() == 1
+    assert predicate.get_arity() == 1
+    assert len(predicate.get_parameters()) == 1
     assert predicate.get_parameters()[0].get_variable().get_name() == "x"
-    assert predicate.get_parameters()[0].get_num_types() == 1
-    assert literal.is_positive()
+    assert len(predicate.get_parameters()[0].get_types()) == 1
+    assert literal.get_polarity()
     assert literal.get_atom().get_predicate().get_name() == "holding"
-    assert literal.get_atom().get_num_terms() == 1
+    assert len(literal.get_atom().get_terms()) == 1
     assert int(precondition.get_index()) >= 0
     assert int(effect.get_index()) >= 0
-    assert action.has_precondition()
     assert action.get_precondition() is not None
-    assert action.has_effect()
+    assert action.get_precondition() is not None
+    assert action.get_effect() is not None
     assert action.get_effect() is not None
     assert task.get_name() == "programmatic-task"
     assert task.get_domain().get_name() == domain.get_name()
-    assert task.get_num_requirements() == 0
-    assert task.get_num_objects() == 0
-    assert task.get_num_initial_literals() == 0
-    assert task.get_num_initial_function_values() == 0
-    assert task.get_num_predicates() == 0
-    assert task.get_num_axioms() == 0
-    assert not task.has_goal()
-    assert not task.has_metric()
+    assert len(task.get_requirements()) == 0
+    assert len(task.get_objects()) == 0
+    assert len(task.get_initial_literals()) == 0
+    assert len(task.get_initial_function_values()) == 0
+    assert len(task.get_predicates()) == 0
+    assert len(task.get_axioms()) == 0
+    assert task.get_goal() is None
+    assert task.get_metric() is None
 
 
 def test_repository_constructs_numeric_function_task_bits():
-    factory = pypddl.RepositoryFactory()
-    repository = factory.create()
+    repository = pypddl.Repository()
     numeric = build(repository, pypddl.RequirementBuilder(pypddl.RequirementKind.NumericFluents))
     object_type = build(repository, pypddl.TypeBuilder("object"))
     number_type = build(repository, pypddl.TypeBuilder("number"))
@@ -563,17 +569,18 @@ def test_repository_constructs_numeric_function_task_bits():
     )
 
     assert domain.get_functions()[0].get_name() == "fuel"
-    assert domain.get_functions()[0].get_num_parameters() == 1
+    assert domain.get_functions()[0].get_arity() == 1
+    assert len(domain.get_functions()[0].get_parameters()) == 1
     assert domain.get_functions()[0].get_type().get_name() == "number"
     assert task.get_initial_function_values()[0].get_function().get_function().get_name() == "fuel"
-    assert task.get_initial_function_values()[0].get_function().get_num_terms() == 1
+    assert len(task.get_initial_function_values()[0].get_function().get_terms()) == 1
     assert condition.get_variant().get_comparator() == pypddl.BinaryComparator.GreaterEqual
     assert condition.get_variant().get_left().get_variant().get_value() == 0.0
     assert condition.get_variant().get_right().get_variant().get_value() == 0.0
     assert effect.get_variant().get_operator() == pypddl.NumericEffectOperator.Assign
     assert effect.get_variant().get_expression().get_variant().get_value() == 1.0
-    assert task.has_goal()
-    assert task.has_metric()
+    assert task.get_goal() is not None
+    assert task.get_metric() is not None
     assert task.get_metric().is_minimize()
     assert task.get_metric().get_expression().get_variant().get_value() == 1.0
 
@@ -809,17 +816,16 @@ def test_recursive_variant_views_are_inspectable():
     action = domain.get_actions()[0]
     assert isinstance(action.get_precondition().get_value(), pypddl.ConditionOr)
     assert action.get_precondition().get_value() == action.get_precondition().get_variant()
-    assert action.get_precondition().get_variant().get_num_conditions() == 2
+    assert len(action.get_precondition().get_variant().get_conditions()) == 2
     assert [type(child.get_variant()) for child in action.get_precondition().get_variant().get_conditions()] == [pypddl.ConditionLiteral, pypddl.ConditionLiteral]
     assert isinstance(action.get_effect().get_value(), pypddl.EffectAnd)
     assert action.get_effect().get_value() == action.get_effect().get_variant()
-    assert action.get_effect().get_variant().get_num_effects() == 1
+    assert len(action.get_effect().get_variant().get_effects()) == 1
     assert isinstance(action.get_effect().get_variant().get_effects()[0].get_variant(), pypddl.EffectWhen)
 
 
 def test_numeric_expression_variant_views_are_inspectable():
-    factory = pypddl.RepositoryFactory()
-    repository = factory.create()
+    repository = pypddl.Repository()
     number = make_number_expression(repository, 2.0)
 
     assert isinstance(number.get_value(), pypddl.FunctionExpressionNumber)
@@ -828,8 +834,7 @@ def test_numeric_expression_variant_views_are_inspectable():
 
 
 def test_repository_exposes_recursive_constructors_and_accessors():
-    factory = pypddl.RepositoryFactory()
-    repository = factory.create()
+    repository = pypddl.Repository()
     object_type = build(repository, pypddl.TypeBuilder("object"))
     number_type = build(repository, pypddl.TypeBuilder("number"))
     variable = build(repository, pypddl.VariableBuilder("x"))
@@ -881,34 +886,34 @@ def test_repository_exposes_recursive_constructors_and_accessors():
     task = build(repository, pypddl.TaskBuilder("full-builder-task", domain, goal=condition_forall, axioms=[axiom]))
 
     assert isinstance(condition_forall.get_variant(), pypddl.ConditionForall)
-    assert condition_forall.get_variant().get_num_parameters() == 1
+    assert len(condition_forall.get_variant().get_parameters()) == 1
     assert condition_imply.get_variant().get_left() == base_condition
     assert condition_imply.get_variant().get_right() == condition_or
     assert isinstance(condition_exists.get_variant(), pypddl.ConditionExists)
-    assert condition_exists.get_variant().get_num_parameters() == 1
+    assert len(condition_exists.get_variant().get_parameters()) == 1
     assert isinstance(condition_or.get_variant(), pypddl.ConditionOr)
-    assert condition_or.get_variant().get_num_conditions() == len(condition_or.get_variant().get_conditions())
     assert isinstance(condition_and.get_variant(), pypddl.ConditionAnd)
-    assert condition_and.get_variant().get_num_conditions() == len(condition_and.get_variant().get_conditions())
     assert isinstance(effect_forall.get_variant(), pypddl.EffectForall)
-    assert effect_forall.get_variant().get_num_parameters() == 1
+    assert len(effect_forall.get_variant().get_parameters()) == 1
     assert isinstance(effect_one_of.get_variant(), pypddl.EffectOneOf)
-    assert effect_one_of.get_variant().get_num_effects() == 2
+    assert len(effect_one_of.get_variant().get_effects()) == 2
     assert isinstance(effect_probabilistic.get_variant(), pypddl.EffectProbabilistic)
-    assert effect_probabilistic.get_variant().get_num_alternatives() == 2
+    assert len(effect_probabilistic.get_variant().get_alternatives()) == 2
     assert isinstance(numeric_effect.get_variant(), pypddl.EffectNumeric)
     assert numeric_effect.get_variant().get_operator() == pypddl.NumericEffectOperator.Assign
-    assert numeric_effect.get_variant().get_num_terms() == 1
+    assert len(numeric_effect.get_variant().get_terms()) == 1
     assert isinstance(unary.get_variant(), pypddl.UnaryFunctionExpression)
     assert unary.get_variant().get_operator() == pypddl.UnaryArithmeticOperator.Minus
     assert isinstance(binary.get_variant(), pypddl.BinaryFunctionExpression)
     assert binary.get_variant().get_operator() == pypddl.BinaryArithmeticOperator.Add
     assert isinstance(multi.get_variant(), pypddl.MultiFunctionExpression)
     assert multi.get_variant().get_operator() == pypddl.MultiArithmeticOperator.Add
-    assert multi.get_variant().get_num_expressions() == 2
+    assert len(multi.get_variant().get_expressions()) == 2
     assert len(effect_probabilistic.get_variant().get_alternatives()) == 2
     assert effect_probabilistic.get_variant().get_alternatives()[0].get_probability() == 0.4
-    assert domain.get_axioms()[0].get_num_parameters() == 1
+    assert domain.get_axioms()[0].get_arity() == 1
+    assert domain.get_axioms()[0].get_original_arity() == 1
+    assert len(domain.get_axioms()[0].get_parameters()) == 1
     assert isinstance(domain.get_axioms()[0].get_condition().get_variant(), pypddl.ConditionForall)
     assert isinstance(task.get_goal().get_variant(), pypddl.ConditionForall)
 

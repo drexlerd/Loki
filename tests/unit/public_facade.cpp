@@ -1,11 +1,20 @@
 /*
- * Copyright (C) 2026 Dominik Drexler
+ * Copyright (C) 2024-2026 Dominik Drexler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 #include <gtest/gtest.h>
 #include <loki/formalism/formatter.hpp>
@@ -55,18 +64,18 @@ TEST(LokiPublicFacade, ExposesParserAndTranslatorThroughLokiNamespace)
     const auto named_domain_translation = loki::translate_domain(domain);
     const auto named_task_translation = loki::translate_task(task, named_domain_translation);
 
-    EXPECT_EQ(domain.get_num_requirements(), 1);
-    EXPECT_EQ(domain.get_num_predicates(), 1);
-    EXPECT_EQ(domain.get_num_actions(), 1);
+    EXPECT_EQ(domain.get_requirements().size(), 1);
+    EXPECT_EQ(domain.get_predicates().size(), 1);
+    EXPECT_EQ(domain.get_actions().size(), 1);
 
     const auto action = domain.get_actions()[0];
-    EXPECT_EQ(action.get_num_parameters(), 0);
-    EXPECT_TRUE(action.has_precondition());
-    EXPECT_TRUE(action.has_effect());
+    EXPECT_EQ(action.get_parameters().size(), 0);
+    EXPECT_TRUE(action.get_precondition().has_value());
+    EXPECT_TRUE(action.get_effect().has_value());
 
-    EXPECT_EQ(task.get_num_initial_literals(), 1);
-    EXPECT_TRUE(task.has_goal());
-    EXPECT_FALSE(task.has_metric());
+    EXPECT_EQ(task.get_initial_literals().size(), 1);
+    EXPECT_TRUE(task.get_goal().has_value());
+    EXPECT_FALSE(task.get_metric().has_value());
 
     EXPECT_EQ(domain_translation.get_original_domain().get_name(), domain.get_name());
     EXPECT_EQ(task_translation.get_original_task().get_name(), task.get_name());
@@ -191,36 +200,36 @@ TEST(LokiPublicFacade, ViewConvenienceMethodsCoverTypedSymbolsAndLiterals)
           (:goal (ready item-1)))
     )" });
 
-    ASSERT_GE(domain.get_num_types(), 2);
+    ASSERT_GE(domain.get_types().size(), 2);
     auto saw_item_type = false;
     for (const auto type : domain.get_types())
     {
         if (type.get_name() == "item")
         {
             saw_item_type = true;
-            EXPECT_EQ(type.get_num_bases(), 1);
+            EXPECT_EQ(type.get_bases().size(), 1);
             EXPECT_EQ(type.get_bases()[0].get_name(), "base");
         }
     }
     EXPECT_TRUE(saw_item_type);
 
-    ASSERT_EQ(domain.get_num_predicates(), 1);
+    ASSERT_EQ(domain.get_predicates().size(), 1);
     const auto predicate = domain.get_predicates()[0];
-    ASSERT_EQ(predicate.get_num_parameters(), 1);
-    EXPECT_EQ(predicate.get_parameters()[0].get_num_types(), 1);
+    ASSERT_EQ(predicate.get_parameters().size(), 1);
+    EXPECT_EQ(predicate.get_parameters()[0].get_types().size(), 1);
 
-    ASSERT_EQ(domain.get_num_actions(), 1);
+    ASSERT_EQ(domain.get_actions().size(), 1);
     const auto action = domain.get_actions()[0];
-    ASSERT_EQ(action.get_num_parameters(), 1);
-    EXPECT_EQ(action.get_parameters()[0].get_num_types(), 1);
+    ASSERT_EQ(action.get_parameters().size(), 1);
+    EXPECT_EQ(action.get_parameters()[0].get_types().size(), 1);
 
-    ASSERT_EQ(task.get_num_objects(), 1);
-    EXPECT_EQ(task.get_objects()[0].get_num_types(), 1);
+    ASSERT_EQ(task.get_objects().size(), 1);
+    EXPECT_EQ(task.get_objects()[0].get_types().size(), 1);
 
-    ASSERT_EQ(task.get_num_initial_literals(), 1);
+    ASSERT_EQ(task.get_initial_literals().size(), 1);
     const auto literal = task.get_initial_literals()[0];
-    EXPECT_TRUE(literal.is_positive());
-    EXPECT_EQ(literal.get_atom().get_num_terms(), 1);
+    EXPECT_TRUE(literal.get_polarity());
+    EXPECT_EQ(literal.get_atom().get_terms().size(), 1);
     static_cast<void>(action.get_precondition().value().get_variant());
     static_cast<void>(action.get_effect().value().get_variant());
     static_cast<void>(literal.get_atom().get_terms()[0].get_variant());
@@ -248,8 +257,8 @@ TEST(LokiPublicFacade, ViewConvenienceMethodsCoverNumericEffectsAndMetrics)
           (:metric minimize (total-cost)))
     )" });
 
-    ASSERT_EQ(domain.get_num_functions(), 1);
-    ASSERT_EQ(domain.get_num_actions(), 1);
+    ASSERT_EQ(domain.get_functions().size(), 1);
+    ASSERT_EQ(domain.get_actions().size(), 1);
     const auto effect = domain.get_actions()[0].get_effect();
     ASSERT_TRUE(effect.has_value());
     auto saw_numeric_effect = false;
@@ -259,35 +268,38 @@ TEST(LokiPublicFacade, ViewConvenienceMethodsCoverNumericEffectsAndMetrics)
             using EffectHandle = std::decay_t<decltype(effect_node.get_index())>;
             if constexpr (std::is_same_v<EffectHandle, ygg::Index<loki::formalism::EffectAnd>>)
             {
-                ASSERT_EQ(effect_node.get_num_effects(), 2);
-                ygg::visit(
-                    [&](const auto nested_effect_node)
-                    {
-                        using NestedEffectHandle = std::decay_t<decltype(nested_effect_node.get_index())>;
-                        if constexpr (std::is_same_v<NestedEffectHandle, ygg::Index<loki::formalism::EffectNumeric>>)
+                ASSERT_EQ(effect_node.get_effects().size(), 2);
+                for (auto child : effect_node.get_effects())
+                {
+                    ygg::visit(
+                        [&](const auto nested_effect_node)
                         {
-                            saw_numeric_effect = true;
-                            EXPECT_EQ(nested_effect_node.get_operator(), loki::formalism::NumericEffectOperator::Increase);
-                            EXPECT_EQ(nested_effect_node.get_function().get_name(), "total-cost");
-                            EXPECT_EQ(nested_effect_node.get_num_terms(), 0);
+                            using NestedEffectHandle = std::decay_t<decltype(nested_effect_node.get_index())>;
+                            if constexpr (std::is_same_v<NestedEffectHandle, ygg::Index<loki::formalism::EffectNumeric>>)
+                            {
+                                saw_numeric_effect = true;
+                                EXPECT_EQ(nested_effect_node.get_operator(), loki::formalism::NumericEffectOperator::Increase);
+                                EXPECT_EQ(nested_effect_node.get_function().get_name(), "total-cost");
+                                EXPECT_EQ(nested_effect_node.get_terms().size(), 0);
 
-                            ygg::visit(
-                                [](const auto expression_node)
-                                {
-                                    using ExpressionHandle = std::decay_t<decltype(expression_node.get_index())>;
-                                    if constexpr (std::is_same_v<ExpressionHandle, ygg::Index<loki::formalism::FunctionExpressionNumber>>)
+                                ygg::visit(
+                                    [](const auto expression_node)
                                     {
-                                        EXPECT_EQ(expression_node.get_value(), 1);
-                                    }
-                                    else
-                                    {
-                                        ADD_FAILURE() << "Expected numeric effect expression to be a number.";
-                                    }
-                                },
-                                nested_effect_node.get_expression().get_variant());
-                        }
-                    },
-                    effect_node.get_effects()[1].get_variant());
+                                        using ExpressionHandle = std::decay_t<decltype(expression_node.get_index())>;
+                                        if constexpr (std::is_same_v<ExpressionHandle, ygg::Index<loki::formalism::FunctionExpressionNumber>>)
+                                        {
+                                            EXPECT_EQ(expression_node.get_value(), 1);
+                                        }
+                                        else
+                                        {
+                                            ADD_FAILURE() << "Expected numeric effect expression to be a number.";
+                                        }
+                                    },
+                                    nested_effect_node.get_expression().get_variant());
+                            }
+                        },
+                        child.get_variant());
+                }
             }
             else
             {
@@ -297,7 +309,7 @@ TEST(LokiPublicFacade, ViewConvenienceMethodsCoverNumericEffectsAndMetrics)
         effect.value().get_variant());
     EXPECT_TRUE(saw_numeric_effect);
 
-    ASSERT_TRUE(task.has_metric());
+    ASSERT_TRUE(task.get_metric().has_value());
     const auto metric = task.get_metric().value();
     EXPECT_TRUE(metric.is_minimize());
     ygg::visit(
@@ -370,9 +382,9 @@ TEST(LokiPublicFacade, FormatsAlternativeEffectsAsReparseablePddl)
     const auto reparsed_domain = reparsed.get_domain();
 
     EXPECT_EQ(reparsed_domain.get_name(), domain.get_name());
-    ASSERT_EQ(reparsed_domain.get_num_actions(), 2);
-    ASSERT_TRUE(reparsed_domain.get_actions()[0].has_effect());
-    ASSERT_TRUE(reparsed_domain.get_actions()[1].has_effect());
+    ASSERT_EQ(reparsed_domain.get_actions().size(), 2);
+    ASSERT_TRUE(reparsed_domain.get_actions()[0].get_effect().has_value());
+    ASSERT_TRUE(reparsed_domain.get_actions()[1].get_effect().has_value());
     ygg::visit(
         [](const auto effect_node)
         {
@@ -432,14 +444,14 @@ TEST(LokiPublicFacade, FormatsTypedNumericTaskSectionsAsReparseablePddl)
     const auto reparsed_task = reparsed.parse_task(task_text);
 
     EXPECT_EQ(reparsed_domain.get_name(), domain.get_name());
-    EXPECT_EQ(reparsed_domain.get_num_constants(), 1);
-    ASSERT_EQ(reparsed_domain.get_num_functions(), 1);
-    EXPECT_EQ(reparsed_domain.get_functions()[0].get_num_parameters(), 1);
+    EXPECT_EQ(reparsed_domain.get_constants().size(), 1);
+    ASSERT_EQ(reparsed_domain.get_functions().size(), 1);
+    EXPECT_EQ(reparsed_domain.get_functions()[0].get_parameters().size(), 1);
     EXPECT_EQ(reparsed_domain.get_functions()[0].get_type().get_name(), "number");
-    EXPECT_EQ(reparsed_task.get_num_objects(), 1);
-    EXPECT_EQ(reparsed_task.get_num_initial_literals(), 1);
-    EXPECT_EQ(reparsed_task.get_num_initial_function_values(), 1);
-    ASSERT_TRUE(reparsed_task.has_metric());
+    EXPECT_EQ(reparsed_task.get_objects().size(), 1);
+    EXPECT_EQ(reparsed_task.get_initial_literals().size(), 1);
+    EXPECT_EQ(reparsed_task.get_initial_function_values().size(), 1);
+    ASSERT_TRUE(reparsed_task.get_metric().has_value());
     EXPECT_TRUE(reparsed_task.get_metric().value().is_minimize());
 }
 

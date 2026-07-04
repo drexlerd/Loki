@@ -1,29 +1,39 @@
 /*
- * Copyright (C) 2026 Dominik Drexler
+ * Copyright (C) 2024-2026 Dominik Drexler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 #ifndef LOKI_FORMALISM_ACTION_DATA_HPP_
 #define LOKI_FORMALISM_ACTION_DATA_HPP_
 
-#include <tuple>
-#include <utility>
-#include <optional>
-#include <string>
-#include <variant>
-#include <vector>
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/core/types_utils.hpp>
-#include <cista/containers/string.h>
-#include <cista/containers/optional.h>
 #include "loki/formalism/action_index.hpp"
 #include "loki/formalism/condition_index.hpp"
 #include "loki/formalism/effect_index.hpp"
 #include "loki/formalism/parameter_index.hpp"
+
+#include <cista/containers/optional.h>
+#include <cista/containers/string.h>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <variant>
+#include <vector>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 
 namespace ygg
 {
@@ -34,26 +44,64 @@ struct Data<::loki::formalism::Action>
     ygg::Index<::loki::formalism::Action> index;
     ::cista::offset::string name;
     ygg::IndexList<::loki::formalism::Parameter> parameters;
+    ygg::uint_t original_arity;
     ::cista::optional<ygg::Index<::loki::formalism::Condition>> precondition;
     ::cista::optional<ygg::Index<::loki::formalism::Effect>> effect;
 
     Data() = default;
-    Data(::cista::offset::string name_, ygg::IndexList<::loki::formalism::Parameter> parameters_, ::cista::optional<ygg::Index<::loki::formalism::Condition>> precondition_, ::cista::optional<ygg::Index<::loki::formalism::Effect>> effect_) : index(), name(std::move(name_)), parameters(std::move(parameters_)), precondition(precondition_), effect(effect_) {}
+    Data(::cista::offset::string name_,
+         ygg::IndexList<::loki::formalism::Parameter> parameters_,
+         ::cista::optional<ygg::Index<::loki::formalism::Condition>> precondition_,
+         ::cista::optional<ygg::Index<::loki::formalism::Effect>> effect_) :
+        index(),
+        name(std::move(name_)),
+        parameters(std::move(parameters_)),
+        original_arity(parameters.size()),
+        precondition(precondition_),
+        effect(effect_)
+    {
+    }
+    Data(::cista::offset::string name_,
+         ygg::IndexList<::loki::formalism::Parameter> parameters_,
+         ygg::uint_t original_arity_,
+         ::cista::optional<ygg::Index<::loki::formalism::Condition>> precondition_,
+         ::cista::optional<ygg::Index<::loki::formalism::Effect>> effect_) :
+        index(),
+        name(std::move(name_)),
+        parameters(std::move(parameters_)),
+        original_arity(original_arity_),
+        precondition(precondition_),
+        effect(effect_)
+    {
+    }
     template<typename C>
     Data(const std::string& name_,
          const std::vector<::ygg::View<ygg::Index<::loki::formalism::Parameter>, C>>& parameters_,
          const std::optional<::ygg::View<ygg::Index<::loki::formalism::Condition>, C>>& precondition_,
          const std::optional<::ygg::View<ygg::Index<::loki::formalism::Effect>, C>>& effect_) :
-        index(), name(name_), parameters(), precondition(), effect()
+        index(),
+        name(name_),
+        parameters(),
+        original_arity(parameters_.size()),
+        precondition(),
+        effect()
     {
         set(parameters_, parameters);
         set(precondition_, precondition);
         set(effect_, effect);
     }
 
-    void clear() noexcept { ygg::clear(index); ygg::clear(name); ygg::clear(parameters); ygg::clear(precondition); ygg::clear(effect); }
-    auto cista_members() const noexcept { return std::tie(index, name, parameters, precondition, effect); }
-    auto identifying_members() const noexcept { return std::tie(name, parameters, precondition, effect); }
+    void clear() noexcept
+    {
+        ygg::clear(index);
+        ygg::clear(name);
+        ygg::clear(parameters);
+        ygg::clear(original_arity);
+        ygg::clear(precondition);
+        ygg::clear(effect);
+    }
+    auto cista_members() const noexcept { return std::tie(index, name, parameters, original_arity, precondition, effect); }
+    auto identifying_members() const noexcept { return std::tie(name, parameters, original_arity, precondition, effect); }
 };
 
 }

@@ -55,7 +55,8 @@ yggdrasil_install_python_files(pypddl "${CMAKE_CURRENT_SOURCE_DIR}/src"
     pypddl/__main__.py
     pypddl/__init__.pyi
     pypddl/py.typed
-    pypddl/formalism/__init__.py)
+    pypddl/formalism/__init__.py
+    pypddl/formalism/__init__.pyi)
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/pypddl/__init__.py"
                "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/__init__.py"
@@ -71,6 +72,9 @@ configure_file("${PYPDDL_GENERATED_VERSION_FILE}"
                COPYONLY)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/pypddl/formalism/__init__.py"
                "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/formalism/__init__.py"
+               COPYONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/pypddl/formalism/__init__.pyi"
+               "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/formalism/__init__.pyi"
                COPYONLY)
 add_custom_command(TARGET _pypddl POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different

@@ -1,11 +1,20 @@
 /*
- * Copyright (C) 2026 Dominik Drexler
+ * Copyright (C) 2024-2026 Dominik Drexler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 #ifndef LOKI_FORMALISM_TASK_VIEW_HPP_
 #define LOKI_FORMALISM_TASK_VIEW_HPP_
@@ -39,21 +48,13 @@ public:
     const auto& get_name() const noexcept { return get_data().name; }
     auto get_domain() const noexcept { return ygg::make_view(get_data().domain, *m_context); }
     auto get_requirements() const noexcept { return ygg::make_view(get_data().requirements, *m_context); }
-    auto get_num_requirements() const noexcept { return get_data().requirements.size(); }
     auto get_objects() const noexcept { return ygg::make_view(get_data().objects, *m_context); }
-    auto get_num_objects() const noexcept { return get_data().objects.size(); }
     auto get_initial_literals() const noexcept { return ygg::make_view(get_data().initial_literals, *m_context); }
-    auto get_num_initial_literals() const noexcept { return get_data().initial_literals.size(); }
     auto get_initial_function_values() const noexcept { return ygg::make_view(get_data().initial_function_values, *m_context); }
-    auto get_num_initial_function_values() const noexcept { return get_data().initial_function_values.size(); }
-    auto has_goal() const noexcept { return get_data().goal.has_value(); }
     auto get_goal() const noexcept { return ygg::make_view(get_data().goal, *m_context); }
-    auto has_metric() const noexcept { return get_data().metric.has_value(); }
     auto get_metric() const noexcept { return ygg::make_view(get_data().metric, *m_context); }
     auto get_predicates() const noexcept { return ygg::make_view(get_data().predicates, *m_context); }
-    auto get_num_predicates() const noexcept { return get_data().predicates.size(); }
     auto get_axioms() const noexcept { return ygg::make_view(get_data().axioms, *m_context); }
-    auto get_num_axioms() const noexcept { return get_data().axioms.size(); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context); }
 };

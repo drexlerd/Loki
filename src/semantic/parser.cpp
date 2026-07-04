@@ -1,11 +1,20 @@
 /*
- * Copyright (C) 2026 Dominik Drexler
+ * Copyright (C) 2024-2026 Dominik Drexler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 #include "loki/semantic/parser.hpp"
 
@@ -475,7 +484,7 @@ ygg::Index<formalism::Axiom> Parser::parse_axiom(const ast::Axiom& node)
     }
     auto pred = predicate(node.head.name, terms.size());
     auto atom = formalism::get_or_create<formalism::Atom>(repo(), pred, std::move(terms)).get_index();
-    auto head = formalism::get_or_create<formalism::Literal>(repo(), true, atom).get_index();
+    auto head = formalism::get_or_create<formalism::Literal>(repo(), atom, true).get_index();
     auto condition = parse_condition(node.condition);
     m_variable_scopes.pop_back();
     return formalism::get_or_create<formalism::Axiom>(repo(), std::move(parameters), head, condition).get_index();
@@ -850,7 +859,7 @@ ygg::IndexList<formalism::Term> Parser::parse_terms(const std::vector<ast::Term>
 
 ygg::Index<formalism::Literal> Parser::parse_literal(const ast::Literal& node)
 {
-    return formalism::get_or_create<formalism::Literal>(repo(), node.positive, parse_atom(node.atom)).get_index();
+    return formalism::get_or_create<formalism::Literal>(repo(), parse_atom(node.atom), node.positive).get_index();
 }
 
 ygg::Index<formalism::Condition> Parser::wrap_condition(ygg::Data<formalism::Condition>::Variant value)

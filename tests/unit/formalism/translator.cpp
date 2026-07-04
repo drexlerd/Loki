@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Dominik Drexler
+ * Copyright (C) 2024-2026 Dominik Drexler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 #include <gtest/gtest.h>
 
@@ -256,7 +257,7 @@ TEST(LokiTests, GeneratedUniversalPredicateKeepsNumericFreeVariables)
             continue;
 
         found = true;
-        EXPECT_EQ(predicate.get_num_parameters(), std::size_t { 1 });
+        EXPECT_EQ(predicate.get_parameters().size(), std::size_t { 1 });
     }
     EXPECT_TRUE(found);
 }
@@ -452,7 +453,7 @@ TEST(LokiTests, SplitDisjunctiveActionPreconditions)
     const auto domain = translation.get_translated_domain();
     const auto& repository = domain.get_context();
 
-    ASSERT_EQ(domain.get_num_actions(), std::size_t { 2 });
+    ASSERT_EQ(domain.get_actions().size(), std::size_t { 2 });
     for (auto action_view : domain.get_actions())
     {
         const auto& action = repository[action_view.get_index()];
@@ -481,7 +482,7 @@ TEST(LokiTests, SplitDisjunctiveAxiomConditions)
     const auto domain = translation.get_translated_domain();
     const auto& repository = domain.get_context();
 
-    ASSERT_EQ(domain.get_num_axioms(), std::size_t { 2 });
+    ASSERT_EQ(domain.get_axioms().size(), std::size_t { 2 });
     for (auto axiom_view : domain.get_axioms())
     {
         const auto& axiom = repository[axiom_view.get_index()];
@@ -675,7 +676,7 @@ TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
 
     const auto domain_translation = loki::translate(domain);
     const auto translated_domain = domain_translation.get_translated_domain();
-    const auto translated_domain_predicates = translated_domain.get_num_predicates();
+    const auto translated_domain_predicates = translated_domain.get_predicates().size();
     const auto task_translation = loki::translate(task, domain_translation);
     const auto translated_task = task_translation.get_translated_task();
 
@@ -698,7 +699,7 @@ TEST(LokiTests, TaskGeneratedAxiomsDoNotReuseDomainGeneratedPredicateNames)
         }
     }
 
-    EXPECT_EQ(translated_task.get_domain().get_num_predicates(), translated_domain_predicates);
+    EXPECT_EQ(translated_task.get_domain().get_predicates().size(), translated_domain_predicates);
     EXPECT_TRUE(has_task_generated_name);
 }
 

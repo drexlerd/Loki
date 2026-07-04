@@ -1,11 +1,20 @@
 /*
- * Copyright (C) 2026 Dominik Drexler
+ * Copyright (C) 2024-2026 Dominik Drexler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 #ifndef LOKI_FORMALISM_DOMAIN_VIEW_HPP_
 #define LOKI_FORMALISM_DOMAIN_VIEW_HPP_
@@ -38,19 +47,12 @@ public:
 
     const auto& get_name() const noexcept { return get_data().name; }
     auto get_requirements() const noexcept { return ygg::make_view(get_data().requirements, *m_context); }
-    auto get_num_requirements() const noexcept { return get_data().requirements.size(); }
     auto get_types() const noexcept { return ygg::make_view(get_data().types, *m_context); }
-    auto get_num_types() const noexcept { return get_data().types.size(); }
     auto get_constants() const noexcept { return ygg::make_view(get_data().constants, *m_context); }
-    auto get_num_constants() const noexcept { return get_data().constants.size(); }
     auto get_predicates() const noexcept { return ygg::make_view(get_data().predicates, *m_context); }
-    auto get_num_predicates() const noexcept { return get_data().predicates.size(); }
     auto get_functions() const noexcept { return ygg::make_view(get_data().functions, *m_context); }
-    auto get_num_functions() const noexcept { return get_data().functions.size(); }
     auto get_actions() const noexcept { return ygg::make_view(get_data().actions, *m_context); }
-    auto get_num_actions() const noexcept { return get_data().actions.size(); }
     auto get_axioms() const noexcept { return ygg::make_view(get_data().axioms, *m_context); }
-    auto get_num_axioms() const noexcept { return get_data().axioms.size(); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context); }
 };

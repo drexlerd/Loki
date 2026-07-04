@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Dominik Drexler
+ * Copyright (C) 2024-2026 Dominik Drexler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 #include <gtest/gtest.h>
 
@@ -40,12 +41,12 @@ TEST(LokiTests, ParserTest)
     const auto domain = parser.get_domain();
     const auto problem = parser.parse_task(problem_file);
 
-    EXPECT_EQ(domain.get_num_constants(), 2);
-    EXPECT_EQ(domain.get_num_predicates(), 7);
-    EXPECT_EQ(domain.get_num_actions(), 3);
+    EXPECT_EQ(domain.get_constants().size(), 2);
+    EXPECT_EQ(domain.get_predicates().size(), 7);
+    EXPECT_EQ(domain.get_actions().size(), 3);
 
-    EXPECT_EQ(problem.get_num_objects(), 4);
-    EXPECT_EQ(problem.get_num_initial_literals(), 11);
+    EXPECT_EQ(problem.get_objects().size(), 4);
+    EXPECT_EQ(problem.get_initial_literals().size(), 11);
 }
 
 TEST(LokiTests, ParserStringTest)
@@ -64,9 +65,9 @@ TEST(LokiTests, ParserStringTest)
 
     const auto domain = parser.get_domain();
 
-    EXPECT_EQ(domain.get_num_constants(), 0);
-    EXPECT_EQ(domain.get_num_predicates(), 1);
-    EXPECT_EQ(domain.get_num_actions(), 1);
+    EXPECT_EQ(domain.get_constants().size(), 0);
+    EXPECT_EQ(domain.get_predicates().size(), 1);
+    EXPECT_EQ(domain.get_actions().size(), 1);
 }
 
 TEST(LokiTests, ParserNonDeterministicTest)
@@ -86,9 +87,9 @@ TEST(LokiTests, ParserNonDeterministicTest)
 
     const auto domain = parser.get_domain();
 
-    EXPECT_EQ(domain.get_num_constants(), 0);
-    EXPECT_EQ(domain.get_num_predicates(), 2);
-    EXPECT_EQ(domain.get_num_actions(), 1);
+    EXPECT_EQ(domain.get_constants().size(), 0);
+    EXPECT_EQ(domain.get_predicates().size(), 2);
+    EXPECT_EQ(domain.get_actions().size(), 1);
 }
 
 TEST(LokiTests, ParserNonDeterministicMissingRequirementTest)

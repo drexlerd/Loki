@@ -9,7 +9,7 @@ def build(repository, builder):
 
 def make_literal(repository, predicate, terms, positive=True):
     atom = build(repository, pypddl.AtomBuilder(predicate, list(terms)))
-    return build(repository, pypddl.LiteralBuilder(positive, atom))
+    return build(repository, pypddl.LiteralBuilder(atom, positive))
 
 
 def make_condition(repository, predicate, terms, positive=True):
@@ -34,8 +34,7 @@ def make_effect_and(repository, effects):
 
 
 def build_gripper():
-    factory = pypddl.RepositoryFactory()
-    repository = factory.create()
+    repository = pypddl.Repository()
     strips = build(repository, pypddl.RequirementBuilder(pypddl.RequirementKind.Strips))
     typing = build(repository, pypddl.RequirementBuilder(pypddl.RequirementKind.Typing))
 
@@ -141,6 +140,6 @@ def build_gripper():
 
 if __name__ == "__main__":
     _, domain, one_ball, two_ball = build_gripper()
-    print(f"domain: {domain.get_name()}, actions={domain.get_num_actions()}, predicates={domain.get_num_predicates()}")
-    print(f"task: {one_ball.get_name()}, objects={one_ball.get_num_objects()}, init={one_ball.get_num_initial_literals()}")
-    print(f"task: {two_ball.get_name()}, objects={two_ball.get_num_objects()}, init={two_ball.get_num_initial_literals()}")
+    print(f"domain: {domain.get_name()}, actions={len(domain.get_actions())}, predicates={len(domain.get_predicates())}")
+    print(f"task: {one_ball.get_name()}, objects={len(one_ball.get_objects())}, init={len(one_ball.get_initial_literals())}")
+    print(f"task: {two_ball.get_name()}, objects={len(two_ball.get_objects())}, init={len(two_ball.get_initial_literals())}")

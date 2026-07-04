@@ -1,6 +1,20 @@
 /*
- * Copyright (C) 2026 Dominik Drexler
+ * Copyright (C) 2024-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 #ifndef LOKI_SEMANTIC_TRANSLATOR_TYPE_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_TYPE_TRANSLATOR_HPP_
@@ -24,13 +38,13 @@ public:
     ygg::IndexList<formalism::Parameter> maybe_strip_parameters(const ygg::IndexList<formalism::Parameter>& parameters);
     formalism::ObjectView maybe_strip_object(ygg::Index<formalism::Object> object);
     formalism::PredicateView type_predicate(ygg::Index<formalism::Type> type);
-    formalism::LiteralView type_literal(ygg::Index<formalism::Type> type,ygg::Index<formalism::Term> term);
-    formalism::ConditionView type_condition(ygg::Index<formalism::Type> type,ygg::Index<formalism::Variable> variable);
+    formalism::LiteralView type_literal(ygg::Index<formalism::Type> type, ygg::Index<formalism::Term> term);
+    formalism::ConditionView type_condition(ygg::Index<formalism::Type> type, ygg::Index<formalism::Variable> variable);
     ygg::IndexList<formalism::Condition> type_conditions_for_parameters(const ygg::IndexList<formalism::Parameter>& parameters);
     void prepend_type_conditions(cista::optional<ygg::Index<formalism::Condition>>& condition, const ygg::IndexList<formalism::Parameter>& parameters);
     void prepend_type_conditions(ygg::Index<formalism::Condition>& condition, const ygg::IndexList<formalism::Parameter>& parameters);
     void add_type_predicates_to_domain(ygg::Data<formalism::Domain>& data);
-    void add_type_literals_for_object(ygg::IndexList<formalism::Literal>& literals,ygg::Index<formalism::Object> object);
+    void add_type_literals_for_object(ygg::IndexList<formalism::Literal>& literals, ygg::Index<formalism::Object> object);
     void initialize_type_literals(ygg::Data<formalism::Task>& task);
 };
 
@@ -45,7 +59,7 @@ ygg::IndexList<formalism::Type> TypeTranslator<Derived>::collect_type_hierarchy(
 {
     auto result = ygg::IndexList<formalism::Type> {};
     auto seen = std::unordered_set<ygg::uint_t> {};
-    auto visit = [&](auto&& self,ygg::Index<formalism::Type> current) -> void
+    auto visit = [&](auto&& self, ygg::Index<formalism::Type> current) -> void
     {
         if (!seen.insert(current.get_value()).second)
             return;
@@ -126,19 +140,21 @@ formalism::PredicateView TypeTranslator<Derived>::type_predicate(ygg::Index<form
 }
 
 template<typename Derived>
-formalism::LiteralView TypeTranslator<Derived>::type_literal(ygg::Index<formalism::Type> type,ygg::Index<formalism::Term> term)
+formalism::LiteralView TypeTranslator<Derived>::type_literal(ygg::Index<formalism::Type> type, ygg::Index<formalism::Term> term)
 {
     auto terms = ygg::IndexList<formalism::Term> {};
     terms.push_back(term);
-    const auto atom = formalism::get_or_create<formalism::Atom>(this->m_storage->repository, as_index(this->self().type_predicate(type)), std::move(terms)).get_index();
-    return formalism::get_or_create<formalism::Literal>(this->m_storage->repository, true, atom);
+    const auto atom =
+        formalism::get_or_create<formalism::Atom>(this->m_storage->repository, as_index(this->self().type_predicate(type)), std::move(terms)).get_index();
+    return formalism::get_or_create<formalism::Literal>(this->m_storage->repository, atom, true);
 }
 
 template<typename Derived>
-formalism::ConditionView TypeTranslator<Derived>::type_condition(ygg::Index<formalism::Type> type,ygg::Index<formalism::Variable> variable)
+formalism::ConditionView TypeTranslator<Derived>::type_condition(ygg::Index<formalism::Type> type, ygg::Index<formalism::Variable> variable)
 {
     const auto term = formalism::get_or_create<formalism::Term>(this->m_storage->repository, ygg::Data<formalism::Term>::Variant(variable)).get_index();
-    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, as_index(this->self().type_literal(type, term))).get_index());
+    return this->self().wrap_condition(
+        formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, as_index(this->self().type_literal(type, term))).get_index());
 }
 
 template<typename Derived>
@@ -155,7 +171,8 @@ ygg::IndexList<formalism::Condition> TypeTranslator<Derived>::type_conditions_fo
 }
 
 template<typename Derived>
-void TypeTranslator<Derived>::prepend_type_conditions(cista::optional<ygg::Index<formalism::Condition>>& condition, const ygg::IndexList<formalism::Parameter>& parameters)
+void TypeTranslator<Derived>::prepend_type_conditions(cista::optional<ygg::Index<formalism::Condition>>& condition,
+                                                      const ygg::IndexList<formalism::Parameter>& parameters)
 {
     auto parts = this->self().type_conditions_for_parameters(parameters);
     if (parts.empty())
@@ -208,7 +225,7 @@ void TypeTranslator<Derived>::add_type_predicates_to_domain(ygg::Data<formalism:
 }
 
 template<typename Derived>
-void TypeTranslator<Derived>::add_type_literals_for_object(ygg::IndexList<formalism::Literal>& literals,ygg::Index<formalism::Object> object)
+void TypeTranslator<Derived>::add_type_literals_for_object(ygg::IndexList<formalism::Literal>& literals, ygg::Index<formalism::Object> object)
 {
     const auto& data = this->m_storage->repository[object];
     const auto term = formalism::get_or_create<formalism::Term>(this->m_storage->repository, ygg::Data<formalism::Term>::Variant(object)).get_index();
@@ -233,6 +250,6 @@ void TypeTranslator<Derived>::initialize_type_literals(ygg::Data<formalism::Task
     task.requirements = this->self().strip_typing_requirement(task.requirements);
 }
 
-} // namespace loki::semantic::detail
+}  // namespace loki::semantic::detail
 
 #endif

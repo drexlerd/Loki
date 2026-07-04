@@ -1,87 +1,73 @@
+/*
+ * Copyright (C) 2024-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include "index.hpp"
 
 #include <loki/semantic.hpp>
-
 #include <nanobind/nanobind.h>
-#include <nanobind/stl/string.h>
-
-#include <string>
+#include <yggdrasil/python/bindings.hpp>
 
 namespace nb = nanobind;
 using namespace nb::literals;
 
 namespace loki::formalism
 {
-namespace
-{
-
-template<typename T>
-void bind_index(nb::module_& m, const std::string& name)
-{
-    using V = ygg::Index<T>;
-    nb::class_<V>(m, name.c_str())
-        .def(nb::init<>())
-        .def(nb::init<ygg::uint_t>(), "index"_a)
-        .def("__int__", [](const V& self) { return static_cast<ygg::uint_t>(self); })
-        .def("__index__", [](const V& self) { return static_cast<ygg::uint_t>(self); })
-        .def("__hash__", [](const V& self) { return static_cast<ygg::uint_t>(self); })
-        .def("__eq__", [](const V& lhs, const V& rhs) { return lhs == rhs; })
-        .def("__lt__", [](const V& lhs, const V& rhs) { return lhs < rhs; })
-        .def("__le__", [](const V& lhs, const V& rhs) { return lhs <= rhs; })
-        .def("__gt__", [](const V& lhs, const V& rhs) { return lhs > rhs; })
-        .def("__ge__", [](const V& lhs, const V& rhs) { return lhs >= rhs; })
-        .def("__repr__", [name](const V& self) { return name + "(" + std::to_string(static_cast<ygg::uint_t>(self)) + ")"; })
-        .def("__str__", [name](const V& self) { return name + "(" + std::to_string(static_cast<ygg::uint_t>(self)) + ")"; });
-}
-
-
-
-} // namespace
-
 void bind_indices(nb::module_& m)
 {
-    bind_index<formalism::Requirement>(m, "RequirementIndex");
-    bind_index<formalism::Type>(m, "TypeIndex");
-    bind_index<formalism::Object>(m, "ObjectIndex");
-    bind_index<formalism::Variable>(m, "VariableIndex");
-    bind_index<formalism::Parameter>(m, "ParameterIndex");
-    bind_index<formalism::Predicate>(m, "PredicateIndex");
-    bind_index<formalism::FunctionSkeleton>(m, "FunctionSkeletonIndex");
-    bind_index<formalism::Term>(m, "TermIndex");
-    bind_index<formalism::Atom>(m, "AtomIndex");
-    bind_index<formalism::Literal>(m, "LiteralIndex");
-    bind_index<formalism::FunctionExpressionNumber>(m, "FunctionExpressionNumberIndex");
-    bind_index<formalism::FunctionTerm>(m, "FunctionTermIndex");
-    bind_index<formalism::UnaryFunctionExpression>(m, "UnaryFunctionExpressionIndex");
-    bind_index<formalism::BinaryFunctionExpression>(m, "BinaryFunctionExpressionIndex");
-    bind_index<formalism::MultiFunctionExpression>(m, "MultiFunctionExpressionIndex");
-    bind_index<formalism::FunctionExpression>(m, "FunctionExpressionIndex");
-    bind_index<formalism::ConditionLiteral>(m, "ConditionLiteralIndex");
-    bind_index<formalism::ConditionAnd>(m, "ConditionAndIndex");
-    bind_index<formalism::ConditionOr>(m, "ConditionOrIndex");
-    bind_index<formalism::ConditionNot>(m, "ConditionNotIndex");
-    bind_index<formalism::ConditionImply>(m, "ConditionImplyIndex");
-    bind_index<formalism::ConditionExists>(m, "ConditionExistsIndex");
-    bind_index<formalism::ConditionForall>(m, "ConditionForallIndex");
-    bind_index<formalism::ConditionNumericConstraint>(m, "ConditionNumericConstraintIndex");
-    bind_index<formalism::Condition>(m, "ConditionIndex");
-    bind_index<formalism::EffectLiteral>(m, "EffectLiteralIndex");
-    bind_index<formalism::EffectAnd>(m, "EffectAndIndex");
-    bind_index<formalism::EffectNumeric>(m, "EffectNumericIndex");
-    bind_index<formalism::EffectForall>(m, "EffectForallIndex");
-    bind_index<formalism::EffectWhen>(m, "EffectWhenIndex");
-    bind_index<formalism::EffectOneOf>(m, "EffectOneOfIndex");
-    bind_index<formalism::EffectProbabilisticAlternative>(m, "EffectProbabilisticAlternativeIndex");
-    bind_index<formalism::EffectProbabilistic>(m, "EffectProbabilisticIndex");
-    bind_index<formalism::Effect>(m, "EffectIndex");
-    bind_index<formalism::Action>(m, "ActionIndex");
-    bind_index<formalism::Axiom>(m, "AxiomIndex");
-    bind_index<formalism::Metric>(m, "MetricIndex");
-    bind_index<formalism::InitialFunctionValue>(m, "InitialFunctionValueIndex");
-    bind_index<formalism::Domain>(m, "DomainIndex");
-    bind_index<formalism::Task>(m, "TaskIndex");
+    ygg::bind_index<ygg::Index<formalism::Requirement>>(m, "RequirementIndex");
+    ygg::bind_index<ygg::Index<formalism::Type>>(m, "TypeIndex");
+    ygg::bind_index<ygg::Index<formalism::Object>>(m, "ObjectIndex");
+    ygg::bind_index<ygg::Index<formalism::Variable>>(m, "VariableIndex");
+    ygg::bind_index<ygg::Index<formalism::Parameter>>(m, "ParameterIndex");
+    ygg::bind_index<ygg::Index<formalism::Predicate>>(m, "PredicateIndex");
+    ygg::bind_index<ygg::Index<formalism::FunctionSkeleton>>(m, "FunctionSkeletonIndex");
+    ygg::bind_index<ygg::Index<formalism::Term>>(m, "TermIndex");
+    ygg::bind_index<ygg::Index<formalism::Atom>>(m, "AtomIndex");
+    ygg::bind_index<ygg::Index<formalism::Literal>>(m, "LiteralIndex");
+    ygg::bind_index<ygg::Index<formalism::FunctionExpressionNumber>>(m, "FunctionExpressionNumberIndex");
+    ygg::bind_index<ygg::Index<formalism::FunctionTerm>>(m, "FunctionTermIndex");
+    ygg::bind_index<ygg::Index<formalism::UnaryFunctionExpression>>(m, "UnaryFunctionExpressionIndex");
+    ygg::bind_index<ygg::Index<formalism::BinaryFunctionExpression>>(m, "BinaryFunctionExpressionIndex");
+    ygg::bind_index<ygg::Index<formalism::MultiFunctionExpression>>(m, "MultiFunctionExpressionIndex");
+    ygg::bind_index<ygg::Index<formalism::FunctionExpression>>(m, "FunctionExpressionIndex");
+    ygg::bind_index<ygg::Index<formalism::ConditionLiteral>>(m, "ConditionLiteralIndex");
+    ygg::bind_index<ygg::Index<formalism::ConditionAnd>>(m, "ConditionAndIndex");
+    ygg::bind_index<ygg::Index<formalism::ConditionOr>>(m, "ConditionOrIndex");
+    ygg::bind_index<ygg::Index<formalism::ConditionNot>>(m, "ConditionNotIndex");
+    ygg::bind_index<ygg::Index<formalism::ConditionImply>>(m, "ConditionImplyIndex");
+    ygg::bind_index<ygg::Index<formalism::ConditionExists>>(m, "ConditionExistsIndex");
+    ygg::bind_index<ygg::Index<formalism::ConditionForall>>(m, "ConditionForallIndex");
+    ygg::bind_index<ygg::Index<formalism::ConditionNumericConstraint>>(m, "ConditionNumericConstraintIndex");
+    ygg::bind_index<ygg::Index<formalism::Condition>>(m, "ConditionIndex");
+    ygg::bind_index<ygg::Index<formalism::EffectLiteral>>(m, "EffectLiteralIndex");
+    ygg::bind_index<ygg::Index<formalism::EffectAnd>>(m, "EffectAndIndex");
+    ygg::bind_index<ygg::Index<formalism::EffectNumeric>>(m, "EffectNumericIndex");
+    ygg::bind_index<ygg::Index<formalism::EffectForall>>(m, "EffectForallIndex");
+    ygg::bind_index<ygg::Index<formalism::EffectWhen>>(m, "EffectWhenIndex");
+    ygg::bind_index<ygg::Index<formalism::EffectOneOf>>(m, "EffectOneOfIndex");
+    ygg::bind_index<ygg::Index<formalism::EffectProbabilisticAlternative>>(m, "EffectProbabilisticAlternativeIndex");
+    ygg::bind_index<ygg::Index<formalism::EffectProbabilistic>>(m, "EffectProbabilisticIndex");
+    ygg::bind_index<ygg::Index<formalism::Effect>>(m, "EffectIndex");
+    ygg::bind_index<ygg::Index<formalism::Action>>(m, "ActionIndex");
+    ygg::bind_index<ygg::Index<formalism::Axiom>>(m, "AxiomIndex");
+    ygg::bind_index<ygg::Index<formalism::Metric>>(m, "MetricIndex");
+    ygg::bind_index<ygg::Index<formalism::InitialFunctionValue>>(m, "InitialFunctionValueIndex");
+    ygg::bind_index<ygg::Index<formalism::Domain>>(m, "DomainIndex");
+    ygg::bind_index<ygg::Index<formalism::Task>>(m, "TaskIndex");
 }
 
-
-
-} // namespace loki::formalism
+}  // namespace loki::formalism

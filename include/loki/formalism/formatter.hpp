@@ -1,11 +1,20 @@
 /*
- * Copyright (C) 2026 Dominik Drexler
+ * Copyright (C) 2024-2026 Dominik Drexler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 #ifndef LOKI_FORMALISM_FORMATTER_HPP_
 #define LOKI_FORMALISM_FORMATTER_HPP_
@@ -14,7 +23,6 @@
 #include "loki/formalism/views.hpp"
 
 #include <cista/containers/string.h>
-
 #include <cmath>
 #include <limits>
 #include <ostream>
@@ -23,8 +31,8 @@
 #include <string_view>
 #include <type_traits>
 #include <unordered_set>
-#include <vector>
 #include <variant>
+#include <vector>
 
 namespace loki::formalism::format
 {
@@ -59,21 +67,36 @@ inline const char* requirement(RequirementKind kind) noexcept
 {
     switch (kind)
     {
-        case RequirementKind::Strips: return ":strips";
-        case RequirementKind::Typing: return ":typing";
-        case RequirementKind::NegativePreconditions: return ":negative-preconditions";
-        case RequirementKind::DisjunctivePreconditions: return ":disjunctive-preconditions";
-        case RequirementKind::Equality: return ":equality";
-        case RequirementKind::ExistentialPreconditions: return ":existential-preconditions";
-        case RequirementKind::UniversalPreconditions: return ":universal-preconditions";
-        case RequirementKind::QuantifiedPreconditions: return ":quantified-preconditions";
-        case RequirementKind::ConditionalEffects: return ":conditional-effects";
-        case RequirementKind::Fluents: return ":fluents";
-        case RequirementKind::NumericFluents: return ":numeric-fluents";
-        case RequirementKind::DurativeActions: return ":durative-actions";
-        case RequirementKind::DerivedPredicates: return ":derived-predicates";
-        case RequirementKind::NonDeterministic: return ":non-deterministic";
-        case RequirementKind::ProbabilisticEffects: return ":probabilistic-effects";
+        case RequirementKind::Strips:
+            return ":strips";
+        case RequirementKind::Typing:
+            return ":typing";
+        case RequirementKind::NegativePreconditions:
+            return ":negative-preconditions";
+        case RequirementKind::DisjunctivePreconditions:
+            return ":disjunctive-preconditions";
+        case RequirementKind::Equality:
+            return ":equality";
+        case RequirementKind::ExistentialPreconditions:
+            return ":existential-preconditions";
+        case RequirementKind::UniversalPreconditions:
+            return ":universal-preconditions";
+        case RequirementKind::QuantifiedPreconditions:
+            return ":quantified-preconditions";
+        case RequirementKind::ConditionalEffects:
+            return ":conditional-effects";
+        case RequirementKind::Fluents:
+            return ":fluents";
+        case RequirementKind::NumericFluents:
+            return ":numeric-fluents";
+        case RequirementKind::DurativeActions:
+            return ":durative-actions";
+        case RequirementKind::DerivedPredicates:
+            return ":derived-predicates";
+        case RequirementKind::NonDeterministic:
+            return ":non-deterministic";
+        case RequirementKind::ProbabilisticEffects:
+            return ":probabilistic-effects";
     }
     return ":strips";
 }
@@ -82,12 +105,18 @@ inline const char* comparator(BinaryComparator op) noexcept
 {
     switch (op)
     {
-        case BinaryComparator::Equal: return "=";
-        case BinaryComparator::NotEqual: return "!=";
-        case BinaryComparator::Less: return "<";
-        case BinaryComparator::LessEqual: return "<=";
-        case BinaryComparator::Greater: return ">";
-        case BinaryComparator::GreaterEqual: return ">=";
+        case BinaryComparator::Equal:
+            return "=";
+        case BinaryComparator::NotEqual:
+            return "!=";
+        case BinaryComparator::Less:
+            return "<";
+        case BinaryComparator::LessEqual:
+            return "<=";
+        case BinaryComparator::Greater:
+            return ">";
+        case BinaryComparator::GreaterEqual:
+            return ">=";
     }
     return "=";
 }
@@ -96,10 +125,14 @@ inline const char* binary_operator(BinaryArithmeticOperator op) noexcept
 {
     switch (op)
     {
-        case BinaryArithmeticOperator::Add: return "+";
-        case BinaryArithmeticOperator::Subtract: return "-";
-        case BinaryArithmeticOperator::Multiply: return "*";
-        case BinaryArithmeticOperator::Divide: return "/";
+        case BinaryArithmeticOperator::Add:
+            return "+";
+        case BinaryArithmeticOperator::Subtract:
+            return "-";
+        case BinaryArithmeticOperator::Multiply:
+            return "*";
+        case BinaryArithmeticOperator::Divide:
+            return "/";
     }
     return "+";
 }
@@ -108,8 +141,10 @@ inline const char* multi_operator(MultiArithmeticOperator op) noexcept
 {
     switch (op)
     {
-        case MultiArithmeticOperator::Add: return "+";
-        case MultiArithmeticOperator::Multiply: return "*";
+        case MultiArithmeticOperator::Add:
+            return "+";
+        case MultiArithmeticOperator::Multiply:
+            return "*";
     }
     return "+";
 }
@@ -118,11 +153,16 @@ inline const char* numeric_effect_operator(NumericEffectOperator op) noexcept
 {
     switch (op)
     {
-        case NumericEffectOperator::Assign: return "assign";
-        case NumericEffectOperator::Increase: return "increase";
-        case NumericEffectOperator::Decrease: return "decrease";
-        case NumericEffectOperator::ScaleUp: return "scale-up";
-        case NumericEffectOperator::ScaleDown: return "scale-down";
+        case NumericEffectOperator::Assign:
+            return "assign";
+        case NumericEffectOperator::Increase:
+            return "increase";
+        case NumericEffectOperator::Decrease:
+            return "decrease";
+        case NumericEffectOperator::ScaleUp:
+            return "scale-up";
+        case NumericEffectOperator::ScaleDown:
+            return "scale-down";
     }
     return "assign";
 }
@@ -160,14 +200,16 @@ inline void type_list(EntityListView<Type> types, std::ostream& out)
 
 inline void term(TermView term, std::ostream& out)
 {
-    std::visit([&](const auto& value)
-    {
-        using T = std::remove_cvref_t<decltype(value)>;
-        if constexpr (std::same_as<T, ygg::Index<Variable>>)
-            variable_text(term.get_context()[value].name, out);
-        else
-            atom_text(term.get_context()[value].name, out);
-    }, term.get_data().value);
+    std::visit(
+        [&](const auto& value)
+        {
+            using T = std::remove_cvref_t<decltype(value)>;
+            if constexpr (std::same_as<T, ygg::Index<Variable>>)
+                variable_text(term.get_context()[value].name, out);
+            else
+                atom_text(term.get_context()[value].name, out);
+        },
+        term.get_data().value);
 }
 
 inline void term_list(EntityListView<Term> terms, std::ostream& out)
@@ -228,7 +270,7 @@ inline void atom(AtomView atom, std::ostream& out)
 
 inline void literal(LiteralView literal, std::ostream& out)
 {
-    if (literal.get_data().positive)
+    if (literal.get_data().m_polarity)
         atom(literal.get_atom(), out);
     else
     {
@@ -533,7 +575,7 @@ inline void metric(MetricView metric, std::ostream& out)
     out << ')';
 }
 
-} // namespace detail
+}  // namespace detail
 
 inline void write(DomainView domain, std::ostream& out, Options options = {})
 {
@@ -700,6 +742,6 @@ inline std::string task(TaskView task, Options options = {})
     return out.str();
 }
 
-} // namespace loki::formalism::format
+}  // namespace loki::formalism::format
 
 #endif

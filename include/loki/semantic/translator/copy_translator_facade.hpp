@@ -1,6 +1,20 @@
 /*
- * Copyright (C) 2026 Dominik Drexler
+ * Copyright (C) 2024-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 #ifndef LOKI_SEMANTIC_TRANSLATOR_COPY_TRANSLATOR_FACADE_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_COPY_TRANSLATOR_FACADE_HPP_
@@ -30,27 +44,23 @@ public:
 
     ygg::IndexList<formalism::Axiom> split_disjunctive_axioms(const ygg::IndexList<formalism::Axiom>& axioms);
 
-
-
-
-
-
-
-
     formalism::DomainView copy_domain(formalism::DomainView domain);
 
-    formalism::TaskView copy_task(formalism::TaskView task);};
+    formalism::TaskView copy_task(formalism::TaskView task);
+};
 
 template<typename Derived>
 std::optional<formalism::ConditionOrView> CopyTranslatorFacade<Derived>::public_as_or(ygg::Index<formalism::Condition> condition) const
 {
     auto result = std::optional<formalism::ConditionOrView> {};
-    std::visit([&](const auto& node)
-    {
-        using Node = std::decay_t<decltype(node)>;
-        if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionOr>>)
-            result = ygg::make_view(node, this->m_storage->repository);
-    }, this->m_storage->repository[condition].value);
+    std::visit(
+        [&](const auto& node)
+        {
+            using Node = std::decay_t<decltype(node)>;
+            if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionOr>>)
+                result = ygg::make_view(node, this->m_storage->repository);
+        },
+        this->m_storage->repository[condition].value);
     return result;
 }
 
@@ -109,7 +119,15 @@ ygg::IndexList<formalism::Action> CopyTranslatorFacade<Derived>::split_disjuncti
             if (const auto condition_or = this->self().public_as_or(precondition))
             {
                 for (auto part : condition_or->get_data().conditions)
-                    this->self().push_unique(result, seen, formalism::get_or_create<formalism::Action>(this->m_storage->repository, data.name, data.parameters, part, data.effect).get_index());
+                    this->self().push_unique(result,
+                                             seen,
+                                             formalism::get_or_create<formalism::Action>(this->m_storage->repository,
+                                                                                         data.name,
+                                                                                         data.parameters,
+                                                                                         data.original_arity,
+                                                                                         part,
+                                                                                         data.effect)
+                                                 .get_index());
                 continue;
             }
         }
@@ -130,7 +148,10 @@ ygg::IndexList<formalism::Axiom> CopyTranslatorFacade<Derived>::split_disjunctiv
         if (const auto condition_or = this->self().public_as_or(condition))
         {
             for (auto part : condition_or->get_data().conditions)
-                this->self().push_unique(result, seen, formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, data.parameters, data.head, part).get_index());
+                this->self().push_unique(
+                    result,
+                    seen,
+                    formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, data.parameters, data.original_arity, data.head, part).get_index());
         }
         else
         {
@@ -262,7 +283,6 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
     return view;
 }
 
-
-} // namespace loki::semantic::detail
+}  // namespace loki::semantic::detail
 
 #endif

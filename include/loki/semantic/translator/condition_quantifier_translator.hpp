@@ -1,6 +1,20 @@
 /*
- * Copyright (C) 2026 Dominik Drexler
+ * Copyright (C) 2024-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 #ifndef LOKI_SEMANTIC_TRANSLATOR_CONDITION_QUANTIFIER_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_CONDITION_QUANTIFIER_TRANSLATOR_HPP_
@@ -25,14 +39,15 @@ public:
     formalism::ConditionView remove_universal_quantifiers_node(ygg::Index<formalism::ConditionImply> source, const formalism::Repository& repository);
     formalism::ConditionView remove_universal_quantifiers_node(ygg::Index<formalism::ConditionExists> source, const formalism::Repository& repository);
     formalism::ConditionView remove_universal_quantifiers_node(ygg::Index<formalism::ConditionForall> source, const formalism::Repository& repository);
-    formalism::ConditionView remove_universal_quantifiers_node(ygg::Index<formalism::ConditionNumericConstraint> source, const formalism::Repository& repository);
+    formalism::ConditionView remove_universal_quantifiers_node(ygg::Index<formalism::ConditionNumericConstraint> source,
+                                                               const formalism::Repository& repository);
     std::optional<formalism::ConditionExistsView> as_exists(ygg::Index<formalism::Condition> condition) const;
     formalism::ConditionView move_existentials(ygg::Index<formalism::Condition> condition);
     formalism::ConditionView move_existentials_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionLiteral>);
     formalism::ConditionView move_existentials_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionNumericConstraint>);
-    formalism::ConditionView move_existentials_node(ygg::Index<formalism::Condition>,ygg::Index<formalism::ConditionAnd> node);
-    formalism::ConditionView move_existentials_node(ygg::Index<formalism::Condition>,ygg::Index<formalism::ConditionExists> node);
-    formalism::ConditionView move_existentials_node(ygg::Index<formalism::Condition>,ygg::Index<formalism::ConditionOr> node);
+    formalism::ConditionView move_existentials_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionAnd> node);
+    formalism::ConditionView move_existentials_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionExists> node);
+    formalism::ConditionView move_existentials_node(ygg::Index<formalism::Condition>, ygg::Index<formalism::ConditionOr> node);
     template<typename T>
     formalism::ConditionView move_existentials_node(ygg::Index<formalism::Condition> condition, ygg::Index<T>);
     void lift_top_level_exists(ygg::IndexList<formalism::Parameter>& parameters, cista::optional<ygg::Index<formalism::Condition>>& condition);
@@ -64,8 +79,8 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::make_generated_
     const auto name = cista::offset::string("_universal_" + std::to_string(this->m_num_generated_axioms++));
     const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, name, predicate_parameters).get_index();
     const auto atom = formalism::get_or_create<formalism::Atom>(this->m_storage->repository, predicate, terms).get_index();
-    const auto positive_head = formalism::get_or_create<formalism::Literal>(this->m_storage->repository, true, atom).get_index();
-    const auto negative_literal = formalism::get_or_create<formalism::Literal>(this->m_storage->repository, false, atom).get_index();
+    const auto positive_head = formalism::get_or_create<formalism::Literal>(this->m_storage->repository, atom, true).get_index();
+    const auto negative_literal = formalism::get_or_create<formalism::Literal>(this->m_storage->repository, atom, false).get_index();
     const auto axiom = formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, predicate_parameters, positive_head, condition).get_index();
 
     this->m_generated_predicates.push_back(predicate);
@@ -75,18 +90,23 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::make_generated_
     return result;
 }
 
-
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers(ygg::Index<formalism::Condition> condition, const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers(ygg::Index<formalism::Condition> condition,
+                                                                                              const formalism::Repository& repository)
 {
     return std::visit([&](const auto& node) { return this->self().remove_universal_quantifiers_node(node, repository); }, repository[condition].value);
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionLiteral> source, const formalism::Repository& repository) { return this->self().wrap_condition(as_index(this->self().copy(source, repository))); }
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionLiteral> source,
+                                                                                                   const formalism::Repository& repository)
+{
+    return this->self().wrap_condition(as_index(this->self().copy(source, repository)));
+}
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionAnd> source, const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionAnd> source,
+                                                                                                   const formalism::Repository& repository)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : repository[source].conditions)
@@ -95,7 +115,8 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universa
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionOr> source, const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionOr> source,
+                                                                                                   const formalism::Repository& repository)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : repository[source].conditions)
@@ -104,20 +125,30 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universa
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionNot> source, const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionNot> source,
+                                                                                                   const formalism::Repository& repository)
 {
-    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionNot>(this->m_storage->repository, as_index(this->self().remove_universal_quantifiers(repository[source].condition, repository))).get_index());
+    return this->self().wrap_condition(
+        formalism::get_or_create<formalism::ConditionNot>(this->m_storage->repository,
+                                                          as_index(this->self().remove_universal_quantifiers(repository[source].condition, repository)))
+            .get_index());
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionImply> source, const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionImply> source,
+                                                                                                   const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionImply>(this->m_storage->repository, as_index(this->self().remove_universal_quantifiers(data.left, repository)), as_index(this->self().remove_universal_quantifiers(data.right, repository))).get_index());
+    return this->self().wrap_condition(
+        formalism::get_or_create<formalism::ConditionImply>(this->m_storage->repository,
+                                                            as_index(this->self().remove_universal_quantifiers(data.left, repository)),
+                                                            as_index(this->self().remove_universal_quantifiers(data.right, repository)))
+            .get_index());
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionExists> source, const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionExists> source,
+                                                                                                   const formalism::Repository& repository)
 {
     const auto& data = repository[source];
     this->self().increment_quantifications(data.parameters, repository);
@@ -125,11 +156,13 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universa
     this->self().enter_scope(parameters);
     auto condition = as_index(this->self().remove_universal_quantifiers(data.condition, repository));
     this->self().leave_scope();
-    return this->self().flatten_condition(as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), condition).get_index())));
+    return this->self().flatten_condition(as_index(this->self().wrap_condition(
+        formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), condition).get_index())));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionForall> source, const formalism::Repository& repository)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionForall> source,
+                                                                                                   const formalism::Repository& repository)
 {
     const auto& data = repository[source];
     this->self().increment_quantifications(data.parameters, repository);
@@ -137,24 +170,31 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universa
     this->self().enter_scope(parameters);
     auto negated = as_index(this->self().negate_condition(data.condition, repository));
     this->self().leave_scope();
-    const auto exists_not = as_index(this->self().flatten_condition(as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), negated).get_index()))));
+    const auto exists_not = as_index(this->self().flatten_condition(as_index(this->self().wrap_condition(
+        formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), negated).get_index()))));
     const auto translated_exists_not = as_index(this->self().remove_universal_quantifiers(exists_not, this->m_storage->repository));
     return this->self().make_generated_axiom_condition(translated_exists_not);
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionNumericConstraint> source, const formalism::Repository& repository) { return this->self().wrap_condition(as_index(this->self().copy(source, repository))); }
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::remove_universal_quantifiers_node(ygg::Index<formalism::ConditionNumericConstraint> source,
+                                                                                                   const formalism::Repository& repository)
+{
+    return this->self().wrap_condition(as_index(this->self().copy(source, repository)));
+}
 
 template<typename Derived>
 std::optional<formalism::ConditionExistsView> ConditionQuantifierTranslator<Derived>::as_exists(ygg::Index<formalism::Condition> condition) const
 {
     auto result = std::optional<formalism::ConditionExistsView> {};
-    std::visit([&](const auto& node)
-    {
-        using Node = std::decay_t<decltype(node)>;
-        if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionExists>>)
-            result = ygg::make_view(node, this->m_storage->repository);
-    }, this->m_storage->repository[condition].value);
+    std::visit(
+        [&](const auto& node)
+        {
+            using Node = std::decay_t<decltype(node)>;
+            if constexpr (std::is_same_v<Node, ygg::Index<formalism::ConditionExists>>)
+                result = ygg::make_view(node, this->m_storage->repository);
+        },
+        this->m_storage->repository[condition].value);
     return result;
 }
 
@@ -165,13 +205,22 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentia
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionLiteral>) { return ygg::make_view(condition, this->m_storage->repository); }
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition> condition,
+                                                                                        ygg::Index<formalism::ConditionLiteral>)
+{
+    return ygg::make_view(condition, this->m_storage->repository);
+}
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition> condition, ygg::Index<formalism::ConditionNumericConstraint>) { return ygg::make_view(condition, this->m_storage->repository); }
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition> condition,
+                                                                                        ygg::Index<formalism::ConditionNumericConstraint>)
+{
+    return ygg::make_view(condition, this->m_storage->repository);
+}
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition>,ygg::Index<formalism::ConditionAnd> node)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition>,
+                                                                                        ygg::Index<formalism::ConditionAnd> node)
 {
     auto parameters = ygg::IndexList<formalism::Parameter> {};
     auto seen_parameters = std::unordered_set<ygg::uint_t> {};
@@ -197,18 +246,25 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentia
     auto conjunction = as_index(this->self().make_conjunction(std::move(parts)));
     if (parameters.empty())
         return ygg::make_view(conjunction, this->m_storage->repository);
-    return this->self().flatten_condition(as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), conjunction).get_index())));
+    return this->self().flatten_condition(as_index(this->self().wrap_condition(
+        formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), conjunction).get_index())));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition>,ygg::Index<formalism::ConditionExists> node)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition>,
+                                                                                        ygg::Index<formalism::ConditionExists> node)
 {
     const auto& data = this->m_storage->repository[node];
-    return this->self().flatten_condition(as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, data.parameters, as_index(this->self().move_existentials(data.condition))).get_index())));
+    return this->self().flatten_condition(
+        as_index(this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository,
+                                                                                                  data.parameters,
+                                                                                                  as_index(this->self().move_existentials(data.condition)))
+                                                 .get_index())));
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition>,ygg::Index<formalism::ConditionOr> node)
+formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentials_node(ygg::Index<formalism::Condition>,
+                                                                                        ygg::Index<formalism::ConditionOr> node)
 {
     auto parts = ygg::IndexList<formalism::Condition> {};
     for (auto child : this->m_storage->repository[node].conditions)
@@ -224,7 +280,8 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::move_existentia
 }
 
 template<typename Derived>
-void ConditionQuantifierTranslator<Derived>::lift_top_level_exists(ygg::IndexList<formalism::Parameter>& parameters, cista::optional<ygg::Index<formalism::Condition>>& condition)
+void ConditionQuantifierTranslator<Derived>::lift_top_level_exists(ygg::IndexList<formalism::Parameter>& parameters,
+                                                                   cista::optional<ygg::Index<formalism::Condition>>& condition)
 {
     if (!condition)
         return;
@@ -247,13 +304,14 @@ void ConditionQuantifierTranslator<Derived>::lift_top_level_exists(ygg::IndexLis
 }
 
 template<typename Derived>
-void ConditionQuantifierTranslator<Derived>::lift_top_level_exists(ygg::IndexList<formalism::Parameter>& parameters, ygg::Index<formalism::Condition>& condition)
+void ConditionQuantifierTranslator<Derived>::lift_top_level_exists(ygg::IndexList<formalism::Parameter>& parameters,
+                                                                   ygg::Index<formalism::Condition>& condition)
 {
     auto optional = cista::optional<ygg::Index<formalism::Condition>>(condition);
     this->self().lift_top_level_exists(parameters, optional);
     condition = *optional;
 }
 
-} // namespace loki::semantic::detail
+}  // namespace loki::semantic::detail
 
 #endif

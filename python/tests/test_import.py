@@ -93,12 +93,12 @@ def test_programmatic_gripper_example_uses_public_api():
     assert reparsed_one_ball.get_name() == one_ball.get_name()
 
     assert domain.get_name() == "gripper"
-    assert domain.get_num_actions() == 3
-    assert domain.get_num_predicates() == 4
-    assert one_ball.get_num_objects() == 5
-    assert one_ball.get_num_initial_literals() == 4
-    assert two_ball.get_num_objects() == 6
-    assert two_ball.get_num_initial_literals() == 5
+    assert len(domain.get_actions()) == 3
+    assert len(domain.get_predicates()) == 4
+    assert len(one_ball.get_objects()) == 5
+    assert len(one_ball.get_initial_literals()) == 4
+    assert len(two_ball.get_objects()) == 6
+    assert len(two_ball.get_initial_literals()) == 5
 
 
 if __name__ == "__main__":

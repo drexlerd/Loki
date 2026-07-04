@@ -1,11 +1,20 @@
 /*
- * Copyright (C) 2026 Dominik Drexler
+ * Copyright (C) 2024-2026 Dominik Drexler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 #include <gtest/gtest.h>
 
@@ -108,12 +117,12 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
         const auto task_translation = semantic::translate(parser.parse_task(item.task_file), domain_translation);
         const auto translated_task = task_translation.get_translated_task();
 
-        EXPECT_EQ(translated_domain.get_num_predicates(), expected.domain_predicates);
-        EXPECT_EQ(translated_domain.get_num_actions(), expected.domain_actions);
-        EXPECT_EQ(translated_domain.get_num_axioms(), expected.domain_axioms);
-        EXPECT_EQ(translated_task.get_num_predicates(), expected.task_predicates);
-        EXPECT_EQ(translated_task.get_domain().get_num_actions(), expected.task_actions);
-        EXPECT_EQ(translated_task.get_num_axioms(), expected.task_axioms);
+        EXPECT_EQ(translated_domain.get_predicates().size(), expected.domain_predicates);
+        EXPECT_EQ(translated_domain.get_actions().size(), expected.domain_actions);
+        EXPECT_EQ(translated_domain.get_axioms().size(), expected.domain_axioms);
+        EXPECT_EQ(translated_task.get_predicates().size(), expected.task_predicates);
+        EXPECT_EQ(translated_task.get_domain().get_actions().size(), expected.task_actions);
+        EXPECT_EQ(translated_task.get_axioms().size(), expected.task_axioms);
     }
 }
 

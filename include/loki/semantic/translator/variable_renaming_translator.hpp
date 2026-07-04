@@ -1,6 +1,20 @@
 /*
- * Copyright (C) 2026 Dominik Drexler
+ * Copyright (C) 2024-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 #ifndef LOKI_SEMANTIC_TRANSLATOR_VARIABLE_RENAMING_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_VARIABLE_RENAMING_TRANSLATOR_HPP_
@@ -37,7 +51,8 @@ public:
     formalism::ConditionImplyView rename_variables(ygg::Index<formalism::ConditionImply> source, const formalism::Repository& repository);
     formalism::ConditionExistsView rename_variables(ygg::Index<formalism::ConditionExists> source, const formalism::Repository& repository);
     formalism::ConditionForallView rename_variables(ygg::Index<formalism::ConditionForall> source, const formalism::Repository& repository);
-    formalism::ConditionNumericConstraintView rename_variables(ygg::Index<formalism::ConditionNumericConstraint> source, const formalism::Repository& repository);
+    formalism::ConditionNumericConstraintView rename_variables(ygg::Index<formalism::ConditionNumericConstraint> source,
+                                                               const formalism::Repository& repository);
     formalism::ConditionView rename_variables(ygg::Index<formalism::Condition> source, const formalism::Repository& repository);
 
     formalism::EffectLiteralView rename_variables(ygg::Index<formalism::EffectLiteral> source, const formalism::Repository& repository);
@@ -46,7 +61,8 @@ public:
     formalism::EffectForallView rename_variables(ygg::Index<formalism::EffectForall> source, const formalism::Repository& repository);
     formalism::EffectWhenView rename_variables(ygg::Index<formalism::EffectWhen> source, const formalism::Repository& repository);
     formalism::EffectOneOfView rename_variables(ygg::Index<formalism::EffectOneOf> source, const formalism::Repository& repository);
-    formalism::EffectProbabilisticAlternativeView rename_variables(ygg::Index<formalism::EffectProbabilisticAlternative> source, const formalism::Repository& repository);
+    formalism::EffectProbabilisticAlternativeView rename_variables(ygg::Index<formalism::EffectProbabilisticAlternative> source,
+                                                                   const formalism::Repository& repository);
     formalism::EffectProbabilisticView rename_variables(ygg::Index<formalism::EffectProbabilistic> source, const formalism::Repository& repository);
     formalism::EffectView rename_variables(ygg::Index<formalism::Effect> source, const formalism::Repository& repository);
 
@@ -95,11 +111,14 @@ formalism::ParameterView VariableRenamingTranslator<Derived>::rename_parameter(y
     const auto& data = repository[source];
     const auto variable = this->self().fresh_variable(data.variable, repository);
     this->m_variable_bindings.back().emplace(data.variable.get_value(), variable);
-    return formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, variable.get_index(), this->self().template copy_list<formalism::Type>(data.types, repository));
+    return formalism::get_or_create<formalism::Parameter>(this->m_storage->repository,
+                                                          variable.get_index(),
+                                                          this->self().template copy_list<formalism::Type>(data.types, repository));
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Parameter> VariableRenamingTranslator<Derived>::rename_parameters(const ygg::IndexList<formalism::Parameter>& source, const formalism::Repository& repository)
+ygg::IndexList<formalism::Parameter> VariableRenamingTranslator<Derived>::rename_parameters(const ygg::IndexList<formalism::Parameter>& source,
+                                                                                            const formalism::Repository& repository)
 {
     auto result = ygg::IndexList<formalism::Parameter> {};
     for (auto parameter : source)
@@ -137,35 +156,48 @@ template<typename Derived>
 formalism::LiteralView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::Literal> source, const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return formalism::get_or_create<formalism::Literal>(this->m_storage->repository, data.positive, as_index(this->self().rename_variables(data.atom, repository)));
+    return formalism::get_or_create<formalism::Literal>(this->m_storage->repository,
+                                                        as_index(this->self().rename_variables(data.atom, repository)),
+                                                        data.m_polarity);
 }
 
 template<typename Derived>
-formalism::FunctionTermView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::FunctionTerm> source, const formalism::Repository& repository)
+formalism::FunctionTermView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::FunctionTerm> source,
+                                                                                  const formalism::Repository& repository)
 {
     const auto& data = repository[source];
     auto terms = ygg::IndexList<formalism::Term> {};
     for (auto term : data.terms)
         terms.push_back(as_index(this->self().rename_variables(term, repository)));
-    return formalism::get_or_create<formalism::FunctionTerm>(this->m_storage->repository, as_index(this->self().copy(data.function, repository)), std::move(terms));
+    return formalism::get_or_create<formalism::FunctionTerm>(this->m_storage->repository,
+                                                             as_index(this->self().copy(data.function, repository)),
+                                                             std::move(terms));
 }
 
 template<typename Derived>
-formalism::UnaryFunctionExpressionView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::UnaryFunctionExpression> source, const formalism::Repository& repository)
+formalism::UnaryFunctionExpressionView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::UnaryFunctionExpression> source,
+                                                                                             const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return formalism::get_or_create<formalism::UnaryFunctionExpression>(this->m_storage->repository, data.op, as_index(this->self().rename_variables(data.expression, repository)));
+    return formalism::get_or_create<formalism::UnaryFunctionExpression>(this->m_storage->repository,
+                                                                        data.op,
+                                                                        as_index(this->self().rename_variables(data.expression, repository)));
 }
 
 template<typename Derived>
-formalism::BinaryFunctionExpressionView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::BinaryFunctionExpression> source, const formalism::Repository& repository)
+formalism::BinaryFunctionExpressionView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::BinaryFunctionExpression> source,
+                                                                                              const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return formalism::get_or_create<formalism::BinaryFunctionExpression>(this->m_storage->repository, data.op, as_index(this->self().rename_variables(data.left, repository)), as_index(this->self().rename_variables(data.right, repository)));
+    return formalism::get_or_create<formalism::BinaryFunctionExpression>(this->m_storage->repository,
+                                                                         data.op,
+                                                                         as_index(this->self().rename_variables(data.left, repository)),
+                                                                         as_index(this->self().rename_variables(data.right, repository)));
 }
 
 template<typename Derived>
-formalism::MultiFunctionExpressionView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::MultiFunctionExpression> source, const formalism::Repository& repository)
+formalism::MultiFunctionExpressionView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::MultiFunctionExpression> source,
+                                                                                             const formalism::Repository& repository)
 {
     const auto& data = repository[source];
     auto expressions = ygg::IndexList<formalism::FunctionExpression> {};
@@ -175,7 +207,8 @@ formalism::MultiFunctionExpressionView VariableRenamingTranslator<Derived>::rena
 }
 
 template<typename Derived>
-formalism::FunctionExpressionView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::FunctionExpression> source, const formalism::Repository& repository)
+formalism::FunctionExpressionView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::FunctionExpression> source,
+                                                                                        const formalism::Repository& repository)
 {
     auto value = std::visit(
         [&](const auto& arg) -> ygg::Data<formalism::FunctionExpression>::Variant
@@ -193,13 +226,16 @@ formalism::FunctionExpressionView VariableRenamingTranslator<Derived>::rename_va
 }
 
 template<typename Derived>
-formalism::ConditionLiteralView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionLiteral> source, const formalism::Repository& repository)
+formalism::ConditionLiteralView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionLiteral> source,
+                                                                                      const formalism::Repository& repository)
 {
-    return formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, as_index(this->self().rename_variables(repository[source].literal, repository)));
+    return formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository,
+                                                                 as_index(this->self().rename_variables(repository[source].literal, repository)));
 }
 
 template<typename Derived>
-formalism::ConditionAndView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionAnd> source, const formalism::Repository& repository)
+formalism::ConditionAndView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionAnd> source,
+                                                                                  const formalism::Repository& repository)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : repository[source].conditions)
@@ -208,7 +244,8 @@ formalism::ConditionAndView VariableRenamingTranslator<Derived>::rename_variable
 }
 
 template<typename Derived>
-formalism::ConditionOrView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionOr> source, const formalism::Repository& repository)
+formalism::ConditionOrView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionOr> source,
+                                                                                 const formalism::Repository& repository)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : repository[source].conditions)
@@ -217,20 +254,26 @@ formalism::ConditionOrView VariableRenamingTranslator<Derived>::rename_variables
 }
 
 template<typename Derived>
-formalism::ConditionNotView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionNot> source, const formalism::Repository& repository)
+formalism::ConditionNotView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionNot> source,
+                                                                                  const formalism::Repository& repository)
 {
-    return formalism::get_or_create<formalism::ConditionNot>(this->m_storage->repository, as_index(this->self().rename_variables(repository[source].condition, repository)));
+    return formalism::get_or_create<formalism::ConditionNot>(this->m_storage->repository,
+                                                             as_index(this->self().rename_variables(repository[source].condition, repository)));
 }
 
 template<typename Derived>
-formalism::ConditionImplyView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionImply> source, const formalism::Repository& repository)
+formalism::ConditionImplyView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionImply> source,
+                                                                                    const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return formalism::get_or_create<formalism::ConditionImply>(this->m_storage->repository, as_index(this->self().rename_variables(data.left, repository)), as_index(this->self().rename_variables(data.right, repository)));
+    return formalism::get_or_create<formalism::ConditionImply>(this->m_storage->repository,
+                                                               as_index(this->self().rename_variables(data.left, repository)),
+                                                               as_index(this->self().rename_variables(data.right, repository)));
 }
 
 template<typename Derived>
-formalism::ConditionExistsView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionExists> source, const formalism::Repository& repository)
+formalism::ConditionExistsView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionExists> source,
+                                                                                     const formalism::Repository& repository)
 {
     const auto& data = repository[source];
     this->self().enter_variable_scope();
@@ -241,7 +284,8 @@ formalism::ConditionExistsView VariableRenamingTranslator<Derived>::rename_varia
 }
 
 template<typename Derived>
-formalism::ConditionForallView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionForall> source, const formalism::Repository& repository)
+formalism::ConditionForallView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionForall> source,
+                                                                                     const formalism::Repository& repository)
 {
     const auto& data = repository[source];
     this->self().enter_variable_scope();
@@ -252,23 +296,31 @@ formalism::ConditionForallView VariableRenamingTranslator<Derived>::rename_varia
 }
 
 template<typename Derived>
-formalism::ConditionNumericConstraintView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionNumericConstraint> source, const formalism::Repository& repository)
+formalism::ConditionNumericConstraintView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::ConditionNumericConstraint> source,
+                                                                                                const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return formalism::get_or_create<formalism::ConditionNumericConstraint>(this->m_storage->repository, data.comparator, as_index(this->self().rename_variables(data.left, repository)), as_index(this->self().rename_variables(data.right, repository)));
+    return formalism::get_or_create<formalism::ConditionNumericConstraint>(this->m_storage->repository,
+                                                                           data.comparator,
+                                                                           as_index(this->self().rename_variables(data.left, repository)),
+                                                                           as_index(this->self().rename_variables(data.right, repository)));
 }
 
 template<typename Derived>
 formalism::ConditionView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::Condition> source, const formalism::Repository& repository)
 {
-    auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::Condition>::Variant { return as_index(this->self().rename_variables(arg, repository)); }, repository[source].value);
+    auto value =
+        std::visit([&](const auto& arg) -> ygg::Data<formalism::Condition>::Variant { return as_index(this->self().rename_variables(arg, repository)); },
+                   repository[source].value);
     return formalism::get_or_create<formalism::Condition>(this->m_storage->repository, std::move(value));
 }
 
 template<typename Derived>
-formalism::EffectLiteralView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectLiteral> source, const formalism::Repository& repository)
+formalism::EffectLiteralView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectLiteral> source,
+                                                                                   const formalism::Repository& repository)
 {
-    return formalism::get_or_create<formalism::EffectLiteral>(this->m_storage->repository, as_index(this->self().rename_variables(repository[source].literal, repository)));
+    return formalism::get_or_create<formalism::EffectLiteral>(this->m_storage->repository,
+                                                              as_index(this->self().rename_variables(repository[source].literal, repository)));
 }
 
 template<typename Derived>
@@ -281,17 +333,23 @@ formalism::EffectAndView VariableRenamingTranslator<Derived>::rename_variables(y
 }
 
 template<typename Derived>
-formalism::EffectNumericView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectNumeric> source, const formalism::Repository& repository)
+formalism::EffectNumericView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectNumeric> source,
+                                                                                   const formalism::Repository& repository)
 {
     const auto& data = repository[source];
     auto terms = ygg::IndexList<formalism::Term> {};
     for (auto term : data.terms)
         terms.push_back(as_index(this->self().rename_variables(term, repository)));
-    return formalism::get_or_create<formalism::EffectNumeric>(this->m_storage->repository, data.op, as_index(this->self().copy(data.function, repository)), std::move(terms), as_index(this->self().rename_variables(data.expression, repository)));
+    return formalism::get_or_create<formalism::EffectNumeric>(this->m_storage->repository,
+                                                              data.op,
+                                                              as_index(this->self().copy(data.function, repository)),
+                                                              std::move(terms),
+                                                              as_index(this->self().rename_variables(data.expression, repository)));
 }
 
 template<typename Derived>
-formalism::EffectForallView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectForall> source, const formalism::Repository& repository)
+formalism::EffectForallView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectForall> source,
+                                                                                  const formalism::Repository& repository)
 {
     const auto& data = repository[source];
     this->self().enter_variable_scope();
@@ -302,14 +360,18 @@ formalism::EffectForallView VariableRenamingTranslator<Derived>::rename_variable
 }
 
 template<typename Derived>
-formalism::EffectWhenView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectWhen> source, const formalism::Repository& repository)
+formalism::EffectWhenView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectWhen> source,
+                                                                                const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, as_index(this->self().rename_variables(data.condition, repository)), as_index(this->self().rename_variables(data.effect, repository)));
+    return formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository,
+                                                           as_index(this->self().rename_variables(data.condition, repository)),
+                                                           as_index(this->self().rename_variables(data.effect, repository)));
 }
 
 template<typename Derived>
-formalism::EffectOneOfView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectOneOf> source, const formalism::Repository& repository)
+formalism::EffectOneOfView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectOneOf> source,
+                                                                                 const formalism::Repository& repository)
 {
     auto effects = ygg::IndexList<formalism::Effect> {};
     for (auto effect : repository[source].effects)
@@ -318,14 +380,18 @@ formalism::EffectOneOfView VariableRenamingTranslator<Derived>::rename_variables
 }
 
 template<typename Derived>
-formalism::EffectProbabilisticAlternativeView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectProbabilisticAlternative> source, const formalism::Repository& repository)
+formalism::EffectProbabilisticAlternativeView
+VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectProbabilisticAlternative> source, const formalism::Repository& repository)
 {
     const auto& data = repository[source];
-    return formalism::get_or_create<formalism::EffectProbabilisticAlternative>(this->m_storage->repository, data.probability, as_index(this->self().rename_variables(data.effect, repository)));
+    return formalism::get_or_create<formalism::EffectProbabilisticAlternative>(this->m_storage->repository,
+                                                                               data.probability,
+                                                                               as_index(this->self().rename_variables(data.effect, repository)));
 }
 
 template<typename Derived>
-formalism::EffectProbabilisticView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectProbabilistic> source, const formalism::Repository& repository)
+formalism::EffectProbabilisticView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::EffectProbabilistic> source,
+                                                                                         const formalism::Repository& repository)
 {
     auto alternatives = ygg::IndexList<formalism::EffectProbabilisticAlternative> {};
     for (auto alternative : repository[source].alternatives)
@@ -336,12 +402,14 @@ formalism::EffectProbabilisticView VariableRenamingTranslator<Derived>::rename_v
 template<typename Derived>
 formalism::EffectView VariableRenamingTranslator<Derived>::rename_variables(ygg::Index<formalism::Effect> source, const formalism::Repository& repository)
 {
-    auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant { return as_index(this->self().rename_variables(arg, repository)); }, repository[source].value);
+    auto value = std::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant { return as_index(this->self().rename_variables(arg, repository)); },
+                            repository[source].value);
     return formalism::get_or_create<formalism::Effect>(this->m_storage->repository, std::move(value));
 }
 
 template<typename Derived>
-formalism::ActionView VariableRenamingTranslator<Derived>::rename_action_variables(ygg::Index<formalism::Action> source, const formalism::Repository& repository)
+formalism::ActionView VariableRenamingTranslator<Derived>::rename_action_variables(ygg::Index<formalism::Action> source,
+                                                                                   const formalism::Repository& repository)
 {
     const auto& data = repository[source];
     this->m_num_quantifications.clear();
@@ -354,7 +422,12 @@ formalism::ActionView VariableRenamingTranslator<Derived>::rename_action_variabl
     if (data.effect)
         effect = as_index(this->self().rename_variables(*data.effect, repository));
     this->self().leave_variable_scope();
-    return formalism::get_or_create<formalism::Action>(this->m_storage->repository, data.name, std::move(parameters), precondition, effect);
+    return formalism::get_or_create<formalism::Action>(this->m_storage->repository,
+                                                       data.name,
+                                                       std::move(parameters),
+                                                       data.original_arity,
+                                                       precondition,
+                                                       effect);
 }
 
 template<typename Derived>
@@ -367,9 +440,9 @@ formalism::AxiomView VariableRenamingTranslator<Derived>::rename_axiom_variables
     auto head = as_index(this->self().rename_variables(data.head, repository));
     auto condition = as_index(this->self().rename_variables(data.condition, repository));
     this->self().leave_variable_scope();
-    return formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, std::move(parameters), head, condition);
+    return formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, std::move(parameters), data.original_arity, head, condition);
 }
 
-} // namespace loki::semantic::detail
+}  // namespace loki::semantic::detail
 
 #endif
