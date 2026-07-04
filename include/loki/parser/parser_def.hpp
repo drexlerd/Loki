@@ -15,17 +15,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_PARSER_PARSER_DEF_HPP_
 #define LOKI_PARSER_PARSER_DEF_HPP_
 
 #include "loki/parser/ast_adapted.hpp"
 #include "loki/parser/parser.hpp"
 
+#include <boost/fusion/include/at_c.hpp>
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
-#include <boost/fusion/include/at_c.hpp>
-
 #include <string>
 #include <vector>
 
@@ -34,6 +32,8 @@ namespace loki::parser::rules
 namespace x3 = boost::spirit::x3;
 namespace ascii = boost::spirit::x3::ascii;
 
+using x3::_attr;
+using x3::_val;
 using x3::attr;
 using x3::char_;
 using x3::double_;
@@ -42,8 +42,6 @@ using x3::lit;
 using x3::no_case;
 using x3::omit;
 using x3::string;
-using x3::_attr;
-using x3::_val;
 
 identifier_type const identifier = "identifier";
 type_expression_type const type_expression = "type_expression";
@@ -68,37 +66,99 @@ file_type const file = "file";
 
 namespace detail
 {
-struct VariableIdentifierClass : ErrorHandlerBase {};
-struct TypeReferenceClass : ErrorHandlerBase {};
-struct EitherTypeClass : ErrorHandlerBase {};
-struct FunctionExpressionNumberClass : ErrorHandlerBase {};
-struct FunctionExpressionFunctionClass : ErrorHandlerBase {};
-struct FunctionExpressionUnaryClass : ErrorHandlerBase {};
-struct FunctionExpressionBinaryClass : ErrorHandlerBase {};
-struct FunctionExpressionMultiClass : ErrorHandlerBase {};
-struct ConditionLiteralClass : ErrorHandlerBase {};
-struct ConditionAndClass : ErrorHandlerBase {};
-struct ConditionOrClass : ErrorHandlerBase {};
-struct ConditionNotClass : ErrorHandlerBase {};
-struct ConditionImplyClass : ErrorHandlerBase {};
-struct ConditionExistsClass : ErrorHandlerBase {};
-struct ConditionForallClass : ErrorHandlerBase {};
-struct ConditionNumericConstraintClass : ErrorHandlerBase {};
-struct EffectLiteralClass : ErrorHandlerBase {};
-struct EffectAndClass : ErrorHandlerBase {};
-struct EffectNumericClass : ErrorHandlerBase {};
-struct EffectForallClass : ErrorHandlerBase {};
-struct EffectWhenClass : ErrorHandlerBase {};
-struct EffectOneOfClass : ErrorHandlerBase {};
-struct EffectProbabilisticClass : ErrorHandlerBase {};
-struct ProbabilisticEffectAlternativeClass : ErrorHandlerBase {};
-struct RequirementSectionClass : ErrorHandlerBase {};
-struct TypeSectionClass : ErrorHandlerBase {};
-struct ConstantSectionClass : ErrorHandlerBase {};
-struct PredicateSectionClass : ErrorHandlerBase {};
-struct FunctionSectionClass : ErrorHandlerBase {};
-struct ObjectSectionClass : ErrorHandlerBase {};
-struct InitialSectionClass : ErrorHandlerBase {};
+struct VariableIdentifierClass : ErrorHandlerBase
+{
+};
+struct TypeReferenceClass : ErrorHandlerBase
+{
+};
+struct EitherTypeClass : ErrorHandlerBase
+{
+};
+struct FunctionExpressionNumberClass : ErrorHandlerBase
+{
+};
+struct FunctionExpressionFunctionClass : ErrorHandlerBase
+{
+};
+struct FunctionExpressionUnaryClass : ErrorHandlerBase
+{
+};
+struct FunctionExpressionBinaryClass : ErrorHandlerBase
+{
+};
+struct FunctionExpressionMultiClass : ErrorHandlerBase
+{
+};
+struct ConditionLiteralClass : ErrorHandlerBase
+{
+};
+struct ConditionAndClass : ErrorHandlerBase
+{
+};
+struct ConditionOrClass : ErrorHandlerBase
+{
+};
+struct ConditionNotClass : ErrorHandlerBase
+{
+};
+struct ConditionImplyClass : ErrorHandlerBase
+{
+};
+struct ConditionExistsClass : ErrorHandlerBase
+{
+};
+struct ConditionForallClass : ErrorHandlerBase
+{
+};
+struct ConditionNumericConstraintClass : ErrorHandlerBase
+{
+};
+struct EffectLiteralClass : ErrorHandlerBase
+{
+};
+struct EffectAndClass : ErrorHandlerBase
+{
+};
+struct EffectNumericClass : ErrorHandlerBase
+{
+};
+struct EffectForallClass : ErrorHandlerBase
+{
+};
+struct EffectWhenClass : ErrorHandlerBase
+{
+};
+struct EffectOneOfClass : ErrorHandlerBase
+{
+};
+struct EffectProbabilisticClass : ErrorHandlerBase
+{
+};
+struct ProbabilisticEffectAlternativeClass : ErrorHandlerBase
+{
+};
+struct RequirementSectionClass : ErrorHandlerBase
+{
+};
+struct TypeSectionClass : ErrorHandlerBase
+{
+};
+struct ConstantSectionClass : ErrorHandlerBase
+{
+};
+struct PredicateSectionClass : ErrorHandlerBase
+{
+};
+struct FunctionSectionClass : ErrorHandlerBase
+{
+};
+struct ObjectSectionClass : ErrorHandlerBase
+{
+};
+struct InitialSectionClass : ErrorHandlerBase
+{
+};
 
 x3::rule<VariableIdentifierClass, ast::Identifier> const variable_identifier = "variable_identifier";
 x3::rule<TypeReferenceClass, ast::TypeReference> const type_reference = "type_reference";
@@ -134,82 +194,106 @@ x3::rule<InitialSectionClass, std::vector<ast::InitialElement>> const initial_se
 
 inline const auto symbol = lexeme[+(char_ - '(' - ')' - ';' - ascii::space)];
 inline const auto keyword = [](char const* text) { return no_case[lit(text)]; };
-inline const auto operator_symbol = lexeme[string("scale-down") | string("scale-up") | string("increase") | string("decrease") | string("assign") | string("minus") | char_("+-*/=<>!") >> -char_('=')];
-} // namespace detail
+inline const auto operator_symbol = lexeme[string("scale-down") | string("scale-up") | string("increase") | string("decrease") | string("assign")
+                                           | string("minus") | char_("+-*/=<>!") >> -char_('=')];
+}  // namespace detail
 
 namespace d = detail;
-using d::variable_identifier;
-using d::type_reference;
-using d::either_type;
-using d::function_expression_number;
-using d::function_expression_function;
-using d::function_expression_unary;
-using d::function_expression_binary;
-using d::function_expression_multi;
-using d::condition_literal;
 using d::condition_and;
-using d::condition_or;
-using d::condition_not;
-using d::condition_imply;
 using d::condition_exists;
 using d::condition_forall;
+using d::condition_imply;
+using d::condition_literal;
+using d::condition_not;
 using d::condition_numeric_constraint;
-using d::effect_literal;
+using d::condition_or;
+using d::constant_section;
 using d::effect_and;
-using d::effect_numeric;
 using d::effect_forall;
-using d::effect_when;
+using d::effect_literal;
+using d::effect_numeric;
 using d::effect_one_of;
 using d::effect_probabilistic;
+using d::effect_when;
+using d::either_type;
+using d::function_expression_binary;
+using d::function_expression_function;
+using d::function_expression_multi;
+using d::function_expression_number;
+using d::function_expression_unary;
+using d::function_section;
+using d::initial_section;
+using d::object_section;
+using d::predicate_section;
 using d::probabilistic_effect_alternative;
 using d::requirement_section;
+using d::type_reference;
 using d::type_section;
-using d::constant_section;
-using d::predicate_section;
-using d::function_section;
-using d::object_section;
-using d::initial_section;
-
+using d::variable_identifier;
 
 struct set_domain_name
 {
     template<typename Context>
-    void operator()(Context const& ctx) const { _val(ctx).name = _attr(ctx); }
+    void operator()(Context const& ctx) const
+    {
+        _val(ctx).name = _attr(ctx);
+    }
 };
 struct set_domain_requirements
 {
     template<typename Context>
-    void operator()(Context const& ctx) const { _val(ctx).requirements = _attr(ctx); }
+    void operator()(Context const& ctx) const
+    {
+        _val(ctx).requirements = _attr(ctx);
+    }
 };
 struct set_domain_types
 {
     template<typename Context>
-    void operator()(Context const& ctx) const { _val(ctx).types = _attr(ctx); }
+    void operator()(Context const& ctx) const
+    {
+        _val(ctx).types = _attr(ctx);
+    }
 };
 struct set_domain_constants
 {
     template<typename Context>
-    void operator()(Context const& ctx) const { _val(ctx).constants = _attr(ctx); }
+    void operator()(Context const& ctx) const
+    {
+        _val(ctx).constants = _attr(ctx);
+    }
 };
 struct set_domain_predicates
 {
     template<typename Context>
-    void operator()(Context const& ctx) const { _val(ctx).predicates = _attr(ctx); }
+    void operator()(Context const& ctx) const
+    {
+        _val(ctx).predicates = _attr(ctx);
+    }
 };
 struct set_domain_functions
 {
     template<typename Context>
-    void operator()(Context const& ctx) const { _val(ctx).functions = _attr(ctx); }
+    void operator()(Context const& ctx) const
+    {
+        _val(ctx).functions = _attr(ctx);
+    }
 };
 struct push_domain_axiom
 {
     template<typename Context>
-    void operator()(Context const& ctx) const { _val(ctx).axioms.push_back(_attr(ctx)); }
+    void operator()(Context const& ctx) const
+    {
+        _val(ctx).axioms.push_back(_attr(ctx));
+    }
 };
 struct push_domain_action
 {
     template<typename Context>
-    void operator()(Context const& ctx) const { _val(ctx).actions.push_back(_attr(ctx)); }
+    void operator()(Context const& ctx) const
+    {
+        _val(ctx).actions.push_back(_attr(ctx));
+    }
 };
 
 struct append_typed_names
@@ -252,26 +336,36 @@ struct append_typed_variables
 
 auto const identifier_def = d::symbol;
 auto const type_expression_def = d::type_reference | d::either_type;
-auto const typed_name_group = x3::rule<class TypedNameGroupClass, std::vector<ast::TypedName>> { "typed_name_group" } = (+( !lit('-') >> identifier) >> -(lit('-') >> type_expression))[append_typed_names {}];
-auto const typed_variable_group = x3::rule<class TypedVariableGroupClass, std::vector<ast::TypedVariable>> { "typed_variable_group" } = (+( !lit('-') >> d::variable_identifier) >> -(lit('-') >> type_expression))[append_typed_variables {}];
+auto const typed_name_group = x3::rule<class TypedNameGroupClass, std::vector<ast::TypedName>> { "typed_name_group" } =
+    (+(!lit('-') >> identifier) >> -(lit('-') >> type_expression))[append_typed_names {}];
+auto const typed_variable_group = x3::rule<class TypedVariableGroupClass, std::vector<ast::TypedVariable>> { "typed_variable_group" } =
+    (+(!lit('-') >> d::variable_identifier) >> -(lit('-') >> type_expression))[append_typed_variables {}];
 auto const typed_name_list_def = *typed_name_group;
 auto const typed_variable_list_def = *typed_variable_group;
 auto const term_def = (d::variable_identifier >> attr(true)) | (identifier >> attr(false));
 auto const atom_def = '(' >> identifier >> *term >> ')';
 auto const literal_def = ('(' >> d::keyword("not") >> atom >> ')' >> attr(false)) | (atom >> attr(true));
 auto const function_term_def = '(' >> identifier >> *term >> ')';
-auto const function_expression_def = d::function_expression_number | d::function_expression_unary | d::function_expression_binary | d::function_expression_multi | d::function_expression_function;
+auto const function_expression_def = d::function_expression_number | d::function_expression_unary | d::function_expression_binary | d::function_expression_multi
+                                     | d::function_expression_function;
 auto const condition_empty = x3::rule<class ConditionEmptyClass, ast::Condition> { "condition_empty" } = lit('(') >> lit(')') >> attr(ast::ConditionAnd {});
-auto const condition_def = condition_empty | d::condition_and | d::condition_or | d::condition_not | d::condition_imply | d::condition_exists | d::condition_forall | d::condition_numeric_constraint | d::condition_literal;
+auto const condition_def = condition_empty | d::condition_and | d::condition_or | d::condition_not | d::condition_imply | d::condition_exists
+                           | d::condition_forall | d::condition_numeric_constraint | d::condition_literal;
 auto const effect_def = d::effect_and | d::effect_forall | d::effect_when | d::effect_one_of | d::effect_probabilistic | d::effect_numeric | d::effect_literal;
 auto const predicate_declaration_def = '(' >> identifier >> typed_variable_list >> ')';
 auto const function_declaration_def = '(' >> identifier >> typed_variable_list >> ')' >> -(lit('-') >> type_expression);
-auto const action_def = '(' >> d::keyword(":action") >> identifier >> d::keyword(":parameters") >> '(' >> typed_variable_list >> ')' >> -(d::keyword(":precondition") >> condition) >> -(d::keyword(":effect") >> effect) >> ')';
+auto const action_def = '(' >> d::keyword(":action") >> identifier >> d::keyword(":parameters") >> '(' >> typed_variable_list >> ')'
+                        >> -(d::keyword(":precondition") >> condition) >> -(d::keyword(":effect") >> effect) >> ')';
 auto const axiom_def = '(' >> d::keyword(":derived") >> predicate_declaration >> condition >> ')';
 auto const metric_def = '(' >> d::keyword(":metric") >> identifier >> function_expression >> ')';
 auto const initial_function_value_def = '(' >> lit('=') >> function_term >> function_expression >> ')';
-auto const domain_def = '(' >> d::keyword("define") >> '(' >> d::keyword("domain") >> identifier[set_domain_name {}] >> ')' >> -(d::requirement_section[set_domain_requirements {}]) >> -(d::type_section[set_domain_types {}]) >> -(d::constant_section[set_domain_constants {}]) >> -(d::predicate_section[set_domain_predicates {}]) >> -(d::function_section[set_domain_functions {}]) >> *((axiom[push_domain_axiom {}]) | (action[push_domain_action {}])) >> ')';
-auto const task_def = '(' >> d::keyword("define") >> '(' >> d::keyword("problem") >> identifier >> ')' >> '(' >> d::keyword(":domain") >> identifier >> ')' >> (d::requirement_section | attr(std::vector<ast::Requirement> {})) >> (d::object_section | attr(std::vector<ast::TypedName> {})) >> d::initial_section >> -('(' >> d::keyword(":goal") >> condition >> ')') >> -metric >> *axiom >> ')';
+auto const domain_def = '(' >> d::keyword("define") >> '(' >> d::keyword("domain") >> identifier[set_domain_name {}] >> ')'
+                        >> -(d::requirement_section[set_domain_requirements {}]) >> -(d::type_section[set_domain_types {}])
+                        >> -(d::constant_section[set_domain_constants {}]) >> -(d::predicate_section[set_domain_predicates {}])
+                        >> -(d::function_section[set_domain_functions {}]) >> *((axiom[push_domain_axiom {}]) | (action[push_domain_action {}])) >> ')';
+auto const task_def = '(' >> d::keyword("define") >> '(' >> d::keyword("problem") >> identifier >> ')' >> '(' >> d::keyword(":domain") >> identifier >> ')'
+                      >> (d::requirement_section | attr(std::vector<ast::Requirement> {})) >> (d::object_section | attr(std::vector<ast::TypedName> {}))
+                      >> d::initial_section >> -('(' >> d::keyword(":goal") >> condition >> ')') >> -metric >> *axiom >> ')';
 auto const file_def = domain | task;
 
 BOOST_SPIRIT_DEFINE(identifier,
@@ -297,7 +391,7 @@ BOOST_SPIRIT_DEFINE(identifier,
 
 namespace detail
 {
-auto const variable_identifier_def = omit['?'] >> identifier;
+auto const variable_identifier_def = x3::raw['?' >> identifier];
 auto const type_reference_def = identifier;
 auto const either_type_def = '(' >> keyword("either") >> +type_expression >> ')';
 auto const function_expression_number_def = double_;
@@ -360,8 +454,8 @@ BOOST_SPIRIT_DEFINE(variable_identifier,
                     function_section,
                     object_section,
                     initial_section)
-} // namespace detail
-} // namespace loki::parser::rules
+}  // namespace detail
+}  // namespace loki::parser::rules
 
 namespace loki::parser
 {

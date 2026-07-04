@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_ERRORS_HPP_
 #define LOKI_SEMANTIC_ERRORS_HPP_
 
@@ -116,7 +115,7 @@ public:
 class LOKI_SEMANTIC_ERROR_API UndefinedVariableError : public SemanticError
 {
 public:
-    explicit UndefinedVariableError(const std::string& name) : SemanticError("Undefined variable: ?" + name) {}
+    explicit UndefinedVariableError(const std::string& name) : SemanticError("Undefined variable: " + name) {}
 };
 
 class LOKI_SEMANTIC_ERROR_API UndefinedFunctionError : public SemanticError

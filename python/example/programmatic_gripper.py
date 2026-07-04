@@ -43,10 +43,10 @@ def build_gripper():
     ball_t = build(repository, pypddl.TypeData("ball", [object_t]))
     gripper_t = build(repository, pypddl.TypeData("gripper", [object_t]))
 
-    x = build(repository, pypddl.ParameterData(build(repository, pypddl.VariableData("x")), [room_t]))
-    y = build(repository, pypddl.ParameterData(build(repository, pypddl.VariableData("y")), [room_t]))
-    b = build(repository, pypddl.ParameterData(build(repository, pypddl.VariableData("b")), [ball_t]))
-    g = build(repository, pypddl.ParameterData(build(repository, pypddl.VariableData("g")), [gripper_t]))
+    x = build(repository, pypddl.ParameterData(build(repository, pypddl.VariableData("?x")), [room_t]))
+    y = build(repository, pypddl.ParameterData(build(repository, pypddl.VariableData("?y")), [room_t]))
+    b = build(repository, pypddl.ParameterData(build(repository, pypddl.VariableData("?b")), [ball_t]))
+    g = build(repository, pypddl.ParameterData(build(repository, pypddl.VariableData("?g")), [gripper_t]))
 
     at_robby = build(repository, pypddl.PredicateData("at-robby", [x]))
     at = build(repository, pypddl.PredicateData("at", [b, x]))

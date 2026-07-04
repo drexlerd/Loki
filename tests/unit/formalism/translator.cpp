@@ -167,8 +167,8 @@ void expect_translated_pddl_reparses(const fs::path& domain_file, const fs::path
     const auto domain_translation = loki::translate(domain);
     const auto task_translation = loki::translate(task, domain_translation);
 
-    const auto domain_text = formalism::format::domain(domain_translation.get_translated_domain());
-    const auto task_text = formalism::format::task(task_translation.get_translated_task());
+    const auto domain_text = formalism::format::to_string(domain_translation.get_translated_domain());
+    const auto task_text = formalism::format::to_string(task_translation.get_translated_task());
 
     auto reparsed = loki::Parser(domain_text);
 

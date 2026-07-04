@@ -218,8 +218,8 @@ void EqualityTranslator<Derived>::add_equality_predicate_to_domain(ygg::Data<for
     }
 
     auto parameters = ygg::IndexList<formalism::Parameter> {};
-    const auto left = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("lhs")).get_index();
-    const auto right = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("rhs")).get_index();
+    const auto left = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("?lhs")).get_index();
+    const auto right = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("?rhs")).get_index();
     parameters.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, left, object_types).get_index());
     parameters.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, right, std::move(object_types)).get_index());
 

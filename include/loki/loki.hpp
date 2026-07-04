@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_LOKI_HPP_
 #define LOKI_LOKI_HPP_
 
@@ -81,9 +80,9 @@ translate_task(formalism::TaskView task, const DomainTranslationResult& domain_t
     return semantic::translate(task, domain_translation, options);
 }
 
-inline std::string format_domain(formalism::DomainView domain) { return formalism::format::domain(domain); }
+inline std::string format_domain(formalism::DomainView domain) { return formalism::format::to_string(domain); }
 
-inline std::string format_task(formalism::TaskView task) { return formalism::format::task(task); }
+inline std::string format_task(formalism::TaskView task) { return formalism::format::to_string(task); }
 
 }  // namespace loki
 

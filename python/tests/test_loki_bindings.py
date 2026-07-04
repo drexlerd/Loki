@@ -30,7 +30,7 @@ def test_parser_binding_parses_domain_and_task():
     assert domain.get_name() == "py-gripper"
     assert len(domain.get_actions()) == 1
     assert [action.get_name() for action in domain.get_actions()] == ["move"]
-    assert domain.get_predicates()[0].get_parameters()[0].get_variable().get_name() == "x"
+    assert domain.get_predicates()[0].get_parameters()[0].get_variable().get_name() == "?x"
     assert task.get_name() == "py-gripper-task"
     assert task.get_domain().get_name() == domain.get_name()
     assert [obj.get_name() for obj in task.get_objects()] == ["ball"]
@@ -404,7 +404,7 @@ def test_builders_expose_defaulted_mutable_fields():
     repository = pypddl.RepositoryFactory().create()
 
     object_type = build(repository, pypddl.TypeData("object"))
-    variable = build(repository, pypddl.VariableData("x"))
+    variable = build(repository, pypddl.VariableData("?x"))
     parameter = build(repository, pypddl.ParameterData(variable))
     predicate = build(repository, pypddl.PredicateData("p"))
     term = build(repository, pypddl.TermData(variable))
@@ -495,7 +495,7 @@ def test_repository_constructs_domain_and_task_programmatically():
     strips = build(repository, pypddl.RequirementData(pypddl.RequirementKind.Strips))
     object_type = build(repository, pypddl.TypeData("object"))
     ball = build(repository, pypddl.ObjectData("ball", [object_type]))
-    variable = build(repository, pypddl.VariableData("x"))
+    variable = build(repository, pypddl.VariableData("?x"))
     parameter = build(repository, pypddl.ParameterData(variable, [object_type]))
     predicate = build(repository, pypddl.PredicateData("holding", [parameter]))
     variable_term = build(repository, pypddl.TermData(variable))
@@ -530,7 +530,7 @@ def test_repository_constructs_domain_and_task_programmatically():
     assert predicate.get_name() == "holding"
     assert predicate.get_arity() == 1
     assert len(predicate.get_parameters()) == 1
-    assert predicate.get_parameters()[0].get_variable().get_name() == "x"
+    assert predicate.get_parameters()[0].get_variable().get_name() == "?x"
     assert len(predicate.get_parameters()[0].get_types()) == 1
     assert literal.get_polarity()
     assert literal.get_atom().get_predicate().get_name() == "holding"
@@ -558,7 +558,7 @@ def test_repository_constructs_numeric_function_task_bits():
     numeric = build(repository, pypddl.RequirementData(pypddl.RequirementKind.NumericFluents))
     object_type = build(repository, pypddl.TypeData("object"))
     number_type = build(repository, pypddl.TypeData("number"))
-    variable = build(repository, pypddl.VariableData("x"))
+    variable = build(repository, pypddl.VariableData("?x"))
     parameter = build(repository, pypddl.ParameterData(variable, [object_type]))
     location = build(repository, pypddl.ObjectData("l1", [object_type]))
     fluent = build(repository, pypddl.FunctionSkeletonData("fuel", [parameter], number_type))
@@ -864,12 +864,12 @@ def test_repository_exposes_recursive_constructors_and_accessors():
     repository = pypddl.RepositoryFactory().create()
     object_type = build(repository, pypddl.TypeData("object"))
     number_type = build(repository, pypddl.TypeData("number"))
-    variable = build(repository, pypddl.VariableData("x"))
+    variable = build(repository, pypddl.VariableData("?x"))
     parameter = build(repository, pypddl.ParameterData(variable, [object_type]))
     predicate = build(repository, pypddl.PredicateData("p", [parameter]))
     term = build(repository, pypddl.TermData(variable))
     assert term.get_value() == term.get_variant()
-    assert term.get_value().get_name() == "x"
+    assert term.get_value().get_name() == "?x"
     literal = make_literal(repository, predicate, [term])
     base_condition = make_condition(repository, predicate, [term])
     condition_not_node = build(repository, pypddl.ConditionNotData(base_condition))

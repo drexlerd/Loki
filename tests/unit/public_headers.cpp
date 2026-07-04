@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include <gtest/gtest.h>
 #include <iostream>
 #include <loki/ast.hpp>
@@ -26,6 +25,7 @@
 #include <loki/formalism/builder.hpp>
 #include <loki/formalism/canonicalization.hpp>
 #include <loki/formalism/datas.hpp>
+#include <loki/formalism/enums.hpp>
 #include <loki/formalism/formalism.hpp>
 #include <loki/formalism/formatter.hpp>
 #include <loki/formalism/indices.hpp>
@@ -89,11 +89,15 @@ TEST(LokiPublicHeaders, LokiUmbrellaHeaderExposesFacadeHelpers)
 
     const auto domain_translation = loki::translate_domain(domain);
     const auto task_translation = loki::translate_task(task, domain_translation);
-    const auto domain_text = loki::format_domain(domain_translation.get_translated_domain());
-    const auto task_text = loki::format_task(task_translation.get_translated_task());
+    const auto translated_domain = domain_translation.get_translated_domain();
+    const auto translated_task = task_translation.get_translated_task();
+    const auto domain_text = loki::format_domain(translated_domain);
+    const auto task_text = loki::format_task(translated_task);
 
     EXPECT_NE(domain_text.find("umbrella-header"), std::string::npos);
     EXPECT_NE(task_text.find("umbrella-header-task"), std::string::npos);
+    EXPECT_EQ(fmt::format("{}", translated_domain), domain_text);
+    EXPECT_EQ(fmt::format("{}", translated_task), task_text);
 }
 
 TEST(LokiPublicHeaders, SemanticHeaderIsSelfContained)

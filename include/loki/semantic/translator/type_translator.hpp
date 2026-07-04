@@ -113,7 +113,7 @@ formalism::PredicateView TypeTranslator<Derived>::type_predicate(formalism::Type
     auto parameter_types = ygg::IndexList<formalism::Type> {};
     if (!this->self().removes_typing_now())
         parameter_types.push_back(as_index(this->self().copy(type)));
-    const auto variable = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("arg")).get_index();
+    const auto variable = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("?arg")).get_index();
     auto parameters = ygg::IndexList<formalism::Parameter> {};
     parameters.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, variable, std::move(parameter_types)).get_index());
 

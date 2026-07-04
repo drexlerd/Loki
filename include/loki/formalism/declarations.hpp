@@ -15,16 +15,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_FORMALISM_DECLARATIONS_HPP_
 #define LOKI_FORMALISM_DECLARATIONS_HPP_
 
-#include <yggdrasil/core/type_list.hpp>
-#include <yggdrasil/formalism/declarations.hpp>
+#include "loki/formalism/enums.hpp"
 
 #include <concepts>
 #include <cstdint>
 #include <tuple>
+#include <yggdrasil/core/type_list.hpp>
+#include <yggdrasil/formalism/declarations.hpp>
 
 namespace loki::formalism
 {
@@ -169,31 +169,6 @@ struct Maximize { static constexpr std::uint8_t kind = 1; auto identifying_membe
 
 template<typename T>
 concept Optimization = std::same_as<T, Minimize> || std::same_as<T, Maximize>;
-
-enum class BinaryComparator : std::uint8_t { Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual };
-enum class UnaryArithmeticOperator : std::uint8_t { Minus };
-enum class BinaryArithmeticOperator : std::uint8_t { Add, Subtract, Multiply, Divide };
-enum class MultiArithmeticOperator : std::uint8_t { Add, Multiply };
-enum class NumericEffectOperator : std::uint8_t { Assign, Increase, Decrease, ScaleUp, ScaleDown };
-
-enum class RequirementKind : std::uint8_t
-{
-    Strips,
-    Typing,
-    NegativePreconditions,
-    DisjunctivePreconditions,
-    Equality,
-    ExistentialPreconditions,
-    UniversalPreconditions,
-    QuantifiedPreconditions,
-    ConditionalEffects,
-    Fluents,
-    NumericFluents,
-    DurativeActions,
-    DerivedPredicates,
-    NonDeterministic,
-    ProbabilisticEffects,
-};
 
 using SymbolRepositoryTypes = ygg::TypeList<Requirement,
                                             Type,
