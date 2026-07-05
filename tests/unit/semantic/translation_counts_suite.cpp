@@ -185,6 +185,26 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
             EXPECT_EQ(reparsed_task.get_initial_function_values().size(), configuration.task_initial_function_values);
             EXPECT_EQ(reparsed_task.get_domain().get_actions().size(), configuration.task_actions);
             EXPECT_EQ(reparsed_task.get_axioms().size(), configuration.task_axioms);
+
+            // Retranslating the reparsed output must be a fixpoint: same counts as the first translation.
+            const auto retranslation = semantic::translate(reparsed_domain, configuration.options);
+            const auto retranslated_domain = retranslation.get_translated_domain();
+            const auto task_retranslation = semantic::translate(reparsed_task, retranslation, configuration.options);
+            const auto retranslated_task = task_retranslation.get_translated_task();
+
+            EXPECT_EQ(retranslated_domain.get_types().size(), configuration.domain_types);
+            EXPECT_EQ(retranslated_domain.get_predicates().size(), configuration.domain_predicates);
+            EXPECT_EQ(retranslated_domain.get_functions().size(), configuration.domain_functions);
+            EXPECT_EQ(retranslated_domain.get_actions().size(), configuration.domain_actions);
+            EXPECT_EQ(retranslated_domain.get_axioms().size(), configuration.domain_axioms);
+            EXPECT_EQ(retranslated_task.get_objects().size(), configuration.task_objects);
+            // Goal simplification never axiomatizes literals or conjunctions of literals; after the
+            // round-trip every goal is in that form, so no goal predicates are regenerated.
+            EXPECT_TRUE(retranslated_task.get_predicates().empty());
+            EXPECT_EQ(retranslated_task.get_initial_literals().size(), configuration.task_initial_literals);
+            EXPECT_EQ(retranslated_task.get_initial_function_values().size(), configuration.task_initial_function_values);
+            EXPECT_EQ(retranslated_task.get_domain().get_actions().size(), configuration.task_actions);
+            EXPECT_EQ(retranslated_task.get_axioms().size(), configuration.task_axioms);
         }
     }
 }
