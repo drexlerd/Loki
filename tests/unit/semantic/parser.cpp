@@ -602,6 +602,59 @@ TEST(LokiSemanticTranslator, RenamesQuantifiedVariablesDeterministically)
     EXPECT_FALSE(contains_exists(action.get_precondition().value()));
 }
 
+TEST(LokiSemanticTranslator, SeparatesSiblingExistentialsOverSameVariable)
+{
+    const auto domain_source = std::string { "(define (domain sibling-exists)"
+                                             "(:requirements :existential-preconditions)"
+                                             "(:predicates (a ?x) (b ?x) (done))"
+                                             "(:action act :parameters () "
+                                             ":precondition (and (exists (?p) (a ?p)) (exists (?p) (b ?p))) "
+                                             ":effect (done))"
+                                             ")" };
+
+    semantic::Parser parser(domain_source);
+    const auto translation = semantic::translate(parser.get_domain());
+    const auto action = translation.get_translated_domain().get_actions()[0];
+
+    // Both existentials are lifted; the sibling scopes must stay independent bindings.
+    ASSERT_EQ(action.get_parameters().size(), 2);
+    const auto first = std::string(action.get_parameters()[0].get_variable().get_name());
+    const auto second = std::string(action.get_parameters()[1].get_variable().get_name());
+    EXPECT_NE(first, second);
+
+    // Each conjunct must reference its own hoisted variable.
+    const auto text = loki::format_domain(translation.get_translated_domain());
+    EXPECT_NE(text.find("(a " + first + ")") != std::string::npos ? text.find("(b " + second + ")") : std::string::npos, std::string::npos);
+}
+
+TEST(LokiSemanticTranslator, LiftedParameterAvoidsFreeVariablesWhenRenaming)
+{
+    // The second sibling collides on ?p; its fresh name must avoid the action parameter ?p_0,
+    // which occurs free in the sibling body.
+    const auto domain_source = std::string { "(define (domain lift-capture)"
+                                             "(:requirements :existential-preconditions)"
+                                             "(:predicates (a ?x) (b ?x ?y) (done))"
+                                             "(:action act :parameters (?p_0) "
+                                             ":precondition (and (exists (?p) (a ?p)) (exists (?p) (b ?p ?p_0))) "
+                                             ":effect (done))"
+                                             ")" };
+
+    semantic::Parser parser(domain_source);
+    const auto translation = semantic::translate(parser.get_domain());
+    const auto action = translation.get_translated_domain().get_actions()[0];
+
+    ASSERT_EQ(action.get_parameters().size(), 3);
+    auto names = std::vector<std::string> {};
+    for (auto parameter : action.get_parameters())
+        names.push_back(std::string(parameter.get_variable().get_name()));
+    // All parameters distinct, and the renamed binder did not capture the free ?p_0.
+    EXPECT_EQ(names.size(), std::size_t { 3 });
+    std::sort(names.begin(), names.end());
+    EXPECT_EQ(std::unique(names.begin(), names.end()), names.end());
+    const auto text = loki::format_domain(translation.get_translated_domain());
+    EXPECT_NE(text.find(" ?p_0)"), std::string::npos);
+}
+
 TEST(LokiSemanticTranslator, RenamesBeforeNegationNormalFormOnlyOnce)
 {
     const auto domain_source = std::string { "(define (domain rename-once)"

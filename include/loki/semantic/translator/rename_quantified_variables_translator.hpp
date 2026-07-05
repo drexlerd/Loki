@@ -99,35 +99,31 @@ formalism::VariableView RenameQuantifiedVariablesTranslator<Derived>::lookup_var
 template<typename Derived>
 formalism::VariableView RenameQuantifiedVariablesTranslator<Derived>::fresh_variable(formalism::VariableView source)
 {
-    // Inside effects, sibling binders are never lifted into a common scope, so only true
-    // shadowing forces a rename; effect normalization may duplicate a binder into siblings,
-    // and renaming those apart would break idempotence across repeated translations.
-    if (this->m_shadow_only_renaming)
+    // Pure capture avoidance: keep the name unless this binding shadows an enclosing one.
+    // Sibling scopes may share names; the existential-lifting phase uniquifies where scopes
+    // actually merge, which keeps renaming idempotent across repeated translations.
+    auto shadowed = false;
+    for (const auto& scope : this->m_variable_bindings)
+        shadowed = shadowed || scope.contains(source);
+    if (!shadowed)
+        return this->self().copy(source);
+
+    // Pick the first suffix that neither an enclosing binding nor an earlier rename in this
+    // action uses; earlier renames may later be lifted into the action parameters, so reusing
+    // one would shadow it on the next translation and break idempotence.
+    auto taken = this->m_renamed_variable_names;
+    for (const auto& scope : this->m_variable_bindings)
+        for (const auto& [_, target] : scope)
+            taken.insert(std::string(target.get_name()));
+    for (auto k = std::size_t { 0 };; ++k)
     {
-        auto shadowed = false;
-        for (const auto& scope : this->m_variable_bindings)
-            shadowed = shadowed || scope.contains(source);
-        if (!shadowed)
+        auto name = std::string(source.get_name()) + "_" + std::to_string(k);
+        if (!taken.contains(name))
         {
-            this->m_used_variable_names.insert(std::string(source.get_name()));
-            return this->self().copy(source);
+            this->m_renamed_variable_names.insert(name);
+            return formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string(name));
         }
     }
-
-    // Rename only on conflict: the first binding of a name keeps it; rebindings and clashes with
-    // already-assigned names get a numeric suffix. This keeps renaming idempotent across
-    // repeated translations.
-    auto& counter = this->m_num_quantifications[source];
-    auto name = std::string(source.get_name());
-    if (counter > 0)
-        name += "_" + std::to_string(counter - 1);
-    ++counter;
-    while (!this->m_used_variable_names.insert(name).second)
-    {
-        name = std::string(source.get_name()) + "_" + std::to_string(counter - 1);
-        ++counter;
-    }
-    return formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string(name));
 }
 
 template<typename Derived>
@@ -400,7 +396,7 @@ formalism::ActionView RenameQuantifiedVariablesTranslator<Derived>::rename_actio
 {
     const auto& data = source.get_data();
     this->m_num_quantifications.clear();
-    this->m_used_variable_names.clear();
+    this->m_renamed_variable_names.clear();
     this->self().enter_variable_scope();
     auto parameters = this->self().rename_parameters(source.get_parameters());
     auto precondition = cista::optional<ygg::Index<formalism::Condition>> {};
@@ -408,11 +404,7 @@ formalism::ActionView RenameQuantifiedVariablesTranslator<Derived>::rename_actio
         precondition = as_index(this->self().rename_variables(condition.value()));
     auto effect = cista::optional<ygg::Index<formalism::Effect>> {};
     if (const auto effect_view = source.get_effect())
-    {
-        this->m_shadow_only_renaming = true;
         effect = as_index(this->self().rename_variables(effect_view.value()));
-        this->m_shadow_only_renaming = false;
-    }
     this->self().leave_variable_scope();
     return formalism::get_or_create<formalism::Action>(this->m_storage->repository,
                                                        data.name,
@@ -428,7 +420,7 @@ formalism::AxiomView RenameQuantifiedVariablesTranslator<Derived>::rename_axiom_
 {
     const auto& data = source.get_data();
     this->m_num_quantifications.clear();
-    this->m_used_variable_names.clear();
+    this->m_renamed_variable_names.clear();
     this->self().enter_variable_scope();
     auto parameters = this->self().rename_parameters(source.get_parameters());
     auto head = as_index(this->self().rename_variables(source.get_head()));

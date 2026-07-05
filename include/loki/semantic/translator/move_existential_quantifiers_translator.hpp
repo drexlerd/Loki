@@ -39,7 +39,20 @@ public:
     formalism::ConditionView move_existentials_node(formalism::ConditionView condition, formalism::ConditionOrView node);
     template<typename T>
     formalism::ConditionView move_existentials_node(formalism::ConditionView condition, formalism::EntityView<T>);
-    formalism::ConditionView lift_top_level_exists(std::vector<formalism::ParameterView>& parameters, formalism::ConditionView condition);
+    formalism::ConditionView
+    lift_top_level_exists(std::vector<formalism::ParameterView>& parameters, formalism::ConditionView condition, std::optional<formalism::EffectView> effect);
+
+private:
+    // Collects the names of all binders occurring in a subtree; lifted parameters must avoid
+    // them so that no binder shadows an action parameter after the lift.
+    void collect_binder_names(formalism::ConditionView condition, ygg::UnorderedSet<std::string>& names) const;
+    void collect_binder_names(formalism::EffectView effect, ygg::UnorderedSet<std::string>& names) const;
+
+    // Hoists the binders of an exists into parameters/claimed; a binder whose name is already
+    // claimed by a sibling scope is alpha-renamed together with its bound occurrences. Fresh
+    // names avoid the claimed names and the free variables of the body, so no capture is possible.
+    formalism::ConditionView
+    hoist_exists(formalism::ConditionExistsView exists, ygg::UnorderedSet<std::string>& claimed, ygg::IndexList<formalism::Parameter>& parameters);
 };
 
 template<typename Derived>
@@ -64,22 +77,121 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_exi
 }
 
 template<typename Derived>
+void MoveExistentialQuantifiersTranslator<Derived>::collect_binder_names(formalism::ConditionView condition, ygg::UnorderedSet<std::string>& names) const
+{
+    ygg::visit(
+        [&](const auto& node)
+        {
+            using Node = std::decay_t<decltype(node)>;
+            if constexpr (std::is_same_v<Node, formalism::ConditionExistsView> || std::is_same_v<Node, formalism::ConditionForallView>)
+            {
+                for (auto parameter : node.get_parameters())
+                    names.insert(std::string(parameter.get_variable().get_name()));
+                collect_binder_names(node.get_condition(), names);
+            }
+            else if constexpr (std::is_same_v<Node, formalism::ConditionAndView> || std::is_same_v<Node, formalism::ConditionOrView>)
+            {
+                for (auto child : node.get_conditions())
+                    collect_binder_names(child, names);
+            }
+            else if constexpr (std::is_same_v<Node, formalism::ConditionNotView>)
+            {
+                collect_binder_names(node.get_condition(), names);
+            }
+            else if constexpr (std::is_same_v<Node, formalism::ConditionImplyView>)
+            {
+                collect_binder_names(node.get_left(), names);
+                collect_binder_names(node.get_right(), names);
+            }
+        },
+        condition.get_value());
+}
+
+template<typename Derived>
+void MoveExistentialQuantifiersTranslator<Derived>::collect_binder_names(formalism::EffectView effect, ygg::UnorderedSet<std::string>& names) const
+{
+    ygg::visit(
+        [&](const auto& node)
+        {
+            using Node = std::decay_t<decltype(node)>;
+            if constexpr (std::is_same_v<Node, formalism::EffectForallView>)
+            {
+                for (auto parameter : node.get_parameters())
+                    names.insert(std::string(parameter.get_variable().get_name()));
+                collect_binder_names(node.get_effect(), names);
+            }
+            else if constexpr (std::is_same_v<Node, formalism::EffectAndView> || std::is_same_v<Node, formalism::EffectOneOfView>)
+            {
+                for (auto child : node.get_effects())
+                    collect_binder_names(child, names);
+            }
+            else if constexpr (std::is_same_v<Node, formalism::EffectWhenView>)
+            {
+                collect_binder_names(node.get_condition(), names);
+                collect_binder_names(node.get_effect(), names);
+            }
+            else if constexpr (std::is_same_v<Node, formalism::EffectProbabilisticView>)
+            {
+                for (auto alternative : node.get_alternatives())
+                    collect_binder_names(alternative.get_effect(), names);
+            }
+        },
+        effect.get_value());
+}
+
+template<typename Derived>
+formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::hoist_exists(formalism::ConditionExistsView exists,
+                                                                                     ygg::UnorderedSet<std::string>& claimed,
+                                                                                     ygg::IndexList<formalism::Parameter>& parameters)
+{
+    auto condition = exists.get_condition();
+    for (auto parameter : exists.get_parameters())
+    {
+        const auto variable = parameter.get_variable();
+        if (claimed.insert(std::string(variable.get_name())).second)
+        {
+            parameters.push_back(parameter.get_index());
+            continue;
+        }
+
+        auto avoid = claimed;
+        auto bound = ygg::UnorderedSet<formalism::VariableView> {};
+        auto free = ygg::UnorderedSet<formalism::VariableView> {};
+        this->self().collect_free_variables(condition, bound, free);
+        for (auto free_variable : free)
+            avoid.insert(std::string(free_variable.get_name()));
+
+        auto name = std::string {};
+        for (auto k = std::size_t { 0 };; ++k)
+        {
+            name = std::string(variable.get_name()) + "_" + std::to_string(k);
+            if (!avoid.contains(name))
+                break;
+        }
+        const auto fresh = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string(name));
+        this->self().enter_variable_scope();
+        this->m_variable_bindings.back().emplace(variable, fresh);
+        condition = this->self().rename_variables(condition);
+        this->self().leave_variable_scope();
+        claimed.insert(name);
+        parameters.push_back(
+            formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, fresh.get_index(), parameter.get_data().types).get_index());
+    }
+    return condition;
+}
+
+template<typename Derived>
 formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_existentials_node(formalism::ConditionView, formalism::ConditionAndView node)
 {
     auto parameters = ygg::IndexList<formalism::Parameter> {};
-    auto seen_parameters = ygg::UnorderedSet<formalism::ParameterView> {};
+    auto claimed = ygg::UnorderedSet<std::string> {};
     auto parts = ygg::IndexList<formalism::Condition> {};
     for (auto child : node.get_conditions())
     {
         const auto moved = this->self().move_existentials(child);
         if (const auto exists = this->self().as_exists(moved))
         {
-            for (auto parameter : exists->get_parameters())
-            {
-                if (seen_parameters.insert(parameter).second)
-                    parameters.push_back(parameter.get_index());
-            }
-            parts.push_back(exists->get_condition().get_index());
+            parts.push_back(as_index(this->self().hoist_exists(*exists, claimed, parameters)));
         }
         else
         {
@@ -120,21 +232,24 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_exi
 
 template<typename Derived>
 formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::lift_top_level_exists(std::vector<formalism::ParameterView>& parameters,
-                                                                                              formalism::ConditionView condition)
+                                                                                              formalism::ConditionView condition,
+                                                                                              std::optional<formalism::EffectView> effect)
 {
     auto moved = this->self().move_existentials(condition);
     if (const auto exists = this->self().as_exists(moved))
     {
-        auto seen_parameters = ygg::UnorderedSet<formalism::ParameterView> {};
+        auto claimed = ygg::UnorderedSet<std::string> {};
         for (auto parameter : parameters)
-            seen_parameters.insert(parameter);
+            claimed.insert(std::string(parameter.get_variable().get_name()));
+        // Lifted parameters must not shadow-clash with binders that stay behind.
+        collect_binder_names(exists->get_condition(), claimed);
+        if (effect)
+            collect_binder_names(*effect, claimed);
 
-        for (auto parameter : exists->get_parameters())
-        {
-            if (seen_parameters.insert(parameter).second)
-                parameters.push_back(parameter);
-        }
-        moved = exists->get_condition();
+        auto hoisted = ygg::IndexList<formalism::Parameter> {};
+        moved = this->self().hoist_exists(*exists, claimed, hoisted);
+        for (auto index : hoisted)
+            parameters.push_back(ygg::make_view(index, this->m_storage->repository));
     }
     return this->self().flatten_condition(moved);
 }

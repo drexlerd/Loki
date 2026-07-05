@@ -64,7 +64,12 @@ formalism::ActionView TopLevelTranslator<Derived>::copy(formalism::ActionView so
     {
         auto copied_condition = this->self().copy(condition.value());
         if (this->m_phase == TranslationPhase::MoveExistentialQuantifiers)
-            copied_condition = this->self().lift_top_level_exists(parameter_views, copied_condition);
+        {
+            auto effect = std::optional<formalism::EffectView> {};
+            if (const auto effect_view = source.get_effect())
+                effect = effect_view.value();
+            copied_condition = this->self().lift_top_level_exists(parameter_views, copied_condition, effect);
+        }
         precondition = as_index(copied_condition);
     }
     if (this->m_phase == TranslationPhase::CompileTyping)
@@ -109,7 +114,7 @@ formalism::AxiomView TopLevelTranslator<Derived>::copy(formalism::AxiomView sour
     this->self().enter_scope(parameter_views);
     auto copied_condition = this->self().copy(source.get_condition());
     if (this->m_phase == TranslationPhase::MoveExistentialQuantifiers)
-        copied_condition = this->self().lift_top_level_exists(parameter_views, copied_condition);
+        copied_condition = this->self().lift_top_level_exists(parameter_views, copied_condition, std::nullopt);
     auto condition = as_index(copied_condition);
     if (this->m_phase == TranslationPhase::CompileTyping)
         this->self().prepend_type_conditions(condition, source.get_parameters());

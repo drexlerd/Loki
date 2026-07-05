@@ -35,7 +35,7 @@ struct CopyContext
     std::vector<std::vector<formalism::ParameterView>> active_parameters;
     std::vector<std::vector<formalism::VariableView>> active_parameter_variables;
     std::vector<ygg::UnorderedMap<formalism::VariableView, formalism::VariableView>> variable_bindings;
-    ygg::UnorderedSet<std::string> used_variable_names;
+    ygg::UnorderedSet<std::string> renamed_variable_names;
     ygg::UnorderedSet<std::string> used_predicate_names;
     std::vector<formalism::PredicateView> generated_predicates;
     std::vector<formalism::AxiomView> generated_axioms;
@@ -44,7 +44,6 @@ struct CopyContext
     ygg::UnorderedMap<formalism::TypeView, formalism::PredicateView> type_predicates;
     bool compile_typing = true;
     bool renaming_enabled = true;
-    bool shadow_only_renaming = false;
     TranslationPhase phase = TranslationPhase::ToNegationNormalForm;
 };
 
