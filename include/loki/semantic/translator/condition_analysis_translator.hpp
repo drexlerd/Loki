@@ -20,6 +20,9 @@
 
 #include "loki/semantic/translator/copy_translator_component.hpp"
 
+#include <algorithm>
+#include <yggdrasil/semantics/comparators.hpp>
+
 namespace loki::semantic::detail
 {
 
@@ -279,6 +282,7 @@ ConditionAnalysisTranslator<Derived>::free_parameters_in_scope(formalism::Condit
                 result.emplace_back(parameters[i], variables[i]);
         }
     }
+    std::sort(result.begin(), result.end(), ygg::Less<ScopedFreeParameter> {});
     return result;
 }
 

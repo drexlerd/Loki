@@ -58,7 +58,7 @@ protected:
     ygg::UnorderedSet<std::string>& m_used_predicate_names;
     std::vector<formalism::PredicateView>& m_generated_predicates;
     std::vector<formalism::AxiomView>& m_generated_axioms;
-    ygg::UnorderedMap<formalism::ConditionView, std::vector<GeneratedUniversalConditionEntry>>& m_generated_universal_conditions;
+    ygg::UnorderedMap<GeneratedUniversalConditionKey, formalism::ConditionView>& m_generated_universal_conditions;
     size_t& m_num_generated_axioms;
     ygg::UnorderedMap<formalism::TypeView, formalism::PredicateView>& m_type_predicates;
     bool& m_remove_typing;

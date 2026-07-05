@@ -26,7 +26,7 @@ namespace loki::semantic::detail
 {
 
 using ScopedFreeParameter = std::pair<formalism::ParameterView, formalism::VariableView>;
-using GeneratedUniversalConditionEntry = std::pair<std::vector<ScopedFreeParameter>, formalism::ConditionView>;
+using GeneratedUniversalConditionKey = std::pair<std::vector<ScopedFreeParameter>, formalism::ConditionView>;
 
 struct CopyContext
 {
@@ -38,7 +38,7 @@ struct CopyContext
     ygg::UnorderedSet<std::string> used_predicate_names;
     std::vector<formalism::PredicateView> generated_predicates;
     std::vector<formalism::AxiomView> generated_axioms;
-    ygg::UnorderedMap<formalism::ConditionView, std::vector<GeneratedUniversalConditionEntry>> generated_universal_conditions;
+    ygg::UnorderedMap<GeneratedUniversalConditionKey, formalism::ConditionView> generated_universal_conditions;
     size_t num_generated_axioms = 0;
     ygg::UnorderedMap<formalism::TypeView, formalism::PredicateView> type_predicates;
     bool remove_typing = true;
