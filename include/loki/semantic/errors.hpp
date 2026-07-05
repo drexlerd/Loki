@@ -18,8 +18,6 @@
 #ifndef LOKI_SEMANTIC_ERRORS_HPP_
 #define LOKI_SEMANTIC_ERRORS_HPP_
 
-#include <cstddef>
-#include <optional>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -33,47 +31,17 @@
 namespace loki::semantic
 {
 
-struct SourcePosition
-{
-    std::size_t line = 1;
-    std::size_t column = 1;
-    std::size_t offset = 0;
-
-    friend bool operator==(const SourcePosition&, const SourcePosition&) = default;
-};
-
-struct SourceRange
-{
-    SourcePosition begin;
-    SourcePosition end;
-
-    friend bool operator==(const SourceRange&, const SourceRange&) = default;
-};
-
 class LOKI_SEMANTIC_ERROR_API SemanticError : public std::runtime_error
 {
 public:
-    explicit SemanticError(std::string message) :
-        std::runtime_error(message),
-        m_message(std::move(message)),
-        m_display_message(m_message)
-    {
-    }
+    explicit SemanticError(std::string message) : std::runtime_error(message), m_display_message(std::move(message)) {}
 
     const char* what() const noexcept override { return m_display_message.c_str(); }
 
-    bool has_source_range() const noexcept { return m_source_range.has_value(); }
-    const std::optional<SourceRange>& source_range() const noexcept { return m_source_range; }
-    void set_source_range(SourceRange source_range)
-    {
-        m_source_range = source_range;
-        m_display_message = m_message + " at line " + std::to_string(source_range.begin.line) + ", column " + std::to_string(source_range.begin.column);
-    }
+    void set_display_message(std::string display_message) { m_display_message = std::move(display_message); }
 
 private:
-    std::string m_message;
     std::string m_display_message;
-    std::optional<SourceRange> m_source_range;
 };
 
 class LOKI_SEMANTIC_ERROR_API ParseError : public SemanticError

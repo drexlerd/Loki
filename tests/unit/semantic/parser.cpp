@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <fstream>
 #include <gtest/gtest.h>
 #include <loki/semantic.hpp>
 #include <optional>
@@ -1117,12 +1118,51 @@ TEST(LokiSemanticParser, ReportsSyntaxFailureMessage)
     {
         const auto message = std::string(error.what());
         EXPECT_NE(message.find("Could not parse PDDL domain"), std::string::npos);
-        EXPECT_NE(message.find("line 2, column"), std::string::npos);
-        ASSERT_TRUE(error.has_source_range());
-        ASSERT_TRUE(error.source_range().has_value());
-        EXPECT_EQ(error.source_range()->begin.line, 2);
-        EXPECT_EQ(error.source_range()->begin.line, error.source_range()->end.line);
-        EXPECT_EQ(error.source_range()->begin.column, error.source_range()->end.column);
+        EXPECT_NE(message.find("In line 2:"), std::string::npos);
+        EXPECT_NE(message.find("^_"), std::string::npos);
+    }
+}
+
+TEST(LokiSemanticParser, IncludesFileNameForPathDiagnostics)
+{
+    const auto domain_path = fs::path(::testing::TempDir()) / "loki_bad_domain.pddl";
+    {
+        auto out = std::ofstream(domain_path);
+        out << "(define (domain bad-syntax) (:predicates (p))";
+    }
+
+    try
+    {
+        auto parser = semantic::Parser(domain_path);
+        FAIL() << "Expected parse error";
+    }
+    catch (const semantic::ParseError& error)
+    {
+        const auto message = std::string(error.what());
+        EXPECT_NE(message.find("Could not parse PDDL domain"), std::string::npos);
+        EXPECT_NE(message.find("In file " + domain_path.string() + ", line 1:"), std::string::npos);
+    }
+
+    const auto task_path = fs::path(::testing::TempDir()) / "loki_bad_task.pddl";
+    {
+        auto out = std::ofstream(task_path);
+        out << "(define (problem p)\n";
+        out << "  (:domain other)\n";
+        out << "  (:init)\n";
+        out << ")\n";
+    }
+
+    try
+    {
+        auto parser = semantic::Parser(std::string { "(define (domain d) (:predicates (p)))" });
+        parser.parse_task(task_path);
+        FAIL() << "Expected mismatched domain error";
+    }
+    catch (const semantic::MismatchedDomainError& error)
+    {
+        const auto message = std::string(error.what());
+        EXPECT_NE(message.find("Task references domain 'other'"), std::string::npos);
+        EXPECT_NE(message.find("In file " + task_path.string() + ", line 2:"), std::string::npos);
     }
 }
 
@@ -1213,11 +1253,10 @@ TEST(LokiSemanticParser, StrictModeRejectsMissingRequirements)
     }
     catch (const semantic::MissingRequirementError& error)
     {
-        EXPECT_NE(std::string(error.what()).find(":disjunctive-preconditions"), std::string::npos);
-        ASSERT_TRUE(error.has_source_range());
-        ASSERT_TRUE(error.source_range().has_value());
-        EXPECT_EQ(error.source_range()->begin.line, 6);
-        EXPECT_EQ(error.source_range()->begin.column, 19);
+        const auto message = std::string(error.what());
+        EXPECT_NE(message.find(":disjunctive-preconditions"), std::string::npos);
+        EXPECT_NE(message.find("In line 6:"), std::string::npos);
+        EXPECT_NE(message.find("^_"), std::string::npos);
     }
 }
 

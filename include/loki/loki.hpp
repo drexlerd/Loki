@@ -31,8 +31,6 @@ namespace loki
 
 using ParserOptions = parser::ParserOptions;
 using Parser = semantic::Parser;
-using SourcePosition = semantic::SourcePosition;
-using SourceRange = semantic::SourceRange;
 using SemanticError = semantic::SemanticError;
 using ParseError = semantic::ParseError;
 using UnsupportedRequirementError = semantic::UnsupportedRequirementError;

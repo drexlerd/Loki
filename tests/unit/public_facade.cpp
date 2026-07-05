@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include <gtest/gtest.h>
 #include <loki/formalism/formatter.hpp>
 #include <loki/loki.hpp>
@@ -87,16 +86,6 @@ TEST(LokiPublicFacade, ExposesParserAndTranslatorThroughLokiNamespace)
 
 TEST(LokiPublicFacade, ExposesSemanticErrorsThroughLokiNamespace)
 {
-    static_assert(std::is_same_v<loki::SourcePosition, loki::semantic::SourcePosition>);
-    static_assert(std::is_same_v<loki::SourceRange, loki::semantic::SourceRange>);
-
-    const auto position = loki::SourcePosition { .line = 2, .column = 3, .offset = 4 };
-    EXPECT_EQ(position, (loki::SourcePosition { .line = 2, .column = 3, .offset = 4 }));
-    EXPECT_NE(position, (loki::SourcePosition { .line = 2, .column = 4, .offset = 4 }));
-
-    const auto range = loki::SourceRange { position, loki::SourcePosition { .line = 2, .column = 8, .offset = 9 } };
-    EXPECT_EQ(range, (loki::SourceRange { position, loki::SourcePosition { .line = 2, .column = 8, .offset = 9 } }));
-    EXPECT_NE(range, (loki::SourceRange { position, position }));
     static_assert(std::is_same_v<loki::SemanticError, loki::semantic::SemanticError>);
     static_assert(std::is_same_v<loki::ParseError, loki::semantic::ParseError>);
     static_assert(std::is_same_v<loki::UnsupportedRequirementError, loki::semantic::UnsupportedRequirementError>);
@@ -123,15 +112,9 @@ TEST(LokiPublicFacade, ExposesSemanticErrorsThroughLokiNamespace)
     static_assert(std::is_same_v<loki::MissingDomainError, loki::semantic::MissingDomainError>);
 
     auto error = loki::SemanticError("base diagnostic");
-    EXPECT_FALSE(error.has_source_range());
-    EXPECT_FALSE(error.source_range().has_value());
     EXPECT_EQ(std::string(error.what()), "base diagnostic");
-
-    error.set_source_range(range);
-    ASSERT_TRUE(error.has_source_range());
-    ASSERT_TRUE(error.source_range().has_value());
-    EXPECT_EQ(*error.source_range(), range);
-    EXPECT_EQ(std::string(error.what()), "base diagnostic at line 2, column 3");
+    error.set_display_message("rendered diagnostic");
+    EXPECT_EQ(std::string(error.what()), "rendered diagnostic");
 
     try
     {
@@ -140,12 +123,10 @@ TEST(LokiPublicFacade, ExposesSemanticErrorsThroughLokiNamespace)
     }
     catch (const loki::ParseError& error)
     {
-        EXPECT_NE(std::string(error.what()).find("line 1, column"), std::string::npos);
-        ASSERT_TRUE(error.has_source_range());
-        ASSERT_TRUE(error.source_range().has_value());
-        EXPECT_EQ(error.source_range()->begin.line, 1);
-        EXPECT_EQ(error.source_range()->begin.line, error.source_range()->end.line);
-        EXPECT_EQ(error.source_range()->begin.column, error.source_range()->end.column);
+        const auto message = std::string(error.what());
+        EXPECT_NE(message.find("Could not parse PDDL domain"), std::string::npos);
+        EXPECT_NE(message.find("In line 1:"), std::string::npos);
+        EXPECT_NE(message.find("^_"), std::string::npos);
     }
 
     auto options = loki::ParserOptions {};
@@ -164,13 +145,10 @@ TEST(LokiPublicFacade, ExposesSemanticErrorsThroughLokiNamespace)
     }
     catch (const loki::MissingRequirementError& error)
     {
-        EXPECT_NE(std::string(error.what()).find(":disjunctive-preconditions"), std::string::npos);
-        EXPECT_NE(std::string(error.what()).find("line 6, column 31"), std::string::npos);
-        ASSERT_TRUE(error.has_source_range());
-        ASSERT_TRUE(error.source_range().has_value());
-        const loki::SourceRange source_range = *error.source_range();
-        EXPECT_EQ(source_range.begin.line, 6);
-        EXPECT_EQ(source_range.begin.column, 31);
+        const auto message = std::string(error.what());
+        EXPECT_NE(message.find(":disjunctive-preconditions"), std::string::npos);
+        EXPECT_NE(message.find("In line 6:"), std::string::npos);
+        EXPECT_NE(message.find("^_"), std::string::npos);
     }
     catch (...)
     {

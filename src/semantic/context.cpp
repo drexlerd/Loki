@@ -1,0 +1,144 @@
+/*
+ * Copyright (C) 2024-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "context.hpp"
+
+#include "mappings.hpp"
+
+#include <utility>
+
+namespace loki::semantic
+{
+
+void remember_requirement(ParseContext& parse_context, formalism::RequirementKind kind)
+{
+    parse_context.active_requirements.insert(kind);
+    if (kind == formalism::RequirementKind::QuantifiedPreconditions)
+    {
+        parse_context.active_requirements.insert(formalism::RequirementKind::ExistentialPreconditions);
+        parse_context.active_requirements.insert(formalism::RequirementKind::UniversalPreconditions);
+    }
+    if (kind == formalism::RequirementKind::Fluents)
+        parse_context.active_requirements.insert(formalism::RequirementKind::NumericFluents);
+}
+
+void remember_adl_requirements(ParseContext& parse_context)
+{
+    remember_requirement(parse_context, formalism::RequirementKind::Typing);
+    remember_requirement(parse_context, formalism::RequirementKind::NegativePreconditions);
+    remember_requirement(parse_context, formalism::RequirementKind::DisjunctivePreconditions);
+    remember_requirement(parse_context, formalism::RequirementKind::Equality);
+    remember_requirement(parse_context, formalism::RequirementKind::QuantifiedPreconditions);
+    remember_requirement(parse_context, formalism::RequirementKind::ConditionalEffects);
+}
+
+ygg::Index<formalism::Type>
+intern_type(DomainContext& domain_context, formalism::Repository& repository, const std::string& name, ygg::IndexList<formalism::Type> bases)
+{
+    auto k = key(name);
+    if (auto it = domain_context.types.find(k); it != domain_context.types.end() && bases.empty())
+        return it->second.get_index();
+    auto view = formalism::get_or_create<formalism::Type>(repository, to_cista(k), std::move(bases));
+    if (auto [it, inserted] = domain_context.types.emplace(k, view); !inserted)
+        it->second = view;
+    return view.get_index();
+}
+
+void clear_domain_symbols(DomainContext& domain_context, ParseContext& parse_context)
+{
+    domain_context.domain = {};
+    domain_context.domain_name.clear();
+    domain_context.types.clear();
+    domain_context.objects.clear();
+    domain_context.predicates.clear();
+    domain_context.functions.clear();
+    domain_context.declared_types.clear();
+    domain_context.declared_objects.clear();
+    domain_context.declared_predicates.clear();
+    domain_context.declared_functions.clear();
+    parse_context.active_requirements.clear();
+    domain_context.requirement_kinds.clear();
+    parse_context.active_action_costs = false;
+    domain_context.action_costs = false;
+    parse_context.variable_types.clear();
+    parse_context.variable_scopes.clear();
+    parse_context.task_objects.clear();
+}
+
+void rebuild_domain_symbols(DomainContext& domain_context, ParseContext& parse_context, formalism::Repository& repository)
+{
+    domain_context.types.clear();
+    domain_context.objects.clear();
+    domain_context.predicates.clear();
+    domain_context.functions.clear();
+    domain_context.declared_types.clear();
+    domain_context.declared_objects.clear();
+    domain_context.declared_predicates.clear();
+    domain_context.declared_functions.clear();
+    parse_context.active_requirements.clear();
+    domain_context.requirement_kinds.clear();
+    parse_context.active_action_costs = false;
+    domain_context.action_costs = false;
+    parse_context.variable_types.clear();
+    if (!domain_context.domain)
+        return;
+
+    auto remember_type = [&](auto&& self, formalism::TypeView type) -> void
+    {
+        if (auto [it, inserted] = domain_context.types.emplace(std::string(type.get_name()), type); !inserted)
+            it->second = type;
+        domain_context.declared_types.insert(std::string(type.get_name()));
+        for (auto base : type.get_bases())
+            self(self, base);
+    };
+
+    for (auto requirement : domain_context.domain->get_requirements())
+        remember_requirement(parse_context, requirement.get_kind());
+    domain_context.requirement_kinds = parse_context.active_requirements;
+    for (auto type : domain_context.domain->get_types())
+        remember_type(remember_type, type);
+    for (auto object : domain_context.domain->get_constants())
+    {
+        domain_context.objects.emplace(std::string(object.get_name()), object);
+        domain_context.declared_objects.insert(std::string(object.get_name()));
+        for (auto type : object.get_types())
+            remember_type(remember_type, type);
+    }
+    for (auto predicate : domain_context.domain->get_predicates())
+    {
+        const auto name = std::string(predicate.get_name());
+        domain_context.predicates.emplace(name, predicate);
+        domain_context.declared_predicates.insert(name);
+    }
+    for (auto function : domain_context.domain->get_functions())
+    {
+        domain_context.functions.emplace(std::string(function.get_name()), function);
+        domain_context.declared_functions.insert(std::string(function.get_name()));
+        remember_type(remember_type, function.get_type());
+    }
+    if (auto it = domain_context.types.find("object"); it != domain_context.types.end())
+        domain_context.object_type = it->second.get_index();
+    else
+        domain_context.object_type = intern_type(domain_context, repository, "object", {});
+
+    if (auto it = domain_context.types.find("number"); it != domain_context.types.end())
+        domain_context.number_type = it->second.get_index();
+    else
+        domain_context.number_type = intern_type(domain_context, repository, "number", {});
+}
+
+}  // namespace loki::semantic

@@ -20,8 +20,7 @@
 
 #include "loki/parser/config.hpp"
 
-#include <cstddef>
-#include <optional>
+#include <sstream>
 #include <string>
 #include <yggdrasil/containers/associative_containers.hpp>
 #include <yggdrasil/semantics/equal_to.hpp>
@@ -31,51 +30,21 @@ namespace loki::parser
 {
 namespace x3 = boost::spirit::x3;
 
-struct SourcePosition
-{
-    std::size_t line = 1;
-    std::size_t column = 1;
-    std::size_t offset = 0;
-
-    friend bool operator==(const SourcePosition&, const SourcePosition&) = default;
-};
-
-struct SourceRange
-{
-    SourcePosition begin;
-    SourcePosition end;
-
-    friend bool operator==(const SourceRange&, const SourceRange&) = default;
-};
-
 template<typename Iterator>
-SourcePosition source_position(const ErrorHandler<Iterator>& error_handler, Iterator iterator)
+std::string format_error_at(const ErrorHandler<Iterator>& source, Iterator position, const std::string& message)
 {
-    const auto& cache = error_handler.get_position_cache();
-    auto result = SourcePosition {};
-    for (auto it = cache.first(); it != iterator && it != cache.last(); ++it)
-    {
-        ++result.offset;
-        if (*it == '\n')
-        {
-            ++result.line;
-            result.column = 1;
-        }
-        else
-        {
-            ++result.column;
-        }
-    }
-    return result;
+    auto out = std::ostringstream {};
+    auto formatter = ErrorHandler<Iterator>(source.get_position_cache().first(), source.get_position_cache().last(), out, source.file(), source.tabs());
+    formatter(position, message);
+    return out.str();
 }
 
 template<typename Iterator>
-std::optional<SourceRange> source_range(const ErrorHandler<Iterator>& error_handler, const x3::position_tagged& node)
+std::string format_error_at(const ErrorHandler<Iterator>& source, const x3::position_tagged& node, const std::string& message)
 {
     if (node.id_first < 0 || node.id_last < 0)
-        return std::nullopt;
-    const auto range = error_handler.position_of(node);
-    return SourceRange { source_position(error_handler, range.begin()), source_position(error_handler, range.end()) };
+        return message;
+    return format_error_at(source, source.position_of(node).begin(), message);
 }
 
 struct ErrorHandlerBase
