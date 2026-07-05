@@ -1,0 +1,10 @@
+(define (domain typed-signatures)
+  (:requirements :strips :typing :numeric-fluents)
+  (:types thing)
+  (:predicates (p ?x - thing) (done ?x - thing))
+  (:functions (fuel ?x - thing))
+  (:action a
+    :parameters (?x - thing)
+    :precondition (p ?x)
+    :effect (and (done ?x) (increase (fuel ?x) 1)))
+)

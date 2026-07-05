@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "benchmark_utils.hpp"
+
 #include <gtest/gtest.h>
 #include <loki/formalism/formatter.hpp>
 #include <loki/loki.hpp>
@@ -26,38 +28,20 @@ namespace loki::tests
 
 TEST(LokiPublicFacade, CanonicalLokiUmbrellaExposesLokiFacade)
 {
-    auto parser = loki::Parser(std::string { R"(
-        (define (domain umbrella)
-          (:requirements :strips)
-          (:predicates (ready)))
-    )" });
+    auto parser = loki::Parser(read_text(fixture_path("facade")));
 
     const auto domain = parser.get_domain();
 
-    EXPECT_EQ(domain.get_name(), "umbrella");
+    EXPECT_EQ(domain.get_name(), "facade");
 }
 
 TEST(LokiPublicFacade, ExposesParserAndTranslatorThroughLokiNamespace)
 {
-    auto parser = loki::Parser(std::string { R"(
-        (define (domain facade)
-          (:requirements :strips)
-          (:predicates (ready))
-          (:action wait
-            :parameters ()
-            :precondition (ready)
-            :effect (ready)))
-    )" },
-                               loki::ParserOptions { .strict = false, .add_action_costs = false });
+    auto parser = loki::Parser(fixture_path("facade"), loki::ParserOptions { .strict = false, .add_action_costs = false });
 
     const auto domain = parser.get_domain();
 
-    const auto task = parser.parse_task(std::string { R"(
-        (define (problem facade-task)
-          (:domain facade)
-          (:init (ready))
-          (:goal (ready)))
-    )" });
+    const auto task = parser.parse_task(fixture_path("facade", "task.pddl"));
 
     const auto domain_translation = loki::translate(domain);
     const auto task_translation = loki::translate(task, domain_translation);
@@ -119,7 +103,7 @@ TEST(LokiPublicFacade, ExposesSemanticErrorsThroughLokiNamespace)
 
     try
     {
-        static_cast<void>(loki::Parser(std::string { "(define (domain broken) (:predicates (p))" }));
+        static_cast<void>(loki::Parser(read_text(fixture_path("broken-syntax"))));
         FAIL() << "Expected loki::ParseError through the public facade.";
     }
     catch (const loki::ParseError& error)
@@ -134,50 +118,24 @@ TEST(LokiPublicFacade, ExposesSemanticErrorsThroughLokiNamespace)
     options.strict = true;
     try
     {
-        static_cast<void>(loki::Parser(std::string { R"(
-            (define (domain missing-requirement)
-              (:predicates (p) (q))
-              (:action a
-                :parameters ()
-                :precondition (or (p) (q))
-                :effect (and)))
-        )" },
-                                       options));
+        static_cast<void>(loki::Parser(read_text(fixture_path("missing-disjunctive-requirement")), options));
+        FAIL() << "Expected loki::MissingRequirementError through the public facade.";
     }
     catch (const loki::MissingRequirementError& error)
     {
         const auto message = std::string(error.what());
         EXPECT_NE(message.find(":disjunctive-preconditions"), std::string::npos);
-        EXPECT_NE(message.find("In line 6:"), std::string::npos);
+        EXPECT_NE(message.find("In line 5:"), std::string::npos);
         EXPECT_NE(message.find("^_"), std::string::npos);
-    }
-    catch (...)
-    {
-        FAIL() << "Expected loki::MissingRequirementError through the public facade.";
     }
 }
 
 TEST(LokiPublicFacade, ViewConvenienceMethodsCoverTypedSymbolsAndLiterals)
 {
-    auto parser = loki::Parser(std::string { R"(
-        (define (domain typed-facade)
-          (:requirements :strips :typing)
-          (:types base - object item - base)
-          (:predicates (ready ?x - item))
-          (:action mark
-            :parameters (?x - item)
-            :precondition (ready ?x)
-            :effect (ready ?x)))
-    )" });
+    auto parser = loki::Parser(fixture_path("typed-facade"));
 
     const auto domain = parser.get_domain();
-    const auto task = parser.parse_task(std::string { R"(
-        (define (problem typed-facade-task)
-          (:domain typed-facade)
-          (:objects item-1 - item)
-          (:init (ready item-1))
-          (:goal (ready item-1)))
-    )" });
+    const auto task = parser.parse_task(fixture_path("typed-facade", "task.pddl"));
 
     ASSERT_GE(domain.get_types().size(), 2);
     auto saw_item_type = false;
@@ -216,25 +174,10 @@ TEST(LokiPublicFacade, ViewConvenienceMethodsCoverTypedSymbolsAndLiterals)
 
 TEST(LokiPublicFacade, ViewConvenienceMethodsCoverNumericEffectsAndMetrics)
 {
-    auto parser = loki::Parser(std::string { R"(
-        (define (domain numeric-facade)
-          (:requirements :strips :fluents)
-          (:predicates (ready))
-          (:functions (total-cost))
-          (:action spend
-            :parameters ()
-            :precondition (ready)
-            :effect (and (ready) (increase (total-cost) 1))))
-    )" });
+    auto parser = loki::Parser(fixture_path("numeric-facade"));
 
     const auto domain = parser.get_domain();
-    const auto task = parser.parse_task(std::string { R"(
-        (define (problem numeric-facade-task)
-          (:domain numeric-facade)
-          (:init (ready) (= (total-cost) 0))
-          (:goal (ready))
-          (:metric minimize (total-cost)))
-    )" });
+    const auto task = parser.parse_task(fixture_path("numeric-facade", "task.pddl"));
 
     ASSERT_EQ(domain.get_functions().size(), 1);
     ASSERT_EQ(domain.get_actions().size(), 1);
@@ -302,26 +245,10 @@ TEST(LokiPublicFacade, ViewConvenienceMethodsCoverNumericEffectsAndMetrics)
 
 TEST(LokiPublicFacade, FormatsSemanticDomainAndTaskAsReparseablePddl)
 {
-    auto parser = loki::Parser(std::string { R"(
-        (define (domain facade-format)
-          (:requirements :strips)
-          (:predicates (ready) (seen ?x))
-          (:action wait
-            :parameters (?x)
-            :precondition (ready)
-            :effect (and (ready) (seen ?x)))
-        )
-    )" });
+    auto parser = loki::Parser(fixture_path("facade-format"));
 
     const auto domain = parser.get_domain();
-    const auto task = parser.parse_task(std::string { R"(
-        (define (problem facade-format-task)
-          (:domain facade-format)
-          (:objects item)
-          (:init (ready))
-          (:goal (seen item))
-        )
-    )" });
+    const auto task = parser.parse_task(fixture_path("facade-format", "task.pddl"));
 
     const auto domain_text = loki::format_domain(domain);
     const auto task_text = loki::format_task(task);
@@ -338,19 +265,7 @@ TEST(LokiPublicFacade, FormatsSemanticDomainAndTaskAsReparseablePddl)
 
 TEST(LokiPublicFacade, FormatsAlternativeEffectsAsReparseablePddl)
 {
-    auto parser = loki::Parser(std::string { R"(
-        (define (domain facade-format-alternatives)
-          (:requirements :strips :non-deterministic :probabilistic-effects)
-          (:predicates (p) (q))
-          (:action choose
-            :parameters ()
-            :effect (oneof (p) (q)))
-          (:action sample
-            :parameters ()
-            :effect (probabilistic 0.25 (p) 0.75 (q)))
-        )
-    )" },
-                               loki::ParserOptions { .strict = false, .add_action_costs = false });
+    auto parser = loki::Parser(fixture_path("alternative-effects"), loki::ParserOptions { .strict = false, .add_action_costs = false });
 
     const auto domain = parser.get_domain();
     const auto domain_text = loki::format_domain(domain);
@@ -383,31 +298,10 @@ TEST(LokiPublicFacade, FormatsAlternativeEffectsAsReparseablePddl)
 
 TEST(LokiPublicFacade, FormatsTypedNumericTaskSectionsAsReparseablePddl)
 {
-    auto parser = loki::Parser(std::string { R"(
-        (define (domain facade-format-numeric)
-          (:requirements :strips :typing :numeric-fluents)
-          (:types item)
-          (:constants depot - item)
-          (:predicates (ready ?x - item))
-          (:functions (cost ?x - item))
-          (:action spend
-            :parameters (?x - item)
-            :precondition (ready ?x)
-            :effect (and (ready ?x) (increase (cost ?x) 1.5)))
-        )
-    )" },
-                               loki::ParserOptions { .strict = false, .add_action_costs = false });
+    auto parser = loki::Parser(fixture_path("facade-format-numeric"), loki::ParserOptions { .strict = false, .add_action_costs = false });
 
     const auto domain = parser.get_domain();
-    const auto task = parser.parse_task(std::string { R"(
-        (define (problem facade-format-numeric-task)
-          (:domain facade-format-numeric)
-          (:objects package - item)
-          (:init (ready package) (= (cost package) 0))
-          (:goal (ready package))
-          (:metric minimize (cost package))
-        )
-    )" });
+    const auto task = parser.parse_task(fixture_path("facade-format-numeric", "task.pddl"));
 
     const auto domain_text = loki::format_domain(domain);
     const auto task_text = loki::format_task(task);

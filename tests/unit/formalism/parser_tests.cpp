@@ -15,14 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-#include <gtest/gtest.h>
-
 #include "../benchmark_utils.hpp"
 
-#include <loki/loki.hpp>
-
 #include <filesystem>
+#include <gtest/gtest.h>
+#include <loki/loki.hpp>
 #include <string>
 
 namespace loki::tests
@@ -51,17 +48,7 @@ TEST(LokiTests, ParserTest)
 
 TEST(LokiTests, ParserStringTest)
 {
-    const std::string domain_str =
-        "(define (domain test-domain) "
-        "        (:requirements :strips) "
-        "        (:predicates (p)) "
-        "        (:action a "
-        "         :parameters () "
-        "         :precondition (and) "
-        "         :effect (and (p))))";
-
-    auto parser = loki::Parser(domain_str);
-
+    auto parser = loki::Parser(read_text(fixture_path("strips-minimal")));
 
     const auto domain = parser.get_domain();
 
@@ -72,44 +59,23 @@ TEST(LokiTests, ParserStringTest)
 
 TEST(LokiTests, ParserNonDeterministicTest)
 {
-    const auto domain_str = std::string { R"(
-(define (domain nondet)
-  (:requirements :strips :non-deterministic)
-  (:predicates (p) (q))
-  (:action a
-    :parameters ()
-    :effect (oneof (p) (q)))
-)
-)" };
-
-    auto parser = loki::Parser(domain_str);
-
+    auto parser = loki::Parser(fixture_path("alternative-effects"), loki::ParserOptions { .strict = false, .add_action_costs = false });
 
     const auto domain = parser.get_domain();
 
     EXPECT_EQ(domain.get_constants().size(), 0);
     EXPECT_EQ(domain.get_predicates().size(), 2);
-    EXPECT_EQ(domain.get_actions().size(), 1);
+    EXPECT_EQ(domain.get_actions().size(), 2);
 }
 
 TEST(LokiTests, ParserNonDeterministicMissingRequirementTest)
 {
-    const auto domain_str = std::string { R"(
-(define (domain missing-requirement)
-  (:predicates (p) (q))
-  (:action a
-    :parameters ()
-    :precondition (or (p) (q))
-    :effect (and))
-)
-)" };
-
     auto options = loki::ParserOptions {};
     options.strict = true;
 
     try
     {
-        auto parser = loki::Parser(domain_str, options);
+        auto parser = loki::Parser(fixture_path("missing-disjunctive-requirement"), options);
         static_cast<void>(parser.get_domain());
         FAIL() << "Expected missing requirement diagnostic";
     }
@@ -118,4 +84,4 @@ TEST(LokiTests, ParserNonDeterministicMissingRequirementTest)
     }
 }
 
-} // namespace loki::tests
+}  // namespace loki::tests

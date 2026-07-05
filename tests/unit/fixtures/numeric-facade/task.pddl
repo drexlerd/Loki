@@ -1,0 +1,6 @@
+(define (problem numeric-facade-task)
+  (:domain numeric-facade)
+  (:init (ready) (= (total-cost) 0))
+  (:goal (ready))
+  (:metric minimize (total-cost))
+)

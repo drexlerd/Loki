@@ -1,0 +1,6 @@
+(define (problem task-rename-once-problem)
+  (:domain task-rename-once)
+  (:objects o - object)
+  (:init)
+  (:goal (not (exists (?x - object) (p ?x ?x))))
+)

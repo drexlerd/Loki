@@ -232,6 +232,90 @@
                 "  (:goal (p))",
                 ")"
             ]
+        },
+        {
+            "name": "strict function type mismatch",
+            "entry": "domain",
+            "expected_error": "TypeMismatchError",
+            "strict": true,
+            "domain": [
+                "(define (domain function-type-mismatch)",
+                "  (:requirements :typing :numeric-fluents)",
+                "  (:types room ball)",
+                "  (:constants b - ball)",
+                "  (:predicates)",
+                "  (:functions (distance ?r - room))",
+                "  (:action a :parameters () :effect (assign (distance b) 0))",
+                ")"
+            ]
+        },
+        {
+            "name": "declared predicate arity mismatch",
+            "entry": "domain",
+            "expected_error": "ArityMismatchError",
+            "domain": [
+                "(define (domain bad-arity)",
+                "  (:predicates (p ?x))",
+                "  (:action a :parameters () :precondition (p) :effect (and))",
+                ")"
+            ]
+        },
+        {
+            "name": "strict action-costs requires metric",
+            "entry": "task",
+            "expected_error": "SemanticError",
+            "expected_message": "Missing total-cost metric for :action-costs",
+            "strict": true,
+            "domain": [
+                "(define (domain action-cost-domain)",
+                "  (:requirements :action-costs)",
+                "  (:predicates)",
+                "  (:functions (total-cost))",
+                "  (:action pay :parameters () :effect (increase (total-cost) 1))",
+                ")"
+            ],
+            "task": [
+                "(define (problem action-cost-task)",
+                "  (:domain action-cost-domain)",
+                "  (:init (= (total-cost) 0))",
+                ")"
+            ]
+        },
+        {
+            "name": "strict action-costs requires initial value",
+            "entry": "task",
+            "expected_error": "SemanticError",
+            "expected_message": "Missing initial value for total-cost for :action-costs",
+            "strict": true,
+            "domain": [
+                "(define (domain action-cost-domain)",
+                "  (:requirements :action-costs)",
+                "  (:predicates)",
+                "  (:functions (total-cost))",
+                "  (:action pay :parameters () :effect (increase (total-cost) 1))",
+                ")"
+            ],
+            "task": [
+                "(define (problem action-cost-task)",
+                "  (:domain action-cost-domain)",
+                "  (:init)",
+                "  (:metric minimize (total-cost))",
+                ")"
+            ]
+        },
+        {
+            "name": "strict action-costs requires total-cost function",
+            "entry": "domain",
+            "expected_error": "SemanticError",
+            "expected_message": "Missing total-cost function for :action-costs",
+            "strict": true,
+            "domain": [
+                "(define (domain action-cost-domain)",
+                "  (:requirements :action-costs)",
+                "  (:predicates (p))",
+                "  (:action pay :parameters () :effect (increase (total-cost) 1))",
+                ")"
+            ]
         }
     ]
 }

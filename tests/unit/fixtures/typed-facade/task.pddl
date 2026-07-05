@@ -1,0 +1,6 @@
+(define (problem typed-facade-task)
+  (:domain typed-facade)
+  (:objects item-1 - item)
+  (:init (ready item-1))
+  (:goal (ready item-1))
+)

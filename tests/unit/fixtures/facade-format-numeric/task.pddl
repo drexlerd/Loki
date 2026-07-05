@@ -1,0 +1,7 @@
+(define (problem facade-format-numeric-task)
+  (:domain facade-format-numeric)
+  (:objects package - item)
+  (:init (ready package) (= (cost package) 0))
+  (:goal (ready package))
+  (:metric minimize (cost package))
+)

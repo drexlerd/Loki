@@ -1,0 +1,6 @@
+(define (domain equality)
+  (:requirements :typing :equality)
+  (:types thing)
+  (:constants c - thing)
+  (:predicates (p))
+)

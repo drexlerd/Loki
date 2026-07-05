@@ -1,0 +1,10 @@
+(define (domain equality-negated)
+  (:requirements :typing :equality)
+  (:types thing)
+  (:constants c - thing)
+  (:predicates (p))
+  (:action a
+    :parameters (?x - thing ?y - thing)
+    :precondition (not (= ?x ?y))
+    :effect (p))
+)

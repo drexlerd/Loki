@@ -1,0 +1,6 @@
+(define (problem equality-problem)
+  (:domain equality)
+  (:objects o - thing)
+  (:init)
+  (:goal (p))
+)

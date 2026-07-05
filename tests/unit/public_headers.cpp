@@ -15,13 +15,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "benchmark_utils.hpp"
+
 #include <gtest/gtest.h>
 #include <iostream>
 #include <loki/ast.hpp>
 #include <loki/ast/ast.hpp>
 #include <loki/ast/ast_fwd.hpp>
-#include <loki/ast.hpp>
-#include <loki/ast.hpp>
 #include <loki/formalism/builder.hpp>
 #include <loki/formalism/canonicalization.hpp>
 #include <loki/formalism/datas.hpp>
@@ -62,30 +62,20 @@ TEST(LokiPublicHeaders, FormalismBuilderHeaderIsSelfContained)
 
 TEST(LokiPublicHeaders, ParserAndFormatterHeadersAreSelfContained)
 {
-    const auto domain_source = std::string { "(define (domain direct) (:predicates (p)))" };
+    const auto domain_source = read_text(fixture_path("facade"));
     auto first = domain_source.cbegin();
     auto error_handler = parser::ErrorHandlerType(first, domain_source.cend(), std::cerr);
     auto ast_domain = ast::Domain {};
 
     ASSERT_TRUE(parser::parse_domain(domain_source, ast_domain, error_handler));
-    EXPECT_EQ(fmt::format("{}", ast_domain).find("direct") != std::string::npos, true);
+    EXPECT_EQ(fmt::format("{}", ast_domain).find("facade") != std::string::npos, true);
 }
 
 TEST(LokiPublicHeaders, LokiUmbrellaHeaderExposesFacadeHelpers)
 {
-    auto parser = loki::Parser(std::string { R"(
-        (define (domain umbrella-header)
-          (:predicates (p))
-        )
-    )" });
+    auto parser = loki::Parser(read_text(fixture_path("facade")));
     const auto domain = parser.get_domain();
-    const auto task = parser.parse_task(std::string { R"(
-        (define (problem umbrella-header-task)
-          (:domain umbrella-header)
-          (:init)
-          (:goal (p))
-        )
-    )" });
+    const auto task = parser.parse_task(read_text(fixture_path("facade", "task.pddl")));
 
     const auto domain_translation = loki::translate_domain(domain);
     const auto task_translation = loki::translate_task(task, domain_translation);
@@ -94,17 +84,17 @@ TEST(LokiPublicHeaders, LokiUmbrellaHeaderExposesFacadeHelpers)
     const auto domain_text = loki::format_domain(translated_domain);
     const auto task_text = loki::format_task(translated_task);
 
-    EXPECT_NE(domain_text.find("umbrella-header"), std::string::npos);
-    EXPECT_NE(task_text.find("umbrella-header-task"), std::string::npos);
+    EXPECT_NE(domain_text.find("facade"), std::string::npos);
+    EXPECT_NE(task_text.find("facade-task"), std::string::npos);
     EXPECT_EQ(fmt::format("{}", translated_domain), domain_text);
     EXPECT_EQ(fmt::format("{}", translated_task), task_text);
 }
 
 TEST(LokiPublicHeaders, SemanticHeaderIsSelfContained)
 {
-    auto parser = semantic::Parser(std::string { "(define (domain semantic-direct) (:predicates (p)))" });
+    auto parser = semantic::Parser(read_text(fixture_path("facade")));
 
-    EXPECT_EQ(parser.get_domain().get_name(), "semantic-direct");
+    EXPECT_EQ(parser.get_domain().get_name(), "facade");
 }
 
 }  // namespace loki::tests

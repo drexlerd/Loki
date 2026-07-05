@@ -1,0 +1,6 @@
+(define (problem disjunctive-goal-task)
+  (:domain disjunctive-goal)
+  (:requirements :strips :disjunctive-preconditions)
+  (:init)
+  (:goal (or (p) (q)))
+)

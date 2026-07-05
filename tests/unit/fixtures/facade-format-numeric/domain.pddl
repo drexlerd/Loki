@@ -1,0 +1,11 @@
+(define (domain facade-format-numeric)
+  (:requirements :strips :typing :numeric-fluents)
+  (:types item)
+  (:constants depot - item)
+  (:predicates (ready ?x - item))
+  (:functions (cost ?x - item))
+  (:action spend
+    :parameters (?x - item)
+    :precondition (ready ?x)
+    :effect (and (ready ?x) (increase (cost ?x) 1.5)))
+)

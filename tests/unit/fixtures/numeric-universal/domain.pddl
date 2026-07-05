@@ -1,0 +1,10 @@
+(define (domain numeric-universal)
+  (:requirements :strips :typing :universal-preconditions :numeric-fluents)
+  (:types thing)
+  (:predicates (done ?x - thing))
+  (:functions (fuel ?x - thing))
+  (:action a
+    :parameters (?x - thing)
+    :precondition (forall (?y - thing) (> (fuel ?x) 0))
+    :effect (done ?x))
+)

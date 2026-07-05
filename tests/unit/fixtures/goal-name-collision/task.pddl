@@ -1,0 +1,5 @@
+(define (problem goal-name-collision-problem)
+  (:domain goal-name-collision)
+  (:init)
+  (:goal (or (p) (q)))
+)

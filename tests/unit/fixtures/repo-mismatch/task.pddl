@@ -1,0 +1,5 @@
+(define (problem second-translation-task)
+  (:domain second-translation-domain)
+  (:init)
+  (:goal (q))
+)

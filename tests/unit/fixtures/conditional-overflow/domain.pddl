@@ -1,0 +1,8 @@
+(define (domain conditional-overflow)
+  (:requirements :strips :conditional-effects)
+  (:predicates (p) (c0) (c1) (c2) (c3) (c4) (c5) (c6) (c7) (c8) (c9) (c10) (c11) (c12) (c13) (c14) (c15) (c16) (c17) (c18) (c19) (c20) (c21) (c22) (c23) (c24) (c25) (c26) (c27) (c28) (c29) (c30) (c31) (c32) (c33) (c34) (c35) (c36) (c37) (c38) (c39) (c40) (c41) (c42) (c43) (c44) (c45) (c46) (c47) (c48) (c49) (c50) (c51) (c52) (c53) (c54) (c55) (c56) (c57) (c58) (c59) (c60) (c61) (c62) (c63))
+  (:action a
+    :parameters ()
+    :precondition (p)
+    :effect (and (when (c0) (p)) (when (c1) (p)) (when (c2) (p)) (when (c3) (p)) (when (c4) (p)) (when (c5) (p)) (when (c6) (p)) (when (c7) (p)) (when (c8) (p)) (when (c9) (p)) (when (c10) (p)) (when (c11) (p)) (when (c12) (p)) (when (c13) (p)) (when (c14) (p)) (when (c15) (p)) (when (c16) (p)) (when (c17) (p)) (when (c18) (p)) (when (c19) (p)) (when (c20) (p)) (when (c21) (p)) (when (c22) (p)) (when (c23) (p)) (when (c24) (p)) (when (c25) (p)) (when (c26) (p)) (when (c27) (p)) (when (c28) (p)) (when (c29) (p)) (when (c30) (p)) (when (c31) (p)) (when (c32) (p)) (when (c33) (p)) (when (c34) (p)) (when (c35) (p)) (when (c36) (p)) (when (c37) (p)) (when (c38) (p)) (when (c39) (p)) (when (c40) (p)) (when (c41) (p)) (when (c42) (p)) (when (c43) (p)) (when (c44) (p)) (when (c45) (p)) (when (c46) (p)) (when (c47) (p)) (when (c48) (p)) (when (c49) (p)) (when (c50) (p)) (when (c51) (p)) (when (c52) (p)) (when (c53) (p)) (when (c54) (p)) (when (c55) (p)) (when (c56) (p)) (when (c57) (p)) (when (c58) (p)) (when (c59) (p)) (when (c60) (p)) (when (c61) (p)) (when (c62) (p)) (when (c63) (p))))
+)

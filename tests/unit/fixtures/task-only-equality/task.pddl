@@ -1,0 +1,7 @@
+(define (problem task-only-equality-problem)
+  (:domain task-only-equality)
+  (:requirements :equality)
+  (:objects o)
+  (:init)
+  (:goal (p))
+)

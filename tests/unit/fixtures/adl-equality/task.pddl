@@ -1,0 +1,6 @@
+(define (problem adl-equality-problem)
+  (:domain adl-equality)
+  (:objects o)
+  (:init)
+  (:goal (p o))
+)

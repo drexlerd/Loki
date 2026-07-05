@@ -1,0 +1,6 @@
+(define (problem facade-format-task)
+  (:domain facade-format)
+  (:objects item)
+  (:init (ready))
+  (:goal (seen item))
+)

@@ -15,17 +15,73 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_TESTS_BENCHMARK_UTILS_HPP_
 #define LOKI_TESTS_BENCHMARK_UTILS_HPP_
 
 #include <filesystem>
+#include <fstream>
 #include <gtest/gtest.h>
+#include <optional>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 namespace loki::tests
 {
 
 inline bool benchmark_file_available(const std::filesystem::path& path) { return std::filesystem::is_regular_file(path); }
+
+struct SuiteCase
+{
+    std::string name;
+    std::filesystem::path domain_file;
+    std::optional<std::filesystem::path> task_file;
+};
+
+inline std::vector<SuiteCase> load_suite_cases(const std::filesystem::path& suite_json)
+{
+    const auto suite_value = ygg::common::load_json_file(suite_json);
+    const auto& suite = ygg::common::as_object(suite_value, "suite");
+    auto result = std::vector<SuiteCase> {};
+    for (const auto& case_value : ygg::common::as_array(suite, "cases", "suite"))
+    {
+        const auto& object = ygg::common::as_object(case_value, "case");
+        auto item = SuiteCase { ygg::common::as_string(object, "name", "case"),
+                                ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
+                                std::nullopt };
+        if (object.if_contains("task_file"))
+            item.task_file = ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case"));
+        result.push_back(std::move(item));
+    }
+    return result;
+}
+
+inline std::vector<SuiteCase> benchmark_suite_cases() { return load_suite_cases(ygg::common::root_path() / "tests/unit/parser/suite.json"); }
+
+inline std::vector<SuiteCase> fixture_suite_cases() { return load_suite_cases(ygg::common::root_path() / "tests/unit/fixtures/suite.json"); }
+
+// Benchmark cases plus the loki mini-corpus: the exhaustive input set for positive invariants.
+inline std::vector<SuiteCase> all_positive_cases()
+{
+    auto result = benchmark_suite_cases();
+    auto fixtures = fixture_suite_cases();
+    result.insert(result.end(), fixtures.begin(), fixtures.end());
+    return result;
+}
+
+inline std::filesystem::path fixture_path(const std::string& case_dir, const std::string& file = "domain.pddl")
+{
+    return ygg::common::root_path() / "tests/unit/fixtures" / case_dir / file;
+}
+
+inline std::string read_text(const std::filesystem::path& path)
+{
+    auto in = std::ifstream(path);
+    auto out = std::ostringstream {};
+    out << in.rdbuf();
+    return out.str();
+}
 
 inline bool benchmark_tree_available(const std::filesystem::path& path)
 {
@@ -39,6 +95,8 @@ inline bool benchmark_tree_available(const std::filesystem::path& path)
     }
     return false;
 }
+
+inline bool benchmark_file_available(const std::optional<std::filesystem::path>& path) { return !path || std::filesystem::is_regular_file(*path); }
 
 template<typename Cases>
 inline bool benchmark_suite_available(const Cases& cases)

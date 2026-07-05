@@ -66,29 +66,7 @@ void expect_parse_format_reparse(const fs::path& path, ParseFn parse)
     EXPECT_TRUE(parse(printed, reparsed, printed_error_handler)) << path << "\n" << printed;
 }
 
-struct ParserSuiteCase
-{
-    std::string name;
-    fs::path domain_file;
-    fs::path task_file;
-};
-
-ParserSuiteCase parse_case(const boost::json::object& suite, const boost::json::object& object)
-{
-    return ParserSuiteCase { ygg::common::as_string(object, "name", "case"),
-                             ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
-                             ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")) };
-}
-
-std::vector<ParserSuiteCase> load_cases()
-{
-    const auto suite_value = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/parser/suite.json");
-    const auto& suite = ygg::common::as_object(suite_value, "suite");
-    auto result = std::vector<ParserSuiteCase> {};
-    for (const auto& case_value : ygg::common::as_array(suite, "cases", "suite"))
-        result.push_back(parse_case(suite, ygg::common::as_object(case_value, "case")));
-    return result;
-}
+std::vector<SuiteCase> load_cases() { return benchmark_suite_cases(); }
 
 TEST(LokiParserSuite, JsonSuiteCoversEveryBenchmarkProblem)
 {
@@ -101,7 +79,7 @@ TEST(LokiParserSuite, JsonSuiteCoversEveryBenchmarkProblem)
     auto listed = std::set<std::string> {};
     for (const auto& item : load_cases())
     {
-        listed.insert(fs::relative(item.domain_file, benchmark_root).generic_string() + "|" + fs::relative(item.task_file, benchmark_root).generic_string());
+        listed.insert(fs::relative(item.domain_file, benchmark_root).generic_string() + "|" + fs::relative(*item.task_file, benchmark_root).generic_string());
     }
 
     auto discovered = std::set<std::string> {};
@@ -143,16 +121,16 @@ TEST(LokiParserSuite, ParsesAllBenchmarkTaskAsts)
     const auto cases = load_cases();
     ASSERT_FALSE(cases.empty());
     if (!benchmark_suite_available(cases))
-        GTEST_SKIP() << "Benchmark data unavailable: " << cases.front().task_file;
+        GTEST_SKIP() << "Benchmark data unavailable: " << *cases.front().task_file;
 
     for (const auto& item : cases)
     {
-        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.task_file);
-        const auto source = read_file(item.task_file);
+        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(*item.task_file);
+        const auto source = read_file(*item.task_file);
         auto first = source.cbegin();
         parser::ErrorHandlerType error_handler(first, source.cend(), std::cerr);
         ast::Task ast;
-        EXPECT_TRUE(parser::parse_task(source, ast, error_handler)) << item.name << ": " << item.task_file;
+        EXPECT_TRUE(parser::parse_task(source, ast, error_handler)) << item.name << ": " << *item.task_file;
     }
 }
 

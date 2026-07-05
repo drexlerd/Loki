@@ -1,0 +1,10 @@
+(define (domain permissive-predicate-type-mismatch)
+  (:requirements :typing)
+  (:types room ball)
+  (:constants b - ball)
+  (:predicates (at ?r - room))
+  (:action a
+    :parameters ()
+    :precondition (at b)
+    :effect (and))
+)

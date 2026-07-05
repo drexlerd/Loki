@@ -1,0 +1,10 @@
+(define (domain numeric-effects)
+  (:requirements :strips :typing :numeric-fluents)
+  (:types thing)
+  (:predicates (done ?x - thing))
+  (:functions (fuel ?x - thing))
+  (:action a
+    :parameters (?x - thing)
+    :precondition ()
+    :effect (and (increase (fuel ?x) 1) (increase (fuel ?x) 2) (done ?x)))
+)

@@ -1,0 +1,10 @@
+(define (domain typing)
+  (:requirements :typing)
+  (:types thing)
+  (:constants c - thing)
+  (:predicates (p ?x - thing))
+  (:action a
+    :parameters (?x - thing)
+    :precondition (p ?x)
+    :effect (and (p ?x)))
+)

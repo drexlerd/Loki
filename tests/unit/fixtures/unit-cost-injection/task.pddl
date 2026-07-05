@@ -1,0 +1,5 @@
+(define (problem plain-task)
+  (:domain plain-domain)
+  (:init)
+  (:goal (p))
+)

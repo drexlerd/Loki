@@ -1,0 +1,5 @@
+(define (domain split-axiom-condition)
+  (:requirements :strips :derived-predicates :disjunctive-preconditions)
+  (:predicates (p) (q) (r))
+  (:derived (r) (or (p) (q)))
+)

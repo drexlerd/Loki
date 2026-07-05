@@ -1,0 +1,5 @@
+(define (problem facade-task)
+  (:domain facade)
+  (:init (ready))
+  (:goal (ready))
+)

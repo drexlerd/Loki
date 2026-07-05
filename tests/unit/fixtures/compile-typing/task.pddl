@@ -1,0 +1,6 @@
+(define (problem typing-problem)
+  (:domain typing)
+  (:objects o - thing)
+  (:init)
+  (:goal (p o))
+)

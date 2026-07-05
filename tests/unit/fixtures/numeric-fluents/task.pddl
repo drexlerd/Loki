@@ -1,0 +1,5 @@
+(define (problem numeric-task)
+  (:domain numeric-domain)
+  (:init (= (fuel) 3))
+  (:goal (p))
+)
