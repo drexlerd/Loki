@@ -40,6 +40,8 @@ struct TranslatorOptions
 {
     bool remove_typing = true;
     bool multiply_conditional_effects = false;
+    // Add the = predicate and (= o o) initial literals; disable for consumers with native equality.
+    bool initialize_equality = true;
 };
 
 enum class TranslationPhase

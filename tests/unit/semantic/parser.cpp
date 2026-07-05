@@ -21,6 +21,7 @@
 #include <filesystem>
 #include <fstream>
 #include <gtest/gtest.h>
+#include <loki/loki.hpp>
 #include <loki/semantic.hpp>
 #include <optional>
 #include <stdexcept>
@@ -961,6 +962,36 @@ TEST(LokiSemanticTranslator, InitializesEqualityForConstantsAndTaskObjects)
     EXPECT_EQ(&translated.get_domain().get_context().get_root(), &translation.get_translated_domain().get_context().get_root());
 }
 
+TEST(LokiSemanticTranslator, SkipsEqualityInitializationWhenDisabled)
+{
+    const auto domain_source = std::string { "(define (domain equality)"
+                                             "(:requirements :typing :equality)"
+                                             "(:types thing)"
+                                             "(:constants c - thing)"
+                                             "(:predicates (p))"
+                                             "(:action a :parameters (?x - thing ?y - thing) "
+                                             ":precondition (not (= ?x ?y)) "
+                                             ":effect (p))"
+                                             ")" };
+    const auto task_source = std::string { "(define (problem equality-problem) (:domain equality)"
+                                           "(:objects o - thing)"
+                                           "(:init)"
+                                           "(:goal (p))"
+                                           ")" };
+
+    semantic::Parser parser(domain_source);
+
+    auto options = semantic::TranslatorOptions {};
+    options.initialize_equality = false;
+    const auto translation = semantic::translate(parser.get_domain(), options);
+    EXPECT_FALSE(has_equality_predicate(translation.get_translated_domain()));
+
+    const auto translated_result = semantic::translate(parser.parse_task(task_source), translation, options);
+    const auto translated = translated_result.get_translated_task();
+    EXPECT_FALSE(has_equality_predicate(translated.get_domain()));
+    EXPECT_EQ(count_equality_literals(translated.get_initial_literals()), 0);
+}
+
 TEST(LokiSemanticTranslator, GeneratedGoalPredicateAvoidsExistingNames)
 {
     const auto domain_source = std::string { "(define (domain goal-name-collision)"
@@ -1525,6 +1556,231 @@ TEST(LokiSemanticParser, StrictActionCostsRequiresInitialValue)
     options.strict = true;
     auto parser = semantic::Parser(domain, options);
     EXPECT_THROW(parser.parse_task(task), semantic::SemanticError);
+}
+
+TEST(LokiSemanticParser, StrictActionCostsRequiresTotalCostFunction)
+{
+    const auto domain = std::string { R"(
+(define (domain action-cost-domain)
+  (:requirements :action-costs)
+  (:predicates (p))
+  (:action pay
+    :parameters ()
+    :effect (increase (total-cost) 1))
+)
+)" };
+
+    auto options = parser::ParserOptions {};
+    options.strict = true;
+    EXPECT_THROW(semantic::Parser(domain, options), semantic::SemanticError);
+}
+
+TEST(LokiSemanticParser, AddsTotalCostFunctionInPermissiveMode)
+{
+    const auto domain = std::string { R"(
+(define (domain action-cost-domain)
+  (:requirements :action-costs)
+  (:predicates (p))
+  (:action pay
+    :parameters ()
+    :effect (increase (total-cost) 1))
+)
+)" };
+
+    auto parser = semantic::Parser(domain);
+    auto found = false;
+    for (auto function : parser.get_domain().get_functions())
+        found = found || function.get_name() == "total-cost";
+    EXPECT_TRUE(found);
+}
+
+TEST(LokiSemanticParser, AddActionCostsOptionInjectsUnitCosts)
+{
+    const auto domain = std::string { R"(
+(define (domain plain-domain)
+  (:requirements :strips)
+  (:predicates (p))
+  (:action flip
+    :parameters ()
+    :effect (p))
+)
+)" };
+    const auto task = std::string { R"(
+(define (problem plain-task)
+  (:domain plain-domain)
+  (:init)
+  (:goal (p))
+)
+)" };
+
+    auto options = parser::ParserOptions {};
+    options.add_action_costs = true;
+    auto parser = semantic::Parser(domain, options);
+
+    const auto domain_text = loki::format_domain(parser.get_domain());
+    EXPECT_NE(domain_text.find(":numeric-fluents"), std::string::npos);
+    EXPECT_NE(domain_text.find("(total-cost)"), std::string::npos);
+    EXPECT_NE(domain_text.find("(increase (total-cost) 1)"), std::string::npos);
+
+    const auto parsed_task = parser.parse_task(task);
+    ASSERT_TRUE(parsed_task.get_metric().has_value());
+    EXPECT_TRUE(parsed_task.get_metric().value().is_minimize());
+    ASSERT_EQ(parsed_task.get_initial_function_values().size(), 1);
+    EXPECT_EQ(parsed_task.get_initial_function_values()[0].get_function().get_function().get_name(), "total-cost");
+}
+
+TEST(LokiSemanticParser, AddActionCostsOptionSkipsActionsAlreadyWritingTotalCost)
+{
+    const auto domain = std::string { R"(
+(define (domain plain-domain)
+  (:requirements :strips)
+  (:predicates (p))
+  (:action expensive
+    :parameters ()
+    :effect (and (p) (increase (total-cost) 5)))
+  (:action cheap
+    :parameters ()
+    :effect (p))
+)
+)" };
+
+    auto options = parser::ParserOptions {};
+    options.add_action_costs = true;
+    auto parser = semantic::Parser(domain, options);
+
+    const auto domain_text = loki::format_domain(parser.get_domain());
+    const auto count = [&](const std::string& needle)
+    {
+        auto occurrences = 0;
+        for (auto pos = domain_text.find(needle); pos != std::string::npos; pos = domain_text.find(needle, pos + 1))
+            ++occurrences;
+        return occurrences;
+    };
+    EXPECT_EQ(count("(increase (total-cost) 5)"), 1);
+    // Only the cheap action gets a unit cost; the expensive one already writes total-cost.
+    EXPECT_EQ(count("(increase (total-cost) 1)"), 1);
+}
+
+TEST(LokiSemanticParser, AddActionCostsOptionCompletesInsteadOfStrictErrors)
+{
+    const auto domain = std::string { R"(
+(define (domain action-cost-domain)
+  (:requirements :action-costs)
+  (:predicates (p))
+  (:action pay
+    :parameters ()
+    :effect (increase (total-cost) 1))
+)
+)" };
+    const auto task = std::string { R"(
+(define (problem action-cost-task)
+  (:domain action-cost-domain)
+  (:init)
+  (:goal (p))
+)
+)" };
+
+    auto options = parser::ParserOptions {};
+    options.strict = true;
+    options.add_action_costs = true;
+    auto parser = semantic::Parser(domain, options);
+    const auto parsed_task = parser.parse_task(task);
+
+    ASSERT_TRUE(parsed_task.get_metric().has_value());
+    ASSERT_EQ(parsed_task.get_initial_function_values().size(), 1);
+}
+
+TEST(LokiSemanticParser, ActionCostsForbidsGeneralNumericWritesInPermissiveMode)
+{
+    const auto domain = std::string { R"(
+(define (domain action-cost-domain)
+  (:requirements :action-costs)
+  (:predicates (p))
+  (:functions (total-cost) (fuel))
+  (:action burn
+    :parameters ()
+    :effect (assign (fuel) 5))
+)
+)" };
+
+    EXPECT_THROW((semantic::Parser { domain }), semantic::MissingRequirementError);
+}
+
+TEST(LokiSemanticParser, ActionCostsForbidsIncreaseOfOtherFunctions)
+{
+    const auto domain = std::string { R"(
+(define (domain action-cost-domain)
+  (:requirements :action-costs)
+  (:predicates (p))
+  (:functions (total-cost) (fuel))
+  (:action burn
+    :parameters ()
+    :effect (increase (fuel) 1))
+)
+)" };
+
+    EXPECT_THROW((semantic::Parser { domain }), semantic::MissingRequirementError);
+}
+
+TEST(LokiSemanticParser, ActionCostsAllowsFunctionReadsInIncreaseAmounts)
+{
+    const auto domain = std::string { R"(
+(define (domain action-cost-domain)
+  (:requirements :action-costs)
+  (:predicates (p))
+  (:functions (total-cost) (road-length))
+  (:action drive
+    :parameters ()
+    :effect (increase (total-cost) (road-length)))
+)
+)" };
+
+    EXPECT_NO_THROW((semantic::Parser { domain }));
+}
+
+TEST(LokiSemanticParser, NumericUseWithoutRequirementErrorsInPermissiveMode)
+{
+    const auto domain = std::string { R"(
+(define (domain no-requirement-domain)
+  (:requirements :strips)
+  (:predicates (p))
+  (:functions (fuel))
+)
+)" };
+
+    EXPECT_THROW((semantic::Parser { domain }), semantic::MissingRequirementError);
+}
+
+TEST(LokiSemanticParser, NumericFluentsTaskWithoutMetricKeepsMetricAbsent)
+{
+    const auto domain = std::string { R"(
+(define (domain numeric-domain)
+  (:requirements :numeric-fluents)
+  (:predicates (p))
+  (:functions (fuel))
+  (:action burn
+    :parameters ()
+    :effect (decrease (fuel) 1))
+)
+)" };
+    const auto task = std::string { R"(
+(define (problem numeric-task)
+  (:domain numeric-domain)
+  (:init (= (fuel) 3))
+  (:goal (p))
+)
+)" };
+
+    for (const auto strict : { false, true })
+    {
+        auto options = parser::ParserOptions {};
+        options.strict = strict;
+        auto parser = semantic::Parser(domain, options);
+        const auto parsed_task = parser.parse_task(task);
+        EXPECT_FALSE(parsed_task.get_metric().has_value());
+        ASSERT_EQ(parsed_task.get_initial_function_values().size(), 1);
+        EXPECT_EQ(parsed_task.get_initial_function_values()[0].get_function().get_function().get_name(), "fuel");
+    }
 }
 
 TEST(LokiSemanticParser, ReportsInvalidMetricOptimization)

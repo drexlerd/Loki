@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include <argparse/argparse.hpp>
 #include <cstdlib>
 #include <filesystem>
@@ -66,10 +65,12 @@ static int run(const argparse::ArgumentParser& program)
 
     auto parser_options = loki::ParserOptions();
     parser_options.strict = program.get<bool>("--strict");
+    parser_options.add_action_costs = program.get<bool>("--add-action-costs");
 
     auto translator_options = loki::TranslatorOptions();
     translator_options.remove_typing = program.get<bool>("--remove-typing");
     translator_options.multiply_conditional_effects = program.get<bool>("--multiply-conditional-effects");
+    translator_options.initialize_equality = !program.get<bool>("--no-initialize-equality");
 
     auto parser = loki::Parser(domain_filepath, parser_options);
     const auto domain = parser.get_domain();
@@ -112,11 +113,19 @@ int main(int argc, char** argv)
         .implicit_value(true)
         .help("Enable strict semantic checks for requirements, arity, and type compatibility.");
     program.add_argument("-v", "--verbose").default_value(false).implicit_value(true).help("Enable verbose console prints.");
+    program.add_argument("--add-action-costs")
+        .default_value(false)
+        .implicit_value(true)
+        .help("Complete missing :action-costs artifacts; without :action-costs, inject the requirement, total-cost, and unit-cost effects.");
     program.add_argument("--remove-typing").default_value(false).implicit_value(true).help("Enable the removal of type annotations.");
     program.add_argument("--multiply-conditional-effects")
         .default_value(false)
         .implicit_value(true)
         .help("Split actions to eliminate top-level conditional effects after effect normalization.");
+    program.add_argument("--no-initialize-equality")
+        .default_value(false)
+        .implicit_value(true)
+        .help("Skip adding the = predicate and (= o o) initial literals; for consumers with native equality handling.");
 
     try
     {

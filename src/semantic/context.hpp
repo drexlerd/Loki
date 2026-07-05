@@ -54,6 +54,7 @@ struct DomainContext
     ygg::UnorderedSet<std::string> declared_functions;
     ygg::UnorderedSet<formalism::RequirementKind> requirement_kinds;
     bool action_costs = false;
+    bool numeric_fluents = false;
 };
 
 // Transient state of a single domain or task parse.
@@ -61,6 +62,9 @@ struct ParseContext
 {
     ygg::UnorderedSet<formalism::RequirementKind> active_requirements;
     bool active_action_costs = false;
+    // Set by :fluents/:numeric-fluents only; bare :action-costs permits reads but restricts
+    // numeric writes to (increase (total-cost) ...).
+    bool active_numeric_fluents = false;
     ygg::UnorderedMap<formalism::VariableView, std::vector<formalism::TypeView>> variable_types;
     std::vector<ygg::UnorderedMap<std::string, formalism::VariableView>> variable_scopes;
     ygg::UnorderedMap<std::string, formalism::ObjectView> task_objects;
@@ -102,10 +106,12 @@ struct RequirementScope
     ParseContext& parse_context;
     ygg::UnorderedSet<formalism::RequirementKind> previous_requirements;
     bool previous_action_costs;
+    bool previous_numeric_fluents;
     ~RequirementScope()
     {
         parse_context.active_requirements = std::move(previous_requirements);
         parse_context.active_action_costs = previous_action_costs;
+        parse_context.active_numeric_fluents = previous_numeric_fluents;
     }
 };
 

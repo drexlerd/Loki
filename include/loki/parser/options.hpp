@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_PARSER_OPTIONS_HPP_
 #define LOKI_PARSER_OPTIONS_HPP_
 
@@ -25,8 +24,11 @@ namespace loki::parser
 struct ParserOptions
 {
     bool strict = false;
+    // Complete missing :action-costs artifacts instead of erroring; if the domain does not
+    // declare :action-costs, injects the requirement, total-cost, and unit-cost effects.
+    bool add_action_costs = false;
 };
 
-} // namespace loki::parser
+}  // namespace loki::parser
 
 #endif

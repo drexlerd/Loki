@@ -66,7 +66,8 @@ struct SemanticChecks
     template<typename Node>
     void require_requirement(formalism::RequirementKind kind, const Node& node) const
     {
-        if (!options.strict)
+        // Numeric fluent use without a numeric requirement is an error in both modes.
+        if (!options.strict && kind != formalism::RequirementKind::NumericFluents)
             return;
         if (!parse_context.active_requirements.contains(kind))
             diagnostics.throw_at(node, MissingRequirementError(requirement_name(kind)));

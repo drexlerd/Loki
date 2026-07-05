@@ -114,6 +114,12 @@ private:
     void
     parse_initial_element(const ast::InitialFunctionValue& value, ygg::IndexList<formalism::Literal>&, ygg::IndexList<formalism::InitialFunctionValue>& values);
     ygg::Index<formalism::Metric> parse_metric(const ast::Metric& node);
+
+    // Action-costs completion.
+    formalism::FunctionSkeletonView total_cost_function();
+    ygg::Index<formalism::FunctionTerm> total_cost_term();
+    bool writes_total_cost(formalism::EffectView effect);
+    ygg::Index<formalism::Action> add_unit_cost(ygg::Index<formalism::Action> action);
     bool has_total_cost_initial_value(const ygg::IndexList<formalism::InitialFunctionValue>& values);
     void complete_action_costs(const ast::Task& task,
                                ygg::IndexList<formalism::InitialFunctionValue>& initial_function_values,

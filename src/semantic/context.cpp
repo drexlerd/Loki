@@ -81,6 +81,8 @@ void rebuild_domain_symbols(DomainContext& domain_context, ParseContext& parse_c
     domain_context.requirement_kinds.clear();
     parse_context.active_action_costs = false;
     domain_context.action_costs = false;
+    parse_context.active_numeric_fluents = false;
+    domain_context.numeric_fluents = false;
     parse_context.variable_types.clear();
     if (!domain_context.domain)
         return;

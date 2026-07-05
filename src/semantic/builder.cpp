@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <type_traits>
 #include <utility>
 
 namespace loki::semantic
@@ -38,12 +39,29 @@ AstBuilder::AstBuilder(const parser::ParserOptions& options, const DiagnosticCon
 formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
 {
     auto requirements = parse_requirements(domain.requirements);
+    const auto inject_unit_costs = m_options.add_action_costs && !m_parse_context.active_action_costs;
+    if (inject_unit_costs)
+    {
+        m_parse_context.active_action_costs = true;
+        remember_requirement(m_parse_context, formalism::RequirementKind::NumericFluents);
+        const auto requirement = formalism::get_or_create<formalism::Requirement>(repo(), formalism::RequirementKind::NumericFluents).get_index();
+        if (std::find(requirements.begin(), requirements.end(), requirement) == requirements.end())
+            requirements.push_back(requirement);
+    }
     m_domain_context.requirement_kinds = m_parse_context.active_requirements;
     m_domain_context.action_costs = m_parse_context.active_action_costs;
+    m_domain_context.numeric_fluents = m_parse_context.active_numeric_fluents;
     auto types = parse_types(domain.types);
     auto constants = parse_objects(domain.constants, m_domain_context.objects);
     auto predicates = parse_predicates(domain.predicates);
     auto functions = parse_functions(domain.functions);
+    if (m_parse_context.active_action_costs && !m_domain_context.declared_functions.contains("total-cost"))
+    {
+        if (m_options.strict && !m_options.add_action_costs)
+            m_diagnostics.throw_at(domain.name, SemanticError("Missing total-cost function for :action-costs"));
+        m_domain_context.declared_functions.insert("total-cost");
+        functions.push_back(total_cost_function().get_index());
+    }
     auto axioms = ygg::IndexList<formalism::Axiom> {};
     for (const auto& axiom : domain.axioms)
     {
@@ -53,6 +71,9 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
     auto actions = ygg::IndexList<formalism::Action> {};
     for (const auto& action : domain.actions)
         actions.push_back(parse_action(action));
+    if (inject_unit_costs)
+        for (auto& action : actions)
+            action = add_unit_cost(action);
 
     auto all_types = std::vector<formalism::TypeView> {};
     for (const auto& [_, type] : m_domain_context.types)
@@ -183,6 +204,8 @@ ygg::IndexList<formalism::Requirement> AstBuilder::parse_requirements(const std:
         const auto kind = requirement_kind(node, m_diagnostics);
         if (name == "action-costs")
             m_parse_context.active_action_costs = true;
+        if (name == "fluents" || name == "numeric-fluents")
+            m_parse_context.active_numeric_fluents = true;
         if (name == "adl")
             remember_adl_requirements(m_parse_context);
         else
@@ -430,6 +453,7 @@ ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::Con
 
 ygg::Index<formalism::FunctionTerm> AstBuilder::parse_function_term(const ast::FunctionTerm& node)
 {
+    checks().require_requirement(formalism::RequirementKind::NumericFluents, node.function);
     auto skeleton = function(node.function, node.terms.size());
     if (m_domain_context.declared_functions.contains(key(node.function.text)))
         checks().check_argument_types(key(node.function.text), skeleton.get_parameters(), node.terms, node.function);
@@ -509,11 +533,16 @@ ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectAnd
 ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectNumeric& node)
 {
     checks().require_requirement(formalism::RequirementKind::NumericFluents, node);
+    const auto op = numeric_effect_operator(node, m_diagnostics);
+    // Bare :action-costs permits only writes of the form (increase (total-cost) ...).
+    const auto is_total_cost_increase = op == formalism::NumericEffectOperator::Increase && key(node.function.function.text) == "total-cost";
+    if (!m_parse_context.active_numeric_fluents && !(m_parse_context.active_action_costs && is_total_cost_increase))
+        m_diagnostics.throw_at(node, MissingRequirementError("numeric-fluents"));
     auto skeleton = function(node.function.function, node.function.terms.size());
     if (m_domain_context.declared_functions.contains(key(node.function.function.text)))
         checks().check_argument_types(key(node.function.function.text), skeleton.get_parameters(), node.function.terms, node.function.function);
     return wrap_effect(formalism::get_or_create<formalism::EffectNumeric>(repo(),
-                                                                          numeric_effect_operator(node, m_diagnostics),
+                                                                          op,
                                                                           skeleton.get_index(),
                                                                           parse_terms(node.function.terms),
                                                                           parse_function_expression(node.expression.get()))
@@ -625,6 +654,85 @@ ygg::Index<formalism::Metric> AstBuilder::parse_metric(const ast::Metric& node)
     return formalism::get_or_create<formalism::Metric>(repo(), optimization == "minimize", parse_function_expression(node.expression)).get_index();
 }
 
+formalism::FunctionSkeletonView AstBuilder::total_cost_function()
+{
+    if (auto it = m_domain_context.functions.find("total-cost"); it != m_domain_context.functions.end())
+        return it->second;
+    auto view = formalism::get_or_create<formalism::FunctionSkeleton>(repo(),
+                                                                      cista::offset::string("total-cost"),
+                                                                      ygg::IndexList<formalism::Parameter> {},
+                                                                      m_domain_context.number_type.get_index());
+    m_domain_context.functions.emplace("total-cost", view);
+    return view;
+}
+
+ygg::Index<formalism::FunctionTerm> AstBuilder::total_cost_term()
+{
+    return formalism::get_or_create<formalism::FunctionTerm>(repo(), total_cost_function().get_index(), ygg::IndexList<formalism::Term> {}).get_index();
+}
+
+bool AstBuilder::writes_total_cost(formalism::EffectView effect)
+{
+    return ygg::visit(
+        [&](const auto& arg) -> bool
+        {
+            using Node = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<Node, formalism::EffectNumericView>)
+                return arg.get_function().get_name() == "total-cost";
+            else if constexpr (std::is_same_v<Node, formalism::EffectAndView> || std::is_same_v<Node, formalism::EffectOneOfView>)
+            {
+                for (auto child : arg.get_effects())
+                    if (writes_total_cost(child))
+                        return true;
+                return false;
+            }
+            else if constexpr (std::is_same_v<Node, formalism::EffectForallView> || std::is_same_v<Node, formalism::EffectWhenView>)
+                return writes_total_cost(arg.get_effect());
+            else if constexpr (std::is_same_v<Node, formalism::EffectProbabilisticView>)
+            {
+                for (auto alternative : arg.get_alternatives())
+                    if (writes_total_cost(alternative.get_effect()))
+                        return true;
+                return false;
+            }
+            else
+                return false;
+        },
+        effect.get_value());
+}
+
+ygg::Index<formalism::Action> AstBuilder::add_unit_cost(ygg::Index<formalism::Action> action)
+{
+    const auto view = ygg::make_view(action, repo());
+    if (const auto effect = view.get_effect(); effect && writes_total_cost(effect.value()))
+        return action;
+
+    const auto one = wrap_function_expression(formalism::get_or_create<formalism::FunctionExpressionNumber>(repo(), 1.0).get_index());
+    const auto increase = wrap_effect(formalism::get_or_create<formalism::EffectNumeric>(repo(),
+                                                                                         formalism::NumericEffectOperator::Increase,
+                                                                                         total_cost_function().get_index(),
+                                                                                         ygg::IndexList<formalism::Term> {},
+                                                                                         one)
+                                          .get_index());
+    auto combined = increase;
+    if (const auto effect = view.get_effect())
+        combined = wrap_effect(
+            formalism::get_or_create<formalism::EffectAnd>(repo(), ygg::IndexList<formalism::Effect> { effect.value().get_index(), increase }).get_index());
+
+    auto parameters = ygg::IndexList<formalism::Parameter> {};
+    for (auto parameter : view.get_parameters())
+        parameters.push_back(parameter.get_index());
+    auto precondition = cista::optional<ygg::Index<formalism::Condition>> {};
+    if (const auto condition = view.get_precondition())
+        precondition = condition.value().get_index();
+    return formalism::get_or_create<formalism::Action>(repo(),
+                                                       to_cista(std::string(view.get_name())),
+                                                       std::move(parameters),
+                                                       precondition,
+                                                       cista::optional<ygg::Index<formalism::Effect>>(combined))
+        .get_index();
+}
+
 bool AstBuilder::has_total_cost_initial_value(const ygg::IndexList<formalism::InitialFunctionValue>& values)
 {
     for (auto value : values)
@@ -645,7 +753,7 @@ void AstBuilder::complete_action_costs(const ast::Task& task,
 
     const auto missing_metric = !metric;
     const auto missing_initial_value = !has_total_cost_initial_value(initial_function_values);
-    if (m_options.strict)
+    if (m_options.strict && !m_options.add_action_costs)
     {
         if (missing_metric)
             m_diagnostics.throw_at(task, SemanticError("Missing total-cost metric for :action-costs"));
@@ -653,20 +761,6 @@ void AstBuilder::complete_action_costs(const ast::Task& task,
             m_diagnostics.throw_at(task, SemanticError("Missing initial value for total-cost for :action-costs"));
         return;
     }
-
-    auto total_cost_function = [&]()
-    {
-        if (auto it = m_domain_context.functions.find("total-cost"); it != m_domain_context.functions.end())
-            return it->second;
-        auto view = formalism::get_or_create<formalism::FunctionSkeleton>(repo(),
-                                                                          cista::offset::string("total-cost"),
-                                                                          ygg::IndexList<formalism::Parameter> {},
-                                                                          m_domain_context.number_type.get_index());
-        m_domain_context.functions.emplace("total-cost", view);
-        return view;
-    };
-    auto total_cost_term = [&]()
-    { return formalism::get_or_create<formalism::FunctionTerm>(repo(), total_cost_function().get_index(), ygg::IndexList<formalism::Term> {}).get_index(); };
 
     if (missing_metric)
         metric = formalism::get_or_create<formalism::Metric>(repo(), true, wrap_function_expression(total_cost_term())).get_index();

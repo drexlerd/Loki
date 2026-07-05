@@ -394,6 +394,8 @@ DomainTranslationResult translate(formalism::DomainView domain, const Translator
     {
         if (step.phase == TranslationPhase::MultiplyConditionalEffects && !options.multiply_conditional_effects)
             continue;
+        if (step.phase == TranslationPhase::InitializeEquality && !options.initialize_equality)
+            continue;
 
         auto phase_storage = std::make_shared<detail::TranslationStorage>(phase_index++);
         auto semantic_copier = detail::CopyTranslator(phase_storage, options.remove_typing, step.phase);
@@ -419,6 +421,9 @@ ProblemTranslationResult translate(formalism::TaskView task, const DomainTransla
 
     for (const auto& step : detail::task_phase_steps())
     {
+        if (step.phase == TranslationPhase::InitializeEquality && !options.initialize_equality)
+            continue;
+
         auto phase_storage = std::make_shared<detail::TranslationStorage>(phase_index++, &result.m_storage->repository);
         if (current_storage)
             detail::inherit_domain_identity_mappings(*phase_storage, *result.m_storage);

@@ -129,11 +129,14 @@ formalism::DomainView Parser::Impl::parse_domain_ast(const ast::Domain& domain)
     auto view = builder().build_domain(domain);
     const auto declared_requirements = m_domain_context.requirement_kinds;
     const auto declared_action_costs = m_domain_context.action_costs;
+    const auto declared_numeric_fluents = m_domain_context.numeric_fluents;
     canonicalize_domain(view);
     m_domain_context.requirement_kinds = declared_requirements;
     m_parse_context.active_requirements = declared_requirements;
     m_domain_context.action_costs = declared_action_costs;
     m_parse_context.active_action_costs = declared_action_costs;
+    m_domain_context.numeric_fluents = declared_numeric_fluents;
+    m_parse_context.active_numeric_fluents = declared_numeric_fluents;
     m_domain_context.domain_name = domain.name.text;
     return get_domain();
 }
@@ -152,9 +155,13 @@ formalism::TaskView Parser::Impl::parse_task_ast(const ast::Task& task)
 
     ObjectDeclarationScope object_declaration_scope { m_domain_context, m_domain_context.declared_objects };
 
-    RequirementScope requirement_scope { m_parse_context, m_parse_context.active_requirements, m_parse_context.active_action_costs };
+    RequirementScope requirement_scope { m_parse_context,
+                                         m_parse_context.active_requirements,
+                                         m_parse_context.active_action_costs,
+                                         m_parse_context.active_numeric_fluents };
     m_parse_context.active_requirements = m_domain_context.requirement_kinds;
     m_parse_context.active_action_costs = m_domain_context.action_costs;
+    m_parse_context.active_numeric_fluents = m_domain_context.numeric_fluents;
 
     auto view = builder().build_task(task);
     return canonicalize_task(view, domain_storage);
