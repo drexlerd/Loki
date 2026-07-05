@@ -18,13 +18,12 @@
 #ifndef LOKI_FORMALISM_FORMATTER_HPP_
 #define LOKI_FORMALISM_FORMATTER_HPP_
 
-#include "loki/config.hpp"
 #include "loki/formalism/repository.hpp"
 #include "loki/formalism/views.hpp"
 
 #include <cmath>
 #include <fmt/core.h>
-#include <fmt/ostream.h>
+#include <fmt/ranges.h>
 #include <limits>
 #include <ostream>
 #include <sstream>
@@ -33,16 +32,58 @@
 #include <type_traits>
 #include <vector>
 #include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/formatting/cista_formatters.hpp>
 #include <yggdrasil/io/iostream.hpp>
 
+#if !YGG_ENABLE_FMT_FORMATTERS
+#error "loki requires yggdrasil's fmt formatters (YGG_ENABLE_FMT_FORMATTERS=1)."
+#endif
+
+// Serialization lives in the plain loki::formalism::format::to_string overloads; the
+// fmt::formatter specializations below are thin delegates to them.
 namespace loki::formalism::format
 {
 
-template<typename T>
-std::string to_string(const T& value)
-{
-    return fmt::format("{}", value);
-}
+std::string to_string(RequirementView value);
+std::string to_string(TypeView value);
+std::string to_string(ObjectView value);
+std::string to_string(VariableView value);
+std::string to_string(ParameterView value);
+std::string to_string(PredicateView value);
+std::string to_string(FunctionSkeletonView value);
+std::string to_string(TermView value);
+std::string to_string(AtomView value);
+std::string to_string(LiteralView value);
+std::string to_string(FunctionExpressionNumberView value);
+std::string to_string(FunctionTermView value);
+std::string to_string(UnaryFunctionExpressionView value);
+std::string to_string(BinaryFunctionExpressionView value);
+std::string to_string(MultiFunctionExpressionView value);
+std::string to_string(FunctionExpressionView value);
+std::string to_string(ConditionLiteralView value);
+std::string to_string(ConditionAndView value);
+std::string to_string(ConditionOrView value);
+std::string to_string(ConditionNotView value);
+std::string to_string(ConditionImplyView value);
+std::string to_string(ConditionExistsView value);
+std::string to_string(ConditionForallView value);
+std::string to_string(ConditionNumericConstraintView value);
+std::string to_string(ConditionView value);
+std::string to_string(EffectLiteralView value);
+std::string to_string(EffectAndView value);
+std::string to_string(EffectNumericView value);
+std::string to_string(EffectForallView value);
+std::string to_string(EffectWhenView value);
+std::string to_string(EffectOneOfView value);
+std::string to_string(EffectProbabilisticAlternativeView value);
+std::string to_string(EffectProbabilisticView value);
+std::string to_string(EffectView value);
+std::string to_string(ActionView value);
+std::string to_string(AxiomView value);
+std::string to_string(MetricView value);
+std::string to_string(InitialFunctionValueView value);
+std::string to_string(DomainView value);
+std::string to_string(TaskView value);
 
 namespace detail
 {
@@ -53,725 +94,395 @@ inline bool is_builtin_type(TypeView type)
     return name == "object" || name == "number";
 }
 
+// Serializes a range as " e1 e2 ..." with a leading space per element; an empty range yields "".
+template<typename Range>
+inline std::string spaced(const Range& range)
+{
+    auto result = std::string {};
+    for (auto element : range)
+        fmt::format_to(std::back_inserter(result), " {}", to_string(element));
+    return result;
+}
+
 // Renders " - type" or " - (either t1 t2 ...)"; multiple types require an either wrapper to reparse.
 template<typename Types>
 inline std::string type_annotation(const Types& types)
 {
     if (types.size() == 1)
-        return fmt::format(" - {}", types[0]);
-    auto text = std::string { " - (either" };
-    for (auto type : types)
-        text += fmt::format(" {}", type);
-    return text + ")";
+        return fmt::format(" - {}", to_string(types[0]));
+    return fmt::format(" - (either{})", spaced(types));
 }
 
 }  // namespace detail
 
+inline std::string to_string(RequirementView value) { return std::string(loki::formalism::to_string(value.get_kind())); }
+
+inline std::string to_string(TypeView value) { return fmt::format("{}", value.get_name()); }
+
+inline std::string to_string(ObjectView value) { return fmt::format("{}", value.get_name()); }
+
+inline std::string to_string(VariableView value) { return fmt::format("{}", value.get_name()); }
+
+inline std::string to_string(ParameterView value)
+{
+    return fmt::format("{}{}", to_string(value.get_variable()), value.get_types().empty() ? "" : detail::type_annotation(value.get_types()));
+}
+
+inline std::string to_string(PredicateView value) { return fmt::format("({}{})", value.get_name(), detail::spaced(value.get_parameters())); }
+
+inline std::string to_string(FunctionSkeletonView value)
+{
+    return fmt::format("({}{}) - {}", value.get_name(), detail::spaced(value.get_parameters()), to_string(value.get_type()));
+}
+
+inline std::string to_string(TermView value)
+{
+    auto result = std::string {};
+    visit([&](const auto& node) { result = to_string(node); }, value.get_value());
+    return result;
+}
+
+inline std::string to_string(AtomView value) { return fmt::format("({}{})", value.get_predicate().get_name(), detail::spaced(value.get_terms())); }
+
+inline std::string to_string(LiteralView value)
+{
+    if (value.get_polarity())
+        return to_string(value.get_atom());
+    return fmt::format("(not {})", to_string(value.get_atom()));
+}
+
+inline std::string to_string(FunctionExpressionNumberView value) { return fmt::format("{}", value.get_value()); }
+
+inline std::string to_string(FunctionTermView value) { return fmt::format("({}{})", value.get_function().get_name(), detail::spaced(value.get_terms())); }
+
+inline std::string to_string(UnaryFunctionExpressionView value) { return fmt::format("(- {})", to_string(value.get_expression())); }
+
+inline std::string to_string(BinaryFunctionExpressionView value)
+{
+    return fmt::format("({} {} {})", loki::formalism::to_string(value.get_data().op), to_string(value.get_left()), to_string(value.get_right()));
+}
+
+inline std::string to_string(MultiFunctionExpressionView value)
+{
+    return fmt::format("({}{})", loki::formalism::to_string(value.get_data().op), detail::spaced(value.get_expressions()));
+}
+
+inline std::string to_string(FunctionExpressionView value)
+{
+    auto result = std::string {};
+    visit([&](const auto& node) { result = to_string(node); }, value.get_value());
+    return result;
+}
+
+inline std::string to_string(ConditionLiteralView value) { return to_string(value.get_literal()); }
+
+inline std::string to_string(ConditionAndView value) { return fmt::format("(and{})", detail::spaced(value.get_conditions())); }
+
+inline std::string to_string(ConditionOrView value) { return fmt::format("(or{})", detail::spaced(value.get_conditions())); }
+
+inline std::string to_string(ConditionNotView value) { return fmt::format("(not {})", to_string(value.get_condition())); }
+
+inline std::string to_string(ConditionImplyView value) { return fmt::format("(imply {} {})", to_string(value.get_left()), to_string(value.get_right())); }
+
+namespace detail
+{
+
+// Materializes element strings so fmt::join never needs the guarded view formatters.
+template<typename Range>
+inline std::vector<std::string> to_strings(const Range& range)
+{
+    auto result = std::vector<std::string> {};
+    for (auto element : range)
+        result.push_back(to_string(element));
+    return result;
+}
+
+}  // namespace detail
+
+inline std::string to_string(ConditionExistsView value)
+{
+    return fmt::format("(exists ({}) {})", fmt::join(detail::to_strings(value.get_parameters()), " "), to_string(value.get_condition()));
+}
+
+inline std::string to_string(ConditionForallView value)
+{
+    return fmt::format("(forall ({}) {})", fmt::join(detail::to_strings(value.get_parameters()), " "), to_string(value.get_condition()));
+}
+
+inline std::string to_string(ConditionNumericConstraintView value)
+{
+    return fmt::format("({} {} {})", loki::formalism::to_string(value.get_data().comparator), to_string(value.get_left()), to_string(value.get_right()));
+}
+
+inline std::string to_string(ConditionView value)
+{
+    auto result = std::string {};
+    visit([&](const auto& node) { result = to_string(node); }, value.get_value());
+    return result;
+}
+
+inline std::string to_string(EffectLiteralView value) { return to_string(value.get_literal()); }
+
+inline std::string to_string(EffectAndView value) { return fmt::format("(and{})", detail::spaced(value.get_effects())); }
+
+inline std::string to_string(EffectNumericView value)
+{
+    return fmt::format("({} ({}{}) {})",
+                       loki::formalism::to_string(value.get_data().op),
+                       value.get_function().get_name(),
+                       detail::spaced(value.get_terms()),
+                       to_string(value.get_expression()));
+}
+
+inline std::string to_string(EffectForallView value)
+{
+    return fmt::format("(forall ({}) {})", fmt::join(detail::to_strings(value.get_parameters()), " "), to_string(value.get_effect()));
+}
+
+inline std::string to_string(EffectWhenView value) { return fmt::format("(when {} {})", to_string(value.get_condition()), to_string(value.get_effect())); }
+
+inline std::string to_string(EffectOneOfView value) { return fmt::format("(oneof{})", detail::spaced(value.get_effects())); }
+
+inline std::string to_string(EffectProbabilisticAlternativeView value)
+{
+    return fmt::format("{} {}", value.get_data().probability, to_string(value.get_effect()));
+}
+
+inline std::string to_string(EffectProbabilisticView value) { return fmt::format("(probabilistic{})", detail::spaced(value.get_alternatives())); }
+
+inline std::string to_string(EffectView value)
+{
+    auto result = std::string {};
+    visit([&](const auto& node) { result = to_string(node); }, value.get_value());
+    return result;
+}
+
+inline std::string to_string(ActionView value)
+{
+    return fmt::format("(:action {} :parameters ({}){}{})",
+                       value.get_name(),
+                       fmt::join(detail::to_strings(value.get_parameters()), " "),
+                       value.get_precondition() ? fmt::format(" :precondition {}", to_string(value.get_precondition().value())) : "",
+                       value.get_effect() ? fmt::format(" :effect {}", to_string(value.get_effect().value())) : "");
+}
+
+inline std::string to_string(AxiomView value)
+{
+    auto head_variables = ygg::UnorderedSet<VariableView> {};
+    for (auto term : value.get_head().get_atom().get_terms())
+    {
+        visit(
+            [&](const auto& node)
+            {
+                using T = std::remove_cvref_t<decltype(node)>;
+                if constexpr (std::same_as<T, VariableView>)
+                    head_variables.insert(node);
+            },
+            term.get_value());
+    }
+
+    auto existential_parameters = std::vector<ParameterView> {};
+    for (auto parameter : value.get_parameters())
+    {
+        if (!head_variables.contains(parameter.get_variable()))
+            existential_parameters.push_back(parameter);
+    }
+
+    auto result = fmt::format("(:derived {} ", to_string(value.get_head()));
+    if (!existential_parameters.empty())
+        return result + fmt::format("(exists ({}) {}))", fmt::join(detail::to_strings(existential_parameters), " "), to_string(value.get_condition()));
+    return result + fmt::format("{})", to_string(value.get_condition()));
+}
+
+inline std::string to_string(MetricView value)
+{
+    return fmt::format("(:metric {} {})", value.get_data().minimize ? "minimize" : "maximize", to_string(value.get_expression()));
+}
+
+inline std::string to_string(InitialFunctionValueView value) { return fmt::format("(= {} {})", to_string(value.get_function()), to_string(value.get_value())); }
+
+inline std::string to_string(DomainView value)
+{
+    auto os = std::stringstream {};
+    os << fmt::format("(define (domain {})", value.get_name());
+    {
+        ygg::IndentScope section(os);
+        if (!value.get_requirements().empty())
+        {
+            os << '\n' << ygg::print_indent << "(:requirements";
+            for (auto requirement : value.get_requirements())
+                os << ' ' << to_string(requirement);
+            os << ')';
+        }
+        if (!value.get_types().empty())
+        {
+            auto wrote_header = false;
+            for (auto type : value.get_types())
+            {
+                if (detail::is_builtin_type(type))
+                    continue;
+                if (!wrote_header)
+                {
+                    os << '\n' << ygg::print_indent << "(:types";
+                    wrote_header = true;
+                }
+                os << ' ' << to_string(type);
+                if (!type.get_bases().empty())
+                    os << detail::type_annotation(type.get_bases());
+            }
+            if (wrote_header)
+                os << ')';
+        }
+        if (!value.get_constants().empty())
+        {
+            os << '\n' << ygg::print_indent << "(:constants ";
+            auto first = true;
+            for (auto object : value.get_constants())
+            {
+                if (!first)
+                    os << ' ';
+                first = false;
+                os << to_string(object);
+                if (!object.get_types().empty())
+                    os << detail::type_annotation(object.get_types());
+            }
+            os << ')';
+        }
+        if (!value.get_predicates().empty())
+        {
+            os << '\n' << ygg::print_indent << "(:predicates";
+            {
+                ygg::IndentScope predicates(os);
+                for (auto predicate : value.get_predicates())
+                    os << '\n' << ygg::print_indent << to_string(predicate);
+            }
+            os << ')';
+        }
+        if (!value.get_functions().empty())
+        {
+            os << '\n' << ygg::print_indent << "(:functions";
+            {
+                ygg::IndentScope functions(os);
+                for (auto function : value.get_functions())
+                    os << '\n' << ygg::print_indent << to_string(function);
+            }
+            os << ')';
+        }
+        for (auto axiom : value.get_axioms())
+            os << '\n' << ygg::print_indent << to_string(axiom);
+        for (auto action : value.get_actions())
+            os << '\n' << ygg::print_indent << to_string(action);
+    }
+    os << "\n)";
+    return os.str();
+}
+
+inline std::string to_string(TaskView value)
+{
+    auto os = std::stringstream {};
+    os << fmt::format("(define (problem {})", value.get_name());
+    {
+        ygg::IndentScope section(os);
+        os << '\n' << ygg::print_indent << fmt::format("(:domain {})", value.get_domain().get_name());
+        if (!value.get_requirements().empty())
+        {
+            os << '\n' << ygg::print_indent << "(:requirements";
+            for (auto requirement : value.get_requirements())
+                os << ' ' << to_string(requirement);
+            os << ')';
+        }
+        if (!value.get_objects().empty())
+        {
+            os << '\n' << ygg::print_indent << "(:objects ";
+            auto first = true;
+            for (auto object : value.get_objects())
+            {
+                if (!first)
+                    os << ' ';
+                first = false;
+                os << to_string(object);
+                if (!object.get_types().empty())
+                    os << detail::type_annotation(object.get_types());
+            }
+            os << ')';
+        }
+        os << '\n' << ygg::print_indent << "(:init";
+        for (auto literal : value.get_initial_literals())
+            os << ' ' << to_string(literal);
+        for (auto initial_value : value.get_initial_function_values())
+            os << ' ' << to_string(initial_value);
+        os << ')';
+        if (value.get_goal())
+            os << '\n' << ygg::print_indent << "(:goal " << to_string(value.get_goal().value()) << ')';
+        if (value.get_metric())
+            os << '\n' << ygg::print_indent << to_string(value.get_metric().value());
+        for (auto axiom : value.get_axioms())
+            os << '\n' << ygg::print_indent << to_string(axiom);
+    }
+    os << "\n)";
+    return os.str();
+}
+
 }  // namespace loki::formalism::format
 
-#if LOKI_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
-template<>
-struct formatter<loki::formalism::RequirementView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::RequirementView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "{}", loki::formalism::to_string(value.get_kind()));
-    }
-};
+#define LOKI_DETAIL_FMT_DELEGATE(ViewType)                                                     \
+    template<>                                                                                 \
+    struct formatter<loki::formalism::ViewType, char>                                          \
+    {                                                                                          \
+        constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }                \
+        template<typename FormatContext>                                                       \
+        auto format(const loki::formalism::ViewType& value, FormatContext& ctx) const          \
+        {                                                                                      \
+            return fmt::format_to(ctx.out(), "{}", loki::formalism::format::to_string(value)); \
+        }                                                                                      \
+    };
 
-template<>
-struct formatter<loki::formalism::TypeView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::TypeView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "{}", std::string_view(value.get_name().data(), value.get_name().size()));
-    }
-};
+LOKI_DETAIL_FMT_DELEGATE(RequirementView)
+LOKI_DETAIL_FMT_DELEGATE(TypeView)
+LOKI_DETAIL_FMT_DELEGATE(ObjectView)
+LOKI_DETAIL_FMT_DELEGATE(VariableView)
+LOKI_DETAIL_FMT_DELEGATE(ParameterView)
+LOKI_DETAIL_FMT_DELEGATE(PredicateView)
+LOKI_DETAIL_FMT_DELEGATE(FunctionSkeletonView)
+LOKI_DETAIL_FMT_DELEGATE(TermView)
+LOKI_DETAIL_FMT_DELEGATE(AtomView)
+LOKI_DETAIL_FMT_DELEGATE(LiteralView)
+LOKI_DETAIL_FMT_DELEGATE(FunctionExpressionNumberView)
+LOKI_DETAIL_FMT_DELEGATE(FunctionTermView)
+LOKI_DETAIL_FMT_DELEGATE(UnaryFunctionExpressionView)
+LOKI_DETAIL_FMT_DELEGATE(BinaryFunctionExpressionView)
+LOKI_DETAIL_FMT_DELEGATE(MultiFunctionExpressionView)
+LOKI_DETAIL_FMT_DELEGATE(FunctionExpressionView)
+LOKI_DETAIL_FMT_DELEGATE(ConditionLiteralView)
+LOKI_DETAIL_FMT_DELEGATE(ConditionAndView)
+LOKI_DETAIL_FMT_DELEGATE(ConditionOrView)
+LOKI_DETAIL_FMT_DELEGATE(ConditionNotView)
+LOKI_DETAIL_FMT_DELEGATE(ConditionImplyView)
+LOKI_DETAIL_FMT_DELEGATE(ConditionExistsView)
+LOKI_DETAIL_FMT_DELEGATE(ConditionForallView)
+LOKI_DETAIL_FMT_DELEGATE(ConditionNumericConstraintView)
+LOKI_DETAIL_FMT_DELEGATE(ConditionView)
+LOKI_DETAIL_FMT_DELEGATE(EffectLiteralView)
+LOKI_DETAIL_FMT_DELEGATE(EffectAndView)
+LOKI_DETAIL_FMT_DELEGATE(EffectNumericView)
+LOKI_DETAIL_FMT_DELEGATE(EffectForallView)
+LOKI_DETAIL_FMT_DELEGATE(EffectWhenView)
+LOKI_DETAIL_FMT_DELEGATE(EffectOneOfView)
+LOKI_DETAIL_FMT_DELEGATE(EffectProbabilisticAlternativeView)
+LOKI_DETAIL_FMT_DELEGATE(EffectProbabilisticView)
+LOKI_DETAIL_FMT_DELEGATE(EffectView)
+LOKI_DETAIL_FMT_DELEGATE(ActionView)
+LOKI_DETAIL_FMT_DELEGATE(AxiomView)
+LOKI_DETAIL_FMT_DELEGATE(MetricView)
+LOKI_DETAIL_FMT_DELEGATE(InitialFunctionValueView)
+LOKI_DETAIL_FMT_DELEGATE(DomainView)
+LOKI_DETAIL_FMT_DELEGATE(TaskView)
 
-template<>
-struct formatter<loki::formalism::ObjectView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::ObjectView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "{}", std::string_view(value.get_name().data(), value.get_name().size()));
-    }
-};
-
-template<>
-struct formatter<loki::formalism::VariableView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::VariableView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "{}", std::string_view(value.get_name().data(), value.get_name().size()));
-    }
-};
-
-template<>
-struct formatter<loki::formalism::ParameterView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::ParameterView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "{}", value.get_variable());
-        if (!value.get_types().empty())
-            out = fmt::format_to(out, "{}", loki::formalism::format::detail::type_annotation(value.get_types()));
-        return out;
-    }
-};
-
-template<>
-struct formatter<loki::formalism::PredicateView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::PredicateView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "({}", std::string_view(value.get_name().data(), value.get_name().size()));
-        for (auto parameter : value.get_parameters())
-            out = fmt::format_to(out, " {}", parameter);
-        return fmt::format_to(out, ")");
-    }
-};
-
-template<>
-struct formatter<loki::formalism::FunctionSkeletonView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::FunctionSkeletonView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "({}", std::string_view(value.get_name().data(), value.get_name().size()));
-        for (auto parameter : value.get_parameters())
-            out = fmt::format_to(out, " {}", parameter);
-        return fmt::format_to(out, ") - {}", value.get_type());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::TermView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::TermView& value, FormatContext& ctx) const
-    {
-        auto out = ctx.out();
-        visit([&](const auto& node) { out = fmt::format_to(out, "{}", node); }, value.get_value());
-        return out;
-    }
-};
-
-template<>
-struct formatter<loki::formalism::AtomView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::AtomView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "({}", std::string_view(value.get_predicate().get_name().data(), value.get_predicate().get_name().size()));
-        for (auto term : value.get_terms())
-            out = fmt::format_to(out, " {}", term);
-        return fmt::format_to(out, ")");
-    }
-};
-
-template<>
-struct formatter<loki::formalism::LiteralView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::LiteralView& value, FormatContext& ctx) const
-    {
-        if (value.get_polarity())
-            return fmt::format_to(ctx.out(), "{}", value.get_atom());
-        return fmt::format_to(ctx.out(), "(not {})", value.get_atom());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::FunctionExpressionNumberView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::FunctionExpressionNumberView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "{}", value.get_value());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::FunctionTermView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::FunctionTermView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "({}", std::string_view(value.get_function().get_name().data(), value.get_function().get_name().size()));
-        for (auto term : value.get_terms())
-            out = fmt::format_to(out, " {}", term);
-        return fmt::format_to(out, ")");
-    }
-};
-
-template<>
-struct formatter<loki::formalism::UnaryFunctionExpressionView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::UnaryFunctionExpressionView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "(- {})", value.get_expression());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::BinaryFunctionExpressionView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::BinaryFunctionExpressionView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "({} {} {})", loki::formalism::to_string(value.get_data().op), value.get_left(), value.get_right());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::MultiFunctionExpressionView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::MultiFunctionExpressionView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "({}", loki::formalism::to_string(value.get_data().op));
-        for (auto expression : value.get_expressions())
-            out = fmt::format_to(out, " {}", expression);
-        return fmt::format_to(out, ")");
-    }
-};
-
-template<>
-struct formatter<loki::formalism::FunctionExpressionView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::FunctionExpressionView& value, FormatContext& ctx) const
-    {
-        auto out = ctx.out();
-        visit([&](const auto& node) { out = fmt::format_to(out, "{}", node); }, value.get_value());
-        return out;
-    }
-};
-
-template<>
-struct formatter<loki::formalism::ConditionLiteralView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::ConditionLiteralView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "{}", value.get_literal());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::ConditionAndView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::ConditionAndView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "(and");
-        for (auto condition : value.get_conditions())
-            out = fmt::format_to(out, " {}", condition);
-        return fmt::format_to(out, ")");
-    }
-};
-
-template<>
-struct formatter<loki::formalism::ConditionOrView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::ConditionOrView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "(or");
-        for (auto condition : value.get_conditions())
-            out = fmt::format_to(out, " {}", condition);
-        return fmt::format_to(out, ")");
-    }
-};
-
-template<>
-struct formatter<loki::formalism::ConditionNotView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::ConditionNotView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "(not {})", value.get_condition());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::ConditionImplyView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::ConditionImplyView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "(imply {} {})", value.get_left(), value.get_right());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::ConditionExistsView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::ConditionExistsView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "(exists (");
-        auto first = true;
-        for (auto parameter : value.get_parameters())
-        {
-            if (!first)
-                out = fmt::format_to(out, " ");
-            first = false;
-            out = fmt::format_to(out, "{}", parameter);
-        }
-        return fmt::format_to(out, ") {})", value.get_condition());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::ConditionForallView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::ConditionForallView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "(forall (");
-        auto first = true;
-        for (auto parameter : value.get_parameters())
-        {
-            if (!first)
-                out = fmt::format_to(out, " ");
-            first = false;
-            out = fmt::format_to(out, "{}", parameter);
-        }
-        return fmt::format_to(out, ") {})", value.get_condition());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::ConditionNumericConstraintView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::ConditionNumericConstraintView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "({} {} {})", loki::formalism::to_string(value.get_data().comparator), value.get_left(), value.get_right());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::ConditionView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::ConditionView& value, FormatContext& ctx) const
-    {
-        auto out = ctx.out();
-        visit([&](const auto& node) { out = fmt::format_to(out, "{}", node); }, value.get_value());
-        return out;
-    }
-};
-
-template<>
-struct formatter<loki::formalism::EffectLiteralView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::EffectLiteralView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "{}", value.get_literal());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::EffectAndView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::EffectAndView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "(and");
-        for (auto effect : value.get_effects())
-            out = fmt::format_to(out, " {}", effect);
-        return fmt::format_to(out, ")");
-    }
-};
-
-template<>
-struct formatter<loki::formalism::EffectNumericView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::EffectNumericView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(),
-                                  "({} ({}",
-                                  loki::formalism::to_string(value.get_data().op),
-                                  std::string_view(value.get_function().get_name().data(), value.get_function().get_name().size()));
-        for (auto term : value.get_terms())
-            out = fmt::format_to(out, " {}", term);
-        return fmt::format_to(out, ") {})", value.get_expression());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::EffectForallView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::EffectForallView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "(forall (");
-        auto first = true;
-        for (auto parameter : value.get_parameters())
-        {
-            if (!first)
-                out = fmt::format_to(out, " ");
-            first = false;
-            out = fmt::format_to(out, "{}", parameter);
-        }
-        return fmt::format_to(out, ") {})", value.get_effect());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::EffectWhenView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::EffectWhenView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "(when {} {})", value.get_condition(), value.get_effect());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::EffectOneOfView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::EffectOneOfView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "(oneof");
-        for (auto effect : value.get_effects())
-            out = fmt::format_to(out, " {}", effect);
-        return fmt::format_to(out, ")");
-    }
-};
-
-template<>
-struct formatter<loki::formalism::EffectProbabilisticAlternativeView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::EffectProbabilisticAlternativeView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "{} {}", value.get_data().probability, value.get_effect());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::EffectProbabilisticView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::EffectProbabilisticView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "(probabilistic");
-        for (auto alternative : value.get_alternatives())
-            out = fmt::format_to(out, " {}", alternative);
-        return fmt::format_to(out, ")");
-    }
-};
-
-template<>
-struct formatter<loki::formalism::EffectView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::EffectView& value, FormatContext& ctx) const
-    {
-        auto out = ctx.out();
-        visit([&](const auto& node) { out = fmt::format_to(out, "{}", node); }, value.get_value());
-        return out;
-    }
-};
-
-template<>
-struct formatter<loki::formalism::ActionView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::ActionView& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), "(:action {} :parameters (", std::string_view(value.get_name().data(), value.get_name().size()));
-        auto first = true;
-        for (auto parameter : value.get_parameters())
-        {
-            if (!first)
-                out = fmt::format_to(out, " ");
-            first = false;
-            out = fmt::format_to(out, "{}", parameter);
-        }
-        out = fmt::format_to(out, ")");
-        if (value.get_precondition())
-            out = fmt::format_to(out, " :precondition {}", value.get_precondition().value());
-        if (value.get_effect())
-            out = fmt::format_to(out, " :effect {}", value.get_effect().value());
-        return fmt::format_to(out, ")");
-    }
-};
-
-template<>
-struct formatter<loki::formalism::AxiomView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::AxiomView& value, FormatContext& ctx) const
-    {
-        auto head_variables = ygg::UnorderedSet<loki::formalism::VariableView> {};
-        for (auto term : value.get_head().get_atom().get_terms())
-        {
-            visit(
-                [&](const auto& node)
-                {
-                    using T = std::remove_cvref_t<decltype(node)>;
-                    if constexpr (std::same_as<T, loki::formalism::VariableView>)
-                        head_variables.insert(node);
-                },
-                term.get_value());
-        }
-
-        auto existential_parameters = std::vector<loki::formalism::ParameterView> {};
-        for (auto parameter : value.get_parameters())
-        {
-            if (!head_variables.contains(parameter.get_variable()))
-                existential_parameters.push_back(parameter);
-        }
-
-        auto out = fmt::format_to(ctx.out(), "(:derived {} ", value.get_head());
-        if (!existential_parameters.empty())
-        {
-            out = fmt::format_to(out, "(exists (");
-            auto first = true;
-            for (auto parameter : existential_parameters)
-            {
-                if (!first)
-                    out = fmt::format_to(out, " ");
-                first = false;
-                out = fmt::format_to(out, "{}", parameter);
-            }
-            return fmt::format_to(out, ") {}))", value.get_condition());
-        }
-        return fmt::format_to(out, "{})", value.get_condition());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::MetricView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::MetricView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "(:metric {} {})", value.get_data().minimize ? "minimize" : "maximize", value.get_expression());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::InitialFunctionValueView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::InitialFunctionValueView& value, FormatContext& ctx) const
-    {
-        return fmt::format_to(ctx.out(), "(= {} {})", value.get_function(), value.get_value());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::DomainView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::DomainView& value, FormatContext& ctx) const
-    {
-        auto os = std::stringstream {};
-        os << "(define (domain " << std::string_view(value.get_name().data(), value.get_name().size()) << ')';
-        {
-            ygg::IndentScope section(os);
-            if (!value.get_requirements().empty())
-            {
-                os << '\n' << ygg::print_indent << "(:requirements";
-                for (auto requirement : value.get_requirements())
-                    fmt::print(os, " {}", requirement);
-                os << ')';
-            }
-            if (!value.get_types().empty())
-            {
-                auto wrote_header = false;
-                for (auto type : value.get_types())
-                {
-                    if (loki::formalism::format::detail::is_builtin_type(type))
-                        continue;
-                    if (!wrote_header)
-                    {
-                        os << '\n' << ygg::print_indent << "(:types";
-                        wrote_header = true;
-                    }
-                    fmt::print(os, " {}", type);
-                    if (!type.get_bases().empty())
-                        os << loki::formalism::format::detail::type_annotation(type.get_bases());
-                }
-                if (wrote_header)
-                    os << ')';
-            }
-            if (!value.get_constants().empty())
-            {
-                os << '\n' << ygg::print_indent << "(:constants ";
-                auto first = true;
-                for (auto object : value.get_constants())
-                {
-                    if (!first)
-                        os << ' ';
-                    first = false;
-                    fmt::print(os, "{}", object);
-                    if (!object.get_types().empty())
-                        os << loki::formalism::format::detail::type_annotation(object.get_types());
-                }
-                os << ')';
-            }
-            if (!value.get_predicates().empty())
-            {
-                os << '\n' << ygg::print_indent << "(:predicates";
-                {
-                    ygg::IndentScope predicates(os);
-                    for (auto predicate : value.get_predicates())
-                    {
-                        os << '\n' << ygg::print_indent;
-                        fmt::print(os, "{}", predicate);
-                    }
-                }
-                os << ')';
-            }
-            if (!value.get_functions().empty())
-            {
-                os << '\n' << ygg::print_indent << "(:functions";
-                {
-                    ygg::IndentScope functions(os);
-                    for (auto function : value.get_functions())
-                    {
-                        os << '\n' << ygg::print_indent;
-                        fmt::print(os, "{}", function);
-                    }
-                }
-                os << ')';
-            }
-            for (auto axiom : value.get_axioms())
-            {
-                os << '\n' << ygg::print_indent;
-                fmt::print(os, "{}", axiom);
-            }
-            for (auto action : value.get_actions())
-            {
-                os << '\n' << ygg::print_indent;
-                fmt::print(os, "{}", action);
-            }
-        }
-        os << "\n)";
-        return fmt::format_to(ctx.out(), "{}", os.str());
-    }
-};
-
-template<>
-struct formatter<loki::formalism::TaskView, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::formalism::TaskView& value, FormatContext& ctx) const
-    {
-        auto os = std::stringstream {};
-        os << "(define (problem " << std::string_view(value.get_name().data(), value.get_name().size()) << ')';
-        {
-            ygg::IndentScope section(os);
-            os << '\n'
-               << ygg::print_indent << "(:domain " << std::string_view(value.get_domain().get_name().data(), value.get_domain().get_name().size()) << ')';
-            if (!value.get_requirements().empty())
-            {
-                os << '\n' << ygg::print_indent << "(:requirements";
-                for (auto requirement : value.get_requirements())
-                    fmt::print(os, " {}", requirement);
-                os << ')';
-            }
-            if (!value.get_objects().empty())
-            {
-                os << '\n' << ygg::print_indent << "(:objects ";
-                auto first = true;
-                for (auto object : value.get_objects())
-                {
-                    if (!first)
-                        os << ' ';
-                    first = false;
-                    fmt::print(os, "{}", object);
-                    if (!object.get_types().empty())
-                        os << loki::formalism::format::detail::type_annotation(object.get_types());
-                }
-                os << ')';
-            }
-            os << '\n' << ygg::print_indent << "(:init";
-            for (auto literal : value.get_initial_literals())
-                fmt::print(os, " {}", literal);
-            for (auto initial_value : value.get_initial_function_values())
-                fmt::print(os, " {}", initial_value);
-            os << ')';
-            if (value.get_goal())
-            {
-                os << '\n' << ygg::print_indent;
-                fmt::print(os, "(:goal {})", value.get_goal().value());
-            }
-            if (value.get_metric())
-            {
-                os << '\n' << ygg::print_indent;
-                fmt::print(os, "{}", value.get_metric().value());
-            }
-            for (auto axiom : value.get_axioms())
-            {
-                os << '\n' << ygg::print_indent;
-                fmt::print(os, "{}", axiom);
-            }
-        }
-        os << "\n)";
-        return fmt::format_to(ctx.out(), "{}", os.str());
-    }
-};
+#undef LOKI_DETAIL_FMT_DELEGATE
 
 }  // namespace fmt
-#endif
 
 #endif

@@ -19,7 +19,7 @@
 
 #include "../benchmark_utils.hpp"
 
-#include <loki/fmt.hpp>
+#include <loki/ast.hpp>
 #include <loki/parser.hpp>
 
 #include <yggdrasil/serialization/json_suite.hpp>

@@ -19,7 +19,6 @@
 #define LOKI_LOKI_HPP_
 
 #include "loki/ast.hpp"
-#include "loki/fmt.hpp"
 #include "loki/formalism/formalism.hpp"
 #include "loki/parser.hpp"
 #include "loki/semantic.hpp"

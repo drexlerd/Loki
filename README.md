@@ -77,7 +77,6 @@ CMake options:
 | `LOKI_BUILD_EXECUTABLES` | `OFF` | Build Loki executables. |
 | `LOKI_BUILD_PROFILING` | `OFF` | Build Loki profiling targets. |
 | `LOKI_BUILD_PYPDDL` | `OFF` | Build Loki for the `pypddl` Python wheel. |
-| `LOKI_ENABLE_FMT_FORMATTERS` | `ON` | Enable the public `fmt::formatter` specializations of Loki and yggdrasil (`LOKI_`/`YGG_ENABLE_FMT_FORMATTERS` macros, both default-on in the headers). |
 
 Run tests from a build configured with `-DLOKI_BUILD_TESTS=ON`:
 

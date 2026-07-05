@@ -19,7 +19,6 @@
 #define LOKI_AST_FORMATTER_HPP_
 
 #include "loki/ast/ast.hpp"
-#include "loki/config.hpp"
 
 #include <boost/variant/apply_visitor.hpp>
 #include <fmt/format.h>
@@ -27,7 +26,6 @@
 #include <sstream>
 #include <yggdrasil/io/iostream.hpp>
 
-#if LOKI_ENABLE_FMT_FORMATTERS
 namespace fmt
 {
 
@@ -745,6 +743,5 @@ struct formatter<loki::ast::File, char>
 };
 
 }  // namespace fmt
-#endif
 
 #endif

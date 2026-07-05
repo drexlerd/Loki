@@ -20,5 +20,6 @@
 
 #include "loki/ast/ast.hpp"
 #include "loki/ast/ast_fwd.hpp"
+#include "loki/ast/formatter.hpp"
 
 #endif

@@ -20,8 +20,8 @@
 #include <loki/ast.hpp>
 #include <loki/ast/ast.hpp>
 #include <loki/ast/ast_fwd.hpp>
-#include <loki/ast/formatter.hpp>
-#include <loki/fmt.hpp>
+#include <loki/ast.hpp>
+#include <loki/ast.hpp>
 #include <loki/formalism/builder.hpp>
 #include <loki/formalism/canonicalization.hpp>
 #include <loki/formalism/datas.hpp>

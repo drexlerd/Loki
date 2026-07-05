@@ -63,12 +63,6 @@ message("Build shared libraries enabled.")
 
 option(LOKI_BUILD_PYPDDL "Build Loki for the pypddl Python wheel." OFF)
 
-option(LOKI_ENABLE_FMT_FORMATTERS "Enable Loki's public fmt::formatter specializations." ON)
-if(LOKI_ENABLE_FMT_FORMATTERS)
-  add_compile_definitions(LOKI_ENABLE_FMT_FORMATTERS=1 YGG_ENABLE_FMT_FORMATTERS=1)
-else()
-  add_compile_definitions(LOKI_ENABLE_FMT_FORMATTERS=0 YGG_ENABLE_FMT_FORMATTERS=0)
-endif()
 
 set(LOKI_INSTALL_INTERFACE_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}")
 

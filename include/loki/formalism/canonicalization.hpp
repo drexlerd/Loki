@@ -18,7 +18,6 @@
 #ifndef LOKI_FORMALISM_CANONICALIZATION_HPP_
 #define LOKI_FORMALISM_CANONICALIZATION_HPP_
 
-#include "loki/config.hpp"
 #include "loki/formalism/datas.hpp"
 #include "loki/formalism/declarations.hpp"
 #include "loki/formalism/formatter.hpp"
@@ -122,10 +121,6 @@ inline void canonicalize(Data<::loki::formalism::Task>&) noexcept {}
 namespace loki::formalism::detail
 {
 
-#if !LOKI_ENABLE_FMT_FORMATTERS
-#error "loki/formalism/canonicalization.hpp requires LOKI_ENABLE_FMT_FORMATTERS: canonical keys are the serialized views."
-#endif
-
 // Canonicalize a list (sort + deduplicate) by each element's serialized view: the single-line
 // PDDL text fully represents the entity within one repository.
 //
@@ -143,7 +138,7 @@ void canonicalize_list(const Repository& repository, ListT& list)
     auto keyed = std::vector<std::pair<std::string, std::size_t>> {};  // (render key, original position)
     keyed.reserve(n);
     for (std::size_t i = 0; i < n; ++i)
-        keyed.emplace_back(fmt::format("{}", ygg::make_view(list[i], repository)), i);  // render once each: O(n)
+        keyed.emplace_back(format::to_string(ygg::make_view(list[i], repository)), i);  // render once each: O(n)
 
     const auto by_key = [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; };
     if (!std::is_sorted(keyed.begin(), keyed.end(), by_key))  // skip the sort when already canonical (e.g. across translation phases)
@@ -168,10 +163,10 @@ bool is_canonical_list(const Repository& repository, const ListT& list)
     if (n < 2)
         return true;
 
-    auto previous = fmt::format("{}", ygg::make_view(list[0], repository));
+    auto previous = format::to_string(ygg::make_view(list[0], repository));
     for (std::size_t i = 1; i < n; ++i)
     {
-        auto current = fmt::format("{}", ygg::make_view(list[i], repository));
+        auto current = format::to_string(ygg::make_view(list[i], repository));
         if (!(previous < current))  // not strictly increasing => unsorted or duplicate
             return false;
         previous = std::move(current);
