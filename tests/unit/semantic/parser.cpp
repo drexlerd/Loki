@@ -596,8 +596,8 @@ TEST(LokiSemanticTranslator, RenamesQuantifiedVariablesDeterministically)
     ASSERT_EQ(translated_domain.get_actions().size(), 1);
     const auto action = translated_domain.get_actions()[0];
     ASSERT_EQ(action.get_parameters().size(), 2);
-    EXPECT_EQ(std::string(action.get_parameters()[0].get_variable().get_name()), "?x_0");
-    EXPECT_EQ(std::string(action.get_parameters()[1].get_variable().get_name()), "?x_1");
+    EXPECT_EQ(std::string(action.get_parameters()[0].get_variable().get_name()), "?x");
+    EXPECT_EQ(std::string(action.get_parameters()[1].get_variable().get_name()), "?x_0");
     ASSERT_TRUE(action.get_precondition().has_value());
     EXPECT_FALSE(contains_exists(action.get_precondition().value()));
 }
@@ -619,12 +619,12 @@ TEST(LokiSemanticTranslator, RenamesBeforeNegationNormalFormOnlyOnce)
     ASSERT_EQ(translated_domain.get_axioms().size(), 1);
     const auto axiom = translated_domain.get_axioms()[0];
     ASSERT_EQ(axiom.get_parameters().size(), 1);
-    EXPECT_EQ(std::string(axiom.get_parameters()[0].get_variable().get_name()), "?x_1");
+    EXPECT_EQ(std::string(axiom.get_parameters()[0].get_variable().get_name()), "?x_0");
 
     ASSERT_EQ(translated_domain.get_actions().size(), 1);
     const auto action = translated_domain.get_actions()[0];
     ASSERT_EQ(action.get_parameters().size(), 1);
-    EXPECT_EQ(std::string(action.get_parameters()[0].get_variable().get_name()), "?x_0");
+    EXPECT_EQ(std::string(action.get_parameters()[0].get_variable().get_name()), "?x");
 }
 
 TEST(LokiSemanticTranslator, RemovesUniversalQuantifiersWithDerivedAxioms)
@@ -839,8 +839,8 @@ TEST(LokiSemanticTranslator, KeepsActionScopedEffectVariablesAfterQuantifierRena
 
         found_takeoff = true;
         ASSERT_TRUE(action.get_effect().has_value());
-        EXPECT_TRUE(has_top_level_effect_literal_with_terms(action.get_effect().value(), "blocked", "?s_0", "?a_0"));
-        EXPECT_FALSE(has_top_level_effect_literal_with_terms(action.get_effect().value(), "blocked", "?s_2", "?a_0"));
+        EXPECT_TRUE(has_top_level_effect_literal_with_terms(action.get_effect().value(), "blocked", "?s", "?a"));
+        EXPECT_FALSE(has_top_level_effect_literal_with_terms(action.get_effect().value(), "blocked", "?s_1", "?a"));
     }
     EXPECT_TRUE(found_takeoff);
 }
@@ -1133,7 +1133,7 @@ TEST(LokiSemanticTranslator, RenamesTaskGoalVariablesBeforeGoalSimplificationOnl
     ASSERT_EQ(translated.get_axioms().size(), 1);
     const auto axiom = translated.get_axioms().front();
     ASSERT_EQ(axiom.get_parameters().size(), 1);
-    EXPECT_EQ(std::string(axiom.get_parameters().front().get_variable().get_name()), "?x_0");
+    EXPECT_EQ(std::string(axiom.get_parameters().front().get_variable().get_name()), "?x");
 }
 
 TEST(LokiSemanticParser, ReportsSyntaxFailureMessage)
@@ -1625,7 +1625,7 @@ TEST(LokiSemanticParser, AddActionCostsOptionInjectsUnitCosts)
     auto parser = semantic::Parser(domain, options);
 
     const auto domain_text = loki::format_domain(parser.get_domain());
-    EXPECT_NE(domain_text.find(":numeric-fluents"), std::string::npos);
+    EXPECT_NE(domain_text.find(":action-costs"), std::string::npos);
     EXPECT_NE(domain_text.find("(total-cost)"), std::string::npos);
     EXPECT_NE(domain_text.find("(increase (total-cost) 1)"), std::string::npos);
 

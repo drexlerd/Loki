@@ -166,9 +166,11 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
             EXPECT_EQ(translated_task.get_axioms().size(), configuration.task_axioms);
 
             // The formatted translation must reparse under the same parser options with stable counts.
-            auto reparsed = semantic::Parser(loki::format_domain(translated_domain), configuration.parser_options);
+            const auto domain_text = loki::format_domain(translated_domain);
+            const auto task_text = loki::format_task(translated_task);
+            auto reparsed = semantic::Parser(domain_text, configuration.parser_options);
             const auto reparsed_domain = reparsed.get_domain();
-            const auto reparsed_task = reparsed.parse_task(loki::format_task(translated_task));
+            const auto reparsed_task = reparsed.parse_task(task_text);
             EXPECT_EQ(reparsed_domain.get_name(), translated_domain.get_name());
             EXPECT_EQ(reparsed_task.get_name(), translated_task.get_name());
             // Reparsing re-interns the built-in object and number types that typing compilation removed.
@@ -205,6 +207,10 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
             EXPECT_EQ(retranslated_task.get_initial_function_values().size(), configuration.task_initial_function_values);
             EXPECT_EQ(retranslated_task.get_domain().get_actions().size(), configuration.task_actions);
             EXPECT_EQ(retranslated_task.get_axioms().size(), configuration.task_axioms);
+
+            // Text stability: retranslation must reproduce the exact string representations.
+            EXPECT_TRUE(loki::format_domain(retranslated_domain) == domain_text) << "domain text not stable under retranslation";
+            EXPECT_TRUE(loki::format_task(retranslated_task) == task_text) << "task text not stable under retranslation";
         }
     }
 }

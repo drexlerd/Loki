@@ -43,6 +43,8 @@ void remember_requirement(ParseContext& parse_context, formalism::RequirementKin
     }
     if (kind == formalism::RequirementKind::Fluents)
         parse_context.active_requirements.insert(formalism::RequirementKind::NumericFluents);
+    if (kind == formalism::RequirementKind::ActionCosts)
+        parse_context.active_requirements.insert(formalism::RequirementKind::NumericFluents);
 }
 
 void remember_adl_requirements(ParseContext& parse_context)

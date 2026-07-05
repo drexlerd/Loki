@@ -43,8 +43,8 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
     if (inject_unit_costs)
     {
         m_parse_context.active_action_costs = true;
-        remember_requirement(m_parse_context, formalism::RequirementKind::NumericFluents);
-        const auto requirement = formalism::get_or_create<formalism::Requirement>(repo(), formalism::RequirementKind::NumericFluents).get_index();
+        remember_requirement(m_parse_context, formalism::RequirementKind::ActionCosts);
+        const auto requirement = formalism::get_or_create<formalism::Requirement>(repo(), formalism::RequirementKind::ActionCosts).get_index();
         if (std::find(requirements.begin(), requirements.end(), requirement) == requirements.end())
             requirements.push_back(requirement);
     }

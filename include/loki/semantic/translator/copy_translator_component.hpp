@@ -34,6 +34,7 @@ protected:
         m_active_parameters(context.active_parameters),
         m_active_parameter_variables(context.active_parameter_variables),
         m_variable_bindings(context.variable_bindings),
+        m_used_variable_names(context.used_variable_names),
         m_used_predicate_names(context.used_predicate_names),
         m_generated_predicates(context.generated_predicates),
         m_generated_axioms(context.generated_axioms),
@@ -42,6 +43,7 @@ protected:
         m_type_predicates(context.type_predicates),
         m_compile_typing(context.compile_typing),
         m_renaming_enabled(context.renaming_enabled),
+        m_shadow_only_renaming(context.shadow_only_renaming),
         m_phase(context.phase)
     {
     }
@@ -55,6 +57,7 @@ protected:
     std::vector<std::vector<formalism::ParameterView>>& m_active_parameters;
     std::vector<std::vector<formalism::VariableView>>& m_active_parameter_variables;
     std::vector<ygg::UnorderedMap<formalism::VariableView, formalism::VariableView>>& m_variable_bindings;
+    ygg::UnorderedSet<std::string>& m_used_variable_names;
     ygg::UnorderedSet<std::string>& m_used_predicate_names;
     std::vector<formalism::PredicateView>& m_generated_predicates;
     std::vector<formalism::AxiomView>& m_generated_axioms;
@@ -63,6 +66,7 @@ protected:
     ygg::UnorderedMap<formalism::TypeView, formalism::PredicateView>& m_type_predicates;
     bool& m_compile_typing;
     bool& m_renaming_enabled;
+    bool& m_shadow_only_renaming;
     TranslationPhase& m_phase;
 };
 

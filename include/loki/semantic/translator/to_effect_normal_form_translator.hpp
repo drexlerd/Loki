@@ -145,14 +145,18 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
 
     for (const auto& group : numeric_groups)
     {
-        const auto sum = formalism::get_or_create<formalism::FunctionExpression>(
-                             this->m_storage->repository,
-                             ygg::Data<formalism::FunctionExpression>::Variant(
-                                 formalism::get_or_create<formalism::MultiFunctionExpression>(this->m_storage->repository,
-                                                                                              formalism::MultiArithmeticOperator::Add,
-                                                                                              group.expressions)
-                                     .get_index()))
-                             .get_index();
+        // A single expression stays as-is; only genuine aggregations get a sum, keeping
+        // normalization idempotent across repeated translations.
+        const auto sum = group.expressions.size() == 1 ?
+                             group.expressions.front() :
+                             formalism::get_or_create<formalism::FunctionExpression>(
+                                 this->m_storage->repository,
+                                 ygg::Data<formalism::FunctionExpression>::Variant(
+                                     formalism::get_or_create<formalism::MultiFunctionExpression>(this->m_storage->repository,
+                                                                                                  formalism::MultiArithmeticOperator::Add,
+                                                                                                  group.expressions)
+                                         .get_index()))
+                                 .get_index();
         effects.push_back(this->self().wrap_effect(
             formalism::get_or_create<formalism::EffectNumeric>(this->m_storage->repository, group.op, group.function, group.terms, sum)));
     }

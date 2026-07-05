@@ -71,6 +71,7 @@ enum class RequirementKind : std::uint8_t
     ConditionalEffects,
     Fluents,
     NumericFluents,
+    ActionCosts,
     DurativeActions,
     DerivedPredicates,
     NonDeterministic,
@@ -169,6 +170,8 @@ inline const char* to_string(RequirementKind kind)
             return ":fluents";
         case RequirementKind::NumericFluents:
             return ":numeric-fluents";
+        case RequirementKind::ActionCosts:
+            return ":action-costs";
         case RequirementKind::DurativeActions:
             return ":durative-actions";
         case RequirementKind::DerivedPredicates:

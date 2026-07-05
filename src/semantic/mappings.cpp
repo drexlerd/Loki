@@ -62,7 +62,7 @@ formalism::RequirementKind requirement_kind(const ast::Requirement& node, const 
     if (name == "numeric-fluents")
         return formalism::RequirementKind::NumericFluents;
     if (name == "action-costs")
-        return formalism::RequirementKind::NumericFluents;
+        return formalism::RequirementKind::ActionCosts;
     if (name == "adl")
         return formalism::RequirementKind::QuantifiedPreconditions;
     if (name == "durative-actions")
@@ -100,6 +100,8 @@ std::string requirement_name(formalism::RequirementKind kind)
             return "fluents";
         case formalism::RequirementKind::NumericFluents:
             return "numeric-fluents";
+        case formalism::RequirementKind::ActionCosts:
+            return "action-costs";
         case formalism::RequirementKind::DurativeActions:
             return "durative-actions";
         case formalism::RequirementKind::DerivedPredicates:
