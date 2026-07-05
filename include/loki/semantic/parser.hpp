@@ -81,6 +81,8 @@ private:
     ygg::UnorderedSet<std::string> m_declared_functions;
     ygg::UnorderedSet<formalism::RequirementKind> m_active_requirements;
     ygg::UnorderedSet<formalism::RequirementKind> m_domain_requirement_kinds;
+    bool m_active_action_costs = false;
+    bool m_domain_action_costs = false;
     ygg::UnorderedMap<formalism::VariableView, std::vector<formalism::TypeView>> m_variable_types;
     std::vector<ygg::UnorderedMap<std::string, formalism::VariableView>> m_variable_scopes;
     ygg::UnorderedMap<std::string, formalism::ObjectView>* m_task_objects = nullptr;
@@ -207,6 +209,12 @@ private:
     formalism::PredicateView equality_predicate(const ast::Identifier& identifier, size_t arity);
 
     formalism::FunctionSkeletonView function(const ast::Identifier& identifier, size_t arity);
+
+    bool has_total_cost_initial_value(const ygg::IndexList<formalism::InitialFunctionValue>& values) const;
+
+    void complete_action_costs(const ast::Task& task,
+                               ygg::IndexList<formalism::InitialFunctionValue>& initial_function_values,
+                               cista::optional<ygg::Index<formalism::Metric>>& metric);
 
     formalism::VariableView variable(const ast::Identifier& identifier) const;
 

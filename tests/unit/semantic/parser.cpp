@@ -1383,6 +1383,111 @@ TEST(LokiSemanticParser, StrictModeRejectsFunctionArgumentTypeMismatch)
     }
 }
 
+TEST(LokiSemanticParser, AddsActionCostsDefaultsInPermissiveMode)
+{
+    const auto domain = std::string { R"(
+(define (domain action-cost-domain)
+  (:requirements :action-costs)
+  (:predicates)
+  (:functions (total-cost))
+  (:action pay
+    :parameters ()
+    :effect (increase (total-cost) 1))
+)
+)" };
+    const auto task = std::string { R"(
+(define (problem action-cost-task)
+  (:domain action-cost-domain)
+  (:init)
+)
+)" };
+
+    auto parser = semantic::Parser(domain);
+    const auto parsed_task = parser.parse_task(task);
+
+    ASSERT_TRUE(parsed_task.get_metric().has_value());
+    EXPECT_TRUE(parsed_task.get_metric().value().is_minimize());
+    ygg::visit(
+        [](const auto expression)
+        {
+            using Expression = std::decay_t<decltype(expression)>;
+            EXPECT_TRUE((std::is_same_v<Expression, formalism::FunctionTermView>) );
+            if constexpr (std::is_same_v<Expression, formalism::FunctionTermView>)
+            {
+                EXPECT_EQ(expression.get_function().get_name(), "total-cost");
+                EXPECT_EQ(expression.get_terms().size(), 0);
+            }
+        },
+        parsed_task.get_metric().value().get_expression().get_variant());
+
+    ASSERT_EQ(parsed_task.get_initial_function_values().size(), 1);
+    const auto initial_value = parsed_task.get_initial_function_values()[0];
+    EXPECT_EQ(initial_value.get_function().get_function().get_name(), "total-cost");
+    EXPECT_EQ(initial_value.get_function().get_terms().size(), 0);
+    ygg::visit(
+        [](const auto expression)
+        {
+            using Expression = std::decay_t<decltype(expression)>;
+            EXPECT_TRUE((std::is_same_v<Expression, formalism::FunctionExpressionNumberView>) );
+            if constexpr (std::is_same_v<Expression, formalism::FunctionExpressionNumberView>)
+            {
+                EXPECT_EQ(expression.get_value(), 0.0);
+            }
+        },
+        initial_value.get_value().get_variant());
+}
+
+TEST(LokiSemanticParser, StrictActionCostsRequiresMetric)
+{
+    const auto domain = std::string { R"(
+(define (domain action-cost-domain)
+  (:requirements :action-costs)
+  (:predicates)
+  (:functions (total-cost))
+  (:action pay
+    :parameters ()
+    :effect (increase (total-cost) 1))
+)
+)" };
+    const auto task = std::string { R"(
+(define (problem action-cost-task)
+  (:domain action-cost-domain)
+  (:init (= (total-cost) 0))
+)
+)" };
+
+    auto options = parser::ParserOptions {};
+    options.strict = true;
+    auto parser = semantic::Parser(domain, options);
+    EXPECT_THROW(parser.parse_task(task), semantic::SemanticError);
+}
+
+TEST(LokiSemanticParser, StrictActionCostsRequiresInitialValue)
+{
+    const auto domain = std::string { R"(
+(define (domain action-cost-domain)
+  (:requirements :action-costs)
+  (:predicates)
+  (:functions (total-cost))
+  (:action pay
+    :parameters ()
+    :effect (increase (total-cost) 1))
+)
+)" };
+    const auto task = std::string { R"(
+(define (problem action-cost-task)
+  (:domain action-cost-domain)
+  (:init)
+  (:metric minimize (total-cost))
+)
+)" };
+
+    auto options = parser::ParserOptions {};
+    options.strict = true;
+    auto parser = semantic::Parser(domain, options);
+    EXPECT_THROW(parser.parse_task(task), semantic::SemanticError);
+}
+
 TEST(LokiSemanticParser, ReportsInvalidMetricOptimization)
 {
     const auto domain = std::string { R"(

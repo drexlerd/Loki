@@ -73,6 +73,7 @@ formalism::DomainView Parser::parse_domain_ast(const ast::Domain& domain)
 
     auto requirements = parse_requirements(domain.requirements);
     m_domain_requirement_kinds = m_active_requirements;
+    m_domain_action_costs = m_active_action_costs;
     auto types = parse_types(domain.types);
     auto constants = parse_objects(domain.constants, m_objects);
     auto predicates = parse_predicates(domain.predicates);
@@ -105,9 +106,12 @@ formalism::DomainView Parser::parse_domain_ast(const ast::Domain& domain)
                                              std::move(axioms));
     auto view = formalism::get_or_create<formalism::Domain>(repo(), std::move(data));
     const auto declared_requirements = m_domain_requirement_kinds;
+    const auto declared_action_costs = m_domain_action_costs;
     canonicalize_domain(view);
     m_domain_requirement_kinds = declared_requirements;
     m_active_requirements = declared_requirements;
+    m_domain_action_costs = declared_action_costs;
+    m_active_action_costs = declared_action_costs;
     m_domain_name = domain.name.text;
     return get_domain();
 }
@@ -125,6 +129,8 @@ void Parser::rebuild_domain_symbols()
     m_declared_functions.clear();
     m_active_requirements.clear();
     m_domain_requirement_kinds.clear();
+    m_active_action_costs = false;
+    m_domain_action_costs = false;
     m_variable_types.clear();
     if (!m_domain)
         return;
@@ -571,11 +577,17 @@ formalism::TaskView Parser::parse_task_ast(const ast::Task& task)
     struct RequirementScope
     {
         Parser& parser;
-        ygg::UnorderedSet<formalism::RequirementKind> previous;
-        ~RequirementScope() { parser.m_active_requirements = std::move(previous); }
+        ygg::UnorderedSet<formalism::RequirementKind> previous_requirements;
+        bool previous_action_costs;
+        ~RequirementScope()
+        {
+            parser.m_active_requirements = std::move(previous_requirements);
+            parser.m_active_action_costs = previous_action_costs;
+        }
     };
-    RequirementScope requirement_scope { *this, m_active_requirements };
+    RequirementScope requirement_scope { *this, m_active_requirements, m_active_action_costs };
     m_active_requirements = m_domain_requirement_kinds;
+    m_active_action_costs = m_domain_action_costs;
 
     auto requirements = parse_requirements(task.requirements);
     auto objects = parse_objects(task.objects, task_objects);
@@ -591,6 +603,7 @@ formalism::TaskView Parser::parse_task_ast(const ast::Task& task)
     auto metric = cista::optional<ygg::Index<formalism::Metric>> {};
     if (task.metric)
         metric = parse_metric(*task.metric);
+    complete_action_costs(task, initial_function_values, metric);
 
     auto axioms = ygg::IndexList<formalism::Axiom> {};
     for (const auto& axiom : task.axioms)
@@ -667,6 +680,8 @@ void Parser::clear_domain_symbols()
     m_declared_functions.clear();
     m_active_requirements.clear();
     m_domain_requirement_kinds.clear();
+    m_active_action_costs = false;
+    m_domain_action_costs = false;
     m_variable_types.clear();
     m_variable_scopes.clear();
     m_task_objects = nullptr;
@@ -742,8 +757,11 @@ ygg::IndexList<formalism::Requirement> Parser::parse_requirements(const std::vec
     auto result = ygg::IndexList<formalism::Requirement> {};
     for (const auto& node : nodes)
     {
+        const auto name = key(node.name.text);
         const auto kind = requirement_kind(node);
-        if (key(node.name.text) == "adl")
+        if (name == "action-costs")
+            m_active_action_costs = true;
+        if (name == "adl")
             remember_adl_requirements();
         else
             remember_requirement(kind);
@@ -848,6 +866,59 @@ formalism::FunctionSkeletonView Parser::function(const ast::Identifier& identifi
     auto view = formalism::get_or_create<formalism::FunctionSkeleton>(repo(), to_cista(name), ygg::IndexList<formalism::Parameter> {}, m_number_type);
     m_functions.emplace(name, view);
     return view;
+}
+
+bool Parser::has_total_cost_initial_value(const ygg::IndexList<formalism::InitialFunctionValue>& values) const
+{
+    for (auto value : values)
+    {
+        const auto function = ygg::make_view(value, repo()).get_function();
+        if (function.get_function().get_name() == "total-cost" && function.get_terms().empty())
+            return true;
+    }
+    return false;
+}
+
+void Parser::complete_action_costs(const ast::Task& task,
+                                   ygg::IndexList<formalism::InitialFunctionValue>& initial_function_values,
+                                   cista::optional<ygg::Index<formalism::Metric>>& metric)
+{
+    if (!m_active_action_costs)
+        return;
+
+    const auto missing_metric = !metric;
+    const auto missing_initial_value = !has_total_cost_initial_value(initial_function_values);
+    if (m_options.strict)
+    {
+        if (missing_metric)
+            throw_at(task, SemanticError("Missing total-cost metric for :action-costs"));
+        if (missing_initial_value)
+            throw_at(task, SemanticError("Missing initial value for total-cost for :action-costs"));
+        return;
+    }
+
+    auto total_cost_function = [&]()
+    {
+        if (auto it = m_functions.find("total-cost"); it != m_functions.end())
+            return it->second;
+        auto view = formalism::get_or_create<formalism::FunctionSkeleton>(repo(),
+                                                                          cista::offset::string("total-cost"),
+                                                                          ygg::IndexList<formalism::Parameter> {},
+                                                                          m_number_type);
+        m_functions.emplace("total-cost", view);
+        return view;
+    };
+    auto total_cost_term = [&]()
+    { return formalism::get_or_create<formalism::FunctionTerm>(repo(), total_cost_function().get_index(), ygg::IndexList<formalism::Term> {}).get_index(); };
+
+    if (missing_metric)
+        metric = formalism::get_or_create<formalism::Metric>(repo(), true, wrap_function_expression(total_cost_term())).get_index();
+    if (missing_initial_value)
+    {
+        const auto zero = formalism::get_or_create<formalism::FunctionExpressionNumber>(repo(), 0.0).get_index();
+        const auto zero_expression = wrap_function_expression(zero);
+        initial_function_values.push_back(formalism::get_or_create<formalism::InitialFunctionValue>(repo(), total_cost_term(), zero_expression).get_index());
+    }
 }
 
 formalism::ObjectView Parser::object(const ast::Identifier& identifier) const
