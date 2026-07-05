@@ -182,6 +182,9 @@ struct PhaseStep
 {
     TranslationPhase phase;
     std::string_view name;
+    // Compiling conditional effects negates when-conditions, which reintroduces disjunctions
+    // and quantifiers into preconditions; the normalization phases must run again afterwards.
+    bool requires_compile_conditional_effects = false;
 };
 
 const std::vector<PhaseStep>& domain_phase_steps()
@@ -195,7 +198,11 @@ const std::vector<PhaseStep>& domain_phase_steps()
         { TranslationPhase::MoveExistentialQuantifiers, "move-existential-quantifiers" },
         { TranslationPhase::CompileTyping, "compile-typing" },
         { TranslationPhase::ToEffectNormalForm, "to-effect-normal-form" },
-        { TranslationPhase::CompileConditionalEffects, "compile-conditional-effects" },
+        { TranslationPhase::CompileConditionalEffects, "compile-conditional-effects", true },
+        { TranslationPhase::RemoveUniversalQuantifiers, "remove-universal-quantifiers", true },
+        { TranslationPhase::ToDisjunctiveNormalForm, "to-disjunctive-normal-form", true },
+        { TranslationPhase::SplitDisjunctiveConditions, "split-disjunctive-conditions", true },
+        { TranslationPhase::MoveExistentialQuantifiers, "move-existential-quantifiers", true },
         { TranslationPhase::MaterializeEquality, "materialize-equality" },
     };
     return steps;
@@ -392,7 +399,7 @@ DomainTranslationResult translate(formalism::DomainView domain, const Translator
 
     for (const auto& step : detail::domain_phase_steps())
     {
-        if (step.phase == TranslationPhase::CompileConditionalEffects && !options.compile_conditional_effects)
+        if (step.requires_compile_conditional_effects && !options.compile_conditional_effects)
             continue;
         if (step.phase == TranslationPhase::MaterializeEquality && !options.materialize_equality)
             continue;

@@ -423,7 +423,7 @@ TEST(LokiTests, SplitDisjunctiveConditionalEffects)
     :effect (when (or (p ?x) (q ?x)) (done ?x))))
 )PDDL");
 
-    auto parser = loki::Parser(domain_source);
+    auto parser = loki::Parser(domain_source, loki::ParserOptions { .strict = false, .add_action_costs = false });
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
 
@@ -511,7 +511,7 @@ TEST(LokiTests, AggregatesNumericEffectsWithSameTarget)
     :effect (and (increase (fuel ?x) 1) (increase (fuel ?x) 2) (done ?x))))
 )PDDL");
 
-    auto parser = loki::Parser(domain_source);
+    auto parser = loki::Parser(domain_source, loki::ParserOptions { .strict = false, .add_action_costs = false });
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
 
@@ -533,7 +533,7 @@ TEST(LokiTests, FlattenCanonicalizesDuplicateConditionsAndEffects)
     :effect (and (q) (q))))
 )PDDL");
 
-    auto parser = loki::Parser(domain_source);
+    auto parser = loki::Parser(domain_source, loki::ParserOptions { .strict = false, .add_action_costs = false });
     const auto translation = loki::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
 

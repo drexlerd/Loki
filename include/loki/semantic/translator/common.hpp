@@ -38,10 +38,10 @@ namespace loki::semantic
 
 struct TranslatorOptions
 {
-    bool compile_typing = false;
+    bool compile_typing = true;
     bool compile_conditional_effects = false;
-    // Add the = predicate and (= o o) initial literals; leave off for consumers with native equality.
-    bool materialize_equality = false;
+    // Add the = predicate and (= o o) initial literals; turn off for consumers with native equality.
+    bool materialize_equality = true;
 };
 
 enum class TranslationPhase

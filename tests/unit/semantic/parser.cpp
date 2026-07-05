@@ -1532,6 +1532,7 @@ TEST(LokiSemanticParser, StrictActionCostsRequiresMetric)
 
     auto options = parser::ParserOptions {};
     options.strict = true;
+    options.add_action_costs = false;
     auto parser = semantic::Parser(domain, options);
     EXPECT_THROW(parser.parse_task(task), semantic::SemanticError);
 }
@@ -1558,6 +1559,7 @@ TEST(LokiSemanticParser, StrictActionCostsRequiresInitialValue)
 
     auto options = parser::ParserOptions {};
     options.strict = true;
+    options.add_action_costs = false;
     auto parser = semantic::Parser(domain, options);
     EXPECT_THROW(parser.parse_task(task), semantic::SemanticError);
 }
@@ -1576,6 +1578,7 @@ TEST(LokiSemanticParser, StrictActionCostsRequiresTotalCostFunction)
 
     auto options = parser::ParserOptions {};
     options.strict = true;
+    options.add_action_costs = false;
     EXPECT_THROW(semantic::Parser(domain, options), semantic::SemanticError);
 }
 
@@ -1752,7 +1755,9 @@ TEST(LokiSemanticParser, NumericUseWithoutRequirementErrorsInPermissiveMode)
 )
 )" };
 
-    EXPECT_THROW((semantic::Parser { domain }), semantic::MissingRequirementError);
+    auto options = parser::ParserOptions {};
+    options.add_action_costs = false;
+    EXPECT_THROW((semantic::Parser { domain, options }), semantic::MissingRequirementError);
 }
 
 TEST(LokiSemanticParser, NumericFluentsTaskWithoutMetricKeepsMetricAbsent)
@@ -1779,6 +1784,7 @@ TEST(LokiSemanticParser, NumericFluentsTaskWithoutMetricKeepsMetricAbsent)
     {
         auto options = parser::ParserOptions {};
         options.strict = strict;
+        options.add_action_costs = false;
         auto parser = semantic::Parser(domain, options);
         const auto parsed_task = parser.parse_task(task);
         EXPECT_FALSE(parsed_task.get_metric().has_value());

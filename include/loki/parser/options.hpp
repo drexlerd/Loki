@@ -26,7 +26,7 @@ struct ParserOptions
     bool strict = false;
     // Complete missing :action-costs artifacts instead of erroring; if the domain does not
     // declare :action-costs, injects the requirement, total-cost, and unit-cost effects.
-    bool add_action_costs = false;
+    bool add_action_costs = true;
 };
 
 }  // namespace loki::parser

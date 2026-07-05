@@ -37,15 +37,27 @@ struct ParserSuiteCase
     fs::path task_file;
 };
 
+struct ConfigurationExpectation
+{
+    parser::ParserOptions parser_options;
+    semantic::TranslatorOptions options;
+    std::size_t domain_types;
+    std::size_t domain_predicates;
+    std::size_t domain_functions;
+    std::size_t domain_actions;
+    std::size_t domain_axioms;
+    std::size_t task_objects;
+    std::size_t task_predicates;
+    std::size_t task_initial_literals;
+    std::size_t task_initial_function_values;
+    std::size_t task_actions;
+    std::size_t task_axioms;
+};
+
 struct TranslationCountExpectation
 {
     std::string name;
-    std::size_t domain_predicates;
-    std::size_t domain_actions;
-    std::size_t domain_axioms;
-    std::size_t task_predicates;
-    std::size_t task_actions;
-    std::size_t task_axioms;
+    std::vector<ConfigurationExpectation> configurations;
 };
 
 ParserSuiteCase parse_parser_case(const boost::json::object& suite, const boost::json::object& object)
@@ -67,15 +79,35 @@ std::vector<ParserSuiteCase> load_parser_cases()
 
 TranslationCountExpectation parse_expectation(const boost::json::object& object)
 {
-    const auto& domain = ygg::common::as_object(object, "translated_domain", "case");
-    const auto& task = ygg::common::as_object(object, "translated_task", "case");
-    return TranslationCountExpectation { ygg::common::as_string(object, "name", "case"),
-                                         ygg::common::as_size(domain, "predicates", "case.translated_domain"),
-                                         ygg::common::as_size(domain, "actions", "case.translated_domain"),
-                                         ygg::common::as_size(domain, "axioms", "case.translated_domain"),
-                                         ygg::common::as_size(task, "predicates", "case.translated_task"),
-                                         ygg::common::as_size(task, "actions", "case.translated_task"),
-                                         ygg::common::as_size(task, "axioms", "case.translated_task") };
+    auto result = TranslationCountExpectation { ygg::common::as_string(object, "name", "case"), {} };
+    for (const auto& configuration_value : ygg::common::as_array(object, "configurations", "case"))
+    {
+        const auto& configuration = ygg::common::as_object(configuration_value, "case.configuration");
+        const auto& parser_options_object = ygg::common::as_object(configuration, "parser_options", "case.configuration");
+        const auto& options = ygg::common::as_object(configuration, "options", "case.configuration");
+        const auto& domain = ygg::common::as_object(configuration, "translated_domain", "case.configuration");
+        const auto& task = ygg::common::as_object(configuration, "translated_task", "case.configuration");
+        auto parser_options = parser::ParserOptions {};
+        parser_options.add_action_costs = ygg::common::as_bool(parser_options_object, "add_action_costs", "case.configuration.parser_options");
+        auto translator_options = semantic::TranslatorOptions {};
+        translator_options.compile_typing = ygg::common::as_bool(options, "compile_typing", "case.configuration.options");
+        translator_options.compile_conditional_effects = ygg::common::as_bool(options, "compile_conditional_effects", "case.configuration.options");
+        translator_options.materialize_equality = ygg::common::as_bool(options, "materialize_equality", "case.configuration.options");
+        result.configurations.push_back(ConfigurationExpectation { parser_options,
+                                                                   translator_options,
+                                                                   ygg::common::as_size(domain, "types", "case.translated_domain"),
+                                                                   ygg::common::as_size(domain, "predicates", "case.translated_domain"),
+                                                                   ygg::common::as_size(domain, "functions", "case.translated_domain"),
+                                                                   ygg::common::as_size(domain, "actions", "case.translated_domain"),
+                                                                   ygg::common::as_size(domain, "axioms", "case.translated_domain"),
+                                                                   ygg::common::as_size(task, "objects", "case.translated_task"),
+                                                                   ygg::common::as_size(task, "predicates", "case.translated_task"),
+                                                                   ygg::common::as_size(task, "initial_literals", "case.translated_task"),
+                                                                   ygg::common::as_size(task, "initial_function_values", "case.translated_task"),
+                                                                   ygg::common::as_size(task, "actions", "case.translated_task"),
+                                                                   ygg::common::as_size(task, "axioms", "case.translated_task") });
+    }
+    return result;
 }
 
 std::vector<TranslationCountExpectation> load_expectations()
@@ -107,20 +139,31 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
         LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.domain_file);
         LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.task_file);
 
-        auto parser = semantic::Parser(item.domain_file);
-        // Expected counts were recorded with the full normalization pipeline.
-        const auto options = semantic::TranslatorOptions { .compile_typing = true, .materialize_equality = true };
-        const auto domain_translation = semantic::translate(parser.get_domain(), options);
-        const auto translated_domain = domain_translation.get_translated_domain();
-        const auto task_translation = semantic::translate(parser.parse_task(item.task_file), domain_translation, options);
-        const auto translated_task = task_translation.get_translated_task();
+        for (const auto& configuration : expected.configurations)
+        {
+            SCOPED_TRACE("add_action_costs=" + std::to_string(configuration.parser_options.add_action_costs)
+                         + " compile_typing=" + std::to_string(configuration.options.compile_typing)
+                         + " compile_conditional_effects=" + std::to_string(configuration.options.compile_conditional_effects)
+                         + " materialize_equality=" + std::to_string(configuration.options.materialize_equality));
+            auto parser = semantic::Parser(item.domain_file, configuration.parser_options);
+            const auto task = parser.parse_task(item.task_file);
+            const auto domain_translation = semantic::translate(parser.get_domain(), configuration.options);
+            const auto translated_domain = domain_translation.get_translated_domain();
+            const auto task_translation = semantic::translate(task, domain_translation, configuration.options);
+            const auto translated_task = task_translation.get_translated_task();
 
-        EXPECT_EQ(translated_domain.get_predicates().size(), expected.domain_predicates);
-        EXPECT_EQ(translated_domain.get_actions().size(), expected.domain_actions);
-        EXPECT_EQ(translated_domain.get_axioms().size(), expected.domain_axioms);
-        EXPECT_EQ(translated_task.get_predicates().size(), expected.task_predicates);
-        EXPECT_EQ(translated_task.get_domain().get_actions().size(), expected.task_actions);
-        EXPECT_EQ(translated_task.get_axioms().size(), expected.task_axioms);
+            EXPECT_EQ(translated_domain.get_types().size(), configuration.domain_types);
+            EXPECT_EQ(translated_domain.get_predicates().size(), configuration.domain_predicates);
+            EXPECT_EQ(translated_domain.get_functions().size(), configuration.domain_functions);
+            EXPECT_EQ(translated_domain.get_actions().size(), configuration.domain_actions);
+            EXPECT_EQ(translated_domain.get_axioms().size(), configuration.domain_axioms);
+            EXPECT_EQ(translated_task.get_objects().size(), configuration.task_objects);
+            EXPECT_EQ(translated_task.get_predicates().size(), configuration.task_predicates);
+            EXPECT_EQ(translated_task.get_initial_literals().size(), configuration.task_initial_literals);
+            EXPECT_EQ(translated_task.get_initial_function_values().size(), configuration.task_initial_function_values);
+            EXPECT_EQ(translated_task.get_domain().get_actions().size(), configuration.task_actions);
+            EXPECT_EQ(translated_task.get_axioms().size(), configuration.task_axioms);
+        }
     }
 }
 

@@ -117,6 +117,10 @@ reparsed = pddl.Parser(domain_text)
 assert reparsed.domain().get_name() == "ready-domain"
 ```
 
+With default options the parser completes `:action-costs` artifacts and the
+translator compiles typing and materializes equality; see
+[Parser and Translator Options](#parser-and-translator-options) to override.
+
 ## C++ API
 
 The umbrella header exposes the semantic parser, translator, and reparseable
@@ -136,6 +140,41 @@ int main()
     return reparsed.get_domain().get_name() == "ready-domain" ? 0 : 1;
 }
 ```
+
+## Parser and Translator Options
+
+Both APIs accept options at construction/translation time. The library defaults
+are normalization-friendly for downstream consumers; every option can be turned
+off individually.
+
+`ParserOptions` (second argument of `Parser`):
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `strict` | `false` | Strict semantic validation for requirements, arity, and type compatibility. Numeric-fluents violations error even in permissive mode: reads require `:fluents`/`:numeric-fluents`/`:action-costs`, and writes other than `(increase (total-cost) ...)` require `:fluents`/`:numeric-fluents`. |
+| `add_action_costs` | `true` | Complete missing `:action-costs` artifacts (`total-cost` function, initial value, `minimize` metric) instead of erroring. If the domain does not declare `:action-costs`, additionally injects the requirement and a unit-cost effect `(increase (total-cost) 1)` into every action that does not already write `total-cost`. |
+
+`TranslatorOptions` (second argument of `translate_domain`/`translate_task`):
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `compile_typing` | `true` | Compile typing away into type predicates and remove type annotations. |
+| `compile_conditional_effects` | `false` | Multiply conditional effects out into unconditional actions; the normalization phases re-run afterwards so preconditions stay conjunctive (quantified `when`-conditions become derived predicates). Worst case exponential in the number of conditional effects per action. |
+| `materialize_equality` | `true` | Add the `=` predicate and `(= o o)` initial literals. Turn off for consumers with native equality handling. |
+
+Pass the same `TranslatorOptions` to the domain and the task translation;
+mismatched options between the two can fail (e.g. equality materialization
+requires the `=` predicate added during domain translation).
+
+```python
+options = pddl.TranslatorOptions()
+options.materialize_equality = False
+translation = pddl.translate_domain(parser.domain(), options)
+```
+
+The `loki` executable exposes the same options as opt-in flags (all off by
+default): `--strict`, `--add-action-costs`, `--compile-typing`,
+`--compile-conditional-effects`, and `--materialize-equality`.
 
 ## CMake Integration
 
@@ -184,6 +223,11 @@ git submodule update --init --recursive data/planning-benchmarks
   data/planning-benchmarks/tests/classical/gripper/domain.pddl \
   data/planning-benchmarks/tests/classical/gripper/test-1.pddl
 ```
+
+Use `--out-domain`/`--out-problem` to write the translated PDDL to files, and
+see `./build/exe/loki --help` for the parser and translator flags
+(`--strict`, `--add-action-costs`, `--compile-typing`,
+`--compile-conditional-effects`, `--materialize-equality`).
 
 ## Citing Loki
 

@@ -168,6 +168,70 @@
                 "  (:init)",
                 ")"
             ]
+        },
+        {
+            "name": "permissive numeric write requires numeric-fluents under bare action-costs",
+            "entry": "domain",
+            "expected_error": "MissingRequirementError",
+            "expected_message": "Missing required PDDL requirement: :numeric-fluents",
+            "strict": false,
+            "domain": [
+                "(define (domain write-fragment)",
+                "  (:requirements :action-costs)",
+                "  (:predicates (p))",
+                "  (:functions (total-cost) (fuel))",
+                "  (:action burn :parameters () :effect (assign (fuel) 5))",
+                ")"
+            ]
+        },
+        {
+            "name": "permissive increase of non-total-cost requires numeric-fluents under bare action-costs",
+            "entry": "domain",
+            "expected_error": "MissingRequirementError",
+            "expected_message": "Missing required PDDL requirement: :numeric-fluents",
+            "strict": false,
+            "domain": [
+                "(define (domain increase-fragment)",
+                "  (:requirements :action-costs)",
+                "  (:predicates (p))",
+                "  (:functions (total-cost) (fuel))",
+                "  (:action burn :parameters () :effect (increase (fuel) 1))",
+                ")"
+            ]
+        },
+        {
+            "name": "permissive function declaration requires a numeric requirement",
+            "entry": "domain",
+            "expected_error": "MissingRequirementError",
+            "expected_message": "Missing required PDDL requirement: :numeric-fluents",
+            "strict": false,
+            "domain": [
+                "(define (domain no-numeric-requirement)",
+                "  (:requirements :strips)",
+                "  (:predicates (p))",
+                "  (:functions (fuel))",
+                ")"
+            ]
+        },
+        {
+            "name": "permissive numeric read in init requires a numeric requirement",
+            "entry": "task",
+            "expected_error": "MissingRequirementError",
+            "expected_message": "Missing required PDDL requirement: :numeric-fluents",
+            "strict": false,
+            "domain": [
+                "(define (domain no-numeric-read)",
+                "  (:requirements :strips)",
+                "  (:predicates (p))",
+                ")"
+            ],
+            "task": [
+                "(define (problem no-numeric-read-task)",
+                "  (:domain no-numeric-read)",
+                "  (:init (= (fuel) 3))",
+                "  (:goal (p))",
+                ")"
+            ]
         }
     ]
 }

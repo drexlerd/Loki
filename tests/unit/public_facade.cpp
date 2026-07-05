@@ -47,7 +47,8 @@ TEST(LokiPublicFacade, ExposesParserAndTranslatorThroughLokiNamespace)
             :parameters ()
             :precondition (ready)
             :effect (ready)))
-    )" });
+    )" },
+                               loki::ParserOptions { .strict = false, .add_action_costs = false });
 
     const auto domain = parser.get_domain();
 
@@ -348,7 +349,8 @@ TEST(LokiPublicFacade, FormatsAlternativeEffectsAsReparseablePddl)
             :parameters ()
             :effect (probabilistic 0.25 (p) 0.75 (q)))
         )
-    )" });
+    )" },
+                               loki::ParserOptions { .strict = false, .add_action_costs = false });
 
     const auto domain = parser.get_domain();
     const auto domain_text = loki::format_domain(domain);
@@ -356,7 +358,7 @@ TEST(LokiPublicFacade, FormatsAlternativeEffectsAsReparseablePddl)
     EXPECT_NE(domain_text.find("(oneof (p) (q))"), std::string::npos);
     EXPECT_NE(domain_text.find("(probabilistic 0.25 (p) 0.75 (q))"), std::string::npos);
 
-    auto reparsed = loki::Parser(domain_text);
+    auto reparsed = loki::Parser(domain_text, loki::ParserOptions { .strict = false, .add_action_costs = false });
     const auto reparsed_domain = reparsed.get_domain();
 
     EXPECT_EQ(reparsed_domain.get_name(), domain.get_name());
@@ -393,7 +395,8 @@ TEST(LokiPublicFacade, FormatsTypedNumericTaskSectionsAsReparseablePddl)
             :precondition (ready ?x)
             :effect (and (ready ?x) (increase (cost ?x) 1.5)))
         )
-    )" });
+    )" },
+                               loki::ParserOptions { .strict = false, .add_action_costs = false });
 
     const auto domain = parser.get_domain();
     const auto task = parser.parse_task(std::string { R"(
@@ -417,7 +420,7 @@ TEST(LokiPublicFacade, FormatsTypedNumericTaskSectionsAsReparseablePddl)
     EXPECT_NE(task_text.find("(= (cost package) 0)"), std::string::npos);
     EXPECT_NE(task_text.find("(:metric minimize (cost package))"), std::string::npos);
 
-    auto reparsed = loki::Parser(domain_text);
+    auto reparsed = loki::Parser(domain_text, loki::ParserOptions { .strict = false, .add_action_costs = false });
     const auto reparsed_domain = reparsed.get_domain();
     const auto reparsed_task = reparsed.parse_task(task_text);
 

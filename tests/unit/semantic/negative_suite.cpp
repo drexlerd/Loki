@@ -145,6 +145,8 @@ TEST(LokiSemanticNegativeSuite, ReportsExpectedSemanticErrors)
         SCOPED_TRACE(item.name);
         auto options = parser::ParserOptions {};
         options.strict = item.strict;
+        // Negative cases assert enforcement without action-costs completion.
+        options.add_action_costs = false;
         try
         {
             auto parser = semantic::Parser(item.domain_source, options);

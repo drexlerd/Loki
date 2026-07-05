@@ -244,8 +244,8 @@ def test_translation_bindings_return_translated_views():
     )
 
     options = pypddl.TranslatorOptions()
-    assert options.compile_typing is False
-    assert options.materialize_equality is False
+    assert options.compile_typing is True
+    assert options.materialize_equality is True
 
     domain_translation = pypddl.translate_domain(domain, options)
     problem_translation = pypddl.translate_task(task, domain_translation, options)
@@ -639,7 +639,7 @@ def test_parser_path_entry_points_and_strict_options():
 
         options = pypddl.ParserOptions()
         assert options.strict is False
-        assert options.add_action_costs is False
+        assert options.add_action_costs is True
         parser = pypddl.Parser(domain_path, options)
         domain = parser.domain()
         task = parser.parse_task(task_path)
@@ -837,6 +837,8 @@ def test_parse_error_uses_typed_exception():
 
 
 def test_recursive_variant_views_are_inspectable():
+    options = pypddl.ParserOptions()
+    options.add_action_costs = False
     parser = pypddl.Parser("""
 (define (domain py-recursive)
   (:requirements :disjunctive-preconditions :conditional-effects)
@@ -846,7 +848,7 @@ def test_recursive_variant_views_are_inspectable():
     :precondition (or (p) (q))
     :effect (and (when (p) (q))))
 )
-""")
+""", options)
     domain = parser.domain()
 
     action = domain.get_actions()[0]
