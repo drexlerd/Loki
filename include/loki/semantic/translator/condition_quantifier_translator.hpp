@@ -54,8 +54,24 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::make_generated_
 {
     const auto free_parameters = this->self().free_parameters_in_scope(condition);
 
+    auto same_free_parameters = [](const auto& lhs, const auto& rhs)
+    {
+        if (lhs.size() != rhs.size())
+            return false;
+        for (auto i = std::size_t { 0 }; i < lhs.size(); ++i)
+        {
+            if (!ygg::EqualTo<formalism::ParameterView> {}(lhs[i].first, rhs[i].first))
+                return false;
+            if (!ygg::EqualTo<formalism::VariableView> {}(lhs[i].second, rhs[i].second))
+                return false;
+        }
+        return true;
+    };
+
     if (auto it = this->m_generated_universal_conditions.find(condition); it != this->m_generated_universal_conditions.end())
-        return it->second;
+        for (const auto& [cached_parameters, cached_condition] : it->second)
+            if (same_free_parameters(cached_parameters, free_parameters))
+                return cached_condition;
 
     auto predicate_parameters = ygg::IndexList<formalism::Parameter> {};
     auto terms = ygg::IndexList<formalism::Term> {};
@@ -75,7 +91,7 @@ formalism::ConditionView ConditionQuantifierTranslator<Derived>::make_generated_
     this->m_generated_predicates.push_back(predicate);
     this->m_generated_axioms.push_back(axiom);
     auto result = this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, negative_literal));
-    this->m_generated_universal_conditions.emplace(condition, result);
+    this->m_generated_universal_conditions[condition].emplace_back(free_parameters, result);
     return result;
 }
 

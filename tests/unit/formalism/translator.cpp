@@ -853,12 +853,12 @@ TEST(LokiTests, RenameQuantifiedVariablesSeparatesNestedBinders)
     ASSERT_FALSE(domain.get_actions().empty());
     const auto action = domain.get_actions().front();
     ASSERT_EQ(action.get_parameters().size(), std::size_t { 1 });
-    EXPECT_EQ(variable_name(action.get_parameters().front()), "x_0");
+    EXPECT_EQ(variable_name(action.get_parameters().front()), "?x_0");
 
     ASSERT_TRUE(action.get_precondition().has_value());
     const auto exists = action.get_precondition().value().get_variant().get<ygg::Index<formalism::ConditionExists>>();
     ASSERT_EQ(exists.get_parameters().size(), std::size_t { 1 });
-    EXPECT_EQ(variable_name(exists.get_parameters().front()), "x_1");
+    EXPECT_EQ(variable_name(exists.get_parameters().front()), "?x_1");
 
     const auto conjunction = exists.get_condition().get_variant().get<ygg::Index<formalism::ConditionAnd>>();
     auto checked_forall = false;
@@ -872,7 +872,7 @@ TEST(LokiTests, RenameQuantifiedVariablesSeparatesNestedBinders)
                 {
                     checked_forall = true;
                     ASSERT_EQ(node.get_parameters().size(), std::size_t { 1 });
-                    EXPECT_EQ(variable_name(node.get_parameters().front()), "x_2");
+                    EXPECT_EQ(variable_name(node.get_parameters().front()), "?x_2");
                 }
             },
             child.get_variant());
@@ -882,7 +882,7 @@ TEST(LokiTests, RenameQuantifiedVariablesSeparatesNestedBinders)
     ASSERT_TRUE(action.get_effect().has_value());
     const auto effect_forall = action.get_effect().value().get_variant().get<ygg::Index<formalism::EffectForall>>();
     ASSERT_EQ(effect_forall.get_parameters().size(), std::size_t { 1 });
-    EXPECT_EQ(variable_name(effect_forall.get_parameters().front()), "x_3");
+    EXPECT_EQ(variable_name(effect_forall.get_parameters().front()), "?x_3");
 }
 
 TEST(LokiTests, LokiPddlTranslatorTest)

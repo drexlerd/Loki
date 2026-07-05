@@ -252,7 +252,7 @@
             "translated_domain": {
                 "predicates": 43,
                 "actions": 7,
-                "axioms": 5
+                "axioms": 6
             },
             "translated_task": {
                 "predicates": 0,
