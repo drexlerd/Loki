@@ -4920,7 +4920,7 @@
                     "translated_domain": {
                         "types": 3,
                         "predicates": 3,
-                        "functions": 7,
+                        "functions": 6,
                         "actions": 4,
                         "axioms": 0
                     },
@@ -4928,7 +4928,7 @@
                         "objects": 5,
                         "predicates": 0,
                         "initial_literals": 10,
-                        "initial_function_values": 15,
+                        "initial_function_values": 14,
                         "actions": 4,
                         "axioms": 0
                     }
@@ -4945,7 +4945,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 3,
-                        "functions": 7,
+                        "functions": 6,
                         "actions": 4,
                         "axioms": 0
                     },
@@ -4953,7 +4953,7 @@
                         "objects": 5,
                         "predicates": 0,
                         "initial_literals": 10,
-                        "initial_function_values": 15,
+                        "initial_function_values": 14,
                         "actions": 4,
                         "axioms": 0
                     }
@@ -5075,7 +5075,7 @@
                     "translated_domain": {
                         "types": 3,
                         "predicates": 3,
-                        "functions": 3,
+                        "functions": 2,
                         "actions": 2,
                         "axioms": 0
                     },
@@ -5083,7 +5083,7 @@
                         "objects": 4,
                         "predicates": 0,
                         "initial_literals": 8,
-                        "initial_function_values": 6,
+                        "initial_function_values": 5,
                         "actions": 2,
                         "axioms": 0
                     }
@@ -5100,7 +5100,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 4,
-                        "functions": 3,
+                        "functions": 2,
                         "actions": 2,
                         "axioms": 0
                     },
@@ -5108,7 +5108,7 @@
                         "objects": 4,
                         "predicates": 0,
                         "initial_literals": 12,
-                        "initial_function_values": 6,
+                        "initial_function_values": 5,
                         "actions": 2,
                         "axioms": 0
                     }
@@ -5230,7 +5230,7 @@
                     "translated_domain": {
                         "types": 6,
                         "predicates": 13,
-                        "functions": 5,
+                        "functions": 4,
                         "actions": 5,
                         "axioms": 0
                     },
@@ -5238,7 +5238,7 @@
                         "objects": 13,
                         "predicates": 0,
                         "initial_literals": 44,
-                        "initial_function_values": 10,
+                        "initial_function_values": 9,
                         "actions": 5,
                         "axioms": 0
                     }
@@ -5255,7 +5255,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 13,
-                        "functions": 5,
+                        "functions": 4,
                         "actions": 5,
                         "axioms": 0
                     },
@@ -5263,7 +5263,7 @@
                         "objects": 13,
                         "predicates": 0,
                         "initial_literals": 44,
-                        "initial_function_values": 10,
+                        "initial_function_values": 9,
                         "actions": 5,
                         "axioms": 0
                     }
@@ -5385,7 +5385,7 @@
                     "translated_domain": {
                         "types": 3,
                         "predicates": 4,
-                        "functions": 15,
+                        "functions": 14,
                         "actions": 8,
                         "axioms": 0
                     },
@@ -5393,7 +5393,7 @@
                         "objects": 2,
                         "predicates": 0,
                         "initial_literals": 4,
-                        "initial_function_values": 18,
+                        "initial_function_values": 17,
                         "actions": 8,
                         "axioms": 0
                     }
@@ -5410,7 +5410,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 4,
-                        "functions": 15,
+                        "functions": 14,
                         "actions": 8,
                         "axioms": 0
                     },
@@ -5418,7 +5418,7 @@
                         "objects": 2,
                         "predicates": 0,
                         "initial_literals": 4,
-                        "initial_function_values": 18,
+                        "initial_function_values": 17,
                         "actions": 8,
                         "axioms": 0
                     }
@@ -5540,7 +5540,7 @@
                     "translated_domain": {
                         "types": 4,
                         "predicates": 6,
-                        "functions": 4,
+                        "functions": 3,
                         "actions": 4,
                         "axioms": 0
                     },
@@ -5548,7 +5548,7 @@
                         "objects": 8,
                         "predicates": 0,
                         "initial_literals": 23,
-                        "initial_function_values": 11,
+                        "initial_function_values": 10,
                         "actions": 4,
                         "axioms": 0
                     }
@@ -5565,7 +5565,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 6,
-                        "functions": 4,
+                        "functions": 3,
                         "actions": 4,
                         "axioms": 0
                     },
@@ -5573,7 +5573,7 @@
                         "objects": 8,
                         "predicates": 0,
                         "initial_literals": 23,
-                        "initial_function_values": 11,
+                        "initial_function_values": 10,
                         "actions": 4,
                         "axioms": 0
                     }
@@ -5695,7 +5695,7 @@
                     "translated_domain": {
                         "types": 7,
                         "predicates": 7,
-                        "functions": 13,
+                        "functions": 12,
                         "actions": 10,
                         "axioms": 0
                     },
@@ -5703,7 +5703,7 @@
                         "objects": 8,
                         "predicates": 0,
                         "initial_literals": 24,
-                        "initial_function_values": 33,
+                        "initial_function_values": 32,
                         "actions": 10,
                         "axioms": 0
                     }
@@ -5720,7 +5720,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 7,
-                        "functions": 13,
+                        "functions": 12,
                         "actions": 10,
                         "axioms": 0
                     },
@@ -5728,7 +5728,7 @@
                         "objects": 8,
                         "predicates": 0,
                         "initial_literals": 24,
-                        "initial_function_values": 33,
+                        "initial_function_values": 32,
                         "actions": 10,
                         "axioms": 0
                     }
@@ -5850,7 +5850,7 @@
                     "translated_domain": {
                         "types": 3,
                         "predicates": 4,
-                        "functions": 3,
+                        "functions": 2,
                         "actions": 2,
                         "axioms": 0
                     },
@@ -5858,7 +5858,7 @@
                         "objects": 2,
                         "predicates": 0,
                         "initial_literals": 6,
-                        "initial_function_values": 4,
+                        "initial_function_values": 3,
                         "actions": 2,
                         "axioms": 0
                     }
@@ -5875,7 +5875,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 5,
-                        "functions": 3,
+                        "functions": 2,
                         "actions": 2,
                         "axioms": 0
                     },
@@ -5883,7 +5883,7 @@
                         "objects": 2,
                         "predicates": 0,
                         "initial_literals": 8,
-                        "initial_function_values": 4,
+                        "initial_function_values": 3,
                         "actions": 2,
                         "axioms": 0
                     }
@@ -6160,7 +6160,7 @@
                     "translated_domain": {
                         "types": 3,
                         "predicates": 5,
-                        "functions": 4,
+                        "functions": 3,
                         "actions": 3,
                         "axioms": 0
                     },
@@ -6168,7 +6168,7 @@
                         "objects": 2,
                         "predicates": 0,
                         "initial_literals": 6,
-                        "initial_function_values": 5,
+                        "initial_function_values": 4,
                         "actions": 3,
                         "axioms": 0
                     }
@@ -6185,7 +6185,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 6,
-                        "functions": 4,
+                        "functions": 3,
                         "actions": 3,
                         "axioms": 0
                     },
@@ -6193,7 +6193,7 @@
                         "objects": 2,
                         "predicates": 0,
                         "initial_literals": 8,
-                        "initial_function_values": 5,
+                        "initial_function_values": 4,
                         "actions": 3,
                         "axioms": 0
                     }
@@ -6315,7 +6315,7 @@
                     "translated_domain": {
                         "types": 4,
                         "predicates": 6,
-                        "functions": 5,
+                        "functions": 4,
                         "actions": 10,
                         "axioms": 0
                     },
@@ -6323,7 +6323,7 @@
                         "objects": 2,
                         "predicates": 0,
                         "initial_literals": 4,
-                        "initial_function_values": 5,
+                        "initial_function_values": 4,
                         "actions": 10,
                         "axioms": 0
                     }
@@ -6340,7 +6340,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 6,
-                        "functions": 5,
+                        "functions": 4,
                         "actions": 10,
                         "axioms": 0
                     },
@@ -6348,7 +6348,7 @@
                         "objects": 2,
                         "predicates": 0,
                         "initial_literals": 4,
-                        "initial_function_values": 5,
+                        "initial_function_values": 4,
                         "actions": 10,
                         "axioms": 0
                     }
@@ -6470,7 +6470,7 @@
                     "translated_domain": {
                         "types": 5,
                         "predicates": 12,
-                        "functions": 5,
+                        "functions": 4,
                         "actions": 3,
                         "axioms": 0
                     },
@@ -6478,7 +6478,7 @@
                         "objects": 78,
                         "predicates": 0,
                         "initial_literals": 256,
-                        "initial_function_values": 31,
+                        "initial_function_values": 30,
                         "actions": 3,
                         "axioms": 0
                     }
@@ -6495,7 +6495,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 12,
-                        "functions": 5,
+                        "functions": 4,
                         "actions": 3,
                         "axioms": 0
                     },
@@ -6503,7 +6503,7 @@
                         "objects": 78,
                         "predicates": 0,
                         "initial_literals": 256,
-                        "initial_function_values": 31,
+                        "initial_function_values": 30,
                         "actions": 3,
                         "axioms": 0
                     }
@@ -6625,7 +6625,7 @@
                     "translated_domain": {
                         "types": 7,
                         "predicates": 9,
-                        "functions": 10,
+                        "functions": 9,
                         "actions": 4,
                         "axioms": 0
                     },
@@ -6633,7 +6633,7 @@
                         "objects": 20,
                         "predicates": 0,
                         "initial_literals": 63,
-                        "initial_function_values": 92,
+                        "initial_function_values": 91,
                         "actions": 4,
                         "axioms": 0
                     }
@@ -6650,7 +6650,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 9,
-                        "functions": 10,
+                        "functions": 9,
                         "actions": 4,
                         "axioms": 0
                     },
@@ -6658,7 +6658,7 @@
                         "objects": 20,
                         "predicates": 0,
                         "initial_literals": 63,
-                        "initial_function_values": 92,
+                        "initial_function_values": 91,
                         "actions": 4,
                         "axioms": 0
                     }
@@ -6780,7 +6780,7 @@
                     "translated_domain": {
                         "types": 6,
                         "predicates": 9,
-                        "functions": 3,
+                        "functions": 2,
                         "actions": 4,
                         "axioms": 0
                     },
@@ -6788,7 +6788,7 @@
                         "objects": 8,
                         "predicates": 0,
                         "initial_literals": 34,
-                        "initial_function_values": 7,
+                        "initial_function_values": 6,
                         "actions": 4,
                         "axioms": 0
                     }
@@ -6805,7 +6805,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 9,
-                        "functions": 3,
+                        "functions": 2,
                         "actions": 4,
                         "axioms": 0
                     },
@@ -6813,7 +6813,7 @@
                         "objects": 8,
                         "predicates": 0,
                         "initial_literals": 34,
-                        "initial_function_values": 7,
+                        "initial_function_values": 6,
                         "actions": 4,
                         "axioms": 0
                     }
@@ -6935,7 +6935,7 @@
                     "translated_domain": {
                         "types": 6,
                         "predicates": 12,
-                        "functions": 15,
+                        "functions": 14,
                         "actions": 6,
                         "axioms": 0
                     },
@@ -6943,7 +6943,7 @@
                         "objects": 26,
                         "predicates": 0,
                         "initial_literals": 106,
-                        "initial_function_values": 76,
+                        "initial_function_values": 75,
                         "actions": 6,
                         "axioms": 0
                     }
@@ -6960,7 +6960,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 12,
-                        "functions": 15,
+                        "functions": 14,
                         "actions": 6,
                         "axioms": 0
                     },
@@ -6968,7 +6968,7 @@
                         "objects": 26,
                         "predicates": 0,
                         "initial_literals": 106,
-                        "initial_function_values": 76,
+                        "initial_function_values": 75,
                         "actions": 6,
                         "axioms": 0
                     }
@@ -7090,7 +7090,7 @@
                     "translated_domain": {
                         "types": 2,
                         "predicates": 2,
-                        "functions": 2,
+                        "functions": 1,
                         "actions": 1,
                         "axioms": 0
                     },
@@ -7098,7 +7098,7 @@
                         "objects": 0,
                         "predicates": 0,
                         "initial_literals": 0,
-                        "initial_function_values": 2,
+                        "initial_function_values": 1,
                         "actions": 1,
                         "axioms": 0
                     }
@@ -7115,7 +7115,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 2,
-                        "functions": 2,
+                        "functions": 1,
                         "actions": 1,
                         "axioms": 0
                     },
@@ -7123,7 +7123,7 @@
                         "objects": 0,
                         "predicates": 0,
                         "initial_literals": 0,
-                        "initial_function_values": 2,
+                        "initial_function_values": 1,
                         "actions": 1,
                         "axioms": 0
                     }
@@ -7245,7 +7245,7 @@
                     "translated_domain": {
                         "types": 5,
                         "predicates": 6,
-                        "functions": 3,
+                        "functions": 2,
                         "actions": 2,
                         "axioms": 0
                     },
@@ -7253,7 +7253,7 @@
                         "objects": 5,
                         "predicates": 1,
                         "initial_literals": 14,
-                        "initial_function_values": 5,
+                        "initial_function_values": 4,
                         "actions": 2,
                         "axioms": 1
                     }
@@ -7270,7 +7270,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 6,
-                        "functions": 3,
+                        "functions": 2,
                         "actions": 2,
                         "axioms": 0
                     },
@@ -7278,7 +7278,7 @@
                         "objects": 5,
                         "predicates": 1,
                         "initial_literals": 14,
-                        "initial_function_values": 5,
+                        "initial_function_values": 4,
                         "actions": 2,
                         "axioms": 1
                     }
@@ -7400,7 +7400,7 @@
                     "translated_domain": {
                         "types": 9,
                         "predicates": 35,
-                        "functions": 3,
+                        "functions": 2,
                         "actions": 10,
                         "axioms": 0
                     },
@@ -7408,7 +7408,7 @@
                         "objects": 14,
                         "predicates": 0,
                         "initial_literals": 71,
-                        "initial_function_values": 3,
+                        "initial_function_values": 2,
                         "actions": 10,
                         "axioms": 0
                     }
@@ -7425,7 +7425,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 35,
-                        "functions": 3,
+                        "functions": 2,
                         "actions": 10,
                         "axioms": 0
                     },
@@ -7433,7 +7433,7 @@
                         "objects": 14,
                         "predicates": 0,
                         "initial_literals": 71,
-                        "initial_function_values": 3,
+                        "initial_function_values": 2,
                         "actions": 10,
                         "axioms": 0
                     }
@@ -7555,7 +7555,7 @@
                     "translated_domain": {
                         "types": 4,
                         "predicates": 5,
-                        "functions": 4,
+                        "functions": 3,
                         "actions": 8,
                         "axioms": 0
                     },
@@ -7563,7 +7563,7 @@
                         "objects": 3,
                         "predicates": 0,
                         "initial_literals": 6,
-                        "initial_function_values": 6,
+                        "initial_function_values": 5,
                         "actions": 8,
                         "axioms": 0
                     }
@@ -7580,7 +7580,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 5,
-                        "functions": 4,
+                        "functions": 3,
                         "actions": 8,
                         "axioms": 0
                     },
@@ -7588,7 +7588,7 @@
                         "objects": 3,
                         "predicates": 0,
                         "initial_literals": 6,
-                        "initial_function_values": 6,
+                        "initial_function_values": 5,
                         "actions": 8,
                         "axioms": 0
                     }
@@ -7710,7 +7710,7 @@
                     "translated_domain": {
                         "types": 6,
                         "predicates": 25,
-                        "functions": 8,
+                        "functions": 7,
                         "actions": 25,
                         "axioms": 0
                     },
@@ -7718,7 +7718,7 @@
                         "objects": 11,
                         "predicates": 0,
                         "initial_literals": 65,
-                        "initial_function_values": 36,
+                        "initial_function_values": 35,
                         "actions": 25,
                         "axioms": 0
                     }
@@ -7735,7 +7735,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 25,
-                        "functions": 8,
+                        "functions": 7,
                         "actions": 25,
                         "axioms": 0
                     },
@@ -7743,7 +7743,7 @@
                         "objects": 11,
                         "predicates": 0,
                         "initial_literals": 65,
-                        "initial_function_values": 36,
+                        "initial_function_values": 35,
                         "actions": 25,
                         "axioms": 0
                     }
@@ -7865,7 +7865,7 @@
                     "translated_domain": {
                         "types": 13,
                         "predicates": 25,
-                        "functions": 21,
+                        "functions": 20,
                         "actions": 13,
                         "axioms": 0
                     },
@@ -7873,7 +7873,7 @@
                         "objects": 15,
                         "predicates": 0,
                         "initial_literals": 92,
-                        "initial_function_values": 49,
+                        "initial_function_values": 48,
                         "actions": 13,
                         "axioms": 0
                     }
@@ -7890,7 +7890,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 26,
-                        "functions": 21,
+                        "functions": 20,
                         "actions": 13,
                         "axioms": 0
                     },
@@ -7898,7 +7898,7 @@
                         "objects": 15,
                         "predicates": 0,
                         "initial_literals": 107,
-                        "initial_function_values": 49,
+                        "initial_function_values": 48,
                         "actions": 13,
                         "axioms": 0
                     }
@@ -8175,7 +8175,7 @@
                     "translated_domain": {
                         "types": 6,
                         "predicates": 8,
-                        "functions": 10,
+                        "functions": 9,
                         "actions": 5,
                         "axioms": 0
                     },
@@ -8183,7 +8183,7 @@
                         "objects": 7,
                         "predicates": 0,
                         "initial_literals": 22,
-                        "initial_function_values": 17,
+                        "initial_function_values": 16,
                         "actions": 5,
                         "axioms": 0
                     }
@@ -8200,7 +8200,7 @@
                     "translated_domain": {
                         "types": 0,
                         "predicates": 8,
-                        "functions": 10,
+                        "functions": 9,
                         "actions": 5,
                         "axioms": 0
                     },
@@ -8208,7 +8208,7 @@
                         "objects": 7,
                         "predicates": 0,
                         "initial_literals": 22,
-                        "initial_function_values": 17,
+                        "initial_function_values": 16,
                         "actions": 5,
                         "axioms": 0
                     }

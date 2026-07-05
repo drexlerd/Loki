@@ -151,7 +151,7 @@ off individually.
 | Option | Default | Description |
 | --- | --- | --- |
 | `strict` | `false` | Strict semantic validation for requirements, arity, and type compatibility. Numeric-fluents violations error even in permissive mode: reads require `:fluents`/`:numeric-fluents`/`:action-costs`, and writes other than `(increase (total-cost) ...)` require `:fluents`/`:numeric-fluents`. |
-| `add_action_costs` | `true` | Complete missing `:action-costs` artifacts (`total-cost` function, initial value, `minimize` metric) instead of erroring. If the domain does not declare `:action-costs`, additionally injects the requirement and a unit-cost effect `(increase (total-cost) 1)` into every action that does not already write `total-cost`. |
+| `add_action_costs` | `true` | Complete missing `:action-costs` artifacts (`total-cost` function, initial value, `minimize` metric) instead of erroring. If the domain declares neither `:action-costs` nor `:fluents`/`:numeric-fluents`, additionally injects the requirement and a unit-cost effect `(increase (total-cost) 1)` into every action that does not already write `total-cost`. Genuine numeric domains are left untouched: an absent metric means unit costs. |
 
 `TranslatorOptions` (second argument of `translate_domain`/`translate_task`):
 

@@ -343,10 +343,21 @@ TEST(LokiSemanticInvariantSuite, AddActionCostsOptionHoldsAcrossFixtures)
         auto parser = semantic::Parser(item.domain_file, options);
         const auto domain = parser.get_domain();
 
+        // Three regimes: :action-costs domains get missing artifacts completed; genuine numeric
+        // domains (:fluents/:numeric-fluents) are left untouched (absent metric = unit costs);
+        // plain domains get :action-costs, total-cost, and unit-cost effects injected.
+        const auto domain_text = read_text(item.domain_file);
+        const auto declares_action_costs = domain_text.find(":action-costs") != std::string::npos;
+        const auto declares_numeric_fluents = domain_text.find(":fluents") != std::string::npos || domain_text.find(":numeric-fluents") != std::string::npos;
+
+        if (!declares_action_costs && declares_numeric_fluents)
+        {
+            EXPECT_FALSE(has_requirement_kind(domain, formalism::RequirementKind::ActionCosts));
+            continue;
+        }
+
         EXPECT_TRUE(has_function_named(domain, "total-cost"));
-        // Unit-cost injection only happens when the domain did not declare :action-costs itself;
-        // otherwise the option merely completes missing artifacts and leaves actions alone.
-        if (read_text(item.domain_file).find(":action-costs") == std::string::npos)
+        if (!declares_action_costs)
         {
             for (auto action : domain.get_actions())
             {

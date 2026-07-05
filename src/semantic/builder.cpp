@@ -39,7 +39,9 @@ AstBuilder::AstBuilder(const parser::ParserOptions& options, const DiagnosticCon
 formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
 {
     auto requirements = parse_requirements(domain.requirements);
-    const auto inject_unit_costs = m_options.add_action_costs && !m_parse_context.active_action_costs;
+    // Genuine numeric domains keep their own cost structure; a planner interprets an absent
+    // metric as unit costs, so grafting total-cost onto :numeric-fluents would be wrong.
+    const auto inject_unit_costs = m_options.add_action_costs && !m_parse_context.active_action_costs && !m_parse_context.active_numeric_fluents;
     if (inject_unit_costs)
     {
         m_parse_context.active_action_costs = true;

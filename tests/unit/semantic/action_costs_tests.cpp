@@ -123,16 +123,22 @@ TEST(LokiSemanticActionCosts, ActionCostsAllowsFunctionReadsInIncreaseAmounts) {
 
 TEST(LokiSemanticActionCosts, NumericFluentsTaskWithoutMetricKeepsMetricAbsent)
 {
+    // add_action_costs must not graft total-cost onto genuine numeric domains either.
     for (const auto strict : { false, true })
     {
-        auto options = parser::ParserOptions {};
-        options.strict = strict;
-        options.add_action_costs = false;
-        auto parser = semantic::Parser(fixture_path("numeric-fluents"), options);
-        const auto parsed_task = parser.parse_task(fixture_path("numeric-fluents", "task.pddl"));
-        EXPECT_FALSE(parsed_task.get_metric().has_value());
-        ASSERT_EQ(parsed_task.get_initial_function_values().size(), 1);
-        EXPECT_EQ(parsed_task.get_initial_function_values()[0].get_function().get_function().get_name(), "fuel");
+        for (const auto add_action_costs : { false, true })
+        {
+            auto options = parser::ParserOptions {};
+            options.strict = strict;
+            options.add_action_costs = add_action_costs;
+            auto parser = semantic::Parser(fixture_path("numeric-fluents"), options);
+            EXPECT_FALSE(has_function_named(parser.get_domain(), "total-cost"));
+            EXPECT_FALSE(has_requirement_kind(parser.get_domain(), formalism::RequirementKind::ActionCosts));
+            const auto parsed_task = parser.parse_task(fixture_path("numeric-fluents", "task.pddl"));
+            EXPECT_FALSE(parsed_task.get_metric().has_value());
+            ASSERT_EQ(parsed_task.get_initial_function_values().size(), 1);
+            EXPECT_EQ(parsed_task.get_initial_function_values()[0].get_function().get_function().get_name(), "fuel");
+        }
     }
 }
 
