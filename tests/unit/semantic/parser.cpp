@@ -1760,6 +1760,37 @@ TEST(LokiSemanticParser, NumericUseWithoutRequirementErrorsInPermissiveMode)
     EXPECT_THROW((semantic::Parser { domain, options }), semantic::MissingRequirementError);
 }
 
+TEST(LokiSemanticParser, PreservesComplementaryLiteralsInConjunctions)
+{
+    const auto domain = std::string { R"(
+(define (domain contradiction)
+  (:requirements :negative-preconditions)
+  (:predicates (p) (q) (r))
+  (:action a
+    :parameters ()
+    :precondition (and (p) (not (p)) (q))
+    :effect (r))
+)
+)" };
+
+    auto options = parser::ParserOptions {};
+    options.add_action_costs = false;
+    auto parser = semantic::Parser(domain, options);
+    const auto action = parser.get_domain().get_actions()[0];
+    ASSERT_TRUE(action.get_precondition().has_value());
+    auto conjuncts = std::size_t { 0 };
+    ygg::visit(
+        [&](const auto& node)
+        {
+            using Node = std::decay_t<decltype(node)>;
+            if constexpr (std::is_same_v<Node, formalism::ConditionAndView>)
+                conjuncts = node.get_conditions().size();
+        },
+        action.get_precondition().value().get_variant());
+    // A complementary literal pair must not be canonicalized away.
+    EXPECT_EQ(conjuncts, 3);
+}
+
 TEST(LokiSemanticParser, NumericFluentsTaskWithoutMetricKeepsMetricAbsent)
 {
     const auto domain = std::string { R"(

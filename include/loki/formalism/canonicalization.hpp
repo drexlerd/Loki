@@ -21,6 +21,7 @@
 #include "loki/config.hpp"
 #include "loki/formalism/datas.hpp"
 #include "loki/formalism/declarations.hpp"
+#include "loki/formalism/formatter.hpp"
 #include "loki/formalism/repository.hpp"
 #include "loki/formalism/views.hpp"
 
@@ -29,9 +30,7 @@
 #include <fmt/format.h>
 #include <string>
 #include <utility>
-#include <variant>
 #include <vector>
-#include <yggdrasil/formatting/cista_formatters.hpp>
 #include <yggdrasil/semantics/canonicalization.hpp>
 
 namespace ygg
@@ -123,242 +122,12 @@ inline void canonicalize(Data<::loki::formalism::Task>&) noexcept {}
 namespace loki::formalism::detail
 {
 
-inline std::string render(const Repository&, const ygg::Data<Requirement>&);
-inline std::string render(const Repository&, const ygg::Data<Type>&);
-inline std::string render(const Repository&, const ygg::Data<Object>&);
-inline std::string render(const Repository&, const ygg::Data<Variable>&);
-inline std::string render(const Repository&, const ygg::Data<Parameter>&);
-inline std::string render(const Repository&, const ygg::Data<Predicate>&);
-inline std::string render(const Repository&, const ygg::Data<FunctionSkeleton>&);
-inline std::string render(const Repository&, const ygg::Data<Term>&);
-inline std::string render(const Repository&, const ygg::Data<Atom>&);
-inline std::string render(const Repository&, const ygg::Data<Literal>&);
-inline std::string render(const Repository&, const ygg::Data<FunctionExpressionNumber>&);
-inline std::string render(const Repository&, const ygg::Data<FunctionTerm>&);
-inline std::string render(const Repository&, const ygg::Data<UnaryFunctionExpression>&);
-inline std::string render(const Repository&, const ygg::Data<BinaryFunctionExpression>&);
-inline std::string render(const Repository&, const ygg::Data<MultiFunctionExpression>&);
-inline std::string render(const Repository&, const ygg::Data<FunctionExpression>&);
-inline std::string render(const Repository&, const ygg::Data<ConditionLiteral>&);
-inline std::string render(const Repository&, const ygg::Data<ConditionAnd>&);
-inline std::string render(const Repository&, const ygg::Data<ConditionOr>&);
-inline std::string render(const Repository&, const ygg::Data<ConditionNot>&);
-inline std::string render(const Repository&, const ygg::Data<ConditionImply>&);
-inline std::string render(const Repository&, const ygg::Data<ConditionExists>&);
-inline std::string render(const Repository&, const ygg::Data<ConditionForall>&);
-inline std::string render(const Repository&, const ygg::Data<ConditionNumericConstraint>&);
-inline std::string render(const Repository&, const ygg::Data<Condition>&);
-inline std::string render(const Repository&, const ygg::Data<EffectLiteral>&);
-inline std::string render(const Repository&, const ygg::Data<EffectAnd>&);
-inline std::string render(const Repository&, const ygg::Data<EffectNumeric>&);
-inline std::string render(const Repository&, const ygg::Data<EffectForall>&);
-inline std::string render(const Repository&, const ygg::Data<EffectWhen>&);
-inline std::string render(const Repository&, const ygg::Data<EffectOneOf>&);
-inline std::string render(const Repository&, const ygg::Data<EffectProbabilisticAlternative>&);
-inline std::string render(const Repository&, const ygg::Data<EffectProbabilistic>&);
-inline std::string render(const Repository&, const ygg::Data<Effect>&);
-inline std::string render(const Repository&, const ygg::Data<Action>&);
-inline std::string render(const Repository&, const ygg::Data<Axiom>&);
-inline std::string render(const Repository&, const ygg::Data<Metric>&);
-inline std::string render(const Repository&, const ygg::Data<InitialFunctionValue>&);
-inline std::string render(const Repository&, const ygg::Data<Domain>&);
-inline std::string render(const Repository&, const ygg::Data<Task>&);
+#if !LOKI_ENABLE_FMT_FORMATTERS
+#error "loki/formalism/canonicalization.hpp requires LOKI_ENABLE_FMT_FORMATTERS: canonical keys are the serialized views."
+#endif
 
-template<typename T>
-std::string render_key(const Repository& repository, ygg::Index<T> index)
-{
-    return render(repository, repository[index]);
-}
-
-template<typename T>
-std::string render_key(const Repository& repository, const ygg::Data<T>& data)
-{
-    return render(repository, data);
-}
-
-template<typename T>
-std::string render_key(const Repository& repository, const ygg::IndexList<T>& list)
-{
-    auto result = std::string { "[" };
-    auto first = true;
-    for (auto index : list)
-    {
-        if (!first)
-            result += ", ";
-        first = false;
-        result += render_key(repository, index);
-    }
-    result += "]";
-    return result;
-}
-
-template<typename T, typename... Ts>
-std::string render_key(const Repository& repository, const cista::offset::variant<T, Ts...>& value)
-{
-    if (!value.valid())
-        return "<invalid>";
-
-    auto result = std::string {};
-    std::visit([&](const auto& arg) { result = render_key(repository, arg); }, value);
-    return result;
-}
-
-}  // namespace loki::formalism::detail
-
-namespace loki::formalism::detail
-{
-
-inline std::string render(const Repository&, const ygg::Data<Requirement>& data) { return std::to_string(static_cast<unsigned>(data.kind)); }
-inline std::string render(const Repository& repository, const ygg::Data<Type>& data)
-{
-    return fmt::format("{}|{}", data.name, render_key(repository, data.bases));
-}
-inline std::string render(const Repository& repository, const ygg::Data<Object>& data)
-{
-    return fmt::format("{}|{}", data.name, render_key(repository, data.types));
-}
-inline std::string render(const Repository&, const ygg::Data<Variable>& data) { return std::string(data.name); }
-inline std::string render(const Repository& repository, const ygg::Data<Parameter>& data)
-{
-    return fmt::format("{}|{}", render_key(repository, data.variable), render_key(repository, data.types));
-}
-inline std::string render(const Repository& repository, const ygg::Data<Predicate>& data)
-{
-    return fmt::format("{}|{}", data.name, render_key(repository, data.parameters));
-}
-inline std::string render(const Repository& repository, const ygg::Data<FunctionSkeleton>& data)
-{
-    return fmt::format("{}|{}|{}", data.name, render_key(repository, data.parameters), render_key(repository, data.type));
-}
-inline std::string render(const Repository& repository, const ygg::Data<Term>& data) { return render_key(repository, data.value); }
-inline std::string render(const Repository& repository, const ygg::Data<Atom>& data)
-{
-    return fmt::format("{}|{}", render_key(repository, data.predicate), render_key(repository, data.terms));
-}
-inline std::string render(const Repository& repository, const ygg::Data<Literal>& data)
-{
-    return fmt::format("{}|{}", render_key(repository, data.atom), data.m_polarity ? "1" : "0");
-}
-inline std::string render(const Repository&, const ygg::Data<FunctionExpressionNumber>& data) { return std::to_string(data.value); }
-inline std::string render(const Repository& repository, const ygg::Data<FunctionTerm>& data)
-{
-    return fmt::format("{}|{}", render_key(repository, data.function), render_key(repository, data.terms));
-}
-inline std::string render(const Repository& repository, const ygg::Data<UnaryFunctionExpression>& data)
-{
-    return fmt::format("{}|{}", static_cast<unsigned>(data.op), render_key(repository, data.expression));
-}
-inline std::string render(const Repository& repository, const ygg::Data<BinaryFunctionExpression>& data)
-{
-    return fmt::format("{}|{}|{}", static_cast<unsigned>(data.op), render_key(repository, data.left), render_key(repository, data.right));
-}
-inline std::string render(const Repository& repository, const ygg::Data<MultiFunctionExpression>& data)
-{
-    return fmt::format("{}|{}", static_cast<unsigned>(data.op), render_key(repository, data.expressions));
-}
-inline std::string render(const Repository& repository, const ygg::Data<FunctionExpression>& data) { return render_key(repository, data.value); }
-inline std::string render(const Repository& repository, const ygg::Data<ConditionLiteral>& data) { return render_key(repository, data.literal); }
-inline std::string render(const Repository& repository, const ygg::Data<ConditionAnd>& data) { return render_key(repository, data.conditions); }
-inline std::string render(const Repository& repository, const ygg::Data<ConditionOr>& data) { return render_key(repository, data.conditions); }
-inline std::string render(const Repository& repository, const ygg::Data<ConditionNot>& data) { return render_key(repository, data.condition); }
-inline std::string render(const Repository& repository, const ygg::Data<ConditionImply>& data)
-{
-    return fmt::format("{}|{}", render_key(repository, data.left), render_key(repository, data.right));
-}
-inline std::string render(const Repository& repository, const ygg::Data<ConditionExists>& data)
-{
-    return fmt::format("{}|{}", render_key(repository, data.parameters), render_key(repository, data.condition));
-}
-inline std::string render(const Repository& repository, const ygg::Data<ConditionForall>& data)
-{
-    return fmt::format("{}|{}", render_key(repository, data.parameters), render_key(repository, data.condition));
-}
-inline std::string render(const Repository& repository, const ygg::Data<ConditionNumericConstraint>& data)
-{
-    return fmt::format("{}|{}|{}", static_cast<unsigned>(data.comparator), render_key(repository, data.left), render_key(repository, data.right));
-}
-inline std::string render(const Repository& repository, const ygg::Data<Condition>& data) { return render_key(repository, data.value); }
-inline std::string render(const Repository& repository, const ygg::Data<EffectLiteral>& data) { return render_key(repository, data.literal); }
-inline std::string render(const Repository& repository, const ygg::Data<EffectAnd>& data) { return render_key(repository, data.effects); }
-inline std::string render(const Repository& repository, const ygg::Data<EffectNumeric>& data)
-{
-    return fmt::format("{}|{}|{}|{}",
-                       static_cast<unsigned>(data.op),
-                       render_key(repository, data.function),
-                       render_key(repository, data.terms),
-                       render_key(repository, data.expression));
-}
-inline std::string render(const Repository& repository, const ygg::Data<EffectForall>& data)
-{
-    return fmt::format("{}|{}", render_key(repository, data.parameters), render_key(repository, data.effect));
-}
-inline std::string render(const Repository& repository, const ygg::Data<EffectWhen>& data)
-{
-    return fmt::format("{}|{}", render_key(repository, data.condition), render_key(repository, data.effect));
-}
-inline std::string render(const Repository& repository, const ygg::Data<EffectOneOf>& data) { return render_key(repository, data.effects); }
-inline std::string render(const Repository& repository, const ygg::Data<EffectProbabilisticAlternative>& data)
-{
-    return fmt::format("{}|{}", data.probability, render_key(repository, data.effect));
-}
-inline std::string render(const Repository& repository, const ygg::Data<EffectProbabilistic>& data) { return render_key(repository, data.alternatives); }
-inline std::string render(const Repository& repository, const ygg::Data<Effect>& data) { return render_key(repository, data.value); }
-inline std::string render(const Repository& repository, const ygg::Data<Action>& data)
-{
-    auto result = fmt::format("{}|{}|{}|", data.name, render_key(repository, data.parameters), data.original_arity);
-    if (data.precondition)
-        result += render_key(repository, *data.precondition);
-    result += "|";
-    if (data.effect)
-        result += render_key(repository, *data.effect);
-    return result;
-}
-inline std::string render(const Repository& repository, const ygg::Data<Axiom>& data)
-{
-    return fmt::format("{}|{}|{}|{}",
-                       render_key(repository, data.parameters),
-                       data.original_arity,
-                       render_key(repository, data.head),
-                       render_key(repository, data.condition));
-}
-inline std::string render(const Repository& repository, const ygg::Data<Metric>& data)
-{
-    return fmt::format("{}|{}", data.minimize ? "1" : "0", render_key(repository, data.expression));
-}
-inline std::string render(const Repository& repository, const ygg::Data<InitialFunctionValue>& data)
-{
-    return fmt::format("{}|{}", render_key(repository, data.function), render_key(repository, data.value));
-}
-inline std::string render(const Repository& repository, const ygg::Data<Domain>& data)
-{
-    return fmt::format("{}|{}|{}|{}|{}|{}|{}|{}",
-                       data.name,
-                       render_key(repository, data.requirements),
-                       render_key(repository, data.types),
-                       render_key(repository, data.constants),
-                       render_key(repository, data.predicates),
-                       render_key(repository, data.functions),
-                       render_key(repository, data.actions),
-                       render_key(repository, data.axioms));
-}
-inline std::string render(const Repository& repository, const ygg::Data<Task>& data)
-{
-    auto result = fmt::format("{}|{}|{}|{}|{}|{}|",
-                              data.name,
-                              render_key(repository, data.domain),
-                              render_key(repository, data.requirements),
-                              render_key(repository, data.objects),
-                              render_key(repository, data.initial_literals),
-                              render_key(repository, data.initial_function_values));
-    if (data.goal)
-        result += render_key(repository, *data.goal);
-    result += "|";
-    if (data.metric)
-        result += render_key(repository, *data.metric);
-    return result + "|" + render_key(repository, data.predicates) + "|" + render_key(repository, data.axioms);
-}
-
-// Canonicalize a list (sort + deduplicate) by each element's rendered string key.
+// Canonicalize a list (sort + deduplicate) by each element's serialized view: the single-line
+// PDDL text fully represents the entity within one repository.
 //
 // This mirrors yggdrasil's context-aware ygg::canonicalize(context, list), but renders each element's
 // key exactly once (Schwartzian transform) instead of recomputing it on every comparison. That turns
@@ -374,7 +143,7 @@ void canonicalize_list(const Repository& repository, ListT& list)
     auto keyed = std::vector<std::pair<std::string, std::size_t>> {};  // (render key, original position)
     keyed.reserve(n);
     for (std::size_t i = 0; i < n; ++i)
-        keyed.emplace_back(render_key(repository, list[i]), i);  // render once each: O(n)
+        keyed.emplace_back(fmt::format("{}", ygg::make_view(list[i], repository)), i);  // render once each: O(n)
 
     const auto by_key = [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; };
     if (!std::is_sorted(keyed.begin(), keyed.end(), by_key))  // skip the sort when already canonical (e.g. across translation phases)
@@ -399,10 +168,10 @@ bool is_canonical_list(const Repository& repository, const ListT& list)
     if (n < 2)
         return true;
 
-    auto previous = render_key(repository, list[0]);
+    auto previous = fmt::format("{}", ygg::make_view(list[0], repository));
     for (std::size_t i = 1; i < n; ++i)
     {
-        auto current = render_key(repository, list[i]);
+        auto current = fmt::format("{}", ygg::make_view(list[i], repository));
         if (!(previous < current))  // not strictly increasing => unsorted or duplicate
             return false;
         previous = std::move(current);

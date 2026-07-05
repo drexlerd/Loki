@@ -19,6 +19,7 @@
 
 #include <filesystem>
 #include <gtest/gtest.h>
+#include <loki/loki.hpp>
 #include <loki/semantic.hpp>
 #include <string>
 #include <vector>
@@ -163,6 +164,27 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
             EXPECT_EQ(translated_task.get_initial_function_values().size(), configuration.task_initial_function_values);
             EXPECT_EQ(translated_task.get_domain().get_actions().size(), configuration.task_actions);
             EXPECT_EQ(translated_task.get_axioms().size(), configuration.task_axioms);
+
+            // The formatted translation must reparse under the same parser options with stable counts.
+            auto reparsed = semantic::Parser(loki::format_domain(translated_domain), configuration.parser_options);
+            const auto reparsed_domain = reparsed.get_domain();
+            const auto reparsed_task = reparsed.parse_task(loki::format_task(translated_task));
+            EXPECT_EQ(reparsed_domain.get_name(), translated_domain.get_name());
+            EXPECT_EQ(reparsed_task.get_name(), translated_task.get_name());
+            // Reparsing re-interns the built-in object and number types that typing compilation removed.
+            EXPECT_EQ(reparsed_domain.get_types().size(), configuration.options.compile_typing ? 2 : configuration.domain_types);
+            EXPECT_EQ(reparsed_domain.get_predicates().size(), configuration.domain_predicates);
+            EXPECT_EQ(reparsed_domain.get_functions().size(), configuration.domain_functions);
+            EXPECT_EQ(reparsed_domain.get_actions().size(), configuration.domain_actions);
+            EXPECT_EQ(reparsed_domain.get_axioms().size(), configuration.domain_axioms);
+            EXPECT_EQ(reparsed_task.get_objects().size(), configuration.task_objects);
+            // Problem PDDL has no :predicates section; generated goal predicates are re-declared
+            // into the domain symbol table when the reparser reads the task axioms.
+            EXPECT_TRUE(reparsed_task.get_predicates().empty());
+            EXPECT_EQ(reparsed_task.get_initial_literals().size(), configuration.task_initial_literals);
+            EXPECT_EQ(reparsed_task.get_initial_function_values().size(), configuration.task_initial_function_values);
+            EXPECT_EQ(reparsed_task.get_domain().get_actions().size(), configuration.task_actions);
+            EXPECT_EQ(reparsed_task.get_axioms().size(), configuration.task_axioms);
         }
     }
 }
