@@ -144,7 +144,7 @@ formalism::PredicateView AstBuilder::equality_predicate(const ast::Identifier& i
         return it->second;
     }
 
-    auto types = ygg::IndexList<formalism::Type> { m_domain_context.object_type };
+    auto types = ygg::IndexList<formalism::Type> { m_domain_context.object_type.get_index() };
     auto parameters = ygg::IndexList<formalism::Parameter> {};
     const auto left = formalism::get_or_create<formalism::Variable>(repo(), cista::offset::string("?lhs")).get_index();
     const auto right = formalism::get_or_create<formalism::Variable>(repo(), cista::offset::string("?rhs")).get_index();
@@ -166,8 +166,10 @@ formalism::FunctionSkeletonView AstBuilder::function(const ast::Identifier& iden
     }
     if (m_options.strict)
         m_diagnostics.throw_at(identifier, UndefinedFunctionError(name));
-    auto view =
-        formalism::get_or_create<formalism::FunctionSkeleton>(repo(), to_cista(name), ygg::IndexList<formalism::Parameter> {}, m_domain_context.number_type);
+    auto view = formalism::get_or_create<formalism::FunctionSkeleton>(repo(),
+                                                                      to_cista(name),
+                                                                      ygg::IndexList<formalism::Parameter> {},
+                                                                      m_domain_context.number_type.get_index());
     m_domain_context.functions.emplace(name, view);
     return view;
 }
@@ -199,8 +201,8 @@ ygg::IndexList<formalism::Type> AstBuilder::parse_types(const std::vector<ast::T
     {
         const auto name = key(node.name.text);
         checks().ensure_new<DuplicateTypeError>(m_domain_context.declared_types, name, node.name);
-        auto bases = node.type ? parse_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_domain_context.object_type };
-        result.push_back(intern_type(m_domain_context, repo(), name, std::move(bases)));
+        auto bases = node.type ? parse_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_domain_context.object_type.get_index() };
+        result.push_back(intern_type(m_domain_context, repo(), name, std::move(bases)).get_index());
     }
     return result;
 }
@@ -222,8 +224,8 @@ ygg::IndexList<formalism::Type> AstBuilder::parse_type_expression_node(const ast
     {
         auto bases = ygg::IndexList<formalism::Type> {};
         if (k != "object" && k != "number")
-            bases.push_back(m_domain_context.object_type);
-        result.push_back(intern_type(m_domain_context, repo(), k, std::move(bases)));
+            bases.push_back(m_domain_context.object_type.get_index());
+        result.push_back(intern_type(m_domain_context, repo(), k, std::move(bases)).get_index());
     }
     return result;
 }
@@ -248,7 +250,7 @@ ygg::IndexList<formalism::Object> AstBuilder::parse_objects(const std::vector<as
         const auto name = key(node.name.text);
         checks().ensure_new<DuplicateObjectError>(m_domain_context.declared_objects, name, node.name);
         checks().require_typing_if_needed(node.type, node.name);
-        auto types = node.type ? parse_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_domain_context.object_type };
+        auto types = node.type ? parse_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_domain_context.object_type.get_index() };
         auto view = formalism::get_or_create<formalism::Object>(repo(), to_cista(name), std::move(types));
         table.emplace(name, view);
         result.push_back(view.get_index());
@@ -268,7 +270,7 @@ ygg::IndexList<formalism::Parameter> AstBuilder::parse_parameters(const std::vec
         if (!m_parse_context.variable_scopes.empty())
             m_parse_context.variable_scopes.back().emplace(name, variable);
         checks().require_typing_if_needed(node.type, node.variable);
-        auto types = node.type ? parse_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_domain_context.object_type };
+        auto types = node.type ? parse_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_domain_context.object_type.get_index() };
         auto type_views = std::vector<formalism::TypeView> {};
         for (auto type : types)
             type_views.emplace_back(type, repo());
@@ -308,7 +310,7 @@ ygg::IndexList<formalism::FunctionSkeleton> AstBuilder::parse_functions(const st
         checks().require_requirement(formalism::RequirementKind::NumericFluents, node.name);
         checks().ensure_new<DuplicateFunctionError>(m_domain_context.declared_functions, name, node.name);
         checks().require_typing_if_needed(node.type, node.name);
-        auto type = node.type ? parse_type_expression(*node.type).front() : m_domain_context.number_type;
+        auto type = node.type ? parse_type_expression(*node.type).front() : m_domain_context.number_type.get_index();
         auto view = formalism::get_or_create<formalism::FunctionSkeleton>(repo(), to_cista(name), std::move(parameters), type);
         m_domain_context.functions.emplace(name, view);
         result.push_back(view.get_index());
@@ -659,7 +661,7 @@ void AstBuilder::complete_action_costs(const ast::Task& task,
         auto view = formalism::get_or_create<formalism::FunctionSkeleton>(repo(),
                                                                           cista::offset::string("total-cost"),
                                                                           ygg::IndexList<formalism::Parameter> {},
-                                                                          m_domain_context.number_type);
+                                                                          m_domain_context.number_type.get_index());
         m_domain_context.functions.emplace("total-cost", view);
         return view;
     };

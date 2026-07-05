@@ -24,6 +24,15 @@
 namespace loki::semantic
 {
 
+DomainContext::DomainContext(std::shared_ptr<detail::TranslationStorage> storage_) :
+    storage(std::move(storage_)),
+    object_type(formalism::get_or_create<formalism::Type>(storage->repository, cista::offset::string("object"), ygg::IndexList<formalism::Type> {})),
+    number_type(formalism::get_or_create<formalism::Type>(storage->repository, cista::offset::string("number"), ygg::IndexList<formalism::Type> {}))
+{
+    types.emplace("object", object_type);
+    types.emplace("number", number_type);
+}
+
 void remember_requirement(ParseContext& parse_context, formalism::RequirementKind kind)
 {
     parse_context.active_requirements.insert(kind);
@@ -46,37 +55,16 @@ void remember_adl_requirements(ParseContext& parse_context)
     remember_requirement(parse_context, formalism::RequirementKind::ConditionalEffects);
 }
 
-ygg::Index<formalism::Type>
+formalism::TypeView
 intern_type(DomainContext& domain_context, formalism::Repository& repository, const std::string& name, ygg::IndexList<formalism::Type> bases)
 {
     auto k = key(name);
     if (auto it = domain_context.types.find(k); it != domain_context.types.end() && bases.empty())
-        return it->second.get_index();
+        return it->second;
     auto view = formalism::get_or_create<formalism::Type>(repository, to_cista(k), std::move(bases));
     if (auto [it, inserted] = domain_context.types.emplace(k, view); !inserted)
         it->second = view;
-    return view.get_index();
-}
-
-void clear_domain_symbols(DomainContext& domain_context, ParseContext& parse_context)
-{
-    domain_context.domain = {};
-    domain_context.domain_name.clear();
-    domain_context.types.clear();
-    domain_context.objects.clear();
-    domain_context.predicates.clear();
-    domain_context.functions.clear();
-    domain_context.declared_types.clear();
-    domain_context.declared_objects.clear();
-    domain_context.declared_predicates.clear();
-    domain_context.declared_functions.clear();
-    parse_context.active_requirements.clear();
-    domain_context.requirement_kinds.clear();
-    parse_context.active_action_costs = false;
-    domain_context.action_costs = false;
-    parse_context.variable_types.clear();
-    parse_context.variable_scopes.clear();
-    parse_context.task_objects.clear();
+    return view;
 }
 
 void rebuild_domain_symbols(DomainContext& domain_context, ParseContext& parse_context, formalism::Repository& repository)
@@ -131,12 +119,12 @@ void rebuild_domain_symbols(DomainContext& domain_context, ParseContext& parse_c
         remember_type(remember_type, function.get_type());
     }
     if (auto it = domain_context.types.find("object"); it != domain_context.types.end())
-        domain_context.object_type = it->second.get_index();
+        domain_context.object_type = it->second;
     else
         domain_context.object_type = intern_type(domain_context, repository, "object", {});
 
     if (auto it = domain_context.types.find("number"); it != domain_context.types.end())
-        domain_context.number_type = it->second.get_index();
+        domain_context.number_type = it->second;
     else
         domain_context.number_type = intern_type(domain_context, repository, "number", {});
 }

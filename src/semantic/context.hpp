@@ -35,12 +35,15 @@ namespace loki::semantic
 // Symbols and storage of the currently parsed domain; survives across parse_task calls.
 struct DomainContext
 {
+    // Interns the "object" and "number" base types into the storage's repository.
+    explicit DomainContext(std::shared_ptr<detail::TranslationStorage> storage);
+
     std::shared_ptr<detail::TranslationStorage> storage;
     std::optional<formalism::DomainView> domain;
     std::string domain_name;
 
-    ygg::Index<formalism::Type> object_type;
-    ygg::Index<formalism::Type> number_type;
+    formalism::TypeView object_type;
+    formalism::TypeView number_type;
     ygg::UnorderedMap<std::string, formalism::TypeView> types;
     ygg::UnorderedMap<std::string, formalism::ObjectView> objects;
     ygg::UnorderedMap<std::string, formalism::PredicateView> predicates;
@@ -66,11 +69,9 @@ struct ParseContext
 void remember_requirement(ParseContext& parse_context, formalism::RequirementKind kind);
 void remember_adl_requirements(ParseContext& parse_context);
 
-ygg::Index<formalism::Type>
+formalism::TypeView
 intern_type(DomainContext& domain_context, formalism::Repository& repository, const std::string& name, ygg::IndexList<formalism::Type> bases);
 
-// Resets all symbol tables; storage lifetime is managed by the caller.
-void clear_domain_symbols(DomainContext& domain_context, ParseContext& parse_context);
 // Repopulates the symbol tables from domain_context.domain after canonicalization.
 void rebuild_domain_symbols(DomainContext& domain_context, ParseContext& parse_context, formalism::Repository& repository);
 
