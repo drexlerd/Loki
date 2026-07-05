@@ -53,6 +53,18 @@ inline bool is_builtin_type(TypeView type)
     return name == "object" || name == "number";
 }
 
+// Renders " - type" or " - (either t1 t2 ...)"; multiple types require an either wrapper to reparse.
+template<typename Types>
+inline std::string type_annotation(const Types& types)
+{
+    if (types.size() == 1)
+        return fmt::format(" - {}", types[0]);
+    auto text = std::string { " - (either" };
+    for (auto type : types)
+        text += fmt::format(" {}", type);
+    return text + ")";
+}
+
 }  // namespace detail
 
 }  // namespace loki::formalism::format
@@ -114,11 +126,7 @@ struct formatter<loki::formalism::ParameterView, char>
     {
         auto out = fmt::format_to(ctx.out(), "{}", value.get_variable());
         if (!value.get_types().empty())
-        {
-            out = fmt::format_to(out, " -");
-            for (auto type : value.get_types())
-                out = fmt::format_to(out, " {}", type);
-        }
+            out = fmt::format_to(out, "{}", loki::formalism::format::detail::type_annotation(value.get_types()));
         return out;
     }
 };
@@ -639,11 +647,7 @@ struct formatter<loki::formalism::DomainView, char>
                     }
                     fmt::print(os, " {}", type);
                     if (!type.get_bases().empty())
-                    {
-                        os << " -";
-                        for (auto base : type.get_bases())
-                            fmt::print(os, " {}", base);
-                    }
+                        os << loki::formalism::format::detail::type_annotation(type.get_bases());
                 }
                 if (wrote_header)
                     os << ')';
@@ -659,11 +663,7 @@ struct formatter<loki::formalism::DomainView, char>
                     first = false;
                     fmt::print(os, "{}", object);
                     if (!object.get_types().empty())
-                    {
-                        os << " -";
-                        for (auto type : object.get_types())
-                            fmt::print(os, " {}", type);
-                    }
+                        os << loki::formalism::format::detail::type_annotation(object.get_types());
                 }
                 os << ')';
             }
@@ -740,11 +740,7 @@ struct formatter<loki::formalism::TaskView, char>
                     first = false;
                     fmt::print(os, "{}", object);
                     if (!object.get_types().empty())
-                    {
-                        os << " -";
-                        for (auto type : object.get_types())
-                            fmt::print(os, " {}", type);
-                    }
+                        os << loki::formalism::format::detail::type_annotation(object.get_types());
                 }
                 os << ')';
             }

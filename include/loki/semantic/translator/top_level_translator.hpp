@@ -67,10 +67,10 @@ formalism::ActionView TopLevelTranslator<Derived>::copy(formalism::ActionView so
             copied_condition = this->self().lift_top_level_exists(parameter_views, copied_condition);
         precondition = as_index(copied_condition);
     }
-    if (this->m_phase == TranslationPhase::AddTypePredicates)
+    if (this->m_phase == TranslationPhase::CompileTyping)
         this->self().prepend_type_conditions(precondition, source.get_parameters());
     const auto parameters = this->self().parameter_indices(parameter_views);
-    const auto out_parameters = this->self().removes_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
+    const auto out_parameters = this->self().compiles_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
     auto effect = cista::optional<ygg::Index<formalism::Effect>> {};
     if (const auto effect_view = source.get_effect())
         effect = as_index(this->self().copy(effect_view.value()));
@@ -111,10 +111,10 @@ formalism::AxiomView TopLevelTranslator<Derived>::copy(formalism::AxiomView sour
     if (this->m_phase == TranslationPhase::MoveExistentialQuantifiers)
         copied_condition = this->self().lift_top_level_exists(parameter_views, copied_condition);
     auto condition = as_index(copied_condition);
-    if (this->m_phase == TranslationPhase::AddTypePredicates)
+    if (this->m_phase == TranslationPhase::CompileTyping)
         this->self().prepend_type_conditions(condition, source.get_parameters());
     const auto parameters = this->self().parameter_indices(parameter_views);
-    const auto out_parameters = this->self().removes_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
+    const auto out_parameters = this->self().compiles_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
     auto out = formalism::get_or_create<formalism::Axiom>(this->m_storage->repository,
                                                           out_parameters,
                                                           data.original_arity,

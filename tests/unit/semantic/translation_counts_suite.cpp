@@ -15,18 +15,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-#include <gtest/gtest.h>
-
 #include "../benchmark_utils.hpp"
 
-#include <loki/semantic.hpp>
-
-#include <yggdrasil/serialization/json_suite.hpp>
-
 #include <filesystem>
+#include <gtest/gtest.h>
+#include <loki/semantic.hpp>
 #include <string>
 #include <vector>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 namespace loki::tests
 {
@@ -92,7 +88,7 @@ std::vector<TranslationCountExpectation> load_expectations()
     return result;
 }
 
-} // namespace
+}  // namespace
 
 TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
 {
@@ -112,9 +108,11 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
         LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.task_file);
 
         auto parser = semantic::Parser(item.domain_file);
-        const auto domain_translation = semantic::translate(parser.get_domain());
+        // Expected counts were recorded with the full normalization pipeline.
+        const auto options = semantic::TranslatorOptions { .compile_typing = true, .materialize_equality = true };
+        const auto domain_translation = semantic::translate(parser.get_domain(), options);
         const auto translated_domain = domain_translation.get_translated_domain();
-        const auto task_translation = semantic::translate(parser.parse_task(item.task_file), domain_translation);
+        const auto task_translation = semantic::translate(parser.parse_task(item.task_file), domain_translation, options);
         const auto translated_task = task_translation.get_translated_task();
 
         EXPECT_EQ(translated_domain.get_predicates().size(), expected.domain_predicates);
@@ -126,4 +124,4 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
     }
 }
 
-} // namespace loki::tests
+}  // namespace loki::tests

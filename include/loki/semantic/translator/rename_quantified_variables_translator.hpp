@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SEMANTIC_TRANSLATOR_VARIABLE_RENAMING_TRANSLATOR_HPP_
-#define LOKI_SEMANTIC_TRANSLATOR_VARIABLE_RENAMING_TRANSLATOR_HPP_
+#ifndef LOKI_SEMANTIC_TRANSLATOR_RENAME_QUANTIFIED_VARIABLES_TRANSLATOR_HPP_
+#define LOKI_SEMANTIC_TRANSLATOR_RENAME_QUANTIFIED_VARIABLES_TRANSLATOR_HPP_
 
 #include "loki/semantic/translator/copy_translator_component.hpp"
 
@@ -24,10 +24,12 @@ namespace loki::semantic::detail
 {
 
 template<typename Derived>
-class VariableRenamingTranslator : public CopyTranslatorComponent<Derived, VariableRenamingTranslator<Derived>>
+class RenameQuantifiedVariablesTranslator : public CopyTranslatorComponent<Derived, RenameQuantifiedVariablesTranslator<Derived>>
 {
 public:
-    explicit VariableRenamingTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, VariableRenamingTranslator<Derived>>(context) {}
+    explicit RenameQuantifiedVariablesTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, RenameQuantifiedVariablesTranslator<Derived>>(context)
+    {
+    }
 
     void enter_variable_scope();
     void leave_variable_scope();
@@ -72,19 +74,19 @@ private:
 };
 
 template<typename Derived>
-void VariableRenamingTranslator<Derived>::enter_variable_scope()
+void RenameQuantifiedVariablesTranslator<Derived>::enter_variable_scope()
 {
     this->m_variable_bindings.emplace_back();
 }
 
 template<typename Derived>
-void VariableRenamingTranslator<Derived>::leave_variable_scope()
+void RenameQuantifiedVariablesTranslator<Derived>::leave_variable_scope()
 {
     this->m_variable_bindings.pop_back();
 }
 
 template<typename Derived>
-formalism::VariableView VariableRenamingTranslator<Derived>::lookup_variable(formalism::VariableView source)
+formalism::VariableView RenameQuantifiedVariablesTranslator<Derived>::lookup_variable(formalism::VariableView source)
 {
     for (auto it = this->m_variable_bindings.rbegin(); it != this->m_variable_bindings.rend(); ++it)
     {
@@ -95,7 +97,7 @@ formalism::VariableView VariableRenamingTranslator<Derived>::lookup_variable(for
 }
 
 template<typename Derived>
-formalism::VariableView VariableRenamingTranslator<Derived>::fresh_variable(formalism::VariableView source)
+formalism::VariableView RenameQuantifiedVariablesTranslator<Derived>::fresh_variable(formalism::VariableView source)
 {
     auto& counter = this->m_num_quantifications[source];
     auto name = std::string(source.get_name()) + "_" + std::to_string(counter++);
@@ -103,7 +105,7 @@ formalism::VariableView VariableRenamingTranslator<Derived>::fresh_variable(form
 }
 
 template<typename Derived>
-formalism::ParameterView VariableRenamingTranslator<Derived>::rename_parameter(formalism::ParameterView source)
+formalism::ParameterView RenameQuantifiedVariablesTranslator<Derived>::rename_parameter(formalism::ParameterView source)
 {
     const auto variable = this->self().fresh_variable(source.get_variable());
     this->m_variable_bindings.back().emplace(source.get_variable(), variable);
@@ -113,7 +115,7 @@ formalism::ParameterView VariableRenamingTranslator<Derived>::rename_parameter(f
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Parameter> VariableRenamingTranslator<Derived>::rename_parameters(formalism::EntityListView<formalism::Parameter> source)
+ygg::IndexList<formalism::Parameter> RenameQuantifiedVariablesTranslator<Derived>::rename_parameters(formalism::EntityListView<formalism::Parameter> source)
 {
     auto result = ygg::IndexList<formalism::Parameter> {};
     for (auto parameter : source)
@@ -122,7 +124,7 @@ ygg::IndexList<formalism::Parameter> VariableRenamingTranslator<Derived>::rename
 }
 
 template<typename Derived>
-formalism::TermView VariableRenamingTranslator<Derived>::rename_variables(formalism::TermView source)
+formalism::TermView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::TermView source)
 {
     auto value = ygg::visit(
         [&](const auto& arg) -> ygg::Data<formalism::Term>::Variant
@@ -138,7 +140,7 @@ formalism::TermView VariableRenamingTranslator<Derived>::rename_variables(formal
 }
 
 template<typename Derived>
-formalism::AtomView VariableRenamingTranslator<Derived>::rename_variables(formalism::AtomView source)
+formalism::AtomView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::AtomView source)
 {
     auto terms = ygg::IndexList<formalism::Term> {};
     for (auto term : source.get_terms())
@@ -147,7 +149,7 @@ formalism::AtomView VariableRenamingTranslator<Derived>::rename_variables(formal
 }
 
 template<typename Derived>
-formalism::LiteralView VariableRenamingTranslator<Derived>::rename_variables(formalism::LiteralView source)
+formalism::LiteralView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::LiteralView source)
 {
     return formalism::get_or_create<formalism::Literal>(this->m_storage->repository,
                                                         as_index(this->self().rename_variables(source.get_atom())),
@@ -155,7 +157,7 @@ formalism::LiteralView VariableRenamingTranslator<Derived>::rename_variables(for
 }
 
 template<typename Derived>
-formalism::FunctionTermView VariableRenamingTranslator<Derived>::rename_variables(formalism::FunctionTermView source)
+formalism::FunctionTermView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::FunctionTermView source)
 {
     auto terms = ygg::IndexList<formalism::Term> {};
     for (auto term : source.get_terms())
@@ -164,7 +166,7 @@ formalism::FunctionTermView VariableRenamingTranslator<Derived>::rename_variable
 }
 
 template<typename Derived>
-formalism::UnaryFunctionExpressionView VariableRenamingTranslator<Derived>::rename_variables(formalism::UnaryFunctionExpressionView source)
+formalism::UnaryFunctionExpressionView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::UnaryFunctionExpressionView source)
 {
     const auto& data = source.get_data();
     return formalism::get_or_create<formalism::UnaryFunctionExpression>(this->m_storage->repository,
@@ -173,7 +175,7 @@ formalism::UnaryFunctionExpressionView VariableRenamingTranslator<Derived>::rena
 }
 
 template<typename Derived>
-formalism::BinaryFunctionExpressionView VariableRenamingTranslator<Derived>::rename_variables(formalism::BinaryFunctionExpressionView source)
+formalism::BinaryFunctionExpressionView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::BinaryFunctionExpressionView source)
 {
     const auto& data = source.get_data();
     return formalism::get_or_create<formalism::BinaryFunctionExpression>(this->m_storage->repository,
@@ -183,7 +185,7 @@ formalism::BinaryFunctionExpressionView VariableRenamingTranslator<Derived>::ren
 }
 
 template<typename Derived>
-formalism::MultiFunctionExpressionView VariableRenamingTranslator<Derived>::rename_variables(formalism::MultiFunctionExpressionView source)
+formalism::MultiFunctionExpressionView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::MultiFunctionExpressionView source)
 {
     const auto& data = source.get_data();
     auto expressions = ygg::IndexList<formalism::FunctionExpression> {};
@@ -193,7 +195,7 @@ formalism::MultiFunctionExpressionView VariableRenamingTranslator<Derived>::rena
 }
 
 template<typename Derived>
-formalism::FunctionExpressionView VariableRenamingTranslator<Derived>::rename_variables(formalism::FunctionExpressionView source)
+formalism::FunctionExpressionView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::FunctionExpressionView source)
 {
     auto value = ygg::visit(
         [&](const auto& arg) -> ygg::Data<formalism::FunctionExpression>::Variant
@@ -209,13 +211,13 @@ formalism::FunctionExpressionView VariableRenamingTranslator<Derived>::rename_va
 }
 
 template<typename Derived>
-formalism::ConditionLiteralView VariableRenamingTranslator<Derived>::rename_variables(formalism::ConditionLiteralView source)
+formalism::ConditionLiteralView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionLiteralView source)
 {
     return formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, as_index(this->self().rename_variables(source.get_literal())));
 }
 
 template<typename Derived>
-formalism::ConditionAndView VariableRenamingTranslator<Derived>::rename_variables(formalism::ConditionAndView source)
+formalism::ConditionAndView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionAndView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : source.get_conditions())
@@ -224,7 +226,7 @@ formalism::ConditionAndView VariableRenamingTranslator<Derived>::rename_variable
 }
 
 template<typename Derived>
-formalism::ConditionOrView VariableRenamingTranslator<Derived>::rename_variables(formalism::ConditionOrView source)
+formalism::ConditionOrView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionOrView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : source.get_conditions())
@@ -233,13 +235,13 @@ formalism::ConditionOrView VariableRenamingTranslator<Derived>::rename_variables
 }
 
 template<typename Derived>
-formalism::ConditionNotView VariableRenamingTranslator<Derived>::rename_variables(formalism::ConditionNotView source)
+formalism::ConditionNotView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionNotView source)
 {
     return formalism::get_or_create<formalism::ConditionNot>(this->m_storage->repository, as_index(this->self().rename_variables(source.get_condition())));
 }
 
 template<typename Derived>
-formalism::ConditionImplyView VariableRenamingTranslator<Derived>::rename_variables(formalism::ConditionImplyView source)
+formalism::ConditionImplyView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionImplyView source)
 {
     return formalism::get_or_create<formalism::ConditionImply>(this->m_storage->repository,
                                                                as_index(this->self().rename_variables(source.get_left())),
@@ -247,7 +249,7 @@ formalism::ConditionImplyView VariableRenamingTranslator<Derived>::rename_variab
 }
 
 template<typename Derived>
-formalism::ConditionExistsView VariableRenamingTranslator<Derived>::rename_variables(formalism::ConditionExistsView source)
+formalism::ConditionExistsView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionExistsView source)
 {
     this->self().enter_variable_scope();
     auto parameters = this->self().rename_parameters(source.get_parameters());
@@ -257,7 +259,7 @@ formalism::ConditionExistsView VariableRenamingTranslator<Derived>::rename_varia
 }
 
 template<typename Derived>
-formalism::ConditionForallView VariableRenamingTranslator<Derived>::rename_variables(formalism::ConditionForallView source)
+formalism::ConditionForallView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionForallView source)
 {
     this->self().enter_variable_scope();
     auto parameters = this->self().rename_parameters(source.get_parameters());
@@ -267,7 +269,7 @@ formalism::ConditionForallView VariableRenamingTranslator<Derived>::rename_varia
 }
 
 template<typename Derived>
-formalism::ConditionNumericConstraintView VariableRenamingTranslator<Derived>::rename_variables(formalism::ConditionNumericConstraintView source)
+formalism::ConditionNumericConstraintView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionNumericConstraintView source)
 {
     const auto& data = source.get_data();
     return formalism::get_or_create<formalism::ConditionNumericConstraint>(this->m_storage->repository,
@@ -277,7 +279,7 @@ formalism::ConditionNumericConstraintView VariableRenamingTranslator<Derived>::r
 }
 
 template<typename Derived>
-formalism::ConditionView VariableRenamingTranslator<Derived>::rename_variables(formalism::ConditionView source)
+formalism::ConditionView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionView source)
 {
     auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Condition>::Variant { return as_index(this->self().rename_variables(arg)); },
                             source.get_value());
@@ -285,13 +287,13 @@ formalism::ConditionView VariableRenamingTranslator<Derived>::rename_variables(f
 }
 
 template<typename Derived>
-formalism::EffectLiteralView VariableRenamingTranslator<Derived>::rename_variables(formalism::EffectLiteralView source)
+formalism::EffectLiteralView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectLiteralView source)
 {
     return formalism::get_or_create<formalism::EffectLiteral>(this->m_storage->repository, as_index(this->self().rename_variables(source.get_literal())));
 }
 
 template<typename Derived>
-formalism::EffectAndView VariableRenamingTranslator<Derived>::rename_variables(formalism::EffectAndView source)
+formalism::EffectAndView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectAndView source)
 {
     auto effects = ygg::IndexList<formalism::Effect> {};
     for (auto effect : source.get_effects())
@@ -300,7 +302,7 @@ formalism::EffectAndView VariableRenamingTranslator<Derived>::rename_variables(f
 }
 
 template<typename Derived>
-formalism::EffectNumericView VariableRenamingTranslator<Derived>::rename_variables(formalism::EffectNumericView source)
+formalism::EffectNumericView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectNumericView source)
 {
     const auto& data = source.get_data();
     auto terms = ygg::IndexList<formalism::Term> {};
@@ -314,7 +316,7 @@ formalism::EffectNumericView VariableRenamingTranslator<Derived>::rename_variabl
 }
 
 template<typename Derived>
-formalism::EffectForallView VariableRenamingTranslator<Derived>::rename_variables(formalism::EffectForallView source)
+formalism::EffectForallView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectForallView source)
 {
     this->self().enter_variable_scope();
     auto parameters = this->self().rename_parameters(source.get_parameters());
@@ -324,7 +326,7 @@ formalism::EffectForallView VariableRenamingTranslator<Derived>::rename_variable
 }
 
 template<typename Derived>
-formalism::EffectWhenView VariableRenamingTranslator<Derived>::rename_variables(formalism::EffectWhenView source)
+formalism::EffectWhenView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectWhenView source)
 {
     return formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository,
                                                            as_index(this->self().rename_variables(source.get_condition())),
@@ -332,7 +334,7 @@ formalism::EffectWhenView VariableRenamingTranslator<Derived>::rename_variables(
 }
 
 template<typename Derived>
-formalism::EffectOneOfView VariableRenamingTranslator<Derived>::rename_variables(formalism::EffectOneOfView source)
+formalism::EffectOneOfView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectOneOfView source)
 {
     auto effects = ygg::IndexList<formalism::Effect> {};
     for (auto effect : source.get_effects())
@@ -341,7 +343,8 @@ formalism::EffectOneOfView VariableRenamingTranslator<Derived>::rename_variables
 }
 
 template<typename Derived>
-formalism::EffectProbabilisticAlternativeView VariableRenamingTranslator<Derived>::rename_variables(formalism::EffectProbabilisticAlternativeView source)
+formalism::EffectProbabilisticAlternativeView
+RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectProbabilisticAlternativeView source)
 {
     const auto& data = source.get_data();
     return formalism::get_or_create<formalism::EffectProbabilisticAlternative>(this->m_storage->repository,
@@ -350,7 +353,7 @@ formalism::EffectProbabilisticAlternativeView VariableRenamingTranslator<Derived
 }
 
 template<typename Derived>
-formalism::EffectProbabilisticView VariableRenamingTranslator<Derived>::rename_variables(formalism::EffectProbabilisticView source)
+formalism::EffectProbabilisticView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectProbabilisticView source)
 {
     auto alternatives = ygg::IndexList<formalism::EffectProbabilisticAlternative> {};
     for (auto alternative : source.get_alternatives())
@@ -359,7 +362,7 @@ formalism::EffectProbabilisticView VariableRenamingTranslator<Derived>::rename_v
 }
 
 template<typename Derived>
-formalism::EffectView VariableRenamingTranslator<Derived>::rename_variables(formalism::EffectView source)
+formalism::EffectView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectView source)
 {
     auto value =
         ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant { return as_index(this->self().rename_variables(arg)); }, source.get_value());
@@ -367,7 +370,7 @@ formalism::EffectView VariableRenamingTranslator<Derived>::rename_variables(form
 }
 
 template<typename Derived>
-formalism::ActionView VariableRenamingTranslator<Derived>::rename_action_variables(formalism::ActionView source)
+formalism::ActionView RenameQuantifiedVariablesTranslator<Derived>::rename_action_variables(formalism::ActionView source)
 {
     const auto& data = source.get_data();
     this->m_num_quantifications.clear();
@@ -390,7 +393,7 @@ formalism::ActionView VariableRenamingTranslator<Derived>::rename_action_variabl
 }
 
 template<typename Derived>
-formalism::AxiomView VariableRenamingTranslator<Derived>::rename_axiom_variables(formalism::AxiomView source)
+formalism::AxiomView RenameQuantifiedVariablesTranslator<Derived>::rename_axiom_variables(formalism::AxiomView source)
 {
     const auto& data = source.get_data();
     this->m_num_quantifications.clear();

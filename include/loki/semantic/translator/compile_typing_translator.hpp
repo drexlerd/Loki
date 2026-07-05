@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SEMANTIC_TRANSLATOR_TYPE_TRANSLATOR_HPP_
-#define LOKI_SEMANTIC_TRANSLATOR_TYPE_TRANSLATOR_HPP_
+#ifndef LOKI_SEMANTIC_TRANSLATOR_COMPILE_TYPING_TRANSLATOR_HPP_
+#define LOKI_SEMANTIC_TRANSLATOR_COMPILE_TYPING_TRANSLATOR_HPP_
 
 #include "loki/semantic/translator/copy_translator_component.hpp"
 
@@ -24,12 +24,12 @@ namespace loki::semantic::detail
 {
 
 template<typename Derived>
-class TypeTranslator : public CopyTranslatorComponent<Derived, TypeTranslator<Derived>>
+class CompileTypingTranslator : public CopyTranslatorComponent<Derived, CompileTypingTranslator<Derived>>
 {
 public:
-    explicit TypeTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, TypeTranslator<Derived>>(context) {}
+    explicit CompileTypingTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, CompileTypingTranslator<Derived>>(context) {}
 
-    bool removes_typing_now() const noexcept;
+    bool compiles_typing_now() const noexcept;
     std::vector<formalism::TypeView> collect_type_hierarchy(formalism::TypeView type);
     ygg::IndexList<formalism::Type> copy_type_hierarchy(formalism::EntityListView<formalism::Type> types);
     ygg::IndexList<formalism::Type> maybe_strip_types(const ygg::IndexList<formalism::Type>& types) const;
@@ -40,19 +40,19 @@ public:
     ygg::IndexList<formalism::Condition> type_conditions_for_parameters(formalism::EntityListView<formalism::Parameter> parameters);
     void prepend_type_conditions(cista::optional<ygg::Index<formalism::Condition>>& condition, formalism::EntityListView<formalism::Parameter> parameters);
     void prepend_type_conditions(ygg::Index<formalism::Condition>& condition, formalism::EntityListView<formalism::Parameter> parameters);
-    void add_type_predicates_to_domain(ygg::Data<formalism::Domain>& data, formalism::DomainView domain);
+    void compile_typing_to_domain(ygg::Data<formalism::Domain>& data, formalism::DomainView domain);
     void add_type_literals_for_object(ygg::IndexList<formalism::Literal>& literals, formalism::ObjectView object);
     void initialize_type_literals(ygg::Data<formalism::Task>& data, formalism::TaskView task);
 };
 
 template<typename Derived>
-bool TypeTranslator<Derived>::removes_typing_now() const noexcept
+bool CompileTypingTranslator<Derived>::compiles_typing_now() const noexcept
 {
-    return this->m_remove_typing && this->m_phase == TranslationPhase::AddTypePredicates;
+    return this->m_compile_typing && this->m_phase == TranslationPhase::CompileTyping;
 }
 
 template<typename Derived>
-std::vector<formalism::TypeView> TypeTranslator<Derived>::collect_type_hierarchy(formalism::TypeView type)
+std::vector<formalism::TypeView> CompileTypingTranslator<Derived>::collect_type_hierarchy(formalism::TypeView type)
 {
     auto result = std::vector<formalism::TypeView> {};
     auto seen = ygg::UnorderedSet<formalism::TypeView> {};
@@ -69,7 +69,7 @@ std::vector<formalism::TypeView> TypeTranslator<Derived>::collect_type_hierarchy
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Type> TypeTranslator<Derived>::copy_type_hierarchy(formalism::EntityListView<formalism::Type> types)
+ygg::IndexList<formalism::Type> CompileTypingTranslator<Derived>::copy_type_hierarchy(formalism::EntityListView<formalism::Type> types)
 {
     auto result = ygg::IndexList<formalism::Type> {};
     auto seen = ygg::UnorderedSet<formalism::TypeView> {};
@@ -85,13 +85,13 @@ ygg::IndexList<formalism::Type> TypeTranslator<Derived>::copy_type_hierarchy(for
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Type> TypeTranslator<Derived>::maybe_strip_types(const ygg::IndexList<formalism::Type>& types) const
+ygg::IndexList<formalism::Type> CompileTypingTranslator<Derived>::maybe_strip_types(const ygg::IndexList<formalism::Type>& types) const
 {
-    return this->self().removes_typing_now() ? ygg::IndexList<formalism::Type> {} : types;
+    return this->self().compiles_typing_now() ? ygg::IndexList<formalism::Type> {} : types;
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Parameter> TypeTranslator<Derived>::copy_parameters_without_types(formalism::EntityListView<formalism::Parameter> parameters)
+ygg::IndexList<formalism::Parameter> CompileTypingTranslator<Derived>::copy_parameters_without_types(formalism::EntityListView<formalism::Parameter> parameters)
 {
     auto result = ygg::IndexList<formalism::Parameter> {};
     for (auto parameter : parameters)
@@ -105,13 +105,13 @@ ygg::IndexList<formalism::Parameter> TypeTranslator<Derived>::copy_parameters_wi
 }
 
 template<typename Derived>
-formalism::PredicateView TypeTranslator<Derived>::type_predicate(formalism::TypeView type)
+formalism::PredicateView CompileTypingTranslator<Derived>::type_predicate(formalism::TypeView type)
 {
     if (auto it = this->m_type_predicates.find(type); it != this->m_type_predicates.end())
         return it->second;
 
     auto parameter_types = ygg::IndexList<formalism::Type> {};
-    if (!this->self().removes_typing_now())
+    if (!this->self().compiles_typing_now())
         parameter_types.push_back(as_index(this->self().copy(type)));
     const auto variable = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("?arg")).get_index();
     auto parameters = ygg::IndexList<formalism::Parameter> {};
@@ -124,7 +124,7 @@ formalism::PredicateView TypeTranslator<Derived>::type_predicate(formalism::Type
 }
 
 template<typename Derived>
-formalism::LiteralView TypeTranslator<Derived>::type_literal(formalism::TypeView type, ygg::Index<formalism::Term> term)
+formalism::LiteralView CompileTypingTranslator<Derived>::type_literal(formalism::TypeView type, ygg::Index<formalism::Term> term)
 {
     auto terms = ygg::IndexList<formalism::Term> {};
     terms.push_back(term);
@@ -134,7 +134,7 @@ formalism::LiteralView TypeTranslator<Derived>::type_literal(formalism::TypeView
 }
 
 template<typename Derived>
-formalism::ConditionView TypeTranslator<Derived>::type_condition(formalism::TypeView type, formalism::VariableView variable)
+formalism::ConditionView CompileTypingTranslator<Derived>::type_condition(formalism::TypeView type, formalism::VariableView variable)
 {
     const auto term =
         formalism::get_or_create<formalism::Term>(this->m_storage->repository, ygg::Data<formalism::Term>::Variant(as_index(this->self().copy(variable))))
@@ -144,7 +144,8 @@ formalism::ConditionView TypeTranslator<Derived>::type_condition(formalism::Type
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Condition> TypeTranslator<Derived>::type_conditions_for_parameters(formalism::EntityListView<formalism::Parameter> parameters)
+ygg::IndexList<formalism::Condition>
+CompileTypingTranslator<Derived>::type_conditions_for_parameters(formalism::EntityListView<formalism::Parameter> parameters)
 {
     auto result = ygg::IndexList<formalism::Condition> {};
     auto add_conditions = [&](auto&& self, formalism::TypeView type, formalism::VariableView variable) -> void
@@ -160,8 +161,8 @@ ygg::IndexList<formalism::Condition> TypeTranslator<Derived>::type_conditions_fo
 }
 
 template<typename Derived>
-void TypeTranslator<Derived>::prepend_type_conditions(cista::optional<ygg::Index<formalism::Condition>>& condition,
-                                                      formalism::EntityListView<formalism::Parameter> parameters)
+void CompileTypingTranslator<Derived>::prepend_type_conditions(cista::optional<ygg::Index<formalism::Condition>>& condition,
+                                                               formalism::EntityListView<formalism::Parameter> parameters)
 {
     auto parts = this->self().type_conditions_for_parameters(parameters);
     if (parts.empty())
@@ -172,7 +173,8 @@ void TypeTranslator<Derived>::prepend_type_conditions(cista::optional<ygg::Index
 }
 
 template<typename Derived>
-void TypeTranslator<Derived>::prepend_type_conditions(ygg::Index<formalism::Condition>& condition, formalism::EntityListView<formalism::Parameter> parameters)
+void CompileTypingTranslator<Derived>::prepend_type_conditions(ygg::Index<formalism::Condition>& condition,
+                                                               formalism::EntityListView<formalism::Parameter> parameters)
 {
     auto optional = cista::optional<ygg::Index<formalism::Condition>>(condition);
     this->self().prepend_type_conditions(optional, parameters);
@@ -180,7 +182,7 @@ void TypeTranslator<Derived>::prepend_type_conditions(ygg::Index<formalism::Cond
 }
 
 template<typename Derived>
-void TypeTranslator<Derived>::add_type_predicates_to_domain(ygg::Data<formalism::Domain>& data, formalism::DomainView domain)
+void CompileTypingTranslator<Derived>::compile_typing_to_domain(ygg::Data<formalism::Domain>& data, formalism::DomainView domain)
 {
     auto existing = ygg::UnorderedSet<formalism::PredicateView> {};
     for (auto predicate : domain.get_predicates())
@@ -202,12 +204,12 @@ void TypeTranslator<Derived>::add_type_predicates_to_domain(ygg::Data<formalism:
             add_type(add_type, type);
 
     data.requirements = this->self().strip_typing_requirement(domain.get_requirements());
-    if (this->self().removes_typing_now())
+    if (this->self().compiles_typing_now())
         data.types = {};
 }
 
 template<typename Derived>
-void TypeTranslator<Derived>::add_type_literals_for_object(ygg::IndexList<formalism::Literal>& literals, formalism::ObjectView object)
+void CompileTypingTranslator<Derived>::add_type_literals_for_object(ygg::IndexList<formalism::Literal>& literals, formalism::ObjectView object)
 {
     const auto copied_object = this->self().copy(object);
     const auto term =
@@ -235,7 +237,7 @@ void TypeTranslator<Derived>::add_type_literals_for_object(ygg::IndexList<formal
 }
 
 template<typename Derived>
-void TypeTranslator<Derived>::initialize_type_literals(ygg::Data<formalism::Task>& data, formalism::TaskView task)
+void CompileTypingTranslator<Derived>::initialize_type_literals(ygg::Data<formalism::Task>& data, formalism::TaskView task)
 {
     for (auto object : this->m_storage->translated_domain->get_constants())
         this->self().add_type_literals_for_object(data.initial_literals, object);

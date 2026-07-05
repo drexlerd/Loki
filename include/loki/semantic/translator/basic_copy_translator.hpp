@@ -209,8 +209,8 @@ ygg::IndexList<formalism::Requirement> BasicCopyTranslator<Derived>::strip_requi
 template<typename Derived>
 ygg::IndexList<formalism::Requirement> BasicCopyTranslator<Derived>::strip_typing_requirement(formalism::EntityListView<formalism::Requirement> requirements)
 {
-    return this->m_remove_typing ? this->self().strip_requirement(requirements, formalism::RequirementKind::Typing) :
-                                   this->self().template copy_list<formalism::Requirement>(requirements);
+    return this->m_compile_typing ? this->self().strip_requirement(requirements, formalism::RequirementKind::Typing) :
+                                    this->self().template copy_list<formalism::Requirement>(requirements);
 }
 
 template<typename Derived>
@@ -278,7 +278,7 @@ formalism::PredicateView BasicCopyTranslator<Derived>::copy(formalism::Predicate
     const auto previous = this->m_renaming_enabled;
     this->m_renaming_enabled = false;
     auto parameters = this->self().template copy_list<formalism::Parameter>(source.get_parameters());
-    if (this->self().removes_typing_now())
+    if (this->self().compiles_typing_now())
         parameters = this->self().copy_parameters_without_types(source.get_parameters());
     auto out = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, source.get_name(), std::move(parameters));
     this->m_used_predicate_names.insert(std::string(source.get_name()));
@@ -295,7 +295,7 @@ formalism::FunctionSkeletonView BasicCopyTranslator<Derived>::copy(formalism::Fu
     const auto previous = this->m_renaming_enabled;
     this->m_renaming_enabled = false;
     auto parameters = this->self().template copy_list<formalism::Parameter>(source.get_parameters());
-    if (this->self().removes_typing_now())
+    if (this->self().compiles_typing_now())
         parameters = this->self().copy_parameters_without_types(source.get_parameters());
     auto out = formalism::get_or_create<formalism::FunctionSkeleton>(this->m_storage->repository,
                                                                      source.get_name(),

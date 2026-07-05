@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SEMANTIC_TRANSLATOR_EFFECT_NORMAL_FORM_TRANSLATOR_HPP_
-#define LOKI_SEMANTIC_TRANSLATOR_EFFECT_NORMAL_FORM_TRANSLATOR_HPP_
+#ifndef LOKI_SEMANTIC_TRANSLATOR_TO_EFFECT_NORMAL_FORM_TRANSLATOR_HPP_
+#define LOKI_SEMANTIC_TRANSLATOR_TO_EFFECT_NORMAL_FORM_TRANSLATOR_HPP_
 
 #include "loki/semantic/translator/copy_translator_component.hpp"
 
@@ -27,10 +27,10 @@ namespace loki::semantic::detail
 {
 
 template<typename Derived>
-class EffectNormalFormTranslator : public CopyTranslatorComponent<Derived, EffectNormalFormTranslator<Derived>>
+class ToEffectNormalFormTranslator : public CopyTranslatorComponent<Derived, ToEffectNormalFormTranslator<Derived>>
 {
 public:
-    explicit EffectNormalFormTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, EffectNormalFormTranslator<Derived>>(context) {}
+    explicit ToEffectNormalFormTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, ToEffectNormalFormTranslator<Derived>>(context) {}
 
     formalism::EffectView wrap_effect(ygg::Data<formalism::Effect>::Variant value);
     template<typename T>
@@ -46,14 +46,14 @@ public:
 };
 
 template<typename Derived>
-formalism::EffectView EffectNormalFormTranslator<Derived>::wrap_effect(ygg::Data<formalism::Effect>::Variant value)
+formalism::EffectView ToEffectNormalFormTranslator<Derived>::wrap_effect(ygg::Data<formalism::Effect>::Variant value)
 {
     return formalism::get_or_create<formalism::Effect>(this->m_storage->repository, std::move(value));
 }
 
 template<typename Derived>
 template<typename T>
-formalism::EffectView EffectNormalFormTranslator<Derived>::wrap_effect(formalism::EntityView<T> value)
+formalism::EffectView ToEffectNormalFormTranslator<Derived>::wrap_effect(formalism::EntityView<T> value)
 {
     return formalism::get_or_create<formalism::Effect>(this->m_storage->repository,
                                                        typename ygg::Data<formalism::Effect>::template ViewVariant<formalism::Repository>(value));
@@ -61,7 +61,7 @@ formalism::EffectView EffectNormalFormTranslator<Derived>::wrap_effect(formalism
 
 template<typename Derived>
 template<typename T>
-std::optional<formalism::EntityView<T>> EffectNormalFormTranslator<Derived>::as_effect(formalism::EffectView effect) const
+std::optional<formalism::EntityView<T>> ToEffectNormalFormTranslator<Derived>::as_effect(formalism::EffectView effect) const
 {
     auto result = std::optional<formalism::EntityView<T>> {};
     ygg::visit(
@@ -76,20 +76,20 @@ std::optional<formalism::EntityView<T>> EffectNormalFormTranslator<Derived>::as_
 }
 
 template<typename Derived>
-formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect(formalism::EffectView effect)
+formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect(formalism::EffectView effect)
 {
     return ygg::visit([&](const auto& node) { return this->self().normalize_effect_node(effect, node); }, effect.get_value());
 }
 
 template<typename Derived>
 template<typename T>
-formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node(formalism::EffectView effect, formalism::EntityView<T>)
+formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_node(formalism::EffectView effect, formalism::EntityView<T>)
 {
     return effect;
 }
 
 template<typename Derived>
-formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node(formalism::EffectView, formalism::EffectAndView node)
+formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_node(formalism::EffectView, formalism::EffectAndView node)
 {
     struct NumericGroup
     {
@@ -161,7 +161,7 @@ formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node
 }
 
 template<typename Derived>
-formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node(formalism::EffectView, formalism::EffectForallView node)
+formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_node(formalism::EffectView, formalism::EffectForallView node)
 {
     const auto& data = node.get_data();
     const auto nested = this->self().normalize_effect(node.get_effect());
@@ -190,7 +190,7 @@ formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node
 }
 
 template<typename Derived>
-formalism::EffectView EffectNormalFormTranslator<Derived>::normalize_effect_node(formalism::EffectView, formalism::EffectWhenView node)
+formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_node(formalism::EffectView, formalism::EffectWhenView node)
 {
     const auto moved_condition = this->self().move_existentials(node.get_condition());
     auto condition = this->self().flatten_condition(this->self().to_dnf(moved_condition));

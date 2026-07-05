@@ -250,7 +250,7 @@ TEST(LokiTests, GeneratedUniversalPredicateAvoidsExistingPredicateName)
     EXPECT_TRUE(predicate_names.contains("loki-universal-1"));
 }
 
-TEST(LokiTests, MultiplyConditionalEffectsSplitsActions)
+TEST(LokiTests, CompileConditionalEffectsSplitsActions)
 {
     const auto domain_source = std::string(R"PDDL(
 (define (domain conditional-multiply)
@@ -265,7 +265,7 @@ TEST(LokiTests, MultiplyConditionalEffectsSplitsActions)
 
     auto parser = loki::Parser(domain_source);
     auto options = loki::TranslatorOptions {};
-    options.multiply_conditional_effects = true;
+    options.compile_conditional_effects = true;
 
     const auto translation = loki::translate(parser.get_domain(), options);
     const auto domain = translation.get_translated_domain();
@@ -289,7 +289,7 @@ TEST(LokiTests, MultiplyConditionalEffectsSplitsActions)
     }
 }
 
-TEST(LokiTests, MultiplyConditionalEffectsThrowsOnOverflow)
+TEST(LokiTests, CompileConditionalEffectsThrowsOnOverflow)
 {
     auto domain_source = std::ostringstream {};
     domain_source << "(define (domain conditional-overflow)\n";
@@ -305,7 +305,7 @@ TEST(LokiTests, MultiplyConditionalEffectsThrowsOnOverflow)
 
     auto parser = loki::Parser(domain_source.str());
     auto options = loki::TranslatorOptions {};
-    options.multiply_conditional_effects = true;
+    options.compile_conditional_effects = true;
 
     EXPECT_THROW(loki::translate(parser.get_domain(), options), loki::SemanticError);
 }
@@ -760,7 +760,7 @@ TEST(LokiTests, KeepTypingPreservesPersistentParameters)
 )PDDL");
 
     auto parser = loki::Parser(domain_source);
-    const auto translation = loki::translate(parser.get_domain(), loki::TranslatorOptions { .remove_typing = false });
+    const auto translation = loki::translate(parser.get_domain(), loki::TranslatorOptions { .compile_typing = false });
     const auto domain = translation.get_translated_domain();
 
     ASSERT_FALSE(domain.get_types().empty());
@@ -808,7 +808,7 @@ TEST(LokiTests, RemoveTypingStripsPersistentParameters)
 )PDDL");
 
     auto parser = loki::Parser(domain_source);
-    const auto translation = loki::translate(parser.get_domain(), loki::TranslatorOptions { .remove_typing = true });
+    const auto translation = loki::translate(parser.get_domain(), loki::TranslatorOptions { .compile_typing = true });
     const auto domain = translation.get_translated_domain();
     EXPECT_TRUE(domain.get_types().empty());
 

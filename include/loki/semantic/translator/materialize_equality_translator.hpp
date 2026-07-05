@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SEMANTIC_TRANSLATOR_EQUALITY_TRANSLATOR_HPP_
-#define LOKI_SEMANTIC_TRANSLATOR_EQUALITY_TRANSLATOR_HPP_
+#ifndef LOKI_SEMANTIC_TRANSLATOR_MATERIALIZE_EQUALITY_TRANSLATOR_HPP_
+#define LOKI_SEMANTIC_TRANSLATOR_MATERIALIZE_EQUALITY_TRANSLATOR_HPP_
 
 #include "loki/semantic/errors.hpp"
 #include "loki/semantic/translator/copy_translator_component.hpp"
@@ -25,10 +25,10 @@ namespace loki::semantic::detail
 {
 
 template<typename Derived>
-class EqualityTranslator : public CopyTranslatorComponent<Derived, EqualityTranslator<Derived>>
+class MaterializeEqualityTranslator : public CopyTranslatorComponent<Derived, MaterializeEqualityTranslator<Derived>>
 {
 public:
-    explicit EqualityTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, EqualityTranslator<Derived>>(context) {}
+    explicit MaterializeEqualityTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, MaterializeEqualityTranslator<Derived>>(context) {}
 
     bool has_requirement(formalism::EntityListView<formalism::Requirement> requirements, formalism::RequirementKind kind) const;
     bool literal_uses_equality(formalism::LiteralView literal) const;
@@ -39,11 +39,12 @@ public:
     formalism::LiteralView equality_literal(formalism::PredicateView predicate, ygg::Index<formalism::Object> object);
     bool domain_uses_equality(formalism::DomainView domain) const;
     void add_equality_predicate_to_domain(ygg::Data<formalism::Domain>& data, formalism::DomainView domain);
-    void initialize_equality(ygg::Data<formalism::Task>& data, formalism::TaskView task);
+    void materialize_equality(ygg::Data<formalism::Task>& data, formalism::TaskView task);
 };
 
 template<typename Derived>
-bool EqualityTranslator<Derived>::has_requirement(formalism::EntityListView<formalism::Requirement> requirements, formalism::RequirementKind kind) const
+bool MaterializeEqualityTranslator<Derived>::has_requirement(formalism::EntityListView<formalism::Requirement> requirements,
+                                                             formalism::RequirementKind kind) const
 {
     for (auto requirement : requirements)
         if (requirement.get_kind() == kind)
@@ -52,13 +53,13 @@ bool EqualityTranslator<Derived>::has_requirement(formalism::EntityListView<form
 }
 
 template<typename Derived>
-bool EqualityTranslator<Derived>::literal_uses_equality(formalism::LiteralView literal) const
+bool MaterializeEqualityTranslator<Derived>::literal_uses_equality(formalism::LiteralView literal) const
 {
     return std::string_view(literal.get_atom().get_predicate().get_name()) == "=";
 }
 
 template<typename Derived>
-bool EqualityTranslator<Derived>::condition_uses_equality(formalism::ConditionView condition) const
+bool MaterializeEqualityTranslator<Derived>::condition_uses_equality(formalism::ConditionView condition) const
 {
     return ygg::visit(
         [&](const auto& node) -> bool
@@ -94,7 +95,7 @@ bool EqualityTranslator<Derived>::condition_uses_equality(formalism::ConditionVi
 }
 
 template<typename Derived>
-bool EqualityTranslator<Derived>::effect_uses_equality(formalism::EffectView effect) const
+bool MaterializeEqualityTranslator<Derived>::effect_uses_equality(formalism::EffectView effect) const
 {
     return ygg::visit(
         [&](const auto& node) -> bool
@@ -137,7 +138,7 @@ bool EqualityTranslator<Derived>::effect_uses_equality(formalism::EffectView eff
 }
 
 template<typename Derived>
-bool EqualityTranslator<Derived>::equality_required(formalism::TaskView task) const
+bool MaterializeEqualityTranslator<Derived>::equality_required(formalism::TaskView task) const
 {
     if (this->self().has_requirement(task.get_requirements(), formalism::RequirementKind::Equality))
         return true;
@@ -146,7 +147,7 @@ bool EqualityTranslator<Derived>::equality_required(formalism::TaskView task) co
 }
 
 template<typename Derived>
-std::optional<formalism::PredicateView> EqualityTranslator<Derived>::find_domain_equality_predicate() const
+std::optional<formalism::PredicateView> MaterializeEqualityTranslator<Derived>::find_domain_equality_predicate() const
 {
     for (auto predicate : this->m_storage->translated_domain->get_predicates())
     {
@@ -157,7 +158,7 @@ std::optional<formalism::PredicateView> EqualityTranslator<Derived>::find_domain
 }
 
 template<typename Derived>
-formalism::LiteralView EqualityTranslator<Derived>::equality_literal(formalism::PredicateView predicate, ygg::Index<formalism::Object> object)
+formalism::LiteralView MaterializeEqualityTranslator<Derived>::equality_literal(formalism::PredicateView predicate, ygg::Index<formalism::Object> object)
 {
     auto terms = ygg::IndexList<formalism::Term> {};
     const auto term = formalism::get_or_create<formalism::Term>(this->m_storage->repository, ygg::Data<formalism::Term>::Variant(object)).get_index();
@@ -168,7 +169,7 @@ formalism::LiteralView EqualityTranslator<Derived>::equality_literal(formalism::
 }
 
 template<typename Derived>
-bool EqualityTranslator<Derived>::domain_uses_equality(formalism::DomainView domain) const
+bool MaterializeEqualityTranslator<Derived>::domain_uses_equality(formalism::DomainView domain) const
 {
     for (auto predicate : domain.get_predicates())
     {
@@ -193,7 +194,7 @@ bool EqualityTranslator<Derived>::domain_uses_equality(formalism::DomainView dom
 }
 
 template<typename Derived>
-void EqualityTranslator<Derived>::add_equality_predicate_to_domain(ygg::Data<formalism::Domain>& data, formalism::DomainView domain)
+void MaterializeEqualityTranslator<Derived>::add_equality_predicate_to_domain(ygg::Data<formalism::Domain>& data, formalism::DomainView domain)
 {
     if (!this->self().has_requirement(domain.get_requirements(), formalism::RequirementKind::Equality) && !this->self().domain_uses_equality(domain))
         return;
@@ -229,7 +230,7 @@ void EqualityTranslator<Derived>::add_equality_predicate_to_domain(ygg::Data<for
 }
 
 template<typename Derived>
-void EqualityTranslator<Derived>::initialize_equality(ygg::Data<formalism::Task>& data, formalism::TaskView task)
+void MaterializeEqualityTranslator<Derived>::materialize_equality(ygg::Data<formalism::Task>& data, formalism::TaskView task)
 {
     if (!this->self().equality_required(task))
         return;

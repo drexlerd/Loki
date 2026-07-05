@@ -41,7 +41,7 @@ struct CopyContext
     ygg::UnorderedMap<GeneratedUniversalConditionKey, formalism::ConditionView> generated_universal_conditions;
     size_t num_generated_axioms = 0;
     ygg::UnorderedMap<formalism::TypeView, formalism::PredicateView> type_predicates;
-    bool remove_typing = true;
+    bool compile_typing = true;
     bool renaming_enabled = true;
     TranslationPhase phase = TranslationPhase::ToNegationNormalForm;
 };
@@ -49,10 +49,10 @@ struct CopyContext
 class CopyContextOwner
 {
 public:
-    explicit CopyContextOwner(std::shared_ptr<TranslationStorage> storage, bool remove_typing, TranslationPhase phase)
+    explicit CopyContextOwner(std::shared_ptr<TranslationStorage> storage, bool compile_typing, TranslationPhase phase)
     {
         m_context.storage = std::move(storage);
-        m_context.remove_typing = remove_typing;
+        m_context.compile_typing = compile_typing;
         m_context.phase = phase;
     }
 

@@ -96,9 +96,9 @@ formalism::ConditionExistsView ConditionTranslator<Derived>::copy(formalism::Con
     const auto condition = as_index(this->self().copy(source.get_condition()));
     this->self().leave_scope();
     auto typed_condition = condition;
-    if (this->m_phase == TranslationPhase::AddTypePredicates)
+    if (this->m_phase == TranslationPhase::CompileTyping)
         this->self().prepend_type_conditions(typed_condition, source.get_parameters());
-    const auto out_parameters = this->self().removes_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
+    const auto out_parameters = this->self().compiles_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
     return formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, out_parameters, typed_condition);
 }
 
@@ -112,9 +112,9 @@ formalism::ConditionForallView ConditionTranslator<Derived>::copy(formalism::Con
     const auto condition = as_index(this->self().copy(source.get_condition()));
     this->self().leave_scope();
     auto typed_condition = condition;
-    if (this->m_phase == TranslationPhase::AddTypePredicates)
+    if (this->m_phase == TranslationPhase::CompileTyping)
         this->self().prepend_type_conditions(typed_condition, source.get_parameters());
-    const auto out_parameters = this->self().removes_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
+    const auto out_parameters = this->self().compiles_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
     return formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository, out_parameters, typed_condition);
 }
 

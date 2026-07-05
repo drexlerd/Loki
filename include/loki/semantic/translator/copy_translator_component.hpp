@@ -40,7 +40,7 @@ protected:
         m_generated_universal_conditions(context.generated_universal_conditions),
         m_num_generated_axioms(context.num_generated_axioms),
         m_type_predicates(context.type_predicates),
-        m_remove_typing(context.remove_typing),
+        m_compile_typing(context.compile_typing),
         m_renaming_enabled(context.renaming_enabled),
         m_phase(context.phase)
     {
@@ -61,7 +61,7 @@ protected:
     ygg::UnorderedMap<GeneratedUniversalConditionKey, formalism::ConditionView>& m_generated_universal_conditions;
     size_t& m_num_generated_axioms;
     ygg::UnorderedMap<formalism::TypeView, formalism::PredicateView>& m_type_predicates;
-    bool& m_remove_typing;
+    bool& m_compile_typing;
     bool& m_renaming_enabled;
     TranslationPhase& m_phase;
 };

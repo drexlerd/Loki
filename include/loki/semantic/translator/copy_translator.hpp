@@ -19,20 +19,23 @@
 #define LOKI_SEMANTIC_TRANSLATOR_COPY_TRANSLATOR_HPP_
 
 #include "loki/semantic/translator/basic_copy_translator.hpp"
+#include "loki/semantic/translator/compile_conditional_effects_translator.hpp"
+#include "loki/semantic/translator/compile_typing_translator.hpp"
 #include "loki/semantic/translator/condition_analysis_translator.hpp"
 #include "loki/semantic/translator/condition_builder_translator.hpp"
-#include "loki/semantic/translator/condition_dnf_translator.hpp"
-#include "loki/semantic/translator/condition_nnf_translator.hpp"
-#include "loki/semantic/translator/condition_quantifier_translator.hpp"
 #include "loki/semantic/translator/condition_translator.hpp"
 #include "loki/semantic/translator/copy_translator_facade.hpp"
-#include "loki/semantic/translator/effect_normal_form_translator.hpp"
 #include "loki/semantic/translator/effect_translator.hpp"
-#include "loki/semantic/translator/equality_translator.hpp"
-#include "loki/semantic/translator/goal_simplification_translator.hpp"
+#include "loki/semantic/translator/materialize_equality_translator.hpp"
+#include "loki/semantic/translator/move_existential_quantifiers_translator.hpp"
+#include "loki/semantic/translator/remove_universal_quantifiers_translator.hpp"
+#include "loki/semantic/translator/rename_quantified_variables_translator.hpp"
+#include "loki/semantic/translator/simplify_goal_translator.hpp"
+#include "loki/semantic/translator/split_disjunctive_conditions_translator.hpp"
+#include "loki/semantic/translator/to_disjunctive_normal_form_translator.hpp"
+#include "loki/semantic/translator/to_effect_normal_form_translator.hpp"
+#include "loki/semantic/translator/to_negation_normal_form_translator.hpp"
 #include "loki/semantic/translator/top_level_translator.hpp"
-#include "loki/semantic/translator/type_translator.hpp"
-#include "loki/semantic/translator/variable_renaming_translator.hpp"
 
 namespace loki::semantic::detail
 {
@@ -41,40 +44,46 @@ class CopyTranslator :
     private CopyContextOwner,
     public CopyTranslatorFacade<CopyTranslator>,
     public BasicCopyTranslator<CopyTranslator>,
+    public CompileConditionalEffectsTranslator<CopyTranslator>,
     public ConditionTranslator<CopyTranslator>,
     public ConditionAnalysisTranslator<CopyTranslator>,
     public ConditionBuilderTranslator<CopyTranslator>,
-    public ConditionDnfTranslator<CopyTranslator>,
-    public ConditionNnfTranslator<CopyTranslator>,
-    public ConditionQuantifierTranslator<CopyTranslator>,
+    public ToDisjunctiveNormalFormTranslator<CopyTranslator>,
+    public ToNegationNormalFormTranslator<CopyTranslator>,
+    public RemoveUniversalQuantifiersTranslator<CopyTranslator>,
+    public MoveExistentialQuantifiersTranslator<CopyTranslator>,
+    public SplitDisjunctiveConditionsTranslator<CopyTranslator>,
     public EffectTranslator<CopyTranslator>,
-    public EffectNormalFormTranslator<CopyTranslator>,
-    public EqualityTranslator<CopyTranslator>,
-    public GoalSimplificationTranslator<CopyTranslator>,
+    public ToEffectNormalFormTranslator<CopyTranslator>,
+    public MaterializeEqualityTranslator<CopyTranslator>,
+    public SimplifyGoalTranslator<CopyTranslator>,
     public TopLevelTranslator<CopyTranslator>,
-    public TypeTranslator<CopyTranslator>,
-    public VariableRenamingTranslator<CopyTranslator>
+    public CompileTypingTranslator<CopyTranslator>,
+    public RenameQuantifiedVariablesTranslator<CopyTranslator>
 {
 public:
     explicit CopyTranslator(std::shared_ptr<TranslationStorage> storage,
-                            bool remove_typing = true,
+                            bool compile_typing = true,
                             TranslationPhase phase = TranslationPhase::ToNegationNormalForm) :
-        CopyContextOwner(std::move(storage), remove_typing, phase),
+        CopyContextOwner(std::move(storage), compile_typing, phase),
         CopyTranslatorFacade<CopyTranslator>(context()),
         BasicCopyTranslator<CopyTranslator>(context()),
+        CompileConditionalEffectsTranslator<CopyTranslator>(context()),
         ConditionTranslator<CopyTranslator>(context()),
         ConditionAnalysisTranslator<CopyTranslator>(context()),
         ConditionBuilderTranslator<CopyTranslator>(context()),
-        ConditionDnfTranslator<CopyTranslator>(context()),
-        ConditionNnfTranslator<CopyTranslator>(context()),
-        ConditionQuantifierTranslator<CopyTranslator>(context()),
+        ToDisjunctiveNormalFormTranslator<CopyTranslator>(context()),
+        ToNegationNormalFormTranslator<CopyTranslator>(context()),
+        RemoveUniversalQuantifiersTranslator<CopyTranslator>(context()),
+        MoveExistentialQuantifiersTranslator<CopyTranslator>(context()),
+        SplitDisjunctiveConditionsTranslator<CopyTranslator>(context()),
         EffectTranslator<CopyTranslator>(context()),
-        EffectNormalFormTranslator<CopyTranslator>(context()),
-        EqualityTranslator<CopyTranslator>(context()),
-        GoalSimplificationTranslator<CopyTranslator>(context()),
+        ToEffectNormalFormTranslator<CopyTranslator>(context()),
+        MaterializeEqualityTranslator<CopyTranslator>(context()),
+        SimplifyGoalTranslator<CopyTranslator>(context()),
         TopLevelTranslator<CopyTranslator>(context()),
-        TypeTranslator<CopyTranslator>(context()),
-        VariableRenamingTranslator<CopyTranslator>(context())
+        CompileTypingTranslator<CopyTranslator>(context()),
+        RenameQuantifiedVariablesTranslator<CopyTranslator>(context())
     {
     }
 
@@ -82,9 +91,11 @@ public:
     using CopyTranslatorFacade<CopyTranslator>::copy_task;
     using CopyTranslatorFacade<CopyTranslator>::used_predicate_names;
     using CopyTranslatorFacade<CopyTranslator>::next_generated_predicate_name;
-    using CopyTranslatorFacade<CopyTranslator>::split_disjunctive_actions;
-    using CopyTranslatorFacade<CopyTranslator>::multiply_conditional_effect_actions;
-    using CopyTranslatorFacade<CopyTranslator>::split_disjunctive_axioms;
+
+    using SplitDisjunctiveConditionsTranslator<CopyTranslator>::split_disjunctive_actions;
+    using SplitDisjunctiveConditionsTranslator<CopyTranslator>::split_disjunctive_axioms;
+
+    using CompileConditionalEffectsTranslator<CopyTranslator>::compile_conditional_effect_actions;
 
     using BasicCopyTranslator<CopyTranslator>::copy;
     using BasicCopyTranslator<CopyTranslator>::copy_list;
@@ -108,63 +119,64 @@ public:
     using ConditionBuilderTranslator<CopyTranslator>::make_conjunction;
     using ConditionBuilderTranslator<CopyTranslator>::make_disjunction;
 
-    using ConditionDnfTranslator<CopyTranslator>::to_dnf;
-    using ConditionDnfTranslator<CopyTranslator>::to_dnf_node;
+    using ToDisjunctiveNormalFormTranslator<CopyTranslator>::to_dnf;
+    using ToDisjunctiveNormalFormTranslator<CopyTranslator>::to_dnf_node;
 
-    using ConditionNnfTranslator<CopyTranslator>::negate_comparator;
-    using ConditionNnfTranslator<CopyTranslator>::negate_condition;
-    using ConditionNnfTranslator<CopyTranslator>::negate_condition_node;
-    using ConditionNnfTranslator<CopyTranslator>::copy_condition_node;
+    using ToNegationNormalFormTranslator<CopyTranslator>::negate_comparator;
+    using ToNegationNormalFormTranslator<CopyTranslator>::negate_condition;
+    using ToNegationNormalFormTranslator<CopyTranslator>::negate_condition_node;
+    using ToNegationNormalFormTranslator<CopyTranslator>::copy_condition_node;
 
-    using ConditionQuantifierTranslator<CopyTranslator>::make_generated_axiom_condition;
-    using ConditionQuantifierTranslator<CopyTranslator>::remove_universal_quantifiers;
-    using ConditionQuantifierTranslator<CopyTranslator>::remove_universal_quantifiers_node;
-    using ConditionQuantifierTranslator<CopyTranslator>::as_exists;
-    using ConditionQuantifierTranslator<CopyTranslator>::move_existentials;
-    using ConditionQuantifierTranslator<CopyTranslator>::move_existentials_node;
-    using ConditionQuantifierTranslator<CopyTranslator>::lift_top_level_exists;
+    using RemoveUniversalQuantifiersTranslator<CopyTranslator>::make_generated_axiom_condition;
+    using RemoveUniversalQuantifiersTranslator<CopyTranslator>::remove_universal_quantifiers;
+    using RemoveUniversalQuantifiersTranslator<CopyTranslator>::remove_universal_quantifiers_node;
 
-    using GoalSimplificationTranslator<CopyTranslator>::make_generated_goal_condition;
-    using GoalSimplificationTranslator<CopyTranslator>::simplify_goal_condition;
-    using GoalSimplificationTranslator<CopyTranslator>::simplify_goal_condition_node;
+    using MoveExistentialQuantifiersTranslator<CopyTranslator>::as_exists;
+    using MoveExistentialQuantifiersTranslator<CopyTranslator>::move_existentials;
+    using MoveExistentialQuantifiersTranslator<CopyTranslator>::move_existentials_node;
+    using MoveExistentialQuantifiersTranslator<CopyTranslator>::lift_top_level_exists;
+
+    using SimplifyGoalTranslator<CopyTranslator>::make_generated_goal_condition;
+    using SimplifyGoalTranslator<CopyTranslator>::simplify_goal_condition;
+    using SimplifyGoalTranslator<CopyTranslator>::simplify_goal_condition_node;
 
     using EffectTranslator<CopyTranslator>::copy;
 
-    using EqualityTranslator<CopyTranslator>::has_requirement;
-    using EqualityTranslator<CopyTranslator>::equality_required;
-    using EqualityTranslator<CopyTranslator>::find_domain_equality_predicate;
-    using EqualityTranslator<CopyTranslator>::equality_literal;
-    using EqualityTranslator<CopyTranslator>::domain_uses_equality;
-    using EqualityTranslator<CopyTranslator>::add_equality_predicate_to_domain;
-    using EqualityTranslator<CopyTranslator>::initialize_equality;
+    using MaterializeEqualityTranslator<CopyTranslator>::has_requirement;
+    using MaterializeEqualityTranslator<CopyTranslator>::equality_required;
+    using MaterializeEqualityTranslator<CopyTranslator>::find_domain_equality_predicate;
+    using MaterializeEqualityTranslator<CopyTranslator>::equality_literal;
+    using MaterializeEqualityTranslator<CopyTranslator>::domain_uses_equality;
+    using MaterializeEqualityTranslator<CopyTranslator>::add_equality_predicate_to_domain;
+    using MaterializeEqualityTranslator<CopyTranslator>::materialize_equality;
 
-    using EffectNormalFormTranslator<CopyTranslator>::wrap_effect;
-    using EffectNormalFormTranslator<CopyTranslator>::as_effect;
-    using EffectNormalFormTranslator<CopyTranslator>::normalize_effect;
-    using EffectNormalFormTranslator<CopyTranslator>::normalize_effect_node;
+    using ToEffectNormalFormTranslator<CopyTranslator>::wrap_effect;
+    using ToEffectNormalFormTranslator<CopyTranslator>::as_effect;
+    using ToEffectNormalFormTranslator<CopyTranslator>::normalize_effect;
+    using ToEffectNormalFormTranslator<CopyTranslator>::normalize_effect_node;
 
     using TopLevelTranslator<CopyTranslator>::copy;
 
-    using TypeTranslator<CopyTranslator>::collect_type_hierarchy;
-    using TypeTranslator<CopyTranslator>::copy_type_hierarchy;
-    using TypeTranslator<CopyTranslator>::maybe_strip_types;
-    using TypeTranslator<CopyTranslator>::copy_parameters_without_types;
-    using TypeTranslator<CopyTranslator>::type_predicate;
-    using TypeTranslator<CopyTranslator>::type_literal;
-    using TypeTranslator<CopyTranslator>::type_condition;
-    using TypeTranslator<CopyTranslator>::type_conditions_for_parameters;
-    using TypeTranslator<CopyTranslator>::prepend_type_conditions;
-    using TypeTranslator<CopyTranslator>::add_type_predicates_to_domain;
-    using TypeTranslator<CopyTranslator>::add_type_literals_for_object;
-    using TypeTranslator<CopyTranslator>::initialize_type_literals;
+    using CompileTypingTranslator<CopyTranslator>::collect_type_hierarchy;
+    using CompileTypingTranslator<CopyTranslator>::copy_type_hierarchy;
+    using CompileTypingTranslator<CopyTranslator>::maybe_strip_types;
+    using CompileTypingTranslator<CopyTranslator>::copy_parameters_without_types;
+    using CompileTypingTranslator<CopyTranslator>::type_predicate;
+    using CompileTypingTranslator<CopyTranslator>::type_literal;
+    using CompileTypingTranslator<CopyTranslator>::type_condition;
+    using CompileTypingTranslator<CopyTranslator>::type_conditions_for_parameters;
+    using CompileTypingTranslator<CopyTranslator>::prepend_type_conditions;
+    using CompileTypingTranslator<CopyTranslator>::compile_typing_to_domain;
+    using CompileTypingTranslator<CopyTranslator>::add_type_literals_for_object;
+    using CompileTypingTranslator<CopyTranslator>::initialize_type_literals;
 
-    using VariableRenamingTranslator<CopyTranslator>::enter_variable_scope;
-    using VariableRenamingTranslator<CopyTranslator>::leave_variable_scope;
-    using VariableRenamingTranslator<CopyTranslator>::rename_parameter;
-    using VariableRenamingTranslator<CopyTranslator>::rename_parameters;
-    using VariableRenamingTranslator<CopyTranslator>::rename_variables;
-    using VariableRenamingTranslator<CopyTranslator>::rename_action_variables;
-    using VariableRenamingTranslator<CopyTranslator>::rename_axiom_variables;
+    using RenameQuantifiedVariablesTranslator<CopyTranslator>::enter_variable_scope;
+    using RenameQuantifiedVariablesTranslator<CopyTranslator>::leave_variable_scope;
+    using RenameQuantifiedVariablesTranslator<CopyTranslator>::rename_parameter;
+    using RenameQuantifiedVariablesTranslator<CopyTranslator>::rename_parameters;
+    using RenameQuantifiedVariablesTranslator<CopyTranslator>::rename_variables;
+    using RenameQuantifiedVariablesTranslator<CopyTranslator>::rename_action_variables;
+    using RenameQuantifiedVariablesTranslator<CopyTranslator>::rename_axiom_variables;
 };
 
 }  // namespace loki::semantic::detail

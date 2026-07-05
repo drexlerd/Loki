@@ -75,14 +75,18 @@ void bind_semantic(nb::module_& m)
 {
     nb::class_<parser::ParserOptions>(m, "ParserOptions", "Options controlling semantic parser validation.")
         .def(nb::init<>())
-        .def_rw("strict", &parser::ParserOptions::strict, "Enable stricter semantic validation for requirements, arity, and type compatibility.");
+        .def_rw("strict", &parser::ParserOptions::strict, "Enable stricter semantic validation for requirements, arity, and type compatibility.")
+        .def_rw("add_action_costs", &parser::ParserOptions::add_action_costs, "Complete missing :action-costs artifacts while parsing.");
 
     nb::class_<semantic::TranslatorOptions>(m, "TranslatorOptions", "Options controlling PDDL normalization and translation.")
         .def(nb::init<>())
-        .def_rw("remove_typing", &semantic::TranslatorOptions::remove_typing, "Remove type annotations during translation.")
-        .def_rw("multiply_conditional_effects",
-                &semantic::TranslatorOptions::multiply_conditional_effects,
-                "Split actions to eliminate top-level conditional effects after effect normalization.");
+        .def_rw("compile_typing", &semantic::TranslatorOptions::compile_typing, "Compile typing away into type predicates and remove type annotations.")
+        .def_rw("compile_conditional_effects",
+                &semantic::TranslatorOptions::compile_conditional_effects,
+                "Split actions to eliminate top-level conditional effects after effect normalization.")
+        .def_rw("materialize_equality",
+                &semantic::TranslatorOptions::materialize_equality,
+                "Add equality predicate and equality initial literals during translation.");
 
     nb::class_<semantic::Parser>(m, "Parser", "Parse a PDDL domain once and parse matching tasks against it.")
         .def(nb::init<const std::string&, parser::ParserOptions>(),

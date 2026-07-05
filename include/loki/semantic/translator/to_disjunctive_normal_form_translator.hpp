@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SEMANTIC_TRANSLATOR_CONDITION_DNF_TRANSLATOR_HPP_
-#define LOKI_SEMANTIC_TRANSLATOR_CONDITION_DNF_TRANSLATOR_HPP_
+#ifndef LOKI_SEMANTIC_TRANSLATOR_TO_DISJUNCTIVE_NORMAL_FORM_TRANSLATOR_HPP_
+#define LOKI_SEMANTIC_TRANSLATOR_TO_DISJUNCTIVE_NORMAL_FORM_TRANSLATOR_HPP_
 
 #include "loki/semantic/translator/copy_translator_component.hpp"
 
@@ -24,10 +24,10 @@ namespace loki::semantic::detail
 {
 
 template<typename Derived>
-class ConditionDnfTranslator : public CopyTranslatorComponent<Derived, ConditionDnfTranslator<Derived>>
+class ToDisjunctiveNormalFormTranslator : public CopyTranslatorComponent<Derived, ToDisjunctiveNormalFormTranslator<Derived>>
 {
 public:
-    explicit ConditionDnfTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, ConditionDnfTranslator<Derived>>(context) {}
+    explicit ToDisjunctiveNormalFormTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, ToDisjunctiveNormalFormTranslator<Derived>>(context) {}
 
     formalism::ConditionView to_dnf(formalism::ConditionView condition);
     formalism::ConditionView to_dnf_node(formalism::ConditionView, formalism::ConditionOrView node);
@@ -39,13 +39,13 @@ public:
 };
 
 template<typename Derived>
-formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf(formalism::ConditionView condition)
+formalism::ConditionView ToDisjunctiveNormalFormTranslator<Derived>::to_dnf(formalism::ConditionView condition)
 {
     return ygg::visit([&](const auto& node) { return this->self().to_dnf_node(condition, node); }, condition.get_value());
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism::ConditionView, formalism::ConditionOrView node)
+formalism::ConditionView ToDisjunctiveNormalFormTranslator<Derived>::to_dnf_node(formalism::ConditionView, formalism::ConditionOrView node)
 {
     auto parts = ygg::IndexList<formalism::Condition> {};
     for (auto child : node.get_conditions())
@@ -65,7 +65,7 @@ formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism:
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism::ConditionView, formalism::ConditionAndView node)
+formalism::ConditionView ToDisjunctiveNormalFormTranslator<Derived>::to_dnf_node(formalism::ConditionView, formalism::ConditionAndView node)
 {
     auto as_indices = [](const std::vector<formalism::ConditionView>& views)
     {
@@ -110,7 +110,7 @@ formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism:
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism::ConditionView, formalism::ConditionExistsView node)
+formalism::ConditionView ToDisjunctiveNormalFormTranslator<Derived>::to_dnf_node(formalism::ConditionView, formalism::ConditionExistsView node)
 {
     const auto& data = node.get_data();
     const auto child = this->self().to_dnf(node.get_condition());
@@ -131,7 +131,7 @@ formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism:
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism::ConditionView, formalism::ConditionForallView node)
+formalism::ConditionView ToDisjunctiveNormalFormTranslator<Derived>::to_dnf_node(formalism::ConditionView, formalism::ConditionForallView node)
 {
     const auto& data = node.get_data();
     const auto child = this->self().to_dnf(node.get_condition());
@@ -153,7 +153,7 @@ formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism:
 
 template<typename Derived>
 template<typename T>
-formalism::ConditionView ConditionDnfTranslator<Derived>::to_dnf_node(formalism::ConditionView condition, T)
+formalism::ConditionView ToDisjunctiveNormalFormTranslator<Derived>::to_dnf_node(formalism::ConditionView condition, T)
 {
     return condition;
 }

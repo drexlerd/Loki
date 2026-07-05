@@ -38,10 +38,10 @@ namespace loki::semantic
 
 struct TranslatorOptions
 {
-    bool remove_typing = true;
-    bool multiply_conditional_effects = false;
-    // Add the = predicate and (= o o) initial literals; disable for consumers with native equality.
-    bool initialize_equality = true;
+    bool compile_typing = false;
+    bool compile_conditional_effects = false;
+    // Add the = predicate and (= o o) initial literals; leave off for consumers with native equality.
+    bool materialize_equality = false;
 };
 
 enum class TranslationPhase
@@ -53,18 +53,24 @@ enum class TranslationPhase
     ToDisjunctiveNormalForm,
     SplitDisjunctiveConditions,
     MoveExistentialQuantifiers,
-    AddTypePredicates,
+    CompileTyping,
     ToEffectNormalForm,
-    MultiplyConditionalEffects,
-    InitializeEquality,
+    CompileConditionalEffects,
+    MaterializeEquality,
 };
 
 inline const std::vector<std::string_view>& domain_translation_steps()
 {
     static const auto steps = std::vector<std::string_view> {
-        "to-negation-normal-form",    "rename-quantified-variables",  "remove-universal-quantifiers",
-        "to-disjunctive-normal-form", "split-disjunctive-conditions", "move-existential-quantifiers",
-        "add-type-predicates",        "to-effect-normal-form",        "initialize-equality",
+        "to-negation-normal-form",
+        "rename-quantified-variables",
+        "remove-universal-quantifiers",
+        "to-disjunctive-normal-form",
+        "split-disjunctive-conditions",
+        "move-existential-quantifiers",
+        "compile-typing",
+        "to-effect-normal-form",
+        "materialize-equality",
     };
     return steps;
 }
@@ -72,8 +78,8 @@ inline const std::vector<std::string_view>& domain_translation_steps()
 inline const std::vector<std::string_view>& task_translation_steps()
 {
     static const auto steps = std::vector<std::string_view> {
-        "to-negation-normal-form",      "rename-quantified-variables",  "remove-universal-quantifiers", "simplify-goal",       "to-disjunctive-normal-form",
-        "split-disjunctive-conditions", "move-existential-quantifiers", "to-effect-normal-form",        "initialize-equality", "add-type-predicates",
+        "to-negation-normal-form",      "rename-quantified-variables",  "remove-universal-quantifiers", "simplify-goal",        "to-disjunctive-normal-form",
+        "split-disjunctive-conditions", "move-existential-quantifiers", "to-effect-normal-form",        "materialize-equality", "compile-typing",
     };
     return steps;
 }

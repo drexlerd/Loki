@@ -87,14 +87,14 @@ formalism::EffectForallView EffectTranslator<Derived>::copy(formalism::EffectFor
     auto parameters = this->self().parameter_indices(parameter_views);
     this->self().enter_scope(parameter_views);
     auto effect = as_index(this->self().copy(source.get_effect()));
-    if (this->m_phase == TranslationPhase::AddTypePredicates)
+    if (this->m_phase == TranslationPhase::CompileTyping)
     {
         auto guard = this->self().type_conditions_for_parameters(source.get_parameters());
         const auto condition = this->self().make_conjunction(std::move(guard));
         effect =
             this->self().wrap_effect(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition.get_index(), effect)).get_index();
     }
-    const auto out_parameters = this->self().removes_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
+    const auto out_parameters = this->self().compiles_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
     const auto out = formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, out_parameters, effect);
     this->self().leave_scope();
     return out;

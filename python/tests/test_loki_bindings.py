@@ -244,7 +244,8 @@ def test_translation_bindings_return_translated_views():
     )
 
     options = pypddl.TranslatorOptions()
-    assert options.remove_typing is True
+    assert options.compile_typing is False
+    assert options.materialize_equality is False
 
     domain_translation = pypddl.translate_domain(domain, options)
     problem_translation = pypddl.translate_task(task, domain_translation, options)
@@ -257,7 +258,7 @@ def test_translation_bindings_return_translated_views():
     assert temporary_translated_task.get_domain().get_name() == domain_translation.translated_domain.get_name()
 
 
-def test_translator_options_control_typing_removal():
+def test_translator_options_control_typing_compilation():
     parser = pypddl.Parser(
         """
 (define (domain py-typed-translate)
@@ -274,10 +275,12 @@ def test_translator_options_control_typing_removal():
     )
 
     keep_typing = pypddl.TranslatorOptions()
-    keep_typing.remove_typing = False
+    keep_typing.compile_typing = False
+    strip_typing = pypddl.TranslatorOptions()
+    strip_typing.compile_typing = True
 
     kept = pypddl.translate_domain(parser.domain(), keep_typing).translated_domain
-    stripped = pypddl.translate_domain(parser.domain()).translated_domain
+    stripped = pypddl.translate_domain(parser.domain(), strip_typing).translated_domain
 
     assert len(kept.get_types()) > 0
     assert len(stripped.get_types()) == 0
@@ -292,7 +295,7 @@ def test_translator_options_control_typing_removal():
         for parameter in predicate.get_parameters():
             assert len(parameter.get_types()) == 0
 
-def test_translator_options_multiply_conditional_effects():
+def test_translator_options_compile_conditional_effects():
     parser = pypddl.Parser(
         """
 (define (domain py-conditional-multiply)
@@ -307,8 +310,8 @@ def test_translator_options_multiply_conditional_effects():
     )
 
     options = pypddl.TranslatorOptions()
-    assert options.multiply_conditional_effects is False
-    options.multiply_conditional_effects = True
+    assert options.compile_conditional_effects is False
+    options.compile_conditional_effects = True
 
     translated = pypddl.translate_domain(parser.domain(), options).translated_domain
 
@@ -636,6 +639,7 @@ def test_parser_path_entry_points_and_strict_options():
 
         options = pypddl.ParserOptions()
         assert options.strict is False
+        assert options.add_action_costs is False
         parser = pypddl.Parser(domain_path, options)
         domain = parser.domain()
         task = parser.parse_task(task_path)
@@ -800,7 +804,9 @@ def test_translate_task_task_only_equality_uses_typed_exception():
   (:predicates (p))
 )
 """)
-    domain_translation = pypddl.translate_domain(parser.domain())
+    options = pypddl.TranslatorOptions()
+    options.materialize_equality = True
+    domain_translation = pypddl.translate_domain(parser.domain(), options)
     task = parser.parse_task("""
 (define (problem py-task-only-equality-task)
   (:domain py-task-only-equality)
@@ -812,7 +818,7 @@ def test_translate_task_task_only_equality_uses_typed_exception():
 """)
 
     try:
-        pypddl.translate_task(task, domain_translation)
+        pypddl.translate_task(task, domain_translation, options)
     except pypddl.InvalidEqualityError as error:
         assert "equality predicate" in str(error)
     else:

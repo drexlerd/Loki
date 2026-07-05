@@ -193,10 +193,10 @@ const std::vector<PhaseStep>& domain_phase_steps()
         { TranslationPhase::ToDisjunctiveNormalForm, "to-disjunctive-normal-form" },
         { TranslationPhase::SplitDisjunctiveConditions, "split-disjunctive-conditions" },
         { TranslationPhase::MoveExistentialQuantifiers, "move-existential-quantifiers" },
-        { TranslationPhase::AddTypePredicates, "add-type-predicates" },
+        { TranslationPhase::CompileTyping, "compile-typing" },
         { TranslationPhase::ToEffectNormalForm, "to-effect-normal-form" },
-        { TranslationPhase::MultiplyConditionalEffects, "multiply-conditional-effects" },
-        { TranslationPhase::InitializeEquality, "initialize-equality" },
+        { TranslationPhase::CompileConditionalEffects, "compile-conditional-effects" },
+        { TranslationPhase::MaterializeEquality, "materialize-equality" },
     };
     return steps;
 }
@@ -212,8 +212,8 @@ const std::vector<PhaseStep>& task_phase_steps()
         { TranslationPhase::SplitDisjunctiveConditions, "split-disjunctive-conditions" },
         { TranslationPhase::MoveExistentialQuantifiers, "move-existential-quantifiers" },
         { TranslationPhase::ToEffectNormalForm, "to-effect-normal-form" },
-        { TranslationPhase::InitializeEquality, "initialize-equality" },
-        { TranslationPhase::AddTypePredicates, "add-type-predicates" },
+        { TranslationPhase::MaterializeEquality, "materialize-equality" },
+        { TranslationPhase::CompileTyping, "compile-typing" },
     };
     return steps;
 }
@@ -392,13 +392,13 @@ DomainTranslationResult translate(formalism::DomainView domain, const Translator
 
     for (const auto& step : detail::domain_phase_steps())
     {
-        if (step.phase == TranslationPhase::MultiplyConditionalEffects && !options.multiply_conditional_effects)
+        if (step.phase == TranslationPhase::CompileConditionalEffects && !options.compile_conditional_effects)
             continue;
-        if (step.phase == TranslationPhase::InitializeEquality && !options.initialize_equality)
+        if (step.phase == TranslationPhase::MaterializeEquality && !options.materialize_equality)
             continue;
 
         auto phase_storage = std::make_shared<detail::TranslationStorage>(phase_index++);
-        auto semantic_copier = detail::CopyTranslator(phase_storage, options.remove_typing, step.phase);
+        auto semantic_copier = detail::CopyTranslator(phase_storage, options.compile_typing, step.phase);
         current_domain = semantic_copier.copy_domain(current_domain);
         if (current_storage)
             detail::compose_storage_maps_from_previous(*phase_storage, *current_storage);
@@ -421,7 +421,7 @@ ProblemTranslationResult translate(formalism::TaskView task, const DomainTransla
 
     for (const auto& step : detail::task_phase_steps())
     {
-        if (step.phase == TranslationPhase::InitializeEquality && !options.initialize_equality)
+        if (step.phase == TranslationPhase::MaterializeEquality && !options.materialize_equality)
             continue;
 
         auto phase_storage = std::make_shared<detail::TranslationStorage>(phase_index++, &result.m_storage->repository);
@@ -430,7 +430,7 @@ ProblemTranslationResult translate(formalism::TaskView task, const DomainTransla
         else
             detail::inherit_domain_mappings(*phase_storage, *result.m_storage);
 
-        auto semantic_copier = detail::CopyTranslator(phase_storage, options.remove_typing, step.phase);
+        auto semantic_copier = detail::CopyTranslator(phase_storage, options.compile_typing, step.phase);
         current_task = semantic_copier.copy_task(current_task);
         if (current_storage)
             detail::compose_storage_maps_from_previous(*phase_storage, *current_storage);

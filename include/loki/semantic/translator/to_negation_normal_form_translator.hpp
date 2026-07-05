@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_SEMANTIC_TRANSLATOR_CONDITION_NNF_TRANSLATOR_HPP_
-#define LOKI_SEMANTIC_TRANSLATOR_CONDITION_NNF_TRANSLATOR_HPP_
+#ifndef LOKI_SEMANTIC_TRANSLATOR_TO_NEGATION_NORMAL_FORM_TRANSLATOR_HPP_
+#define LOKI_SEMANTIC_TRANSLATOR_TO_NEGATION_NORMAL_FORM_TRANSLATOR_HPP_
 
 #include "loki/semantic/translator/copy_translator_component.hpp"
 
@@ -24,10 +24,10 @@ namespace loki::semantic::detail
 {
 
 template<typename Derived>
-class ConditionNnfTranslator : public CopyTranslatorComponent<Derived, ConditionNnfTranslator<Derived>>
+class ToNegationNormalFormTranslator : public CopyTranslatorComponent<Derived, ToNegationNormalFormTranslator<Derived>>
 {
 public:
-    explicit ConditionNnfTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, ConditionNnfTranslator<Derived>>(context) {}
+    explicit ToNegationNormalFormTranslator(CopyContext& context) : CopyTranslatorComponent<Derived, ToNegationNormalFormTranslator<Derived>>(context) {}
 
     formalism::BinaryComparator negate_comparator(formalism::BinaryComparator comparator);
     formalism::ConditionView negate_condition(formalism::ConditionView source);
@@ -46,7 +46,7 @@ public:
 };
 
 template<typename Derived>
-formalism::BinaryComparator ConditionNnfTranslator<Derived>::negate_comparator(formalism::BinaryComparator comparator)
+formalism::BinaryComparator ToNegationNormalFormTranslator<Derived>::negate_comparator(formalism::BinaryComparator comparator)
 {
     switch (comparator)
     {
@@ -67,13 +67,13 @@ formalism::BinaryComparator ConditionNnfTranslator<Derived>::negate_comparator(f
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition(formalism::ConditionView source)
+formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition(formalism::ConditionView source)
 {
     return ygg::visit([&](const auto& arg) { return this->self().negate_condition_node(arg); }, source.get_value());
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionLiteralView source)
+formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition_node(formalism::ConditionLiteralView source)
 {
     const auto literal = source.get_literal();
     const auto negated_literal =
@@ -82,7 +82,7 @@ formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionAndView source)
+formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition_node(formalism::ConditionAndView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : source.get_conditions())
@@ -91,7 +91,7 @@ formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionOrView source)
+formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition_node(formalism::ConditionOrView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     for (auto condition : source.get_conditions())
@@ -100,13 +100,13 @@ formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionNotView source)
+formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition_node(formalism::ConditionNotView source)
 {
     return this->self().copy(source.get_condition());
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionImplyView source)
+formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition_node(formalism::ConditionImplyView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     conditions.push_back(as_index(this->self().copy(source.get_left())));
@@ -115,7 +115,7 @@ formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionExistsView source)
+formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition_node(formalism::ConditionExistsView source)
 {
     this->self().increment_quantifications(source.get_parameters());
     auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
@@ -128,7 +128,7 @@ formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionForallView source)
+formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition_node(formalism::ConditionForallView source)
 {
     this->self().increment_quantifications(source.get_parameters());
     auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
@@ -141,7 +141,7 @@ formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(formalism::ConditionNumericConstraintView source)
+formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition_node(formalism::ConditionNumericConstraintView source)
 {
     const auto& data = source.get_data();
     return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionNumericConstraint>(this->m_storage->repository,
@@ -151,13 +151,13 @@ formalism::ConditionView ConditionNnfTranslator<Derived>::negate_condition_node(
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(formalism::ConditionNotView source)
+formalism::ConditionView ToNegationNormalFormTranslator<Derived>::copy_condition_node(formalism::ConditionNotView source)
 {
     return this->self().negate_condition(source.get_condition());
 }
 
 template<typename Derived>
-formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(formalism::ConditionImplyView source)
+formalism::ConditionView ToNegationNormalFormTranslator<Derived>::copy_condition_node(formalism::ConditionImplyView source)
 {
     auto conditions = ygg::IndexList<formalism::Condition> {};
     conditions.push_back(as_index(this->self().negate_condition(source.get_left())));
@@ -167,7 +167,7 @@ formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(fo
 
 template<typename Derived>
 template<typename T>
-formalism::ConditionView ConditionNnfTranslator<Derived>::copy_condition_node(formalism::EntityView<T> source)
+formalism::ConditionView ToNegationNormalFormTranslator<Derived>::copy_condition_node(formalism::EntityView<T> source)
 {
     return this->self().wrap_condition(this->self().copy(source));
 }

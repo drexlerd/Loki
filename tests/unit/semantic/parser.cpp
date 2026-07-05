@@ -716,7 +716,7 @@ TEST(LokiSemanticTranslator, GeneratesFreshAxiomsForIdenticalUniversalConditions
 
     semantic::Parser parser(domain_source);
 
-    const auto translation = semantic::translate(parser.get_domain(), semantic::TranslatorOptions { .remove_typing = false });
+    const auto translation = semantic::translate(parser.get_domain(), semantic::TranslatorOptions { .compile_typing = false });
     const auto translated_domain = translation.get_translated_domain();
 
     auto generated_predicates = std::size_t {};
@@ -845,7 +845,7 @@ TEST(LokiSemanticTranslator, KeepsActionScopedEffectVariablesAfterQuantifierRena
     EXPECT_TRUE(found_takeoff);
 }
 
-TEST(LokiSemanticTranslator, AddsTypePredicatesAndRemovesTypingByDefault)
+TEST(LokiSemanticTranslator, CompilesTypingWhenEnabled)
 {
     const auto domain_source = std::string { "(define (domain typing)"
                                              "(:requirements :typing)"
@@ -864,8 +864,9 @@ TEST(LokiSemanticTranslator, AddsTypePredicatesAndRemovesTypingByDefault)
 
     semantic::Parser parser(domain_source);
 
+    const auto options = semantic::TranslatorOptions { .compile_typing = true };
     const auto domain = parser.get_domain();
-    const auto translation = semantic::translate(domain);
+    const auto translation = semantic::translate(domain, options);
     const auto translated_domain = translation.get_translated_domain();
 
     EXPECT_TRUE(has_predicate_named(translated_domain, "thing"));
@@ -880,7 +881,7 @@ TEST(LokiSemanticTranslator, AddsTypePredicatesAndRemovesTypingByDefault)
     EXPECT_TRUE(condition_mentions_predicate(action.get_precondition().value(), "thing"));
 
     const auto task = parser.parse_task(task_source);
-    const auto translated_task_result = semantic::translate(task, translation);
+    const auto translated_task_result = semantic::translate(task, translation, options);
     const auto translated_task = translated_task_result.get_translated_task();
     EXPECT_GE(count_initial_literals_for_predicate(translated_task.get_initial_literals(), "thing"), 2);
     EXPECT_GE(count_initial_literals_for_predicate(translated_task.get_initial_literals(), "object"), 2);
@@ -924,10 +925,11 @@ TEST(LokiSemanticTranslator, AddsEqualityPredicateWhenAdlDomainUsesEquality)
                                            ")" };
 
     semantic::Parser parser(domain_source);
-    const auto translation = semantic::translate(parser.get_domain());
+    const auto options = semantic::TranslatorOptions { .materialize_equality = true };
+    const auto translation = semantic::translate(parser.get_domain(), options);
     EXPECT_TRUE(has_equality_predicate(translation.get_translated_domain()));
 
-    const auto translated_result = semantic::translate(parser.parse_task(task_source), translation);
+    const auto translated_result = semantic::translate(parser.parse_task(task_source), translation, options);
     const auto translated = translated_result.get_translated_task();
     EXPECT_TRUE(has_equality_predicate(translated.get_domain()));
     EXPECT_EQ(count_equality_literals(translated.get_initial_literals()), count_unique_object_names(translation.get_translated_domain(), translated));
@@ -949,12 +951,13 @@ TEST(LokiSemanticTranslator, InitializesEqualityForConstantsAndTaskObjects)
 
     semantic::Parser parser(domain_source);
 
+    const auto options = semantic::TranslatorOptions { .materialize_equality = true };
     const auto domain = parser.get_domain();
-    const auto translation = semantic::translate(domain);
+    const auto translation = semantic::translate(domain, options);
     EXPECT_TRUE(has_equality_predicate(translation.get_translated_domain()));
 
     const auto task = parser.parse_task(task_source);
-    const auto translated_result = semantic::translate(task, translation);
+    const auto translated_result = semantic::translate(task, translation, options);
     const auto translated = translated_result.get_translated_task();
 
     EXPECT_TRUE(has_equality_predicate(translated.get_domain()));
@@ -982,7 +985,7 @@ TEST(LokiSemanticTranslator, SkipsEqualityInitializationWhenDisabled)
     semantic::Parser parser(domain_source);
 
     auto options = semantic::TranslatorOptions {};
-    options.initialize_equality = false;
+    options.materialize_equality = false;
     const auto translation = semantic::translate(parser.get_domain(), options);
     EXPECT_FALSE(has_equality_predicate(translation.get_translated_domain()));
 
@@ -1065,11 +1068,12 @@ TEST(LokiSemanticTranslator, TaskEqualityRequiresTranslatedDomainEqualityPredica
                                            ")" };
 
     semantic::Parser parser(domain_source);
-    const auto translation = semantic::translate(parser.get_domain());
+    const auto options = semantic::TranslatorOptions { .materialize_equality = true };
+    const auto translation = semantic::translate(parser.get_domain(), options);
     ASSERT_FALSE(has_equality_predicate(translation.get_translated_domain()));
 
     const auto task = parser.parse_task(task_source);
-    EXPECT_THROW(static_cast<void>(semantic::translate(task, translation)), semantic::InvalidEqualityError);
+    EXPECT_THROW(static_cast<void>(semantic::translate(task, translation, options)), semantic::InvalidEqualityError);
 }
 
 TEST(LokiSemanticTranslator, SimplifiesComplexTaskGoalsWithTaskAxioms)
