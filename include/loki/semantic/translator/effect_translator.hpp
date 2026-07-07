@@ -103,9 +103,11 @@ formalism::EffectForallView EffectTranslator<Derived>::copy(formalism::EffectFor
 template<typename Derived>
 formalism::EffectWhenView EffectTranslator<Derived>::copy(formalism::EffectWhenView source)
 {
-    return formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository,
-                                                           as_index(this->self().copy(source.get_condition())),
-                                                           as_index(this->self().copy(source.get_effect())));
+    // Sequence the child copies: argument evaluation order is unspecified, and both children
+    // may pull from the generated-name counter (compiler-independent output requires a fixed order).
+    const auto condition = as_index(this->self().copy(source.get_condition()));
+    const auto effect = as_index(this->self().copy(source.get_effect()));
+    return formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition, effect);
 }
 
 template<typename Derived>

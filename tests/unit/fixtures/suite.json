@@ -241,6 +241,10 @@
         {
             "name": "strips-minimal",
             "domain_file": "strips-minimal/domain.pddl"
+        },
+        {
+            "name": "sibling-universal-when",
+            "domain_file": "sibling-universal-when/domain.pddl"
         }
     ]
 }

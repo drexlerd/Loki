@@ -265,9 +265,11 @@ formalism::ConditionNotView RenameQuantifiedVariablesTranslator<Derived>::rename
 template<typename Derived>
 formalism::ConditionImplyView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionImplyView source)
 {
-    return formalism::get_or_create<formalism::ConditionImply>(this->m_storage->repository,
-                                                               as_index(this->self().rename_variables(source.get_left())),
-                                                               as_index(this->self().rename_variables(source.get_right())));
+    // Sequence the recursions: both sides can assign collision-rename suffixes, and argument
+    // evaluation order is unspecified.
+    const auto left = as_index(this->self().rename_variables(source.get_left()));
+    const auto right = as_index(this->self().rename_variables(source.get_right()));
+    return formalism::get_or_create<formalism::ConditionImply>(this->m_storage->repository, left, right);
 }
 
 template<typename Derived>

@@ -110,10 +110,11 @@ formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::remove_u
 template<typename Derived>
 formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionImplyView source)
 {
-    return this->self().wrap_condition(
-        formalism::get_or_create<formalism::ConditionImply>(this->m_storage->repository,
-                                                            as_index(this->self().remove_universal_quantifiers(source.get_left())),
-                                                            as_index(this->self().remove_universal_quantifiers(source.get_right()))));
+    // Sequence the recursions: both sides can generate loki-universal-* names, and argument
+    // evaluation order is unspecified.
+    const auto left = as_index(this->self().remove_universal_quantifiers(source.get_left()));
+    const auto right = as_index(this->self().remove_universal_quantifiers(source.get_right()));
+    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionImply>(this->m_storage->repository, left, right));
 }
 
 template<typename Derived>
