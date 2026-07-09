@@ -180,7 +180,9 @@ void expect_domain_invariants(formalism::DomainView domain)
 
     expect_axiom_invariants(domain.get_axioms(), "domain " + std::string(domain.get_name()));
     if (!domain.get_axioms().empty())
+    {
         EXPECT_TRUE(has_requirement_kind(domain, formalism::RequirementKind::DerivedPredicates)) << domain.get_name();
+    }
 }
 
 void expect_task_invariants(formalism::DomainView translated_domain, formalism::TaskView task)
@@ -195,15 +197,21 @@ void expect_task_invariants(formalism::DomainView translated_domain, formalism::
         const auto name = std::string(predicate.get_name());
         EXPECT_TRUE(task_predicate_names.insert(name).second) << "duplicate task predicate name " << name;
         if (name.starts_with("loki-"))
+        {
             EXPECT_FALSE(domain_predicate_names.contains(name)) << "task-generated predicate reuses domain name " << name;
+        }
     }
 
     if (const auto goal = task.get_goal())
+    {
         EXPECT_TRUE(is_conjunctive(goal.value())) << "task goal is not a conjunction of literals";
+    }
 
     expect_axiom_invariants(task.get_axioms(), "task " + std::string(task.get_name()));
     if (!task.get_axioms().empty())
+    {
         EXPECT_TRUE(has_requirement_kind(task.get_requirements(), formalism::RequirementKind::DerivedPredicates)) << task.get_name();
+    }
 }
 
 }  // namespace
@@ -262,7 +270,9 @@ TEST(LokiSemanticInvariantSuite, TranslatorOptionCombinationsKeepInvariants)
                         // Multiplied-out actions must expose plain conjunctive preconditions.
                         for (auto action : translated_domain.get_actions())
                             if (const auto precondition = action.get_precondition())
+                            {
                                 EXPECT_TRUE(is_conjunctive(precondition.value()));
+                            }
                     }
 
                     if (!task)
@@ -282,8 +292,10 @@ TEST(LokiSemanticInvariantSuite, TranslatorOptionCombinationsKeepInvariants)
                     if (materialize_equality)
                     {
                         if (has_equality_predicate(translated_domain))
+                        {
                             EXPECT_EQ(count_equality_literals(translated_task.get_initial_literals()),
                                       count_unique_object_names(translated_domain, translated_task));
+                        }
                     }
                     else
                     {
