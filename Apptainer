@@ -27,7 +27,7 @@ Stage: build
     cd /opt/loki
 
     # Install native dependencies
-    python3 -m pip install --break-system-packages pyyggdrasil>=0.0.11
+    python3 -m pip install --break-system-packages pyyggdrasil==0.0.21
 
     # Build Loki
     cmake -S . -B build \

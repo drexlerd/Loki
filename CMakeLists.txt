@@ -89,7 +89,7 @@ include("${PROJECT_SOURCE_DIR}/cmake/bootstrap_pyyggdrasil.cmake")
 # yggdrasil
 # ---------
 
-find_package(yggdrasil 0.0.18 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_package(yggdrasil 0.0.21 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(yggdrasil_FOUND)
   message(STATUS "Found yggdrasil: ${yggdrasil_DIR} (found version ${yggdrasil_VERSION})")
 endif()
