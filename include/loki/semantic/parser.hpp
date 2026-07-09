@@ -18,24 +18,12 @@
 #ifndef LOKI_SEMANTIC_PARSER_HPP_
 #define LOKI_SEMANTIC_PARSER_HPP_
 
-#include "loki/ast.hpp"
-#include "loki/formalism/formalism.hpp"
-#include "loki/parser.hpp"
-#include "loki/parser/error_handler.hpp"
-#include "loki/semantic/errors.hpp"
-#include "loki/semantic/translator.hpp"
+#include "loki/formalism/repository.hpp"
+#include "loki/semantic/options.hpp"
 
-#include <boost/optional.hpp>
-#include <cista/containers/optional.h>
-#include <cista/containers/string.h>
-#include <cstddef>
 #include <filesystem>
 #include <memory>
 #include <string>
-#include <vector>
-#include <yggdrasil/containers/associative_containers.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/semantics/hash.hpp>
 
 namespace loki::semantic
 {
@@ -46,8 +34,8 @@ std::string read_file(const fs::path& path);
 class Parser
 {
 public:
-    explicit Parser(const std::string& domain_source, parser::ParserOptions options = {});
-    explicit Parser(const fs::path& domain_path, parser::ParserOptions options = {});
+    explicit Parser(const std::string& domain_source, ParserOptions options = {});
+    explicit Parser(const fs::path& domain_path, ParserOptions options = {});
     ~Parser();
 
     Parser(const Parser&) = delete;

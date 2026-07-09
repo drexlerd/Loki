@@ -1,4 +1,5 @@
 add_library(parsers SHARED
+    parser.cpp
     semantic/builder.cpp
     semantic/context.cpp
     semantic/diagnostics.cpp

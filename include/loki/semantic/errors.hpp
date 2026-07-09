@@ -62,6 +62,12 @@ public:
     explicit MissingRequirementError(const std::string& requirement) : SemanticError("Missing required PDDL requirement: :" + requirement) {}
 };
 
+class LOKI_SEMANTIC_ERROR_API UnusedRequirementError : public SemanticError
+{
+public:
+    explicit UnusedRequirementError(const std::string& requirement) : SemanticError("Unused PDDL requirement: :" + requirement) {}
+};
+
 class LOKI_SEMANTIC_ERROR_API UndefinedTypeError : public SemanticError
 {
 public:

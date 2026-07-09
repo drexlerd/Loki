@@ -19,8 +19,6 @@
 #ifndef LOKI_PARSER_HPP_
 #define LOKI_PARSER_HPP_
 
-#include "loki/parser/options.hpp"
 #include "loki/parser/parser.hpp"
-#include "loki/parser/parser_def.hpp"
 
 #endif

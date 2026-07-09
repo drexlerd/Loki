@@ -109,6 +109,7 @@ from .._pypddl.formalism import (
     MismatchedDomainError,
     MissingDomainError,
     MissingRequirementError,
+    UnusedRequirementError,
     MultiArithmeticOperator,
     MultiFunctionExpression,
     MultiFunctionExpressionData,

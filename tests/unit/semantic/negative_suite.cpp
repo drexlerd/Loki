@@ -96,6 +96,8 @@ bool matches_error_type(const semantic::SemanticError& error, const std::string&
         return dynamic_cast<const semantic::UnsupportedRequirementError*>(&error) != nullptr;
     if (expected_error == "MissingRequirementError")
         return dynamic_cast<const semantic::MissingRequirementError*>(&error) != nullptr;
+    if (expected_error == "UnusedRequirementError")
+        return dynamic_cast<const semantic::UnusedRequirementError*>(&error) != nullptr;
     if (expected_error == "UndefinedTypeError")
         return dynamic_cast<const semantic::UndefinedTypeError*>(&error) != nullptr;
     if (expected_error == "UndefinedPredicateError")
@@ -143,7 +145,7 @@ TEST(LokiSemanticNegativeSuite, ReportsExpectedSemanticErrors)
     for (const auto& item : load_cases())
     {
         SCOPED_TRACE(item.name);
-        auto options = parser::ParserOptions {};
+        auto options = semantic::ParserOptions {};
         options.strict = item.strict;
         // Negative cases assert enforcement without action-costs completion.
         options.add_action_costs = false;
@@ -171,7 +173,8 @@ TEST(LokiSemanticNegativeSuite, ReportsExpectedSemanticErrors)
             }
             if (item.expected_column)
             {
-                EXPECT_NE(message.find("^_"), std::string::npos) << message;
+                const auto pointer = "\n" + std::string(*item.expected_column - 1, '_') + "^_";
+                EXPECT_NE(message.find(pointer), std::string::npos) << message;
             }
         }
     }

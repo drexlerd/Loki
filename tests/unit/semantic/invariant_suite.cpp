@@ -338,7 +338,7 @@ TEST(LokiSemanticInvariantSuite, AddActionCostsOptionHoldsAcrossFixtures)
         if (!benchmark_file_available(item.domain_file) || !benchmark_file_available(item.task_file))
             continue;
 
-        auto options = parser::ParserOptions {};
+        auto options = semantic::ParserOptions {};
         options.add_action_costs = true;
         auto parser = semantic::Parser(item.domain_file, options);
         const auto domain = parser.get_domain();

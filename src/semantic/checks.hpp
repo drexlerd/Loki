@@ -22,8 +22,8 @@
 #include "diagnostics.hpp"
 #include "loki/ast.hpp"
 #include "loki/formalism/formalism.hpp"
-#include "loki/parser/options.hpp"
 #include "loki/semantic/errors.hpp"
+#include "loki/semantic/options.hpp"
 #include "mappings.hpp"
 
 #include <boost/optional.hpp>
@@ -58,14 +58,34 @@ lookup_object(const DomainContext& domain_context, const ParseContext& parse_con
 
 struct SemanticChecks
 {
-    const parser::ParserOptions& options;
+    const ParserOptions& options;
     const DiagnosticContext& diagnostics;
     const DomainContext& domain_context;
-    const ParseContext& parse_context;
+    ParseContext& parse_context;
+
+    void mark_requirement_used(formalism::RequirementKind kind) const { parse_context.used_requirements.insert(kind); }
+
+    bool uses_declared_requirement(const ast::Requirement& node) const
+    {
+        for (const auto capability : requirement_capabilities(node, diagnostics))
+            if (parse_context.used_requirements.contains(capability))
+                return true;
+        return false;
+    }
+
+    void reject_unused_requirements(const std::vector<ast::Requirement>& nodes) const
+    {
+        if (!options.strict)
+            return;
+        for (const auto& node : nodes)
+            if (!uses_declared_requirement(node))
+                diagnostics.throw_at(node.name, UnusedRequirementError(key(node.name.text)));
+    }
 
     template<typename Node>
     void require_requirement(formalism::RequirementKind kind, const Node& node) const
     {
+        mark_requirement_used(kind);
         // Numeric fluent use without a numeric requirement is an error in both modes.
         if (!options.strict && kind != formalism::RequirementKind::NumericFluents)
             return;

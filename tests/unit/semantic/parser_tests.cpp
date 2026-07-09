@@ -43,7 +43,7 @@ TEST(LokiSemanticParser, PermissiveModeAllowsMissingRequirements)
 
 TEST(LokiSemanticParser, StrictModeExpandsAdlRequirement)
 {
-    auto options = parser::ParserOptions {};
+    auto options = semantic::ParserOptions {};
     options.strict = true;
     EXPECT_NO_THROW(semantic::Parser(fixture_path("adl-requirements"), options));
 }
@@ -66,7 +66,7 @@ TEST(LokiSemanticParser, PermissiveModeKeepsImplicitPredicateCompatibility)
 
 TEST(LokiSemanticParser, PreservesComplementaryLiteralsInConjunctions)
 {
-    auto options = parser::ParserOptions {};
+    auto options = semantic::ParserOptions {};
     options.add_action_costs = false;
     auto parser = semantic::Parser(fixture_path("complementary-literals"), options);
     const auto action = parser.get_domain().get_actions()[0];
@@ -114,6 +114,37 @@ TEST(LokiSemanticParser, ParsesAndTranslatesDistinctTasksAfterOneDomain)
     EXPECT_TRUE(has_object(second_translated, "b"));
     EXPECT_NE(&first_translated.get_context(), &second_translated.get_context());
     EXPECT_NE(std::string(first_translated.get_name()), std::string(second_translated.get_name()));
+}
+
+TEST(LokiSemanticParser, FailedTaskDoesNotLeakVariableScopes)
+{
+    auto options = semantic::ParserOptions {};
+    options.add_action_costs = false;
+    auto parser = semantic::Parser(std::string { R"((define (domain task-isolation)
+             (:predicates (p ?x))))" },
+                                   options);
+
+    EXPECT_THROW(parser.parse_task(std::string {
+                     R"((define (problem bad)
+                 (:domain task-isolation)
+                 (:init)
+                 (:goal (exists (?leaked) (p ?missing)))))" }),
+                 semantic::UndefinedVariableError);
+
+    EXPECT_THROW(parser.parse_task(std::string {
+                     R"((define (problem still-bad)
+                 (:domain task-isolation)
+                 (:init)
+                 (:goal (p ?leaked))))" }),
+                 semantic::UndefinedVariableError);
+
+    const auto task = parser.parse_task(std::string {
+        R"((define (problem good)
+             (:domain task-isolation)
+             (:objects o)
+             (:init)
+             (:goal (p o))))" });
+    EXPECT_EQ(task.get_name(), "good");
 }
 
 }  // namespace loki::tests

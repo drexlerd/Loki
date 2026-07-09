@@ -76,6 +76,27 @@ formalism::RequirementKind requirement_kind(const ast::Requirement& node, const 
     diagnostics.throw_at(node.name, UnsupportedRequirementError(name));
 }
 
+std::vector<formalism::RequirementKind> requirement_capabilities(formalism::RequirementKind kind)
+{
+    using enum formalism::RequirementKind;
+    if (kind == QuantifiedPreconditions)
+        return { QuantifiedPreconditions, ExistentialPreconditions, UniversalPreconditions };
+    if (kind == Fluents || kind == ActionCosts)
+        return { kind, NumericFluents };
+    return { kind };
+}
+
+std::vector<formalism::RequirementKind> requirement_capabilities(const ast::Requirement& node, const DiagnosticContext& diagnostics)
+{
+    auto result = requirement_capabilities(requirement_kind(node, diagnostics));
+    if (key(node.name.text) == "adl")
+    {
+        using enum formalism::RequirementKind;
+        result.insert(result.end(), { Strips, Typing, NegativePreconditions, DisjunctivePreconditions, Equality, ConditionalEffects });
+    }
+    return result;
+}
+
 std::string requirement_name(formalism::RequirementKind kind)
 {
     switch (kind)

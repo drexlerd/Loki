@@ -40,6 +40,21 @@
             ]
         },
         {
+            "name": "strict missing implication requirement",
+            "entry": "domain",
+            "expected_error": "MissingRequirementError",
+            "strict": true,
+            "expected_message": "Missing required PDDL requirement: :disjunctive-preconditions",
+            "expected_line": 3,
+            "expected_column": 43,
+            "domain": [
+                "(define (domain missing-implication-requirement)",
+                "  (:requirements :strips)",
+                "  (:action a :parameters () :precondition (imply (p) (q)) :effect (and))",
+                ")"
+            ]
+        },
+        {
             "name": "strict missing equality requirement",
             "entry": "domain",
             "expected_error": "MissingRequirementError",
@@ -49,6 +64,21 @@
                 "(define (domain missing-equality-requirement)",
                 "  (:predicates)",
                 "  (:action a :parameters (?x ?y) :precondition (= ?x ?y) :effect (and))",
+                ")"
+            ]
+        },
+        {
+            "name": "strict unused typing requirement",
+            "entry": "domain",
+            "expected_error": "UnusedRequirementError",
+            "expected_message": "Unused PDDL requirement: :typing",
+            "strict": true,
+            "expected_line": 2,
+            "expected_column": 18,
+            "domain": [
+                "(define (domain unused-typing-requirement)",
+                "  (:requirements :typing)",
+                "  (:predicates (p))",
                 ")"
             ]
         },

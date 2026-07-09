@@ -24,6 +24,7 @@
 
 #include <cista/containers/string.h>
 #include <string>
+#include <vector>
 
 namespace loki::semantic
 {
@@ -34,6 +35,8 @@ cista::offset::string to_cista(const std::string& text);
 
 // PDDL name <-> enum mappings.
 formalism::RequirementKind requirement_kind(const ast::Requirement& node, const DiagnosticContext& diagnostics);
+std::vector<formalism::RequirementKind> requirement_capabilities(formalism::RequirementKind kind);
+std::vector<formalism::RequirementKind> requirement_capabilities(const ast::Requirement& node, const DiagnosticContext& diagnostics);
 std::string requirement_name(formalism::RequirementKind kind);
 formalism::BinaryComparator comparator(const ast::ConditionNumericConstraint& node, const DiagnosticContext& diagnostics);
 formalism::BinaryArithmeticOperator binary_operator(std::string op);

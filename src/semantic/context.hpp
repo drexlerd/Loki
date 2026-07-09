@@ -61,59 +61,24 @@ struct DomainContext
 struct ParseContext
 {
     ygg::UnorderedSet<formalism::RequirementKind> active_requirements;
+    ygg::UnorderedSet<formalism::RequirementKind> used_requirements;
     bool active_action_costs = false;
     // Set by :fluents/:numeric-fluents only; bare :action-costs permits reads but restricts
     // numeric writes to (increase (total-cost) ...).
     bool active_numeric_fluents = false;
     ygg::UnorderedMap<formalism::VariableView, std::vector<formalism::TypeView>> variable_types;
     std::vector<ygg::UnorderedMap<std::string, formalism::VariableView>> variable_scopes;
+    ygg::UnorderedSet<std::string> declared_objects;
     ygg::UnorderedMap<std::string, formalism::ObjectView> task_objects;
 };
 
 void remember_requirement(ParseContext& parse_context, formalism::RequirementKind kind);
-void remember_adl_requirements(ParseContext& parse_context);
 
 formalism::TypeView
 intern_type(DomainContext& domain_context, formalism::Repository& repository, const std::string& name, ygg::IndexList<formalism::Type> bases);
 
 // Repopulates the symbol tables from domain_context.domain after canonicalization.
-void rebuild_domain_symbols(DomainContext& domain_context, ParseContext& parse_context, formalism::Repository& repository);
-
-// RAII guards restoring context state after a task parse.
-struct StorageScope
-{
-    DomainContext& domain_context;
-    std::shared_ptr<detail::TranslationStorage> previous;
-    ~StorageScope() { domain_context.storage = std::move(previous); }
-};
-
-struct TaskObjectScope
-{
-    ParseContext& parse_context;
-    ygg::UnorderedMap<std::string, formalism::ObjectView> previous;
-    ~TaskObjectScope() { parse_context.task_objects = std::move(previous); }
-};
-
-struct ObjectDeclarationScope
-{
-    DomainContext& domain_context;
-    ygg::UnorderedSet<std::string> previous;
-    ~ObjectDeclarationScope() { domain_context.declared_objects = std::move(previous); }
-};
-
-struct RequirementScope
-{
-    ParseContext& parse_context;
-    ygg::UnorderedSet<formalism::RequirementKind> previous_requirements;
-    bool previous_action_costs;
-    bool previous_numeric_fluents;
-    ~RequirementScope()
-    {
-        parse_context.active_requirements = std::move(previous_requirements);
-        parse_context.active_action_costs = previous_action_costs;
-        parse_context.active_numeric_fluents = previous_numeric_fluents;
-    }
-};
+void rebuild_domain_symbols(DomainContext& domain_context, formalism::Repository& repository);
 
 }  // namespace loki::semantic
 

@@ -28,9 +28,30 @@
 namespace loki::semantic
 {
 
-AstBuilder::AstBuilder(const parser::ParserOptions& options, const DiagnosticContext& diagnostics, DomainContext& domain_context, ParseContext& parse_context) :
+namespace
+{
+class VariableScope
+{
+public:
+    explicit VariableScope(ParseContext& context) : m_context(context) { m_context.variable_scopes.emplace_back(); }
+    ~VariableScope() { m_context.variable_scopes.pop_back(); }
+
+    VariableScope(const VariableScope&) = delete;
+    VariableScope& operator=(const VariableScope&) = delete;
+
+private:
+    ParseContext& m_context;
+};
+}  // namespace
+
+AstBuilder::AstBuilder(const ParserOptions& options,
+                       const DiagnosticContext& diagnostics,
+                       formalism::Repository& repository,
+                       DomainContext& domain_context,
+                       ParseContext& parse_context) :
     m_options(options),
     m_diagnostics(diagnostics),
+    m_repository(repository),
     m_domain_context(domain_context),
     m_parse_context(parse_context)
 {
@@ -54,7 +75,7 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
     m_domain_context.action_costs = m_parse_context.active_action_costs;
     m_domain_context.numeric_fluents = m_parse_context.active_numeric_fluents;
     auto types = parse_types(domain.types);
-    auto constants = parse_objects(domain.constants, m_domain_context.objects);
+    auto constants = parse_objects(domain.constants, m_domain_context.objects, m_domain_context.declared_objects);
     auto predicates = parse_predicates(domain.predicates);
     auto functions = parse_functions(domain.functions);
     if (m_parse_context.active_action_costs && !m_domain_context.declared_functions.contains("total-cost"))
@@ -76,6 +97,7 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
     if (inject_unit_costs)
         for (auto& action : actions)
             action = add_unit_cost(action);
+    checks().reject_unused_requirements(domain.requirements);
 
     auto all_types = std::vector<formalism::TypeView> {};
     for (const auto& [_, type] : m_domain_context.types)
@@ -102,7 +124,7 @@ formalism::TaskView AstBuilder::build_task(const ast::Task& task)
         m_diagnostics.throw_at(task.domain_name, MismatchedDomainError(m_domain_context.domain_name, task.domain_name.text));
 
     auto requirements = parse_requirements(task.requirements);
-    auto objects = parse_objects(task.objects, m_parse_context.task_objects);
+    auto objects = parse_objects(task.objects, m_parse_context.task_objects, m_parse_context.declared_objects);
     auto initial_literals = ygg::IndexList<formalism::Literal> {};
     auto initial_function_values = ygg::IndexList<formalism::InitialFunctionValue> {};
     for (const auto& element : task.initial)
@@ -123,6 +145,7 @@ formalism::TaskView AstBuilder::build_task(const ast::Task& task)
         checks().require_requirement(formalism::RequirementKind::DerivedPredicates, axiom);
         axioms.push_back(parse_axiom(axiom));
     }
+    checks().reject_unused_requirements(task.requirements);
 
     auto data = ygg::Data<formalism::Task>(to_cista(task.name.text),
                                            m_domain_context.domain->get_index(),
@@ -202,16 +225,13 @@ ygg::IndexList<formalism::Requirement> AstBuilder::parse_requirements(const std:
     auto result = ygg::IndexList<formalism::Requirement> {};
     for (const auto& node : nodes)
     {
-        const auto name = key(node.name.text);
         const auto kind = requirement_kind(node, m_diagnostics);
-        if (name == "action-costs")
+        if (kind == formalism::RequirementKind::ActionCosts)
             m_parse_context.active_action_costs = true;
-        if (name == "fluents" || name == "numeric-fluents")
+        if (kind == formalism::RequirementKind::Fluents || kind == formalism::RequirementKind::NumericFluents)
             m_parse_context.active_numeric_fluents = true;
-        if (name == "adl")
-            remember_adl_requirements(m_parse_context);
-        else
-            remember_requirement(m_parse_context, kind);
+        for (const auto capability : requirement_capabilities(node, m_diagnostics))
+            m_parse_context.active_requirements.insert(capability);
         result.push_back(formalism::get_or_create<formalism::Requirement>(repo(), kind).get_index());
     }
     return result;
@@ -267,13 +287,14 @@ ygg::IndexList<formalism::Type> AstBuilder::parse_type_expression_node(const ast
 }
 
 ygg::IndexList<formalism::Object> AstBuilder::parse_objects(const std::vector<ast::TypedName>& nodes,
-                                                            ygg::UnorderedMap<std::string, formalism::ObjectView>& table)
+                                                            ygg::UnorderedMap<std::string, formalism::ObjectView>& table,
+                                                            ygg::UnorderedSet<std::string>& declared_objects)
 {
     auto result = ygg::IndexList<formalism::Object> {};
     for (const auto& node : nodes)
     {
         const auto name = key(node.name.text);
-        checks().ensure_new<DuplicateObjectError>(m_domain_context.declared_objects, name, node.name);
+        checks().ensure_new<DuplicateObjectError>(declared_objects, name, node.name);
         checks().require_typing_if_needed(node.type, node.name);
         auto types = node.type ? parse_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_domain_context.object_type.get_index() };
         auto view = formalism::get_or_create<formalism::Object>(repo(), to_cista(name), std::move(types));
@@ -311,9 +332,8 @@ ygg::IndexList<formalism::Predicate> AstBuilder::parse_predicates(const std::vec
     auto result = ygg::IndexList<formalism::Predicate> {};
     for (const auto& node : nodes)
     {
-        m_parse_context.variable_scopes.emplace_back();
+        auto scope = VariableScope(m_parse_context);
         auto parameters = parse_parameters(node.parameters);
-        m_parse_context.variable_scopes.pop_back();
         const auto name = key(node.name.text);
         checks().ensure_new<DuplicatePredicateError>(m_domain_context.declared_predicates, name, node.name);
         auto view = formalism::get_or_create<formalism::Predicate>(repo(), to_cista(name), std::move(parameters));
@@ -328,9 +348,8 @@ ygg::IndexList<formalism::FunctionSkeleton> AstBuilder::parse_functions(const st
     auto result = ygg::IndexList<formalism::FunctionSkeleton> {};
     for (const auto& node : nodes)
     {
-        m_parse_context.variable_scopes.emplace_back();
+        auto scope = VariableScope(m_parse_context);
         auto parameters = parse_parameters(node.parameters);
-        m_parse_context.variable_scopes.pop_back();
         const auto name = key(node.name.text);
         checks().require_requirement(formalism::RequirementKind::NumericFluents, node.name);
         checks().ensure_new<DuplicateFunctionError>(m_domain_context.declared_functions, name, node.name);
@@ -376,6 +395,7 @@ ygg::Index<formalism::Atom> AstBuilder::parse_atom(const ast::Atom& node)
 
 ygg::Index<formalism::Literal> AstBuilder::parse_literal(const ast::Literal& node)
 {
+    checks().mark_requirement_used(formalism::RequirementKind::Strips);
     return formalism::get_or_create<formalism::Literal>(repo(), parse_atom(node.atom), node.positive).get_index();
 }
 
@@ -419,6 +439,7 @@ ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::Con
 
 ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::ConditionImply& node)
 {
+    checks().require_requirement(formalism::RequirementKind::DisjunctivePreconditions, node);
     return wrap_condition(
         formalism::get_or_create<formalism::ConditionImply>(repo(), parse_condition(node.left.get()), parse_condition(node.right.get())).get_index());
 }
@@ -426,20 +447,18 @@ ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::Con
 ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::ConditionExists& node)
 {
     checks().require_requirement(formalism::RequirementKind::ExistentialPreconditions, node);
-    m_parse_context.variable_scopes.emplace_back();
+    auto scope = VariableScope(m_parse_context);
     auto parameters = parse_parameters(node.parameters);
     auto child = parse_condition(node.condition.get());
-    m_parse_context.variable_scopes.pop_back();
     return wrap_condition(formalism::get_or_create<formalism::ConditionExists>(repo(), std::move(parameters), child).get_index());
 }
 
 ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::ConditionForall& node)
 {
     checks().require_requirement(formalism::RequirementKind::UniversalPreconditions, node);
-    m_parse_context.variable_scopes.emplace_back();
+    auto scope = VariableScope(m_parse_context);
     auto parameters = parse_parameters(node.parameters);
     auto child = parse_condition(node.condition.get());
-    m_parse_context.variable_scopes.pop_back();
     return wrap_condition(formalism::get_or_create<formalism::ConditionForall>(repo(), std::move(parameters), child).get_index());
 }
 
@@ -456,9 +475,12 @@ ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::Con
 ygg::Index<formalism::FunctionTerm> AstBuilder::parse_function_term(const ast::FunctionTerm& node)
 {
     checks().require_requirement(formalism::RequirementKind::NumericFluents, node.function);
+    const auto name = key(node.function.text);
+    if (m_parse_context.active_action_costs && name == "total-cost")
+        checks().mark_requirement_used(formalism::RequirementKind::ActionCosts);
     auto skeleton = function(node.function, node.terms.size());
-    if (m_domain_context.declared_functions.contains(key(node.function.text)))
-        checks().check_argument_types(key(node.function.text), skeleton.get_parameters(), node.terms, node.function);
+    if (m_domain_context.declared_functions.contains(name))
+        checks().check_argument_types(name, skeleton.get_parameters(), node.terms, node.function);
     auto terms = parse_terms(node.terms);
     return formalism::get_or_create<formalism::FunctionTerm>(repo(), skeleton.get_index(), std::move(terms)).get_index();
 }
@@ -538,6 +560,8 @@ ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectNum
     const auto op = numeric_effect_operator(node, m_diagnostics);
     // Bare :action-costs permits only writes of the form (increase (total-cost) ...).
     const auto is_total_cost_increase = op == formalism::NumericEffectOperator::Increase && key(node.function.function.text) == "total-cost";
+    if (m_parse_context.active_action_costs && is_total_cost_increase)
+        checks().mark_requirement_used(formalism::RequirementKind::ActionCosts);
     if (!m_parse_context.active_numeric_fluents && !(m_parse_context.active_action_costs && is_total_cost_increase))
         m_diagnostics.throw_at(node, MissingRequirementError("numeric-fluents"));
     auto skeleton = function(node.function.function, node.function.terms.size());
@@ -554,10 +578,9 @@ ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectNum
 ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectForall& node)
 {
     checks().require_requirement(formalism::RequirementKind::UniversalPreconditions, node);
-    m_parse_context.variable_scopes.emplace_back();
+    auto scope = VariableScope(m_parse_context);
     auto parameters = parse_parameters(node.parameters);
     auto child = parse_effect(node.effect.get());
-    m_parse_context.variable_scopes.pop_back();
     return wrap_effect(formalism::get_or_create<formalism::EffectForall>(repo(), std::move(parameters), child).get_index());
 }
 
@@ -598,8 +621,9 @@ ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectPro
 
 ygg::Index<formalism::Action> AstBuilder::parse_action(const ast::Action& node)
 {
+    checks().mark_requirement_used(formalism::RequirementKind::Strips);
     const auto name = key(node.name.text);
-    m_parse_context.variable_scopes.emplace_back();
+    auto scope = VariableScope(m_parse_context);
     auto parameters = parse_parameters(node.parameters);
     auto precondition = cista::optional<ygg::Index<formalism::Condition>> {};
     if (node.precondition)
@@ -607,13 +631,12 @@ ygg::Index<formalism::Action> AstBuilder::parse_action(const ast::Action& node)
     auto effect = cista::optional<ygg::Index<formalism::Effect>> {};
     if (node.effect)
         effect = parse_effect(*node.effect);
-    m_parse_context.variable_scopes.pop_back();
     return formalism::get_or_create<formalism::Action>(repo(), to_cista(name), std::move(parameters), precondition, effect).get_index();
 }
 
 ygg::Index<formalism::Axiom> AstBuilder::parse_axiom(const ast::Axiom& node)
 {
-    m_parse_context.variable_scopes.emplace_back();
+    auto scope = VariableScope(m_parse_context);
     auto parameters = parse_parameters(node.head.parameters);
     auto terms = ygg::IndexList<formalism::Term> {};
     for (const auto& parameter : node.head.parameters)
@@ -627,7 +650,6 @@ ygg::Index<formalism::Axiom> AstBuilder::parse_axiom(const ast::Axiom& node)
     auto atom = formalism::get_or_create<formalism::Atom>(repo(), pred.get_index(), std::move(terms)).get_index();
     auto head = formalism::get_or_create<formalism::Literal>(repo(), atom, true).get_index();
     auto condition = parse_condition(node.condition);
-    m_parse_context.variable_scopes.pop_back();
     return formalism::get_or_create<formalism::Axiom>(repo(), std::move(parameters), head, condition).get_index();
 }
 

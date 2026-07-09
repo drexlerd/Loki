@@ -47,6 +47,7 @@ void bind_semantic_errors(nb::module_& m)
 
     nb::exception<semantic::UnsupportedRequirementError>(m, "UnsupportedRequirementError", semantic_error.ptr());
     nb::exception<semantic::MissingRequirementError>(m, "MissingRequirementError", semantic_error.ptr());
+    nb::exception<semantic::UnusedRequirementError>(m, "UnusedRequirementError", semantic_error.ptr());
 
     nb::exception<semantic::UndefinedTypeError>(m, "UndefinedTypeError", semantic_error.ptr());
     nb::exception<semantic::UndefinedPredicateError>(m, "UndefinedPredicateError", semantic_error.ptr());
@@ -73,10 +74,10 @@ void bind_semantic_errors(nb::module_& m)
 
 void bind_semantic(nb::module_& m)
 {
-    nb::class_<parser::ParserOptions>(m, "ParserOptions", "Options controlling semantic parser validation.")
+    nb::class_<semantic::ParserOptions>(m, "ParserOptions", "Options controlling semantic parser validation.")
         .def(nb::init<>())
-        .def_rw("strict", &parser::ParserOptions::strict, "Enable stricter semantic validation for requirements, arity, and type compatibility.")
-        .def_rw("add_action_costs", &parser::ParserOptions::add_action_costs, "Complete missing :action-costs artifacts while parsing.");
+        .def_rw("strict", &semantic::ParserOptions::strict, "Enable stricter semantic validation for requirements, arity, and type compatibility.")
+        .def_rw("add_action_costs", &semantic::ParserOptions::add_action_costs, "Complete missing :action-costs artifacts while parsing.");
 
     nb::class_<semantic::TranslatorOptions>(m, "TranslatorOptions", "Options controlling PDDL normalization and translation.")
         .def(nb::init<>())
@@ -89,13 +90,13 @@ void bind_semantic(nb::module_& m)
                 "Add equality predicate and equality initial literals during translation.");
 
     nb::class_<semantic::Parser>(m, "Parser", "Parse a PDDL domain once and parse matching tasks against it.")
-        .def(nb::init<const std::string&, parser::ParserOptions>(),
+        .def(nb::init<const std::string&, semantic::ParserOptions>(),
              "domain_source"_a,
-             "options"_a = parser::ParserOptions {},
+             "options"_a = semantic::ParserOptions {},
              "Parse a PDDL domain from a source string.")
-        .def(nb::init<const std::filesystem::path&, parser::ParserOptions>(),
+        .def(nb::init<const std::filesystem::path&, semantic::ParserOptions>(),
              "domain_path"_a,
-             "options"_a = parser::ParserOptions {},
+             "options"_a = semantic::ParserOptions {},
              "Parse a PDDL domain from a filesystem path.")
         .def("domain", &semantic::Parser::get_domain, nb::keep_alive<0, 1>(), "Return the parsed domain view.")
         .def("repository",

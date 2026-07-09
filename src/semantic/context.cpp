@@ -35,26 +35,8 @@ DomainContext::DomainContext(std::shared_ptr<detail::TranslationStorage> storage
 
 void remember_requirement(ParseContext& parse_context, formalism::RequirementKind kind)
 {
-    parse_context.active_requirements.insert(kind);
-    if (kind == formalism::RequirementKind::QuantifiedPreconditions)
-    {
-        parse_context.active_requirements.insert(formalism::RequirementKind::ExistentialPreconditions);
-        parse_context.active_requirements.insert(formalism::RequirementKind::UniversalPreconditions);
-    }
-    if (kind == formalism::RequirementKind::Fluents)
-        parse_context.active_requirements.insert(formalism::RequirementKind::NumericFluents);
-    if (kind == formalism::RequirementKind::ActionCosts)
-        parse_context.active_requirements.insert(formalism::RequirementKind::NumericFluents);
-}
-
-void remember_adl_requirements(ParseContext& parse_context)
-{
-    remember_requirement(parse_context, formalism::RequirementKind::Typing);
-    remember_requirement(parse_context, formalism::RequirementKind::NegativePreconditions);
-    remember_requirement(parse_context, formalism::RequirementKind::DisjunctivePreconditions);
-    remember_requirement(parse_context, formalism::RequirementKind::Equality);
-    remember_requirement(parse_context, formalism::RequirementKind::QuantifiedPreconditions);
-    remember_requirement(parse_context, formalism::RequirementKind::ConditionalEffects);
+    for (const auto capability : requirement_capabilities(kind))
+        parse_context.active_requirements.insert(capability);
 }
 
 formalism::TypeView
@@ -69,7 +51,7 @@ intern_type(DomainContext& domain_context, formalism::Repository& repository, co
     return view;
 }
 
-void rebuild_domain_symbols(DomainContext& domain_context, ParseContext& parse_context, formalism::Repository& repository)
+void rebuild_domain_symbols(DomainContext& domain_context, formalism::Repository& repository)
 {
     domain_context.types.clear();
     domain_context.objects.clear();
@@ -79,13 +61,9 @@ void rebuild_domain_symbols(DomainContext& domain_context, ParseContext& parse_c
     domain_context.declared_objects.clear();
     domain_context.declared_predicates.clear();
     domain_context.declared_functions.clear();
-    parse_context.active_requirements.clear();
     domain_context.requirement_kinds.clear();
-    parse_context.active_action_costs = false;
     domain_context.action_costs = false;
-    parse_context.active_numeric_fluents = false;
     domain_context.numeric_fluents = false;
-    parse_context.variable_types.clear();
     if (!domain_context.domain)
         return;
 
@@ -98,6 +76,7 @@ void rebuild_domain_symbols(DomainContext& domain_context, ParseContext& parse_c
             self(self, base);
     };
 
+    auto parse_context = ParseContext {};
     for (auto requirement : domain_context.domain->get_requirements())
         remember_requirement(parse_context, requirement.get_kind());
     domain_context.requirement_kinds = parse_context.active_requirements;

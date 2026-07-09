@@ -15,14 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_PARSER_PARSER_HPP_
 #define LOKI_PARSER_PARSER_HPP_
 
 #include "loki/ast/ast.hpp"
 #include "loki/parser/config.hpp"
 #include "loki/parser/error_handler.hpp"
-#include "loki/parser/options.hpp"
 
 #include <boost/spirit/home/x3.hpp>
 
@@ -118,9 +116,8 @@ rules::task_type const& task();
 rules::file_type const& file();
 
 template<typename Iterator, typename Parser, typename Node>
-bool parse_ast(Iterator& first, Iterator last, const Parser& parser, Node& out, ErrorHandler<Iterator>& error_handler, const ParserOptions& options = {})
+bool parse_ast(Iterator& first, Iterator last, const Parser& parser, Node& out, ErrorHandler<Iterator>& error_handler)
 {
-    (void) options;
     error_handler.clear_error();
     out = Node {};
     auto wrapped = x3::with<ErrorHandlerTag>(std::ref(error_handler))[parser];
@@ -128,16 +125,15 @@ bool parse_ast(Iterator& first, Iterator last, const Parser& parser, Node& out, 
 }
 
 template<typename Parser, typename Node>
-bool parse_ast(const std::string& source, const Parser& parser, Node& out, ErrorHandlerType& error_handler, const ParserOptions& options = {})
+bool parse_ast(const std::string& source, const Parser& parser, Node& out, ErrorHandlerType& error_handler)
 {
     auto first = source.begin();
-    return parse_ast(first, source.end(), parser, out, error_handler, options);
+    return parse_ast(first, source.end(), parser, out, error_handler);
 }
 
 template<typename Iterator, typename Parser, typename Node>
-bool parse_full(Iterator& first, Iterator last, const Parser& parser, Node& out, ErrorHandler<Iterator>& error_handler, const ParserOptions& options = {})
+bool parse_full(Iterator& first, Iterator last, const Parser& parser, Node& out, ErrorHandler<Iterator>& error_handler)
 {
-    (void) options;
     error_handler.clear_error();
     out = Node {};
     auto wrapped = x3::with<ErrorHandlerTag>(std::ref(error_handler))[parser >> x3::eoi];
@@ -145,41 +141,20 @@ bool parse_full(Iterator& first, Iterator last, const Parser& parser, Node& out,
 }
 
 template<typename Parser, typename Node>
-bool parse_full(const std::string& source, const Parser& parser, Node& out, ErrorHandlerType& error_handler, const ParserOptions& options = {})
+bool parse_full(const std::string& source, const Parser& parser, Node& out, ErrorHandlerType& error_handler)
 {
     auto first = source.begin();
-    return parse_full(first, source.end(), parser, out, error_handler, options);
-}
-
-inline bool parse_domain_with_options(const std::string& source, ast::Domain& out, ErrorHandlerType& error_handler, const ParserOptions& options)
-{
-    return parse_full(source, domain(), out, error_handler, options);
+    return parse_full(first, source.end(), parser, out, error_handler);
 }
 
 inline bool parse_domain(const std::string& source, ast::Domain& out, ErrorHandlerType& error_handler)
 {
-    return parse_domain_with_options(source, out, error_handler, {});
+    return parse_full(source, domain(), out, error_handler);
 }
 
-inline bool parse_task_with_options(const std::string& source, ast::Task& out, ErrorHandlerType& error_handler, const ParserOptions& options)
-{
-    return parse_full(source, task(), out, error_handler, options);
-}
+inline bool parse_task(const std::string& source, ast::Task& out, ErrorHandlerType& error_handler) { return parse_full(source, task(), out, error_handler); }
 
-inline bool parse_task(const std::string& source, ast::Task& out, ErrorHandlerType& error_handler)
-{
-    return parse_task_with_options(source, out, error_handler, {});
-}
-
-inline bool parse_file_with_options(const std::string& source, ast::File& out, ErrorHandlerType& error_handler, const ParserOptions& options)
-{
-    return parse_full(source, file(), out, error_handler, options);
-}
-
-inline bool parse_file(const std::string& source, ast::File& out, ErrorHandlerType& error_handler)
-{
-    return parse_file_with_options(source, out, error_handler, {});
-}
+inline bool parse_file(const std::string& source, ast::File& out, ErrorHandlerType& error_handler) { return parse_full(source, file(), out, error_handler); }
 
 }
 

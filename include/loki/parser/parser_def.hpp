@@ -457,28 +457,4 @@ BOOST_SPIRIT_DEFINE(variable_identifier,
 }  // namespace detail
 }  // namespace loki::parser::rules
 
-namespace loki::parser
-{
-inline rules::identifier_type const& identifier() { return rules::identifier; }
-inline rules::type_expression_type const& type_expression() { return rules::type_expression; }
-inline rules::typed_name_list_type const& typed_name_list() { return rules::typed_name_list; }
-inline rules::typed_variable_list_type const& typed_variable_list() { return rules::typed_variable_list; }
-inline rules::term_type const& term() { return rules::term; }
-inline rules::atom_type const& atom() { return rules::atom; }
-inline rules::literal_type const& literal() { return rules::literal; }
-inline rules::function_term_type const& function_term() { return rules::function_term; }
-inline rules::function_expression_type const& function_expression() { return rules::function_expression; }
-inline rules::condition_type const& condition() { return rules::condition; }
-inline rules::effect_type const& effect() { return rules::effect; }
-inline rules::predicate_declaration_type const& predicate_declaration() { return rules::predicate_declaration; }
-inline rules::function_declaration_type const& function_declaration() { return rules::function_declaration; }
-inline rules::action_type const& action() { return rules::action; }
-inline rules::axiom_type const& axiom() { return rules::axiom; }
-inline rules::metric_type const& metric() { return rules::metric; }
-inline rules::initial_function_value_type const& initial_function_value() { return rules::initial_function_value; }
-inline rules::domain_type const& domain() { return rules::domain; }
-inline rules::task_type const& task() { return rules::task; }
-inline rules::file_type const& file() { return rules::file; }
-}
-
 #endif

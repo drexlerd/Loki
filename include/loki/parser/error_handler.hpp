@@ -22,9 +22,6 @@
 
 #include <sstream>
 #include <string>
-#include <yggdrasil/containers/associative_containers.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
-#include <yggdrasil/semantics/hash.hpp>
 
 namespace loki::parser
 {
@@ -49,8 +46,6 @@ std::string format_error_at(const ErrorHandler<Iterator>& source, const x3::posi
 
 struct ErrorHandlerBase
 {
-    ygg::UnorderedMap<std::string, std::string> id_map;
-
     template<typename Iterator, typename Ast, typename Context>
     void on_success(Iterator const& first, Iterator const& last, Ast& ast, Context const& context)
     {
@@ -62,8 +57,6 @@ struct ErrorHandlerBase
     x3::error_handler_result on_error(Iterator& /*first*/, Iterator const& /*last*/, Exception const& x, Context const& context)
     {
         auto which = std::string(x.which());
-        if (auto it = id_map.find(which); it != id_map.end())
-            which = it->second;
 
         auto message = "Error! Expecting: " + which + " here:";
         auto& error_handler = x3::get<ErrorHandlerTag>(context).get();

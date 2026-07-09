@@ -28,12 +28,13 @@
 namespace loki
 {
 
-using ParserOptions = parser::ParserOptions;
+using ParserOptions = semantic::ParserOptions;
 using Parser = semantic::Parser;
 using SemanticError = semantic::SemanticError;
 using ParseError = semantic::ParseError;
 using UnsupportedRequirementError = semantic::UnsupportedRequirementError;
 using MissingRequirementError = semantic::MissingRequirementError;
+using UnusedRequirementError = semantic::UnusedRequirementError;
 using UndefinedTypeError = semantic::UndefinedTypeError;
 using UndefinedPredicateError = semantic::UndefinedPredicateError;
 using UndefinedObjectError = semantic::UndefinedObjectError;

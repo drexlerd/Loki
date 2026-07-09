@@ -15,10 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_SEMANTIC_HPP_
 #define LOKI_SEMANTIC_HPP_
 
+#include "loki/semantic/errors.hpp"
 #include "loki/semantic/parser.hpp"
 #include "loki/semantic/translator.hpp"
 

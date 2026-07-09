@@ -23,7 +23,7 @@
 #include "diagnostics.hpp"
 #include "loki/ast.hpp"
 #include "loki/formalism/formalism.hpp"
-#include "loki/parser/options.hpp"
+#include "loki/semantic/options.hpp"
 
 #include <cista/containers/optional.h>
 #include <cstddef>
@@ -35,23 +35,27 @@ namespace loki::semantic
 {
 
 // Translates a syntactic AST into (un-canonicalized) formalism entities inside the
-// repository of domain_context.storage. Storage lifecycle, canonicalization, and
-// scope handling across task parses belong to the caller.
+// supplied repository. Storage lifecycle and canonicalization belong to the caller.
 class AstBuilder
 {
 public:
-    AstBuilder(const parser::ParserOptions& options, const DiagnosticContext& diagnostics, DomainContext& domain_context, ParseContext& parse_context);
+    AstBuilder(const ParserOptions& options,
+               const DiagnosticContext& diagnostics,
+               formalism::Repository& repository,
+               DomainContext& domain_context,
+               ParseContext& parse_context);
 
     formalism::DomainView build_domain(const ast::Domain& domain);
     formalism::TaskView build_task(const ast::Task& task);
 
 private:
-    const parser::ParserOptions& m_options;
+    const ParserOptions& m_options;
     const DiagnosticContext& m_diagnostics;
+    formalism::Repository& m_repository;
     DomainContext& m_domain_context;
     ParseContext& m_parse_context;
 
-    formalism::Repository& repo() noexcept { return m_domain_context.storage->repository; }
+    formalism::Repository& repo() noexcept { return m_repository; }
     SemanticChecks checks() const { return SemanticChecks { m_options, m_diagnostics, m_domain_context, m_parse_context }; }
 
     // Symbol lookup with auto-declaration in non-strict mode.
@@ -65,7 +69,9 @@ private:
     ygg::IndexList<formalism::Type> parse_type_expression(const ast::TypeExpression& type);
     ygg::IndexList<formalism::Type> parse_type_expression_node(const ast::TypeReference& node);
     ygg::IndexList<formalism::Type> parse_type_expression_node(const ast::EitherType& node);
-    ygg::IndexList<formalism::Object> parse_objects(const std::vector<ast::TypedName>& nodes, ygg::UnorderedMap<std::string, formalism::ObjectView>& table);
+    ygg::IndexList<formalism::Object> parse_objects(const std::vector<ast::TypedName>& nodes,
+                                                    ygg::UnorderedMap<std::string, formalism::ObjectView>& table,
+                                                    ygg::UnorderedSet<std::string>& declared_objects);
     ygg::IndexList<formalism::Parameter> parse_parameters(const std::vector<ast::TypedVariable>& nodes);
     ygg::IndexList<formalism::Predicate> parse_predicates(const std::vector<ast::PredicateDeclaration>& nodes);
     ygg::IndexList<formalism::FunctionSkeleton> parse_functions(const std::vector<ast::FunctionDeclaration>& nodes);

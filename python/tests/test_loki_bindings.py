@@ -340,6 +340,7 @@ def test_semantic_exceptions_have_expected_hierarchy():
         "MismatchedDomainError",
         "UnsupportedRequirementError",
         "MissingRequirementError",
+        "UnusedRequirementError",
         "UndefinedTypeError",
         "UndefinedPredicateError",
         "UndefinedObjectError",

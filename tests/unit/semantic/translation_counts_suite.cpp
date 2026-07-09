@@ -40,7 +40,7 @@ struct ParserSuiteCase
 
 struct ConfigurationExpectation
 {
-    parser::ParserOptions parser_options;
+    semantic::ParserOptions parser_options;
     semantic::TranslatorOptions options;
     std::size_t domain_types;
     std::size_t domain_predicates;
@@ -88,7 +88,7 @@ TranslationCountExpectation parse_expectation(const boost::json::object& object)
         const auto& options = ygg::common::as_object(configuration, "options", "case.configuration");
         const auto& domain = ygg::common::as_object(configuration, "translated_domain", "case.configuration");
         const auto& task = ygg::common::as_object(configuration, "translated_task", "case.configuration");
-        auto parser_options = parser::ParserOptions {};
+        auto parser_options = semantic::ParserOptions {};
         parser_options.add_action_costs = ygg::common::as_bool(parser_options_object, "add_action_costs", "case.configuration.parser_options");
         auto translator_options = semantic::TranslatorOptions {};
         translator_options.compile_typing = ygg::common::as_bool(options, "compile_typing", "case.configuration.options");

@@ -75,6 +75,7 @@ TEST(LokiPublicFacade, ExposesSemanticErrorsThroughLokiNamespace)
     static_assert(std::is_same_v<loki::ParseError, loki::semantic::ParseError>);
     static_assert(std::is_same_v<loki::UnsupportedRequirementError, loki::semantic::UnsupportedRequirementError>);
     static_assert(std::is_same_v<loki::MissingRequirementError, loki::semantic::MissingRequirementError>);
+    static_assert(std::is_same_v<loki::UnusedRequirementError, loki::semantic::UnusedRequirementError>);
     static_assert(std::is_same_v<loki::UndefinedTypeError, loki::semantic::UndefinedTypeError>);
     static_assert(std::is_same_v<loki::UndefinedPredicateError, loki::semantic::UndefinedPredicateError>);
     static_assert(std::is_same_v<loki::UndefinedObjectError, loki::semantic::UndefinedObjectError>);

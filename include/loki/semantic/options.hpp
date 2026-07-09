@@ -15,10 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LOKI_PARSER_OPTIONS_HPP_
-#define LOKI_PARSER_OPTIONS_HPP_
+#ifndef LOKI_SEMANTIC_OPTIONS_HPP_
+#define LOKI_SEMANTIC_OPTIONS_HPP_
 
-namespace loki::parser
+namespace loki::semantic
 {
 
 struct ParserOptions
@@ -29,6 +29,14 @@ struct ParserOptions
     bool add_action_costs = true;
 };
 
-}  // namespace loki::parser
+struct TranslatorOptions
+{
+    bool compile_typing = true;
+    bool compile_conditional_effects = false;
+    // Add the = predicate and (= o o) initial literals; turn off for consumers with native equality.
+    bool materialize_equality = true;
+};
+
+}  // namespace loki::semantic
 
 #endif

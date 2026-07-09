@@ -34,7 +34,6 @@
 #include <loki/loki.hpp>
 #include <loki/parser.hpp>
 #include <loki/parser/error_handler.hpp>
-#include <loki/parser/options.hpp>
 #include <loki/parser/parser.hpp>
 #include <loki/semantic.hpp>
 #include <loki/semantic/errors.hpp>

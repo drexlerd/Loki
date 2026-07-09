@@ -72,7 +72,7 @@ TEST(LokiSemanticActionCosts, AddsTotalCostFunctionInPermissiveMode)
 
 TEST(LokiSemanticActionCosts, AddActionCostsOptionInjectsUnitCosts)
 {
-    auto options = parser::ParserOptions {};
+    auto options = semantic::ParserOptions {};
     options.add_action_costs = true;
     auto parser = semantic::Parser(fixture_path("unit-cost-injection"), options);
 
@@ -90,7 +90,7 @@ TEST(LokiSemanticActionCosts, AddActionCostsOptionInjectsUnitCosts)
 
 TEST(LokiSemanticActionCosts, AddActionCostsOptionSkipsActionsAlreadyWritingTotalCost)
 {
-    auto options = parser::ParserOptions {};
+    auto options = semantic::ParserOptions {};
     options.add_action_costs = true;
     auto parser = semantic::Parser(fixture_path("mixed-costs"), options);
 
@@ -109,7 +109,7 @@ TEST(LokiSemanticActionCosts, AddActionCostsOptionSkipsActionsAlreadyWritingTota
 
 TEST(LokiSemanticActionCosts, AddActionCostsOptionCompletesInsteadOfStrictErrors)
 {
-    auto options = parser::ParserOptions {};
+    auto options = semantic::ParserOptions {};
     options.strict = true;
     options.add_action_costs = true;
     auto parser = semantic::Parser(fixture_path("action-costs"), options);
@@ -128,7 +128,7 @@ TEST(LokiSemanticActionCosts, NumericFluentsTaskWithoutMetricKeepsMetricAbsent)
     {
         for (const auto add_action_costs : { false, true })
         {
-            auto options = parser::ParserOptions {};
+            auto options = semantic::ParserOptions {};
             options.strict = strict;
             options.add_action_costs = add_action_costs;
             auto parser = semantic::Parser(fixture_path("numeric-fluents"), options);
