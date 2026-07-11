@@ -45,3 +45,6 @@ __pycache__
 *.exe
 *.out
 *.app
+
+# Benchmark data materialized by pypddl-datasets (see README)
+data/

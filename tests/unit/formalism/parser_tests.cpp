@@ -28,8 +28,8 @@ namespace fs = std::filesystem;
 
 TEST(LokiTests, ParserTest)
 {
-    const auto domain_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/domain.pddl");
-    const auto problem_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/gripper/test-1.pddl");
+    const auto domain_file = fs::path(std::string(DATA_DIR) + "benchmarks/classical/tests/gripper/domain.pddl");
+    const auto problem_file = fs::path(std::string(DATA_DIR) + "benchmarks/classical/tests/gripper/test-1.pddl");
     LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(domain_file);
     LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(problem_file);
 

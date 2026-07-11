@@ -399,7 +399,7 @@ TEST(LokiSemanticInvariantSuite, AddActionCostsOptionHoldsAcrossFixtures)
 
 TEST(LokiSemanticInvariantSuite, ParsesDomainAndManyTasks)
 {
-    const auto root = fs::path(std::string(DATA_DIR)) / "planning-benchmarks" / "tests" / "classical" / "gripper";
+    const auto root = fs::path(std::string(DATA_DIR)) / "benchmarks" / "classical" / "tests" / "gripper";
     LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(root / "domain.pddl");
     LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(root / "test-1.pddl");
 

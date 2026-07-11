@@ -21,8 +21,6 @@ jobs:
     steps:
       - name: Checkout Loki
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -36,6 +34,11 @@ jobs:
         env:
           PIP_NO_CACHE_DIR: 1
           PYYGGDRASIL_JOBS: 2
+
+      - name: Fetch benchmark data
+        run: |
+          python -m pip install --no-cache-dir pypddl-datasets
+          python -c "import pypddl_datasets as pb; [pb.export_suite(s, 'data/benchmarks') for s in ('tests-classical', 'tests-numeric')]"
 
       - name: Install CMake on Linux
         if: runner.os == 'Linux'

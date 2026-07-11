@@ -213,11 +213,11 @@ TEST(LokiParserSuite, FormatterPrintsConstructedAstAsParseablePddl)
 
 TEST(LokiParserSuite, ParsesAndReparsesRepresentativeBenchmarkDomains)
 {
-    const auto root = fs::path(std::string(DATA_DIR)) / "planning-benchmarks" / "tests";
+    const auto root = fs::path(std::string(DATA_DIR)) / "benchmarks";
     const std::vector<fs::path> domains = {
-        root / "classical" / "gripper" / "domain.pddl",
-        root / "classical" / "miconic-fulladl" / "domain.pddl",
-        root / "numeric" / "delivery" / "domain.pddl",
+        root / "classical" / "tests" / "gripper" / "domain.pddl",
+        root / "classical" / "tests" / "miconic-fulladl" / "domain.pddl",
+        root / "numeric" / "tests" / "delivery" / "domain.pddl",
     };
 
     LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(domains.front());
@@ -231,11 +231,11 @@ TEST(LokiParserSuite, ParsesAndReparsesRepresentativeBenchmarkDomains)
 
 TEST(LokiParserSuite, ParsesAndReparsesRepresentativeBenchmarkTasks)
 {
-    const auto root = fs::path(std::string(DATA_DIR)) / "planning-benchmarks" / "tests";
+    const auto root = fs::path(std::string(DATA_DIR)) / "benchmarks";
     const std::vector<fs::path> tasks = {
-        root / "classical" / "gripper" / "test-1.pddl",
-        root / "classical" / "miconic-fulladl" / "test-1.pddl",
-        root / "numeric" / "delivery" / "test-1.pddl",
+        root / "classical" / "tests" / "gripper" / "test-1.pddl",
+        root / "classical" / "tests" / "miconic-fulladl" / "test-1.pddl",
+        root / "numeric" / "tests" / "delivery" / "test-1.pddl",
     };
 
     LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(tasks.front());

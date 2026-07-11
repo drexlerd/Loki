@@ -197,8 +197,8 @@ TEST(LokiSemanticTranslator, CompilesTypingWhenEnabled)
 
 TEST(LokiSemanticTranslator, PreservesTaskObjectTypesAfterDomainCanonicalization)
 {
-    const auto domain_path = fs::path(std::string(DATA_DIR)) / "planning-benchmarks/tests/classical/childsnack/domain.pddl";
-    const auto task_path = fs::path(std::string(DATA_DIR)) / "planning-benchmarks/tests/classical/childsnack/test-1.pddl";
+    const auto domain_path = fs::path(std::string(DATA_DIR)) / "benchmarks/classical/tests/childsnack/domain.pddl";
+    const auto task_path = fs::path(std::string(DATA_DIR)) / "benchmarks/classical/tests/childsnack/test-1.pddl";
     LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(domain_path);
     LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(task_path);
 

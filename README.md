@@ -210,17 +210,19 @@ Loki exports the `loki::parsers` target.
 ## Running the Executables
 
 The executable illustrates how to use Loki. It is disabled by default and can be
-enabled with `-DLOKI_BUILD_EXECUTABLES=ON`. Example PDDL inputs are available
-from the benchmark submodule:
+enabled with `-DLOKI_BUILD_EXECUTABLES=ON`. Example PDDL inputs are provided by the
+[pypddl-datasets](https://pypi.org/project/pypddl-datasets/) package (also used
+by the C++ test suite; materialize them once into `data/benchmarks`):
 
 ```console
-git submodule update --init --recursive data/planning-benchmarks
+pip install pypddl-datasets
+python -c "import pypddl_datasets as pb; [pb.export_suite(s, 'data/benchmarks') for s in ('tests-classical', 'tests-numeric')]"
 ```
 
 ```console
 ./build/exe/loki \
-  data/planning-benchmarks/tests/classical/gripper/domain.pddl \
-  data/planning-benchmarks/tests/classical/gripper/test-1.pddl
+  data/benchmarks/classical/tests/gripper/domain.pddl \
+  data/benchmarks/classical/tests/gripper/test-1.pddl
 ```
 
 Use `--out-domain`/`--out-problem` to write the translated PDDL to files, and

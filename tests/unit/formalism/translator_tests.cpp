@@ -260,8 +260,8 @@ TEST(LokiTests, RenameQuantifiedVariablesSeparatesNestedBinders)
 
 TEST(LokiTests, LokiPddlTranslatorTest)
 {
-    const auto domain_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/domain.pddl");
-    const auto problem_file = fs::path(std::string(DATA_DIR) + "planning-benchmarks/tests/classical/miconic-fulladl/test-1.pddl");
+    const auto domain_file = fs::path(std::string(DATA_DIR) + "benchmarks/classical/tests/miconic-fulladl/domain.pddl");
+    const auto problem_file = fs::path(std::string(DATA_DIR) + "benchmarks/classical/tests/miconic-fulladl/test-1.pddl");
     LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(domain_file);
     LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(problem_file);
 
