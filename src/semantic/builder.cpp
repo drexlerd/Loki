@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <functional>
 #include <type_traits>
 #include <utility>
 
@@ -239,16 +240,67 @@ ygg::IndexList<formalism::Requirement> AstBuilder::parse_requirements(const std:
 
 ygg::IndexList<formalism::Type> AstBuilder::parse_types(const std::vector<ast::TypedName>& nodes)
 {
-    auto result = ygg::IndexList<formalism::Type> {};
     if (!nodes.empty())
         checks().require_requirement(formalism::RequirementKind::Typing, nodes.front().name);
+
+    auto declarations = ygg::UnorderedMap<std::string, const ast::TypedName*> {};
     for (const auto& node : nodes)
     {
         const auto name = key(node.name.text);
         checks().ensure_new<DuplicateTypeError>(m_domain_context.declared_types, name, node.name);
-        auto bases = node.type ? parse_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_domain_context.object_type.get_index() };
-        result.push_back(intern_type(m_domain_context, repo(), name, std::move(bases)).get_index());
+        declarations.emplace(name, &node);
     }
+
+    auto resolving = ygg::UnorderedSet<std::string> {};
+    auto build_type = std::function<formalism::TypeView(const ast::TypedName&)> {};
+    auto resolve_type_expression = std::function<ygg::IndexList<formalism::Type>(const ast::TypeExpression&)> {};
+
+    // A type may inherit from another type declared later in the same :types section.
+    resolve_type_expression = [&](const ast::TypeExpression& expression)
+    {
+        return boost::apply_visitor(
+            [&](const auto& node) -> ygg::IndexList<formalism::Type>
+            {
+                using Node = std::decay_t<decltype(node)>;
+                if constexpr (std::is_same_v<Node, ast::TypeReference>)
+                {
+                    const auto name = key(node.name.text);
+                    if (const auto it = m_domain_context.types.find(name); it != m_domain_context.types.end())
+                        return { it->second.get_index() };
+                    if (const auto it = declarations.find(name); it != declarations.end())
+                        return { build_type(*it->second).get_index() };
+                    return parse_type_expression_node(node);
+                }
+                else
+                {
+                    auto result = ygg::IndexList<formalism::Type> {};
+                    for (const auto& alternative : node.alternatives)
+                    {
+                        auto part = resolve_type_expression(alternative.get());
+                        result.insert(result.end(), part.begin(), part.end());
+                    }
+                    return result;
+                }
+            },
+            expression);
+    };
+
+    build_type = [&](const ast::TypedName& node)
+    {
+        const auto name = key(node.name.text);
+        if (const auto it = m_domain_context.types.find(name); it != m_domain_context.types.end())
+            return it->second;
+        if (!resolving.insert(name).second)
+            m_diagnostics.throw_at(node.name, SemanticError("Cyclic type hierarchy involving " + name));
+
+        auto bases = node.type ? resolve_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_domain_context.object_type.get_index() };
+        resolving.erase(name);
+        return intern_type(m_domain_context, repo(), name, std::move(bases));
+    };
+
+    auto result = ygg::IndexList<formalism::Type> {};
+    for (const auto& node : nodes)
+        result.push_back(build_type(node).get_index());
     return result;
 }
 

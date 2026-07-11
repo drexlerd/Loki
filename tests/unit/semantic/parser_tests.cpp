@@ -48,6 +48,38 @@ TEST(LokiSemanticParser, StrictModeExpandsAdlRequirement)
     EXPECT_NO_THROW(semantic::Parser(fixture_path("adl-requirements"), options));
 }
 
+TEST(LokiSemanticParser, StrictModeAllowsForwardTypeReferences)
+{
+    auto options = semantic::ParserOptions {};
+    options.strict = true;
+    options.add_action_costs = false;
+    auto parser = semantic::Parser(std::string { R"((define (domain forward-types)
+        (:requirements :typing)
+        (:types child - parent parent - object)
+        (:predicates (holds ?x - child))))" },
+                                   options);
+
+    auto saw_child = false;
+    auto saw_parent = false;
+    for (const auto type : parser.get_domain().get_types())
+    {
+        if (type.get_name() == "child")
+        {
+            ASSERT_EQ(type.get_bases().size(), 1);
+            EXPECT_EQ(type.get_bases()[0].get_name(), "parent");
+            saw_child = true;
+        }
+        else if (type.get_name() == "parent")
+        {
+            ASSERT_EQ(type.get_bases().size(), 1);
+            EXPECT_EQ(type.get_bases()[0].get_name(), "object");
+            saw_parent = true;
+        }
+    }
+    EXPECT_TRUE(saw_child);
+    EXPECT_TRUE(saw_parent);
+}
+
 TEST(LokiSemanticParser, PermissiveModeAllowsPredicateArgumentTypeMismatch)
 {
     EXPECT_NO_THROW({
