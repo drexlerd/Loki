@@ -43,6 +43,22 @@ public:
 private:
     ParseContext& m_context;
 };
+
+template<typename T>
+ygg::IndexList<T> to_index_list(const std::vector<formalism::EntityView<T>>& views)
+{
+    auto result = ygg::IndexList<T> {};
+    result.reserve(views.size());
+    for (const auto view : views)
+        result.push_back(view.get_index());
+    return result;
+}
+
+template<typename T>
+cista::optional<ygg::Index<T>> to_optional_index(const std::optional<formalism::EntityView<T>>& view)
+{
+    return view ? cista::optional<ygg::Index<T>> { view->get_index() } : cista::optional<ygg::Index<T>> {};
+}
 }  // namespace
 
 AstBuilder::AstBuilder(const ParserOptions& options,
@@ -68,8 +84,8 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
     {
         m_parse_context.active_action_costs = true;
         remember_requirement(m_parse_context, formalism::RequirementKind::ActionCosts);
-        const auto requirement = formalism::get_or_create<formalism::Requirement>(repo(), formalism::RequirementKind::ActionCosts).get_index();
-        if (std::find(requirements.begin(), requirements.end(), requirement) == requirements.end())
+        const auto requirement = formalism::get_or_create<formalism::Requirement>(repo(), formalism::RequirementKind::ActionCosts);
+        if (std::none_of(requirements.begin(), requirements.end(), [&](const auto value) { return value.get_index() == requirement.get_index(); }))
             requirements.push_back(requirement);
     }
     m_domain_context.requirement_kinds = m_parse_context.active_requirements;
@@ -84,15 +100,15 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
         if (m_options.strict && !m_options.add_action_costs)
             m_diagnostics.throw_at(domain.name, SemanticError("Missing total-cost function for :action-costs"));
         m_domain_context.declared_functions.insert("total-cost");
-        functions.push_back(total_cost_function().get_index());
+        functions.push_back(total_cost_function());
     }
-    auto axioms = ygg::IndexList<formalism::Axiom> {};
+    auto axioms = std::vector<formalism::AxiomView> {};
     for (const auto& axiom : domain.axioms)
     {
         checks().require_requirement(formalism::RequirementKind::DerivedPredicates, axiom);
         axioms.push_back(parse_axiom(axiom));
     }
-    auto actions = ygg::IndexList<formalism::Action> {};
+    auto actions = std::vector<formalism::ActionView> {};
     for (const auto& action : domain.actions)
         actions.push_back(parse_action(action));
     if (inject_unit_costs)
@@ -100,22 +116,19 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
             action = add_unit_cost(action);
     checks().reject_unused_requirements(domain.requirements);
 
-    auto all_types = std::vector<formalism::TypeView> {};
-    for (const auto& [_, type] : m_domain_context.types)
-        all_types.push_back(type);
-    std::sort(all_types.begin(), all_types.end(), [](auto lhs, auto rhs) { return lhs.get_index() < rhs.get_index(); });
-
     types.clear();
-    for (auto type : all_types)
-        types.push_back(type.get_index());
+    for (const auto& [_, type] : m_domain_context.types)
+        types.push_back(type);
+    std::sort(types.begin(), types.end(), [](auto lhs, auto rhs) { return lhs.get_index() < rhs.get_index(); });
+
     auto data = ygg::Data<formalism::Domain>(to_cista(domain.name.text),
-                                             std::move(requirements),
-                                             std::move(types),
-                                             std::move(constants),
-                                             std::move(predicates),
-                                             std::move(functions),
-                                             std::move(actions),
-                                             std::move(axioms));
+                                             to_index_list(requirements),
+                                             to_index_list(types),
+                                             to_index_list(constants),
+                                             to_index_list(predicates),
+                                             to_index_list(functions),
+                                             to_index_list(actions),
+                                             to_index_list(axioms));
     return formalism::get_or_create<formalism::Domain>(repo(), std::move(data));
 }
 
@@ -126,21 +139,21 @@ formalism::TaskView AstBuilder::build_task(const ast::Task& task)
 
     auto requirements = parse_requirements(task.requirements);
     auto objects = parse_objects(task.objects, m_parse_context.task_objects, m_parse_context.declared_objects);
-    auto initial_literals = ygg::IndexList<formalism::Literal> {};
-    auto initial_function_values = ygg::IndexList<formalism::InitialFunctionValue> {};
+    auto initial_literals = std::vector<formalism::LiteralView> {};
+    auto initial_function_values = std::vector<formalism::InitialFunctionValueView> {};
     for (const auto& element : task.initial)
         boost::apply_visitor([&](const auto& node) { parse_initial_element(node, initial_literals, initial_function_values); }, element);
 
-    auto goal = cista::optional<ygg::Index<formalism::Condition>> {};
+    auto goal = std::optional<formalism::ConditionView> {};
     if (task.goal)
         goal = parse_condition(*task.goal);
 
-    auto metric = cista::optional<ygg::Index<formalism::Metric>> {};
+    auto metric = std::optional<formalism::MetricView> {};
     if (task.metric)
         metric = parse_metric(*task.metric);
     complete_action_costs(task, initial_function_values, metric);
 
-    auto axioms = ygg::IndexList<formalism::Axiom> {};
+    auto axioms = std::vector<formalism::AxiomView> {};
     for (const auto& axiom : task.axioms)
     {
         checks().require_requirement(formalism::RequirementKind::DerivedPredicates, axiom);
@@ -150,14 +163,14 @@ formalism::TaskView AstBuilder::build_task(const ast::Task& task)
 
     auto data = ygg::Data<formalism::Task>(to_cista(task.name.text),
                                            m_domain_context.domain->get_index(),
-                                           std::move(requirements),
-                                           std::move(objects),
-                                           std::move(initial_literals),
-                                           std::move(initial_function_values),
-                                           goal,
-                                           metric,
+                                           to_index_list(requirements),
+                                           to_index_list(objects),
+                                           to_index_list(initial_literals),
+                                           to_index_list(initial_function_values),
+                                           to_optional_index(goal),
+                                           to_optional_index(metric),
                                            ygg::IndexList<formalism::Predicate> {},
-                                           std::move(axioms));
+                                           to_index_list(axioms));
     return formalism::get_or_create<formalism::Task>(repo(), std::move(data));
 }
 
@@ -221,9 +234,9 @@ formalism::FunctionSkeletonView AstBuilder::function(const ast::Identifier& iden
     return view;
 }
 
-ygg::IndexList<formalism::Requirement> AstBuilder::parse_requirements(const std::vector<ast::Requirement>& nodes)
+std::vector<formalism::RequirementView> AstBuilder::parse_requirements(const std::vector<ast::Requirement>& nodes)
 {
-    auto result = ygg::IndexList<formalism::Requirement> {};
+    auto result = std::vector<formalism::RequirementView> {};
     for (const auto& node : nodes)
     {
         const auto kind = requirement_kind(node, m_diagnostics);
@@ -233,12 +246,12 @@ ygg::IndexList<formalism::Requirement> AstBuilder::parse_requirements(const std:
             m_parse_context.active_numeric_fluents = true;
         for (const auto capability : requirement_capabilities(node, m_diagnostics))
             m_parse_context.active_requirements.insert(capability);
-        result.push_back(formalism::get_or_create<formalism::Requirement>(repo(), kind).get_index());
+        result.push_back(formalism::get_or_create<formalism::Requirement>(repo(), kind));
     }
     return result;
 }
 
-ygg::IndexList<formalism::Type> AstBuilder::parse_types(const std::vector<ast::TypedName>& nodes)
+std::vector<formalism::TypeView> AstBuilder::parse_types(const std::vector<ast::TypedName>& nodes)
 {
     if (!nodes.empty())
         checks().require_requirement(formalism::RequirementKind::Typing, nodes.front().name);
@@ -253,27 +266,27 @@ ygg::IndexList<formalism::Type> AstBuilder::parse_types(const std::vector<ast::T
 
     auto resolving = ygg::UnorderedSet<std::string> {};
     auto build_type = std::function<formalism::TypeView(const ast::TypedName&)> {};
-    auto resolve_type_expression = std::function<ygg::IndexList<formalism::Type>(const ast::TypeExpression&)> {};
+    auto resolve_type_expression = std::function<std::vector<formalism::TypeView>(const ast::TypeExpression&)> {};
 
     // A type may inherit from another type declared later in the same :types section.
     resolve_type_expression = [&](const ast::TypeExpression& expression)
     {
         return boost::apply_visitor(
-            [&](const auto& node) -> ygg::IndexList<formalism::Type>
+            [&](const auto& node) -> std::vector<formalism::TypeView>
             {
                 using Node = std::decay_t<decltype(node)>;
                 if constexpr (std::is_same_v<Node, ast::TypeReference>)
                 {
                     const auto name = key(node.name.text);
                     if (const auto it = m_domain_context.types.find(name); it != m_domain_context.types.end())
-                        return { it->second.get_index() };
+                        return { it->second };
                     if (const auto it = declarations.find(name); it != declarations.end())
-                        return { build_type(*it->second).get_index() };
+                        return { build_type(*it->second) };
                     return parse_type_expression_node(node);
                 }
                 else
                 {
-                    auto result = ygg::IndexList<formalism::Type> {};
+                    auto result = std::vector<formalism::TypeView> {};
                     for (const auto& alternative : node.alternatives)
                     {
                         auto part = resolve_type_expression(alternative.get());
@@ -293,28 +306,28 @@ ygg::IndexList<formalism::Type> AstBuilder::parse_types(const std::vector<ast::T
         if (!resolving.insert(name).second)
             m_diagnostics.throw_at(node.name, SemanticError("Cyclic type hierarchy involving " + name));
 
-        auto bases = node.type ? resolve_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_domain_context.object_type.get_index() };
+        auto bases = node.type ? resolve_type_expression(*node.type) : std::vector<formalism::TypeView> { m_domain_context.object_type };
         resolving.erase(name);
-        return intern_type(m_domain_context, repo(), name, std::move(bases));
+        return intern_type(m_domain_context, repo(), name, to_index_list(bases));
     };
 
-    auto result = ygg::IndexList<formalism::Type> {};
+    auto result = std::vector<formalism::TypeView> {};
     for (const auto& node : nodes)
-        result.push_back(build_type(node).get_index());
+        result.push_back(build_type(node));
     return result;
 }
 
-ygg::IndexList<formalism::Type> AstBuilder::parse_type_expression(const ast::TypeExpression& type)
+std::vector<formalism::TypeView> AstBuilder::parse_type_expression(const ast::TypeExpression& type)
 {
     return boost::apply_visitor([&](const auto& node) { return parse_type_expression_node(node); }, type);
 }
 
-ygg::IndexList<formalism::Type> AstBuilder::parse_type_expression_node(const ast::TypeReference& node)
+std::vector<formalism::TypeView> AstBuilder::parse_type_expression_node(const ast::TypeReference& node)
 {
-    auto result = ygg::IndexList<formalism::Type> {};
+    auto result = std::vector<formalism::TypeView> {};
     auto k = key(node.name.text);
     if (auto it = m_domain_context.types.find(k); it != m_domain_context.types.end())
-        result.push_back(it->second.get_index());
+        result.push_back(it->second);
     else if (m_options.strict)
         m_diagnostics.throw_at(node.name, UndefinedTypeError(k));
     else
@@ -322,14 +335,14 @@ ygg::IndexList<formalism::Type> AstBuilder::parse_type_expression_node(const ast
         auto bases = ygg::IndexList<formalism::Type> {};
         if (k != "object" && k != "number")
             bases.push_back(m_domain_context.object_type.get_index());
-        result.push_back(intern_type(m_domain_context, repo(), k, std::move(bases)).get_index());
+        result.push_back(intern_type(m_domain_context, repo(), k, std::move(bases)));
     }
     return result;
 }
 
-ygg::IndexList<formalism::Type> AstBuilder::parse_type_expression_node(const ast::EitherType& node)
+std::vector<formalism::TypeView> AstBuilder::parse_type_expression_node(const ast::EitherType& node)
 {
-    auto result = ygg::IndexList<formalism::Type> {};
+    auto result = std::vector<formalism::TypeView> {};
     for (const auto& alternative : node.alternatives)
     {
         auto part = parse_type_expression(alternative.get());
@@ -338,27 +351,27 @@ ygg::IndexList<formalism::Type> AstBuilder::parse_type_expression_node(const ast
     return result;
 }
 
-ygg::IndexList<formalism::Object> AstBuilder::parse_objects(const std::vector<ast::TypedName>& nodes,
-                                                            ygg::UnorderedMap<std::string, formalism::ObjectView>& table,
-                                                            ygg::UnorderedSet<std::string>& declared_objects)
+std::vector<formalism::ObjectView> AstBuilder::parse_objects(const std::vector<ast::TypedName>& nodes,
+                                                             ygg::UnorderedMap<std::string, formalism::ObjectView>& table,
+                                                             ygg::UnorderedSet<std::string>& declared_objects)
 {
-    auto result = ygg::IndexList<formalism::Object> {};
+    auto result = std::vector<formalism::ObjectView> {};
     for (const auto& node : nodes)
     {
         const auto name = key(node.name.text);
         checks().ensure_new<DuplicateObjectError>(declared_objects, name, node.name);
         checks().require_typing_if_needed(node.type, node.name);
-        auto types = node.type ? parse_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_domain_context.object_type.get_index() };
-        auto view = formalism::get_or_create<formalism::Object>(repo(), to_cista(name), std::move(types));
+        auto types = node.type ? parse_type_expression(*node.type) : std::vector<formalism::TypeView> { m_domain_context.object_type };
+        auto view = formalism::get_or_create<formalism::Object>(repo(), to_cista(name), to_index_list(types));
         table.emplace(name, view);
-        result.push_back(view.get_index());
+        result.push_back(view);
     }
     return result;
 }
 
-ygg::IndexList<formalism::Parameter> AstBuilder::parse_parameters(const std::vector<ast::TypedVariable>& nodes)
+std::vector<formalism::ParameterView> AstBuilder::parse_parameters(const std::vector<ast::TypedVariable>& nodes)
 {
-    auto result = ygg::IndexList<formalism::Parameter> {};
+    auto result = std::vector<formalism::ParameterView> {};
     for (const auto& node : nodes)
     {
         const auto name = key(node.variable.text);
@@ -368,36 +381,34 @@ ygg::IndexList<formalism::Parameter> AstBuilder::parse_parameters(const std::vec
         if (!m_parse_context.variable_scopes.empty())
             m_parse_context.variable_scopes.back().emplace(name, variable);
         checks().require_typing_if_needed(node.type, node.variable);
-        auto types = node.type ? parse_type_expression(*node.type) : ygg::IndexList<formalism::Type> { m_domain_context.object_type.get_index() };
-        auto type_views = std::vector<formalism::TypeView> {};
-        for (auto type : types)
-            type_views.emplace_back(type, repo());
-        if (auto [it, inserted] = m_parse_context.variable_types.emplace(variable, type_views); !inserted)
-            it->second = std::move(type_views);
-        result.push_back(formalism::get_or_create<formalism::Parameter>(repo(), variable.get_index(), std::move(types)).get_index());
+        auto types = node.type ? parse_type_expression(*node.type) : std::vector<formalism::TypeView> { m_domain_context.object_type };
+        auto type_indices = to_index_list(types);
+        if (auto [it, inserted] = m_parse_context.variable_types.emplace(variable, types); !inserted)
+            it->second = std::move(types);
+        result.push_back(formalism::get_or_create<formalism::Parameter>(repo(), variable.get_index(), std::move(type_indices)));
     }
     return result;
 }
 
-ygg::IndexList<formalism::Predicate> AstBuilder::parse_predicates(const std::vector<ast::PredicateDeclaration>& nodes)
+std::vector<formalism::PredicateView> AstBuilder::parse_predicates(const std::vector<ast::PredicateDeclaration>& nodes)
 {
-    auto result = ygg::IndexList<formalism::Predicate> {};
+    auto result = std::vector<formalism::PredicateView> {};
     for (const auto& node : nodes)
     {
         auto scope = VariableScope(m_parse_context);
         auto parameters = parse_parameters(node.parameters);
         const auto name = key(node.name.text);
         checks().ensure_new<DuplicatePredicateError>(m_domain_context.declared_predicates, name, node.name);
-        auto view = formalism::get_or_create<formalism::Predicate>(repo(), to_cista(name), std::move(parameters));
+        auto view = formalism::get_or_create<formalism::Predicate>(repo(), to_cista(name), to_index_list(parameters));
         m_domain_context.predicates.emplace(name, view);
-        result.push_back(view.get_index());
+        result.push_back(view);
     }
     return result;
 }
 
-ygg::IndexList<formalism::FunctionSkeleton> AstBuilder::parse_functions(const std::vector<ast::FunctionDeclaration>& nodes)
+std::vector<formalism::FunctionSkeletonView> AstBuilder::parse_functions(const std::vector<ast::FunctionDeclaration>& nodes)
 {
-    auto result = ygg::IndexList<formalism::FunctionSkeleton> {};
+    auto result = std::vector<formalism::FunctionSkeletonView> {};
     for (const auto& node : nodes)
     {
         auto scope = VariableScope(m_parse_context);
@@ -406,125 +417,124 @@ ygg::IndexList<formalism::FunctionSkeleton> AstBuilder::parse_functions(const st
         checks().require_requirement(formalism::RequirementKind::NumericFluents, node.name);
         checks().ensure_new<DuplicateFunctionError>(m_domain_context.declared_functions, name, node.name);
         checks().require_typing_if_needed(node.type, node.name);
-        auto type = node.type ? parse_type_expression(*node.type).front() : m_domain_context.number_type.get_index();
-        auto view = formalism::get_or_create<formalism::FunctionSkeleton>(repo(), to_cista(name), std::move(parameters), type);
+        auto type = node.type ? parse_type_expression(*node.type).front().get_index() : m_domain_context.number_type.get_index();
+        auto view = formalism::get_or_create<formalism::FunctionSkeleton>(repo(), to_cista(name), to_index_list(parameters), type);
         m_domain_context.functions.emplace(name, view);
-        result.push_back(view.get_index());
+        result.push_back(view);
     }
     return result;
 }
 
-ygg::Index<formalism::Term> AstBuilder::parse_term(const ast::Term& node)
+formalism::TermView AstBuilder::parse_term(const ast::Term& node)
 {
     if (node.variable)
         return formalism::get_or_create<formalism::Term>(
-                   repo(),
-                   ygg::Data<formalism::Term>::Variant(lookup_variable(m_parse_context, m_diagnostics, node.name).get_index()))
-            .get_index();
+            repo(),
+            ygg::Data<formalism::Term>::Variant(lookup_variable(m_parse_context, m_diagnostics, node.name).get_index()));
     return formalism::get_or_create<formalism::Term>(
-               repo(),
-               ygg::Data<formalism::Term>::Variant(lookup_object(m_domain_context, m_parse_context, m_diagnostics, node.name).get_index()))
-        .get_index();
+        repo(),
+        ygg::Data<formalism::Term>::Variant(lookup_object(m_domain_context, m_parse_context, m_diagnostics, node.name).get_index()));
 }
 
-ygg::IndexList<formalism::Term> AstBuilder::parse_terms(const std::vector<ast::Term>& nodes)
+std::vector<formalism::TermView> AstBuilder::parse_terms(const std::vector<ast::Term>& nodes)
 {
-    auto result = ygg::IndexList<formalism::Term> {};
+    auto result = std::vector<formalism::TermView> {};
     for (const auto& node : nodes)
         result.push_back(parse_term(node));
     return result;
 }
 
-ygg::Index<formalism::Atom> AstBuilder::parse_atom(const ast::Atom& node)
+formalism::AtomView AstBuilder::parse_atom(const ast::Atom& node)
 {
     const auto name = key(node.predicate.text);
     auto pred = name == "=" ? equality_predicate(node.predicate, node.terms.size()) : predicate(node.predicate, node.terms.size());
     if (m_domain_context.declared_predicates.contains(name))
         checks().check_argument_types(name, pred.get_parameters(), node.terms, node.predicate);
     auto terms = parse_terms(node.terms);
-    return formalism::get_or_create<formalism::Atom>(repo(), pred.get_index(), std::move(terms)).get_index();
+    return formalism::get_or_create<formalism::Atom>(repo(), pred.get_index(), to_index_list(terms));
 }
 
-ygg::Index<formalism::Literal> AstBuilder::parse_literal(const ast::Literal& node)
+formalism::LiteralView AstBuilder::parse_literal(const ast::Literal& node)
 {
     checks().mark_requirement_used(formalism::RequirementKind::Strips);
-    return formalism::get_or_create<formalism::Literal>(repo(), parse_atom(node.atom), node.positive).get_index();
+    return formalism::get_or_create<formalism::Literal>(repo(), parse_atom(node.atom).get_index(), node.positive);
 }
 
-ygg::Index<formalism::Condition> AstBuilder::parse_condition(const ast::Condition& condition)
+formalism::ConditionView AstBuilder::parse_condition(const ast::Condition& condition)
 {
     return boost::apply_visitor([&](const auto& node) { return parse_condition_node(node); }, condition);
 }
 
-ygg::Index<formalism::Condition> AstBuilder::wrap_condition(ygg::Data<formalism::Condition>::Variant value)
+formalism::ConditionView AstBuilder::wrap_condition(ygg::Data<formalism::Condition>::Variant value)
 {
-    return formalism::get_or_create<formalism::Condition>(repo(), std::move(value)).get_index();
+    return formalism::get_or_create<formalism::Condition>(repo(), std::move(value));
 }
 
-ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::ConditionLiteral& node)
+formalism::ConditionView AstBuilder::parse_condition_node(const ast::ConditionLiteral& node)
 {
-    return wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(repo(), parse_literal(node.literal)).get_index());
+    return wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(repo(), parse_literal(node.literal).get_index()).get_index());
 }
 
-ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::ConditionAnd& node)
+formalism::ConditionView AstBuilder::parse_condition_node(const ast::ConditionAnd& node)
 {
-    auto list = ygg::IndexList<formalism::Condition> {};
+    auto list = std::vector<formalism::ConditionView> {};
     for (const auto& child : node.conditions)
         list.push_back(parse_condition(child.get()));
-    return wrap_condition(formalism::get_or_create<formalism::ConditionAnd>(repo(), std::move(list)).get_index());
+    return wrap_condition(formalism::get_or_create<formalism::ConditionAnd>(repo(), to_index_list(list)).get_index());
 }
 
-ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::ConditionOr& node)
+formalism::ConditionView AstBuilder::parse_condition_node(const ast::ConditionOr& node)
 {
     checks().require_requirement(formalism::RequirementKind::DisjunctivePreconditions, node);
-    auto list = ygg::IndexList<formalism::Condition> {};
+    auto list = std::vector<formalism::ConditionView> {};
     for (const auto& child : node.conditions)
         list.push_back(parse_condition(child.get()));
-    return wrap_condition(formalism::get_or_create<formalism::ConditionOr>(repo(), std::move(list)).get_index());
+    return wrap_condition(formalism::get_or_create<formalism::ConditionOr>(repo(), to_index_list(list)).get_index());
 }
 
-ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::ConditionNot& node)
+formalism::ConditionView AstBuilder::parse_condition_node(const ast::ConditionNot& node)
 {
     checks().require_requirement(formalism::RequirementKind::NegativePreconditions, node);
-    return wrap_condition(formalism::get_or_create<formalism::ConditionNot>(repo(), parse_condition(node.condition.get())).get_index());
+    return wrap_condition(formalism::get_or_create<formalism::ConditionNot>(repo(), parse_condition(node.condition.get()).get_index()).get_index());
 }
 
-ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::ConditionImply& node)
+formalism::ConditionView AstBuilder::parse_condition_node(const ast::ConditionImply& node)
 {
     checks().require_requirement(formalism::RequirementKind::DisjunctivePreconditions, node);
     return wrap_condition(
-        formalism::get_or_create<formalism::ConditionImply>(repo(), parse_condition(node.left.get()), parse_condition(node.right.get())).get_index());
+        formalism::get_or_create<formalism::ConditionImply>(repo(), parse_condition(node.left.get()).get_index(), parse_condition(node.right.get()).get_index())
+            .get_index());
 }
 
-ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::ConditionExists& node)
+formalism::ConditionView AstBuilder::parse_condition_node(const ast::ConditionExists& node)
 {
     checks().require_requirement(formalism::RequirementKind::ExistentialPreconditions, node);
     auto scope = VariableScope(m_parse_context);
     auto parameters = parse_parameters(node.parameters);
     auto child = parse_condition(node.condition.get());
-    return wrap_condition(formalism::get_or_create<formalism::ConditionExists>(repo(), std::move(parameters), child).get_index());
+    return wrap_condition(formalism::get_or_create<formalism::ConditionExists>(repo(), to_index_list(parameters), child.get_index()).get_index());
 }
 
-ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::ConditionForall& node)
+formalism::ConditionView AstBuilder::parse_condition_node(const ast::ConditionForall& node)
 {
     checks().require_requirement(formalism::RequirementKind::UniversalPreconditions, node);
     auto scope = VariableScope(m_parse_context);
     auto parameters = parse_parameters(node.parameters);
     auto child = parse_condition(node.condition.get());
-    return wrap_condition(formalism::get_or_create<formalism::ConditionForall>(repo(), std::move(parameters), child).get_index());
+    return wrap_condition(formalism::get_or_create<formalism::ConditionForall>(repo(), to_index_list(parameters), child.get_index()).get_index());
 }
 
-ygg::Index<formalism::Condition> AstBuilder::parse_condition_node(const ast::ConditionNumericConstraint& node)
+formalism::ConditionView AstBuilder::parse_condition_node(const ast::ConditionNumericConstraint& node)
 {
     checks().require_requirement(formalism::RequirementKind::NumericFluents, node);
     return wrap_condition(formalism::get_or_create<formalism::ConditionNumericConstraint>(repo(),
                                                                                           comparator(node, m_diagnostics),
-                                                                                          parse_function_expression(node.left.get()),
-                                                                                          parse_function_expression(node.right.get()))
+                                                                                          parse_function_expression(node.left.get()).get_index(),
+                                                                                          parse_function_expression(node.right.get()).get_index())
                               .get_index());
 }
 
-ygg::Index<formalism::FunctionTerm> AstBuilder::parse_function_term(const ast::FunctionTerm& node)
+formalism::FunctionTermView AstBuilder::parse_function_term(const ast::FunctionTerm& node)
 {
     checks().require_requirement(formalism::RequirementKind::NumericFluents, node.function);
     const auto name = key(node.function.text);
@@ -534,79 +544,79 @@ ygg::Index<formalism::FunctionTerm> AstBuilder::parse_function_term(const ast::F
     if (m_domain_context.declared_functions.contains(name))
         checks().check_argument_types(name, skeleton.get_parameters(), node.terms, node.function);
     auto terms = parse_terms(node.terms);
-    return formalism::get_or_create<formalism::FunctionTerm>(repo(), skeleton.get_index(), std::move(terms)).get_index();
+    return formalism::get_or_create<formalism::FunctionTerm>(repo(), skeleton.get_index(), to_index_list(terms));
 }
 
-ygg::Index<formalism::FunctionExpression> AstBuilder::parse_function_expression(const ast::FunctionExpression& expression)
+formalism::FunctionExpressionView AstBuilder::parse_function_expression(const ast::FunctionExpression& expression)
 {
     return boost::apply_visitor([&](const auto& node) { return parse_function_expression_node(node); }, expression);
 }
 
-ygg::Index<formalism::FunctionExpression> AstBuilder::wrap_function_expression(ygg::Data<formalism::FunctionExpression>::Variant value)
+formalism::FunctionExpressionView AstBuilder::wrap_function_expression(ygg::Data<formalism::FunctionExpression>::Variant value)
 {
-    return formalism::get_or_create<formalism::FunctionExpression>(repo(), std::move(value)).get_index();
+    return formalism::get_or_create<formalism::FunctionExpression>(repo(), std::move(value));
 }
 
-ygg::Index<formalism::FunctionExpression> AstBuilder::parse_function_expression_node(const ast::FunctionExpressionNumber& node)
+formalism::FunctionExpressionView AstBuilder::parse_function_expression_node(const ast::FunctionExpressionNumber& node)
 {
     return wrap_function_expression(formalism::get_or_create<formalism::FunctionExpressionNumber>(repo(), node.value).get_index());
 }
 
-ygg::Index<formalism::FunctionExpression> AstBuilder::parse_function_expression_node(const ast::FunctionExpressionFunction& node)
+formalism::FunctionExpressionView AstBuilder::parse_function_expression_node(const ast::FunctionExpressionFunction& node)
 {
-    return wrap_function_expression(parse_function_term(node.term));
+    return wrap_function_expression(parse_function_term(node.term).get_index());
 }
 
-ygg::Index<formalism::FunctionExpression> AstBuilder::parse_function_expression_node(const ast::FunctionExpressionUnary& node)
+formalism::FunctionExpressionView AstBuilder::parse_function_expression_node(const ast::FunctionExpressionUnary& node)
 {
     return wrap_function_expression(formalism::get_or_create<formalism::UnaryFunctionExpression>(repo(),
                                                                                                  formalism::UnaryArithmeticOperator::Minus,
-                                                                                                 parse_function_expression(node.expression.get()))
+                                                                                                 parse_function_expression(node.expression.get()).get_index())
                                         .get_index());
 }
 
-ygg::Index<formalism::FunctionExpression> AstBuilder::parse_function_expression_node(const ast::FunctionExpressionBinary& node)
+formalism::FunctionExpressionView AstBuilder::parse_function_expression_node(const ast::FunctionExpressionBinary& node)
 {
     return wrap_function_expression(formalism::get_or_create<formalism::BinaryFunctionExpression>(repo(),
                                                                                                   binary_operator(node.op),
-                                                                                                  parse_function_expression(node.left.get()),
-                                                                                                  parse_function_expression(node.right.get()))
+                                                                                                  parse_function_expression(node.left.get()).get_index(),
+                                                                                                  parse_function_expression(node.right.get()).get_index())
                                         .get_index());
 }
 
-ygg::Index<formalism::FunctionExpression> AstBuilder::parse_function_expression_node(const ast::FunctionExpressionMulti& node)
+formalism::FunctionExpressionView AstBuilder::parse_function_expression_node(const ast::FunctionExpressionMulti& node)
 {
-    auto expressions = ygg::IndexList<formalism::FunctionExpression> {};
+    auto expressions = std::vector<formalism::FunctionExpressionView> {};
     for (const auto& child : node.expressions)
         expressions.push_back(parse_function_expression(child.get()));
     return wrap_function_expression(
-        formalism::get_or_create<formalism::MultiFunctionExpression>(repo(), multi_operator(node.op), std::move(expressions)).get_index());
+        formalism::get_or_create<formalism::MultiFunctionExpression>(repo(), multi_operator(node.op), to_index_list(expressions)).get_index());
 }
 
-ygg::Index<formalism::Effect> AstBuilder::parse_effect(const ast::Effect& effect)
+formalism::EffectView AstBuilder::parse_effect(const ast::Effect& effect)
 {
     return boost::apply_visitor([&](const auto& node) { return parse_effect_node(node); }, effect);
 }
 
-ygg::Index<formalism::Effect> AstBuilder::wrap_effect(ygg::Data<formalism::Effect>::Variant value)
+formalism::EffectView AstBuilder::wrap_effect(ygg::Data<formalism::Effect>::Variant value)
 {
-    return formalism::get_or_create<formalism::Effect>(repo(), std::move(value)).get_index();
+    return formalism::get_or_create<formalism::Effect>(repo(), std::move(value));
 }
 
-ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectLiteral& node)
+formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectLiteral& node)
 {
-    return wrap_effect(formalism::get_or_create<formalism::EffectLiteral>(repo(), parse_literal(node.literal)).get_index());
+    return wrap_effect(formalism::get_or_create<formalism::EffectLiteral>(repo(), parse_literal(node.literal).get_index()).get_index());
 }
 
-ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectAnd& node)
+formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectAnd& node)
 {
-    auto list = ygg::IndexList<formalism::Effect> {};
+    auto list = std::vector<formalism::EffectView> {};
     for (const auto& child : node.effects)
         list.push_back(parse_effect(child.get()));
-    return wrap_effect(formalism::get_or_create<formalism::EffectAnd>(repo(), std::move(list)).get_index());
+    return wrap_effect(formalism::get_or_create<formalism::EffectAnd>(repo(), to_index_list(list)).get_index());
 }
 
-ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectNumeric& node)
+formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectNumeric& node)
 {
     checks().require_requirement(formalism::RequirementKind::NumericFluents, node);
     const auto op = numeric_effect_operator(node, m_diagnostics);
@@ -619,78 +629,84 @@ ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectNum
     auto skeleton = function(node.function.function, node.function.terms.size());
     if (m_domain_context.declared_functions.contains(key(node.function.function.text)))
         checks().check_argument_types(key(node.function.function.text), skeleton.get_parameters(), node.function.terms, node.function.function);
+    const auto terms = parse_terms(node.function.terms);
     return wrap_effect(formalism::get_or_create<formalism::EffectNumeric>(repo(),
                                                                           op,
                                                                           skeleton.get_index(),
-                                                                          parse_terms(node.function.terms),
-                                                                          parse_function_expression(node.expression.get()))
+                                                                          to_index_list(terms),
+                                                                          parse_function_expression(node.expression.get()).get_index())
                            .get_index());
 }
 
-ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectForall& node)
+formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectForall& node)
 {
     checks().require_requirement(formalism::RequirementKind::UniversalPreconditions, node);
     auto scope = VariableScope(m_parse_context);
     auto parameters = parse_parameters(node.parameters);
     auto child = parse_effect(node.effect.get());
-    return wrap_effect(formalism::get_or_create<formalism::EffectForall>(repo(), std::move(parameters), child).get_index());
+    return wrap_effect(formalism::get_or_create<formalism::EffectForall>(repo(), to_index_list(parameters), child.get_index()).get_index());
 }
 
-ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectWhen& node)
+formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectWhen& node)
 {
     checks().require_requirement(formalism::RequirementKind::ConditionalEffects, node);
     return wrap_effect(
-        formalism::get_or_create<formalism::EffectWhen>(repo(), parse_condition(node.condition.get()), parse_effect(node.effect.get())).get_index());
+        formalism::get_or_create<formalism::EffectWhen>(repo(), parse_condition(node.condition.get()).get_index(), parse_effect(node.effect.get()).get_index())
+            .get_index());
 }
 
-ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectOneOf& node)
+formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectOneOf& node)
 {
     checks().require_requirement(formalism::RequirementKind::NonDeterministic, node);
-    auto list = ygg::IndexList<formalism::Effect> {};
+    auto list = std::vector<formalism::EffectView> {};
     for (const auto& child : node.effects)
         list.push_back(parse_effect(child.get()));
-    return wrap_effect(formalism::get_or_create<formalism::EffectOneOf>(repo(), std::move(list)).get_index());
+    return wrap_effect(formalism::get_or_create<formalism::EffectOneOf>(repo(), to_index_list(list)).get_index());
 }
 
-ygg::Index<formalism::Effect> AstBuilder::parse_effect_node(const ast::EffectProbabilistic& node)
+formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectProbabilistic& node)
 {
     checks().require_requirement(formalism::RequirementKind::ProbabilisticEffects, node);
-    auto list = ygg::IndexList<formalism::EffectProbabilisticAlternative> {};
+    auto list = std::vector<formalism::EffectProbabilisticAlternativeView> {};
     auto total = 0.0;
     for (const auto& alternative : node.alternatives)
     {
         if (!std::isfinite(alternative.probability) || alternative.probability < 0.0 || alternative.probability > 1.0)
             m_diagnostics.throw_at(alternative, InvalidProbabilisticEffectError("probability must be in [0, 1]"));
         total += alternative.probability;
-        list.push_back(
-            formalism::get_or_create<formalism::EffectProbabilisticAlternative>(repo(), alternative.probability, parse_effect(alternative.effect.get()))
-                .get_index());
+        list.push_back(formalism::get_or_create<formalism::EffectProbabilisticAlternative>(repo(),
+                                                                                           alternative.probability,
+                                                                                           parse_effect(alternative.effect.get()).get_index()));
     }
     if (total > 1.0 + 1e-9)
         m_diagnostics.throw_at(node, InvalidProbabilisticEffectError("probabilities sum to more than 1"));
-    return wrap_effect(formalism::get_or_create<formalism::EffectProbabilistic>(repo(), std::move(list)).get_index());
+    return wrap_effect(formalism::get_or_create<formalism::EffectProbabilistic>(repo(), to_index_list(list)).get_index());
 }
 
-ygg::Index<formalism::Action> AstBuilder::parse_action(const ast::Action& node)
+formalism::ActionView AstBuilder::parse_action(const ast::Action& node)
 {
     checks().mark_requirement_used(formalism::RequirementKind::Strips);
     const auto name = key(node.name.text);
     auto scope = VariableScope(m_parse_context);
     auto parameters = parse_parameters(node.parameters);
-    auto precondition = cista::optional<ygg::Index<formalism::Condition>> {};
+    auto precondition = std::optional<formalism::ConditionView> {};
     if (node.precondition)
         precondition = parse_condition(*node.precondition);
-    auto effect = cista::optional<ygg::Index<formalism::Effect>> {};
+    auto effect = std::optional<formalism::EffectView> {};
     if (node.effect)
         effect = parse_effect(*node.effect);
-    return formalism::get_or_create<formalism::Action>(repo(), to_cista(name), std::move(parameters), precondition, effect).get_index();
+    return formalism::get_or_create<formalism::Action>(repo(),
+                                                       to_cista(name),
+                                                       to_index_list(parameters),
+                                                       to_optional_index(precondition),
+                                                       to_optional_index(effect));
 }
 
-ygg::Index<formalism::Axiom> AstBuilder::parse_axiom(const ast::Axiom& node)
+formalism::AxiomView AstBuilder::parse_axiom(const ast::Axiom& node)
 {
     auto scope = VariableScope(m_parse_context);
     auto parameters = parse_parameters(node.head.parameters);
-    auto terms = ygg::IndexList<formalism::Term> {};
+    auto terms = std::vector<formalism::TermView> {};
     for (const auto& parameter : node.head.parameters)
     {
         auto term = ast::Term {};
@@ -699,35 +715,35 @@ ygg::Index<formalism::Axiom> AstBuilder::parse_axiom(const ast::Axiom& node)
         terms.push_back(parse_term(term));
     }
     auto pred = predicate(node.head.name, terms.size());
-    auto atom = formalism::get_or_create<formalism::Atom>(repo(), pred.get_index(), std::move(terms)).get_index();
-    auto head = formalism::get_or_create<formalism::Literal>(repo(), atom, true).get_index();
+    auto atom = formalism::get_or_create<formalism::Atom>(repo(), pred.get_index(), to_index_list(terms));
+    auto head = formalism::get_or_create<formalism::Literal>(repo(), atom.get_index(), true);
     auto condition = parse_condition(node.condition);
-    return formalism::get_or_create<formalism::Axiom>(repo(), std::move(parameters), head, condition).get_index();
+    return formalism::get_or_create<formalism::Axiom>(repo(), to_index_list(parameters), head.get_index(), condition.get_index());
 }
 
 void AstBuilder::parse_initial_element(const ast::Literal& literal,
-                                       ygg::IndexList<formalism::Literal>& literals,
-                                       ygg::IndexList<formalism::InitialFunctionValue>&)
+                                       std::vector<formalism::LiteralView>& literals,
+                                       std::vector<formalism::InitialFunctionValueView>&)
 {
     literals.push_back(parse_literal(literal));
 }
 
 void AstBuilder::parse_initial_element(const ast::InitialFunctionValue& value,
-                                       ygg::IndexList<formalism::Literal>&,
-                                       ygg::IndexList<formalism::InitialFunctionValue>& values)
+                                       std::vector<formalism::LiteralView>&,
+                                       std::vector<formalism::InitialFunctionValueView>& values)
 {
-    values.push_back(
-        formalism::get_or_create<formalism::InitialFunctionValue>(repo(), parse_function_term(value.function), parse_function_expression(value.value))
-            .get_index());
+    values.push_back(formalism::get_or_create<formalism::InitialFunctionValue>(repo(),
+                                                                               parse_function_term(value.function).get_index(),
+                                                                               parse_function_expression(value.value).get_index()));
 }
 
-ygg::Index<formalism::Metric> AstBuilder::parse_metric(const ast::Metric& node)
+formalism::MetricView AstBuilder::parse_metric(const ast::Metric& node)
 {
     checks().require_requirement(formalism::RequirementKind::NumericFluents, node);
     const auto optimization = key(node.optimization.text);
     if (optimization != "minimize" && optimization != "maximize")
         m_diagnostics.throw_at(node.optimization, InvalidMetricError(optimization));
-    return formalism::get_or_create<formalism::Metric>(repo(), optimization == "minimize", parse_function_expression(node.expression)).get_index();
+    return formalism::get_or_create<formalism::Metric>(repo(), optimization == "minimize", parse_function_expression(node.expression).get_index());
 }
 
 formalism::FunctionSkeletonView AstBuilder::total_cost_function()
@@ -742,9 +758,9 @@ formalism::FunctionSkeletonView AstBuilder::total_cost_function()
     return view;
 }
 
-ygg::Index<formalism::FunctionTerm> AstBuilder::total_cost_term()
+formalism::FunctionTermView AstBuilder::total_cost_term()
 {
-    return formalism::get_or_create<formalism::FunctionTerm>(repo(), total_cost_function().get_index(), ygg::IndexList<formalism::Term> {}).get_index();
+    return formalism::get_or_create<formalism::FunctionTerm>(repo(), total_cost_function().get_index(), ygg::IndexList<formalism::Term> {});
 }
 
 bool AstBuilder::writes_total_cost(formalism::EffectView effect)
@@ -777,23 +793,23 @@ bool AstBuilder::writes_total_cost(formalism::EffectView effect)
         effect.get_value());
 }
 
-ygg::Index<formalism::Action> AstBuilder::add_unit_cost(ygg::Index<formalism::Action> action)
+formalism::ActionView AstBuilder::add_unit_cost(formalism::ActionView view)
 {
-    const auto view = ygg::make_view(action, repo());
     if (const auto effect = view.get_effect(); effect && writes_total_cost(effect.value()))
-        return action;
+        return view;
 
     const auto one = wrap_function_expression(formalism::get_or_create<formalism::FunctionExpressionNumber>(repo(), 1.0).get_index());
     const auto increase = wrap_effect(formalism::get_or_create<formalism::EffectNumeric>(repo(),
                                                                                          formalism::NumericEffectOperator::Increase,
                                                                                          total_cost_function().get_index(),
                                                                                          ygg::IndexList<formalism::Term> {},
-                                                                                         one)
+                                                                                         one.get_index())
                                           .get_index());
     auto combined = increase;
     if (const auto effect = view.get_effect())
         combined = wrap_effect(
-            formalism::get_or_create<formalism::EffectAnd>(repo(), ygg::IndexList<formalism::Effect> { effect.value().get_index(), increase }).get_index());
+            formalism::get_or_create<formalism::EffectAnd>(repo(), ygg::IndexList<formalism::Effect> { effect.value().get_index(), increase.get_index() })
+                .get_index());
 
     auto parameters = ygg::IndexList<formalism::Parameter> {};
     for (auto parameter : view.get_parameters())
@@ -805,15 +821,14 @@ ygg::Index<formalism::Action> AstBuilder::add_unit_cost(ygg::Index<formalism::Ac
                                                        to_cista(std::string(view.get_name())),
                                                        std::move(parameters),
                                                        precondition,
-                                                       cista::optional<ygg::Index<formalism::Effect>>(combined))
-        .get_index();
+                                                       cista::optional<ygg::Index<formalism::Effect>>(combined.get_index()));
 }
 
-bool AstBuilder::has_total_cost_initial_value(const ygg::IndexList<formalism::InitialFunctionValue>& values)
+bool AstBuilder::has_total_cost_initial_value(const std::vector<formalism::InitialFunctionValueView>& values)
 {
     for (auto value : values)
     {
-        const auto function = ygg::make_view(value, repo()).get_function();
+        const auto function = value.get_function();
         if (function.get_function().get_name() == "total-cost" && function.get_terms().empty())
             return true;
     }
@@ -821,8 +836,8 @@ bool AstBuilder::has_total_cost_initial_value(const ygg::IndexList<formalism::In
 }
 
 void AstBuilder::complete_action_costs(const ast::Task& task,
-                                       ygg::IndexList<formalism::InitialFunctionValue>& initial_function_values,
-                                       cista::optional<ygg::Index<formalism::Metric>>& metric)
+                                       std::vector<formalism::InitialFunctionValueView>& initial_function_values,
+                                       std::optional<formalism::MetricView>& metric)
 {
     if (!m_parse_context.active_action_costs)
         return;
@@ -839,12 +854,13 @@ void AstBuilder::complete_action_costs(const ast::Task& task,
     }
 
     if (missing_metric)
-        metric = formalism::get_or_create<formalism::Metric>(repo(), true, wrap_function_expression(total_cost_term())).get_index();
+        metric = formalism::get_or_create<formalism::Metric>(repo(), true, wrap_function_expression(total_cost_term().get_index()).get_index());
     if (missing_initial_value)
     {
         const auto zero = formalism::get_or_create<formalism::FunctionExpressionNumber>(repo(), 0.0).get_index();
         const auto zero_expression = wrap_function_expression(zero);
-        initial_function_values.push_back(formalism::get_or_create<formalism::InitialFunctionValue>(repo(), total_cost_term(), zero_expression).get_index());
+        initial_function_values.push_back(
+            formalism::get_or_create<formalism::InitialFunctionValue>(repo(), total_cost_term().get_index(), zero_expression.get_index()));
     }
 }
 

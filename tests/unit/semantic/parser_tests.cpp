@@ -80,6 +80,24 @@ TEST(LokiSemanticParser, StrictModeAllowsForwardTypeReferences)
     EXPECT_TRUE(saw_parent);
 }
 
+TEST(LokiSemanticParser, StrictModeChecksTaskQuantifierTypesAcrossRepositories)
+{
+    auto options = semantic::ParserOptions {};
+    options.strict = true;
+    options.add_action_costs = false;
+    auto parser = semantic::Parser(std::string { R"((define (domain quantified-types)
+        (:requirements :typing)
+        (:types passenger)
+        (:predicates (served ?p - passenger))))" },
+                                   options);
+
+    EXPECT_NO_THROW(parser.parse_task(std::string { R"((define (problem quantified-types-task)
+        (:domain quantified-types)
+        (:requirements :typing :universal-preconditions)
+        (:init)
+        (:goal (forall (?p - passenger) (served ?p)))))" }));
+}
+
 TEST(LokiSemanticParser, PermissiveModeAllowsPredicateArgumentTypeMismatch)
 {
     EXPECT_NO_THROW({
