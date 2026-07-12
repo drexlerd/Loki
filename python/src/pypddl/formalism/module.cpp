@@ -48,6 +48,8 @@ void bind_semantic_errors(nb::module_& m)
     nb::exception<semantic::UnsupportedRequirementError>(m, "UnsupportedRequirementError", semantic_error.ptr());
     nb::exception<semantic::MissingRequirementError>(m, "MissingRequirementError", semantic_error.ptr());
     nb::exception<semantic::UnusedRequirementError>(m, "UnusedRequirementError", semantic_error.ptr());
+    nb::exception<semantic::AggregateRequirementError>(m, "AggregateRequirementError", semantic_error.ptr());
+    nb::exception<semantic::RedundantRequirementError>(m, "RedundantRequirementError", semantic_error.ptr());
 
     nb::exception<semantic::UndefinedTypeError>(m, "UndefinedTypeError", semantic_error.ptr());
     nb::exception<semantic::UndefinedPredicateError>(m, "UndefinedPredicateError", semantic_error.ptr());

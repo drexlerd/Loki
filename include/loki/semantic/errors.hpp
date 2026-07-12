@@ -68,6 +68,24 @@ public:
     explicit UnusedRequirementError(const std::string& requirement) : SemanticError("Unused PDDL requirement: :" + requirement) {}
 };
 
+class LOKI_SEMANTIC_ERROR_API AggregateRequirementError : public SemanticError
+{
+public:
+    explicit AggregateRequirementError(const std::string& requirement) :
+        SemanticError("Aggregate PDDL requirement must be declared atomically: :" + requirement)
+    {
+    }
+};
+
+class LOKI_SEMANTIC_ERROR_API RedundantRequirementError : public SemanticError
+{
+public:
+    explicit RedundantRequirementError(const std::string& requirement) :
+        SemanticError("Task requirement already declared by the domain: :" + requirement)
+    {
+    }
+};
+
 class LOKI_SEMANTIC_ERROR_API UndefinedTypeError : public SemanticError
 {
 public:

@@ -1,5 +1,5 @@
 (define (domain numeric-domain)
-  (:requirements :numeric-fluents)
+  (:requirements :strips :numeric-fluents)
   (:predicates (p))
   (:functions (fuel))
   (:action burn

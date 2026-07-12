@@ -98,6 +98,10 @@ bool matches_error_type(const semantic::SemanticError& error, const std::string&
         return dynamic_cast<const semantic::MissingRequirementError*>(&error) != nullptr;
     if (expected_error == "UnusedRequirementError")
         return dynamic_cast<const semantic::UnusedRequirementError*>(&error) != nullptr;
+    if (expected_error == "AggregateRequirementError")
+        return dynamic_cast<const semantic::AggregateRequirementError*>(&error) != nullptr;
+    if (expected_error == "RedundantRequirementError")
+        return dynamic_cast<const semantic::RedundantRequirementError*>(&error) != nullptr;
     if (expected_error == "UndefinedTypeError")
         return dynamic_cast<const semantic::UndefinedTypeError*>(&error) != nullptr;
     if (expected_error == "UndefinedPredicateError")

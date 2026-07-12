@@ -68,6 +68,7 @@ enum class RequirementKind : std::uint8_t
     ExistentialPreconditions,
     UniversalPreconditions,
     QuantifiedPreconditions,
+    Adl,
     ConditionalEffects,
     Fluents,
     NumericFluents,
@@ -164,6 +165,8 @@ inline const char* to_string(RequirementKind kind)
             return ":universal-preconditions";
         case RequirementKind::QuantifiedPreconditions:
             return ":quantified-preconditions";
+        case RequirementKind::Adl:
+            return ":adl";
         case RequirementKind::ConditionalEffects:
             return ":conditional-effects";
         case RequirementKind::Fluents:

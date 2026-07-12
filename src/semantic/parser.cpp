@@ -23,6 +23,7 @@
 #include "loki/ast/ast.hpp"
 #include "loki/parser/parser.hpp"
 #include "loki/semantic/errors.hpp"
+#include "mappings.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -45,7 +46,7 @@ std::string read_file(const fs::path& path)
 // (AstBuilder) -> canonicalized storage (CanonicalCopyTranslator).
 struct Parser::Impl
 {
-    Impl(const std::string& domain_source, std::string source_name, ParserOptions options);
+    Impl(std::string domain_source, std::string source_name, ParserOptions options);
 
     const formalism::Repository& repository() const noexcept;
     formalism::Repository& repository() noexcept;
@@ -63,7 +64,7 @@ private:
     const formalism::Repository& repo() const noexcept;
 
     formalism::DomainView parse_domain_ast(const ast::Domain& domain);
-    formalism::TaskView parse_task_source(const std::string& source, const std::string& source_name);
+    formalism::TaskView parse_task_source(std::string source, const std::string& source_name);
     formalism::TaskView parse_task_ast(const ast::Task& task);
 
     void canonicalize_domain(formalism::DomainView domain);
@@ -85,10 +86,11 @@ formalism::DomainView Parser::get_domain() const noexcept { return m_impl->get_d
 formalism::TaskView Parser::parse_task(const std::string& source) { return m_impl->parse_task(source); }
 formalism::TaskView Parser::parse_task(const fs::path& path) { return m_impl->parse_task(path); }
 
-Parser::Impl::Impl(const std::string& domain_source, std::string source_name, ParserOptions options) :
+Parser::Impl::Impl(std::string domain_source, std::string source_name, ParserOptions options) :
     m_options(options),
     m_domain_context(std::make_shared<detail::TranslationStorage>(0))
 {
+    domain_source = lowercase(std::move(domain_source));
     auto first = domain_source.cbegin();
     auto syntax_errors = std::ostringstream {};
     parser::ErrorHandlerType error_handler(first, domain_source.cend(), syntax_errors, std::move(source_name));
@@ -109,8 +111,9 @@ formalism::TaskView Parser::Impl::parse_task(const fs::path& path) { return pars
 formalism::Repository& Parser::Impl::repo() noexcept { return m_domain_context.storage->repository; }
 const formalism::Repository& Parser::Impl::repo() const noexcept { return m_domain_context.storage->repository; }
 
-formalism::TaskView Parser::Impl::parse_task_source(const std::string& source, const std::string& source_name)
+formalism::TaskView Parser::Impl::parse_task_source(std::string source, const std::string& source_name)
 {
+    source = lowercase(std::move(source));
     auto first = source.cbegin();
     auto syntax_errors = std::ostringstream {};
     parser::ErrorHandlerType error_handler(first, source.cend(), syntax_errors, source_name);

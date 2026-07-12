@@ -19,19 +19,24 @@
 
 #include "loki/semantic/errors.hpp"
 
+#include <cctype>
 #include <utility>
 
 namespace loki::semantic
 {
 
+std::string lowercase(std::string text)
+{
+    for (auto& c : text)
+        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    return text;
+}
+
 std::string key(std::string text)
 {
     if (!text.empty() && text.front() == ':')
         text.erase(text.begin());
-    for (auto& c : text)
-        if (c >= 'A' && c <= 'Z')
-            c = static_cast<char>(c - 'A' + 'a');
-    return text;
+    return lowercase(std::move(text));
 }
 
 cista::offset::string to_cista(const std::string& text) { return cista::offset::string(text); }
@@ -64,7 +69,7 @@ formalism::RequirementKind requirement_kind(const ast::Requirement& node, const 
     if (name == "action-costs")
         return formalism::RequirementKind::ActionCosts;
     if (name == "adl")
-        return formalism::RequirementKind::QuantifiedPreconditions;
+        return formalism::RequirementKind::Adl;
     if (name == "durative-actions")
         return formalism::RequirementKind::DurativeActions;
     if (name == "derived-predicates")
@@ -81,6 +86,17 @@ std::vector<formalism::RequirementKind> requirement_capabilities(formalism::Requ
     using enum formalism::RequirementKind;
     if (kind == QuantifiedPreconditions)
         return { QuantifiedPreconditions, ExistentialPreconditions, UniversalPreconditions };
+    if (kind == Adl)
+        return { Adl,
+                 Strips,
+                 Typing,
+                 NegativePreconditions,
+                 DisjunctivePreconditions,
+                 Equality,
+                 QuantifiedPreconditions,
+                 ExistentialPreconditions,
+                 UniversalPreconditions,
+                 ConditionalEffects };
     if (kind == Fluents || kind == ActionCosts)
         return { kind, NumericFluents };
     return { kind };
@@ -88,19 +104,15 @@ std::vector<formalism::RequirementKind> requirement_capabilities(formalism::Requ
 
 std::vector<formalism::RequirementKind> requirement_capabilities(const ast::Requirement& node, const DiagnosticContext& diagnostics)
 {
-    auto result = requirement_capabilities(requirement_kind(node, diagnostics));
-    if (key(node.name.text) == "adl")
-    {
-        using enum formalism::RequirementKind;
-        result.insert(result.end(), { Strips, Typing, NegativePreconditions, DisjunctivePreconditions, Equality, ConditionalEffects });
-    }
-    return result;
+    return requirement_capabilities(requirement_kind(node, diagnostics));
 }
 
 std::string requirement_name(formalism::RequirementKind kind)
 {
     switch (kind)
     {
+        case formalism::RequirementKind::Adl:
+            return "adl";
         case formalism::RequirementKind::Typing:
             return "typing";
         case formalism::RequirementKind::NegativePreconditions:

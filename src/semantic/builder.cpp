@@ -77,6 +77,9 @@ AstBuilder::AstBuilder(const ParserOptions& options,
 formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
 {
     auto requirements = parse_requirements(domain.requirements);
+    if (m_options.strict
+        && std::none_of(domain.requirements.begin(), domain.requirements.end(), [](const auto& node) { return key(node.name.text) == "strips"; }))
+        m_diagnostics.throw_at(domain.name, MissingRequirementError("strips"));
     // Genuine numeric domains keep their own cost structure; a planner interprets an absent
     // metric as unit costs, so grafting total-cost onto :numeric-fluents would be wrong.
     const auto inject_unit_costs = m_options.add_action_costs && !m_parse_context.active_action_costs && !m_parse_context.active_numeric_fluents;
@@ -138,6 +141,17 @@ formalism::TaskView AstBuilder::build_task(const ast::Task& task)
         m_diagnostics.throw_at(task.domain_name, MismatchedDomainError(m_domain_context.domain_name, task.domain_name.text));
 
     auto requirements = parse_requirements(task.requirements);
+    if (m_options.strict)
+    {
+        // Tasks inherit the domain's requirements; only additional ones belong here.
+        for (const auto& node : task.requirements)
+        {
+            const auto kind = requirement_kind(node, m_diagnostics);
+            for (const auto domain_requirement : m_domain_context.domain->get_requirements())
+                if (domain_requirement.get_kind() == kind)
+                    m_diagnostics.throw_at(node.name, RedundantRequirementError(key(node.name.text)));
+        }
+    }
     auto objects = parse_objects(task.objects, m_parse_context.task_objects, m_parse_context.declared_objects);
     auto initial_literals = std::vector<formalism::LiteralView> {};
     auto initial_function_values = std::vector<formalism::InitialFunctionValueView> {};
@@ -239,6 +253,11 @@ std::vector<formalism::RequirementView> AstBuilder::parse_requirements(const std
     auto result = std::vector<formalism::RequirementView> {};
     for (const auto& node : nodes)
     {
+        const auto name = key(node.name.text);
+        // Aggregates hide which capabilities a model needs; strict mode demands the atomic
+        // requirements, and the MissingRequirementError checks then enumerate the right ones.
+        if (m_options.strict && (name == "adl" || name == "fluents" || name == "quantified-preconditions"))
+            m_diagnostics.throw_at(node.name, AggregateRequirementError(name));
         const auto kind = requirement_kind(node, m_diagnostics);
         if (kind == formalism::RequirementKind::ActionCosts)
             m_parse_context.active_action_costs = true;
@@ -414,7 +433,10 @@ std::vector<formalism::FunctionSkeletonView> AstBuilder::parse_functions(const s
         auto scope = VariableScope(m_parse_context);
         auto parameters = parse_parameters(node.parameters);
         const auto name = key(node.name.text);
-        checks().require_requirement(formalism::RequirementKind::NumericFluents, node.name);
+        if (m_parse_context.active_action_costs && name == "total-cost")
+            checks().mark_requirement_used(formalism::RequirementKind::ActionCosts);
+        else
+            checks().require_requirement(formalism::RequirementKind::NumericFluents, node.name);
         checks().ensure_new<DuplicateFunctionError>(m_domain_context.declared_functions, name, node.name);
         checks().require_typing_if_needed(node.type, node.name);
         auto type = node.type ? parse_type_expression(*node.type).front().get_index() : m_domain_context.number_type.get_index();
@@ -536,10 +558,11 @@ formalism::ConditionView AstBuilder::parse_condition_node(const ast::ConditionNu
 
 formalism::FunctionTermView AstBuilder::parse_function_term(const ast::FunctionTerm& node)
 {
-    checks().require_requirement(formalism::RequirementKind::NumericFluents, node.function);
     const auto name = key(node.function.text);
     if (m_parse_context.active_action_costs && name == "total-cost")
         checks().mark_requirement_used(formalism::RequirementKind::ActionCosts);
+    else
+        checks().require_requirement(formalism::RequirementKind::NumericFluents, node.function);
     auto skeleton = function(node.function, node.terms.size());
     if (m_domain_context.declared_functions.contains(name))
         checks().check_argument_types(name, skeleton.get_parameters(), node.terms, node.function);
@@ -618,13 +641,14 @@ formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectAnd& node)
 
 formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectNumeric& node)
 {
-    checks().require_requirement(formalism::RequirementKind::NumericFluents, node);
     const auto op = numeric_effect_operator(node, m_diagnostics);
     // Bare :action-costs permits only writes of the form (increase (total-cost) ...).
     const auto is_total_cost_increase = op == formalism::NumericEffectOperator::Increase && key(node.function.function.text) == "total-cost";
     if (m_parse_context.active_action_costs && is_total_cost_increase)
         checks().mark_requirement_used(formalism::RequirementKind::ActionCosts);
-    if (!m_parse_context.active_numeric_fluents && !(m_parse_context.active_action_costs && is_total_cost_increase))
+    else
+        checks().require_requirement(formalism::RequirementKind::NumericFluents, node);
+    if (m_options.strict && !m_parse_context.active_numeric_fluents && !(m_parse_context.active_action_costs && is_total_cost_increase))
         m_diagnostics.throw_at(node, MissingRequirementError("numeric-fluents"));
     auto skeleton = function(node.function.function, node.function.terms.size());
     if (m_domain_context.declared_functions.contains(key(node.function.function.text)))
@@ -739,7 +763,8 @@ void AstBuilder::parse_initial_element(const ast::InitialFunctionValue& value,
 
 formalism::MetricView AstBuilder::parse_metric(const ast::Metric& node)
 {
-    checks().require_requirement(formalism::RequirementKind::NumericFluents, node);
+    if (m_options.strict && !m_parse_context.active_requirements.contains(formalism::RequirementKind::NumericFluents))
+        m_diagnostics.throw_at(node, MissingRequirementError(requirement_name(formalism::RequirementKind::NumericFluents)));
     const auto optimization = key(node.optimization.text);
     if (optimization != "minimize" && optimization != "maximize")
         m_diagnostics.throw_at(node.optimization, InvalidMetricError(optimization));
@@ -853,6 +878,8 @@ void AstBuilder::complete_action_costs(const ast::Task& task,
         return;
     }
 
+    if (missing_metric || missing_initial_value)
+        checks().mark_requirement_used(formalism::RequirementKind::ActionCosts);
     if (missing_metric)
         metric = formalism::get_or_create<formalism::Metric>(repo(), true, wrap_function_expression(total_cost_term().get_index()).get_index());
     if (missing_initial_value)

@@ -78,16 +78,20 @@ struct SemanticChecks
         if (!options.strict)
             return;
         for (const auto& node : nodes)
+        {
+            if (key(node.name.text) == "strips")  // baseline: mandatory in strict mode, never audited as unused
+                continue;
             if (!uses_declared_requirement(node))
                 diagnostics.throw_at(node.name, UnusedRequirementError(key(node.name.text)));
+        }
     }
 
     template<typename Node>
     void require_requirement(formalism::RequirementKind kind, const Node& node) const
     {
         mark_requirement_used(kind);
-        // Numeric fluent use without a numeric requirement is an error in both modes.
-        if (!options.strict && kind != formalism::RequirementKind::NumericFluents)
+        // Permissive mode never enforces requirement declarations; strict mode does.
+        if (!options.strict)
             return;
         if (!parse_context.active_requirements.contains(kind))
             diagnostics.throw_at(node, MissingRequirementError(requirement_name(kind)));

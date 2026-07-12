@@ -3,4 +3,8 @@
   (:types thing)
   (:constants c - thing)
   (:predicates (p))
+  (:action same
+    :parameters (?a ?b - thing)
+    :precondition (= ?a ?b)
+    :effect (p))
 )

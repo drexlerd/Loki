@@ -21,6 +21,7 @@
 #include <gtest/gtest.h>
 #include <loki/loki.hpp>
 #include <loki/semantic.hpp>
+#include <set>
 #include <string>
 
 namespace loki::tests
@@ -41,11 +42,49 @@ TEST(LokiSemanticParser, PermissiveModeAllowsMissingRequirements)
     });
 }
 
-TEST(LokiSemanticParser, StrictModeExpandsAdlRequirement)
+TEST(LokiSemanticParser, LowercasesSourceBeforeParsing)
+{
+    auto options = semantic::ParserOptions {};
+    options.add_action_costs = false;
+    auto parser = semantic::Parser(std::string { R"((DeFiNe (DoMaIn MiXeD-DoMaIn)
+        (:PrEdIcAtEs (ReAdY ?VaLuE))))" },
+                                   options);
+
+    EXPECT_EQ(parser.get_domain().get_name(), "mixed-domain");
+    ASSERT_EQ(parser.get_domain().get_predicates().size(), 1);
+    EXPECT_EQ(parser.get_domain().get_predicates()[0].get_name(), "ready");
+
+    const auto task = parser.parse_task(std::string { R"((DeFiNe (PrObLeM MiXeD-TaSk)
+        (:DoMaIn MIXED-DOMAIN)
+        (:ObJeCtS ItEm)
+        (:InIt (ReAdY ItEm))
+        (:GoAl (ReAdY ITEM))))" });
+    EXPECT_EQ(task.get_name(), "mixed-task");
+    ASSERT_EQ(task.get_objects().size(), 1);
+    EXPECT_EQ(task.get_objects()[0].get_name(), "item");
+}
+
+TEST(LokiSemanticParser, StrictModeRejectsAggregateRequirements)
 {
     auto options = semantic::ParserOptions {};
     options.strict = true;
-    EXPECT_NO_THROW(semantic::Parser(fixture_path("adl-requirements"), options));
+    EXPECT_THROW(semantic::Parser(fixture_path("adl-requirements"), options), semantic::AggregateRequirementError);
+}
+
+TEST(LokiSemanticParser, ReturnedRequirementsAreDeclaredVerbatim)
+{
+    auto options = semantic::ParserOptions {};
+    options.add_action_costs = false;
+    auto parser = semantic::Parser(fixture_path("adl-requirements"), options);
+
+    // Permissive mode neither validates nor rewrites requirements: the domain
+    // declares :adl, so :adl is what comes back.
+    auto kinds = std::set<formalism::RequirementKind> {};
+    for (const auto requirement : parser.get_domain().get_requirements())
+        kinds.insert(requirement.get_kind());
+
+    const auto expected = std::set<formalism::RequirementKind> { formalism::RequirementKind::Adl };
+    EXPECT_EQ(kinds, expected);
 }
 
 TEST(LokiSemanticParser, StrictModeAllowsForwardTypeReferences)
@@ -54,7 +93,7 @@ TEST(LokiSemanticParser, StrictModeAllowsForwardTypeReferences)
     options.strict = true;
     options.add_action_costs = false;
     auto parser = semantic::Parser(std::string { R"((define (domain forward-types)
-        (:requirements :typing)
+        (:requirements :strips :typing)
         (:types child - parent parent - object)
         (:predicates (holds ?x - child))))" },
                                    options);
@@ -86,14 +125,14 @@ TEST(LokiSemanticParser, StrictModeChecksTaskQuantifierTypesAcrossRepositories)
     options.strict = true;
     options.add_action_costs = false;
     auto parser = semantic::Parser(std::string { R"((define (domain quantified-types)
-        (:requirements :typing)
+        (:requirements :strips :typing)
         (:types passenger)
         (:predicates (served ?p - passenger))))" },
                                    options);
 
     EXPECT_NO_THROW(parser.parse_task(std::string { R"((define (problem quantified-types-task)
         (:domain quantified-types)
-        (:requirements :typing :universal-preconditions)
+        (:requirements :universal-preconditions)
         (:init)
         (:goal (forall (?p - passenger) (served ?p)))))" }));
 }

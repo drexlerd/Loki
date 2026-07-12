@@ -729,6 +729,7 @@ def test_strict_mode_missing_requirement_uses_typed_exception():
     try:
         pypddl.Parser("""
 (define (domain py-missing-requirement)
+  (:requirements :strips)
   (:predicates (p) (q))
   (:action a
     :parameters ()
@@ -739,7 +740,7 @@ def test_strict_mode_missing_requirement_uses_typed_exception():
     except pypddl.MissingRequirementError as error:
         message = str(error)
         assert ":disjunctive-preconditions" in message
-        assert "In line 6:" in message
+        assert "In line 7:" in message
         assert "^_" in message
     else:
         raise AssertionError("expected missing requirement diagnostic")
@@ -814,7 +815,7 @@ def test_translate_task_task_only_equality_uses_typed_exception():
   (:requirements :equality)
   (:objects o)
   (:init)
-  (:goal (p))
+  (:goal (and (p) (= o o)))
 )
 """)
 

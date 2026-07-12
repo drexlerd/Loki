@@ -1,5 +1,5 @@
 (define (domain action-cost-domain)
-  (:requirements :action-costs)
+  (:requirements :strips :action-costs)
   (:predicates (p))
   (:functions (total-cost))
   (:action pay

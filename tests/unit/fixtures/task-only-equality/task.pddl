@@ -3,5 +3,5 @@
   (:requirements :equality)
   (:objects o)
   (:init)
-  (:goal (p))
+  (:goal (and (p) (= o o)))
 )

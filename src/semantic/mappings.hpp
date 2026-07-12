@@ -29,7 +29,9 @@
 namespace loki::semantic
 {
 
-// Name normalization: strips a leading ':' and lowercases.
+// PDDL source/name normalization.
+std::string lowercase(std::string text);
+// Name normalization additionally strips a leading ':'.
 std::string key(std::string text);
 cista::offset::string to_cista(const std::string& text);
 

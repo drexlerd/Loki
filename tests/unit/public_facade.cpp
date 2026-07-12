@@ -126,7 +126,7 @@ TEST(LokiPublicFacade, ExposesSemanticErrorsThroughLokiNamespace)
     {
         const auto message = std::string(error.what());
         EXPECT_NE(message.find(":disjunctive-preconditions"), std::string::npos);
-        EXPECT_NE(message.find("In line 5:"), std::string::npos);
+        EXPECT_NE(message.find("In line 6:"), std::string::npos);
         EXPECT_NE(message.find("^_"), std::string::npos);
     }
 }
