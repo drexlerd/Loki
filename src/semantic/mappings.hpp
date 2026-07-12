@@ -29,9 +29,9 @@
 namespace loki::semantic
 {
 
-// PDDL source/name normalization.
+// Lowercase an owned PDDL source buffer before parsing.
 std::string lowercase(std::string text);
-// Name normalization additionally strips a leading ':'.
+// Semantic keys strip the requirement marker after source normalization.
 std::string key(std::string text);
 cista::offset::string to_cista(const std::string& text);
 

@@ -36,7 +36,7 @@ std::string key(std::string text)
 {
     if (!text.empty() && text.front() == ':')
         text.erase(text.begin());
-    return lowercase(std::move(text));
+    return text;
 }
 
 cista::offset::string to_cista(const std::string& text) { return cista::offset::string(text); }
