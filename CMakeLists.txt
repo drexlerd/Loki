@@ -67,9 +67,6 @@ option(LOKI_BUILD_PYPDDL "Build Loki for the pypddl Python wheel." OFF)
 set(LOKI_INSTALL_INTERFACE_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}")
 
 
-set(DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/")
-add_definitions(-DDATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/")
-message("DATA_DIR: ${DATA_DIR}")
 
 
 

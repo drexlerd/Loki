@@ -30,8 +30,6 @@
 namespace loki::tests
 {
 
-inline bool benchmark_file_available(const std::filesystem::path& path) { return std::filesystem::is_regular_file(path); }
-
 struct SuiteCase
 {
     std::string name;
@@ -39,25 +37,29 @@ struct SuiteCase
     std::optional<std::filesystem::path> task_file;
 };
 
-inline std::vector<SuiteCase> load_suite_cases(const std::filesystem::path& suite_json)
+inline std::vector<SuiteCase> load_suite_cases(const std::filesystem::path& suite_json, const std::optional<std::filesystem::path>& prefix = std::nullopt)
 {
     const auto suite_value = ygg::common::load_json_file(suite_json);
     const auto& suite = ygg::common::as_object(suite_value, "suite");
+    const auto base = prefix ? *prefix : ygg::common::suite_prefix_path(suite);
     auto result = std::vector<SuiteCase> {};
     for (const auto& case_value : ygg::common::as_array(suite, "cases", "suite"))
     {
         const auto& object = ygg::common::as_object(case_value, "case");
         auto item = SuiteCase { ygg::common::as_string(object, "name", "case"),
-                                ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
+                                ygg::common::resolve_path(base, ygg::common::as_string(object, "domain_file", "case")),
                                 std::nullopt };
         if (object.if_contains("task_file"))
-            item.task_file = ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case"));
+            item.task_file = ygg::common::resolve_path(base, ygg::common::as_string(object, "task_file", "case"));
         result.push_back(std::move(item));
     }
     return result;
 }
 
-inline std::vector<SuiteCase> benchmark_suite_cases() { return load_suite_cases(ygg::common::root_path() / "tests/unit/parser/suite.json"); }
+inline std::vector<SuiteCase> benchmark_suite_cases()
+{
+    return load_suite_cases(ygg::common::root_path() / "tests/unit/parser/suite.json", std::filesystem::path(BENCHMARKS_DIR));
+}
 
 inline std::vector<SuiteCase> fixture_suite_cases() { return load_suite_cases(ygg::common::root_path() / "tests/unit/fixtures/suite.json"); }
 
@@ -83,35 +85,6 @@ inline std::string read_text(const std::filesystem::path& path)
     return out.str();
 }
 
-inline bool benchmark_tree_available(const std::filesystem::path& path)
-{
-    if (!std::filesystem::is_directory(path))
-        return false;
-
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(path))
-    {
-        if (entry.is_regular_file() && entry.path().extension() == ".pddl")
-            return true;
-    }
-    return false;
-}
-
-inline bool benchmark_file_available(const std::optional<std::filesystem::path>& path) { return !path || std::filesystem::is_regular_file(*path); }
-
-template<typename Cases>
-inline bool benchmark_suite_available(const Cases& cases)
-{
-    return !cases.empty() && benchmark_file_available(cases.front().domain_file) && benchmark_file_available(cases.front().task_file);
-}
-
-#define LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(path) ASSERT_TRUE(::loki::tests::benchmark_file_available(path)) << path
-
-#define LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(path)               \
-    do                                                              \
-    {                                                               \
-        if (!::loki::tests::benchmark_file_available(path))         \
-            GTEST_SKIP() << "Benchmark data unavailable: " << path; \
-    } while (false)
 
 }  // namespace loki::tests
 

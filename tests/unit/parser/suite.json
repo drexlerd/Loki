@@ -1,5 +1,4 @@
 {
-    "prefix": "data/benchmarks",
     "cases": [
         {
             "name": "classical/agricola",

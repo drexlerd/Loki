@@ -61,11 +61,11 @@ struct TranslationCountExpectation
     std::vector<ConfigurationExpectation> configurations;
 };
 
-ParserSuiteCase parse_parser_case(const boost::json::object& suite, const boost::json::object& object)
+ParserSuiteCase parse_parser_case(const boost::json::object& object)
 {
     return ParserSuiteCase { ygg::common::as_string(object, "name", "case"),
-                             ygg::common::suite_path(suite, ygg::common::as_string(object, "domain_file", "case")),
-                             ygg::common::suite_path(suite, ygg::common::as_string(object, "task_file", "case")) };
+                             ygg::common::resolve_path(std::filesystem::path(BENCHMARKS_DIR), ygg::common::as_string(object, "domain_file", "case")),
+                             ygg::common::resolve_path(std::filesystem::path(BENCHMARKS_DIR), ygg::common::as_string(object, "task_file", "case")) };
 }
 
 std::vector<ParserSuiteCase> load_parser_cases()
@@ -74,7 +74,7 @@ std::vector<ParserSuiteCase> load_parser_cases()
     const auto& suite = ygg::common::as_object(suite_value, "suite");
     auto result = std::vector<ParserSuiteCase> {};
     for (const auto& case_value : ygg::common::as_array(suite, "cases", "suite"))
-        result.push_back(parse_parser_case(suite, ygg::common::as_object(case_value, "case")));
+        result.push_back(parse_parser_case(ygg::common::as_object(case_value, "case")));
     return result;
 }
 
@@ -128,17 +128,12 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
     const auto cases = load_parser_cases();
     const auto expectations = load_expectations();
     ASSERT_EQ(cases.size(), expectations.size());
-    if (!benchmark_suite_available(cases))
-        GTEST_SKIP() << "Benchmark data unavailable: " << cases.front().domain_file;
-
     for (auto i = std::size_t { 0 }; i < cases.size(); ++i)
     {
         const auto& item = cases[i];
         const auto& expected = expectations[i];
         SCOPED_TRACE(item.name);
         ASSERT_EQ(item.name, expected.name);
-        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.domain_file);
-        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.task_file);
 
         for (const auto& configuration : expected.configurations)
         {

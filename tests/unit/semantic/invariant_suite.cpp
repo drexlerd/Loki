@@ -225,8 +225,6 @@ TEST(LokiSemanticInvariantSuite, TranslatorOptionCombinationsKeepInvariants)
     for (const auto& item : cases)
     {
         SCOPED_TRACE(item.name);
-        if (!benchmark_file_available(item.domain_file) || !benchmark_file_available(item.task_file))
-            continue;
         ++checked;
 
         auto parser = semantic::Parser(item.domain_file);
@@ -324,8 +322,6 @@ TEST(LokiSemanticInvariantSuite, ParsesAllCasesWithContiguousTopLevelIndices)
     for (const auto& item : cases)
     {
         SCOPED_TRACE(item.name);
-        if (!benchmark_file_available(item.domain_file) || !benchmark_file_available(item.task_file))
-            continue;
 
         semantic::Parser parser(item.domain_file);
         const auto domain = parser.get_domain();
@@ -347,8 +343,6 @@ TEST(LokiSemanticInvariantSuite, AddActionCostsOptionHoldsAcrossFixtures)
     for (const auto& item : cases)
     {
         SCOPED_TRACE(item.name);
-        if (!benchmark_file_available(item.domain_file) || !benchmark_file_available(item.task_file))
-            continue;
 
         auto options = semantic::ParserOptions {};
         options.add_action_costs = true;
@@ -399,9 +393,7 @@ TEST(LokiSemanticInvariantSuite, AddActionCostsOptionHoldsAcrossFixtures)
 
 TEST(LokiSemanticInvariantSuite, ParsesDomainAndManyTasks)
 {
-    const auto root = fs::path(std::string(DATA_DIR)) / "benchmarks" / "classical" / "tests" / "gripper";
-    LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(root / "domain.pddl");
-    LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(root / "test-1.pddl");
+    const auto root = fs::path(std::string(BENCHMARKS_DIR)) / "classical" / "tests" / "gripper";
 
     semantic::Parser parser(root / "domain.pddl");
 

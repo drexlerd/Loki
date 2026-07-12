@@ -30,7 +30,8 @@ Loki depends on a fraction of [Boost's](https://www.boost.org) header-only libra
 
 Loki consumes native dependencies from Python packages:
 
-- `pyyggdrasil == 0.0.21` for shared third-party native dependencies.
+- `pyyggdrasil >= 0.0.21, < 0.1` for shared third-party native dependencies.
+- `pypddl-datasets >= 0.0.5, < 0.1` for the PDDL benchmark data used by the C++ test suite and the example executables (resolved from its cache at CMake configure time).
 
 The shared workspace layout, layered install order, and the common
 build-from-source and CMake-integration patterns are documented in the
@@ -51,7 +52,7 @@ Install Loki's native dependency providers into the active Python environment,
 then configure CMake with their native prefixes:
 
 ```console
-python -m pip install 'pyyggdrasil==0.0.21'
+python -m pip install 'pyyggdrasil>=0.0.21,<0.1' 'pypddl-datasets>=0.0.5,<0.1'
 
 cmake -S . -B build
 ```
@@ -183,7 +184,7 @@ consuming the native prefixes from CMake is in the
 
 The Python package `pypddl` installs Loki's native headers, shared library, and
 CMake package config under `pypddl.native_prefix()`. It depends on
-`pyyggdrasil==0.0.21` for third-party native dependencies:
+`pyyggdrasil>=0.0.21,<0.1` for third-party native dependencies:
 
 ```python
 import pypddl
@@ -210,19 +211,11 @@ Loki exports the `loki::parsers` target.
 ## Running the Executables
 
 The executable illustrates how to use Loki. It is disabled by default and can be
-enabled with `-DLOKI_BUILD_EXECUTABLES=ON`. Example PDDL inputs are provided by the
-[pypddl-datasets](https://pypi.org/project/pypddl-datasets/) package (also used
-by the C++ test suite; materialize them once into `data/benchmarks`):
+enabled with `-DLOKI_BUILD_EXECUTABLES=ON`. Example PDDL inputs come straight from the
+[pypddl-datasets](https://pypi.org/project/pypddl-datasets/) cache:
 
 ```console
-pip install 'pypddl-datasets>=0.0.4,<0.1'
-python -c "import pypddl_datasets as pb; [pb.export_suite(s, 'data/benchmarks') for s in ('tests-classical', 'tests-numeric')]"
-```
-
-```console
-./build/exe/loki \
-  data/benchmarks/classical/tests/gripper/domain.pddl \
-  data/benchmarks/classical/tests/gripper/test-1.pddl
+./build/exe/loki $(python -c "import pypddl_datasets as pb; t = pb.fetch_task('classical/tests/gripper/test-1.pddl'); print(t.domain_path, t.task_path)")
 ```
 
 Use `--out-domain`/`--out-problem` to write the translated PDDL to files, and

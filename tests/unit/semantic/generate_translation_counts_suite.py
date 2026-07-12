@@ -43,7 +43,10 @@ def make_options(cls, config):
 
 def main():
     parser_suite = json.loads((ROOT / "tests/unit/parser/suite.json").read_text())
-    prefix = ROOT / parser_suite["prefix"]
+
+    import pypddl_datasets
+
+    prefix = pypddl_datasets.data_root()
 
     cases = []
     for case in parser_suite["cases"]:

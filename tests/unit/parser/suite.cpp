@@ -70,12 +70,7 @@ std::vector<SuiteCase> load_cases() { return benchmark_suite_cases(); }
 
 TEST(LokiParserSuite, JsonSuiteCoversEveryBenchmarkProblem)
 {
-    const auto suite_value = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/parser/suite.json");
-    const auto& suite = ygg::common::as_object(suite_value, "suite");
-    const auto benchmark_root = ygg::common::suite_prefix_path(suite);
-    if (!benchmark_tree_available(benchmark_root / "tests"))
-        GTEST_SKIP() << "Benchmark data unavailable: " << benchmark_root / "tests";
-
+    const auto benchmark_root = fs::path(std::string(BENCHMARKS_DIR));
     auto listed = std::set<std::string> {};
     for (const auto& item : load_cases())
     {
@@ -83,15 +78,18 @@ TEST(LokiParserSuite, JsonSuiteCoversEveryBenchmarkProblem)
     }
 
     auto discovered = std::set<std::string> {};
-    for (const auto& entry : fs::recursive_directory_iterator(benchmark_root / "tests"))
+    for (const auto& tree : { benchmark_root / "classical" / "tests", benchmark_root / "numeric" / "tests" })
     {
-        if (!entry.is_regular_file() || entry.path().filename() != "domain.pddl")
-            continue;
-        for (const auto& task_entry : fs::directory_iterator(entry.path().parent_path()))
+        for (const auto& entry : fs::recursive_directory_iterator(tree))
         {
-            if (!task_entry.is_regular_file() || task_entry.path().extension() != ".pddl" || task_entry.path().filename() == "domain.pddl")
+            if (!entry.is_regular_file() || entry.path().filename() != "domain.pddl")
                 continue;
-            discovered.insert(fs::relative(entry.path(), benchmark_root).generic_string() + "|" + fs::relative(task_entry.path(), benchmark_root).generic_string());
+            for (const auto& task_entry : fs::directory_iterator(entry.path().parent_path()))
+            {
+                if (!task_entry.is_regular_file() || task_entry.path().extension() != ".pddl" || task_entry.path().filename() == "domain.pddl")
+                    continue;
+                discovered.insert(fs::relative(entry.path(), benchmark_root).generic_string() + "|" + fs::relative(task_entry.path(), benchmark_root).generic_string());
+            }
         }
     }
 
@@ -102,12 +100,8 @@ TEST(LokiParserSuite, ParsesAllBenchmarkDomainAsts)
 {
     const auto cases = load_cases();
     ASSERT_FALSE(cases.empty());
-    if (!benchmark_suite_available(cases))
-        GTEST_SKIP() << "Benchmark data unavailable: " << cases.front().domain_file;
-
     for (const auto& item : cases)
     {
-        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(item.domain_file);
         const auto source = read_file(item.domain_file);
         auto first = source.cbegin();
         parser::ErrorHandlerType error_handler(first, source.cend(), std::cerr);
@@ -120,12 +114,8 @@ TEST(LokiParserSuite, ParsesAllBenchmarkTaskAsts)
 {
     const auto cases = load_cases();
     ASSERT_FALSE(cases.empty());
-    if (!benchmark_suite_available(cases))
-        GTEST_SKIP() << "Benchmark data unavailable: " << *cases.front().task_file;
-
     for (const auto& item : cases)
     {
-        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(*item.task_file);
         const auto source = read_file(*item.task_file);
         auto first = source.cbegin();
         parser::ErrorHandlerType error_handler(first, source.cend(), std::cerr);
@@ -213,36 +203,30 @@ TEST(LokiParserSuite, FormatterPrintsConstructedAstAsParseablePddl)
 
 TEST(LokiParserSuite, ParsesAndReparsesRepresentativeBenchmarkDomains)
 {
-    const auto root = fs::path(std::string(DATA_DIR)) / "benchmarks";
+    const auto root = fs::path(std::string(BENCHMARKS_DIR));
     const std::vector<fs::path> domains = {
         root / "classical" / "tests" / "gripper" / "domain.pddl",
         root / "classical" / "tests" / "miconic-fulladl" / "domain.pddl",
         root / "numeric" / "tests" / "delivery" / "domain.pddl",
     };
 
-    LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(domains.front());
-
     for (const auto& path : domains)
     {
-        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(path);
         expect_parse_format_reparse<ast::Domain>(path, parser::parse_domain);
     }
 }
 
 TEST(LokiParserSuite, ParsesAndReparsesRepresentativeBenchmarkTasks)
 {
-    const auto root = fs::path(std::string(DATA_DIR)) / "benchmarks";
+    const auto root = fs::path(std::string(BENCHMARKS_DIR));
     const std::vector<fs::path> tasks = {
         root / "classical" / "tests" / "gripper" / "test-1.pddl",
         root / "classical" / "tests" / "miconic-fulladl" / "test-1.pddl",
         root / "numeric" / "tests" / "delivery" / "test-1.pddl",
     };
 
-    LOKI_SKIP_IF_BENCHMARK_FILE_UNAVAILABLE(tasks.front());
-
     for (const auto& path : tasks)
     {
-        LOKI_EXPECT_BENCHMARK_FILE_AVAILABLE(path);
         expect_parse_format_reparse<ast::Task>(path, parser::parse_task);
     }
 }
