@@ -215,7 +215,7 @@ enabled with `-DLOKI_BUILD_EXECUTABLES=ON`. Example PDDL inputs are provided by 
 by the C++ test suite; materialize them once into `data/benchmarks`):
 
 ```console
-pip install pypddl-datasets
+pip install 'pypddl-datasets>=0.0.4,<0.1'
 python -c "import pypddl_datasets as pb; [pb.export_suite(s, 'data/benchmarks') for s in ('tests-classical', 'tests-numeric')]"
 ```
 
