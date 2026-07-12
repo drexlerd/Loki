@@ -37,7 +37,7 @@ jobs:
 
       - name: Fetch benchmark data
         run: |
-          python -m pip install --no-cache-dir pypddl-datasets
+          python -m pip install --no-cache-dir 'pypddl-datasets>=0.0.4,<0.1'
           python -c "import pypddl_datasets as pb; [pb.export_suite(s, 'data/benchmarks') for s in ('tests-classical', 'tests-numeric')]"
 
       - name: Install CMake on Linux
