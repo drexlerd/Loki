@@ -8,7 +8,7 @@ backend-path = ["python"]
 
 [project]
 name = "pypddl"
-version = "1.0.24"
+version = "1.0.25"
 description = "Python-distributed native package for the Loki PDDL parser library"
 readme = "README.md"
 license = "GPL-3.0-or-later"
@@ -23,7 +23,7 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest",
-    "pypddl-datasets>=0.0.7,<0.1",
+    "pypddl-datasets>=0.0.8,<0.1",
 ]
 
 [project.urls]

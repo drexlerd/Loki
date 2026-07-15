@@ -58,7 +58,7 @@ inline std::vector<SuiteCase> load_suite_cases(const std::filesystem::path& suit
 
 inline std::vector<SuiteCase> benchmark_suite_cases()
 {
-    return load_suite_cases(ygg::common::root_path() / "tests/unit/parser/suite.json", std::filesystem::path(BENCHMARKS_DIR));
+    return load_suite_cases(ygg::common::root_path() / "tests/unit/parser/parser_counts_suite.json", std::filesystem::path(BENCHMARKS_DIR));
 }
 
 inline std::vector<SuiteCase> fixture_suite_cases() { return load_suite_cases(ygg::common::root_path() / "tests/fixtures/suite.json"); }

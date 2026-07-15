@@ -21,7 +21,7 @@ function(add_gtest test_name source_file)
     add_test(NAME ${test_name} COMMAND ${test_name})
 endfunction()
 
-add_gtest(parser_suite                         "parser/suite.cpp")
+add_gtest(parser_counts_suite                  "parser/parser_counts_suite.cpp")
 add_gtest(public_facade                        "public_facade.cpp")
 add_gtest(public_headers                       "public_headers.cpp")
 

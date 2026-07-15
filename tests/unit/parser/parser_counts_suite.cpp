@@ -1,0 +1,213 @@
+/*
+ * Copyright (C) 2024-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "../benchmark_utils.hpp"
+
+#include <filesystem>
+#include <gtest/gtest.h>
+#include <iostream>
+#include <loki/loki.hpp>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
+#include <yggdrasil/serialization/json_suite.hpp>
+
+namespace loki::tests
+{
+namespace fs = std::filesystem;
+namespace
+{
+
+struct DomainExpectation
+{
+    std::size_t requirements;
+    std::size_t types;
+    std::size_t constants;
+    std::size_t predicates;
+    std::size_t functions;
+    std::size_t actions;
+    std::size_t axioms;
+};
+
+struct TaskExpectation
+{
+    std::size_t requirements;
+    std::size_t objects;
+    std::size_t initial_literals;
+    std::size_t initial_function_values;
+    std::size_t predicates;
+    std::size_t axioms;
+    bool has_goal;
+    bool has_metric;
+};
+
+struct ConfigurationExpectation
+{
+    semantic::ParserOptions options;
+    DomainExpectation domain;
+    TaskExpectation task;
+};
+
+struct ParserCountExpectation
+{
+    std::string name;
+    fs::path domain_file;
+    fs::path task_file;
+    std::vector<ConfigurationExpectation> configurations;
+};
+
+template<typename Node, typename ParseFn>
+void expect_parse_format_reparse(const fs::path& path, ParseFn parse)
+{
+    const auto source = read_text(path);
+    auto first = source.cbegin();
+    const auto last = source.cend();
+    parser::ErrorHandlerType error_handler(first, last, std::cerr);
+
+    auto ast = Node {};
+    ASSERT_TRUE(parse(source, ast, error_handler)) << path;
+
+    const auto printed = fmt::format("{}", ast);
+    auto printed_first = printed.cbegin();
+    const auto printed_last = printed.cend();
+    parser::ErrorHandlerType printed_error_handler(printed_first, printed_last, std::cerr);
+
+    auto reparsed = Node {};
+    EXPECT_TRUE(parse(printed, reparsed, printed_error_handler)) << path << '\n' << printed;
+}
+
+ConfigurationExpectation parse_configuration(const boost::json::object& configuration)
+{
+    const auto& options_object = ygg::common::as_object(configuration, "parser_options", "case.configuration");
+    const auto& domain = ygg::common::as_object(configuration, "domain", "case.configuration");
+    const auto& task = ygg::common::as_object(configuration, "task", "case.configuration");
+    auto options = semantic::ParserOptions {};
+    options.strict = ygg::common::as_bool(options_object, "strict", "case.configuration.parser_options");
+    options.add_action_costs = ygg::common::as_bool(options_object, "add_action_costs", "case.configuration.parser_options");
+    return ConfigurationExpectation { options,
+                                      DomainExpectation { ygg::common::as_size(domain, "requirements", "case.configuration.domain"),
+                                                          ygg::common::as_size(domain, "types", "case.configuration.domain"),
+                                                          ygg::common::as_size(domain, "constants", "case.configuration.domain"),
+                                                          ygg::common::as_size(domain, "predicates", "case.configuration.domain"),
+                                                          ygg::common::as_size(domain, "functions", "case.configuration.domain"),
+                                                          ygg::common::as_size(domain, "actions", "case.configuration.domain"),
+                                                          ygg::common::as_size(domain, "axioms", "case.configuration.domain") },
+                                      TaskExpectation { ygg::common::as_size(task, "requirements", "case.configuration.task"),
+                                                        ygg::common::as_size(task, "objects", "case.configuration.task"),
+                                                        ygg::common::as_size(task, "initial_literals", "case.configuration.task"),
+                                                        ygg::common::as_size(task, "initial_function_values", "case.configuration.task"),
+                                                        ygg::common::as_size(task, "predicates", "case.configuration.task"),
+                                                        ygg::common::as_size(task, "axioms", "case.configuration.task"),
+                                                        ygg::common::as_bool(task, "has_goal", "case.configuration.task"),
+                                                        ygg::common::as_bool(task, "has_metric", "case.configuration.task") } };
+}
+
+std::vector<ParserCountExpectation> load_expectations()
+{
+    const auto suite_value = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/parser/parser_counts_suite.json");
+    const auto& suite = ygg::common::as_object(suite_value, "suite");
+    const auto benchmark_root = fs::path(std::string(BENCHMARKS_DIR));
+    auto result = std::vector<ParserCountExpectation> {};
+    for (const auto& case_value : ygg::common::as_array(suite, "cases", "suite"))
+    {
+        const auto& object = ygg::common::as_object(case_value, "case");
+        auto item = ParserCountExpectation { ygg::common::as_string(object, "name", "case"),
+                                             ygg::common::resolve_path(benchmark_root, ygg::common::as_string(object, "domain_file", "case")),
+                                             ygg::common::resolve_path(benchmark_root, ygg::common::as_string(object, "task_file", "case")),
+                                             {} };
+        for (const auto& configuration_value : ygg::common::as_array(object, "configurations", "case"))
+            item.configurations.push_back(parse_configuration(ygg::common::as_object(configuration_value, "case.configuration")));
+        result.push_back(std::move(item));
+    }
+    return result;
+}
+
+}  // namespace
+
+TEST(LokiParserCountsSuite, GeneratedSuiteCoversEveryBenchmarkProblem)
+{
+    const auto benchmark_root = fs::path(std::string(BENCHMARKS_DIR));
+    auto listed = std::set<std::string> {};
+    for (const auto& item : load_expectations())
+        listed.insert(fs::relative(item.domain_file, benchmark_root).generic_string() + "|" + fs::relative(item.task_file, benchmark_root).generic_string());
+
+    auto discovered = std::set<std::string> {};
+    for (const auto& tree : { benchmark_root / "classical" / "tests", benchmark_root / "numeric" / "tests" })
+    {
+        for (const auto& entry : fs::recursive_directory_iterator(tree))
+        {
+            if (!entry.is_regular_file() || entry.path().filename() != "domain.pddl")
+                continue;
+            for (const auto& task_entry : fs::directory_iterator(entry.path().parent_path()))
+            {
+                if (task_entry.is_regular_file() && task_entry.path().extension() == ".pddl" && task_entry.path().filename() != "domain.pddl")
+                    discovered.insert(fs::relative(entry.path(), benchmark_root).generic_string() + "|"
+                                      + fs::relative(task_entry.path(), benchmark_root).generic_string());
+            }
+        }
+    }
+
+    EXPECT_EQ(listed, discovered);
+}
+
+TEST(LokiParserCountsSuite, RawBenchmarkAstsRoundTrip)
+{
+    const auto cases = load_expectations();
+    ASSERT_FALSE(cases.empty());
+    for (const auto& item : cases)
+    {
+        SCOPED_TRACE(item.name);
+        expect_parse_format_reparse<ast::Domain>(item.domain_file, parser::parse_domain);
+        expect_parse_format_reparse<ast::Task>(item.task_file, parser::parse_task);
+    }
+}
+
+TEST(LokiParserCountsSuite, SemanticBenchmarkCountsStayStable)
+{
+    const auto cases = load_expectations();
+    ASSERT_FALSE(cases.empty());
+    for (const auto& item : cases)
+    {
+        SCOPED_TRACE(item.name);
+        ASSERT_EQ(item.configurations.size(), 4);
+        for (const auto& expected : item.configurations)
+        {
+            SCOPED_TRACE("strict=" + std::to_string(expected.options.strict) + " add_action_costs=" + std::to_string(expected.options.add_action_costs));
+            auto semantic_parser = semantic::Parser(item.domain_file, expected.options);
+            const auto domain = semantic_parser.get_domain();
+            const auto task = semantic_parser.parse_task(item.task_file);
+            EXPECT_EQ(domain.get_requirements().size(), expected.domain.requirements);
+            EXPECT_EQ(domain.get_types().size(), expected.domain.types);
+            EXPECT_EQ(domain.get_constants().size(), expected.domain.constants);
+            EXPECT_EQ(domain.get_predicates().size(), expected.domain.predicates);
+            EXPECT_EQ(domain.get_functions().size(), expected.domain.functions);
+            EXPECT_EQ(domain.get_actions().size(), expected.domain.actions);
+            EXPECT_EQ(domain.get_axioms().size(), expected.domain.axioms);
+            EXPECT_EQ(task.get_requirements().size(), expected.task.requirements);
+            EXPECT_EQ(task.get_objects().size(), expected.task.objects);
+            EXPECT_EQ(task.get_initial_literals().size(), expected.task.initial_literals);
+            EXPECT_EQ(task.get_initial_function_values().size(), expected.task.initial_function_values);
+            EXPECT_EQ(task.get_predicates().size(), expected.task.predicates);
+            EXPECT_EQ(task.get_axioms().size(), expected.task.axioms);
+            EXPECT_EQ(static_cast<bool>(task.get_goal()), expected.task.has_goal);
+            EXPECT_EQ(static_cast<bool>(task.get_metric()), expected.task.has_metric);
+        }
+    }
+}
+
+}  // namespace loki::tests
