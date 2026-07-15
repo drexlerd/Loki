@@ -1,0 +1,5 @@
+(define (problem good)
+  (:domain task-isolation)
+  (:objects o)
+  (:init)
+  (:goal (p o)))

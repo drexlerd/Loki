@@ -1,0 +1,5 @@
+(define (problem quantified-types-task)
+  (:domain quantified-types)
+  (:requirements :universal-preconditions)
+  (:init)
+  (:goal (forall (?p - passenger) (served ?p))))

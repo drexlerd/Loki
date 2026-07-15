@@ -1,5 +1,5 @@
 {
-    "prefix": "tests/unit/fixtures",
+    "prefix": "tests/fixtures",
     "cases": [
         {
             "name": "nnf",
@@ -245,6 +245,35 @@
         {
             "name": "sibling-universal-when",
             "domain_file": "sibling-universal-when/domain.pddl"
+        },
+        {
+            "name": "mixed-case",
+            "domain_file": "mixed-case/domain.pddl",
+            "task_file": "mixed-case/task.pddl"
+        },
+        {
+            "name": "forward-types",
+            "domain_file": "forward-types/domain.pddl"
+        },
+        {
+            "name": "quantified-types",
+            "domain_file": "quantified-types/domain.pddl",
+            "task_file": "quantified-types/task.pddl"
+        },
+        {
+            "name": "task-isolation",
+            "domain_file": "task-isolation/domain.pddl",
+            "task_file": "task-isolation/task.pddl"
+        },
+        {
+            "name": "many-tasks-2",
+            "domain_file": "many-tasks/domain.pddl",
+            "task_file": "many-tasks/task2.pddl"
+        },
+        {
+            "name": "task-object-types",
+            "domain_file": "task-object-types/domain.pddl",
+            "task_file": "task-object-types/task.pddl"
         }
     ]
 }

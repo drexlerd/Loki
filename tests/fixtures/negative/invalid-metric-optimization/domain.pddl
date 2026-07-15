@@ -1,0 +1,5 @@
+(define (domain metric-domain)
+  (:requirements :numeric-fluents)
+  (:predicates)
+  (:functions (total-cost))
+)

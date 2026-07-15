@@ -1,0 +1,6 @@
+(define (domain redundant-req)
+  (:requirements :strips :typing)
+  (:types thing)
+  (:predicates (p ?x - thing))
+  (:action a :parameters (?x - thing) :precondition (p ?x) :effect (p ?x))
+)

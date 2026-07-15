@@ -1,0 +1,5 @@
+(define (domain strict-undefined)
+  (:requirements :strips)
+  (:predicates)
+  (:action a :parameters () :precondition (missing) :effect (and))
+)

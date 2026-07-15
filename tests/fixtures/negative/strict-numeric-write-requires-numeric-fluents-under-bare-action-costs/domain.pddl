@@ -1,0 +1,6 @@
+(define (domain write-fragment)
+  (:requirements :strips :action-costs)
+  (:predicates (p))
+  (:functions (total-cost) (fuel))
+  (:action burn :parameters () :effect (assign (fuel) 5))
+)

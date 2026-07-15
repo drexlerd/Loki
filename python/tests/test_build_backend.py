@@ -84,7 +84,7 @@ def test_num_jobs_rejects_invalid_values():
                 raise AssertionError(f"PYPDDL_JOBS={value!r} should be rejected")
 
 
-def check_prepare_native_build_sets_expected_environment(tmp_path):
+def test_prepare_native_build_sets_expected_environment(tmp_path):
     backend = load_backend()
     native_prefix = tmp_path / "native"
     library_dir = native_prefix / "lib"
@@ -124,10 +124,6 @@ def check_prepare_native_build_sets_expected_environment(tmp_path):
             sys.modules["pyyggdrasil"] = old_pyyggdrasil
 
 
-def test_prepare_native_build_sets_expected_environment(tmp_path):
-    check_prepare_native_build_sets_expected_environment(tmp_path)
-
-
 def test_python_native_runtime_rpaths_use_dependency_libdir(tmp_path):
     cmake = shutil.which("cmake")
     if cmake is None:
@@ -158,7 +154,7 @@ def test_python_native_runtime_rpaths_use_dependency_libdir(tmp_path):
     subprocess.run([cmake, "-P", str(script)], check=True)
 
 
-def check_fix_wheel_stubs_preserves_existing_and_publishes_new(tmp_path):
+def test_fix_wheel_stubs_preserves_existing_and_publishes_new(tmp_path):
     backend = load_backend()
     wheel_path = tmp_path / "pypddl-1.0.0-py3-none-any.whl"
     write_wheel(
@@ -197,10 +193,6 @@ def check_fix_wheel_stubs_preserves_existing_and_publishes_new(tmp_path):
     assert record["pypddl/extra.pyi"][0].startswith("sha256=")
     assert record["pypddl/extra.pyi"][1] == str(len(files["pypddl/extra.pyi"].encode("utf-8")))
     assert record["pypddl-1.0.0.dist-info/RECORD"] == ["", ""]
-
-
-def test_fix_wheel_stubs_preserves_existing_and_publishes_new(tmp_path):
-    check_fix_wheel_stubs_preserves_existing_and_publishes_new(tmp_path)
 
 
 def test_install_time_stub_patch_script_publishes_generated_stubs(tmp_path):

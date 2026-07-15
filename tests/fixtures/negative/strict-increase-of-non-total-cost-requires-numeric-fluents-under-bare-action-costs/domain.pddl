@@ -1,0 +1,6 @@
+(define (domain increase-fragment)
+  (:requirements :strips :action-costs)
+  (:predicates (p))
+  (:functions (total-cost) (fuel))
+  (:action burn :parameters () :effect (increase (fuel) 1))
+)

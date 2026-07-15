@@ -1,0 +1,6 @@
+(define (domain invalid-numeric-constraint)
+  (:requirements :numeric-fluents)
+  (:predicates)
+  (:functions (total-cost))
+  (:action a :parameters () :precondition (assign (total-cost) 1) :effect (and))
+)

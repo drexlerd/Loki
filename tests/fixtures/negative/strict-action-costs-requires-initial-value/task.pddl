@@ -1,0 +1,5 @@
+(define (problem action-cost-task)
+  (:domain action-cost-domain)
+  (:init)
+  (:metric minimize (total-cost))
+)

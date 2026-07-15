@@ -12,15 +12,9 @@ import pytest
 
 DOWNSTREAM_PACKAGE_DIR = Path(__file__).resolve().parent / "minimal_downstream_package"
 
-DOMAIN_SOURCE = """
-(define (domain downstream-check)
-  (:predicates (at ?x))
-  (:action noop
-    :parameters (?x)
-    :precondition (at ?x)
-    :effect (at ?x))
-)
-"""
+DOMAIN_SOURCE = (
+    Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "facade" / "domain.pddl"
+).read_text(encoding="utf-8")
 
 
 def test_downstream_python_binding_links_installed_loki(tmp_path):
@@ -64,7 +58,7 @@ def test_downstream_python_binding_links_installed_loki(tmp_path):
         ],
         check=True,
     )
-    subprocess.run([cmake, "--build", str(build_dir), "-j3"], check=True)
+    subprocess.run([cmake, "--build", str(build_dir), "-j4"], check=True)
 
     env = os.environ.copy()
     env["PYTHONPATH"] = str(project_dir / "src") + os.pathsep + env.get("PYTHONPATH", "")
@@ -78,10 +72,11 @@ def test_downstream_python_binding_links_installed_loki(tmp_path):
             "-c",
             (
                 "import json, downstream_loki_user; "
+                f"source = {DOMAIN_SOURCE!r}; "
                 "print(json.dumps({"
-                "'parses': downstream_loki_user.parses_domain('''" + DOMAIN_SOURCE + "'''), "
+                "'parses': downstream_loki_user.parses_domain(source), "
                 "'product': downstream_loki_user.multiply(6, 7), "
-                "'pypddl': downstream_loki_user.describe_pypddl_imports()"
+                "'pypddl': downstream_loki_user.describe_pypddl_imports(source)"
                 "}))"
             ),
         ],
@@ -97,6 +92,6 @@ def test_downstream_python_binding_links_installed_loki(tmp_path):
         "product": 42,
         "pypddl": {
             "parser": "Parser",
-            "domain_name": "downstream-check",
+            "domain_name": "facade",
         },
     }

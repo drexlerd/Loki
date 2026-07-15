@@ -1,0 +1,5 @@
+(define (domain missing-disjunction-requirement)
+  (:requirements :strips)
+  (:predicates (p) (q))
+  (:action a :parameters () :precondition (or (p) (q)) :effect (and))
+)

@@ -20,9 +20,9 @@
 
 #include <filesystem>
 #include <fstream>
-#include <gtest/gtest.h>
 #include <optional>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <yggdrasil/serialization/json_suite.hpp>
@@ -61,7 +61,7 @@ inline std::vector<SuiteCase> benchmark_suite_cases()
     return load_suite_cases(ygg::common::root_path() / "tests/unit/parser/suite.json", std::filesystem::path(BENCHMARKS_DIR));
 }
 
-inline std::vector<SuiteCase> fixture_suite_cases() { return load_suite_cases(ygg::common::root_path() / "tests/unit/fixtures/suite.json"); }
+inline std::vector<SuiteCase> fixture_suite_cases() { return load_suite_cases(ygg::common::root_path() / "tests/fixtures/suite.json"); }
 
 // Benchmark cases plus the loki mini-corpus: the exhaustive input set for positive invariants.
 inline std::vector<SuiteCase> all_positive_cases()
@@ -74,17 +74,18 @@ inline std::vector<SuiteCase> all_positive_cases()
 
 inline std::filesystem::path fixture_path(const std::string& case_dir, const std::string& file = "domain.pddl")
 {
-    return ygg::common::root_path() / "tests/unit/fixtures" / case_dir / file;
+    return ygg::common::root_path() / "tests/fixtures" / case_dir / file;
 }
 
 inline std::string read_text(const std::filesystem::path& path)
 {
     auto in = std::ifstream(path);
+    if (!in)
+        throw std::runtime_error("Failed to open test fixture: " + path.string());
     auto out = std::ostringstream {};
     out << in.rdbuf();
     return out.str();
 }
-
 
 }  // namespace loki::tests
 

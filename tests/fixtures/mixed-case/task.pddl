@@ -1,0 +1,5 @@
+(DeFiNe (PrObLeM MiXeD-TaSk)
+  (:DoMaIn MIXED-DOMAIN)
+  (:ObJeCtS ItEm)
+  (:InIt (ReAdY ItEm))
+  (:GoAl (ReAdY ITEM)))

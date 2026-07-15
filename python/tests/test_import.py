@@ -54,12 +54,7 @@ def test_formalism_package_reexports_native_public_symbols():
     missing = [name for name in dir(native_formalism) if not name.startswith("_") and not hasattr(pypddl.formalism, name)]
 
     assert missing == []
-
-
-def test_formalism_package_uses_explicit_runtime_exports():
     assert not hasattr(pypddl.formalism, "__all__")
-    for name in ("Parser", "RepositoryFactory", "translate_domain"):
-        assert hasattr(pypddl.formalism, name)
 
 
 def test_programmatic_gripper_example_uses_public_api():

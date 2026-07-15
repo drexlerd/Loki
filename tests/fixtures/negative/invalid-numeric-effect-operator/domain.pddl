@@ -1,0 +1,6 @@
+(define (domain invalid-numeric-effect)
+  (:requirements :numeric-fluents)
+  (:predicates)
+  (:functions (total-cost))
+  (:action a :parameters () :effect (= (total-cost) 1))
+)

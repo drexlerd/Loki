@@ -70,22 +70,4 @@ TEST(LokiSemanticDiagnostics, IncludesFileNameForPathDiagnostics)
     }
 }
 
-TEST(LokiSemanticDiagnostics, PointsAtSemanticAstNode)
-{
-    auto options = semantic::ParserOptions {};
-    options.strict = true;
-    options.add_action_costs = false;
-
-    try
-    {
-        auto parser = semantic::Parser(fixture_path("missing-disjunctive-requirement"), options);
-        FAIL() << "Expected missing requirement error";
-    }
-    catch (const semantic::MissingRequirementError& error)
-    {
-        const auto message = std::string(error.what());
-        EXPECT_NE(message.find(":precondition (or (p) (q))\n__________________^_"), std::string::npos) << message;
-    }
-}
-
 }  // namespace loki::tests

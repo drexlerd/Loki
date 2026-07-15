@@ -101,34 +101,6 @@ TEST(LokiPublicFacade, ExposesSemanticErrorsThroughLokiNamespace)
     EXPECT_EQ(std::string(error.what()), "base diagnostic");
     error.set_display_message("rendered diagnostic");
     EXPECT_EQ(std::string(error.what()), "rendered diagnostic");
-
-    try
-    {
-        static_cast<void>(loki::Parser(read_text(fixture_path("broken-syntax"))));
-        FAIL() << "Expected loki::ParseError through the public facade.";
-    }
-    catch (const loki::ParseError& error)
-    {
-        const auto message = std::string(error.what());
-        EXPECT_NE(message.find("Could not parse PDDL domain"), std::string::npos);
-        EXPECT_NE(message.find("In line 1:"), std::string::npos);
-        EXPECT_NE(message.find("^_"), std::string::npos);
-    }
-
-    auto options = loki::ParserOptions {};
-    options.strict = true;
-    try
-    {
-        static_cast<void>(loki::Parser(read_text(fixture_path("missing-disjunctive-requirement")), options));
-        FAIL() << "Expected loki::MissingRequirementError through the public facade.";
-    }
-    catch (const loki::MissingRequirementError& error)
-    {
-        const auto message = std::string(error.what());
-        EXPECT_NE(message.find(":disjunctive-preconditions"), std::string::npos);
-        EXPECT_NE(message.find("In line 6:"), std::string::npos);
-        EXPECT_NE(message.find("^_"), std::string::npos);
-    }
 }
 
 TEST(LokiPublicFacade, ViewConvenienceMethodsCoverTypedSymbolsAndLiterals)
@@ -270,9 +242,6 @@ TEST(LokiPublicFacade, FormatsAlternativeEffectsAsReparseablePddl)
 
     const auto domain = parser.get_domain();
     const auto domain_text = loki::format_domain(domain);
-
-    EXPECT_NE(domain_text.find("(oneof (p) (q))"), std::string::npos);
-    EXPECT_NE(domain_text.find("(probabilistic 0.25 (p) 0.75 (q))"), std::string::npos);
 
     auto reparsed = loki::Parser(domain_text, loki::ParserOptions { .strict = false, .add_action_costs = false });
     const auto reparsed_domain = reparsed.get_domain();

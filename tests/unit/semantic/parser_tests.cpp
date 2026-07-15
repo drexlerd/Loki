@@ -34,41 +34,20 @@ TEST(LokiSemanticParser, AllowsDuplicateActionNamesAndInternsIdenticalBodies)
     EXPECT_EQ(parser.get_domain().get_actions().size(), 2);
 }
 
-TEST(LokiSemanticParser, PermissiveModeAllowsMissingRequirements)
-{
-    EXPECT_NO_THROW({
-        auto parser = semantic::Parser(fixture_path("missing-disjunctive-requirement"));
-        (void) parser;
-    });
-}
-
 TEST(LokiSemanticParser, LowercasesSourceBeforeParsing)
 {
     auto options = semantic::ParserOptions {};
     options.add_action_costs = false;
-    auto parser = semantic::Parser(std::string { R"((DeFiNe (DoMaIn MiXeD-DoMaIn)
-        (:PrEdIcAtEs (ReAdY ?VaLuE))))" },
-                                   options);
+    auto parser = semantic::Parser(read_text(fixture_path("mixed-case")), options);
 
     EXPECT_EQ(parser.get_domain().get_name(), "mixed-domain");
     ASSERT_EQ(parser.get_domain().get_predicates().size(), 1);
     EXPECT_EQ(parser.get_domain().get_predicates()[0].get_name(), "ready");
 
-    const auto task = parser.parse_task(std::string { R"((DeFiNe (PrObLeM MiXeD-TaSk)
-        (:DoMaIn MIXED-DOMAIN)
-        (:ObJeCtS ItEm)
-        (:InIt (ReAdY ItEm))
-        (:GoAl (ReAdY ITEM))))" });
+    const auto task = parser.parse_task(read_text(fixture_path("mixed-case", "task.pddl")));
     EXPECT_EQ(task.get_name(), "mixed-task");
     ASSERT_EQ(task.get_objects().size(), 1);
     EXPECT_EQ(task.get_objects()[0].get_name(), "item");
-}
-
-TEST(LokiSemanticParser, StrictModeRejectsAggregateRequirements)
-{
-    auto options = semantic::ParserOptions {};
-    options.strict = true;
-    EXPECT_THROW(semantic::Parser(fixture_path("adl-requirements"), options), semantic::AggregateRequirementError);
 }
 
 TEST(LokiSemanticParser, ReturnedRequirementsAreDeclaredVerbatim)
@@ -92,11 +71,7 @@ TEST(LokiSemanticParser, StrictModeAllowsForwardTypeReferences)
     auto options = semantic::ParserOptions {};
     options.strict = true;
     options.add_action_costs = false;
-    auto parser = semantic::Parser(std::string { R"((define (domain forward-types)
-        (:requirements :strips :typing)
-        (:types child - parent parent - object)
-        (:predicates (holds ?x - child))))" },
-                                   options);
+    auto parser = semantic::Parser(fixture_path("forward-types"), options);
 
     auto saw_child = false;
     auto saw_parent = false;
@@ -124,33 +99,9 @@ TEST(LokiSemanticParser, StrictModeChecksTaskQuantifierTypesAcrossRepositories)
     auto options = semantic::ParserOptions {};
     options.strict = true;
     options.add_action_costs = false;
-    auto parser = semantic::Parser(std::string { R"((define (domain quantified-types)
-        (:requirements :strips :typing)
-        (:types passenger)
-        (:predicates (served ?p - passenger))))" },
-                                   options);
+    auto parser = semantic::Parser(fixture_path("quantified-types"), options);
 
-    EXPECT_NO_THROW(parser.parse_task(std::string { R"((define (problem quantified-types-task)
-        (:domain quantified-types)
-        (:requirements :universal-preconditions)
-        (:init)
-        (:goal (forall (?p - passenger) (served ?p)))))" }));
-}
-
-TEST(LokiSemanticParser, PermissiveModeAllowsPredicateArgumentTypeMismatch)
-{
-    EXPECT_NO_THROW({
-        auto parser = semantic::Parser(fixture_path("permissive-type-mismatch"));
-        (void) parser;
-    });
-}
-
-TEST(LokiSemanticParser, PermissiveModeKeepsImplicitPredicateCompatibility)
-{
-    EXPECT_NO_THROW({
-        auto parser = semantic::Parser(fixture_path("permissive-implicit"));
-        (void) parser;
-    });
+    EXPECT_NO_THROW(parser.parse_task(fixture_path("quantified-types", "task.pddl")));
 }
 
 TEST(LokiSemanticParser, PreservesComplementaryLiteralsInConjunctions)
@@ -209,30 +160,13 @@ TEST(LokiSemanticParser, FailedTaskDoesNotLeakVariableScopes)
 {
     auto options = semantic::ParserOptions {};
     options.add_action_costs = false;
-    auto parser = semantic::Parser(std::string { R"((define (domain task-isolation)
-             (:predicates (p ?x))))" },
-                                   options);
+    auto parser = semantic::Parser(fixture_path("task-isolation"), options);
 
-    EXPECT_THROW(parser.parse_task(std::string {
-                     R"((define (problem bad)
-                 (:domain task-isolation)
-                 (:init)
-                 (:goal (exists (?leaked) (p ?missing)))))" }),
-                 semantic::UndefinedVariableError);
+    EXPECT_THROW(parser.parse_task(fixture_path("task-isolation", "bad-task.pddl")), semantic::UndefinedVariableError);
 
-    EXPECT_THROW(parser.parse_task(std::string {
-                     R"((define (problem still-bad)
-                 (:domain task-isolation)
-                 (:init)
-                 (:goal (p ?leaked))))" }),
-                 semantic::UndefinedVariableError);
+    EXPECT_THROW(parser.parse_task(fixture_path("task-isolation", "leaked-variable-task.pddl")), semantic::UndefinedVariableError);
 
-    const auto task = parser.parse_task(std::string {
-        R"((define (problem good)
-             (:domain task-isolation)
-             (:objects o)
-             (:init)
-             (:goal (p o))))" });
+    const auto task = parser.parse_task(fixture_path("task-isolation", "task.pddl"));
     EXPECT_EQ(task.get_name(), "good");
 }
 

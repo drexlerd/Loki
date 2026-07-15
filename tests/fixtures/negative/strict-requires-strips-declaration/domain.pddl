@@ -1,0 +1,5 @@
+(define (domain no-strips)
+  (:requirements :typing)
+  (:types thing)
+  (:predicates (p ?x - thing))
+)

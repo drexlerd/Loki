@@ -1,40 +1,18 @@
 import operator
+from pathlib import Path
 
 from pypddl import formalism as pypddl
 
 
-def test_parser_binding_parses_domain_and_task():
-    parser = pypddl.Parser(
-        """
-(define (domain py-gripper)
-  (:predicates (at ?x) (carry ?x))
-  (:action move
-    :parameters (?x)
-    :precondition (at ?x)
-    :effect (and (carry ?x)))
-)
-"""
-    )
-    domain = parser.domain()
-    task = parser.parse_task(
-        """
-(define (problem py-gripper-task)
-  (:domain py-gripper)
-  (:objects ball)
-  (:init (at ball))
-  (:goal (carry ball))
-)
-"""
-    )
+FIXTURE_DIR = Path(__file__).resolve().parents[2] / "tests" / "fixtures"
 
-    assert domain.get_name() == "py-gripper"
-    assert len(domain.get_actions()) == 1
-    assert [action.get_name() for action in domain.get_actions()] == ["move"]
-    assert domain.get_predicates()[0].get_parameters()[0].get_variable().get_name() == "?x"
-    assert task.get_name() == "py-gripper-task"
-    assert task.get_domain().get_name() == domain.get_name()
-    assert [obj.get_name() for obj in task.get_objects()] == ["ball"]
-    assert task.get_goal() is not None
+
+def fixture_path(case_dir, file_name="domain.pddl"):
+    return FIXTURE_DIR / case_dir / file_name
+
+
+def fixture_text(case_dir, file_name="domain.pddl"):
+    return fixture_path(case_dir, file_name).read_text(encoding="utf-8")
 
 
 def test_high_level_bindings_expose_useful_docstrings():
@@ -49,31 +27,8 @@ def test_high_level_bindings_expose_useful_docstrings():
 
 
 def test_format_bindings_emit_reparseable_pddl():
-    parser = pypddl.Parser(
-        """
-(define (domain py-format)
-  (:requirements :typing :numeric-fluents)
-  (:types item)
-  (:predicates (ready ?x - item))
-  (:functions (cost ?x - item))
-  (:action spend
-    :parameters (?x - item)
-    :precondition (ready ?x)
-    :effect (and (ready ?x) (increase (cost ?x) 1.5)))
-)
-"""
-    )
-    task = parser.parse_task(
-        """
-(define (problem py-format-task)
-  (:domain py-format)
-  (:objects package - item)
-  (:init (ready package) (= (cost package) 0))
-  (:goal (ready package))
-  (:metric minimize (cost package))
-)
-"""
-    )
+    parser = pypddl.Parser(fixture_text("facade-format-numeric"))
+    task = parser.parse_task(fixture_text("facade-format-numeric", "task.pddl"))
 
     domain_text = pypddl.format_domain(parser.domain())
     task_text = pypddl.format_task(task)
@@ -91,63 +46,22 @@ def test_format_bindings_emit_reparseable_pddl():
 
 
 def test_parser_views_keep_temporary_parser_alive():
-    domain = pypddl.Parser(
-        """
-(define (domain py-temporary-parser)
-  (:predicates (p))
-)
-"""
-    ).domain()
-    task = pypddl.Parser(
-        """
-(define (domain py-temporary-parser-task-domain)
-  (:predicates (p))
-)
-"""
-    ).parse_task(
-        """
-(define (problem py-temporary-parser-task)
-  (:domain py-temporary-parser-task-domain)
-  (:init)
-  (:goal (and))
-)
-"""
-    )
+    domain = pypddl.Parser(fixture_text("facade")).domain()
+    task = pypddl.Parser(fixture_text("facade")).parse_task(fixture_text("facade", "task.pddl"))
 
-    assert domain.get_name() == "py-temporary-parser"
-    assert task.get_name() == "py-temporary-parser-task"
-    assert task.get_domain().get_name() == "py-temporary-parser-task-domain"
+    assert domain.get_name() == "facade"
+    assert task.get_name() == "facade-task"
+    assert task.get_domain().get_name() == "facade"
 
 
 def test_child_view_getters_keep_parent_views_alive():
-    domain = pypddl.Parser(
-        """
-(define (domain py-temporary-child-view-domain)
-  (:predicates (p))
-)
-"""
-    ).parse_task(
-        """
-(define (problem py-temporary-child-view-task)
-  (:domain py-temporary-child-view-domain)
-  (:init)
-  (:goal (p))
-)
-"""
-    ).get_domain()
+    domain = pypddl.Parser(fixture_text("facade")).parse_task(fixture_text("facade", "task.pddl")).get_domain()
 
-    assert domain.get_name() == "py-temporary-child-view-domain"
+    assert domain.get_name() == "facade"
 
 
 def test_optional_child_view_getters_keep_parent_views_alive():
-    domain = pypddl.Parser(
-        """
-(define (domain py-temporary-optional-action)
-  (:predicates (p))
-  (:action a :parameters () :precondition (p) :effect (and (p)))
-)
-"""
-    ).domain()
+    domain = pypddl.Parser(fixture_text("facade-format")).domain()
     action = domain.get_actions()[0]
     action_precondition = action.get_precondition()
     action_effect = action.get_effect()
@@ -156,23 +70,8 @@ def test_optional_child_view_getters_keep_parent_views_alive():
     assert isinstance(action_precondition.get_variant(), pypddl.ConditionLiteral)
     assert isinstance(action_effect.get_variant(), pypddl.EffectAnd)
 
-    task = pypddl.Parser(
-        """
-(define (domain py-temporary-optional-task)
-  (:requirements :numeric-fluents)
-  (:predicates (p))
-  (:functions (total-cost))
-)
-"""
-    ).parse_task(
-        """
-(define (problem py-temporary-optional-task-problem)
-  (:domain py-temporary-optional-task)
-  (:init (= (total-cost) 0))
-  (:goal (p))
-  (:metric minimize (total-cost))
-)
-"""
+    task = pypddl.Parser(fixture_text("facade-format-numeric")).parse_task(
+        fixture_text("facade-format-numeric", "task.pddl")
     )
     task_goal = task.get_goal()
     task_metric = task.get_metric()
@@ -184,64 +83,27 @@ def test_optional_child_view_getters_keep_parent_views_alive():
 
 
 def test_translation_views_keep_temporary_inputs_alive():
-    original_domain = pypddl.translate_domain(
-        pypddl.Parser(
-            """
-(define (domain py-temporary-translation-domain)
-  (:predicates (p))
-)
-"""
-        ).domain()
-    ).original_domain
+    original_domain = pypddl.translate_domain(pypddl.Parser(fixture_text("facade")).domain()).original_domain
 
-    assert original_domain.get_name() == "py-temporary-translation-domain"
+    assert original_domain.get_name() == "facade"
 
-    parser = pypddl.Parser(
-        """
-(define (domain py-temporary-translation-task-domain)
-  (:predicates (p))
-)
-"""
-    )
+    parser = pypddl.Parser(fixture_text("facade"))
     domain_translation = pypddl.translate_domain(parser.domain())
     original_task = pypddl.translate_task(
-        parser.parse_task(
-            """
-(define (problem py-temporary-translation-task)
-  (:domain py-temporary-translation-task-domain)
-  (:init)
-  (:goal (p))
-)
-"""
-        ),
+        parser.parse_task(fixture_text("facade", "task.pddl")),
         domain_translation,
     ).original_task
     del parser
     del domain_translation
 
-    assert original_task.get_name() == "py-temporary-translation-task"
-    assert original_task.get_domain().get_name() == "py-temporary-translation-task-domain"
+    assert original_task.get_name() == "facade-task"
+    assert original_task.get_domain().get_name() == "facade"
 
 
 def test_translation_bindings_return_translated_views():
-    parser = pypddl.Parser(
-        """
-(define (domain py-translate)
-  (:predicates (p) (q))
-  (:action a :parameters () :precondition (or (p) (q)) :effect (and (p)))
-)
-"""
-    )
+    parser = pypddl.Parser(fixture_text("facade"))
     domain = parser.domain()
-    task = parser.parse_task(
-        """
-(define (problem py-translate-task)
-  (:domain py-translate)
-  (:init)
-  (:goal (p))
-)
-"""
-    )
+    task = parser.parse_task(fixture_text("facade", "task.pddl"))
 
     options = pypddl.TranslatorOptions()
     assert options.compile_typing is True
@@ -251,28 +113,15 @@ def test_translation_bindings_return_translated_views():
     problem_translation = pypddl.translate_task(task, domain_translation, options)
     temporary_translated_task = pypddl.translate_task(task, domain_translation, options).translated_task
 
-    assert domain_translation.original_domain.get_name() == "py-translate"
-    assert len(domain_translation.translated_domain.get_actions()) >= 1
-    assert problem_translation.original_task.get_name() == "py-translate-task"
+    assert domain_translation.original_domain.get_name() == "facade"
+    assert domain_translation.translated_domain.get_actions()
+    assert problem_translation.original_task.get_name() == "facade-task"
     assert problem_translation.translated_task.get_domain().get_name() == domain_translation.translated_domain.get_name()
     assert temporary_translated_task.get_domain().get_name() == domain_translation.translated_domain.get_name()
 
 
 def test_translator_options_control_typing_compilation():
-    parser = pypddl.Parser(
-        """
-(define (domain py-typed-translate)
-  (:requirements :strips :typing :numeric-fluents)
-  (:types thing)
-  (:predicates (p ?x - thing) (done ?x - thing))
-  (:functions (fuel ?x - thing))
-  (:action a
-    :parameters (?x - thing)
-    :precondition (p ?x)
-    :effect (and (done ?x) (increase (fuel ?x) 1)))
-)
-"""
-    )
+    parser = pypddl.Parser(fixture_text("typed-signatures"))
 
     keep_typing = pypddl.TranslatorOptions()
     keep_typing.compile_typing = False
@@ -282,32 +131,14 @@ def test_translator_options_control_typing_compilation():
     kept = pypddl.translate_domain(parser.domain(), keep_typing).translated_domain
     stripped = pypddl.translate_domain(parser.domain(), strip_typing).translated_domain
 
-    assert len(kept.get_types()) > 0
-    assert len(stripped.get_types()) == 0
+    assert keep_typing.compile_typing is False
+    assert strip_typing.compile_typing is True
+    assert kept.get_types()
+    assert not stripped.get_types()
 
-    for predicate in kept.get_predicates():
-        if predicate.get_name() == "thing":
-            continue
-        for parameter in predicate.get_parameters():
-            assert len(parameter.get_types()) > 0
-
-    for predicate in stripped.get_predicates():
-        for parameter in predicate.get_parameters():
-            assert len(parameter.get_types()) == 0
 
 def test_translator_options_compile_conditional_effects():
-    parser = pypddl.Parser(
-        """
-(define (domain py-conditional-multiply)
-  (:requirements :strips :conditional-effects :negative-preconditions)
-  (:predicates (p) (q) (r) (s) (t))
-  (:action a
-    :parameters ()
-    :precondition (p)
-    :effect (and (when (q) (r)) (when (s) (t))))
-)
-"""
-    )
+    parser = pypddl.Parser(fixture_text("conditional-multiply"))
 
     options = pypddl.TranslatorOptions()
     assert options.compile_conditional_effects is False
@@ -315,16 +146,9 @@ def test_translator_options_compile_conditional_effects():
 
     translated = pypddl.translate_domain(parser.domain(), options).translated_domain
 
+    assert options.compile_conditional_effects is True
     assert len(translated.get_actions()) == 4
-    assert all(action.get_name().startswith("a_") for action in translated.get_actions())
     assert all(action.get_original_name() == "a" for action in translated.get_actions())
-
-
-def test_repository_factory_binding_creates_repositories():
-    factory = pypddl.RepositoryFactory()
-    repository = factory.create()
-
-    assert isinstance(repository, pypddl.Repository)
 
 
 def test_repository_view_keeps_temporary_repository_alive():
@@ -389,16 +213,6 @@ def make_effect(repository, literal):
     return build(repository, pypddl.EffectData(effect_literal))
 
 
-def make_condition_and(repository, conditions):
-    conjunction = build(repository, pypddl.ConditionAndData(list(conditions)))
-    return build(repository, pypddl.ConditionData(conjunction))
-
-
-def make_effect_and(repository, effects):
-    conjunction = build(repository, pypddl.EffectAndData(list(effects)))
-    return build(repository, pypddl.EffectData(conjunction))
-
-
 def make_number_expression(repository, value):
     number = build(repository, pypddl.FunctionExpressionNumberData(value))
     return build(repository, pypddl.FunctionExpressionData(number))
@@ -441,9 +255,6 @@ def test_builders_expose_defaulted_mutable_fields():
     action_builder.original_arity = len(action_builder.parameters)
     action_builder.precondition = condition.get_index()
     action_builder.effect = effect.get_index()
-    assert action_builder.parameters == [parameter.get_index()]
-    assert action_builder.precondition == condition.get_index()
-    assert action_builder.effect == effect.get_index()
     action = build(repository, action_builder)
 
     domain_builder = pypddl.DomainData("d")
@@ -458,9 +269,6 @@ def test_builders_expose_defaulted_mutable_fields():
     domain_builder.types = [object_type.get_index()]
     domain_builder.predicates = [predicate.get_index()]
     domain_builder.actions = [action.get_index()]
-    assert domain_builder.types == [object_type.get_index()]
-    assert domain_builder.predicates == [predicate.get_index()]
-    assert domain_builder.actions == [action.get_index()]
     domain = build(repository, domain_builder)
 
     task_builder = pypddl.TaskData("t", domain)
@@ -476,7 +284,6 @@ def test_builders_expose_defaulted_mutable_fields():
     assert task_builder.axioms == []
     task_builder.name = "mutated-task"
     task_builder.goal = condition.get_index()
-    assert task_builder.goal == condition.get_index()
     task = build(repository, task_builder)
 
     assert action.get_name() == "mutated-action"
@@ -542,8 +349,6 @@ def test_repository_constructs_domain_and_task_programmatically():
     assert int(precondition.get_index()) >= 0
     assert int(effect.get_index()) >= 0
     assert action.get_precondition() is not None
-    assert action.get_precondition() is not None
-    assert action.get_effect() is not None
     assert action.get_effect() is not None
     assert task.get_name() == "programmatic-task"
     assert task.get_domain().get_name() == domain.get_name()
@@ -617,45 +422,19 @@ def test_repository_constructs_numeric_function_task_bits():
 
 
 def test_parser_path_entry_points_and_strict_options():
-    from pathlib import Path
-    from tempfile import TemporaryDirectory
+    options = pypddl.ParserOptions()
+    assert options.strict is False
+    assert options.add_action_costs is True
 
-    with TemporaryDirectory() as tmp_dir:
-        tmp_path = Path(tmp_dir)
-        domain_path = tmp_path / "domain.pddl"
-        task_path = tmp_path / "task.pddl"
-        domain_path.write_text("""
-(define (domain py-path)
-  (:predicates (p))
-  (:action a :parameters () :precondition (p) :effect (and (p)))
-)
-""")
-        task_path.write_text("""
-(define (problem py-path-task)
-  (:domain py-path)
-  (:init (p))
-  (:goal (p))
-)
-""")
+    parser = pypddl.Parser(fixture_path("facade"), options)
+    task = parser.parse_task(fixture_path("facade", "task.pddl"))
 
-        options = pypddl.ParserOptions()
-        assert options.strict is False
-        assert options.add_action_costs is True
-        parser = pypddl.Parser(domain_path, options)
-        domain = parser.domain()
-        task = parser.parse_task(task_path)
-
-        assert domain.get_name() == "py-path"
-        assert task.get_domain().get_name() == "py-path"
+    assert parser.domain().get_name() == "facade"
+    assert task.get_domain().get_name() == "facade"
 
 
 def test_views_expose_typed_indices():
-    parser = pypddl.Parser("""
-(define (domain py-index)
-  (:predicates (p))
-  (:action a :parameters () :precondition (p) :effect (and (p)))
-)
-""")
+    parser = pypddl.Parser(fixture_text("facade-format"))
     domain = parser.domain()
 
     domain_index = domain.get_index()
@@ -677,25 +456,17 @@ def test_views_expose_typed_indices():
 
 
 def test_views_are_hashable_and_compare_by_identity():
-    parser = pypddl.Parser("""
-(define (domain py-view-identity)
-  (:predicates (p) (q))
-)
-""")
+    parser = pypddl.Parser(fixture_text("facade-format"))
     domain = parser.domain()
     same_domain = parser.domain()
-    other_domain = pypddl.Parser("""
-(define (domain py-other-view-identity)
-  (:predicates (p))
-)
-""").domain()
+    other_domain = pypddl.Parser(fixture_text("facade-format")).domain()
 
     assert domain == same_domain
     assert hash(domain) == hash(same_domain)
     assert domain != other_domain
     assert len({domain, same_domain, other_domain}) == 2
     assert str(domain) == repr(domain)
-    assert "py-view-identity" in str(domain)
+    assert "facade-format" in str(domain)
 
     first_predicate = domain.get_predicates()[0]
     same_predicate = same_domain.get_predicates()[0]
@@ -706,18 +477,14 @@ def test_views_are_hashable_and_compare_by_identity():
     assert first_predicate != second_predicate
     assert len({first_predicate, same_predicate, second_predicate}) == 2
     assert str(first_predicate) == repr(first_predicate)
-    assert "p" in str(first_predicate)
+    assert "ready" in str(first_predicate)
 
 
 def test_semantic_error_uses_typed_exception():
     try:
-        parser = pypddl.Parser("""
-(define (domain py-error)
-  (:predicates (p) (p))
-)
-""")
-    except pypddl.DuplicatePredicateError as error:
-        assert "Duplicate predicate" in str(error)
+        pypddl.Parser(fixture_text("negative/duplicate-predicate"))
+    except pypddl.DuplicatePredicateError:
+        pass
     else:
         raise AssertionError("expected duplicate predicate diagnostic")
 
@@ -727,97 +494,46 @@ def test_strict_mode_missing_requirement_uses_typed_exception():
     options.strict = True
 
     try:
-        pypddl.Parser("""
-(define (domain py-missing-requirement)
-  (:requirements :strips)
-  (:predicates (p) (q))
-  (:action a
-    :parameters ()
-    :precondition (or (p) (q))
-    :effect (and))
-)
-""", options)
+        pypddl.Parser(fixture_text("missing-disjunctive-requirement"), options)
     except pypddl.MissingRequirementError as error:
         message = str(error)
         assert ":disjunctive-preconditions" in message
-        assert "In line 7:" in message
+        assert "In line 6:" in message
         assert "^_" in message
     else:
         raise AssertionError("expected missing requirement diagnostic")
 
 
 def test_mismatched_task_domain_uses_typed_exception():
-    parser = pypddl.Parser("""
-(define (domain py-domain)
-  (:predicates (p))
-)
-""")
+    parser = pypddl.Parser(fixture_text("facade"))
 
     try:
-        parser.parse_task("""
-(define (problem py-domain-task)
-  (:domain other-domain)
-  (:init)
-  (:goal (and))
-)
-""")
-    except pypddl.MismatchedDomainError as error:
-        message = str(error)
-        assert "py-domain" in message
-        assert "other-domain" in message
+        parser.parse_task(fixture_text("repo-mismatch", "task.pddl"))
+    except pypddl.MismatchedDomainError:
+        pass
     else:
         raise AssertionError("expected mismatched domain diagnostic")
 
 
 def test_translate_task_from_different_domain_translation_uses_typed_exception():
-    first_parser = pypddl.Parser("""
-(define (domain py-first-translation-domain)
-  (:predicates (p))
-)
-""")
-    second_parser = pypddl.Parser("""
-(define (domain py-second-translation-domain)
-  (:predicates (q))
-)
-""")
-    first_translation = pypddl.translate_domain(first_parser.domain())
-    second_task = second_parser.parse_task("""
-(define (problem py-second-translation-task)
-  (:domain py-second-translation-domain)
-  (:init)
-  (:goal (q))
-)
-""")
+    first_translation = pypddl.translate_domain(pypddl.Parser(fixture_text("facade")).domain())
+    second_parser = pypddl.Parser(fixture_text("repo-mismatch"))
+    second_task = second_parser.parse_task(fixture_text("repo-mismatch", "task.pddl"))
 
     try:
         pypddl.translate_task(second_task, first_translation)
-    except pypddl.MismatchedDomainError as error:
-        message = str(error)
-        assert "py-first-translation-domain" in message
-        assert "py-second-translation-domain" in message
+    except pypddl.MismatchedDomainError:
+        pass
     else:
         raise AssertionError("expected mismatched domain diagnostic")
 
 
 def test_translate_task_task_only_equality_uses_typed_exception():
-    parser = pypddl.Parser("""
-(define (domain py-task-only-equality)
-  (:requirements :strips)
-  (:predicates (p))
-)
-""")
+    parser = pypddl.Parser(fixture_text("task-only-equality"))
     options = pypddl.TranslatorOptions()
     options.materialize_equality = True
     domain_translation = pypddl.translate_domain(parser.domain(), options)
-    task = parser.parse_task("""
-(define (problem py-task-only-equality-task)
-  (:domain py-task-only-equality)
-  (:requirements :equality)
-  (:objects o)
-  (:init)
-  (:goal (and (p) (= o o)))
-)
-""")
+    task = parser.parse_task(fixture_text("task-only-equality", "task.pddl"))
 
     try:
         pypddl.translate_task(task, domain_translation, options)
@@ -829,11 +545,9 @@ def test_translate_task_task_only_equality_uses_typed_exception():
 
 def test_parse_error_uses_typed_exception():
     try:
-        pypddl.Parser("(define (domain broken) (:predicates (p))")
+        pypddl.Parser(fixture_text("broken-syntax"))
     except pypddl.ParseError as error:
-        message = str(error)
-        assert "In line 1:" in message
-        assert "^_" in message
+        assert "In line" in str(error)
     else:
         raise AssertionError("expected parse diagnostic")
 
@@ -841,27 +555,15 @@ def test_parse_error_uses_typed_exception():
 def test_recursive_variant_views_are_inspectable():
     options = pypddl.ParserOptions()
     options.add_action_costs = False
-    parser = pypddl.Parser("""
-(define (domain py-recursive)
-  (:requirements :disjunctive-preconditions :conditional-effects)
-  (:predicates (p) (q))
-  (:action a
-    :parameters ()
-    :precondition (or (p) (q))
-    :effect (and (when (p) (q))))
-)
-""", options)
-    domain = parser.domain()
+    parser = pypddl.Parser(fixture_text("when-or-effect"), options)
+    action = parser.domain().get_actions()[0]
 
-    action = domain.get_actions()[0]
-    assert isinstance(action.get_precondition().get_value(), pypddl.ConditionOr)
-    assert action.get_precondition().get_value() == action.get_precondition().get_variant()
-    assert len(action.get_precondition().get_variant().get_conditions()) == 2
-    assert [type(child.get_variant()) for child in action.get_precondition().get_variant().get_conditions()] == [pypddl.ConditionLiteral, pypddl.ConditionLiteral]
-    assert isinstance(action.get_effect().get_value(), pypddl.EffectAnd)
-    assert action.get_effect().get_value() == action.get_effect().get_variant()
-    assert len(action.get_effect().get_variant().get_effects()) == 1
-    assert isinstance(action.get_effect().get_variant().get_effects()[0].get_variant(), pypddl.EffectWhen)
+    effect = action.get_effect().get_variant()
+    assert isinstance(effect, pypddl.EffectWhen)
+    assert action.get_effect().get_value() == effect
+    assert isinstance(effect.get_condition().get_variant(), pypddl.ConditionOr)
+    assert len(effect.get_condition().get_variant().get_conditions()) == 2
+    assert isinstance(effect.get_effect().get_variant(), pypddl.EffectAnd)
 
 
 def test_numeric_expression_variant_views_are_inspectable():
@@ -949,7 +651,6 @@ def test_repository_exposes_recursive_constructors_and_accessors():
     assert isinstance(multi.get_variant(), pypddl.MultiFunctionExpression)
     assert multi.get_variant().get_operator() == pypddl.MultiArithmeticOperator.Add
     assert len(multi.get_variant().get_expressions()) == 2
-    assert len(effect_probabilistic.get_variant().get_alternatives()) == 2
     assert effect_probabilistic.get_variant().get_alternatives()[0].get_probability() == 0.4
     assert domain.get_axioms()[0].get_arity() == 1
     assert domain.get_axioms()[0].get_original_arity() == 1

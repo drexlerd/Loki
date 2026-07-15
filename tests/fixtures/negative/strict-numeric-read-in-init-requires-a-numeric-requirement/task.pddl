@@ -1,0 +1,5 @@
+(define (problem no-numeric-read-task)
+  (:domain no-numeric-read)
+  (:init (= (fuel) 3))
+  (:goal (p))
+)

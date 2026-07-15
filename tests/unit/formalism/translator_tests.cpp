@@ -18,33 +18,15 @@
 #include "../benchmark_utils.hpp"
 #include "../formalism_utils.hpp"
 
-#include <filesystem>
 #include <gtest/gtest.h>
 #include <loki/loki.hpp>
 #include <loki/semantic/translator/copy_translator.hpp>
 #include <memory>
 #include <string>
 #include <string_view>
-#include <yggdrasil/containers/associative_containers.hpp>
 
 namespace loki::tests
 {
-namespace fs = std::filesystem;
-
-namespace
-{
-
-template<typename ObjectList>
-ygg::UnorderedSet<std::string> object_names(ObjectList objects)
-{
-    auto result = ygg::UnorderedSet<std::string> {};
-    for (auto object : objects)
-        result.insert(std::string(object.get_name()));
-    return result;
-}
-
-}  // namespace
-
 TEST(LokiTests, GeneratedUniversalPredicateKeepsNumericFreeVariables)
 {
     auto parser = loki::Parser(fixture_path("numeric-universal"));
@@ -256,47 +238,6 @@ TEST(LokiTests, RenameQuantifiedVariablesSeparatesNestedBinders)
     const auto effect_forall = action.get_effect().value().get_variant().get<ygg::Index<formalism::EffectForall>>();
     ASSERT_EQ(effect_forall.get_parameters().size(), std::size_t { 1 });
     EXPECT_EQ(variable_name(effect_forall.get_parameters().front()), "?x_2");
-}
-
-TEST(LokiTests, LokiPddlTranslatorTest)
-{
-    const auto domain_file = fs::path(std::string(BENCHMARKS_DIR) + "/classical/tests/miconic-fulladl/domain.pddl");
-    const auto problem_file = fs::path(std::string(BENCHMARKS_DIR) + "/classical/tests/miconic-fulladl/test-1.pddl");
-
-    auto parser = loki::Parser(domain_file);
-
-    const auto domain = parser.get_domain();
-    const auto problem = parser.parse_task(problem_file);
-    const auto domain_translation_result = loki::translate(domain);
-    const auto translated_domain = domain_translation_result.get_translated_domain();
-    const auto problem_translation_result = loki::translate(problem, domain_translation_result);
-    const auto translated_problem = problem_translation_result.get_translated_task();
-
-    {
-        const auto problem_objects = object_names(translated_problem.get_objects());
-        for (auto constant : translated_domain.get_constants())
-        {
-            EXPECT_TRUE(problem_objects.contains(std::string(constant.get_name())));
-        }
-    }
-
-    {
-        EXPECT_EQ(translated_problem.get_domain().get_name(), translated_domain.get_name());
-    }
-
-    {
-        auto names = ygg::UnorderedSet<std::string> {};
-        for (auto object : translated_problem.get_objects())
-        {
-            EXPECT_TRUE(names.insert(std::string(object.get_name())).second);
-        }
-    }
-
-    {
-        EXPECT_FALSE(translated_domain.get_actions().empty());
-        EXPECT_FALSE(translated_problem.get_initial_literals().empty());
-        EXPECT_TRUE(translated_problem.get_goal().has_value());
-    }
 }
 
 }  // namespace loki::tests

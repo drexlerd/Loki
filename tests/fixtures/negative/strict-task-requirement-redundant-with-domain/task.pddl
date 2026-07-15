@@ -1,0 +1,7 @@
+(define (problem redundant-req-task)
+  (:domain redundant-req)
+  (:requirements :typing)
+  (:objects o - thing)
+  (:init (p o))
+  (:goal (p o))
+)

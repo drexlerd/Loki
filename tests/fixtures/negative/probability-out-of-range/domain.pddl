@@ -1,0 +1,5 @@
+(define (domain invalid-probability)
+  (:requirements :probabilistic-effects)
+  (:predicates (p))
+  (:action a :parameters () :effect (probabilistic 1.2 (p)))
+)

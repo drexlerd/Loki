@@ -15,41 +15,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
-
 #include "../benchmark_utils.hpp"
-
-#include <loki/ast.hpp>
-#include <loki/parser.hpp>
-
-#include <yggdrasil/serialization/json_suite.hpp>
 
 #include <cmath>
 #include <filesystem>
-#include <fstream>
+#include <gtest/gtest.h>
 #include <iostream>
+#include <loki/ast.hpp>
+#include <loki/parser.hpp>
 #include <set>
-#include <sstream>
 #include <string>
 #include <utility>
-#include <vector>
+#include <yggdrasil/serialization/json_suite.hpp>
 
 namespace loki::tests
 {
 namespace fs = std::filesystem;
 
-std::string read_file(const fs::path& path)
-{
-    std::ifstream in(path);
-    std::ostringstream out;
-    out << in.rdbuf();
-    return out.str();
-}
-
 template<typename Node, typename ParseFn>
 void expect_parse_format_reparse(const fs::path& path, ParseFn parse)
 {
-    const auto source = read_file(path);
+    const auto source = read_text(path);
     auto first = source.cbegin();
     const auto last = source.cend();
     parser::ErrorHandlerType error_handler(first, last, std::cerr);
@@ -66,13 +52,11 @@ void expect_parse_format_reparse(const fs::path& path, ParseFn parse)
     EXPECT_TRUE(parse(printed, reparsed, printed_error_handler)) << path << "\n" << printed;
 }
 
-std::vector<SuiteCase> load_cases() { return benchmark_suite_cases(); }
-
 TEST(LokiParserSuite, JsonSuiteCoversEveryBenchmarkProblem)
 {
     const auto benchmark_root = fs::path(std::string(BENCHMARKS_DIR));
     auto listed = std::set<std::string> {};
-    for (const auto& item : load_cases())
+    for (const auto& item : benchmark_suite_cases())
     {
         listed.insert(fs::relative(item.domain_file, benchmark_root).generic_string() + "|" + fs::relative(*item.task_file, benchmark_root).generic_string());
     }
@@ -88,7 +72,8 @@ TEST(LokiParserSuite, JsonSuiteCoversEveryBenchmarkProblem)
             {
                 if (!task_entry.is_regular_file() || task_entry.path().extension() != ".pddl" || task_entry.path().filename() == "domain.pddl")
                     continue;
-                discovered.insert(fs::relative(entry.path(), benchmark_root).generic_string() + "|" + fs::relative(task_entry.path(), benchmark_root).generic_string());
+                discovered.insert(fs::relative(entry.path(), benchmark_root).generic_string() + "|"
+                                  + fs::relative(task_entry.path(), benchmark_root).generic_string());
             }
         }
     }
@@ -98,29 +83,23 @@ TEST(LokiParserSuite, JsonSuiteCoversEveryBenchmarkProblem)
 
 TEST(LokiParserSuite, ParsesAllBenchmarkDomainAsts)
 {
-    const auto cases = load_cases();
+    const auto cases = benchmark_suite_cases();
     ASSERT_FALSE(cases.empty());
     for (const auto& item : cases)
     {
-        const auto source = read_file(item.domain_file);
-        auto first = source.cbegin();
-        parser::ErrorHandlerType error_handler(first, source.cend(), std::cerr);
-        ast::Domain ast;
-        EXPECT_TRUE(parser::parse_domain(source, ast, error_handler)) << item.name << ": " << item.domain_file;
+        SCOPED_TRACE(item.name);
+        expect_parse_format_reparse<ast::Domain>(item.domain_file, parser::parse_domain);
     }
 }
 
 TEST(LokiParserSuite, ParsesAllBenchmarkTaskAsts)
 {
-    const auto cases = load_cases();
+    const auto cases = benchmark_suite_cases();
     ASSERT_FALSE(cases.empty());
     for (const auto& item : cases)
     {
-        const auto source = read_file(*item.task_file);
-        auto first = source.cbegin();
-        parser::ErrorHandlerType error_handler(first, source.cend(), std::cerr);
-        ast::Task ast;
-        EXPECT_TRUE(parser::parse_task(source, ast, error_handler)) << item.name << ": " << *item.task_file;
+        SCOPED_TRACE(item.name);
+        expect_parse_format_reparse<ast::Task>(*item.task_file, parser::parse_task);
     }
 }
 
@@ -199,36 +178,6 @@ TEST(LokiParserSuite, FormatterPrintsConstructedAstAsParseablePddl)
     auto first = printed.cbegin();
     parser::ErrorHandlerType error_handler(first, printed.cend(), std::cerr);
     EXPECT_TRUE(parser::parse_domain(printed, reparsed, error_handler)) << printed;
-}
-
-TEST(LokiParserSuite, ParsesAndReparsesRepresentativeBenchmarkDomains)
-{
-    const auto root = fs::path(std::string(BENCHMARKS_DIR));
-    const std::vector<fs::path> domains = {
-        root / "classical" / "tests" / "gripper" / "domain.pddl",
-        root / "classical" / "tests" / "miconic-fulladl" / "domain.pddl",
-        root / "numeric" / "tests" / "delivery" / "domain.pddl",
-    };
-
-    for (const auto& path : domains)
-    {
-        expect_parse_format_reparse<ast::Domain>(path, parser::parse_domain);
-    }
-}
-
-TEST(LokiParserSuite, ParsesAndReparsesRepresentativeBenchmarkTasks)
-{
-    const auto root = fs::path(std::string(BENCHMARKS_DIR));
-    const std::vector<fs::path> tasks = {
-        root / "classical" / "tests" / "gripper" / "test-1.pddl",
-        root / "classical" / "tests" / "miconic-fulladl" / "test-1.pddl",
-        root / "numeric" / "tests" / "delivery" / "test-1.pddl",
-    };
-
-    for (const auto& path : tasks)
-    {
-        expect_parse_format_reparse<ast::Task>(path, parser::parse_task);
-    }
 }
 
 }

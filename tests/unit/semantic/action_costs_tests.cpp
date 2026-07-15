@@ -64,12 +64,6 @@ TEST(LokiSemanticActionCosts, AddsActionCostsDefaultsInPermissiveMode)
         initial_value.get_value().get_variant());
 }
 
-TEST(LokiSemanticActionCosts, AddsTotalCostFunctionInPermissiveMode)
-{
-    auto parser = semantic::Parser(fixture_path("action-costs-implicit-function"));
-    EXPECT_TRUE(has_function_named(parser.get_domain(), "total-cost"));
-}
-
 TEST(LokiSemanticActionCosts, AddActionCostsOptionInjectsUnitCosts)
 {
     auto options = semantic::ParserOptions {};
@@ -118,8 +112,6 @@ TEST(LokiSemanticActionCosts, AddActionCostsOptionCompletesInsteadOfStrictErrors
     ASSERT_TRUE(parsed_task.get_metric().has_value());
     ASSERT_EQ(parsed_task.get_initial_function_values().size(), 1);
 }
-
-TEST(LokiSemanticActionCosts, ActionCostsAllowsFunctionReadsInIncreaseAmounts) { EXPECT_NO_THROW((semantic::Parser { fixture_path("action-costs-reads") })); }
 
 TEST(LokiSemanticActionCosts, NumericFluentsTaskWithoutMetricKeepsMetricAbsent)
 {

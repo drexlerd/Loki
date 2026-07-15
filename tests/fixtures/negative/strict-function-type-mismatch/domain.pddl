@@ -1,0 +1,8 @@
+(define (domain function-type-mismatch)
+  (:requirements :strips :typing :numeric-fluents)
+  (:types room ball)
+  (:constants b - ball)
+  (:predicates)
+  (:functions (distance ?r - room))
+  (:action a :parameters () :effect (assign (distance b) 0))
+)

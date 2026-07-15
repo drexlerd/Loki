@@ -1,0 +1,5 @@
+(define (domain missing-equality-requirement)
+  (:requirements :strips)
+  (:predicates)
+  (:action a :parameters (?x ?y) :precondition (= ?x ?y) :effect (and))
+)

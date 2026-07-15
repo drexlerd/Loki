@@ -19,18 +19,48 @@
 #include "../formalism_utils.hpp"
 
 #include <algorithm>
-#include <filesystem>
 #include <gtest/gtest.h>
 #include <loki/loki.hpp>
 #include <loki/semantic.hpp>
+#include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <yggdrasil/containers/associative_containers.hpp>
 #include <yggdrasil/semantics/equal_to.hpp>
 
 namespace loki::tests
 {
-namespace fs = std::filesystem;
+namespace
+{
+
+std::optional<std::string> conjunct_variable(formalism::ConditionView condition, std::string_view predicate_name, std::size_t term_index)
+{
+    if (!condition.get_variant().is<ygg::Index<formalism::ConditionAnd>>())
+        return std::nullopt;
+
+    for (auto child : condition.get_variant().get<ygg::Index<formalism::ConditionAnd>>().get_conditions())
+    {
+        auto result = std::optional<std::string> {};
+        ygg::visit(
+            [&](const auto& node)
+            {
+                using Node = std::decay_t<decltype(node)>;
+                if constexpr (std::is_same_v<Node, formalism::ConditionLiteralView>)
+                {
+                    const auto atom = node.get_literal().get_atom();
+                    if (atom.get_predicate().get_name() == predicate_name && atom.get_terms().size() > term_index)
+                        result = variable_term_name(atom.get_terms()[term_index]);
+                }
+            },
+            child.get_variant());
+        if (result)
+            return result;
+    }
+    return std::nullopt;
+}
+
+}  // namespace
 
 TEST(LokiSemanticTranslator, RenamesQuantifiedVariablesDeterministically)
 {
@@ -60,8 +90,13 @@ TEST(LokiSemanticTranslator, SeparatesSiblingExistentialsOverSameVariable)
     EXPECT_NE(first, second);
 
     // Each conjunct must reference its own hoisted variable.
-    const auto text = loki::format_domain(translation.get_translated_domain());
-    EXPECT_NE(text.find("(a " + first + ")") != std::string::npos ? text.find("(b " + second + ")") : std::string::npos, std::string::npos);
+    ASSERT_TRUE(action.get_precondition().has_value());
+    const auto first_reference = conjunct_variable(action.get_precondition().value(), "a", 0);
+    const auto second_reference = conjunct_variable(action.get_precondition().value(), "b", 0);
+    ASSERT_TRUE(first_reference.has_value());
+    ASSERT_TRUE(second_reference.has_value());
+    EXPECT_EQ(*first_reference, first);
+    EXPECT_EQ(*second_reference, second);
 }
 
 TEST(LokiSemanticTranslator, LiftedParameterAvoidsFreeVariablesWhenRenaming)
@@ -80,8 +115,10 @@ TEST(LokiSemanticTranslator, LiftedParameterAvoidsFreeVariablesWhenRenaming)
     EXPECT_EQ(names.size(), std::size_t { 3 });
     std::sort(names.begin(), names.end());
     EXPECT_EQ(std::unique(names.begin(), names.end()), names.end());
-    const auto text = loki::format_domain(translation.get_translated_domain());
-    EXPECT_NE(text.find(" ?p_0)"), std::string::npos);
+    ASSERT_TRUE(action.get_precondition().has_value());
+    const auto free_reference = conjunct_variable(action.get_precondition().value(), "b", 1);
+    ASSERT_TRUE(free_reference.has_value());
+    EXPECT_EQ(*free_reference, "?p_0");
 }
 
 TEST(LokiSemanticTranslator, RenamesBeforeNegationNormalFormOnlyOnce)
@@ -197,12 +234,9 @@ TEST(LokiSemanticTranslator, CompilesTypingWhenEnabled)
 
 TEST(LokiSemanticTranslator, PreservesTaskObjectTypesAfterDomainCanonicalization)
 {
-    const auto domain_path = fs::path(std::string(BENCHMARKS_DIR)) / "classical/tests/childsnack/domain.pddl";
-    const auto task_path = fs::path(std::string(BENCHMARKS_DIR)) / "classical/tests/childsnack/test-1.pddl";
-
-    semantic::Parser parser(domain_path);
+    semantic::Parser parser(fixture_path("task-object-types"));
     const auto domain_translation = semantic::translate(parser.get_domain());
-    const auto translated_result = semantic::translate(parser.parse_task(task_path), domain_translation);
+    const auto translated_result = semantic::translate(parser.parse_task(fixture_path("task-object-types", "task.pddl")), domain_translation);
     const auto translated = translated_result.get_translated_task();
 
     EXPECT_TRUE(has_initial_unary_literal(translated.get_initial_literals(), "bread-portion", "bread1"));

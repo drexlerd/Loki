@@ -1,0 +1,6 @@
+(define (domain action-cost-domain)
+  (:requirements :strips :action-costs)
+  (:predicates)
+  (:functions (total-cost))
+  (:action pay :parameters () :effect (increase (total-cost) 1))
+)

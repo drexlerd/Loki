@@ -1,0 +1,5 @@
+(define (domain no-numeric-requirement)
+  (:requirements :strips)
+  (:predicates (p))
+  (:functions (fuel))
+)

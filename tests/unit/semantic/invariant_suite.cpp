@@ -19,7 +19,6 @@
 #include "../formalism_utils.hpp"
 
 #include <cstdint>
-#include <filesystem>
 #include <gtest/gtest.h>
 #include <loki/loki.hpp>
 #include <optional>
@@ -31,7 +30,6 @@
 
 namespace loki::tests
 {
-namespace fs = std::filesystem;
 namespace
 {
 
@@ -187,6 +185,11 @@ void expect_domain_invariants(formalism::DomainView domain)
 
 void expect_task_invariants(formalism::DomainView translated_domain, formalism::TaskView task)
 {
+    EXPECT_EQ(task.get_domain().get_name(), translated_domain.get_name());
+
+    auto object_names = ygg::UnorderedSet<std::string> {};
+    for (auto object : task.get_objects())
+        EXPECT_TRUE(object_names.insert(std::string(object.get_name())).second) << "duplicate task object name " << object.get_name();
     auto domain_predicate_names = ygg::UnorderedSet<std::string> {};
     for (auto predicate : translated_domain.get_predicates())
         domain_predicate_names.insert(std::string(predicate.get_name()));
@@ -344,17 +347,22 @@ TEST(LokiSemanticInvariantSuite, AddActionCostsOptionHoldsAcrossFixtures)
     {
         SCOPED_TRACE(item.name);
 
+        auto baseline_options = semantic::ParserOptions {};
+        baseline_options.add_action_costs = false;
+        auto baseline_parser = semantic::Parser(item.domain_file, baseline_options);
+        const auto baseline_domain = baseline_parser.get_domain();
+        const auto declares_action_costs = has_requirement_kind(baseline_domain, formalism::RequirementKind::ActionCosts);
+        const auto declares_numeric_fluents = has_requirement_kind(baseline_domain, formalism::RequirementKind::Fluents)
+                                              || has_requirement_kind(baseline_domain, formalism::RequirementKind::NumericFluents);
+
         auto options = semantic::ParserOptions {};
         options.add_action_costs = true;
         auto parser = semantic::Parser(item.domain_file, options);
         const auto domain = parser.get_domain();
 
-        // Three regimes: :action-costs domains get missing artifacts completed; genuine numeric
-        // domains (:fluents/:numeric-fluents) are left untouched (absent metric = unit costs);
-        // plain domains get :action-costs, total-cost, and unit-cost effects injected.
-        const auto domain_text = read_text(item.domain_file);
-        const auto declares_action_costs = domain_text.find(":action-costs") != std::string::npos;
-        const auto declares_numeric_fluents = domain_text.find(":fluents") != std::string::npos || domain_text.find(":numeric-fluents") != std::string::npos;
+        // Three regimes: action-cost domains get missing artifacts completed; genuine numeric
+        // domains are left untouched (absent metric means unit costs); plain domains get
+        // action-costs, total-cost, and unit-cost effects injected.
 
         if (!declares_action_costs && declares_numeric_fluents)
         {
@@ -389,39 +397,6 @@ TEST(LokiSemanticInvariantSuite, AddActionCostsOptionHoldsAcrossFixtures)
         const auto reparsed_task = reparsed.parse_task(loki::format_task(task));
         EXPECT_EQ(reparsed_task.get_name(), task.get_name());
     }
-}
-
-TEST(LokiSemanticInvariantSuite, ParsesDomainAndManyTasks)
-{
-    const auto root = fs::path(std::string(BENCHMARKS_DIR)) / "classical" / "tests" / "gripper";
-
-    semantic::Parser parser(root / "domain.pddl");
-
-    const auto domain = parser.get_domain();
-    EXPECT_EQ(std::string(domain.get_name()), "gripper-strips");
-    EXPECT_GT(domain.get_actions().size(), 0);
-
-    const auto translation = semantic::translate(domain);
-    const auto translated_domain = translation.get_translated_domain();
-    EXPECT_EQ(std::string(translated_domain.get_name()), "gripper-strips");
-    EXPECT_NE(translated_domain.get_context().get_index(), domain.get_context().get_index());
-    EXPECT_EQ(semantic::domain_translation_steps().size(), 9);
-    EXPECT_EQ(semantic::task_translation_steps().size(), 10);
-    const auto task1 = parser.parse_task(root / "test-1.pddl");
-    const auto translated1_result = semantic::translate(task1, translation);
-    const auto translated1 = translated1_result.get_translated_task();
-    EXPECT_EQ(std::string(translated1.get_domain().get_name()), "gripper-strips");
-    EXPECT_NE(translated1.get_context().get_index(), translated_domain.get_context().get_index());
-    EXPECT_EQ(&translated1.get_domain().get_context().get_root(), &translated_domain.get_context().get_root());
-    EXPECT_GT(translated1.get_initial_literals().size(), 0);
-
-    const auto task2 = parser.parse_task(root / "test-1.pddl");
-    const auto translated2_result = semantic::translate(task2, translation);
-    const auto translated2 = translated2_result.get_translated_task();
-    EXPECT_EQ(std::string(translated2.get_domain().get_name()), "gripper-strips");
-    EXPECT_NE(translated2.get_context().get_index(), translated_domain.get_context().get_index());
-    EXPECT_EQ(&translated2.get_domain().get_context().get_root(), &translated_domain.get_context().get_root());
-    EXPECT_GT(translated2.get_initial_literals().size(), 0);
 }
 
 }  // namespace loki::tests

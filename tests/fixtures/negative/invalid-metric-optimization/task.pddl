@@ -1,0 +1,5 @@
+(define (problem metric-task)
+  (:domain metric-domain)
+  (:init)
+  (:metric smallest (total-cost))
+)

@@ -15,6 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "../benchmark_utils.hpp"
+
+#include <filesystem>
 #include <gtest/gtest.h>
 #include <loki/semantic.hpp>
 #include <optional>
@@ -31,36 +34,23 @@ namespace
 struct NegativeSuiteCase
 {
     std::string name;
-    std::string entry;
     bool strict = false;
-    std::string domain_source;
-    std::string task_source;
+    std::filesystem::path domain_file;
+    std::filesystem::path task_file;
     std::optional<std::string> expected_error;
     std::optional<std::string> expected_message;
     std::optional<std::size_t> expected_line;
     std::optional<std::size_t> expected_column;
 };
 
-std::string source_from_lines(const boost::json::object& object, const std::string& key)
-{
-    auto result = std::string {};
-    for (const auto& line : ygg::common::as_array(object, key, "case"))
-    {
-        result += std::string(line.as_string());
-        result += '\n';
-    }
-    return result;
-}
-
-NegativeSuiteCase parse_case(const boost::json::object& object)
+NegativeSuiteCase parse_case(const boost::json::object& object, const std::filesystem::path& base)
 {
     auto result = NegativeSuiteCase {};
     result.name = ygg::common::as_string(object, "name", "case");
-    result.entry = ygg::common::as_string(object, "entry", "case");
     result.strict = ygg::common::find_bool(object, "strict", "case").value_or(false);
-    result.domain_source = source_from_lines(object, "domain");
-    if (object.if_contains("task"))
-        result.task_source = source_from_lines(object, "task");
+    result.domain_file = ygg::common::resolve_path(base, ygg::common::as_string(object, "domain_file", "case"));
+    if (object.if_contains("task_file"))
+        result.task_file = ygg::common::resolve_path(base, ygg::common::as_string(object, "task_file", "case"));
     if (const auto* expected_error = object.if_contains("expected_error"))
         result.expected_error = std::string(expected_error->as_string());
     if (const auto* expected_message = object.if_contains("expected_message"))
@@ -76,9 +66,10 @@ std::vector<NegativeSuiteCase> load_cases()
 {
     const auto suite_value = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/semantic/negative_suite.json");
     const auto& suite = ygg::common::as_object(suite_value, "suite");
+    const auto base = ygg::common::suite_prefix_path(suite);
     auto result = std::vector<NegativeSuiteCase> {};
     for (const auto& case_value : ygg::common::as_array(suite, "cases", "suite"))
-        result.push_back(parse_case(ygg::common::as_object(case_value, "case")));
+        result.push_back(parse_case(ygg::common::as_object(case_value, "case"), base));
     return result;
 }
 
@@ -155,9 +146,9 @@ TEST(LokiSemanticNegativeSuite, ReportsExpectedSemanticErrors)
         options.add_action_costs = false;
         try
         {
-            auto parser = semantic::Parser(item.domain_source, options);
-            if (item.entry == "task")
-                parser.parse_task(item.task_source);
+            auto parser = semantic::Parser(read_text(item.domain_file), options);
+            if (!item.task_file.empty())
+                parser.parse_task(read_text(item.task_file));
             FAIL() << "Expected semantic error";
         }
         catch (const semantic::SemanticError& error)

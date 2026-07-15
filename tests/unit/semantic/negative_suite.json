@@ -1,431 +1,199 @@
 {
+    "prefix": "tests/fixtures/negative",
     "cases": [
         {
             "name": "strict undefined predicate",
-            "entry": "domain",
             "expected_error": "UndefinedPredicateError",
             "expected_message": "Undefined predicate: missing",
             "strict": true,
-            "domain": [
-                "(define (domain strict-undefined)",
-                "  (:requirements :strips)",
-                "  (:predicates)",
-                "  (:action a :parameters () :precondition (missing) :effect (and))",
-                ")"
-            ]
+            "domain_file": "strict-undefined-predicate/domain.pddl"
         },
         {
             "name": "duplicate predicate",
-            "entry": "domain",
             "expected_error": "DuplicatePredicateError",
             "expected_message": "Duplicate predicate definition: p",
-            "domain": [
-                "(define (domain duplicate-predicate)",
-                "  (:predicates (p) (p))",
-                ")"
-            ]
+            "domain_file": "duplicate-predicate/domain.pddl"
         },
         {
             "name": "strict missing disjunction requirement",
-            "entry": "domain",
             "expected_error": "MissingRequirementError",
             "strict": true,
             "expected_message": "Missing required PDDL requirement: :disjunctive-preconditions",
             "expected_line": 4,
             "expected_column": 43,
-            "domain": [
-                "(define (domain missing-disjunction-requirement)",
-                "  (:requirements :strips)",
-                "  (:predicates (p) (q))",
-                "  (:action a :parameters () :precondition (or (p) (q)) :effect (and))",
-                ")"
-            ]
+            "domain_file": "strict-missing-disjunction-requirement/domain.pddl"
         },
         {
             "name": "strict missing implication requirement",
-            "entry": "domain",
             "expected_error": "MissingRequirementError",
             "strict": true,
             "expected_message": "Missing required PDDL requirement: :disjunctive-preconditions",
             "expected_line": 3,
             "expected_column": 43,
-            "domain": [
-                "(define (domain missing-implication-requirement)",
-                "  (:requirements :strips)",
-                "  (:action a :parameters () :precondition (imply (p) (q)) :effect (and))",
-                ")"
-            ]
+            "domain_file": "strict-missing-implication-requirement/domain.pddl"
         },
         {
             "name": "strict missing equality requirement",
-            "entry": "domain",
             "expected_error": "MissingRequirementError",
             "expected_message": "Missing required PDDL requirement: :equality",
             "strict": true,
-            "domain": [
-                "(define (domain missing-equality-requirement)",
-                "  (:requirements :strips)",
-                "  (:predicates)",
-                "  (:action a :parameters (?x ?y) :precondition (= ?x ?y) :effect (and))",
-                ")"
-            ]
+            "domain_file": "strict-missing-equality-requirement/domain.pddl"
         },
         {
             "name": "strict unused typing requirement",
-            "entry": "domain",
             "expected_error": "UnusedRequirementError",
             "expected_message": "Unused PDDL requirement: :typing",
             "strict": true,
             "expected_line": 2,
             "expected_column": 26,
-            "domain": [
-                "(define (domain unused-typing-requirement)",
-                "  (:requirements :strips :typing)",
-                "  (:predicates (p))",
-                ")"
-            ]
+            "domain_file": "strict-unused-typing-requirement/domain.pddl"
         },
         {
             "name": "invalid equality arity",
-            "entry": "domain",
             "expected_error": "InvalidEqualityError",
             "expected_message": "Invalid equality expression: expected 2 terms, got 3",
-            "domain": [
-                "(define (domain invalid-equality)",
-                "  (:requirements :equality)",
-                "  (:predicates)",
-                "  (:action a :parameters (?x ?y ?z) :precondition (= ?x ?y ?z) :effect (and))",
-                ")"
-            ]
+            "domain_file": "invalid-equality-arity/domain.pddl"
         },
         {
             "name": "strict predicate type mismatch",
-            "entry": "domain",
             "expected_error": "TypeMismatchError",
             "strict": true,
-            "domain": [
-                "(define (domain predicate-type-mismatch)",
-                "  (:requirements :strips :typing)",
-                "  (:types room ball)",
-                "  (:constants b - ball)",
-                "  (:predicates (at ?r - room))",
-                "  (:action a :parameters () :precondition (at b) :effect (and))",
-                ")"
-            ]
+            "domain_file": "strict-predicate-type-mismatch/domain.pddl"
         },
         {
             "name": "invalid metric optimization",
-            "entry": "task",
             "expected_error": "InvalidMetricError",
             "expected_message": "Invalid metric optimization: smallest",
-            "domain": [
-                "(define (domain metric-domain)",
-                "  (:requirements :numeric-fluents)",
-                "  (:predicates)",
-                "  (:functions (total-cost))",
-                ")"
-            ],
-            "task": [
-                "(define (problem metric-task)",
-                "  (:domain metric-domain)",
-                "  (:init)",
-                "  (:metric smallest (total-cost))",
-                ")"
-            ]
+            "domain_file": "invalid-metric-optimization/domain.pddl",
+            "task_file": "invalid-metric-optimization/task.pddl"
         },
         {
             "name": "invalid numeric effect operator",
-            "entry": "domain",
             "expected_error": "InvalidNumericEffectError",
-            "domain": [
-                "(define (domain invalid-numeric-effect)",
-                "  (:requirements :numeric-fluents)",
-                "  (:predicates)",
-                "  (:functions (total-cost))",
-                "  (:action a :parameters () :effect (= (total-cost) 1))",
-                ")"
-            ]
+            "domain_file": "invalid-numeric-effect-operator/domain.pddl"
         },
         {
             "name": "invalid numeric constraint comparator",
-            "entry": "domain",
             "expected_error": "InvalidNumericConstraintError",
-            "domain": [
-                "(define (domain invalid-numeric-constraint)",
-                "  (:requirements :numeric-fluents)",
-                "  (:predicates)",
-                "  (:functions (total-cost))",
-                "  (:action a :parameters () :precondition (assign (total-cost) 1) :effect (and))",
-                ")"
-            ]
+            "domain_file": "invalid-numeric-constraint-comparator/domain.pddl"
         },
         {
             "name": "probability out of range",
-            "entry": "domain",
             "expected_error": "InvalidProbabilisticEffectError",
-            "domain": [
-                "(define (domain invalid-probability)",
-                "  (:requirements :probabilistic-effects)",
-                "  (:predicates (p))",
-                "  (:action a :parameters () :effect (probabilistic 1.2 (p)))",
-                ")"
-            ]
+            "domain_file": "probability-out-of-range/domain.pddl"
         },
         {
             "name": "probability total above one",
-            "entry": "domain",
             "expected_error": "InvalidProbabilisticEffectError",
-            "domain": [
-                "(define (domain invalid-probability-total)",
-                "  (:requirements :probabilistic-effects)",
-                "  (:predicates (p) (q))",
-                "  (:action a :parameters () :effect (probabilistic 0.7 (p) 0.6 (q)))",
-                ")"
-            ]
+            "domain_file": "probability-total-above-one/domain.pddl"
         },
         {
             "name": "mismatched task domain",
-            "entry": "task",
             "expected_error": "MismatchedDomainError",
             "expected_message": "Task references domain 'other-domain' but parser holds domain 'expected-domain'.",
             "expected_line": 2,
             "expected_column": 12,
-            "domain": [
-                "(define (domain expected-domain)",
-                "  (:predicates)",
-                ")"
-            ],
-            "task": [
-                "(define (problem wrong-domain-task)",
-                "  (:domain other-domain)",
-                "  (:init)",
-                ")"
-            ]
+            "domain_file": "mismatched-task-domain/domain.pddl",
+            "task_file": "mismatched-task-domain/task.pddl"
         },
         {
             "name": "strict numeric write requires numeric-fluents under bare action-costs",
-            "entry": "domain",
             "expected_error": "MissingRequirementError",
             "expected_message": "Missing required PDDL requirement: :numeric-fluents",
             "strict": true,
-            "domain": [
-                "(define (domain write-fragment)",
-                "  (:requirements :strips :action-costs)",
-                "  (:predicates (p))",
-                "  (:functions (total-cost) (fuel))",
-                "  (:action burn :parameters () :effect (assign (fuel) 5))",
-                ")"
-            ]
+            "domain_file": "strict-numeric-write-requires-numeric-fluents-under-bare-action-costs/domain.pddl"
         },
         {
             "name": "strict increase of non-total-cost requires numeric-fluents under bare action-costs",
-            "entry": "domain",
             "expected_error": "MissingRequirementError",
             "expected_message": "Missing required PDDL requirement: :numeric-fluents",
             "strict": true,
-            "domain": [
-                "(define (domain increase-fragment)",
-                "  (:requirements :strips :action-costs)",
-                "  (:predicates (p))",
-                "  (:functions (total-cost) (fuel))",
-                "  (:action burn :parameters () :effect (increase (fuel) 1))",
-                ")"
-            ]
+            "domain_file": "strict-increase-of-non-total-cost-requires-numeric-fluents-under-bare-action-costs/domain.pddl"
         },
         {
             "name": "strict function declaration requires a numeric requirement",
-            "entry": "domain",
             "expected_error": "MissingRequirementError",
             "expected_message": "Missing required PDDL requirement: :numeric-fluents",
             "strict": true,
-            "domain": [
-                "(define (domain no-numeric-requirement)",
-                "  (:requirements :strips)",
-                "  (:predicates (p))",
-                "  (:functions (fuel))",
-                ")"
-            ]
+            "domain_file": "strict-function-declaration-requires-a-numeric-requirement/domain.pddl"
         },
         {
             "name": "strict numeric read in init requires a numeric requirement",
-            "entry": "task",
             "expected_error": "MissingRequirementError",
             "expected_message": "Missing required PDDL requirement: :numeric-fluents",
             "strict": true,
-            "domain": [
-                "(define (domain no-numeric-read)",
-                "  (:requirements :strips)",
-                "  (:predicates (p))",
-                ")"
-            ],
-            "task": [
-                "(define (problem no-numeric-read-task)",
-                "  (:domain no-numeric-read)",
-                "  (:init (= (fuel) 3))",
-                "  (:goal (p))",
-                ")"
-            ]
+            "domain_file": "strict-numeric-read-in-init-requires-a-numeric-requirement/domain.pddl",
+            "task_file": "strict-numeric-read-in-init-requires-a-numeric-requirement/task.pddl"
         },
         {
             "name": "strict function type mismatch",
-            "entry": "domain",
             "expected_error": "TypeMismatchError",
             "strict": true,
-            "domain": [
-                "(define (domain function-type-mismatch)",
-                "  (:requirements :strips :typing :numeric-fluents)",
-                "  (:types room ball)",
-                "  (:constants b - ball)",
-                "  (:predicates)",
-                "  (:functions (distance ?r - room))",
-                "  (:action a :parameters () :effect (assign (distance b) 0))",
-                ")"
-            ]
+            "domain_file": "strict-function-type-mismatch/domain.pddl"
         },
         {
             "name": "declared predicate arity mismatch",
-            "entry": "domain",
             "expected_error": "ArityMismatchError",
-            "domain": [
-                "(define (domain bad-arity)",
-                "  (:predicates (p ?x))",
-                "  (:action a :parameters () :precondition (p) :effect (and))",
-                ")"
-            ]
+            "domain_file": "declared-predicate-arity-mismatch/domain.pddl"
         },
         {
             "name": "strict action-costs requires metric",
-            "entry": "task",
             "expected_error": "SemanticError",
             "expected_message": "Missing total-cost metric for :action-costs",
             "strict": true,
-            "domain": [
-                "(define (domain action-cost-domain)",
-                "  (:requirements :strips :action-costs)",
-                "  (:predicates)",
-                "  (:functions (total-cost))",
-                "  (:action pay :parameters () :effect (increase (total-cost) 1))",
-                ")"
-            ],
-            "task": [
-                "(define (problem action-cost-task)",
-                "  (:domain action-cost-domain)",
-                "  (:init (= (total-cost) 0))",
-                ")"
-            ]
+            "domain_file": "strict-action-costs-requires-metric/domain.pddl",
+            "task_file": "strict-action-costs-requires-metric/task.pddl"
         },
         {
             "name": "strict action-costs requires initial value",
-            "entry": "task",
             "expected_error": "SemanticError",
             "expected_message": "Missing initial value for total-cost for :action-costs",
             "strict": true,
-            "domain": [
-                "(define (domain action-cost-domain)",
-                "  (:requirements :strips :action-costs)",
-                "  (:predicates)",
-                "  (:functions (total-cost))",
-                "  (:action pay :parameters () :effect (increase (total-cost) 1))",
-                ")"
-            ],
-            "task": [
-                "(define (problem action-cost-task)",
-                "  (:domain action-cost-domain)",
-                "  (:init)",
-                "  (:metric minimize (total-cost))",
-                ")"
-            ]
+            "domain_file": "strict-action-costs-requires-initial-value/domain.pddl",
+            "task_file": "strict-action-costs-requires-initial-value/task.pddl"
         },
         {
             "name": "strict action-costs requires total-cost function",
-            "entry": "domain",
             "expected_error": "SemanticError",
             "expected_message": "Missing total-cost function for :action-costs",
             "strict": true,
-            "domain": [
-                "(define (domain action-cost-domain)",
-                "  (:requirements :strips :action-costs)",
-                "  (:predicates (p))",
-                "  (:action pay :parameters () :effect (increase (total-cost) 1))",
-                ")"
-            ]
+            "domain_file": "strict-action-costs-requires-total-cost-function/domain.pddl"
         },
         {
             "name": "strict rejects aggregate :adl",
-            "entry": "domain",
             "expected_error": "AggregateRequirementError",
             "expected_message": "Aggregate PDDL requirement must be declared atomically: :adl",
             "strict": true,
-            "domain": [
-                "(define (domain aggregate-domain)",
-                "  (:requirements :adl)",
-                "  (:predicates (p))",
-                ")"
-            ]
+            "domain_file": "strict-rejects-aggregate-adl/domain.pddl"
         },
         {
             "name": "strict rejects aggregate :fluents",
-            "entry": "domain",
             "expected_error": "AggregateRequirementError",
             "expected_message": "Aggregate PDDL requirement must be declared atomically: :fluents",
             "strict": true,
-            "domain": [
-                "(define (domain aggregate-domain)",
-                "  (:requirements :fluents)",
-                "  (:predicates (p))",
-                ")"
-            ]
+            "domain_file": "strict-rejects-aggregate-fluents/domain.pddl"
         },
         {
             "name": "strict rejects aggregate :quantified-preconditions",
-            "entry": "domain",
             "expected_error": "AggregateRequirementError",
             "expected_message": "Aggregate PDDL requirement must be declared atomically: :quantified-preconditions",
             "strict": true,
-            "domain": [
-                "(define (domain aggregate-domain)",
-                "  (:requirements :quantified-preconditions)",
-                "  (:predicates (p))",
-                ")"
-            ]
+            "domain_file": "strict-rejects-aggregate-quantified-preconditions/domain.pddl"
         },
         {
             "name": "strict requires :strips declaration",
-            "entry": "domain",
             "expected_error": "MissingRequirementError",
             "expected_message": "Missing required PDDL requirement: :strips",
             "strict": true,
-            "domain": [
-                "(define (domain no-strips)",
-                "  (:requirements :typing)",
-                "  (:types thing)",
-                "  (:predicates (p ?x - thing))",
-                ")"
-            ]
+            "domain_file": "strict-requires-strips-declaration/domain.pddl"
         },
         {
             "name": "strict task requirement redundant with domain",
-            "entry": "task",
             "expected_error": "RedundantRequirementError",
             "expected_message": "Task requirement already declared by the domain: :typing",
             "strict": true,
-            "domain": [
-                "(define (domain redundant-req)",
-                "  (:requirements :strips :typing)",
-                "  (:types thing)",
-                "  (:predicates (p ?x - thing))",
-                "  (:action a :parameters (?x - thing) :precondition (p ?x) :effect (p ?x))",
-                ")"
-            ],
-            "task": [
-                "(define (problem redundant-req-task)",
-                "  (:domain redundant-req)",
-                "  (:requirements :typing)",
-                "  (:objects o - thing)",
-                "  (:init (p o))",
-                "  (:goal (p o))",
-                ")"
-            ]
+            "domain_file": "strict-task-requirement-redundant-with-domain/domain.pddl",
+            "task_file": "strict-task-requirement-redundant-with-domain/task.pddl"
         }
     ]
 }
