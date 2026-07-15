@@ -138,7 +138,7 @@ if(LOKI_BUILD_TESTS)
     OUTPUT_VARIABLE LOKI_BENCHMARKS_DIR
     RESULT_VARIABLE LOKI_BENCHMARKS_RESULT)
   if(NOT LOKI_BENCHMARKS_RESULT EQUAL 0)
-    message(FATAL_ERROR "Could not resolve the benchmark data root; install 'pypddl-datasets>=0.0.5,<0.1' into the configuring Python (${Python3_EXECUTABLE}).")
+    message(FATAL_ERROR "Could not resolve the benchmark data root; install 'pypddl-datasets>=0.0.7,<0.1' into the configuring Python (${Python3_EXECUTABLE}).")
   endif()
   message(STATUS "Benchmark data: ${LOKI_BENCHMARKS_DIR}")
   add_compile_definitions(BENCHMARKS_DIR="${LOKI_BENCHMARKS_DIR}")

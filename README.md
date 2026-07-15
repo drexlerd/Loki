@@ -31,7 +31,7 @@ Loki depends on a fraction of [Boost's](https://www.boost.org) header-only libra
 Loki consumes native dependencies from Python packages:
 
 - `pyyggdrasil >= 0.0.23, < 0.1` for shared third-party native dependencies.
-- `pypddl-datasets >= 0.0.5, < 0.1` for the PDDL benchmark data used by the C++ test suite and the example executables (resolved from its cache at CMake configure time).
+- `pypddl-datasets >= 0.0.7, < 0.1` for the PDDL benchmark data used by the C++ test suite and the example executables (resolved from its cache at CMake configure time).
 
 The shared workspace layout, layered install order, and the common
 build-from-source and CMake-integration patterns are documented in the
@@ -52,7 +52,7 @@ Install Loki's native dependency providers into the active Python environment,
 then configure CMake with their native prefixes:
 
 ```console
-python -m pip install 'pyyggdrasil>=0.0.23,<0.1' 'pypddl-datasets>=0.0.5,<0.1'
+python -m pip install 'pyyggdrasil>=0.0.23,<0.1' 'pypddl-datasets>=0.0.7,<0.1'
 
 cmake -S . -B build
 ```
