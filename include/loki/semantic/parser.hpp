@@ -18,7 +18,7 @@
 #ifndef LOKI_SEMANTIC_PARSER_HPP_
 #define LOKI_SEMANTIC_PARSER_HPP_
 
-#include "loki/formalism/repository.hpp"
+#include "loki/formalism/declarations.hpp"
 #include "loki/semantic/options.hpp"
 
 #include <filesystem>
