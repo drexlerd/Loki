@@ -27,7 +27,6 @@
 #include <string_view>
 #include <vector>
 #include <yggdrasil/containers/associative_containers.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
 
 namespace loki::tests
 {
@@ -364,10 +363,10 @@ TEST(LokiCanonicalization, SortsSemanticFreeListsLexicographicallyBeforeInternin
     second_conditions.push_back(q_condition);
     const auto second = formalism::get_or_create<formalism::ConditionAnd>(repository, std::move(second_conditions));
 
-    EXPECT_TRUE(ygg::EqualTo<formalism::ConditionAndView> {}(first, second));
+    EXPECT_EQ(first, second);
     ASSERT_EQ(first.get_conditions().size(), 2);
-    EXPECT_TRUE(ygg::EqualTo<formalism::ConditionView> {}(first.get_conditions()[0], p_condition_view));
-    EXPECT_TRUE(ygg::EqualTo<formalism::ConditionView> {}(first.get_conditions()[1], q_condition_view));
+    EXPECT_EQ(first.get_conditions()[0], p_condition_view);
+    EXPECT_EQ(first.get_conditions()[1], q_condition_view);
 
     auto first_predicates = ygg::IndexList<formalism::Predicate> {};
     first_predicates.push_back(q);
@@ -395,10 +394,10 @@ TEST(LokiCanonicalization, SortsSemanticFreeListsLexicographicallyBeforeInternin
                                                                                                         ygg::IndexList<formalism::Action> {},
                                                                                                         ygg::IndexList<formalism::Axiom> {}));
 
-    EXPECT_TRUE(ygg::EqualTo<formalism::DomainView> {}(first_domain, second_domain));
+    EXPECT_EQ(first_domain, second_domain);
     ASSERT_EQ(first_domain.get_predicates().size(), 2);
-    EXPECT_TRUE(ygg::EqualTo<formalism::PredicateView> {}(first_domain.get_predicates()[0], p_predicate));
-    EXPECT_TRUE(ygg::EqualTo<formalism::PredicateView> {}(first_domain.get_predicates()[1], q_predicate));
+    EXPECT_EQ(first_domain.get_predicates()[0], p_predicate);
+    EXPECT_EQ(first_domain.get_predicates()[1], q_predicate);
 }
 
 }  // namespace loki::tests

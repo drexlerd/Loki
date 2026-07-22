@@ -169,7 +169,7 @@ struct SemanticChecks
 
     bool is_subtype(formalism::TypeView actual, formalism::TypeView expected, ygg::UnorderedSet<formalism::TypeView>& seen) const
     {
-        if (ygg::EqualTo<formalism::TypeView> {}(actual, expected))
+        if (actual == expected)
             return true;
         if (!seen.insert(actual).second)
             return false;

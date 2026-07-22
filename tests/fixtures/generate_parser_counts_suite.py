@@ -1,24 +1,25 @@
 """Regenerate parser_counts_suite.json from all packaged benchmark problems.
 
-Usage: uv run python tests/unit/parser/generate_parser_counts_suite.py
+Usage: uv run python tests/fixtures/generate_parser_counts_suite.py
 """
 
 import json
 from pathlib import Path
+from typing import Any
 
 from pypddl import formalism as pypddl
 import pypddl_datasets
 
-ROOT = Path(__file__).resolve().parents[3]
-CONFIGURATIONS = [
+ROOT = Path(__file__).resolve().parents[2]
+CONFIGURATIONS: list[dict[str, bool]] = [
     {"strict": strict, "add_action_costs": add_action_costs}
     for strict in (False, True)
     for add_action_costs in (False, True)
 ]
 
 
-def discover_cases(prefix):
-    cases = []
+def discover_cases(prefix: Path) -> list[dict[str, Any]]:
+    cases: list[dict[str, Any]] = []
     for family in ("classical", "numeric"):
         family_root = prefix / family / "tests"
         for domain_file in sorted(family_root.rglob("domain.pddl")):
@@ -43,14 +44,14 @@ def discover_cases(prefix):
     return cases
 
 
-def make_options(config):
+def make_options(config: dict[str, bool]) -> pypddl.ParserOptions:
     options = pypddl.ParserOptions()
     for key, value in config.items():
         setattr(options, key, value)
     return options
 
 
-def domain_counts(domain):
+def domain_counts(domain: pypddl.Domain) -> dict[str, int]:
     return {
         "requirements": len(domain.get_requirements()),
         "types": len(domain.get_types()),
@@ -62,7 +63,7 @@ def domain_counts(domain):
     }
 
 
-def task_counts(task):
+def task_counts(task: pypddl.Task) -> dict[str, int | bool]:
     return {
         "requirements": len(task.get_requirements()),
         "objects": len(task.get_objects()),
@@ -75,11 +76,11 @@ def task_counts(task):
     }
 
 
-def main():
+def main() -> None:
     prefix = Path(pypddl_datasets.data_root())
     cases = discover_cases(prefix)
     for case in cases:
-        configurations = []
+        configurations: list[dict[str, Any]] = []
         for options_config in CONFIGURATIONS:
             parser = pypddl.Parser(
                 prefix / case["domain_file"], make_options(options_config)
@@ -95,7 +96,7 @@ def main():
             )
         case["configurations"] = configurations
 
-    out = ROOT / "tests/unit/parser/parser_counts_suite.json"
+    out = ROOT / "tests/fixtures/parser_counts_suite.json"
     out.write_text(json.dumps({"cases": cases}, indent=4) + "\n")
     print(f"Wrote {len(cases)} cases x {len(CONFIGURATIONS)} configurations to {out}")
 

@@ -17,7 +17,7 @@ DOMAIN_SOURCE = (
 ).read_text(encoding="utf-8")
 
 
-def test_downstream_python_binding_links_installed_loki(tmp_path):
+def test_downstream_python_binding_links_installed_loki(tmp_path: Path) -> None:
     cmake = shutil.which("cmake")
     if cmake is None:
         pytest.skip("cmake is required for the downstream binding smoke test")
@@ -53,7 +53,6 @@ def test_downstream_python_binding_links_installed_loki(tmp_path):
             f"-DCMAKE_PREFIX_PATH={pypddl_prefix};{pyyggdrasil_prefix}",
             f"-Dloki_DIR={loki_cmake_dir}",
             f"-DPython_EXECUTABLE={sys.executable}",
-            f"-DPython3_EXECUTABLE={sys.executable}",
             f"-DDOWNSTREAM_RUNTIME_LIBRARY_DIRS={';'.join(str(path) for path in dependency_library_dirs)}",
         ],
         check=True,

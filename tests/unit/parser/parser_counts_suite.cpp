@@ -71,6 +71,25 @@ struct ParserCountExpectation
     std::vector<ConfigurationExpectation> configurations;
 };
 
+void expect_counts(formalism::DomainView domain, formalism::TaskView task, const ConfigurationExpectation& expected)
+{
+    EXPECT_EQ(domain.get_requirements().size(), expected.domain.requirements);
+    EXPECT_EQ(domain.get_types().size(), expected.domain.types);
+    EXPECT_EQ(domain.get_constants().size(), expected.domain.constants);
+    EXPECT_EQ(domain.get_predicates().size(), expected.domain.predicates);
+    EXPECT_EQ(domain.get_functions().size(), expected.domain.functions);
+    EXPECT_EQ(domain.get_actions().size(), expected.domain.actions);
+    EXPECT_EQ(domain.get_axioms().size(), expected.domain.axioms);
+    EXPECT_EQ(task.get_requirements().size(), expected.task.requirements);
+    EXPECT_EQ(task.get_objects().size(), expected.task.objects);
+    EXPECT_EQ(task.get_initial_literals().size(), expected.task.initial_literals);
+    EXPECT_EQ(task.get_initial_function_values().size(), expected.task.initial_function_values);
+    EXPECT_EQ(task.get_predicates().size(), expected.task.predicates);
+    EXPECT_EQ(task.get_axioms().size(), expected.task.axioms);
+    EXPECT_EQ(static_cast<bool>(task.get_goal()), expected.task.has_goal);
+    EXPECT_EQ(static_cast<bool>(task.get_metric()), expected.task.has_metric);
+}
+
 template<typename Node, typename ParseFn>
 void expect_parse_format_reparse(const fs::path& path, ParseFn parse)
 {
@@ -119,7 +138,7 @@ ConfigurationExpectation parse_configuration(const boost::json::object& configur
 
 std::vector<ParserCountExpectation> load_expectations()
 {
-    const auto suite_value = ygg::common::load_json_file(ygg::common::root_path() / "tests/unit/parser/parser_counts_suite.json");
+    const auto suite_value = ygg::common::load_json_file(ygg::common::root_path() / "tests/fixtures/parser_counts_suite.json");
     const auto& suite = ygg::common::as_object(suite_value, "suite");
     const auto benchmark_root = fs::path(std::string(BENCHMARKS_DIR));
     auto result = std::vector<ParserCountExpectation> {};
@@ -191,21 +210,7 @@ TEST(LokiParserCountsSuite, SemanticBenchmarkCountsStayStable)
             auto semantic_parser = semantic::Parser(item.domain_file, expected.options);
             const auto domain = semantic_parser.get_domain();
             const auto task = semantic_parser.parse_task(item.task_file);
-            EXPECT_EQ(domain.get_requirements().size(), expected.domain.requirements);
-            EXPECT_EQ(domain.get_types().size(), expected.domain.types);
-            EXPECT_EQ(domain.get_constants().size(), expected.domain.constants);
-            EXPECT_EQ(domain.get_predicates().size(), expected.domain.predicates);
-            EXPECT_EQ(domain.get_functions().size(), expected.domain.functions);
-            EXPECT_EQ(domain.get_actions().size(), expected.domain.actions);
-            EXPECT_EQ(domain.get_axioms().size(), expected.domain.axioms);
-            EXPECT_EQ(task.get_requirements().size(), expected.task.requirements);
-            EXPECT_EQ(task.get_objects().size(), expected.task.objects);
-            EXPECT_EQ(task.get_initial_literals().size(), expected.task.initial_literals);
-            EXPECT_EQ(task.get_initial_function_values().size(), expected.task.initial_function_values);
-            EXPECT_EQ(task.get_predicates().size(), expected.task.predicates);
-            EXPECT_EQ(task.get_axioms().size(), expected.task.axioms);
-            EXPECT_EQ(static_cast<bool>(task.get_goal()), expected.task.has_goal);
-            EXPECT_EQ(static_cast<bool>(task.get_metric()), expected.task.has_metric);
+            expect_counts(domain, task, expected);
         }
     }
 }

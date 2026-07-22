@@ -40,6 +40,7 @@ void bind_requirement(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_kind", &V::get_kind);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -49,6 +50,7 @@ void bind_type(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_name", &V::get_name).def("get_bases", &V::get_bases);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -58,6 +60,7 @@ void bind_object(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_name", &V::get_name).def("get_types", &V::get_types);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -67,6 +70,7 @@ void bind_variable(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_name", &V::get_name);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -76,6 +80,7 @@ void bind_parameter(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_variable", &V::get_variable, nb::keep_alive<0, 1>()).def("get_types", &V::get_types);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -85,6 +90,7 @@ void bind_predicate(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_name", &V::get_name).def("get_parameters", &V::get_parameters).def("get_arity", &V::get_arity);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -98,6 +104,7 @@ void bind_function_skeleton(nb::module_& m, const std::string& name)
         .def("get_arity", &V::get_arity)
         .def("get_type", &V::get_type, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -107,6 +114,7 @@ void bind_term(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_value", &V::get_value, nb::keep_alive<0, 1>()).def("get_variant", &V::get_value, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -116,6 +124,7 @@ void bind_atom(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_predicate", &V::get_predicate, nb::keep_alive<0, 1>()).def("get_terms", &V::get_terms);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -125,6 +134,7 @@ void bind_literal(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_atom", &V::get_atom, nb::keep_alive<0, 1>()).def("get_polarity", &V::get_polarity);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -134,6 +144,7 @@ void bind_condition_literal(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_literal", &V::get_literal, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -143,6 +154,7 @@ void bind_condition_and(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_conditions", &V::get_conditions);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -152,6 +164,7 @@ void bind_condition_or(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_conditions", &V::get_conditions);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -161,6 +174,7 @@ void bind_condition_not(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_condition", &V::get_condition, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -170,6 +184,7 @@ void bind_condition_imply(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_left", &V::get_left, nb::keep_alive<0, 1>()).def("get_right", &V::get_right, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -179,6 +194,7 @@ void bind_condition_exists(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_parameters", &V::get_parameters).def("get_condition", &V::get_condition, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -188,6 +204,7 @@ void bind_condition_forall(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_parameters", &V::get_parameters).def("get_condition", &V::get_condition, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -200,6 +217,7 @@ void bind_condition_numeric_constraint(nb::module_& m, const std::string& name)
         .def("get_left", &V::get_left, nb::keep_alive<0, 1>())
         .def("get_right", &V::get_right, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -209,6 +227,7 @@ void bind_condition(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_value", &V::get_value, nb::keep_alive<0, 1>()).def("get_variant", &V::get_value, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -218,6 +237,7 @@ void bind_effect_literal(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_literal", &V::get_literal, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -227,6 +247,7 @@ void bind_effect_and(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_effects", &V::get_effects);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -240,6 +261,7 @@ void bind_effect_numeric(nb::module_& m, const std::string& name)
         .def("get_terms", &V::get_terms)
         .def("get_expression", &V::get_expression, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -249,6 +271,7 @@ void bind_effect_forall(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_parameters", &V::get_parameters).def("get_effect", &V::get_effect, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -260,6 +283,7 @@ void bind_effect_when(nb::module_& m, const std::string& name)
         .def("get_condition", &V::get_condition, nb::keep_alive<0, 1>())
         .def("get_effect", &V::get_effect, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -269,6 +293,7 @@ void bind_effect_one_of(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_effects", &V::get_effects);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -278,6 +303,7 @@ void bind_effect_probabilistic_alternative(nb::module_& m, const std::string& na
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_probability", &V::get_probability).def("get_effect", &V::get_effect, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -287,6 +313,7 @@ void bind_effect_probabilistic(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_alternatives", &V::get_alternatives);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -296,6 +323,7 @@ void bind_effect(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_value", &V::get_value, nb::keep_alive<0, 1>()).def("get_variant", &V::get_value, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -305,6 +333,7 @@ void bind_function_expression_number(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_value", &V::get_value);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -314,6 +343,7 @@ void bind_function_term(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_function", &V::get_function, nb::keep_alive<0, 1>()).def("get_terms", &V::get_terms);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -323,6 +353,7 @@ void bind_unary_function_expression(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_operator", &V::get_operator).def("get_expression", &V::get_expression, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -335,6 +366,7 @@ void bind_binary_function_expression(nb::module_& m, const std::string& name)
         .def("get_left", &V::get_left, nb::keep_alive<0, 1>())
         .def("get_right", &V::get_right, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -344,6 +376,7 @@ void bind_multi_function_expression(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_operator", &V::get_operator).def("get_expressions", &V::get_expressions);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -353,6 +386,7 @@ void bind_function_expression(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_value", &V::get_value, nb::keep_alive<0, 1>()).def("get_variant", &V::get_value, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -362,6 +396,7 @@ void bind_initial_function_value(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("get_function", &V::get_function, nb::keep_alive<0, 1>()).def("get_value", &V::get_value, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -371,6 +406,7 @@ void bind_metric(nb::module_& m, const std::string& name)
     auto cls = nb::class_<V>(m, name.c_str());
     cls.def("get_index", &V::get_index).def("is_minimize", &V::is_minimize).def("get_expression", &V::get_expression, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -385,6 +421,7 @@ void bind_axiom(nb::module_& m, const std::string& name)
         .def("get_head", &V::get_head, nb::keep_alive<0, 1>())
         .def("get_condition", &V::get_condition, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -401,6 +438,7 @@ void bind_action(nb::module_& m, const std::string& name)
         .def("get_precondition", &V::get_precondition, nb::keep_alive<0, 1>())
         .def("get_effect", &V::get_effect, nb::keep_alive<0, 1>());
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -418,6 +456,7 @@ void bind_domain(nb::module_& m, const std::string& name)
         .def("get_actions", &V::get_actions)
         .def("get_axioms", &V::get_axioms);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 
@@ -437,6 +476,7 @@ void bind_task(nb::module_& m, const std::string& name)
         .def("get_predicates", &V::get_predicates)
         .def("get_axioms", &V::get_axioms);
     ygg::add_print(cls);
+    ygg::add_comparison(cls);
     ygg::add_hash(cls);
 }
 

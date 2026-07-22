@@ -26,7 +26,6 @@
 #include <string_view>
 #include <vector>
 #include <yggdrasil/containers/associative_containers.hpp>
-#include <yggdrasil/semantics/equal_to.hpp>
 
 namespace loki::tests
 {
@@ -332,7 +331,7 @@ TEST(LokiSemanticInvariantSuite, ParsesAllCasesWithContiguousTopLevelIndices)
         if (item.task_file)
         {
             const auto task = parser.parse_task(*item.task_file);
-            EXPECT_TRUE(ygg::EqualTo<formalism::DomainView> {}(task.get_domain(), domain));
+            EXPECT_EQ(task.get_domain(), domain);
             expect_contiguous_task_indices(task);
         }
     }

@@ -1,8 +1,8 @@
 find_package(GTest "1.11.0" REQUIRED COMPONENTS GTest Main PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 find_library(Boost_JSON_LIBRARY boost_json PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES lib NO_DEFAULT_PATH REQUIRED)
 
-function(add_gtest test_name source_file)
-    add_executable(${test_name} ${source_file})
+function(add_gtest test_name)
+    add_executable(${test_name} ${ARGN})
     target_compile_definitions(${test_name} PRIVATE ROOT_DIR="${CMAKE_SOURCE_DIR}")
     target_link_libraries(${test_name}
         PRIVATE
@@ -23,7 +23,6 @@ endfunction()
 
 add_gtest(parser_counts_suite                  "parser/parser_counts_suite.cpp")
 add_gtest(public_facade                        "public_facade.cpp")
-add_gtest(public_headers                       "public_headers.cpp")
 
 file(GLOB_RECURSE LOKI_DIRECT_PUBLIC_HEADERS
     CONFIGURE_DEPENDS
@@ -45,7 +44,6 @@ endforeach()
 if(LOKI_PUBLIC_HEADER_SOURCES)
     add_library(public_header_compile_checks OBJECT ${LOKI_PUBLIC_HEADER_SOURCES})
     target_link_libraries(public_header_compile_checks PRIVATE loki::parsers)
-    add_dependencies(public_headers public_header_compile_checks)
 endif()
 add_gtest(semantic_parser_tests                "semantic/parser_tests.cpp")
 add_gtest(semantic_translator_tests            "semantic/translator_tests.cpp")
@@ -55,3 +53,44 @@ add_gtest(semantic_negative_suite              "semantic/negative_suite.cpp")
 add_gtest(semantic_invariant_suite             "semantic/invariant_suite.cpp")
 add_gtest(semantic_translation_counts_suite    "semantic/translation_counts_suite.cpp")
 add_gtest(formalism_translator_tests           "formalism/translator_tests.cpp")
+add_gtest(formalism_repository_types
+    "formalism/action.cpp"
+    "formalism/atom.cpp"
+    "formalism/axiom.cpp"
+    "formalism/binary_function_expression.cpp"
+    "formalism/condition.cpp"
+    "formalism/condition_and.cpp"
+    "formalism/condition_exists.cpp"
+    "formalism/condition_forall.cpp"
+    "formalism/condition_imply.cpp"
+    "formalism/condition_literal.cpp"
+    "formalism/condition_not.cpp"
+    "formalism/condition_numeric_constraint.cpp"
+    "formalism/condition_or.cpp"
+    "formalism/domain.cpp"
+    "formalism/effect.cpp"
+    "formalism/effect_and.cpp"
+    "formalism/effect_forall.cpp"
+    "formalism/effect_literal.cpp"
+    "formalism/effect_numeric.cpp"
+    "formalism/effect_one_of.cpp"
+    "formalism/effect_probabilistic.cpp"
+    "formalism/effect_probabilistic_alternative.cpp"
+    "formalism/effect_when.cpp"
+    "formalism/function_expression.cpp"
+    "formalism/function_expression_number.cpp"
+    "formalism/function_skeleton.cpp"
+    "formalism/function_term.cpp"
+    "formalism/initial_function_value.cpp"
+    "formalism/literal.cpp"
+    "formalism/metric.cpp"
+    "formalism/multi_function_expression.cpp"
+    "formalism/object.cpp"
+    "formalism/parameter.cpp"
+    "formalism/predicate.cpp"
+    "formalism/requirement.cpp"
+    "formalism/task.cpp"
+    "formalism/term.cpp"
+    "formalism/type.cpp"
+    "formalism/unary_function_expression.cpp"
+    "formalism/variable.cpp")

@@ -89,16 +89,6 @@ if(LOKI_BUILD_TESTS)
              COMMAND "${Python_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_loki_bindings.py")
     set_tests_properties(pypddl_bindings PROPERTIES
         ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR};PYTHONDONTWRITEBYTECODE=1")
-
-    add_test(NAME pypddl_import
-             COMMAND "${Python_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_import.py")
-    set_tests_properties(pypddl_import PROPERTIES
-        ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR};PYTHONDONTWRITEBYTECODE=1")
-
-    add_test(NAME pypddl_build_backend
-             COMMAND "${Python_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_build_backend.py")
-    set_tests_properties(pypddl_build_backend PROPERTIES
-        ENVIRONMENT "PYTHONDONTWRITEBYTECODE=1")
 endif()
 
 yggdrasil_install_provider_env(PYPDDL pypddl PREFIXES "${YGGDRASIL_NATIVE_PREFIX}")

@@ -3,18 +3,21 @@
 Runs every parser-suite fixture through each parser/translator configuration and records
 entity counts of the translated domain and task.
 
-Usage: uv run python tests/unit/semantic/generate_translation_counts_suite.py
+Usage: uv run python tests/fixtures/generate_translation_counts_suite.py
 """
 
 import json
 from pathlib import Path
+from typing import Any, TypeVar
 
 from pypddl import formalism as pypddl
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[2]
+
+_Options = TypeVar("_Options")
 
 # strict mode is exercised by unit tests only: the benchmark fixtures are not strict-clean.
-CONFIGURATIONS = [
+CONFIGURATIONS: list[dict[str, dict[str, bool]]] = [
     {
         "parser_options": {"add_action_costs": add_action_costs},
         "options": {
@@ -34,23 +37,23 @@ CONFIGURATIONS = [
 ]
 
 
-def make_options(cls, config):
+def make_options(cls: type[_Options], config: dict[str, bool]) -> _Options:
     options = cls()
     for key, value in config.items():
         setattr(options, key, value)
     return options
 
 
-def main():
-    parser_suite = json.loads((ROOT / "tests/unit/parser/suite.json").read_text())
+def main() -> None:
+    parser_suite: dict[str, Any] = json.loads((ROOT / "tests/fixtures/parser_counts_suite.json").read_text())
 
     import pypddl_datasets
 
     prefix = pypddl_datasets.data_root()
 
-    cases = []
+    cases: list[dict[str, Any]] = []
     for case in parser_suite["cases"]:
-        configurations = []
+        configurations: list[dict[str, Any]] = []
         for config in CONFIGURATIONS:
             parser_options = make_options(pypddl.ParserOptions, config["parser_options"])
             translator_options = make_options(pypddl.TranslatorOptions, config["options"])
@@ -81,7 +84,7 @@ def main():
             )
         cases.append({"name": case["name"], "configurations": configurations})
 
-    out = ROOT / "tests/unit/semantic/translation_counts_suite.json"
+    out = ROOT / "tests/fixtures/translation_counts_suite.json"
     out.write_text(json.dumps({"cases": cases}, indent=4) + "\n")
     print(f"Wrote {len(cases)} cases x {len(CONFIGURATIONS)} configurations to {out}")
 

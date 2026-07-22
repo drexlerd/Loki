@@ -1,0 +1,41 @@
+{
+  // Type checking resolves the compiled bindings from the active .venv (compiled
+  // extension + generated .pyi stubs + py.typed). Install the package into .venv
+  // first (`uv sync` or `uv pip install -e .`) and rebuild after C++/binding changes
+  // so the stubs regenerate; otherwise pyright reports the bindings as unresolved or untyped.
+  "typeCheckingMode": "strict",
+  "pythonVersion": "3.13",
+  "venvPath": ".",
+  "venv": ".venv",
+  "stubPath": "typings",
+  "include": [
+    "tests",
+    "python/tests"
+  ],
+  "exclude": [
+    ".venv",
+    "build",
+    "dist",
+    "**/__pycache__"
+  ],
+  "reportMissingImports": "error",
+  "reportMissingModuleSource": "error",
+  "reportMissingTypeStubs": "error",
+  "reportUnknownVariableType": "error",
+  "reportUnknownParameterType": "error",
+  "reportUnknownArgumentType": "error",
+  "reportUnknownLambdaType": "error",
+  "reportUnknownMemberType": "error",
+  "reportUntypedFunctionDecorator": "error",
+  "reportUntypedClassDecorator": "error",
+  "reportPrivateImportUsage": "error",
+  "reportImplicitOverride": "error",
+  "reportUnusedImport": "error",
+  "reportUnusedVariable": "error",
+  "reportDuplicateImport": "error",
+  "reportUnnecessaryTypeIgnoreComment": "error",
+  "reportAssertAlwaysTrue": "error",
+  "reportUnreachable": "error",
+  "reportInvalidTypeVarUse": "error",
+  "reportInvalidTypeForm": "error"
+}

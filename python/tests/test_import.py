@@ -50,7 +50,7 @@ def test_native_prefix_layout():
 
 
 def test_formalism_package_reexports_native_public_symbols():
-    native_formalism = pypddl._pypddl.formalism
+    native_formalism = getattr(pypddl, "_pypddl").formalism
     missing = [name for name in dir(native_formalism) if not name.startswith("_") and not hasattr(pypddl.formalism, name)]
 
     assert missing == []

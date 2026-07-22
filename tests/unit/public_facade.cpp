@@ -26,15 +26,6 @@
 namespace loki::tests
 {
 
-TEST(LokiPublicFacade, CanonicalLokiUmbrellaExposesLokiFacade)
-{
-    auto parser = loki::Parser(read_text(fixture_path("facade")));
-
-    const auto domain = parser.get_domain();
-
-    EXPECT_EQ(domain.get_name(), "facade");
-}
-
 TEST(LokiPublicFacade, ExposesParserAndTranslatorThroughLokiNamespace)
 {
     auto parser = loki::Parser(fixture_path("facade"), loki::ParserOptions { .strict = false, .add_action_costs = false });

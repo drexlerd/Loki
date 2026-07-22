@@ -282,7 +282,7 @@ ConditionAnalysisTranslator<Derived>::free_parameters_in_scope(formalism::Condit
                 result.emplace_back(parameters[i], variables[i]);
         }
     }
-    std::sort(result.begin(), result.end(), ygg::Less<ScopedFreeParameter> {});
+    std::sort(result.begin(), result.end());
     return result;
 }
 

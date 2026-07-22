@@ -27,6 +27,7 @@
 #include <yggdrasil/core/type_list.hpp>
 #include <yggdrasil/core/types.hpp>
 #include <yggdrasil/formalism/declarations.hpp>
+#include <yggdrasil/semantics/comparison.hpp>
 
 namespace ygg::formalism
 {
@@ -177,14 +178,30 @@ struct Task
 {
 };
 
-struct Positive { static constexpr std::uint8_t kind = 0; auto identifying_members() const noexcept { return std::tie(kind); } };
-struct Negative { static constexpr std::uint8_t kind = 1; auto identifying_members() const noexcept { return std::tie(kind); } };
+struct Positive : ygg::comparison::Mixin<Positive>
+{
+    static constexpr std::uint8_t kind = 0;
+    constexpr auto identifying_members() const noexcept { return std::tie(kind); }
+};
+struct Negative : ygg::comparison::Mixin<Negative>
+{
+    static constexpr std::uint8_t kind = 1;
+    constexpr auto identifying_members() const noexcept { return std::tie(kind); }
+};
 
 template<typename T>
 concept Polarity = std::same_as<T, Positive> || std::same_as<T, Negative>;
 
-struct Minimize { static constexpr std::uint8_t kind = 0; auto identifying_members() const noexcept { return std::tie(kind); } };
-struct Maximize { static constexpr std::uint8_t kind = 1; auto identifying_members() const noexcept { return std::tie(kind); } };
+struct Minimize : ygg::comparison::Mixin<Minimize>
+{
+    static constexpr std::uint8_t kind = 0;
+    constexpr auto identifying_members() const noexcept { return std::tie(kind); }
+};
+struct Maximize : ygg::comparison::Mixin<Maximize>
+{
+    static constexpr std::uint8_t kind = 1;
+    constexpr auto identifying_members() const noexcept { return std::tie(kind); }
+};
 
 template<typename T>
 concept Optimization = std::same_as<T, Minimize> || std::same_as<T, Maximize>;

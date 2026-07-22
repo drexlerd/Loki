@@ -86,7 +86,7 @@ include("${PROJECT_SOURCE_DIR}/cmake/bootstrap_pyyggdrasil.cmake")
 # yggdrasil
 # ---------
 
-find_package(yggdrasil 0.0.23 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_package(yggdrasil 0.0.25 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(yggdrasil_FOUND)
   message(STATUS "Found yggdrasil: ${yggdrasil_DIR} (found version ${yggdrasil_VERSION})")
 endif()
@@ -99,9 +99,6 @@ yggdrasil_register_python_native_runtime_prefix("pyyggdrasil" "${YGGDRASIL_NATIV
 # -----
 
 # Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
-set(Boost_NO_SYSTEM_PATHS ON)
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.74.0 REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
@@ -130,15 +127,13 @@ endif()
 if(LOKI_BUILD_TESTS)
   # Benchmark PDDL comes from the pypddl-datasets cache, resolved (and
   # downloaded on demand) at configure time.
-  if(NOT Python3_EXECUTABLE)
-    find_package(Python3 REQUIRED COMPONENTS Interpreter)
-  endif()
+  find_package(Python 3.10 REQUIRED COMPONENTS Interpreter)
   execute_process(
-    COMMAND "${Python3_EXECUTABLE}" -c "import pypddl_datasets, sys; sys.stdout.write(str(pypddl_datasets.data_root()))"
+    COMMAND "${Python_EXECUTABLE}" -c "import pypddl_datasets, sys; sys.stdout.write(str(pypddl_datasets.data_root()))"
     OUTPUT_VARIABLE LOKI_BENCHMARKS_DIR
     RESULT_VARIABLE LOKI_BENCHMARKS_RESULT)
   if(NOT LOKI_BENCHMARKS_RESULT EQUAL 0)
-    message(FATAL_ERROR "Could not resolve the benchmark data root; install 'pypddl-datasets>=0.0.7,<0.1' into the configuring Python (${Python3_EXECUTABLE}).")
+    message(FATAL_ERROR "Could not resolve the benchmark data root; install 'pypddl-datasets>=0.0.9,<0.1' into the configuring Python (${Python_EXECUTABLE}).")
   endif()
   message(STATUS "Benchmark data: ${LOKI_BENCHMARKS_DIR}")
   add_compile_definitions(BENCHMARKS_DIR="${LOKI_BENCHMARKS_DIR}")
