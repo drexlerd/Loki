@@ -25,12 +25,12 @@ Stage: build
     # Set working directory
     cd /opt/loki
 
-    # Install native dependencies
-    python3 -m pip install --break-system-packages pyyggdrasil==0.0.23
+    # Install project dependencies declared in pyproject.toml
+    python3 -m pip install --break-system-packages --no-cache-dir uv
+    uv pip install --python /usr/bin/python3 --break-system-packages --no-cache -r pyproject.toml
 
     # Build Loki
     cmake -S . -B build \
-        -DCMAKE_PREFIX_PATH="$(python3 -c 'import pyyggdrasil; print(pyyggdrasil.native_prefix())')" \
         -DCMAKE_BUILD_TYPE=Release \
         -DLOKI_BUILD_TESTS=OFF \
         -DLOKI_BUILD_PROFILING=OFF \
