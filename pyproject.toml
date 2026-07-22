@@ -61,6 +61,8 @@ LOKI_BUILD_PYPDDL = true
 LOKI_BUILD_TESTS = false
 LOKI_BUILD_PROFILING = false
 LOKI_BUILD_EXECUTABLES = false
+LOKI_USE_LLD = false
+LOKI_ENABLE_LTO = {env = "LOKI_ENABLE_LTO", default = false}
 CMAKE_INSTALL_LIBDIR = "lib"
 
 [tool.cibuildwheel]

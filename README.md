@@ -78,6 +78,14 @@ CMake options:
 | `LOKI_BUILD_EXECUTABLES` | `OFF` | Build Loki executables. |
 | `LOKI_BUILD_PROFILING` | `OFF` | Build Loki profiling targets. |
 | `LOKI_BUILD_PYPDDL` | `OFF` | Build Loki for the `pypddl` Python wheel. |
+| `LOKI_USE_LLD` | `ON` | Use LLVM `lld` with Clang when available. |
+| `LOKI_ENABLE_LTO` | `ON` | Enable link-time optimization for Release builds. |
+
+Single-config CMake builds default to Release. On GCC and Clang, Debug builds
+use `-Og` with debug symbols, RelWithDebInfo keeps frame pointers and disables
+LTO, and Release LTO uses GCC LTO or Clang ThinLTO. Editable installs and
+wheels disable `LOKI_USE_LLD` and `LOKI_ENABLE_LTO` by default for build
+reliability.
 
 Run tests from a build configured with `-DLOKI_BUILD_TESTS=ON`:
 
