@@ -21,12 +21,9 @@ def _source_version() -> str:
 
 
 try:
-    from ._version import __version__
-except ImportError:
-    try:
-        __version__ = version("pypddl")
-    except PackageNotFoundError:
-        __version__ = _source_version()
+    __version__ = version("pypddl")
+except PackageNotFoundError:
+    __version__ = _source_version()
 
 
 def native_prefix() -> Path:

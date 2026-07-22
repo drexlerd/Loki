@@ -10,13 +10,14 @@
   "stubPath": "typings",
   "include": [
     "tests",
-    "python/tests"
+    "python"
   ],
   "exclude": [
     ".venv",
     "build",
     "dist",
-    "**/__pycache__"
+    "**/__pycache__",
+    "python/src/**/__init__.py"
   ],
   "reportMissingImports": "error",
   "reportMissingModuleSource": "error",

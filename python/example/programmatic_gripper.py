@@ -1,69 +1,91 @@
 """Build a gripper domain and two tasks programmatically with pypddl."""
 
+from collections.abc import Sequence
+
 from pypddl import formalism as pypddl
 
 
-def build(repository, builder):
-    return repository.get_or_create(builder)
+def make_literal(
+    repository: pypddl.Repository,
+    predicate: pypddl.Predicate,
+    terms: Sequence[pypddl.Term],
+    positive: bool = True,
+) -> pypddl.Literal:
+    atom = repository.get_or_create(pypddl.AtomData(predicate, list(terms)))
+    return repository.get_or_create(pypddl.LiteralData(atom, positive))
 
 
-def make_literal(repository, predicate, terms, positive=True):
-    atom = build(repository, pypddl.AtomData(predicate, list(terms)))
-    return build(repository, pypddl.LiteralData(atom, positive))
-
-
-def make_condition(repository, predicate, terms, positive=True):
+def make_condition(
+    repository: pypddl.Repository,
+    predicate: pypddl.Predicate,
+    terms: Sequence[pypddl.Term],
+    positive: bool = True,
+) -> pypddl.Condition:
     literal = make_literal(repository, predicate, terms, positive)
-    condition_literal = build(repository, pypddl.ConditionLiteralData(literal))
-    return build(repository, pypddl.ConditionData(condition_literal))
+    condition_literal = repository.get_or_create(pypddl.ConditionLiteralData(literal))
+    return repository.get_or_create(pypddl.ConditionData(condition_literal))
 
 
-def make_effect(repository, literal):
-    effect_literal = build(repository, pypddl.EffectLiteralData(literal))
-    return build(repository, pypddl.EffectData(effect_literal))
+def make_effect(repository: pypddl.Repository, literal: pypddl.Literal) -> pypddl.Effect:
+    effect_literal = repository.get_or_create(pypddl.EffectLiteralData(literal))
+    return repository.get_or_create(pypddl.EffectData(effect_literal))
 
 
-def make_condition_and(repository, conditions):
-    conjunction = build(repository, pypddl.ConditionAndData(list(conditions)))
-    return build(repository, pypddl.ConditionData(conjunction))
+def make_condition_and(
+    repository: pypddl.Repository,
+    conditions: Sequence[pypddl.Condition],
+) -> pypddl.Condition:
+    conjunction = repository.get_or_create(pypddl.ConditionAndData(list(conditions)))
+    return repository.get_or_create(pypddl.ConditionData(conjunction))
 
 
-def make_effect_and(repository, effects):
-    conjunction = build(repository, pypddl.EffectAndData(list(effects)))
-    return build(repository, pypddl.EffectData(conjunction))
+def make_effect_and(
+    repository: pypddl.Repository,
+    effects: Sequence[pypddl.Effect],
+) -> pypddl.Effect:
+    conjunction = repository.get_or_create(pypddl.EffectAndData(list(effects)))
+    return repository.get_or_create(pypddl.EffectData(conjunction))
 
 
-def build_gripper():
+def build_gripper() -> tuple[pypddl.Repository, pypddl.Domain, pypddl.Task, pypddl.Task]:
     repository = pypddl.RepositoryFactory().create()
-    strips = build(repository, pypddl.RequirementData(pypddl.RequirementKind.Strips))
-    typing = build(repository, pypddl.RequirementData(pypddl.RequirementKind.Typing))
+    strips = repository.get_or_create(pypddl.RequirementData(pypddl.RequirementKind.Strips))
+    typing = repository.get_or_create(pypddl.RequirementData(pypddl.RequirementKind.Typing))
 
-    object_t = build(repository, pypddl.TypeData("object"))
-    room_t = build(repository, pypddl.TypeData("room", [object_t]))
-    ball_t = build(repository, pypddl.TypeData("ball", [object_t]))
-    gripper_t = build(repository, pypddl.TypeData("gripper", [object_t]))
+    object_t = repository.get_or_create(pypddl.TypeData("object"))
+    room_t = repository.get_or_create(pypddl.TypeData("room", [object_t]))
+    ball_t = repository.get_or_create(pypddl.TypeData("ball", [object_t]))
+    gripper_t = repository.get_or_create(pypddl.TypeData("gripper", [object_t]))
 
-    x = build(repository, pypddl.ParameterData(build(repository, pypddl.VariableData("?x")), [room_t]))
-    y = build(repository, pypddl.ParameterData(build(repository, pypddl.VariableData("?y")), [room_t]))
-    b = build(repository, pypddl.ParameterData(build(repository, pypddl.VariableData("?b")), [ball_t]))
-    g = build(repository, pypddl.ParameterData(build(repository, pypddl.VariableData("?g")), [gripper_t]))
+    x = repository.get_or_create(
+        pypddl.ParameterData(repository.get_or_create(pypddl.VariableData("?x")), [room_t])
+    )
+    y = repository.get_or_create(
+        pypddl.ParameterData(repository.get_or_create(pypddl.VariableData("?y")), [room_t])
+    )
+    b = repository.get_or_create(
+        pypddl.ParameterData(repository.get_or_create(pypddl.VariableData("?b")), [ball_t])
+    )
+    g = repository.get_or_create(
+        pypddl.ParameterData(repository.get_or_create(pypddl.VariableData("?g")), [gripper_t])
+    )
 
-    at_robby = build(repository, pypddl.PredicateData("at-robby", [x]))
-    at = build(repository, pypddl.PredicateData("at", [b, x]))
-    free = build(repository, pypddl.PredicateData("free", [g]))
-    carry = build(repository, pypddl.PredicateData("carry", [b, g]))
+    at_robby = repository.get_or_create(pypddl.PredicateData("at-robby", [x]))
+    at = repository.get_or_create(pypddl.PredicateData("at", [b, x]))
+    free = repository.get_or_create(pypddl.PredicateData("free", [g]))
+    carry = repository.get_or_create(pypddl.PredicateData("carry", [b, g]))
 
-    x_term = build(repository, pypddl.TermData(x.get_variable()))
-    y_term = build(repository, pypddl.TermData(y.get_variable()))
-    b_term = build(repository, pypddl.TermData(b.get_variable()))
-    g_term = build(repository, pypddl.TermData(g.get_variable()))
+    x_term = repository.get_or_create(pypddl.TermData(x.get_variable()))
+    y_term = repository.get_or_create(pypddl.TermData(y.get_variable()))
+    b_term = repository.get_or_create(pypddl.TermData(b.get_variable()))
+    g_term = repository.get_or_create(pypddl.TermData(g.get_variable()))
 
     move_pre = make_condition(repository, at_robby, [x_term])
     move_eff = make_effect_and(repository, [
         make_effect(repository, make_literal(repository, at_robby, [x_term], False)),
         make_effect(repository, make_literal(repository, at_robby, [y_term])),
     ])
-    move = build(repository, pypddl.ActionData("move", [x, y], move_pre, move_eff))
+    move = repository.get_or_create(pypddl.ActionData("move", [x, y], move_pre, move_eff))
 
     pick_pre = make_condition_and(repository, [
         make_condition(repository, at, [b_term, x_term]),
@@ -75,7 +97,7 @@ def build_gripper():
         make_effect(repository, make_literal(repository, free, [g_term], False)),
         make_effect(repository, make_literal(repository, carry, [b_term, g_term])),
     ])
-    pick = build(repository, pypddl.ActionData("pick", [b, x, g], pick_pre, pick_eff))
+    pick = repository.get_or_create(pypddl.ActionData("pick", [b, x, g], pick_pre, pick_eff))
 
     drop_pre = make_condition_and(repository, [
         make_condition(repository, carry, [b_term, g_term]),
@@ -86,10 +108,9 @@ def build_gripper():
         make_effect(repository, make_literal(repository, free, [g_term])),
         make_effect(repository, make_literal(repository, at, [b_term, x_term])),
     ])
-    drop = build(repository, pypddl.ActionData("drop", [b, x, g], drop_pre, drop_eff))
+    drop = repository.get_or_create(pypddl.ActionData("drop", [b, x, g], drop_pre, drop_eff))
 
-    domain = build(
-        repository,
+    domain = repository.get_or_create(
         pypddl.DomainData(
             "gripper",
             requirements=[strips, typing],
@@ -99,31 +120,30 @@ def build_gripper():
         ),
     )
 
-    def task(name, balls):
-        rooma = build(repository, pypddl.ObjectData("rooma", [room_t]))
-        roomb = build(repository, pypddl.ObjectData("roomb", [room_t]))
-        left = build(repository, pypddl.ObjectData("left", [gripper_t]))
-        right = build(repository, pypddl.ObjectData("right", [gripper_t]))
-        ball_objects = [build(repository, pypddl.ObjectData(ball, [ball_t])) for ball in balls]
+    def task(name: str, balls: Sequence[str]) -> pypddl.Task:
+        rooma = repository.get_or_create(pypddl.ObjectData("rooma", [room_t]))
+        roomb = repository.get_or_create(pypddl.ObjectData("roomb", [room_t]))
+        left = repository.get_or_create(pypddl.ObjectData("left", [gripper_t]))
+        right = repository.get_or_create(pypddl.ObjectData("right", [gripper_t]))
+        ball_objects = [repository.get_or_create(pypddl.ObjectData(ball, [ball_t])) for ball in balls]
 
-        rooma_term = build(repository, pypddl.TermData(rooma))
-        roomb_term = build(repository, pypddl.TermData(roomb))
-        left_term = build(repository, pypddl.TermData(left))
-        right_term = build(repository, pypddl.TermData(right))
+        rooma_term = repository.get_or_create(pypddl.TermData(rooma))
+        roomb_term = repository.get_or_create(pypddl.TermData(roomb))
+        left_term = repository.get_or_create(pypddl.TermData(left))
+        right_term = repository.get_or_create(pypddl.TermData(right))
 
         initial_literals = [
             make_literal(repository, at_robby, [rooma_term]),
             make_literal(repository, free, [left_term]),
             make_literal(repository, free, [right_term]),
         ]
-        goals = []
+        goals: list[pypddl.Condition] = []
         for ball in ball_objects:
-            ball_term = build(repository, pypddl.TermData(ball))
+            ball_term = repository.get_or_create(pypddl.TermData(ball))
             initial_literals.append(make_literal(repository, at, [ball_term, rooma_term]))
             goals.append(make_condition(repository, at, [ball_term, roomb_term]))
 
-        return build(
-            repository,
+        return repository.get_or_create(
             pypddl.TaskData(
                 name,
                 domain,
