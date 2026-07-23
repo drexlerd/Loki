@@ -92,9 +92,16 @@ endif()
 
 # Dependencies
 
+set(LOKI_YGGDRASIL_REQUIRED_VERSION 0.0.25)
+
 include("${PROJECT_SOURCE_DIR}/cmake/bootstrap_pyyggdrasil.cmake")
 
-find_package(yggdrasil 0.0.25 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
+find_package(
+    yggdrasil ${LOKI_YGGDRASIL_REQUIRED_VERSION}
+    CONFIG REQUIRED
+    PATHS ${CMAKE_PREFIX_PATH}
+    NO_DEFAULT_PATH
+)
 if(yggdrasil_FOUND)
     message(STATUS "Found yggdrasil: ${yggdrasil_DIR} (found version ${yggdrasil_VERSION})")
 endif()

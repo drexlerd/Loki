@@ -2,59 +2,38 @@
 
 include(CMakeFindDependencyMacro)
 
-
-##############################################################
-# Dependency Handling
-##############################################################
+# Dependencies
 
 include("${CMAKE_CURRENT_LIST_DIR}/cmake/bootstrap_pyyggdrasil.cmake")
 
-# ---------
-# yggdrasil
-# ---------
-
-find_dependency(yggdrasil 0.0.23 CONFIG REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
-if(yggdrasil_FOUND)
-  message(STATUS "Found yggdrasil: ${yggdrasil_DIR} (found version ${yggdrasil_VERSION})")
-endif()
-
+find_dependency(yggdrasil @LOKI_YGGDRASIL_REQUIRED_VERSION@ CONFIG PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
 yggdrasil_register_native_dependency_prefix("${YGGDRASIL_NATIVE_PREFIX}")
 
-# -----
-# Boost
-# -----
-
-# Find Boost headers only according to https://cmake.org/cmake/help/latest/module/FindBoost.html
-find_dependency(Boost 1.74.0 REQUIRED PATHS ${CMAKE_PREFIX_PATH} NO_DEFAULT_PATH)
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-  message(STATUS "Found Boost: ${Boost_DIR} (found version ${Boost_VERSION})")
-endif()
-
-
-############
 # Components
-############
 
 set(_loki_supported_components parsers)
-set(_loki_config_found True)
 if(NOT loki_FIND_COMPONENTS)
-  set(loki_FIND_COMPONENTS parsers)
+    set(loki_FIND_COMPONENTS parsers)
 endif()
 
-foreach(_comp ${loki_FIND_COMPONENTS})
-  if (NOT _comp IN_LIST _loki_supported_components)
-    set(loki_${_comp}_FOUND False)
-    set(loki_FOUND False)
-    set(_loki_config_found False)
-    set(loki_NOT_FOUND_MESSAGE "Unsupported component: ${_comp}")
-    continue()
-  endif()
-  set(loki_${_comp}_FOUND True)
-  include("${CMAKE_CURRENT_LIST_DIR}/loki${_comp}Targets.cmake")
+foreach(_component IN LISTS loki_FIND_COMPONENTS)
+    if(_component IN_LIST _loki_supported_components)
+        set(loki_${_component}_FOUND TRUE)
+    else()
+        set(loki_${_component}_FOUND FALSE)
+        if(loki_FIND_REQUIRED_${_component})
+            set(loki_FOUND FALSE)
+            set(loki_NOT_FOUND_MESSAGE "Unsupported component: ${_component}")
+            unset(_component)
+            unset(_loki_supported_components)
+            return()
+        endif()
+    endif()
 endforeach()
 
-get_filename_component(LOKI_CONFIG_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
-if(_loki_config_found)
-  message(STATUS "Found loki: ${loki_DIR} (found version ${loki_VERSION})")
-endif()
+# Targets
+
+include("${CMAKE_CURRENT_LIST_DIR}/lokiparsersTargets.cmake")
+
+unset(_component)
+unset(_loki_supported_components)
