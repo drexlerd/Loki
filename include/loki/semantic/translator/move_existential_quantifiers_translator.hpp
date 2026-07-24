@@ -52,7 +52,7 @@ private:
     // claimed by a sibling scope is alpha-renamed together with its bound occurrences. Fresh
     // names avoid the claimed names and the free variables of the body, so no capture is possible.
     formalism::ConditionView
-    hoist_exists(formalism::ConditionExistsView exists, ygg::UnorderedSet<std::string>& claimed, ygg::IndexList<formalism::Parameter>& parameters);
+    hoist_exists(formalism::ConditionExistsView exists, ygg::UnorderedSet<std::string>& claimed, std::vector<formalism::ParameterView>& parameters);
 };
 
 template<typename Derived>
@@ -142,7 +142,7 @@ void MoveExistentialQuantifiersTranslator<Derived>::collect_binder_names(formali
 template<typename Derived>
 formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::hoist_exists(formalism::ConditionExistsView exists,
                                                                                      ygg::UnorderedSet<std::string>& claimed,
-                                                                                     ygg::IndexList<formalism::Parameter>& parameters)
+                                                                                     std::vector<formalism::ParameterView>& parameters)
 {
     auto condition = exists.get_condition();
     for (auto parameter : exists.get_parameters())
@@ -150,7 +150,7 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::hoist_ex
         const auto variable = parameter.get_variable();
         if (claimed.insert(std::string(variable.get_name())).second)
         {
-            parameters.push_back(parameter.get_index());
+            parameters.push_back(parameter);
             continue;
         }
 
@@ -174,8 +174,7 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::hoist_ex
         condition = this->self().rename_variables(condition);
         this->self().leave_variable_scope();
         claimed.insert(name);
-        parameters.push_back(
-            formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, fresh.get_index(), parameter.get_data().types).get_index());
+        parameters.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, fresh.get_index(), parameter.get_data().types));
     }
     return condition;
 }
@@ -183,7 +182,7 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::hoist_ex
 template<typename Derived>
 formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_existentials_node(formalism::ConditionView, formalism::ConditionAndView node)
 {
-    auto parameters = ygg::IndexList<formalism::Parameter> {};
+    auto parameters = std::vector<formalism::ParameterView> {};
     auto claimed = ygg::UnorderedSet<std::string> {};
     auto parts = ygg::IndexList<formalism::Condition> {};
     for (auto child : node.get_conditions())
@@ -201,8 +200,8 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_exi
     auto conjunction = this->self().make_conjunction(std::move(parts));
     if (parameters.empty())
         return conjunction;
-    return this->self().flatten_condition(this->self().wrap_condition(
-        formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), conjunction.get_index())));
+    return this->self().flatten_condition(
+        this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), conjunction)));
 }
 
 template<typename Derived>
@@ -246,10 +245,7 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::lift_top
         if (effect)
             collect_binder_names(*effect, claimed);
 
-        auto hoisted = ygg::IndexList<formalism::Parameter> {};
-        moved = this->self().hoist_exists(*exists, claimed, hoisted);
-        for (auto index : hoisted)
-            parameters.push_back(ygg::make_view(index, this->m_storage->repository));
+        moved = this->self().hoist_exists(*exists, claimed, parameters);
     }
     return this->self().flatten_condition(moved);
 }

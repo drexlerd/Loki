@@ -138,6 +138,7 @@ void canonicalize_list(const Repository& repository, ListT& list)
     auto keyed = std::vector<std::pair<std::string, std::size_t>> {};  // (render key, original position)
     keyed.reserve(n);
     for (std::size_t i = 0; i < n; ++i)
+        // Data<T> lists contain only indices, so formatting requires a repository-backed view.
         keyed.emplace_back(format::to_string(ygg::make_view(list[i], repository)), i);  // render once each: O(n)
 
     const auto by_key = [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; };
@@ -163,9 +164,11 @@ bool is_canonical_list(const Repository& repository, const ListT& list)
     if (n < 2)
         return true;
 
+    // Data<T> lists contain only indices, so formatting requires a repository-backed view.
     auto previous = format::to_string(ygg::make_view(list[0], repository));
     for (std::size_t i = 1; i < n; ++i)
     {
+        // Data<T> lists contain only indices, so formatting requires a repository-backed view.
         auto current = format::to_string(ygg::make_view(list[i], repository));
         if (!(previous < current))  // not strictly increasing => unsorted or duplicate
             return false;
