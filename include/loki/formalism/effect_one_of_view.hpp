@@ -47,7 +47,7 @@ public:
 
     auto get_effects() const noexcept { return ygg::make_view(get_data().effects, *m_context); }
 
-    auto identifying_members() const noexcept { return std::tie(m_handle, m_context); }
+    auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };
 
 }

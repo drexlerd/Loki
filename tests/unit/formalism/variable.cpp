@@ -4,6 +4,7 @@
 #include "loki/formalism/variable_view.hpp"
 
 #include <concepts>
+#include <gtest/gtest.h>
 
 namespace f = loki::formalism;
 using Index = ygg::Index<f::Variable>;
@@ -27,3 +28,25 @@ static_assert(requires(const View& view) {
     { view == view } -> std::same_as<bool>;
     { view < view } -> std::same_as<bool>;
 });
+
+TEST(LokiTests, VariableViewIdentityUsesRepositoryIndex)
+{
+    auto first_repository = f::Repository(0);
+    auto second_repository = f::Repository(1);
+    auto equivalent_repository = f::Repository(0);
+    auto first_data = Data(cista::offset::string("?x"));
+    auto second_data = Data(cista::offset::string("?x"));
+    auto equivalent_data = Data(cista::offset::string("?x"));
+
+    const auto [first, first_created] = first_repository.get_or_create(first_data);
+    const auto [second, second_created] = second_repository.get_or_create(second_data);
+    const auto [equivalent, equivalent_created] = equivalent_repository.get_or_create(equivalent_data);
+
+    ASSERT_TRUE(first_created);
+    ASSERT_TRUE(second_created);
+    ASSERT_TRUE(equivalent_created);
+    EXPECT_NE(first, second);
+    EXPECT_NE(ygg::Hash<View> {}(first), ygg::Hash<View> {}(second));
+    EXPECT_EQ(first, equivalent);
+    EXPECT_EQ(ygg::Hash<View> {}(first), ygg::Hash<View> {}(equivalent));
+}

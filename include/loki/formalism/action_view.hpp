@@ -53,7 +53,7 @@ public:
     auto get_precondition() const noexcept { return ygg::make_view(get_data().precondition, *m_context); }
     auto get_effect() const noexcept { return ygg::make_view(get_data().effect, *m_context); }
 
-    auto identifying_members() const noexcept { return std::tie(m_handle, m_context); }
+    auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };
 
 }

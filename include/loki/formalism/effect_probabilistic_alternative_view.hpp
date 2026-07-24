@@ -48,7 +48,7 @@ public:
     auto get_probability() const noexcept { return get_data().probability; }
     auto get_effect() const noexcept { return ygg::make_view(get_data().effect, *m_context); }
 
-    auto identifying_members() const noexcept { return std::tie(m_handle, m_context); }
+    auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };
 
 }

@@ -50,7 +50,7 @@ public:
     auto get_arity() const noexcept { return get_data().parameters.size(); }
     auto get_type() const noexcept { return ygg::make_view(get_data().type, *m_context); }
 
-    auto identifying_members() const noexcept { return std::tie(m_handle, m_context); }
+    auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };
 
 }

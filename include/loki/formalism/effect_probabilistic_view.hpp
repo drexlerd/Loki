@@ -47,7 +47,7 @@ public:
 
     auto get_alternatives() const noexcept { return ygg::make_view(get_data().alternatives, *m_context); }
 
-    auto identifying_members() const noexcept { return std::tie(m_handle, m_context); }
+    auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };
 
 }

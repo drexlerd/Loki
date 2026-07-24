@@ -49,7 +49,7 @@ public:
     auto get_left() const noexcept { return ygg::make_view(get_data().left, *m_context); }
     auto get_right() const noexcept { return ygg::make_view(get_data().right, *m_context); }
 
-    auto identifying_members() const noexcept { return std::tie(m_handle, m_context); }
+    auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };
 
 }

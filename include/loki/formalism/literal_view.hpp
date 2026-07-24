@@ -48,7 +48,7 @@ public:
     bool get_polarity() const noexcept { return get_data().m_polarity; }
     auto get_atom() const noexcept { return ygg::make_view(get_data().atom, *m_context); }
 
-    auto identifying_members() const noexcept { return std::tie(m_handle, m_context); }
+    auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };
 
 }

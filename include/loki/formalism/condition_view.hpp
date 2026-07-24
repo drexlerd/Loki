@@ -48,7 +48,7 @@ public:
     auto get_value() const noexcept { return ygg::make_view(get_data().value, *m_context); }
     auto get_variant() const noexcept { return get_value(); }
 
-    auto identifying_members() const noexcept { return std::tie(m_handle, m_context); }
+    auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };
 
 }

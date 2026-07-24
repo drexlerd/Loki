@@ -48,7 +48,7 @@ public:
     auto get_predicate() const noexcept { return ygg::make_view(get_data().predicate, *m_context); }
     auto get_terms() const noexcept { return ygg::make_view(get_data().terms, *m_context); }
 
-    auto identifying_members() const noexcept { return std::tie(m_handle, m_context); }
+    auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };
 
 }

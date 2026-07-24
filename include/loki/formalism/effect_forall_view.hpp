@@ -48,7 +48,7 @@ public:
     auto get_parameters() const noexcept { return ygg::make_view(get_data().parameters, *m_context); }
     auto get_effect() const noexcept { return ygg::make_view(get_data().effect, *m_context); }
 
-    auto identifying_members() const noexcept { return std::tie(m_handle, m_context); }
+    auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };
 
 }
