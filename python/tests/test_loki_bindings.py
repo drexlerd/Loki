@@ -492,12 +492,13 @@ def test_views_are_hashable_and_compare_by_identity() -> None:
     parser = pypddl.Parser(fixture_text("facade-format"))
     domain = parser.domain()
     same_domain = parser.domain()
-    other_domain = pypddl.Parser(fixture_text("facade-format")).domain()
+    equivalent_domain = pypddl.Parser(fixture_text("facade-format")).domain()
 
     assert domain == same_domain
     assert hash(domain) == hash(same_domain)
-    assert domain != other_domain
-    assert len({domain, same_domain, other_domain}) == 2
+    assert domain == equivalent_domain
+    assert hash(domain) == hash(equivalent_domain)
+    assert len({domain, same_domain, equivalent_domain}) == 1
     assert str(domain) == repr(domain)
     assert "facade-format" in str(domain)
 
