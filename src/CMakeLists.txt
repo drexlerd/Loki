@@ -1,11 +1,19 @@
 add_library(
     parsers SHARED
+    formalism/formatter.cpp
     parser.cpp
     semantic/builder.cpp
+    semantic/builder_declarations.cpp
+    semantic/builder_effects.cpp
+    semantic/builder_expressions.cpp
+    semantic/canonical_copy.cpp
+    semantic/canonical_copy_expressions.cpp
+    semantic/canonical_copy_symbols.cpp
     semantic/context.cpp
     semantic/diagnostics.cpp
     semantic/mappings.cpp
     semantic/parser.cpp
+    semantic/translation_storage.cpp
     semantic/translator.cpp
 )
 add_library(loki::parsers ALIAS parsers)

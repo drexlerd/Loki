@@ -1,0 +1,121 @@
+/*
+ * Copyright (C) 2024-2026 Dominik Drexler
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "loki/formalism/builder.hpp"
+#include "loki/semantic/translator/canonical_copy_translator.hpp"
+#include "loki/semantic/translator/common.hpp"
+
+#include <utility>
+
+namespace loki::semantic::detail
+{
+
+formalism::RequirementView CanonicalCopyTranslator::copy(formalism::RequirementView source)
+{
+    if (auto mapped = find_mapped(m_storage->requirements, source))
+        return *mapped;
+    auto out = formalism::get_or_create<formalism::Requirement>(m_storage->repository, source.get_kind());
+    remember(m_storage->requirements, source, out);
+    return out;
+}
+
+formalism::TypeView CanonicalCopyTranslator::copy(formalism::TypeView source)
+{
+    if (auto mapped = find_mapped(m_storage->types, source))
+        return *mapped;
+    auto out = formalism::get_or_create<formalism::Type>(m_storage->repository, source.get_name(), copy_list(source.get_bases()));
+    remember(m_storage->types, source, out);
+    return out;
+}
+
+formalism::ObjectView CanonicalCopyTranslator::copy(formalism::ObjectView source)
+{
+    if (auto mapped = find_mapped(m_storage->objects, source))
+        return *mapped;
+    auto out = formalism::get_or_create<formalism::Object>(m_storage->repository, source.get_name(), copy_list(source.get_types()));
+    remember(m_storage->objects, source, out);
+    return out;
+}
+
+formalism::VariableView CanonicalCopyTranslator::copy(formalism::VariableView source)
+{
+    if (auto mapped = find_mapped(m_storage->variables, source))
+        return *mapped;
+    auto out = formalism::get_or_create<formalism::Variable>(m_storage->repository, source.get_name());
+    remember(m_storage->variables, source, out);
+    return out;
+}
+
+formalism::ParameterView CanonicalCopyTranslator::copy(formalism::ParameterView source)
+{
+    if (auto mapped = find_mapped(m_storage->parameters, source))
+        return *mapped;
+    auto out = formalism::get_or_create<formalism::Parameter>(m_storage->repository, as_index(copy(source.get_variable())), copy_list(source.get_types()));
+    remember(m_storage->parameters, source, out);
+    return out;
+}
+
+formalism::PredicateView CanonicalCopyTranslator::copy(formalism::PredicateView source)
+{
+    if (auto mapped = find_mapped(m_storage->predicates, source))
+        return *mapped;
+    auto out = formalism::get_or_create<formalism::Predicate>(m_storage->repository, source.get_name(), copy_list(source.get_parameters()));
+    remember(m_storage->predicates, source, out);
+    return out;
+}
+
+formalism::FunctionSkeletonView CanonicalCopyTranslator::copy(formalism::FunctionSkeletonView source)
+{
+    if (auto mapped = find_mapped(m_storage->functions, source))
+        return *mapped;
+    auto out = formalism::get_or_create<formalism::FunctionSkeleton>(m_storage->repository,
+                                                                     source.get_name(),
+                                                                     copy_list(source.get_parameters()),
+                                                                     as_index(copy(source.get_type())));
+    remember(m_storage->functions, source, out);
+    return out;
+}
+
+formalism::TermView CanonicalCopyTranslator::copy(formalism::TermView source)
+{
+    if (auto mapped = find_mapped(m_storage->terms, source))
+        return *mapped;
+    auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Term>::Variant { return as_index(copy(arg)); }, source.get_value());
+    auto out = formalism::get_or_create<formalism::Term>(m_storage->repository, std::move(value));
+    remember(m_storage->terms, source, out);
+    return out;
+}
+
+formalism::AtomView CanonicalCopyTranslator::copy(formalism::AtomView source)
+{
+    if (auto mapped = find_mapped(m_storage->atoms, source))
+        return *mapped;
+    auto out = formalism::get_or_create<formalism::Atom>(m_storage->repository, as_index(copy(source.get_predicate())), copy_list(source.get_terms()));
+    remember(m_storage->atoms, source, out);
+    return out;
+}
+
+formalism::LiteralView CanonicalCopyTranslator::copy(formalism::LiteralView source)
+{
+    if (auto mapped = find_mapped(m_storage->literals, source))
+        return *mapped;
+    auto out = formalism::get_or_create<formalism::Literal>(m_storage->repository, as_index(copy(source.get_atom())), source.get_polarity());
+    remember(m_storage->literals, source, out);
+    return out;
+}
+
+}  // namespace loki::semantic::detail

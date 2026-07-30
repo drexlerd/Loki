@@ -69,7 +69,7 @@ def test_programmatic_gripper_example_uses_public_api():
 
     domain_text = pypddl.formalism.format_domain(domain)
     one_ball_text = pypddl.formalism.format_task(one_ball)
-    reparsed = pypddl.formalism.Parser(domain_text)
+    reparsed = pypddl.formalism.Parser(domain_text, pypddl.formalism.ParserOptions())
     reparsed_one_ball = reparsed.parse_task(one_ball_text)
 
     assert reparsed.domain().get_name() == domain.get_name()

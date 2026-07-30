@@ -20,29 +20,11 @@
 
 #include "loki/parser/config.hpp"
 
-#include <sstream>
 #include <string>
 
 namespace loki::parser
 {
 namespace x3 = boost::spirit::x3;
-
-template<typename Iterator>
-std::string format_error_at(const ErrorHandler<Iterator>& source, Iterator position, const std::string& message)
-{
-    auto out = std::ostringstream {};
-    auto formatter = ErrorHandler<Iterator>(source.get_position_cache().first(), source.get_position_cache().last(), out, source.file(), source.tabs());
-    formatter(position, message);
-    return out.str();
-}
-
-template<typename Iterator>
-std::string format_error_at(const ErrorHandler<Iterator>& source, const x3::position_tagged& node, const std::string& message)
-{
-    if (node.id_first < 0 || node.id_last < 0)
-        return message;
-    return format_error_at(source, source.position_of(node).begin(), message);
-}
 
 struct ErrorHandlerBase
 {

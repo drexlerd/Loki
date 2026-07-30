@@ -18,9 +18,11 @@
 #ifndef LOKI_SEMANTIC_TRANSLATOR_COMMON_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_COMMON_HPP_
 
-#include "loki/formalism/formalism.hpp"
+#include "loki/formalism/repository.hpp"
+#include "loki/formalism/views.hpp"
 
 #include <cista/containers/optional.h>
+#include <cstddef>
 #include <memory>
 #include <optional>
 #include <stdexcept>
@@ -131,6 +133,15 @@ struct TranslationStorage
 
     explicit TranslationStorage(size_t index = 1, const formalism::Repository* parent = nullptr) : repository(index, parent) {}
 };
+
+std::shared_ptr<TranslationStorage> canonicalize_domain_storage(formalism::DomainView original_domain, const std::shared_ptr<TranslationStorage>& middle);
+formalism::DomainView canonical_copy(std::shared_ptr<TranslationStorage> storage, formalism::DomainView source);
+formalism::TaskView canonical_copy(std::shared_ptr<TranslationStorage> storage, formalism::TaskView source);
+void compose_storage_maps_from_previous(TranslationStorage& target, const TranslationStorage& previous);
+void inherit_domain_mappings(TranslationStorage& problem, const TranslationStorage& domain);
+void inherit_domain_identity_mappings(TranslationStorage& problem, const TranslationStorage& domain);
+std::shared_ptr<TranslationStorage>
+canonicalize_problem_storage(formalism::TaskView middle_task, const std::shared_ptr<TranslationStorage>& middle, const TranslationStorage& domain);
 
 template<typename T>
 ygg::Index<T> as_index(ygg::Index<T> index) noexcept

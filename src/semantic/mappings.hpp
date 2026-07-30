@@ -18,9 +18,8 @@
 #ifndef LOKI_SEMANTIC_MAPPINGS_HPP_
 #define LOKI_SEMANTIC_MAPPINGS_HPP_
 
-#include "diagnostics.hpp"
-#include "loki/ast.hpp"
-#include "loki/formalism/formalism.hpp"
+#include "loki/ast/ast_fwd.hpp"
+#include "loki/formalism/enums.hpp"
 
 #include <cista/containers/string.h>
 #include <string>
@@ -28,6 +27,8 @@
 
 namespace loki::semantic
 {
+
+struct DiagnosticContext;
 
 // Lowercase an owned PDDL source buffer before parsing.
 std::string lowercase(std::string text);

@@ -21,9 +21,10 @@
 #include "context.hpp"
 #include "diagnostics.hpp"
 #include "loki/ast/ast.hpp"
-#include "loki/parser/parser.hpp"
 #include "loki/semantic/errors.hpp"
+#include "loki/semantic/translator/common.hpp"
 #include "mappings.hpp"
+#include "parser_runtime.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -95,7 +96,7 @@ Parser::Impl::Impl(std::string domain_source, std::string source_name, ParserOpt
     auto syntax_errors = std::ostringstream {};
     parser::ErrorHandlerType error_handler(first, domain_source.cend(), syntax_errors, std::move(source_name));
     ast::Domain domain_ast;
-    if (!parser::parse_full(first, domain_source.cend(), parser::domain(), domain_ast, error_handler))
+    if (!parser::detail::parse_domain_full(first, domain_source.cend(), domain_ast, error_handler))
         throw DiagnosticContext::parse_error(error_handler, "Could not parse PDDL domain.", first);
     auto scope = DiagnosticContext::Scope { m_diagnostics, error_handler };
     parse_domain_ast(domain_ast);
@@ -118,7 +119,7 @@ formalism::TaskView Parser::Impl::parse_task_source(std::string source, const st
     auto syntax_errors = std::ostringstream {};
     parser::ErrorHandlerType error_handler(first, source.cend(), syntax_errors, source_name);
     ast::Task task_ast;
-    if (!parser::parse_full(first, source.cend(), parser::task(), task_ast, error_handler))
+    if (!parser::detail::parse_task_full(first, source.cend(), task_ast, error_handler))
         throw DiagnosticContext::parse_error(error_handler, "Could not parse PDDL task.", first);
     auto scope = DiagnosticContext::Scope { m_diagnostics, error_handler };
     return parse_task_ast(task_ast);
@@ -160,8 +161,7 @@ formalism::TaskView Parser::Impl::parse_task_ast(const ast::Task& task)
 void Parser::Impl::canonicalize_domain(formalism::DomainView domain)
 {
     auto canonical = std::make_shared<detail::TranslationStorage>(0);
-    auto copier = detail::CanonicalCopyTranslator(canonical);
-    auto copied = copier.copy_domain(domain);
+    auto copied = detail::canonical_copy(canonical, domain);
     m_domain_context.storage = std::move(canonical);
     m_task_storages.clear();
     m_domain_context.domain = copied;
@@ -172,8 +172,7 @@ formalism::TaskView Parser::Impl::canonicalize_task(formalism::TaskView task, co
 {
     auto canonical = std::make_shared<detail::TranslationStorage>(m_task_storages.size() + 1, &domain_storage->repository);
     detail::inherit_domain_identity_mappings(*canonical, *domain_storage);
-    auto copier = detail::CanonicalCopyTranslator(canonical);
-    auto copied = copier.copy_task(task);
+    auto copied = detail::canonical_copy(canonical, task);
     m_task_storages.push_back(canonical);
     return copied;
 }

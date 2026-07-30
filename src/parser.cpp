@@ -17,6 +17,8 @@
 
 #include "loki/parser/parser_def.hpp"
 
+#include "semantic/parser_runtime.hpp"
+
 namespace loki::parser::rules
 {
 
@@ -66,5 +68,20 @@ rules::initial_function_value_type const& initial_function_value() { return rule
 rules::domain_type const& domain() { return rules::domain; }
 rules::task_type const& task() { return rules::task; }
 rules::file_type const& file() { return rules::file; }
+
+namespace detail
+{
+
+bool parse_domain_full(Iterator& first, Iterator last, ast::Domain& out, ErrorHandlerType& error_handler)
+{
+    return parse_full(first, last, domain(), out, error_handler);
+}
+
+bool parse_task_full(Iterator& first, Iterator last, ast::Task& out, ErrorHandlerType& error_handler)
+{
+    return parse_full(first, last, task(), out, error_handler);
+}
+
+}  // namespace detail
 
 }  // namespace loki::parser

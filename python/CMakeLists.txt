@@ -9,13 +9,16 @@ message(STATUS "Found nanobind: ${nanobind_DIR} (found version ${nanobind_VERSIO
 
 yggdrasil_python_package_init(PYPDDL pypddl)
 
+file(
+    GLOB PYPDDL_FORMALISM_SOURCES
+    CONFIGURE_DEPENDS
+    "src/pypddl/formalism/*.cpp"
+)
+
 nanobind_add_module(
     _pypddl NB_SHARED
     src/module.cpp
-    src/pypddl/formalism/module.cpp
-    src/pypddl/formalism/data.cpp
-    src/pypddl/formalism/index.cpp
-    src/pypddl/formalism/view.cpp
+    ${PYPDDL_FORMALISM_SOURCES}
 )
 
 target_link_libraries(_pypddl PRIVATE loki::parsers)

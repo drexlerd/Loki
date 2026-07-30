@@ -17,6 +17,8 @@
 
 #include "context.hpp"
 
+#include "loki/formalism/builder.hpp"
+#include "loki/semantic/translator/common.hpp"
 #include "mappings.hpp"
 
 #include <utility>

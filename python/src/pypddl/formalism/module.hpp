@@ -26,8 +26,12 @@ namespace nb = nanobind;
 namespace loki::formalism
 {
 
+void bind_formalism(nb::module_& m);
+void bind_semantic_errors(nb::module_& m);
+void bind_semantic_parser(nb::module_& m);
+void bind_semantic_translator(nb::module_& m);
 void bind_module_definitions(nb::module_& m);
 
-} // namespace loki::formalism
+}  // namespace loki::formalism
 
 #endif

@@ -18,11 +18,11 @@
 #ifndef LOKI_SEMANTIC_BUILDER_HPP_
 #define LOKI_SEMANTIC_BUILDER_HPP_
 
-#include "checks.hpp"
-#include "context.hpp"
-#include "diagnostics.hpp"
-#include "loki/ast.hpp"
-#include "loki/formalism/formalism.hpp"
+#include "loki/ast/ast_fwd.hpp"
+#include "loki/formalism/condition_data.hpp"
+#include "loki/formalism/declarations.hpp"
+#include "loki/formalism/effect_data.hpp"
+#include "loki/formalism/function_expression_data.hpp"
 #include "loki/semantic/options.hpp"
 
 #include <cista/containers/optional.h>
@@ -34,6 +34,11 @@
 
 namespace loki::semantic
 {
+
+struct DiagnosticContext;
+struct DomainContext;
+struct ParseContext;
+struct SemanticChecks;
 
 // Translates a syntactic AST into (un-canonicalized) formalism entities inside the
 // supplied repository. Storage lifecycle and canonicalization belong to the caller.
@@ -50,14 +55,33 @@ public:
     formalism::TaskView build_task(const ast::Task& task);
 
 private:
+    class VariableScope
+    {
+    public:
+        explicit VariableScope(ParseContext& context);
+        ~VariableScope();
+
+        VariableScope(const VariableScope&) = delete;
+        VariableScope& operator=(const VariableScope&) = delete;
+
+    private:
+        ParseContext& m_context;
+    };
+
     const ParserOptions& m_options;
     const DiagnosticContext& m_diagnostics;
     formalism::Repository& m_repository;
     DomainContext& m_domain_context;
     ParseContext& m_parse_context;
 
-    formalism::Repository& repo() noexcept { return m_repository; }
-    SemanticChecks checks() const { return SemanticChecks { m_options, m_diagnostics, m_domain_context, m_parse_context }; }
+    formalism::Repository& repo() noexcept;
+    SemanticChecks checks() const;
+
+    template<typename T>
+    static ygg::IndexList<T> to_index_list(const std::vector<formalism::EntityView<T>>& views);
+
+    template<typename T>
+    static cista::optional<ygg::Index<T>> to_optional_index(const std::optional<formalism::EntityView<T>>& view);
 
     // Symbol lookup with auto-declaration in non-strict mode.
     formalism::PredicateView predicate(const ast::Identifier& identifier, size_t arity);
@@ -133,6 +157,22 @@ private:
                                std::vector<formalism::InitialFunctionValueView>& initial_function_values,
                                std::optional<formalism::MetricView>& metric);
 };
+
+template<typename T>
+ygg::IndexList<T> AstBuilder::to_index_list(const std::vector<formalism::EntityView<T>>& views)
+{
+    auto result = ygg::IndexList<T> {};
+    result.reserve(views.size());
+    for (const auto view : views)
+        result.push_back(view.get_index());
+    return result;
+}
+
+template<typename T>
+cista::optional<ygg::Index<T>> AstBuilder::to_optional_index(const std::optional<formalism::EntityView<T>>& view)
+{
+    return view ? cista::optional<ygg::Index<T>> { view->get_index() } : cista::optional<ygg::Index<T>> {};
+}
 
 }  // namespace loki::semantic
 

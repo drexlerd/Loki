@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_AST_AST_FWD_HPP_
 #define LOKI_AST_AST_FWD_HPP_
 
@@ -37,8 +36,28 @@ struct Atom;
 struct Literal;
 struct FunctionTerm;
 struct FunctionExpression;
+struct FunctionExpressionNumber;
+struct FunctionExpressionFunction;
+struct FunctionExpressionUnary;
+struct FunctionExpressionBinary;
+struct FunctionExpressionMulti;
 struct Condition;
+struct ConditionLiteral;
+struct ConditionAnd;
+struct ConditionOr;
+struct ConditionNot;
+struct ConditionImply;
+struct ConditionExists;
+struct ConditionForall;
+struct ConditionNumericConstraint;
 struct Effect;
+struct EffectLiteral;
+struct EffectAnd;
+struct EffectNumeric;
+struct EffectForall;
+struct EffectWhen;
+struct EffectOneOf;
+struct EffectProbabilistic;
 struct PredicateDeclaration;
 struct FunctionDeclaration;
 struct Action;

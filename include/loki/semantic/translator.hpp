@@ -18,25 +18,21 @@
 #ifndef LOKI_SEMANTIC_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_HPP_
 
+#include "loki/formalism/domain_view.hpp"
+#include "loki/formalism/task_view.hpp"
 #include "loki/semantic/options.hpp"
-#include "loki/semantic/translator/canonical_copy_translator.hpp"
-#include "loki/semantic/translator/copy_translator.hpp"
+
+#include <memory>
 
 namespace loki::semantic
 {
 
-class ProblemTranslationResult;
-
 namespace detail
 {
+struct TranslationStorage;
+}
 
-std::shared_ptr<TranslationStorage> canonicalize_domain_storage(formalism::DomainView original_domain, const std::shared_ptr<TranslationStorage>& middle);
-void inherit_domain_mappings(TranslationStorage& problem, const TranslationStorage& domain);
-void inherit_domain_identity_mappings(TranslationStorage& problem, const TranslationStorage& domain);
-std::shared_ptr<TranslationStorage>
-canonicalize_problem_storage(formalism::TaskView middle_task, const std::shared_ptr<TranslationStorage>& middle, const TranslationStorage& domain);
-
-}  // namespace detail
+class ProblemTranslationResult;
 
 class DomainTranslationResult
 {

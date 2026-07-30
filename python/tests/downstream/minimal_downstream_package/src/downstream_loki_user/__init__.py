@@ -10,7 +10,7 @@ parses_domain = _downstream_loki.parses_domain
 
 
 def describe_pypddl_imports(domain_source: str) -> dict[str, str]:
-    parser = _formalism.Parser(domain_source)
+    parser = _formalism.Parser(domain_source, _formalism.ParserOptions())
     return {
         "parser": type(parser).__name__,
         "domain_name": parser.domain().get_name(),

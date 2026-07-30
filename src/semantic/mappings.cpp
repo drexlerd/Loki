@@ -17,6 +17,8 @@
 
 #include "mappings.hpp"
 
+#include "diagnostics.hpp"
+#include "loki/ast/ast.hpp"
 #include "loki/semantic/errors.hpp"
 
 #include <cctype>

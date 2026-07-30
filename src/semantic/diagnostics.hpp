@@ -18,7 +18,7 @@
 #ifndef LOKI_SEMANTIC_DIAGNOSTICS_HPP_
 #define LOKI_SEMANTIC_DIAGNOSTICS_HPP_
 
-#include "loki/parser/error_handler.hpp"
+#include "loki/parser/diagnostic.hpp"
 #include "loki/semantic/errors.hpp"
 
 #include <functional>

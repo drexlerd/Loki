@@ -20,8 +20,11 @@
 
 #include "context.hpp"
 #include "diagnostics.hpp"
-#include "loki/ast.hpp"
-#include "loki/formalism/formalism.hpp"
+#include "loki/ast/ast.hpp"
+#include "loki/formalism/object_view.hpp"
+#include "loki/formalism/parameter_view.hpp"
+#include "loki/formalism/type_view.hpp"
+#include "loki/formalism/variable_view.hpp"
 #include "loki/semantic/errors.hpp"
 #include "loki/semantic/options.hpp"
 #include "mappings.hpp"

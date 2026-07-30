@@ -28,12 +28,13 @@ def test_positive_fixture_suite_replays() -> None:
     suite = load_suite("suite.json")
     base = ROOT / cast(str, suite["prefix"])
     for case in cast(list[dict[str, Any]], suite["cases"]):
-        parser = pypddl.Parser(base / cast(str, case["domain_file"]))
-        domain_translation = pypddl.translate_domain(parser.domain())
+        parser = pypddl.Parser(base / cast(str, case["domain_file"]), pypddl.ParserOptions())
+        translator_options = pypddl.TranslatorOptions()
+        domain_translation = pypddl.translate_domain(parser.domain(), translator_options)
         task_file = cast(str | None, case.get("task_file"))
         if task_file is not None:
             task = parser.parse_task(base / task_file)
-            pypddl.translate_task(task, domain_translation)
+            pypddl.translate_task(task, domain_translation, translator_options)
 
 
 def test_negative_fixture_suite_replays() -> None:
@@ -150,8 +151,8 @@ def test_high_level_bindings_expose_useful_docstrings() -> None:
 
 
 def test_parser_views_keep_temporary_parser_alive() -> None:
-    domain = pypddl.Parser(fixture_text("facade")).domain()
-    task = pypddl.Parser(fixture_text("facade")).parse_task(fixture_text("facade", "task.pddl"))
+    domain = pypddl.Parser(fixture_text("facade"), pypddl.ParserOptions()).domain()
+    task = pypddl.Parser(fixture_text("facade"), pypddl.ParserOptions()).parse_task(fixture_text("facade", "task.pddl"))
 
     assert domain.get_name() == "facade"
     assert task.get_name() == "facade-task"
@@ -159,13 +160,13 @@ def test_parser_views_keep_temporary_parser_alive() -> None:
 
 
 def test_child_view_getters_keep_parent_views_alive() -> None:
-    domain = pypddl.Parser(fixture_text("facade")).parse_task(fixture_text("facade", "task.pddl")).get_domain()
+    domain = pypddl.Parser(fixture_text("facade"), pypddl.ParserOptions()).parse_task(fixture_text("facade", "task.pddl")).get_domain()
 
     assert domain.get_name() == "facade"
 
 
 def test_optional_child_view_getters_keep_parent_views_alive() -> None:
-    domain = pypddl.Parser(fixture_text("facade-format")).domain()
+    domain = pypddl.Parser(fixture_text("facade-format"), pypddl.ParserOptions()).domain()
     action = domain.get_actions()[0]
     action_precondition = action.get_precondition()
     action_effect = action.get_effect()
@@ -176,7 +177,7 @@ def test_optional_child_view_getters_keep_parent_views_alive() -> None:
     assert isinstance(action_precondition.get_variant(), pypddl.ConditionLiteral)
     assert isinstance(action_effect.get_variant(), pypddl.EffectAnd)
 
-    task = pypddl.Parser(fixture_text("facade-format-numeric")).parse_task(
+    task = pypddl.Parser(fixture_text("facade-format-numeric"), pypddl.ParserOptions()).parse_task(
         fixture_text("facade-format-numeric", "task.pddl")
     )
     task_goal = task.get_goal()
@@ -191,15 +192,20 @@ def test_optional_child_view_getters_keep_parent_views_alive() -> None:
 
 
 def test_translation_views_keep_temporary_inputs_alive() -> None:
-    original_domain = pypddl.translate_domain(pypddl.Parser(fixture_text("facade")).domain()).original_domain
+    original_domain = pypddl.translate_domain(
+        pypddl.Parser(fixture_text("facade"), pypddl.ParserOptions()).domain(),
+        pypddl.TranslatorOptions(),
+    ).original_domain
 
     assert original_domain.get_name() == "facade"
 
-    parser = pypddl.Parser(fixture_text("facade"))
-    domain_translation = pypddl.translate_domain(parser.domain())
+    parser = pypddl.Parser(fixture_text("facade"), pypddl.ParserOptions())
+    translator_options = pypddl.TranslatorOptions()
+    domain_translation = pypddl.translate_domain(parser.domain(), translator_options)
     original_task = pypddl.translate_task(
         parser.parse_task(fixture_text("facade", "task.pddl")),
         domain_translation,
+        translator_options,
     ).original_task
     del parser
     del domain_translation
@@ -209,7 +215,7 @@ def test_translation_views_keep_temporary_inputs_alive() -> None:
 
 
 def test_translation_bindings_return_translated_views() -> None:
-    parser = pypddl.Parser(fixture_text("facade"))
+    parser = pypddl.Parser(fixture_text("facade"), pypddl.ParserOptions())
     domain = parser.domain()
     task = parser.parse_task(fixture_text("facade", "task.pddl"))
 
@@ -443,7 +449,7 @@ def test_repository_constructs_numeric_function_task_bits() -> None:
 
 
 def test_views_expose_typed_indices() -> None:
-    parser = pypddl.Parser(fixture_text("facade-format"))
+    parser = pypddl.Parser(fixture_text("facade-format"), pypddl.ParserOptions())
     domain = parser.domain()
 
     domain_index = domain.get_index()
@@ -489,10 +495,10 @@ def test_data_compare_by_identifying_members_and_are_unhashable() -> None:
 
 
 def test_views_are_hashable_and_compare_by_identity() -> None:
-    parser = pypddl.Parser(fixture_text("facade-format"))
+    parser = pypddl.Parser(fixture_text("facade-format"), pypddl.ParserOptions())
     domain = parser.domain()
     same_domain = parser.domain()
-    equivalent_domain = pypddl.Parser(fixture_text("facade-format")).domain()
+    equivalent_domain = pypddl.Parser(fixture_text("facade-format"), pypddl.ParserOptions()).domain()
 
     assert domain == same_domain
     assert hash(domain) == hash(same_domain)
@@ -519,12 +525,15 @@ def test_views_are_hashable_and_compare_by_identity() -> None:
 
 
 def test_translate_task_from_different_domain_translation_uses_typed_exception() -> None:
-    first_translation = pypddl.translate_domain(pypddl.Parser(fixture_text("facade")).domain())
-    second_parser = pypddl.Parser(fixture_text("repo-mismatch"))
+    first_translation = pypddl.translate_domain(
+        pypddl.Parser(fixture_text("facade"), pypddl.ParserOptions()).domain(),
+        pypddl.TranslatorOptions(),
+    )
+    second_parser = pypddl.Parser(fixture_text("repo-mismatch"), pypddl.ParserOptions())
     second_task = second_parser.parse_task(fixture_text("repo-mismatch", "task.pddl"))
 
     try:
-        pypddl.translate_task(second_task, first_translation)
+        pypddl.translate_task(second_task, first_translation, pypddl.TranslatorOptions())
     except pypddl.MismatchedDomainError:
         pass
     else:
@@ -532,7 +541,7 @@ def test_translate_task_from_different_domain_translation_uses_typed_exception()
 
 
 def test_translate_task_task_only_equality_uses_typed_exception() -> None:
-    parser = pypddl.Parser(fixture_text("task-only-equality"))
+    parser = pypddl.Parser(fixture_text("task-only-equality"), pypddl.ParserOptions())
     options = pypddl.TranslatorOptions()
     options.materialize_equality = True
     domain_translation = pypddl.translate_domain(parser.domain(), options)

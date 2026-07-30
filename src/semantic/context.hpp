@@ -18,8 +18,13 @@
 #ifndef LOKI_SEMANTIC_CONTEXT_HPP_
 #define LOKI_SEMANTIC_CONTEXT_HPP_
 
-#include "loki/formalism/formalism.hpp"
-#include "loki/semantic/translator.hpp"
+#include "loki/formalism/domain_view.hpp"
+#include "loki/formalism/function_skeleton_view.hpp"
+#include "loki/formalism/object_view.hpp"
+#include "loki/formalism/predicate_view.hpp"
+#include "loki/formalism/repository.hpp"
+#include "loki/formalism/type_view.hpp"
+#include "loki/formalism/variable_view.hpp"
 
 #include <memory>
 #include <optional>
@@ -31,6 +36,11 @@
 
 namespace loki::semantic
 {
+
+namespace detail
+{
+struct TranslationStorage;
+}
 
 // Symbols and storage of the currently parsed domain; survives across parse_task calls.
 struct DomainContext

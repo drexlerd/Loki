@@ -15,16 +15,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef PYPDDL_VIEW_HPP_
-#define PYPDDL_VIEW_HPP_
+#ifndef LOKI_SEMANTIC_PARSER_RUNTIME_HPP_
+#define LOKI_SEMANTIC_PARSER_RUNTIME_HPP_
 
-#include <nanobind/nanobind.h>
+#include "loki/ast/ast_fwd.hpp"
+#include "loki/parser/diagnostic.hpp"
 
-namespace loki::formalism
+namespace loki::parser::detail
 {
 
-void bind_views(nanobind::module_& m);
+bool parse_domain_full(Iterator& first, Iterator last, ast::Domain& out, ErrorHandlerType& error_handler);
+bool parse_task_full(Iterator& first, Iterator last, ast::Task& out, ErrorHandlerType& error_handler);
 
-}
+}  // namespace loki::parser::detail
 
 #endif
