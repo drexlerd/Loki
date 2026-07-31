@@ -385,7 +385,7 @@ TEST(LokiSemanticInvariantSuite, AddActionCostsOptionHoldsAcrossFixtures)
         const auto task = parser.parse_task(*item.task_file);
 
         ASSERT_TRUE(task.get_metric().has_value());
-        EXPECT_TRUE(task.get_metric().value().is_minimize());
+        EXPECT_EQ(task.get_metric().value().get_optimization_direction(), formalism::OptimizationDirection::Minimize);
         auto has_total_cost_init = false;
         for (auto value : task.get_initial_function_values())
             has_total_cost_init = has_total_cost_init || std::string_view(value.get_function().get_function().get_name()) == "total-cost";

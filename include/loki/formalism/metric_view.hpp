@@ -45,7 +45,7 @@ public:
     const auto& get_handle() const noexcept { return m_handle; }
     auto get_index() const noexcept { return m_handle; }
 
-    bool is_minimize() const noexcept { return get_data().minimize; }
+    auto get_optimization_direction() const noexcept { return get_data().optimization_direction; }
     auto get_expression() const noexcept { return ygg::make_view(get_data().expression, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }

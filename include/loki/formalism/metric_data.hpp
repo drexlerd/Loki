@@ -19,16 +19,13 @@
 #ifndef LOKI_FORMALISM_METRIC_DATA_HPP_
 #define LOKI_FORMALISM_METRIC_DATA_HPP_
 
-#include <tuple>
-#include <utility>
-#include <optional>
-#include <string>
-#include <variant>
-#include <vector>
-#include <yggdrasil/core/types.hpp>
-#include <yggdrasil/core/types_utils.hpp>
+#include "loki/formalism/enums.hpp"
 #include "loki/formalism/function_expression_index.hpp"
 #include "loki/formalism/metric_index.hpp"
+
+#include <tuple>
+#include <yggdrasil/core/types.hpp>
+#include <yggdrasil/core/types_utils.hpp>
 
 namespace ygg
 {
@@ -37,20 +34,34 @@ template<>
 struct Data<::loki::formalism::Metric>
 {
     ygg::Index<::loki::formalism::Metric> index;
-    bool minimize = true;
+    ::loki::formalism::OptimizationDirection optimization_direction = ::loki::formalism::OptimizationDirection::Minimize;
     ygg::Index<::loki::formalism::FunctionExpression> expression;
 
     Data() = default;
-    Data(bool minimize_, ygg::Index<::loki::formalism::FunctionExpression> expression_) : index(), minimize(minimize_), expression(expression_) {}
+    Data(::loki::formalism::OptimizationDirection optimization_direction_, ygg::Index<::loki::formalism::FunctionExpression> expression_) :
+        index(),
+        optimization_direction(optimization_direction_),
+        expression(expression_)
+    {
+    }
     template<typename C>
-    Data(bool minimize_, ::ygg::View<ygg::Index<::loki::formalism::FunctionExpression>, C> expression_) : index(), minimize(minimize_), expression()
+    Data(::loki::formalism::OptimizationDirection optimization_direction_,
+         ::ygg::View<ygg::Index<::loki::formalism::FunctionExpression>, C> expression_) :
+        index(),
+        optimization_direction(optimization_direction_),
+        expression()
     {
         set(expression_, expression);
     }
 
-    void clear() noexcept { ygg::clear(index); minimize = true; ygg::clear(expression); }
-    auto cista_members() const noexcept { return std::tie(index, minimize, expression); }
-    auto identifying_members() const noexcept { return std::tie(minimize, expression); }
+    void clear() noexcept
+    {
+        ygg::clear(index);
+        optimization_direction = ::loki::formalism::OptimizationDirection::Minimize;
+        ygg::clear(expression);
+    }
+    auto cista_members() const noexcept { return std::tie(index, optimization_direction, expression); }
+    auto identifying_members() const noexcept { return std::tie(optimization_direction, expression); }
 };
 
 }

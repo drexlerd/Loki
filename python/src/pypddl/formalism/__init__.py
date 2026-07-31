@@ -120,6 +120,7 @@ from .._pypddl.formalism import (
     Object,
     ObjectData,
     ObjectIndex,
+    OptimizationDirection,
     Parameter,
     ParameterData,
     ParameterIndex,

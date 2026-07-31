@@ -196,7 +196,10 @@ formalism::MetricView CanonicalCopyTranslator::copy(formalism::MetricView source
 {
     if (auto mapped = find_mapped(m_storage->metrics, source))
         return *mapped;
-    auto out = formalism::get_or_create<formalism::Metric>(m_storage->repository, source.is_minimize(), as_index(copy(source.get_expression())));
+    auto out = formalism::get_or_create<formalism::Metric>(
+        m_storage->repository,
+        source.get_optimization_direction(),
+        as_index(copy(source.get_expression())));
     remember(m_storage->metrics, source, out);
     return out;
 }

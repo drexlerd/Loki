@@ -50,20 +50,20 @@ formalism::BinaryComparator ToNegationNormalFormTranslator<Derived>::negate_comp
 {
     switch (comparator)
     {
-        case formalism::BinaryComparator::Equal:
-            return formalism::BinaryComparator::NotEqual;
-        case formalism::BinaryComparator::NotEqual:
-            return formalism::BinaryComparator::Equal;
-        case formalism::BinaryComparator::Less:
-            return formalism::BinaryComparator::GreaterEqual;
-        case formalism::BinaryComparator::LessEqual:
-            return formalism::BinaryComparator::Greater;
-        case formalism::BinaryComparator::Greater:
-            return formalism::BinaryComparator::LessEqual;
-        case formalism::BinaryComparator::GreaterEqual:
-            return formalism::BinaryComparator::Less;
+        case formalism::BinaryComparator::Eq:
+            return formalism::BinaryComparator::Ne;
+        case formalism::BinaryComparator::Ne:
+            return formalism::BinaryComparator::Eq;
+        case formalism::BinaryComparator::Lt:
+            return formalism::BinaryComparator::Ge;
+        case formalism::BinaryComparator::Le:
+            return formalism::BinaryComparator::Gt;
+        case formalism::BinaryComparator::Gt:
+            return formalism::BinaryComparator::Le;
+        case formalism::BinaryComparator::Ge:
+            return formalism::BinaryComparator::Lt;
     }
-    return formalism::BinaryComparator::NotEqual;
+    return formalism::BinaryComparator::Ne;
 }
 
 template<typename Derived>

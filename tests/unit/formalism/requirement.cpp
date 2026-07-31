@@ -27,12 +27,3 @@ static_assert(requires(const View& view) {
     { view == view } -> std::same_as<bool>;
     { view < view } -> std::same_as<bool>;
 });
-
-static_assert(f::Positive {} == f::Positive {});
-static_assert(!(f::Positive {} < f::Positive {}));
-static_assert(f::Negative {} == f::Negative {});
-static_assert(!(f::Negative {} < f::Negative {}));
-static_assert(f::Minimize {} == f::Minimize {});
-static_assert(!(f::Minimize {} < f::Minimize {}));
-static_assert(f::Maximize {} == f::Maximize {});
-static_assert(!(f::Maximize {} < f::Maximize {}));

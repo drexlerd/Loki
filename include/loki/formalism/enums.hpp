@@ -26,28 +26,28 @@ namespace loki::formalism
 
 enum class BinaryComparator : std::uint8_t
 {
-    Equal,
-    NotEqual,
-    Less,
-    LessEqual,
-    Greater,
-    GreaterEqual
+    Eq,
+    Ne,
+    Lt,
+    Le,
+    Gt,
+    Ge
 };
 enum class UnaryArithmeticOperator : std::uint8_t
 {
-    Minus
+    Sub
 };
 enum class BinaryArithmeticOperator : std::uint8_t
 {
     Add,
-    Subtract,
-    Multiply,
-    Divide
+    Sub,
+    Mul,
+    Div
 };
 enum class MultiArithmeticOperator : std::uint8_t
 {
     Add,
-    Multiply
+    Mul
 };
 enum class NumericEffectOperator : std::uint8_t
 {
@@ -56,6 +56,11 @@ enum class NumericEffectOperator : std::uint8_t
     Decrease,
     ScaleUp,
     ScaleDown
+};
+enum class OptimizationDirection : std::uint8_t
+{
+    Minimize,
+    Maximize,
 };
 
 enum class RequirementKind : std::uint8_t
@@ -83,17 +88,17 @@ inline const char* to_string(BinaryComparator op)
 {
     switch (op)
     {
-        case BinaryComparator::Equal:
+        case BinaryComparator::Eq:
             return "=";
-        case BinaryComparator::NotEqual:
+        case BinaryComparator::Ne:
             return "!=";
-        case BinaryComparator::Less:
+        case BinaryComparator::Lt:
             return "<";
-        case BinaryComparator::LessEqual:
+        case BinaryComparator::Le:
             return "<=";
-        case BinaryComparator::Greater:
+        case BinaryComparator::Gt:
             return ">";
-        case BinaryComparator::GreaterEqual:
+        case BinaryComparator::Ge:
             return ">=";
     }
     throw std::invalid_argument("invalid BinaryComparator");
@@ -105,11 +110,11 @@ inline const char* to_string(BinaryArithmeticOperator op)
     {
         case BinaryArithmeticOperator::Add:
             return "+";
-        case BinaryArithmeticOperator::Subtract:
+        case BinaryArithmeticOperator::Sub:
             return "-";
-        case BinaryArithmeticOperator::Multiply:
+        case BinaryArithmeticOperator::Mul:
             return "*";
-        case BinaryArithmeticOperator::Divide:
+        case BinaryArithmeticOperator::Div:
             return "/";
     }
     throw std::invalid_argument("invalid BinaryArithmeticOperator");
@@ -121,7 +126,7 @@ inline const char* to_string(MultiArithmeticOperator op)
     {
         case MultiArithmeticOperator::Add:
             return "+";
-        case MultiArithmeticOperator::Multiply:
+        case MultiArithmeticOperator::Mul:
             return "*";
     }
     throw std::invalid_argument("invalid MultiArithmeticOperator");
@@ -143,6 +148,18 @@ inline const char* to_string(NumericEffectOperator op)
             return "scale-down";
     }
     throw std::invalid_argument("invalid NumericEffectOperator");
+}
+
+inline const char* to_string(OptimizationDirection direction)
+{
+    switch (direction)
+    {
+        case OptimizationDirection::Minimize:
+            return "minimize";
+        case OptimizationDirection::Maximize:
+            return "maximize";
+    }
+    throw std::invalid_argument("invalid OptimizationDirection");
 }
 
 inline const char* to_string(RequirementKind kind)

@@ -135,8 +135,10 @@ formalism::MetricView TopLevelTranslator<Derived>::copy(formalism::MetricView so
 {
     if (auto mapped = find_mapped(this->m_storage->metrics, source))
         return *mapped;
-    auto out =
-        formalism::get_or_create<formalism::Metric>(this->m_storage->repository, source.is_minimize(), as_index(this->self().copy(source.get_expression())));
+    auto out = formalism::get_or_create<formalism::Metric>(
+        this->m_storage->repository,
+        source.get_optimization_direction(),
+        as_index(this->self().copy(source.get_expression())));
     remember(this->m_storage->metrics, source, out);
     return out;
 }

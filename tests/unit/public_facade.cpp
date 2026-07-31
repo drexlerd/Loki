@@ -197,7 +197,7 @@ TEST(LokiPublicFacade, ViewConvenienceMethodsCoverNumericEffectsAndMetrics)
 
     ASSERT_TRUE(task.get_metric().has_value());
     const auto metric = task.get_metric().value();
-    EXPECT_TRUE(metric.is_minimize());
+    EXPECT_EQ(metric.get_optimization_direction(), loki::formalism::OptimizationDirection::Minimize);
     ygg::visit(
         [](const auto expression_node)
         {
@@ -288,7 +288,7 @@ TEST(LokiPublicFacade, FormatsTypedNumericTaskSectionsAsReparseablePddl)
     EXPECT_EQ(reparsed_task.get_initial_literals().size(), 1);
     EXPECT_EQ(reparsed_task.get_initial_function_values().size(), 1);
     ASSERT_TRUE(reparsed_task.get_metric().has_value());
-    EXPECT_TRUE(reparsed_task.get_metric().value().is_minimize());
+    EXPECT_EQ(reparsed_task.get_metric().value().get_optimization_direction(), loki::formalism::OptimizationDirection::Minimize);
 }
 
 }  // namespace loki::tests

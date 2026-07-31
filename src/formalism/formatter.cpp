@@ -245,7 +245,7 @@ std::string to_string(AxiomView value)
 
 std::string to_string(MetricView value)
 {
-    return fmt::format("(:metric {} {})", value.get_data().minimize ? "minimize" : "maximize", to_string(value.get_expression()));
+    return fmt::format("(:metric {} {})", formalism::to_string(value.get_optimization_direction()), to_string(value.get_expression()));
 }
 
 std::string to_string(InitialFunctionValueView value) { return fmt::format("(= {} {})", to_string(value.get_function()), to_string(value.get_value())); }

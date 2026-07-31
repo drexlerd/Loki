@@ -155,17 +155,17 @@ formalism::BinaryComparator comparator(const ast::ConditionNumericConstraint& no
 {
     auto op = key(node.comparator);
     if (op == "=")
-        return formalism::BinaryComparator::Equal;
+        return formalism::BinaryComparator::Eq;
     if (op == "!=")
-        return formalism::BinaryComparator::NotEqual;
+        return formalism::BinaryComparator::Ne;
     if (op == "<")
-        return formalism::BinaryComparator::Less;
+        return formalism::BinaryComparator::Lt;
     if (op == "<=")
-        return formalism::BinaryComparator::LessEqual;
+        return formalism::BinaryComparator::Le;
     if (op == ">")
-        return formalism::BinaryComparator::Greater;
+        return formalism::BinaryComparator::Gt;
     if (op == ">=")
-        return formalism::BinaryComparator::GreaterEqual;
+        return formalism::BinaryComparator::Ge;
     diagnostics.throw_at(node, InvalidNumericConstraintError(op));
 }
 
@@ -173,13 +173,13 @@ formalism::BinaryArithmeticOperator binary_operator(std::string op)
 {
     op = key(std::move(op));
     if (op == "/")
-        return formalism::BinaryArithmeticOperator::Divide;
-    return formalism::BinaryArithmeticOperator::Subtract;
+        return formalism::BinaryArithmeticOperator::Div;
+    return formalism::BinaryArithmeticOperator::Sub;
 }
 
 formalism::MultiArithmeticOperator multi_operator(std::string op)
 {
-    return key(std::move(op)) == "*" ? formalism::MultiArithmeticOperator::Multiply : formalism::MultiArithmeticOperator::Add;
+    return key(std::move(op)) == "*" ? formalism::MultiArithmeticOperator::Mul : formalism::MultiArithmeticOperator::Add;
 }
 
 formalism::NumericEffectOperator numeric_effect_operator(const ast::EffectNumeric& node, const DiagnosticContext& diagnostics)

@@ -17,15 +17,18 @@ static_assert(std::totally_ordered<View>);
 static_assert(std::same_as<View, f::MetricView>);
 static_assert(requires(Data& data) {
     data.index;
-    data.minimize;
+    data.optimization_direction;
     data.expression;
     data.clear();
     { data == data } -> std::same_as<bool>;
 });
 static_assert(requires(const View& view) {
     view.get_index();
-    view.is_minimize();
+    view.get_optimization_direction();
     view.get_expression();
     { view == view } -> std::same_as<bool>;
     { view < view } -> std::same_as<bool>;
 });
+
+static_assert(std::totally_ordered<f::OptimizationDirection>);
+static_assert(f::OptimizationDirection::Minimize < f::OptimizationDirection::Maximize);

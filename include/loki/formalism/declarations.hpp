@@ -178,34 +178,6 @@ struct Task
 {
 };
 
-struct Positive : ygg::comparison::Mixin<Positive>
-{
-    static constexpr std::uint8_t kind = 0;
-    constexpr auto identifying_members() const noexcept { return std::tie(kind); }
-};
-struct Negative : ygg::comparison::Mixin<Negative>
-{
-    static constexpr std::uint8_t kind = 1;
-    constexpr auto identifying_members() const noexcept { return std::tie(kind); }
-};
-
-template<typename T>
-concept Polarity = std::same_as<T, Positive> || std::same_as<T, Negative>;
-
-struct Minimize : ygg::comparison::Mixin<Minimize>
-{
-    static constexpr std::uint8_t kind = 0;
-    constexpr auto identifying_members() const noexcept { return std::tie(kind); }
-};
-struct Maximize : ygg::comparison::Mixin<Maximize>
-{
-    static constexpr std::uint8_t kind = 1;
-    constexpr auto identifying_members() const noexcept { return std::tie(kind); }
-};
-
-template<typename T>
-concept Optimization = std::same_as<T, Minimize> || std::same_as<T, Maximize>;
-
 using SymbolRepositoryTypes = ygg::TypeList<Requirement,
                                             Type,
                                             Object,

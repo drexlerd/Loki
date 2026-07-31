@@ -183,7 +183,8 @@ formalism::MetricView AstBuilder::parse_metric(const ast::Metric& node)
     const auto optimization = key(node.optimization.text);
     if (optimization != "minimize" && optimization != "maximize")
         m_diagnostics.throw_at(node.optimization, InvalidMetricError(optimization));
-    return formalism::get_or_create<formalism::Metric>(repo(), optimization == "minimize", parse_function_expression(node.expression).get_index());
+    const auto optimization_direction = optimization == "minimize" ? formalism::OptimizationDirection::Minimize : formalism::OptimizationDirection::Maximize;
+    return formalism::get_or_create<formalism::Metric>(repo(), optimization_direction, parse_function_expression(node.expression).get_index());
 }
 
 formalism::FunctionSkeletonView AstBuilder::total_cost_function()
@@ -296,7 +297,9 @@ void AstBuilder::complete_action_costs(const ast::Task& task,
     if (missing_metric || missing_initial_value)
         checks().mark_requirement_used(formalism::RequirementKind::ActionCosts);
     if (missing_metric)
-        metric = formalism::get_or_create<formalism::Metric>(repo(), true, wrap_function_expression(total_cost_term().get_index()).get_index());
+        metric = formalism::get_or_create<formalism::Metric>(repo(),
+                                                             formalism::OptimizationDirection::Minimize,
+                                                             wrap_function_expression(total_cost_term().get_index()).get_index());
     if (missing_initial_value)
     {
         const auto zero = formalism::get_or_create<formalism::FunctionExpressionNumber>(repo(), 0.0).get_index();

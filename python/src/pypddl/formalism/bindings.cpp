@@ -31,24 +31,24 @@ namespace
 void bind_formalism_enums(nb::module_& m)
 {
     nb::enum_<formalism::BinaryComparator>(m, "BinaryComparator")
-        .value("Equal", formalism::BinaryComparator::Equal)
-        .value("NotEqual", formalism::BinaryComparator::NotEqual)
-        .value("Less", formalism::BinaryComparator::Less)
-        .value("LessEqual", formalism::BinaryComparator::LessEqual)
-        .value("Greater", formalism::BinaryComparator::Greater)
-        .value("GreaterEqual", formalism::BinaryComparator::GreaterEqual);
+        .value("Eq", formalism::BinaryComparator::Eq)
+        .value("Ne", formalism::BinaryComparator::Ne)
+        .value("Lt", formalism::BinaryComparator::Lt)
+        .value("Le", formalism::BinaryComparator::Le)
+        .value("Gt", formalism::BinaryComparator::Gt)
+        .value("Ge", formalism::BinaryComparator::Ge);
 
-    nb::enum_<formalism::UnaryArithmeticOperator>(m, "UnaryArithmeticOperator").value("Minus", formalism::UnaryArithmeticOperator::Minus);
+    nb::enum_<formalism::UnaryArithmeticOperator>(m, "UnaryArithmeticOperator").value("Sub", formalism::UnaryArithmeticOperator::Sub);
 
     nb::enum_<formalism::BinaryArithmeticOperator>(m, "BinaryArithmeticOperator")
         .value("Add", formalism::BinaryArithmeticOperator::Add)
-        .value("Subtract", formalism::BinaryArithmeticOperator::Subtract)
-        .value("Multiply", formalism::BinaryArithmeticOperator::Multiply)
-        .value("Divide", formalism::BinaryArithmeticOperator::Divide);
+        .value("Sub", formalism::BinaryArithmeticOperator::Sub)
+        .value("Mul", formalism::BinaryArithmeticOperator::Mul)
+        .value("Div", formalism::BinaryArithmeticOperator::Div);
 
     nb::enum_<formalism::MultiArithmeticOperator>(m, "MultiArithmeticOperator")
         .value("Add", formalism::MultiArithmeticOperator::Add)
-        .value("Multiply", formalism::MultiArithmeticOperator::Multiply);
+        .value("Mul", formalism::MultiArithmeticOperator::Mul);
 
     nb::enum_<formalism::NumericEffectOperator>(m, "NumericEffectOperator")
         .value("Assign", formalism::NumericEffectOperator::Assign)
@@ -56,6 +56,10 @@ void bind_formalism_enums(nb::module_& m)
         .value("Decrease", formalism::NumericEffectOperator::Decrease)
         .value("ScaleUp", formalism::NumericEffectOperator::ScaleUp)
         .value("ScaleDown", formalism::NumericEffectOperator::ScaleDown);
+
+    nb::enum_<formalism::OptimizationDirection>(m, "OptimizationDirection")
+        .value("Minimize", formalism::OptimizationDirection::Minimize)
+        .value("Maximize", formalism::OptimizationDirection::Maximize);
 
     nb::enum_<formalism::RequirementKind>(m, "RequirementKind")
         .value("Strips", formalism::RequirementKind::Strips)

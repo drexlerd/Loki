@@ -33,7 +33,7 @@ TEST(LokiSemanticActionCosts, AddsActionCostsDefaultsInPermissiveMode)
     const auto parsed_task = parser.parse_task(fixture_path("action-costs", "task.pddl"));
 
     ASSERT_TRUE(parsed_task.get_metric().has_value());
-    EXPECT_TRUE(parsed_task.get_metric().value().is_minimize());
+    EXPECT_EQ(parsed_task.get_metric().value().get_optimization_direction(), formalism::OptimizationDirection::Minimize);
     ygg::visit(
         [](const auto expression)
         {
@@ -77,7 +77,7 @@ TEST(LokiSemanticActionCosts, AddActionCostsOptionInjectsUnitCosts)
 
     const auto parsed_task = parser.parse_task(fixture_path("unit-cost-injection", "task.pddl"));
     ASSERT_TRUE(parsed_task.get_metric().has_value());
-    EXPECT_TRUE(parsed_task.get_metric().value().is_minimize());
+    EXPECT_EQ(parsed_task.get_metric().value().get_optimization_direction(), formalism::OptimizationDirection::Minimize);
     ASSERT_EQ(parsed_task.get_initial_function_values().size(), 1);
     EXPECT_EQ(parsed_task.get_initial_function_values()[0].get_function().get_function().get_name(), "total-cost");
 }

@@ -174,7 +174,7 @@ formalism::FunctionExpressionView AstBuilder::parse_function_expression_node(con
 formalism::FunctionExpressionView AstBuilder::parse_function_expression_node(const ast::FunctionExpressionUnary& node)
 {
     return wrap_function_expression(formalism::get_or_create<formalism::UnaryFunctionExpression>(repo(),
-                                                                                                 formalism::UnaryArithmeticOperator::Minus,
+                                                                                                 formalism::UnaryArithmeticOperator::Sub,
                                                                                                  parse_function_expression(node.expression.get()).get_index())
                                         .get_index());
 }

@@ -33,15 +33,17 @@ void bind_metric(nb::module_& m, RepositoryBinding& repository)
     {
         using V = Data<formalism::Metric>;
         bind_data<V>(m, "MetricData")
-            .def(nb::init<bool, formalism::FunctionExpressionView>(), "minimize"_a, "expression"_a)
-            .def_rw("minimize", &V::minimize)
+            .def(nb::init<formalism::OptimizationDirection, formalism::FunctionExpressionView>(), "optimization_direction"_a, "expression"_a)
+            .def_rw("optimization_direction", &V::optimization_direction)
             .def_rw("expression", &V::expression);
     }
 
     {
         using V = formalism::MetricView;
         auto cls = nb::class_<V>(m, "Metric");
-        cls.def("get_index", &V::get_index).def("is_minimize", &V::is_minimize).def("get_expression", &V::get_expression, nb::keep_alive<0, 1>());
+        cls.def("get_index", &V::get_index)
+            .def("get_optimization_direction", &V::get_optimization_direction)
+            .def("get_expression", &V::get_expression, nb::keep_alive<0, 1>());
         ygg::add_print(cls);
         ygg::add_comparison(cls);
         ygg::add_hash(cls);

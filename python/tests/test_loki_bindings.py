@@ -187,7 +187,7 @@ def test_optional_child_view_getters_keep_parent_views_alive() -> None:
     assert task_metric is not None
 
     assert isinstance(task_goal.get_variant(), pypddl.ConditionLiteral)
-    assert task_metric.is_minimize()
+    assert task_metric.get_optimization_direction() == pypddl.OptimizationDirection.Minimize
     assert isinstance(task_metric.get_expression().get_variant(), pypddl.FunctionTerm)
 
 
@@ -393,13 +393,13 @@ def test_repository_constructs_numeric_function_task_bits() -> None:
     function_term = repository.get_or_create(pypddl.FunctionTermData(fluent, [term]))
     zero = make_number_expression(repository, 0.0)
     one = make_number_expression(repository, 1.0)
-    numeric_node = repository.get_or_create(pypddl.ConditionNumericConstraintData(pypddl.BinaryComparator.GreaterEqual, zero, zero))
+    numeric_node = repository.get_or_create(pypddl.ConditionNumericConstraintData(pypddl.BinaryComparator.Ge, zero, zero))
     condition = repository.get_or_create(pypddl.ConditionData(numeric_node))
     numeric_effect_node = repository.get_or_create(pypddl.EffectNumericData(pypddl.NumericEffectOperator.Assign, fluent, [term], one))
     effect = repository.get_or_create(pypddl.EffectData(numeric_effect_node))
     action = repository.get_or_create(pypddl.ActionData("refuel", [parameter], condition, effect))
     initial_value = repository.get_or_create(pypddl.InitialFunctionValueData(function_term, zero))
-    metric = repository.get_or_create(pypddl.MetricData(True, one))
+    metric = repository.get_or_create(pypddl.MetricData(pypddl.OptimizationDirection.Minimize, one))
     domain = repository.get_or_create(pypddl.DomainData(
             "numeric-programmatic",
             requirements=[numeric],
@@ -426,7 +426,7 @@ def test_repository_constructs_numeric_function_task_bits() -> None:
     assert len(task.get_initial_function_values()[0].get_function().get_terms()) == 1
     numeric_constraint = condition.get_variant()
     assert isinstance(numeric_constraint, pypddl.ConditionNumericConstraint)
-    assert numeric_constraint.get_comparator() == pypddl.BinaryComparator.GreaterEqual
+    assert numeric_constraint.get_comparator() == pypddl.BinaryComparator.Ge
     left = numeric_constraint.get_left().get_variant()
     assert isinstance(left, pypddl.FunctionExpressionNumber)
     assert left.get_value() == 0.0
@@ -442,7 +442,7 @@ def test_repository_constructs_numeric_function_task_bits() -> None:
     assert task.get_goal() is not None
     metric = task.get_metric()
     assert metric is not None
-    assert metric.is_minimize()
+    assert metric.get_optimization_direction() == pypddl.OptimizationDirection.Minimize
     metric_value = metric.get_expression().get_variant()
     assert isinstance(metric_value, pypddl.FunctionExpressionNumber)
     assert metric_value.get_value() == 1.0
@@ -616,7 +616,7 @@ def test_repository_exposes_recursive_constructors_and_accessors() -> None:
     condition_forall = repository.get_or_create(pypddl.ConditionData(condition_forall_node))
 
     number = make_number_expression(repository, 1.0)
-    unary_node = repository.get_or_create(pypddl.UnaryFunctionExpressionData(pypddl.UnaryArithmeticOperator.Minus, number))
+    unary_node = repository.get_or_create(pypddl.UnaryFunctionExpressionData(pypddl.UnaryArithmeticOperator.Sub, number))
     unary = repository.get_or_create(pypddl.FunctionExpressionData(unary_node))
     binary_node = repository.get_or_create(pypddl.BinaryFunctionExpressionData(pypddl.BinaryArithmeticOperator.Add, number, unary))
     binary = repository.get_or_create(pypddl.FunctionExpressionData(binary_node))
@@ -669,7 +669,7 @@ def test_repository_exposes_recursive_constructors_and_accessors() -> None:
     assert len(numeric_effect_variant.get_terms()) == 1
     unary_variant = unary.get_variant()
     assert isinstance(unary_variant, pypddl.UnaryFunctionExpression)
-    assert unary_variant.get_operator() == pypddl.UnaryArithmeticOperator.Minus
+    assert unary_variant.get_operator() == pypddl.UnaryArithmeticOperator.Sub
     binary_variant = binary.get_variant()
     assert isinstance(binary_variant, pypddl.BinaryFunctionExpression)
     assert binary_variant.get_operator() == pypddl.BinaryArithmeticOperator.Add
