@@ -19,8 +19,9 @@
 #include "../formalism_utils.hpp"
 
 #include <gtest/gtest.h>
-#include <loki/loki.hpp>
-#include <loki/semantic.hpp>
+#include <loki/formalism/formatter.hpp>
+#include <loki/semantic/options.hpp>
+#include <loki/semantic/parser.hpp>
 #include <string>
 #include <type_traits>
 
@@ -70,7 +71,7 @@ TEST(LokiSemanticActionCosts, AddActionCostsOptionInjectsUnitCosts)
     options.add_action_costs = true;
     auto parser = semantic::Parser(fixture_path("unit-cost-injection"), options);
 
-    const auto domain_text = loki::format_domain(parser.get_domain());
+    const auto domain_text = formalism::format::to_string(parser.get_domain());
     EXPECT_NE(domain_text.find(":action-costs"), std::string::npos);
     EXPECT_NE(domain_text.find("(total-cost)"), std::string::npos);
     EXPECT_NE(domain_text.find("(increase (total-cost) 1)"), std::string::npos);
@@ -88,7 +89,7 @@ TEST(LokiSemanticActionCosts, AddActionCostsOptionSkipsActionsAlreadyWritingTota
     options.add_action_costs = true;
     auto parser = semantic::Parser(fixture_path("mixed-costs"), options);
 
-    const auto domain_text = loki::format_domain(parser.get_domain());
+    const auto domain_text = formalism::format::to_string(parser.get_domain());
     const auto count = [&](const std::string& needle)
     {
         auto occurrences = 0;

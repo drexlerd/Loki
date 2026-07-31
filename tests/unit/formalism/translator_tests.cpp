@@ -19,7 +19,10 @@
 #include "../formalism_utils.hpp"
 
 #include <gtest/gtest.h>
-#include <loki/loki.hpp>
+#include <loki/semantic/errors.hpp>
+#include <loki/semantic/options.hpp>
+#include <loki/semantic/parser.hpp>
+#include <loki/semantic/translator.hpp>
 #include <loki/semantic/translator/copy_translator.hpp>
 #include <memory>
 #include <string>
@@ -29,8 +32,8 @@ namespace loki::tests
 {
 TEST(LokiTests, GeneratedUniversalPredicateKeepsNumericFreeVariables)
 {
-    auto parser = loki::Parser(fixture_path("numeric-universal"));
-    const auto translation = loki::translate(parser.get_domain());
+    auto parser = semantic::Parser(fixture_path("numeric-universal"));
+    const auto translation = semantic::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
 
     auto found = false;
@@ -48,11 +51,11 @@ TEST(LokiTests, GeneratedUniversalPredicateKeepsNumericFreeVariables)
 
 TEST(LokiTests, CompileConditionalEffectsSplitsActions)
 {
-    auto parser = loki::Parser(fixture_path("conditional-multiply"));
-    auto options = loki::TranslatorOptions {};
+    auto parser = semantic::Parser(fixture_path("conditional-multiply"));
+    auto options = semantic::TranslatorOptions {};
     options.compile_conditional_effects = true;
 
-    const auto translation = loki::translate(parser.get_domain(), options);
+    const auto translation = semantic::translate(parser.get_domain(), options);
     const auto domain = translation.get_translated_domain();
 
     EXPECT_FALSE(has_requirement_kind(domain, formalism::RequirementKind::ConditionalEffects));
@@ -73,17 +76,17 @@ TEST(LokiTests, CompileConditionalEffectsSplitsActions)
 
 TEST(LokiTests, CompileConditionalEffectsThrowsOnOverflow)
 {
-    auto parser = loki::Parser(fixture_path("conditional-overflow"));
-    auto options = loki::TranslatorOptions {};
+    auto parser = semantic::Parser(fixture_path("conditional-overflow"));
+    auto options = semantic::TranslatorOptions {};
     options.compile_conditional_effects = true;
 
-    EXPECT_THROW(loki::translate(parser.get_domain(), options), loki::SemanticError);
+    EXPECT_THROW(semantic::translate(parser.get_domain(), options), semantic::SemanticError);
 }
 
 TEST(LokiTests, ExistentialConditionalEffectBecomesUniversalEffect)
 {
-    auto parser = loki::Parser(fixture_path("conditional-exists"));
-    const auto translation = loki::translate(parser.get_domain());
+    auto parser = semantic::Parser(fixture_path("conditional-exists"));
+    const auto translation = semantic::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
 
     for (auto predicate : domain.get_predicates())
@@ -102,7 +105,7 @@ TEST(LokiTests, ExistentialConditionalEffectBecomesUniversalEffect)
 
 TEST(LokiTests, DnfDistributesUniversalOverDisjunction)
 {
-    auto parser = loki::Parser(fixture_path("dnf-forall"));
+    auto parser = semantic::Parser(fixture_path("dnf-forall"));
     auto storage = std::make_shared<semantic::detail::TranslationStorage>(1);
     auto translator = semantic::detail::CopyTranslator(storage, true, semantic::TranslationPhase::ToDisjunctiveNormalForm);
     const auto domain = translator.copy_domain(parser.get_domain());
@@ -127,8 +130,8 @@ TEST(LokiTests, DnfDistributesUniversalOverDisjunction)
 
 TEST(LokiTests, UntypedUniversalEffectKeepsEmptyGuardWhen)
 {
-    auto parser = loki::Parser(fixture_path("untyped-universal-effect"));
-    const auto translation = loki::translate(parser.get_domain());
+    auto parser = semantic::Parser(fixture_path("untyped-universal-effect"));
+    const auto translation = semantic::translate(parser.get_domain());
     const auto domain = translation.get_translated_domain();
 
     ASSERT_FALSE(domain.get_actions().empty());
@@ -140,8 +143,8 @@ TEST(LokiTests, UntypedUniversalEffectKeepsEmptyGuardWhen)
 
 TEST(LokiTests, KeepTypingPreservesPersistentParameters)
 {
-    auto parser = loki::Parser(fixture_path("typed-signatures"));
-    const auto translation = loki::translate(parser.get_domain(), loki::TranslatorOptions { .compile_typing = false });
+    auto parser = semantic::Parser(fixture_path("typed-signatures"));
+    const auto translation = semantic::translate(parser.get_domain(), semantic::TranslatorOptions { .compile_typing = false });
     const auto domain = translation.get_translated_domain();
 
     ASSERT_FALSE(domain.get_types().empty());
@@ -173,8 +176,8 @@ TEST(LokiTests, KeepTypingPreservesPersistentParameters)
 
 TEST(LokiTests, RemoveTypingStripsPersistentParameters)
 {
-    auto parser = loki::Parser(fixture_path("typed-signatures"));
-    const auto translation = loki::translate(parser.get_domain(), loki::TranslatorOptions { .compile_typing = true });
+    auto parser = semantic::Parser(fixture_path("typed-signatures"));
+    const auto translation = semantic::translate(parser.get_domain(), semantic::TranslatorOptions { .compile_typing = true });
     const auto domain = translation.get_translated_domain();
     EXPECT_TRUE(domain.get_types().empty());
 
@@ -199,7 +202,7 @@ TEST(LokiTests, RemoveTypingStripsPersistentParameters)
 
 TEST(LokiTests, RenameQuantifiedVariablesSeparatesNestedBinders)
 {
-    auto parser = loki::Parser(fixture_path("variable-renaming"));
+    auto parser = semantic::Parser(fixture_path("variable-renaming"));
     auto storage = std::make_shared<semantic::detail::TranslationStorage>(1);
     auto translator = semantic::detail::CopyTranslator(storage, true, semantic::TranslationPhase::RenameQuantifiedVariables);
     const auto domain = translator.copy_domain(parser.get_domain());

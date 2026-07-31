@@ -22,6 +22,7 @@
 #include "diagnostics.hpp"
 #include "loki/ast/ast.hpp"
 #include "loki/semantic/errors.hpp"
+#include "loki/semantic/options.hpp"
 #include "loki/semantic/translator/common.hpp"
 #include "mappings.hpp"
 #include "parser_runtime.hpp"

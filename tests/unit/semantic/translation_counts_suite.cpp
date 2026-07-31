@@ -15,15 +15,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../benchmark_utils.hpp"
-
 #include <filesystem>
 #include <gtest/gtest.h>
-#include <loki/loki.hpp>
-#include <loki/semantic.hpp>
+#include <loki/formalism/formatter.hpp>
+#include <loki/formalism/repository.hpp>
+#include <loki/semantic/options.hpp>
+#include <loki/semantic/parser.hpp>
+#include <loki/semantic/translator.hpp>
 #include <string>
 #include <vector>
-#include <yggdrasil/serialization/json_suite.hpp>
+#include <yggdrasil/io/project_path.hpp>
+#include <yggdrasil/serialization/json.hpp>
 
 namespace loki::tests
 {
@@ -161,8 +163,8 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
             EXPECT_EQ(translated_task.get_axioms().size(), configuration.task_axioms);
 
             // The formatted translation must reparse under the same parser options with stable counts.
-            const auto domain_text = loki::format_domain(translated_domain);
-            const auto task_text = loki::format_task(translated_task);
+            const auto domain_text = formalism::format::to_string(translated_domain);
+            const auto task_text = formalism::format::to_string(translated_task);
             auto reparsed = semantic::Parser(domain_text, configuration.parser_options);
             const auto reparsed_domain = reparsed.get_domain();
             const auto reparsed_task = reparsed.parse_task(task_text);
@@ -204,8 +206,8 @@ TEST(LokiSemanticTranslationCountsSuite, TranslatedBenchmarkCountsStayStable)
             EXPECT_EQ(retranslated_task.get_axioms().size(), configuration.task_axioms);
 
             // Text stability: retranslation must reproduce the exact string representations.
-            EXPECT_TRUE(loki::format_domain(retranslated_domain) == domain_text) << "domain text not stable under retranslation";
-            EXPECT_TRUE(loki::format_task(retranslated_task) == task_text) << "task text not stable under retranslation";
+            EXPECT_TRUE(formalism::format::to_string(retranslated_domain) == domain_text) << "domain text not stable under retranslation";
+            EXPECT_TRUE(formalism::format::to_string(retranslated_task) == task_text) << "task text not stable under retranslation";
         }
     }
 }

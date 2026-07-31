@@ -31,6 +31,7 @@
 #include <string>
 #include <vector>
 #include <yggdrasil/containers/associative_containers.hpp>
+#include <yggdrasil/core/types.hpp>
 
 namespace loki::semantic
 {

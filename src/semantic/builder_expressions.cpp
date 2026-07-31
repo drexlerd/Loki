@@ -18,7 +18,6 @@
 #include "builder.hpp"
 #include "checks.hpp"
 #include "context.hpp"
-#include "diagnostics.hpp"
 #include "loki/ast/ast.hpp"
 #include "loki/formalism/builder.hpp"
 #include "mappings.hpp"

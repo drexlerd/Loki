@@ -19,7 +19,10 @@
 
 #include <filesystem>
 #include <gtest/gtest.h>
-#include <loki/semantic.hpp>
+#include <loki/formalism/task_view.hpp>
+#include <loki/semantic/errors.hpp>
+#include <loki/semantic/options.hpp>
+#include <loki/semantic/parser.hpp>
 #include <optional>
 #include <string>
 #include <typeinfo>

@@ -17,11 +17,17 @@
 
 #include <argparse/argparse.hpp>
 #include <cstdlib>
+#include <exception>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <loki/loki.hpp>
+#include <loki/formalism/formatter.hpp>
+#include <loki/formalism/indices.hpp>
+#include <loki/semantic/options.hpp>
+#include <loki/semantic/parser.hpp>
+#include <loki/semantic/translator.hpp>
 #include <stdexcept>
+#include <string>
 #include <string_view>
 
 #ifndef LOKI_VERSION
@@ -63,20 +69,20 @@ static int run(const argparse::ArgumentParser& program)
     if (problem_filepath.empty() && program.is_used("--out-problem"))
         throw std::runtime_error("--out-problem requires a problem file.");
 
-    auto parser_options = loki::ParserOptions();
+    auto parser_options = loki::semantic::ParserOptions();
     parser_options.strict = program.get<bool>("--strict");
     parser_options.add_action_costs = program.get<bool>("--add-action-costs");
 
-    auto translator_options = loki::TranslatorOptions();
+    auto translator_options = loki::semantic::TranslatorOptions();
     translator_options.compile_typing = program.get<bool>("--compile-typing");
     translator_options.compile_conditional_effects = program.get<bool>("--compile-conditional-effects");
     translator_options.materialize_equality = program.get<bool>("--materialize-equality");
 
-    auto parser = loki::Parser(domain_filepath, parser_options);
+    auto parser = loki::semantic::Parser(domain_filepath, parser_options);
     const auto domain = parser.get_domain();
 
-    const auto domain_translation_result = loki::translate(domain, translator_options);
-    const auto translated_domain_text = loki::format_domain(domain_translation_result.get_translated_domain());
+    const auto domain_translation_result = loki::semantic::translate(domain, translator_options);
+    const auto translated_domain_text = loki::formalism::format::to_string(domain_translation_result.get_translated_domain());
     if (verbose)
         std::cout << translated_domain_text << std::endl;
 
@@ -87,8 +93,8 @@ static int run(const argparse::ArgumentParser& program)
     {
         auto task = parser.parse_task(problem_filepath);
 
-        const auto translated_task_result = loki::translate(task, domain_translation_result, translator_options);
-        const auto translated_task_text = loki::format_task(translated_task_result.get_translated_task());
+        const auto translated_task_result = loki::semantic::translate(task, domain_translation_result, translator_options);
+        const auto translated_task_text = loki::formalism::format::to_string(translated_task_result.get_translated_task());
         if (verbose)
             std::cout << translated_task_text << std::endl;
 

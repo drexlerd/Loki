@@ -18,7 +18,9 @@
 #include "../benchmark_utils.hpp"
 
 #include <gtest/gtest.h>
-#include <loki/semantic.hpp>
+#include <loki/formalism/task_view.hpp>
+#include <loki/semantic/errors.hpp>
+#include <loki/semantic/parser.hpp>
 #include <string>
 
 namespace loki::tests

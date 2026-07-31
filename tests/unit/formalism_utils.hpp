@@ -20,7 +20,8 @@
 
 #include <algorithm>
 #include <gtest/gtest.h>
-#include <loki/loki.hpp>
+#include <loki/formalism/repository.hpp>
+#include <loki/formalism/views.hpp>
 #include <optional>
 #include <string>
 #include <string_view>

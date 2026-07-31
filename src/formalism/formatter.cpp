@@ -20,11 +20,10 @@
 #include "loki/formalism/repository.hpp"
 #include "loki/formalism/views.hpp"
 
-#include <cmath>
-#include <fmt/core.h>
+#include <concepts>
+#include <fmt/format.h>
 #include <fmt/ranges.h>
-#include <limits>
-#include <ostream>
+#include <iterator>
 #include <sstream>
 #include <string>
 #include <string_view>

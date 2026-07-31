@@ -16,13 +16,18 @@
  */
 
 #include "../benchmark_utils.hpp"
-#include "../formalism_utils.hpp"
 
+#include <cstddef>
 #include <gtest/gtest.h>
-#include <loki/loki.hpp>
-#include <loki/semantic.hpp>
+#include <loki/formalism/repository.hpp>
+#include <loki/formalism/views.hpp>
+#include <loki/semantic/errors.hpp>
+#include <loki/semantic/options.hpp>
+#include <loki/semantic/parser.hpp>
+#include <loki/semantic/translator.hpp>
 #include <set>
 #include <string>
+#include <type_traits>
 
 namespace loki::tests
 {

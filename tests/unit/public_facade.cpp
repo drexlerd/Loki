@@ -18,7 +18,6 @@
 #include "benchmark_utils.hpp"
 
 #include <gtest/gtest.h>
-#include <loki/formalism/formatter.hpp>
 #include <loki/loki.hpp>
 #include <string>
 #include <type_traits>

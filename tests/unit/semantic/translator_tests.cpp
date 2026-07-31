@@ -20,11 +20,16 @@
 
 #include <algorithm>
 #include <gtest/gtest.h>
-#include <loki/loki.hpp>
-#include <loki/semantic.hpp>
+#include <loki/formalism/builder.hpp>
+#include <loki/semantic/errors.hpp>
+#include <loki/semantic/options.hpp>
+#include <loki/semantic/parser.hpp>
+#include <loki/semantic/translator.hpp>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
+#include <utility>
 #include <vector>
 #include <yggdrasil/containers/associative_containers.hpp>
 

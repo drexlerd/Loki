@@ -18,6 +18,8 @@
 #include "loki/semantic/translator.hpp"
 
 #include "loki/semantic/errors.hpp"
+#include "loki/semantic/options.hpp"
+#include "loki/semantic/translator/common.hpp"
 #include "loki/semantic/translator/copy_translator.hpp"
 
 #include <utility>

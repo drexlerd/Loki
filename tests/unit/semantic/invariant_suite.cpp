@@ -20,11 +20,13 @@
 
 #include <cstdint>
 #include <gtest/gtest.h>
-#include <loki/loki.hpp>
+#include <loki/formalism/formatter.hpp>
+#include <loki/semantic/options.hpp>
+#include <loki/semantic/parser.hpp>
+#include <loki/semantic/translator.hpp>
 #include <optional>
 #include <string>
 #include <string_view>
-#include <vector>
 #include <yggdrasil/containers/associative_containers.hpp>
 
 namespace loki::tests
@@ -277,7 +279,7 @@ TEST(LokiSemanticInvariantSuite, TranslatorOptionCombinationsKeepInvariants)
 
                     if (!task)
                     {
-                        const auto domain_text = loki::format_domain(translated_domain);
+                        const auto domain_text = formalism::format::to_string(translated_domain);
                         auto reparsed = semantic::Parser(domain_text);
                         EXPECT_EQ(reparsed.get_domain().get_name(), translated_domain.get_name());
                         continue;
@@ -303,8 +305,8 @@ TEST(LokiSemanticInvariantSuite, TranslatorOptionCombinationsKeepInvariants)
                     }
 
                     // Formatted output must reparse for every option combination.
-                    const auto domain_text = loki::format_domain(translated_domain);
-                    const auto task_text = loki::format_task(translated_task);
+                    const auto domain_text = formalism::format::to_string(translated_domain);
+                    const auto task_text = formalism::format::to_string(translated_task);
                     auto reparsed = semantic::Parser(domain_text);
                     const auto reparsed_task = reparsed.parse_task(task_text);
                     EXPECT_EQ(reparsed.get_domain().get_name(), translated_domain.get_name());
@@ -392,8 +394,8 @@ TEST(LokiSemanticInvariantSuite, AddActionCostsOptionHoldsAcrossFixtures)
         EXPECT_TRUE(has_total_cost_init);
 
         // The completed output must still reparse.
-        auto reparsed = semantic::Parser(loki::format_domain(domain));
-        const auto reparsed_task = reparsed.parse_task(loki::format_task(task));
+        auto reparsed = semantic::Parser(formalism::format::to_string(domain));
+        const auto reparsed_task = reparsed.parse_task(formalism::format::to_string(task));
         EXPECT_EQ(reparsed_task.get_name(), task.get_name());
     }
 }
