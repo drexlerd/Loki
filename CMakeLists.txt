@@ -37,10 +37,8 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W1 /EHsc /bigobj /MP")
     string(APPEND CMAKE_EXE_LINKER_FLAGS " /IGNORE:4006,4044,4075")
 else()
-    # TODO: Add -Wextra and fix all warnings
-
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-    add_compile_options(-Wall)
+    add_compile_options(-Wall -Wextra)
 
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og -g2 -ggdb")
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -g2 -fno-omit-frame-pointer -fno-lto")
