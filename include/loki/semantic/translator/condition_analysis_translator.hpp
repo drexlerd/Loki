@@ -93,7 +93,7 @@ formalism::TermView ConditionAnalysisTranslator<Derived>::term_from_variable(for
 {
     auto data = this->template checkout<formalism::Term>();
     data->value = ygg::Data<formalism::Term>::Variant(variable.get_index());
-    return formalism::get_or_create(this->m_storage->repository, *data);
+    return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
 template<typename Derived>

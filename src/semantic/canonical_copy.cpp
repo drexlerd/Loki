@@ -37,7 +37,7 @@ formalism::DomainView CanonicalCopyTranslator::copy_domain(formalism::DomainView
     copy_list(domain.get_functions(), data->functions);
     copy_list(domain.get_actions(), data->actions);
     copy_list(domain.get_axioms(), data->axioms);
-    auto view = formalism::get_or_create(m_storage->repository, *data);
+    auto view = formalism::get_or_create(m_storage->repository, *data).first;
     m_storage->translated_domain = view;
     remember(m_storage->domains, domain, view);
     return view;
@@ -58,7 +58,7 @@ formalism::TaskView CanonicalCopyTranslator::copy_task(formalism::TaskView task)
         data->metric = as_index(copy(source_metric.value()));
     copy_list(task.get_predicates(), data->predicates);
     copy_list(task.get_axioms(), data->axioms);
-    auto view = formalism::get_or_create(m_storage->repository, *data);
+    auto view = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->tasks, task, view);
     return view;
 }
@@ -69,7 +69,7 @@ formalism::EffectLiteralView CanonicalCopyTranslator::copy(formalism::EffectLite
         return *mapped;
     auto data = checkout<formalism::EffectLiteral>();
     data->literal = as_index(copy(source.get_literal()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effect_literals, source, out);
     return out;
 }
@@ -80,7 +80,7 @@ formalism::EffectAndView CanonicalCopyTranslator::copy(formalism::EffectAndView 
         return *mapped;
     auto data = checkout<formalism::EffectAnd>();
     copy_list(source.get_effects(), data->effects);
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effect_ands, source, out);
     return out;
 }
@@ -93,7 +93,7 @@ formalism::EffectNumericView CanonicalCopyTranslator::copy(formalism::EffectNume
     data->op = source.get_data().op;
     data->function = as_index(copy(source.get_function()));
     data->expression = as_index(copy(source.get_expression()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effect_numerics, source, out);
     return out;
 }
@@ -105,7 +105,7 @@ formalism::EffectForallView CanonicalCopyTranslator::copy(formalism::EffectForal
     auto data = checkout<formalism::EffectForall>();
     copy_list(source.get_parameters(), data->parameters);
     data->effect = as_index(copy(source.get_effect()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effect_foralls, source, out);
     return out;
 }
@@ -117,7 +117,7 @@ formalism::EffectWhenView CanonicalCopyTranslator::copy(formalism::EffectWhenVie
     auto data = checkout<formalism::EffectWhen>();
     data->condition = as_index(copy(source.get_condition()));
     data->effect = as_index(copy(source.get_effect()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effect_whens, source, out);
     return out;
 }
@@ -128,7 +128,7 @@ formalism::EffectOneOfView CanonicalCopyTranslator::copy(formalism::EffectOneOfV
         return *mapped;
     auto data = checkout<formalism::EffectOneOf>();
     copy_list(source.get_effects(), data->effects);
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effect_one_ofs, source, out);
     return out;
 }
@@ -140,7 +140,7 @@ formalism::EffectProbabilisticAlternativeView CanonicalCopyTranslator::copy(form
     auto data = checkout<formalism::EffectProbabilisticAlternative>();
     data->probability = source.get_data().probability;
     data->effect = as_index(copy(source.get_effect()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effect_probabilistic_alternatives, source, out);
     return out;
 }
@@ -151,7 +151,7 @@ formalism::EffectProbabilisticView CanonicalCopyTranslator::copy(formalism::Effe
         return *mapped;
     auto data = checkout<formalism::EffectProbabilistic>();
     copy_list(source.get_alternatives(), data->alternatives);
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effect_probabilistics, source, out);
     return out;
 }
@@ -162,7 +162,7 @@ formalism::EffectView CanonicalCopyTranslator::copy(formalism::EffectView source
         return *mapped;
     auto data = checkout<formalism::Effect>();
     data->value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant { return as_index(copy(arg)); }, source.get_value());
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effects, source, out);
     return out;
 }
@@ -181,7 +181,7 @@ formalism::ActionView CanonicalCopyTranslator::copy(formalism::ActionView source
     if (const auto effect_view = source.get_effect())
         out_data->effect = as_index(copy(effect_view.value()));
     copy_list(source.get_parameters(), out_data->parameters);
-    auto out = formalism::get_or_create(m_storage->repository, *out_data);
+    auto out = formalism::get_or_create(m_storage->repository, *out_data).first;
     remember(m_storage->actions, source, out);
     return out;
 }
@@ -195,7 +195,7 @@ formalism::AxiomView CanonicalCopyTranslator::copy(formalism::AxiomView source)
     data->original_arity = source.get_data().original_arity;
     data->head = as_index(copy(source.get_head()));
     data->condition = as_index(copy(source.get_condition()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->axioms, source, out);
     return out;
 }
@@ -207,7 +207,7 @@ formalism::MetricView CanonicalCopyTranslator::copy(formalism::MetricView source
     auto data = checkout<formalism::Metric>();
     data->optimization_direction = source.get_optimization_direction();
     data->expression = as_index(copy(source.get_expression()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->metrics, source, out);
     return out;
 }
@@ -219,7 +219,7 @@ formalism::InitialFunctionValueView CanonicalCopyTranslator::copy(formalism::Ini
     auto data = checkout<formalism::InitialFunctionValue>();
     data->function = as_index(copy(source.get_function()));
     data->value = as_index(copy(source.get_value()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->initial_function_values, source, out);
     return out;
 }

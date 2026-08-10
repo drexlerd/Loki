@@ -74,7 +74,7 @@ formalism::EntityView<T> intern(formalism::Repository& repository, formalism::Bu
     auto data = builder.template get_builder<T>();
     data->clear();
     std::forward<Initialize>(initialize)(*data);
-    return formalism::get_or_create(repository, *data);
+    return formalism::get_or_create(repository, *data).first;
 }
 
 template<typename T>

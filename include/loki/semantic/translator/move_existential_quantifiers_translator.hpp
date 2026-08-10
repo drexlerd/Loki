@@ -170,7 +170,7 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::hoist_ex
         }
         auto variable_data = this->template checkout<formalism::Variable>();
         variable_data->name = cista::offset::string(name);
-        const auto fresh = formalism::get_or_create(this->m_storage->repository, *variable_data);
+        const auto fresh = formalism::get_or_create(this->m_storage->repository, *variable_data).first;
         this->self().enter_variable_scope();
         this->m_variable_bindings.back().emplace(variable, fresh);
         condition = this->self().rename_variables(condition);
@@ -180,7 +180,7 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::hoist_ex
         parameter_data->variable = fresh.get_index();
         for (auto type : parameter.get_data().types)
             parameter_data->types.push_back(type);
-        parameters.push_back(formalism::get_or_create(this->m_storage->repository, *parameter_data));
+        parameters.push_back(formalism::get_or_create(this->m_storage->repository, *parameter_data).first);
     }
     return condition;
 }
@@ -210,7 +210,7 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_exi
     for (auto parameter : parameters)
         data->parameters.push_back(parameter.get_index());
     data->condition = conjunction.get_index();
-    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data)));
+    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first));
 }
 
 template<typename Derived>
@@ -222,7 +222,7 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_exi
     for (auto parameter : data.parameters)
         result->parameters.push_back(parameter);
     result->condition = condition.get_index();
-    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *result)));
+    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *result).first));
 }
 
 template<typename Derived>

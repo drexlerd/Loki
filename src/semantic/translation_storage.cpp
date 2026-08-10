@@ -45,7 +45,7 @@ formalism::TypeView copy_type_view_for_metadata(TranslationStorage& target, form
     for (auto base : source.get_bases())
         data->bases.push_back(copy_type_view_for_metadata(target, builder, base).get_index());
 
-    auto out = formalism::get_or_create(target.repository, *data);
+    auto out = formalism::get_or_create(target.repository, *data).first;
     remember(target.types, source, out);
     return out;
 }

@@ -45,7 +45,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(ygg
 {
     auto data = this->template checkout<formalism::Condition>();
     data->value = std::move(value);
-    return formalism::get_or_create(this->m_storage->repository, *data);
+    return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
 template<typename Derived>
@@ -54,7 +54,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(for
 {
     auto data = this->template checkout<formalism::Condition>();
     data->value = ygg::Data<formalism::Condition>::Variant(value.get_index());
-    return formalism::get_or_create(this->m_storage->repository, *data);
+    return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
 template<typename Derived>
@@ -108,7 +108,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                         },
                         flat.get_value());
                 }
-                return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data));
+                return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first);
             }
             else if constexpr (std::is_same_v<Node, formalism::ConditionOrView>)
             {
@@ -132,7 +132,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                         },
                         flat.get_value());
                 }
-                return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data));
+                return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first);
             }
             else if constexpr (std::is_same_v<Node, formalism::ConditionExistsView>)
             {
@@ -149,7 +149,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                             for (auto parameter : flat_node.get_parameters())
                                 data->parameters.push_back(parameter.get_index());
                             data->condition = flat_node.get_condition().get_index();
-                            return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data));
+                            return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first);
                         }
                         else
                         {
@@ -157,7 +157,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                             for (auto parameter : node.get_parameters())
                                 data->parameters.push_back(parameter.get_index());
                             data->condition = flat.get_index();
-                            return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data));
+                            return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first);
                         }
                     },
                     flat.get_value());
@@ -177,7 +177,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                             for (auto parameter : flat_node.get_parameters())
                                 data->parameters.push_back(parameter.get_index());
                             data->condition = flat_node.get_condition().get_index();
-                            return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data));
+                            return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first);
                         }
                         else
                         {
@@ -185,7 +185,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                             for (auto parameter : node.get_parameters())
                                 data->parameters.push_back(parameter.get_index());
                             data->condition = flat.get_index();
-                            return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data));
+                            return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first);
                         }
                     },
                     flat.get_value());
@@ -204,7 +204,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::make_conjunction(y
     auto data = this->template checkout<formalism::ConditionAnd>();
     for (auto condition : conditions)
         data->conditions.push_back(condition);
-    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data)));
+    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first));
 }
 
 template<typename Derived>
@@ -213,7 +213,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::make_disjunction(y
     auto data = this->template checkout<formalism::ConditionOr>();
     for (auto condition : conditions)
         data->conditions.push_back(condition);
-    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data)));
+    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first));
 }
 
 }  // namespace loki::semantic::detail

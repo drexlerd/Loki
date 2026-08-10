@@ -88,7 +88,7 @@ formalism::ActionView TopLevelTranslator<Derived>::copy(formalism::ActionView so
     result->original_arity = data.original_arity;
     result->precondition = precondition;
     result->effect = effect;
-    auto out = formalism::get_or_create(this->m_storage->repository, *result);
+    auto out = formalism::get_or_create(this->m_storage->repository, *result).first;
     this->self().leave_scope();
     remember(this->m_storage->actions, source, out);
     return out;
@@ -131,7 +131,7 @@ formalism::AxiomView TopLevelTranslator<Derived>::copy(formalism::AxiomView sour
     result->original_arity = data.original_arity;
     result->head = head;
     result->condition = condition;
-    auto out = formalism::get_or_create(this->m_storage->repository, *result);
+    auto out = formalism::get_or_create(this->m_storage->repository, *result).first;
     this->self().leave_scope();
     remember(this->m_storage->axioms, source, out);
     return out;
@@ -146,7 +146,7 @@ formalism::MetricView TopLevelTranslator<Derived>::copy(formalism::MetricView so
     auto data = this->template checkout<formalism::Metric>();
     data->optimization_direction = source.get_optimization_direction();
     data->expression = expression;
-    auto out = formalism::get_or_create(this->m_storage->repository, *data);
+    auto out = formalism::get_or_create(this->m_storage->repository, *data).first;
     remember(this->m_storage->metrics, source, out);
     return out;
 }
@@ -161,7 +161,7 @@ formalism::InitialFunctionValueView TopLevelTranslator<Derived>::copy(formalism:
     auto data = this->template checkout<formalism::InitialFunctionValue>();
     data->function = function;
     data->value = value;
-    auto out = formalism::get_or_create(this->m_storage->repository, *data);
+    auto out = formalism::get_or_create(this->m_storage->repository, *data).first;
     remember(this->m_storage->initial_function_values, source, out);
     return out;
 }

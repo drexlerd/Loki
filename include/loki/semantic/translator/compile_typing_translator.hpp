@@ -90,7 +90,7 @@ void CompileTypingTranslator<Derived>::copy_parameters_without_types(formalism::
         const auto variable = as_index(this->self().copy(parameter.get_variable()));
         auto data = this->template checkout<formalism::Parameter>();
         data->variable = variable;
-        result.push_back(formalism::get_or_create(this->m_storage->repository, *data).get_index());
+        result.push_back(formalism::get_or_create(this->m_storage->repository, *data).first.get_index());
     }
 }
 
@@ -105,11 +105,11 @@ formalism::PredicateView CompileTypingTranslator<Derived>::type_predicate(formal
         parameter_data->types.push_back(as_index(this->self().copy(type)));
     auto variable_data = this->template checkout<formalism::Variable>();
     variable_data->name = cista::offset::string("?arg");
-    parameter_data->variable = formalism::get_or_create(this->m_storage->repository, *variable_data).get_index();
+    parameter_data->variable = formalism::get_or_create(this->m_storage->repository, *variable_data).first.get_index();
     auto predicate_data = this->template checkout<formalism::Predicate>();
     predicate_data->name = type.get_name();
-    predicate_data->parameters.push_back(formalism::get_or_create(this->m_storage->repository, *parameter_data).get_index());
-    auto predicate = formalism::get_or_create(this->m_storage->repository, *predicate_data);
+    predicate_data->parameters.push_back(formalism::get_or_create(this->m_storage->repository, *parameter_data).first.get_index());
+    auto predicate = formalism::get_or_create(this->m_storage->repository, *predicate_data).first;
     this->m_type_predicates.emplace(type, predicate);
     this->m_used_predicate_names.insert(std::string(type.get_name()));
     return predicate;
@@ -122,11 +122,11 @@ formalism::LiteralView CompileTypingTranslator<Derived>::type_literal(formalism:
     auto atom_data = this->template checkout<formalism::Atom>();
     atom_data->predicate = predicate;
     atom_data->terms.push_back(term);
-    const auto atom = formalism::get_or_create(this->m_storage->repository, *atom_data).get_index();
+    const auto atom = formalism::get_or_create(this->m_storage->repository, *atom_data).first.get_index();
     auto literal_data = this->template checkout<formalism::Literal>();
     literal_data->atom = atom;
     literal_data->m_polarity = true;
-    return formalism::get_or_create(this->m_storage->repository, *literal_data);
+    return formalism::get_or_create(this->m_storage->repository, *literal_data).first;
 }
 
 template<typename Derived>
@@ -135,11 +135,11 @@ formalism::ConditionView CompileTypingTranslator<Derived>::type_condition(formal
     const auto copied_variable = as_index(this->self().copy(variable));
     auto term_data = this->template checkout<formalism::Term>();
     term_data->value = ygg::Data<formalism::Term>::Variant(copied_variable);
-    const auto term = formalism::get_or_create(this->m_storage->repository, *term_data).get_index();
+    const auto term = formalism::get_or_create(this->m_storage->repository, *term_data).first.get_index();
     const auto literal = as_index(this->self().type_literal(type, term));
     auto condition_data = this->template checkout<formalism::ConditionLiteral>();
     condition_data->literal = literal;
-    return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *condition_data));
+    return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *condition_data).first);
 }
 
 template<typename Derived>
@@ -213,7 +213,7 @@ void CompileTypingTranslator<Derived>::add_type_literals_for_object(ygg::IndexLi
     const auto copied_object = this->self().copy(object);
     auto term_data = this->template checkout<formalism::Term>();
     term_data->value = ygg::Data<formalism::Term>::Variant(copied_object.get_index());
-    const auto term = formalism::get_or_create(this->m_storage->repository, *term_data).get_index();
+    const auto term = formalism::get_or_create(this->m_storage->repository, *term_data).first.get_index();
     auto add_literal = [&](auto&& self, formalism::TypeView type) -> void
     {
         literals.push_back(as_index(this->self().type_literal(type, term)));

@@ -36,7 +36,7 @@ formalism::TypeView make_base_type(formalism::Repository& repository, std::strin
     auto data = builder.get_builder<formalism::Type>();
     data->clear();
     data->name = cista::offset::string(name);
-    return formalism::get_or_create(repository, *data);
+    return formalism::get_or_create(repository, *data).first;
 }
 
 }
@@ -56,12 +56,11 @@ void remember_requirement(ParseContext& parse_context, formalism::RequirementKin
         parse_context.active_requirements.insert(capability);
 }
 
-formalism::TypeView
-intern_type(DomainContext& domain_context,
-            formalism::Builder& builder,
-            formalism::Repository& repository,
-            const std::string& name,
-            const std::vector<formalism::TypeView>& bases)
+formalism::TypeView intern_type(DomainContext& domain_context,
+                                formalism::Builder& builder,
+                                formalism::Repository& repository,
+                                const std::string& name,
+                                const std::vector<formalism::TypeView>& bases)
 {
     auto k = key(name);
     if (auto it = domain_context.types.find(k); it != domain_context.types.end() && bases.empty())
@@ -72,7 +71,7 @@ intern_type(DomainContext& domain_context,
     data->bases.reserve(bases.size());
     for (const auto base : bases)
         data->bases.push_back(base.get_index());
-    auto view = formalism::get_or_create(repository, *data);
+    auto view = formalism::get_or_create(repository, *data).first;
     if (auto [it, inserted] = domain_context.types.emplace(k, view); !inserted)
         it->second = view;
     return view;

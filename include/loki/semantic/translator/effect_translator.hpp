@@ -56,7 +56,7 @@ formalism::EffectLiteralView EffectTranslator<Derived>::copy(formalism::EffectLi
     const auto literal = as_index(this->self().copy(source.get_literal()));
     auto data = this->template checkout<formalism::EffectLiteral>();
     data->literal = literal;
-    return formalism::get_or_create(this->m_storage->repository, *data);
+    return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
 template<typename Derived>
@@ -65,7 +65,7 @@ formalism::EffectAndView EffectTranslator<Derived>::copy(formalism::EffectAndVie
     auto data = this->template checkout<formalism::EffectAnd>();
     for (auto effect : source.get_effects())
         data->effects.push_back(as_index(this->self().copy(effect)));
-    return formalism::get_or_create(this->m_storage->repository, *data);
+    return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
 template<typename Derived>
@@ -78,7 +78,7 @@ formalism::EffectNumericView EffectTranslator<Derived>::copy(formalism::EffectNu
     result->op = data.op;
     result->function = function;
     result->expression = expression;
-    return formalism::get_or_create(this->m_storage->repository, *result);
+    return formalism::get_or_create(this->m_storage->repository, *result).first;
 }
 
 template<typename Derived>
@@ -95,7 +95,7 @@ formalism::EffectForallView EffectTranslator<Derived>::copy(formalism::EffectFor
         auto data = this->template checkout<formalism::EffectWhen>();
         data->condition = condition.get_index();
         data->effect = effect;
-        effect = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *data)).get_index();
+        effect = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *data).first).get_index();
     }
     auto data = this->template checkout<formalism::EffectForall>();
     if (this->self().compiles_typing_now())
@@ -104,7 +104,7 @@ formalism::EffectForallView EffectTranslator<Derived>::copy(formalism::EffectFor
         for (auto parameter : parameter_views)
             data->parameters.push_back(parameter.get_index());
     data->effect = effect;
-    const auto out = formalism::get_or_create(this->m_storage->repository, *data);
+    const auto out = formalism::get_or_create(this->m_storage->repository, *data).first;
     this->self().leave_scope();
     return out;
 }
@@ -119,7 +119,7 @@ formalism::EffectWhenView EffectTranslator<Derived>::copy(formalism::EffectWhenV
     auto data = this->template checkout<formalism::EffectWhen>();
     data->condition = condition;
     data->effect = effect;
-    return formalism::get_or_create(this->m_storage->repository, *data);
+    return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
 template<typename Derived>
@@ -128,7 +128,7 @@ formalism::EffectOneOfView EffectTranslator<Derived>::copy(formalism::EffectOneO
     auto data = this->template checkout<formalism::EffectOneOf>();
     for (auto effect : source.get_effects())
         data->effects.push_back(as_index(this->self().copy(effect)));
-    return formalism::get_or_create(this->m_storage->repository, *data);
+    return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
 template<typename Derived>
@@ -139,7 +139,7 @@ formalism::EffectProbabilisticAlternativeView EffectTranslator<Derived>::copy(fo
     auto result = this->template checkout<formalism::EffectProbabilisticAlternative>();
     result->probability = data.probability;
     result->effect = effect;
-    return formalism::get_or_create(this->m_storage->repository, *result);
+    return formalism::get_or_create(this->m_storage->repository, *result).first;
 }
 
 template<typename Derived>
@@ -148,7 +148,7 @@ formalism::EffectProbabilisticView EffectTranslator<Derived>::copy(formalism::Ef
     auto data = this->template checkout<formalism::EffectProbabilistic>();
     for (auto alternative : source.get_alternatives())
         data->alternatives.push_back(as_index(this->self().copy(alternative)));
-    return formalism::get_or_create(this->m_storage->repository, *data);
+    return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
 template<typename Derived>
@@ -173,17 +173,17 @@ formalism::EffectView EffectTranslator<Derived>::copy(formalism::EffectView sour
                             auto when_data = this->template checkout<formalism::EffectWhen>();
                             when_data->condition = part.get_index();
                             when_data->effect = effect;
-                            const auto when = formalism::get_or_create(this->m_storage->repository, *when_data);
+                            const auto when = formalism::get_or_create(this->m_storage->repository, *when_data).first;
                             data->effects.push_back(this->self().wrap_effect(when).get_index());
                         }
-                        split = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *data));
+                        split = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *data).first);
                     }
                     else
                     {
                         auto data = this->template checkout<formalism::EffectWhen>();
                         data->condition = condition.get_index();
                         data->effect = effect;
-                        split = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *data));
+                        split = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *data).first);
                     }
                 }
             },
@@ -197,7 +197,7 @@ formalism::EffectView EffectTranslator<Derived>::copy(formalism::EffectView sour
                             source.get_value());
     auto data = this->template checkout<formalism::Effect>();
     data->value = std::move(value);
-    auto copied = formalism::get_or_create(this->m_storage->repository, *data);
+    auto copied = formalism::get_or_create(this->m_storage->repository, *data).first;
     if (this->m_phase == TranslationPhase::ToEffectNormalForm)
         return this->self().normalize_effect(copied);
     return copied;

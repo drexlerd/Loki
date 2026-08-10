@@ -24,7 +24,7 @@ template<typename T>
 [[nodiscard]] auto get_or_create(Repository& repository, ygg::Data<T>& data)
 {
     canonicalize(repository, data);
-    return repository.get_or_create(data).first;
+    return repository.get_or_create(data);
 }
 
 }

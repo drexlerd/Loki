@@ -40,14 +40,16 @@ f::EntityView<T> intern(f::Repository& repository, f::Builder& builder, Initiali
     auto data = builder.template get_builder<T>();
     data->clear();
     std::forward<Initialize>(initialize)(*data);
-    return f::get_or_create(repository, *data);
+    return f::get_or_create(repository, *data).first;
 }
 
 TEST(LokiTests, MultiFunctionExpressionAllowsAnyArity)
 {
     auto repository = f::Repository(0);
     auto data = Data {};
-    EXPECT_TRUE(f::get_or_create(repository, data).get_args().empty());
+    const auto [expression, created] = f::get_or_create(repository, data);
+    EXPECT_TRUE(created);
+    EXPECT_TRUE(expression.get_args().empty());
 }
 
 TEST(LokiTests, MultiFunctionExpressionBreaksEqualRenderTiesByIndex)

@@ -42,7 +42,7 @@ public:
 
 template<typename Derived>
 void CompileConditionalEffectsTranslator<Derived>::compile_conditional_effect_actions(formalism::EntityListView<formalism::Action> actions,
-                                                                                       ygg::IndexList<formalism::Action>& result)
+                                                                                      ygg::IndexList<formalism::Action>& result)
 {
     struct ConditionalEffect
     {
@@ -124,7 +124,7 @@ void CompileConditionalEffectsTranslator<Derived>::compile_conditional_effect_ac
                 auto effect_data = this->template checkout<formalism::EffectAnd>();
                 for (auto item : effects)
                     effect_data->effects.push_back(item);
-                effect = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *effect_data)).get_index();
+                effect = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *effect_data).first).get_index();
             }
 
             auto name = std::string(data.name) + "_" + std::to_string(action.get_index().get_value());
@@ -140,7 +140,7 @@ void CompileConditionalEffectsTranslator<Derived>::compile_conditional_effect_ac
             action_data->original_arity = data.original_arity;
             action_data->precondition = precondition;
             action_data->effect = effect;
-            this->self().push_unique(result, seen, formalism::get_or_create(this->m_storage->repository, *action_data));
+            this->self().push_unique(result, seen, formalism::get_or_create(this->m_storage->repository, *action_data).first);
         }
     }
 }

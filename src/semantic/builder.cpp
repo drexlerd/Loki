@@ -68,7 +68,7 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
         remember_requirement(m_parse_context, formalism::RequirementKind::ActionCosts);
         auto data = checkout<formalism::Requirement>();
         data->kind = formalism::RequirementKind::ActionCosts;
-        const auto requirement = formalism::get_or_create(repo(), *data);
+        const auto requirement = formalism::get_or_create(repo(), *data).first;
         if (std::none_of(requirements.begin(), requirements.end(), [&](const auto value) { return value.get_index() == requirement.get_index(); }))
             requirements.push_back(requirement);
     }
@@ -114,7 +114,7 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
     append_indices(functions, data->functions);
     append_indices(actions, data->actions);
     append_indices(axioms, data->axioms);
-    return formalism::get_or_create(repo(), *data);
+    return formalism::get_or_create(repo(), *data).first;
 }
 
 formalism::TaskView AstBuilder::build_task(const ast::Task& task)
@@ -167,7 +167,7 @@ formalism::TaskView AstBuilder::build_task(const ast::Task& task)
     data->goal = to_optional_index(goal);
     data->metric = to_optional_index(metric);
     append_indices(axioms, data->axioms);
-    return formalism::get_or_create(repo(), *data);
+    return formalism::get_or_create(repo(), *data).first;
 }
 
 }  // namespace loki::semantic

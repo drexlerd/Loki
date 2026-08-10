@@ -94,7 +94,7 @@ formalism::DomainView CopyTranslatorFacade<Derived>::copy_domain(formalism::Doma
     this->self().template copy_list<formalism::Action>(domain.get_actions(), data->actions);
     this->self().template copy_list<formalism::Axiom>(domain.get_axioms(), data->axioms);
 
-    auto copied_domain = formalism::get_or_create(this->m_storage->repository, *data);
+    auto copied_domain = formalism::get_or_create(this->m_storage->repository, *data).first;
     this->m_storage->translated_domain = copied_domain;
     data->index = {};
 
@@ -123,7 +123,7 @@ formalism::DomainView CopyTranslatorFacade<Derived>::copy_domain(formalism::Doma
             break;
     }
 
-    auto view = formalism::get_or_create(this->m_storage->repository, *data);
+    auto view = formalism::get_or_create(this->m_storage->repository, *data).first;
     this->m_storage->translated_domain = view;
     remember(this->m_storage->domains, domain, view);
     return view;
@@ -170,7 +170,7 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
     this->self().template copy_list<formalism::Predicate>(task.get_predicates(), data->predicates);
     this->self().template copy_list<formalism::Axiom>(task.get_axioms(), data->axioms);
 
-    auto copied_task = formalism::get_or_create(this->m_storage->repository, *data);
+    auto copied_task = formalism::get_or_create(this->m_storage->repository, *data).first;
     data->index = {};
 
     switch (this->m_phase)
@@ -212,7 +212,7 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
             break;
     }
 
-    auto view = formalism::get_or_create(this->m_storage->repository, *data);
+    auto view = formalism::get_or_create(this->m_storage->repository, *data).first;
     remember(this->m_storage->tasks, task, view);
     return view;
 }

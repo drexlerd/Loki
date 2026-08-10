@@ -30,7 +30,7 @@ formalism::FunctionExpressionNumberView CanonicalCopyTranslator::copy(formalism:
         return *mapped;
     auto data = checkout<formalism::FunctionExpressionNumber>();
     data->value = source.get_value();
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->numbers, source, out);
     return out;
 }
@@ -42,7 +42,7 @@ formalism::FunctionTermView CanonicalCopyTranslator::copy(formalism::FunctionTer
     auto data = checkout<formalism::FunctionTerm>();
     data->function = as_index(copy(source.get_function()));
     copy_list(source.get_terms(), data->terms);
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->function_terms, source, out);
     return out;
 }
@@ -54,7 +54,7 @@ formalism::UnaryFunctionExpressionView CanonicalCopyTranslator::copy(formalism::
     auto data = checkout<formalism::UnaryFunctionExpression>();
     data->op = source.get_data().op;
     data->expression = as_index(copy(source.get_expression()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->unary_expressions, source, out);
     return out;
 }
@@ -67,7 +67,7 @@ formalism::BinaryFunctionExpressionView CanonicalCopyTranslator::copy(formalism:
     data->op = source.get_data().op;
     data->left = as_index(copy(source.get_left()));
     data->right = as_index(copy(source.get_right()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->binary_expressions, source, out);
     return out;
 }
@@ -79,7 +79,7 @@ formalism::MultiFunctionExpressionView CanonicalCopyTranslator::copy(formalism::
     auto data = checkout<formalism::MultiFunctionExpression>();
     data->op = source.get_operator();
     copy_list(source.get_args(), data->args);
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->multi_expressions, source, out);
     return out;
 }
@@ -90,7 +90,7 @@ formalism::FunctionExpressionView CanonicalCopyTranslator::copy(formalism::Funct
         return *mapped;
     auto data = checkout<formalism::FunctionExpression>();
     data->value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::FunctionExpression>::Variant { return as_index(copy(arg)); }, source.get_value());
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->function_expressions, source, out);
     return out;
 }
@@ -101,7 +101,7 @@ formalism::ConditionLiteralView CanonicalCopyTranslator::copy(formalism::Conditi
         return *mapped;
     auto data = checkout<formalism::ConditionLiteral>();
     data->literal = as_index(copy(source.get_literal()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->condition_literals, source, out);
     return out;
 }
@@ -112,7 +112,7 @@ formalism::ConditionAndView CanonicalCopyTranslator::copy(formalism::ConditionAn
         return *mapped;
     auto data = checkout<formalism::ConditionAnd>();
     copy_list(source.get_conditions(), data->conditions);
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->condition_ands, source, out);
     return out;
 }
@@ -123,7 +123,7 @@ formalism::ConditionOrView CanonicalCopyTranslator::copy(formalism::ConditionOrV
         return *mapped;
     auto data = checkout<formalism::ConditionOr>();
     copy_list(source.get_conditions(), data->conditions);
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->condition_ors, source, out);
     return out;
 }
@@ -134,7 +134,7 @@ formalism::ConditionNotView CanonicalCopyTranslator::copy(formalism::ConditionNo
         return *mapped;
     auto data = checkout<formalism::ConditionNot>();
     data->condition = as_index(copy(source.get_condition()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->condition_nots, source, out);
     return out;
 }
@@ -146,7 +146,7 @@ formalism::ConditionImplyView CanonicalCopyTranslator::copy(formalism::Condition
     auto data = checkout<formalism::ConditionImply>();
     data->left = as_index(copy(source.get_left()));
     data->right = as_index(copy(source.get_right()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->condition_implies, source, out);
     return out;
 }
@@ -158,7 +158,7 @@ formalism::ConditionExistsView CanonicalCopyTranslator::copy(formalism::Conditio
     auto data = checkout<formalism::ConditionExists>();
     copy_list(source.get_parameters(), data->parameters);
     data->condition = as_index(copy(source.get_condition()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->condition_exists, source, out);
     return out;
 }
@@ -170,7 +170,7 @@ formalism::ConditionForallView CanonicalCopyTranslator::copy(formalism::Conditio
     auto data = checkout<formalism::ConditionForall>();
     copy_list(source.get_parameters(), data->parameters);
     data->condition = as_index(copy(source.get_condition()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->condition_foralls, source, out);
     return out;
 }
@@ -183,7 +183,7 @@ formalism::ConditionNumericConstraintView CanonicalCopyTranslator::copy(formalis
     data->comparator = source.get_data().comparator;
     data->left = as_index(copy(source.get_left()));
     data->right = as_index(copy(source.get_right()));
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->condition_numeric_constraints, source, out);
     return out;
 }
@@ -194,7 +194,7 @@ formalism::ConditionView CanonicalCopyTranslator::copy(formalism::ConditionView 
         return *mapped;
     auto data = checkout<formalism::Condition>();
     data->value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Condition>::Variant { return as_index(copy(arg)); }, source.get_value());
-    auto out = formalism::get_or_create(m_storage->repository, *data);
+    auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->conditions, source, out);
     return out;
 }

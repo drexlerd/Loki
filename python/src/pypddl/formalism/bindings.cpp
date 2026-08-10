@@ -84,7 +84,7 @@ void bind_formalism_enums(nb::module_& m)
 template<typename T>
 EntityView<T> get_or_create_data(Repository& repository, Data<T> data)
 {
-    return formalism::get_or_create(repository, data);
+    return formalism::get_or_create(repository, data).first;
 }
 
 template EntityView<Requirement> get_or_create_data<Requirement>(Repository&, Data<Requirement>);

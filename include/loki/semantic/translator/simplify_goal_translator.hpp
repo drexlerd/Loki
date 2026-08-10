@@ -44,24 +44,24 @@ formalism::ConditionView SimplifyGoalTranslator<Derived>::make_generated_goal_co
     const auto name = cista::offset::string(this->self().next_generated_predicate_name("loki-goal-"));
     auto predicate_data = this->template checkout<formalism::Predicate>();
     predicate_data->name = name;
-    const auto predicate = formalism::get_or_create(this->m_storage->repository, *predicate_data);
+    const auto predicate = formalism::get_or_create(this->m_storage->repository, *predicate_data).first;
     auto atom_data = this->template checkout<formalism::Atom>();
     atom_data->predicate = predicate.get_index();
-    const auto atom = formalism::get_or_create(this->m_storage->repository, *atom_data).get_index();
+    const auto atom = formalism::get_or_create(this->m_storage->repository, *atom_data).first.get_index();
     auto literal_data = this->template checkout<formalism::Literal>();
     literal_data->atom = atom;
     literal_data->m_polarity = true;
-    const auto literal = formalism::get_or_create(this->m_storage->repository, *literal_data).get_index();
+    const auto literal = formalism::get_or_create(this->m_storage->repository, *literal_data).first.get_index();
     auto axiom_data = this->template checkout<formalism::Axiom>();
     axiom_data->original_arity = 0;
     axiom_data->head = literal;
     axiom_data->condition = condition;
-    const auto axiom = formalism::get_or_create(this->m_storage->repository, *axiom_data);
+    const auto axiom = formalism::get_or_create(this->m_storage->repository, *axiom_data).first;
     this->m_generated_predicates.push_back(predicate);
     this->m_generated_axioms.push_back(axiom);
     auto condition_data = this->template checkout<formalism::ConditionLiteral>();
     condition_data->literal = literal;
-    return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *condition_data));
+    return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *condition_data).first);
 }
 
 template<typename Derived>

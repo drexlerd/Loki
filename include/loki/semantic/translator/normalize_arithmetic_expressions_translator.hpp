@@ -67,7 +67,7 @@ formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Deriv
 {
     auto data = this->template checkout<formalism::FunctionExpression>();
     data->value = ygg::Data<formalism::FunctionExpression>::Variant(value.get_index());
-    return formalism::get_or_create(this->m_storage->repository, *data);
+    return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
 template<typename Derived>
@@ -99,7 +99,7 @@ formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Deriv
     auto data = this->template checkout<formalism::UnaryFunctionExpression>();
     data->op = source.get_operator();
     data->expression = expression.get_index();
-    return wrap(formalism::get_or_create(this->m_storage->repository, *data));
+    return wrap(formalism::get_or_create(this->m_storage->repository, *data).first);
 }
 
 template<typename Derived>
@@ -120,7 +120,7 @@ formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Deriv
             data->op = source.get_operator();
             data->left = left.get_index();
             data->right = right.get_index();
-            return wrap(formalism::get_or_create(this->m_storage->repository, *data));
+            return wrap(formalism::get_or_create(this->m_storage->repository, *data).first);
         }
     }
     throw std::invalid_argument("invalid BinaryArithmeticOperator");
@@ -141,7 +141,7 @@ formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Deriv
 {
     auto data = this->template checkout<formalism::FunctionExpressionNumber>();
     data->value = value;
-    return wrap(formalism::get_or_create(this->m_storage->repository, *data));
+    return wrap(formalism::get_or_create(this->m_storage->repository, *data).first);
 }
 
 template<typename Derived>
@@ -162,7 +162,7 @@ NormalizeArithmeticExpressionsTranslator<Derived>::normalize_associative(formali
     data->op = op;
     for (const auto operand : operands)
         data->args.push_back(operand.get_index());
-    return wrap(formalism::get_or_create(this->m_storage->repository, *data));
+    return wrap(formalism::get_or_create(this->m_storage->repository, *data).first);
 }
 
 template<typename Derived>
