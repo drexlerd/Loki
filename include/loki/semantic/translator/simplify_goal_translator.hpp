@@ -42,14 +42,26 @@ template<typename Derived>
 formalism::ConditionView SimplifyGoalTranslator<Derived>::make_generated_goal_condition(ygg::Index<formalism::Condition> condition)
 {
     const auto name = cista::offset::string(this->self().next_generated_predicate_name("loki-goal-"));
-    const auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, name, ygg::IndexList<formalism::Parameter> {});
-    const auto atom =
-        formalism::get_or_create<formalism::Atom>(this->m_storage->repository, predicate.get_index(), ygg::IndexList<formalism::Term> {}).get_index();
-    const auto literal = formalism::get_or_create<formalism::Literal>(this->m_storage->repository, atom, true).get_index();
-    const auto axiom = formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, ygg::IndexList<formalism::Parameter> {}, literal, condition);
+    auto predicate_data = this->template checkout<formalism::Predicate>();
+    predicate_data->name = name;
+    const auto predicate = formalism::get_or_create(this->m_storage->repository, *predicate_data);
+    auto atom_data = this->template checkout<formalism::Atom>();
+    atom_data->predicate = predicate.get_index();
+    const auto atom = formalism::get_or_create(this->m_storage->repository, *atom_data).get_index();
+    auto literal_data = this->template checkout<formalism::Literal>();
+    literal_data->atom = atom;
+    literal_data->m_polarity = true;
+    const auto literal = formalism::get_or_create(this->m_storage->repository, *literal_data).get_index();
+    auto axiom_data = this->template checkout<formalism::Axiom>();
+    axiom_data->original_arity = 0;
+    axiom_data->head = literal;
+    axiom_data->condition = condition;
+    const auto axiom = formalism::get_or_create(this->m_storage->repository, *axiom_data);
     this->m_generated_predicates.push_back(predicate);
     this->m_generated_axioms.push_back(axiom);
-    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, literal));
+    auto condition_data = this->template checkout<formalism::ConditionLiteral>();
+    condition_data->literal = literal;
+    return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *condition_data));
 }
 
 template<typename Derived>

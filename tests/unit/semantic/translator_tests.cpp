@@ -68,37 +68,61 @@ std::optional<std::string> conjunct_variable(formalism::ConditionView condition,
     return std::nullopt;
 }
 
-template<typename T>
-formalism::FunctionExpressionView wrap_expression(formalism::Repository& repository, T node)
+template<typename T, typename Initialize>
+formalism::EntityView<T> intern(formalism::Repository& repository, formalism::Builder& builder, Initialize&& initialize)
 {
-    return formalism::get_or_create<formalism::FunctionExpression>(repository, ygg::Data<formalism::FunctionExpression>::Variant(node.get_index()));
+    auto data = builder.template get_builder<T>();
+    data->clear();
+    std::forward<Initialize>(initialize)(*data);
+    return formalism::get_or_create(repository, *data);
 }
 
-formalism::FunctionExpressionView number_expression(formalism::Repository& repository, double value)
+template<typename T>
+formalism::FunctionExpressionView wrap_expression(formalism::Repository& repository, formalism::Builder& builder, T node)
 {
-    return wrap_expression(repository, formalism::get_or_create<formalism::FunctionExpressionNumber>(repository, value));
+    return intern<formalism::FunctionExpression>(repository,
+                                                 builder,
+                                                 [&](auto& data) { data.value = ygg::Data<formalism::FunctionExpression>::Variant(node.get_index()); });
+}
+
+formalism::FunctionExpressionView number_expression(formalism::Repository& repository, formalism::Builder& builder, double value)
+{
+    return wrap_expression(repository, builder, intern<formalism::FunctionExpressionNumber>(repository, builder, [&](auto& data) { data.value = value; }));
 }
 
 formalism::FunctionExpressionView binary_expression(formalism::Repository& repository,
+                                                    formalism::Builder& builder,
                                                     formalism::BinaryArithmeticOperator op,
                                                     formalism::FunctionExpressionView left,
                                                     formalism::FunctionExpressionView right)
 {
-    return wrap_expression(repository, formalism::get_or_create<formalism::BinaryFunctionExpression>(repository, op, left.get_index(), right.get_index()));
+    return wrap_expression(repository,
+                           builder,
+                           intern<formalism::BinaryFunctionExpression>(repository,
+                                                                       builder,
+                                                                       [&](auto& data)
+                                                                       {
+                                                                           data.op = op;
+                                                                           data.left = left.get_index();
+                                                                           data.right = right.get_index();
+                                                                       }));
 }
 
-formalism::FunctionExpressionView
-multi_expression(formalism::Repository& repository, formalism::MultiArithmeticOperator op, std::initializer_list<formalism::FunctionExpressionView> expressions)
+formalism::FunctionExpressionView multi_expression(formalism::Repository& repository,
+                                                   formalism::Builder& builder,
+                                                   formalism::MultiArithmeticOperator op,
+                                                   std::initializer_list<formalism::FunctionExpressionView> expressions)
 {
-    auto it = expressions.begin();
-    const auto first = *it++;
-    const auto second = *it++;
-    auto remaining = ygg::IndexList<formalism::FunctionExpression> {};
-    for (; it != expressions.end(); ++it)
-        remaining.push_back(it->get_index());
-    return wrap_expression(
-        repository,
-        formalism::get_or_create<formalism::MultiFunctionExpression>(repository, op, first.get_index(), second.get_index(), std::move(remaining)));
+    return wrap_expression(repository,
+                           builder,
+                           intern<formalism::MultiFunctionExpression>(repository,
+                                                                      builder,
+                                                                      [&](auto& data)
+                                                                      {
+                                                                          data.op = op;
+                                                                          for (const auto expression : expressions)
+                                                                              data.args.push_back(expression.get_index());
+                                                                      }));
 }
 
 bool contains_binary_add_or_multiply(formalism::FunctionExpressionView expression)
@@ -119,9 +143,7 @@ bool contains_binary_add_or_multiply(formalism::FunctionExpressionView expressio
             }
             else if constexpr (std::is_same_v<Node, formalism::MultiFunctionExpressionView>)
             {
-                if (contains_binary_add_or_multiply(node.get_first()) || contains_binary_add_or_multiply(node.get_second()))
-                    return true;
-                for (const auto child : node.get_remaining())
+                for (const auto child : node.get_args())
                     if (contains_binary_add_or_multiply(child))
                         return true;
             }
@@ -407,50 +429,62 @@ TEST(LokiSemanticTranslator, RenamesTaskGoalVariablesBeforeGoalSimplificationOnl
 TEST(LokiSemanticTranslator, NormalizesArithmeticExpressionsModuloAcu)
 {
     auto repository = formalism::Repository(0);
-    const auto zero = number_expression(repository, 0.0);
-    const auto one = number_expression(repository, 1.0);
-    const auto two = number_expression(repository, 2.0);
-    const auto three = number_expression(repository, 3.0);
+    auto builder = formalism::Builder {};
+    const auto zero = number_expression(repository, builder, 0.0);
+    const auto one = number_expression(repository, builder, 1.0);
+    const auto two = number_expression(repository, builder, 2.0);
+    const auto three = number_expression(repository, builder, 3.0);
 
     const auto first = multi_expression(repository,
+                                        builder,
                                         formalism::MultiArithmeticOperator::Add,
-                                        { three, binary_expression(repository, formalism::BinaryArithmeticOperator::Add, two, zero), two });
+                                        { three, binary_expression(repository, builder, formalism::BinaryArithmeticOperator::Add, two, zero), two });
     const auto second = binary_expression(repository,
+                                          builder,
                                           formalism::BinaryArithmeticOperator::Add,
                                           two,
-                                          multi_expression(repository, formalism::MultiArithmeticOperator::Add, { two, three, zero }));
+                                          multi_expression(repository, builder, formalism::MultiArithmeticOperator::Add, { two, three, zero }));
 
     auto storage = std::make_shared<semantic::detail::TranslationStorage>(1);
     auto translator = semantic::detail::CopyTranslator(storage, true, semantic::TranslationPhase::NormalizeArithmeticExpressions);
     const auto normalized_first = translator.copy(first);
     const auto normalized_second = translator.copy(second);
 
+    const auto empty_sum = translator.copy(multi_expression(repository, builder, formalism::MultiArithmeticOperator::Add, {}));
+    const auto unary_product = translator.copy(multi_expression(repository, builder, formalism::MultiArithmeticOperator::Mul, { three }));
+
     EXPECT_EQ(normalized_first, normalized_second);
     EXPECT_EQ(formalism::format::to_string(normalized_first), "(+ 2 2 3)");
+    EXPECT_EQ(formalism::format::to_string(empty_sum), "0");
+    EXPECT_EQ(unary_product, translator.copy(three));
     EXPECT_FALSE(contains_binary_add_or_multiply(normalized_first));
 
     const auto collapsed_product =
         translator.copy(multi_expression(repository,
+                                         builder,
                                          formalism::MultiArithmeticOperator::Mul,
-                                         { one, binary_expression(repository, formalism::BinaryArithmeticOperator::Mul, three, one) }));
+                                         { one, binary_expression(repository, builder, formalism::BinaryArithmeticOperator::Mul, three, one) }));
     EXPECT_EQ(formalism::format::to_string(collapsed_product), "3");
 
-    const auto zero_product = translator.copy(binary_expression(repository, formalism::BinaryArithmeticOperator::Mul, zero, three));
+    const auto zero_product = translator.copy(binary_expression(repository, builder, formalism::BinaryArithmeticOperator::Mul, zero, three));
     EXPECT_EQ(formalism::format::to_string(zero_product), "(* 0 3)");
 
-    const auto product_exposed_by_sum =
-        translator.copy(binary_expression(repository,
-                                          formalism::BinaryArithmeticOperator::Mul,
-                                          multi_expression(repository,
-                                                           formalism::MultiArithmeticOperator::Add,
-                                                           { zero, binary_expression(repository, formalism::BinaryArithmeticOperator::Mul, two, three) }),
-                                          two));
+    const auto product_exposed_by_sum = translator.copy(
+        binary_expression(repository,
+                          builder,
+                          formalism::BinaryArithmeticOperator::Mul,
+                          multi_expression(repository,
+                                           builder,
+                                           formalism::MultiArithmeticOperator::Add,
+                                           { zero, binary_expression(repository, builder, formalism::BinaryArithmeticOperator::Mul, two, three) }),
+                          two));
     EXPECT_EQ(formalism::format::to_string(product_exposed_by_sum), "(* 2 2 3)");
 
     const auto subtraction = translator.copy(binary_expression(repository,
+                                                               builder,
                                                                formalism::BinaryArithmeticOperator::Sub,
                                                                first,
-                                                               binary_expression(repository, formalism::BinaryArithmeticOperator::Mul, three, one)));
+                                                               binary_expression(repository, builder, formalism::BinaryArithmeticOperator::Mul, three, one)));
     EXPECT_EQ(formalism::format::to_string(subtraction), "(- (+ 2 2 3) 3)");
     EXPECT_FALSE(contains_binary_add_or_multiply(subtraction));
 }
@@ -459,10 +493,11 @@ TEST(LokiSemanticTranslator, FlattensDeepArithmeticBeforeMaterializing)
 {
     constexpr auto operand_count = std::size_t { 256 };
     auto repository = formalism::Repository(0);
-    const auto two = number_expression(repository, 2.0);
+    auto builder = formalism::Builder {};
+    const auto two = number_expression(repository, builder, 2.0);
     auto source = two;
     for (auto i = std::size_t { 1 }; i < operand_count; ++i)
-        source = binary_expression(repository, formalism::BinaryArithmeticOperator::Add, source, two);
+        source = binary_expression(repository, builder, formalism::BinaryArithmeticOperator::Add, source, two);
 
     auto storage = std::make_shared<semantic::detail::TranslationStorage>(1);
     auto translator = semantic::detail::CopyTranslator(storage, true, semantic::TranslationPhase::NormalizeArithmeticExpressions);
@@ -470,7 +505,7 @@ TEST(LokiSemanticTranslator, FlattensDeepArithmeticBeforeMaterializing)
 
     ASSERT_TRUE(normalized.get_variant().is<ygg::Index<formalism::MultiFunctionExpression>>());
     const auto multi = normalized.get_variant().get<ygg::Index<formalism::MultiFunctionExpression>>();
-    EXPECT_EQ(2 + multi.get_remaining().size(), operand_count);
+    EXPECT_EQ(multi.get_args().size(), operand_count);
     EXPECT_EQ(storage->repository.size<formalism::MultiFunctionExpression>(), 1);
 }
 
@@ -523,63 +558,78 @@ TEST(LokiSemanticTranslator, AppliesArithmeticNormalizationAfterEffectNormalForm
 TEST(LokiCanonicalization, SortsSemanticFreeListsLexicographicallyBeforeInterning)
 {
     auto repository = formalism::Repository(0);
-    const auto p_predicate = formalism::get_or_create<formalism::Predicate>(repository, cista::offset::string("p"), ygg::IndexList<formalism::Parameter> {});
-    const auto q_predicate = formalism::get_or_create<formalism::Predicate>(repository, cista::offset::string("q"), ygg::IndexList<formalism::Parameter> {});
+    auto builder = formalism::Builder {};
+    const auto make_predicate = [&](const char* name)
+    { return intern<formalism::Predicate>(repository, builder, [&](auto& data) { data.name = cista::offset::string(name); }); };
+    const auto p_predicate = make_predicate("p");
+    const auto q_predicate = make_predicate("q");
     const auto p = p_predicate.get_index();
     const auto q = q_predicate.get_index();
-    const auto p_atom = formalism::get_or_create<formalism::Atom>(repository, p, ygg::IndexList<formalism::Term> {}).get_index();
-    const auto q_atom = formalism::get_or_create<formalism::Atom>(repository, q, ygg::IndexList<formalism::Term> {}).get_index();
-    const auto p_literal = formalism::get_or_create<formalism::Literal>(repository, p_atom, true).get_index();
-    const auto q_literal = formalism::get_or_create<formalism::Literal>(repository, q_atom, true).get_index();
-    const auto p_condition_view = formalism::get_or_create<formalism::Condition>(
-        repository,
-        ygg::Data<formalism::Condition>::Variant(formalism::get_or_create<formalism::ConditionLiteral>(repository, p_literal).get_index()));
-    const auto q_condition_view = formalism::get_or_create<formalism::Condition>(
-        repository,
-        ygg::Data<formalism::Condition>::Variant(formalism::get_or_create<formalism::ConditionLiteral>(repository, q_literal).get_index()));
+    const auto make_atom = [&](auto predicate)
+    { return intern<formalism::Atom>(repository, builder, [&](auto& data) { data.predicate = predicate; }).get_index(); };
+    const auto p_atom = make_atom(p);
+    const auto q_atom = make_atom(q);
+    const auto make_literal = [&](auto atom)
+    {
+        return intern<formalism::Literal>(repository,
+                                          builder,
+                                          [&](auto& data)
+                                          {
+                                              data.atom = atom;
+                                              data.m_polarity = true;
+                                          })
+            .get_index();
+    };
+    const auto p_literal = make_literal(p_atom);
+    const auto q_literal = make_literal(q_atom);
+    const auto make_condition = [&](auto literal)
+    {
+        const auto condition_literal = intern<formalism::ConditionLiteral>(repository, builder, [&](auto& data) { data.literal = literal; }).get_index();
+        return intern<formalism::Condition>(repository, builder, [&](auto& data) { data.value = ygg::Data<formalism::Condition>::Variant(condition_literal); });
+    };
+    const auto p_condition_view = make_condition(p_literal);
+    const auto q_condition_view = make_condition(q_literal);
     const auto p_condition = p_condition_view.get_index();
     const auto q_condition = q_condition_view.get_index();
 
-    auto first_conditions = ygg::IndexList<formalism::Condition> {};
-    first_conditions.push_back(q_condition);
-    first_conditions.push_back(p_condition);
-    const auto first = formalism::get_or_create<formalism::ConditionAnd>(repository, std::move(first_conditions));
+    const auto first = intern<formalism::ConditionAnd>(repository,
+                                                       builder,
+                                                       [&](auto& data)
+                                                       {
+                                                           data.conditions.push_back(q_condition);
+                                                           data.conditions.push_back(p_condition);
+                                                       });
 
-    auto second_conditions = ygg::IndexList<formalism::Condition> {};
-    second_conditions.push_back(p_condition);
-    second_conditions.push_back(q_condition);
-    const auto second = formalism::get_or_create<formalism::ConditionAnd>(repository, std::move(second_conditions));
+    const auto second = intern<formalism::ConditionAnd>(repository,
+                                                        builder,
+                                                        [&](auto& data)
+                                                        {
+                                                            data.conditions.push_back(p_condition);
+                                                            data.conditions.push_back(q_condition);
+                                                        });
 
     EXPECT_EQ(first, second);
     ASSERT_EQ(first.get_conditions().size(), 2);
     EXPECT_EQ(first.get_conditions()[0], p_condition_view);
     EXPECT_EQ(first.get_conditions()[1], q_condition_view);
 
-    auto first_predicates = ygg::IndexList<formalism::Predicate> {};
-    first_predicates.push_back(q);
-    first_predicates.push_back(p);
-    const auto first_domain = formalism::get_or_create<formalism::Domain>(repository,
-                                                                          ygg::Data<formalism::Domain>(cista::offset::string("d"),
-                                                                                                       ygg::IndexList<formalism::Requirement> {},
-                                                                                                       ygg::IndexList<formalism::Type> {},
-                                                                                                       ygg::IndexList<formalism::Object> {},
-                                                                                                       std::move(first_predicates),
-                                                                                                       ygg::IndexList<formalism::FunctionSkeleton> {},
-                                                                                                       ygg::IndexList<formalism::Action> {},
-                                                                                                       ygg::IndexList<formalism::Axiom> {}));
+    const auto first_domain = intern<formalism::Domain>(repository,
+                                                        builder,
+                                                        [&](auto& data)
+                                                        {
+                                                            data.name = cista::offset::string("d");
+                                                            data.predicates.push_back(q);
+                                                            data.predicates.push_back(p);
+                                                        });
 
-    auto second_predicates = ygg::IndexList<formalism::Predicate> {};
-    second_predicates.push_back(p);
-    second_predicates.push_back(q);
-    const auto second_domain = formalism::get_or_create<formalism::Domain>(repository,
-                                                                           ygg::Data<formalism::Domain>(cista::offset::string("d"),
-                                                                                                        ygg::IndexList<formalism::Requirement> {},
-                                                                                                        ygg::IndexList<formalism::Type> {},
-                                                                                                        ygg::IndexList<formalism::Object> {},
-                                                                                                        std::move(second_predicates),
-                                                                                                        ygg::IndexList<formalism::FunctionSkeleton> {},
-                                                                                                        ygg::IndexList<formalism::Action> {},
-                                                                                                        ygg::IndexList<formalism::Axiom> {}));
+    const auto second_domain = intern<formalism::Domain>(repository,
+                                                         builder,
+                                                         [&](auto& data)
+                                                         {
+                                                             data.name = cista::offset::string("d");
+                                                             data.predicates.push_back(p);
+                                                             data.predicates.push_back(q);
+                                                         });
 
     EXPECT_EQ(first_domain, second_domain);
     ASSERT_EQ(first_domain.get_predicates().size(), 2);

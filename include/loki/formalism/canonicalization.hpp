@@ -27,7 +27,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <fmt/format.h>
-#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -122,43 +121,42 @@ inline void canonicalize(Data<::loki::formalism::Task>&) noexcept {}
 namespace loki::formalism::detail
 {
 
-// Canonicalize a list (sort + deduplicate) by each element's serialized view: the single-line
-// PDDL text fully represents the entity within one repository.
+// Canonicalize a list by each element's serialized view: the single-line PDDL text fully represents
+// the entity within one repository. Deduplicate=false preserves multiplicity.
 //
 // This mirrors yggdrasil's context-aware ygg::canonicalize(context, list), but renders each element's
 // key exactly once (Schwartzian transform) instead of recomputing it on every comparison. That turns
 // O(n log n) string renders into O(n), which matters for problems with large :init lists.
 //
-template<typename ListT>
+template<bool Deduplicate = true, typename ListT>
 void canonicalize_list(const Repository& repository, ListT& list)
 {
     const auto n = list.size();
     if (n < 2)
         return;  // 0 or 1 element: already canonical, no duplicates possible.
 
-    auto keyed = std::vector<std::pair<std::string, std::size_t>> {};  // (render key, original position)
+    auto keyed = std::vector<std::pair<std::string, typename ListT::value_type>> {};
     keyed.reserve(n);
     for (std::size_t i = 0; i < n; ++i)
         // Data<T> lists contain only indices, so formatting requires a repository-backed view.
-        keyed.emplace_back(format::to_string(ygg::make_view(list[i], repository)), i);  // render once each: O(n)
+        keyed.emplace_back(format::to_string(ygg::make_view(list[i], repository)), list[i]);  // render once each: O(n)
 
-    const auto by_key = [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; };
-    if (!std::is_sorted(keyed.begin(), keyed.end(), by_key))  // skip the sort when already canonical (e.g. across translation phases)
-        std::sort(keyed.begin(), keyed.end(), by_key);
+    if (!std::is_sorted(keyed.begin(), keyed.end()))  // skip the sort when already canonical (e.g. across translation phases)
+        std::sort(keyed.begin(), keyed.end());
 
-    auto result = ListT {};
+    auto size = std::size_t { 0 };
     for (std::size_t k = 0; k < n; ++k)
     {
-        if (k > 0 && keyed[k].first == keyed[k - 1].first)
-            continue;  // drop duplicate (equal key == identical entity within one repository)
-        result.push_back(list[keyed[k].second]);
+        if constexpr (Deduplicate)
+            if (k > 0 && keyed[k].first == keyed[k - 1].first)
+                continue;  // drop duplicate (equal key == identical entity within one repository)
+        list[size++] = keyed[k].second;
     }
-    list = std::move(result);
+    list.resize(size);
 }
 
-// Read-only counterpart of canonicalize_list: returns whether the list is already canonical, i.e. its
-// elements' render keys are strictly increasing (sorted and free of duplicates). Renders each key once.
-template<typename ListT>
+// Read-only counterpart of canonicalize_list. Renders each key once.
+template<bool Deduplicate = true, typename ListT>
 bool is_canonical_list(const Repository& repository, const ListT& list)
 {
     const auto n = list.size();
@@ -166,60 +164,20 @@ bool is_canonical_list(const Repository& repository, const ListT& list)
         return true;
 
     // Data<T> lists contain only indices, so formatting requires a repository-backed view.
-    auto previous = format::to_string(ygg::make_view(list[0], repository));
+    auto previous = std::pair { format::to_string(ygg::make_view(list[0], repository)), list[0] };
     for (std::size_t i = 1; i < n; ++i)
     {
         // Data<T> lists contain only indices, so formatting requires a repository-backed view.
-        auto current = format::to_string(ygg::make_view(list[i], repository));
-        if (!(previous < current))  // not strictly increasing => unsorted or duplicate
+        auto current = std::pair { format::to_string(ygg::make_view(list[i], repository)), list[i] };
+        if constexpr (Deduplicate)
+        {
+            if (!(previous.first < current.first))  // not strictly increasing => unsorted or duplicate
+                return false;
+        }
+        else if (current < previous)
             return false;
         previous = std::move(current);
     }
-    return true;
-}
-
-inline void canonicalize_multi_expression(const Repository& repository, ygg::Data<MultiFunctionExpression>& data)
-{
-    if (data.first.is_max() || data.second.is_max())
-        throw std::invalid_argument("MultiFunctionExpression requires at least two operands");
-
-    auto keyed = std::vector<std::pair<std::string, ygg::Index<FunctionExpression>>> {};
-    keyed.reserve(data.remaining.size() + 2);
-    const auto add = [&](auto expression) { keyed.emplace_back(format::to_string(ygg::make_view(expression, repository)), expression); };
-    add(data.first);
-    add(data.second);
-    for (const auto expression : data.remaining)
-        add(expression);
-
-    const auto by_key = [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; };
-    if (!std::is_sorted(keyed.begin(), keyed.end(), by_key))
-        std::sort(keyed.begin(), keyed.end(), by_key);
-
-    data.first = keyed[0].second;
-    data.second = keyed[1].second;
-    data.remaining.clear();
-    for (std::size_t i = 2; i < keyed.size(); ++i)
-        data.remaining.push_back(keyed[i].second);
-}
-
-inline bool is_canonical_multi_expression(const Repository& repository, const ygg::Data<MultiFunctionExpression>& data)
-{
-    if (data.first.is_max() || data.second.is_max())
-        return false;
-
-    auto previous = format::to_string(ygg::make_view(data.first, repository));
-    const auto follows = [&](auto expression)
-    {
-        auto current = format::to_string(ygg::make_view(expression, repository));
-        const auto result = previous <= current;
-        previous = std::move(current);
-        return result;
-    };
-    if (!follows(data.second))
-        return false;
-    for (const auto expression : data.remaining)
-        if (!follows(expression))
-            return false;
     return true;
 }
 
@@ -236,7 +194,7 @@ inline void canonicalize(Repository&, ygg::Data<T>&) noexcept
 inline void canonicalize(Repository& repository, ygg::Data<Type>& data) { detail::canonicalize_list(repository, data.bases); }
 inline void canonicalize(Repository& repository, ygg::Data<Object>& data) { detail::canonicalize_list(repository, data.types); }
 inline void canonicalize(Repository& repository, ygg::Data<Parameter>& data) { detail::canonicalize_list(repository, data.types); }
-inline void canonicalize(Repository& repository, ygg::Data<MultiFunctionExpression>& data) { detail::canonicalize_multi_expression(repository, data); }
+inline void canonicalize(Repository& repository, ygg::Data<MultiFunctionExpression>& data) { detail::canonicalize_list<false>(repository, data.args); }
 inline void canonicalize(Repository& repository, ygg::Data<ConditionAnd>& data) { detail::canonicalize_list(repository, data.conditions); }
 inline void canonicalize(Repository& repository, ygg::Data<ConditionOr>& data) { detail::canonicalize_list(repository, data.conditions); }
 inline void canonicalize(Repository& repository, ygg::Data<ConditionExists>& data) { detail::canonicalize_list(repository, data.parameters); }
@@ -280,7 +238,7 @@ inline bool is_canonical(const Repository& repository, const ygg::Data<Object>& 
 inline bool is_canonical(const Repository& repository, const ygg::Data<Parameter>& data) { return detail::is_canonical_list(repository, data.types); }
 inline bool is_canonical(const Repository& repository, const ygg::Data<MultiFunctionExpression>& data)
 {
-    return detail::is_canonical_multi_expression(repository, data);
+    return detail::is_canonical_list<false>(repository, data.args);
 }
 inline bool is_canonical(const Repository& repository, const ygg::Data<ConditionAnd>& data) { return detail::is_canonical_list(repository, data.conditions); }
 inline bool is_canonical(const Repository& repository, const ygg::Data<ConditionOr>& data) { return detail::is_canonical_list(repository, data.conditions); }

@@ -19,7 +19,6 @@ static_assert(requires(Data& data) {
     data.index;
     data.op;
     data.function;
-    data.terms;
     data.expression;
     data.clear();
     { data == data } -> std::same_as<bool>;
@@ -28,7 +27,6 @@ static_assert(requires(const View& view) {
     view.get_index();
     view.get_operator();
     view.get_function();
-    view.get_terms();
     view.get_expression();
     { view == view } -> std::same_as<bool>;
     { view < view } -> std::same_as<bool>;

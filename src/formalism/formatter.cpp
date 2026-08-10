@@ -115,11 +115,7 @@ std::string to_string(BinaryFunctionExpressionView value)
 
 std::string to_string(MultiFunctionExpressionView value)
 {
-    return fmt::format("({} {} {}{})",
-                       loki::formalism::to_string(value.get_operator()),
-                       to_string(value.get_first()),
-                       to_string(value.get_second()),
-                       detail::spaced(value.get_remaining()));
+    return fmt::format("({}{})", loki::formalism::to_string(value.get_operator()), detail::spaced(value.get_args()));
 }
 
 std::string to_string(FunctionExpressionView value)
@@ -182,11 +178,7 @@ std::string to_string(EffectAndView value) { return fmt::format("(and{})", detai
 
 std::string to_string(EffectNumericView value)
 {
-    return fmt::format("({} ({}{}) {})",
-                       loki::formalism::to_string(value.get_data().op),
-                       value.get_function().get_name(),
-                       detail::spaced(value.get_terms()),
-                       to_string(value.get_expression()));
+    return fmt::format("({} {} {})", loki::formalism::to_string(value.get_data().op), to_string(value.get_function()), to_string(value.get_expression()));
 }
 
 std::string to_string(EffectForallView value)

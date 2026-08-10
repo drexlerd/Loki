@@ -31,9 +31,8 @@ public:
 
     bool compiles_typing_now() const noexcept;
     std::vector<formalism::TypeView> collect_type_hierarchy(formalism::TypeView type);
-    ygg::IndexList<formalism::Type> copy_type_hierarchy(formalism::EntityListView<formalism::Type> types);
-    ygg::IndexList<formalism::Type> maybe_strip_types(const ygg::IndexList<formalism::Type>& types) const;
-    ygg::IndexList<formalism::Parameter> copy_parameters_without_types(formalism::EntityListView<formalism::Parameter> parameters);
+    void copy_type_hierarchy(formalism::EntityListView<formalism::Type> types, ygg::IndexList<formalism::Type>& result);
+    void copy_parameters_without_types(formalism::EntityListView<formalism::Parameter> parameters, ygg::IndexList<formalism::Parameter>& result);
     formalism::PredicateView type_predicate(formalism::TypeView type);
     formalism::LiteralView type_literal(formalism::TypeView type, ygg::Index<formalism::Term> term);
     formalism::ConditionView type_condition(formalism::TypeView type, formalism::VariableView variable);
@@ -69,9 +68,8 @@ std::vector<formalism::TypeView> CompileTypingTranslator<Derived>::collect_type_
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Type> CompileTypingTranslator<Derived>::copy_type_hierarchy(formalism::EntityListView<formalism::Type> types)
+void CompileTypingTranslator<Derived>::copy_type_hierarchy(formalism::EntityListView<formalism::Type> types, ygg::IndexList<formalism::Type>& result)
 {
-    auto result = ygg::IndexList<formalism::Type> {};
     auto seen = ygg::UnorderedSet<formalism::TypeView> {};
     for (auto type : types)
     {
@@ -81,27 +79,19 @@ ygg::IndexList<formalism::Type> CompileTypingTranslator<Derived>::copy_type_hier
                 result.push_back(as_index(this->self().copy(collected)));
         }
     }
-    return result;
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Type> CompileTypingTranslator<Derived>::maybe_strip_types(const ygg::IndexList<formalism::Type>& types) const
+void CompileTypingTranslator<Derived>::copy_parameters_without_types(formalism::EntityListView<formalism::Parameter> parameters,
+                                                                     ygg::IndexList<formalism::Parameter>& result)
 {
-    return this->self().compiles_typing_now() ? ygg::IndexList<formalism::Type> {} : types;
-}
-
-template<typename Derived>
-ygg::IndexList<formalism::Parameter> CompileTypingTranslator<Derived>::copy_parameters_without_types(formalism::EntityListView<formalism::Parameter> parameters)
-{
-    auto result = ygg::IndexList<formalism::Parameter> {};
     for (auto parameter : parameters)
     {
-        result.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository,
-                                                                        as_index(this->self().copy(parameter.get_variable())),
-                                                                        ygg::IndexList<formalism::Type> {})
-                             .get_index());
+        const auto variable = as_index(this->self().copy(parameter.get_variable()));
+        auto data = this->template checkout<formalism::Parameter>();
+        data->variable = variable;
+        result.push_back(formalism::get_or_create(this->m_storage->repository, *data).get_index());
     }
-    return result;
 }
 
 template<typename Derived>
@@ -110,14 +100,16 @@ formalism::PredicateView CompileTypingTranslator<Derived>::type_predicate(formal
     if (auto it = this->m_type_predicates.find(type); it != this->m_type_predicates.end())
         return it->second;
 
-    auto parameter_types = ygg::IndexList<formalism::Type> {};
+    auto parameter_data = this->template checkout<formalism::Parameter>();
     if (!this->self().compiles_typing_now())
-        parameter_types.push_back(as_index(this->self().copy(type)));
-    const auto variable = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string("?arg")).get_index();
-    auto parameters = ygg::IndexList<formalism::Parameter> {};
-    parameters.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, variable, std::move(parameter_types)).get_index());
-
-    auto predicate = formalism::get_or_create<formalism::Predicate>(this->m_storage->repository, type.get_name(), std::move(parameters));
+        parameter_data->types.push_back(as_index(this->self().copy(type)));
+    auto variable_data = this->template checkout<formalism::Variable>();
+    variable_data->name = cista::offset::string("?arg");
+    parameter_data->variable = formalism::get_or_create(this->m_storage->repository, *variable_data).get_index();
+    auto predicate_data = this->template checkout<formalism::Predicate>();
+    predicate_data->name = type.get_name();
+    predicate_data->parameters.push_back(formalism::get_or_create(this->m_storage->repository, *parameter_data).get_index());
+    auto predicate = formalism::get_or_create(this->m_storage->repository, *predicate_data);
     this->m_type_predicates.emplace(type, predicate);
     this->m_used_predicate_names.insert(std::string(type.get_name()));
     return predicate;
@@ -126,21 +118,28 @@ formalism::PredicateView CompileTypingTranslator<Derived>::type_predicate(formal
 template<typename Derived>
 formalism::LiteralView CompileTypingTranslator<Derived>::type_literal(formalism::TypeView type, ygg::Index<formalism::Term> term)
 {
-    auto terms = ygg::IndexList<formalism::Term> {};
-    terms.push_back(term);
-    const auto atom =
-        formalism::get_or_create<formalism::Atom>(this->m_storage->repository, as_index(this->self().type_predicate(type)), std::move(terms)).get_index();
-    return formalism::get_or_create<formalism::Literal>(this->m_storage->repository, atom, true);
+    const auto predicate = as_index(this->self().type_predicate(type));
+    auto atom_data = this->template checkout<formalism::Atom>();
+    atom_data->predicate = predicate;
+    atom_data->terms.push_back(term);
+    const auto atom = formalism::get_or_create(this->m_storage->repository, *atom_data).get_index();
+    auto literal_data = this->template checkout<formalism::Literal>();
+    literal_data->atom = atom;
+    literal_data->m_polarity = true;
+    return formalism::get_or_create(this->m_storage->repository, *literal_data);
 }
 
 template<typename Derived>
 formalism::ConditionView CompileTypingTranslator<Derived>::type_condition(formalism::TypeView type, formalism::VariableView variable)
 {
-    const auto term =
-        formalism::get_or_create<formalism::Term>(this->m_storage->repository, ygg::Data<formalism::Term>::Variant(as_index(this->self().copy(variable))))
-            .get_index();
-    return this->self().wrap_condition(
-        formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, as_index(this->self().type_literal(type, term))));
+    const auto copied_variable = as_index(this->self().copy(variable));
+    auto term_data = this->template checkout<formalism::Term>();
+    term_data->value = ygg::Data<formalism::Term>::Variant(copied_variable);
+    const auto term = formalism::get_or_create(this->m_storage->repository, *term_data).get_index();
+    const auto literal = as_index(this->self().type_literal(type, term));
+    auto condition_data = this->template checkout<formalism::ConditionLiteral>();
+    condition_data->literal = literal;
+    return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *condition_data));
 }
 
 template<typename Derived>
@@ -203,17 +202,18 @@ void CompileTypingTranslator<Derived>::compile_typing_to_domain(ygg::Data<formal
         for (auto type : object.get_types())
             add_type(add_type, type);
 
-    data.requirements = this->self().strip_typing_requirement(domain.get_requirements());
+    this->self().strip_typing_requirement(domain.get_requirements(), data.requirements);
     if (this->self().compiles_typing_now())
-        data.types = {};
+        data.types.clear();
 }
 
 template<typename Derived>
 void CompileTypingTranslator<Derived>::add_type_literals_for_object(ygg::IndexList<formalism::Literal>& literals, formalism::ObjectView object)
 {
     const auto copied_object = this->self().copy(object);
-    const auto term =
-        formalism::get_or_create<formalism::Term>(this->m_storage->repository, ygg::Data<formalism::Term>::Variant(copied_object.get_index())).get_index();
+    auto term_data = this->template checkout<formalism::Term>();
+    term_data->value = ygg::Data<formalism::Term>::Variant(copied_object.get_index());
+    const auto term = formalism::get_or_create(this->m_storage->repository, *term_data).get_index();
     auto add_literal = [&](auto&& self, formalism::TypeView type) -> void
     {
         literals.push_back(as_index(this->self().type_literal(type, term)));
@@ -243,7 +243,7 @@ void CompileTypingTranslator<Derived>::initialize_type_literals(ygg::Data<formal
         this->self().add_type_literals_for_object(data.initial_literals, object);
     for (auto object : task.get_objects())
         this->self().add_type_literals_for_object(data.initial_literals, object);
-    data.requirements = this->self().strip_typing_requirement(task.get_requirements());
+    this->self().strip_typing_requirement(task.get_requirements(), data.requirements);
 }
 
 }  // namespace loki::semantic::detail

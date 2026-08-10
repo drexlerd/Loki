@@ -53,30 +53,32 @@ public:
 template<typename Derived>
 formalism::EffectLiteralView EffectTranslator<Derived>::copy(formalism::EffectLiteralView source)
 {
-    return formalism::get_or_create<formalism::EffectLiteral>(this->m_storage->repository, as_index(this->self().copy(source.get_literal())));
+    const auto literal = as_index(this->self().copy(source.get_literal()));
+    auto data = this->template checkout<formalism::EffectLiteral>();
+    data->literal = literal;
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::EffectAndView EffectTranslator<Derived>::copy(formalism::EffectAndView source)
 {
-    auto effects = ygg::IndexList<formalism::Effect> {};
+    auto data = this->template checkout<formalism::EffectAnd>();
     for (auto effect : source.get_effects())
-        effects.push_back(as_index(this->self().copy(effect)));
-    return formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects));
+        data->effects.push_back(as_index(this->self().copy(effect)));
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::EffectNumericView EffectTranslator<Derived>::copy(formalism::EffectNumericView source)
 {
     const auto& data = source.get_data();
-    auto terms = ygg::IndexList<formalism::Term> {};
-    for (auto term : source.get_terms())
-        terms.push_back(as_index(this->self().copy(term)));
-    return formalism::get_or_create<formalism::EffectNumeric>(this->m_storage->repository,
-                                                              data.op,
-                                                              as_index(this->self().copy(source.get_function())),
-                                                              std::move(terms),
-                                                              as_index(this->self().copy(source.get_expression())));
+    const auto function = as_index(this->self().copy(source.get_function()));
+    const auto expression = as_index(this->self().copy(source.get_expression()));
+    auto result = this->template checkout<formalism::EffectNumeric>();
+    result->op = data.op;
+    result->function = function;
+    result->expression = expression;
+    return formalism::get_or_create(this->m_storage->repository, *result);
 }
 
 template<typename Derived>
@@ -84,18 +86,25 @@ formalism::EffectForallView EffectTranslator<Derived>::copy(formalism::EffectFor
 {
     this->self().increment_quantifications(source.get_parameters());
     auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
-    auto parameters = this->self().parameter_indices(parameter_views);
     this->self().enter_scope(parameter_views);
     auto effect = as_index(this->self().copy(source.get_effect()));
     if (this->m_phase == TranslationPhase::CompileTyping)
     {
         auto guard = this->self().type_conditions_for_parameters(source.get_parameters());
         const auto condition = this->self().make_conjunction(std::move(guard));
-        effect =
-            this->self().wrap_effect(formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition.get_index(), effect)).get_index();
+        auto data = this->template checkout<formalism::EffectWhen>();
+        data->condition = condition.get_index();
+        data->effect = effect;
+        effect = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *data)).get_index();
     }
-    const auto out_parameters = this->self().compiles_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
-    const auto out = formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, out_parameters, effect);
+    auto data = this->template checkout<formalism::EffectForall>();
+    if (this->self().compiles_typing_now())
+        this->self().copy_parameters_without_types(source.get_parameters(), data->parameters);
+    else
+        for (auto parameter : parameter_views)
+            data->parameters.push_back(parameter.get_index());
+    data->effect = effect;
+    const auto out = formalism::get_or_create(this->m_storage->repository, *data);
     this->self().leave_scope();
     return out;
 }
@@ -107,34 +116,39 @@ formalism::EffectWhenView EffectTranslator<Derived>::copy(formalism::EffectWhenV
     // may pull from the generated-name counter (compiler-independent output requires a fixed order).
     const auto condition = as_index(this->self().copy(source.get_condition()));
     const auto effect = as_index(this->self().copy(source.get_effect()));
-    return formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition, effect);
+    auto data = this->template checkout<formalism::EffectWhen>();
+    data->condition = condition;
+    data->effect = effect;
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::EffectOneOfView EffectTranslator<Derived>::copy(formalism::EffectOneOfView source)
 {
-    auto effects = ygg::IndexList<formalism::Effect> {};
+    auto data = this->template checkout<formalism::EffectOneOf>();
     for (auto effect : source.get_effects())
-        effects.push_back(as_index(this->self().copy(effect)));
-    return formalism::get_or_create<formalism::EffectOneOf>(this->m_storage->repository, std::move(effects));
+        data->effects.push_back(as_index(this->self().copy(effect)));
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::EffectProbabilisticAlternativeView EffectTranslator<Derived>::copy(formalism::EffectProbabilisticAlternativeView source)
 {
     const auto& data = source.get_data();
-    return formalism::get_or_create<formalism::EffectProbabilisticAlternative>(this->m_storage->repository,
-                                                                               data.probability,
-                                                                               as_index(this->self().copy(source.get_effect())));
+    const auto effect = as_index(this->self().copy(source.get_effect()));
+    auto result = this->template checkout<formalism::EffectProbabilisticAlternative>();
+    result->probability = data.probability;
+    result->effect = effect;
+    return formalism::get_or_create(this->m_storage->repository, *result);
 }
 
 template<typename Derived>
 formalism::EffectProbabilisticView EffectTranslator<Derived>::copy(formalism::EffectProbabilisticView source)
 {
-    auto alternatives = ygg::IndexList<formalism::EffectProbabilisticAlternative> {};
+    auto data = this->template checkout<formalism::EffectProbabilistic>();
     for (auto alternative : source.get_alternatives())
-        alternatives.push_back(as_index(this->self().copy(alternative)));
-    return formalism::get_or_create<formalism::EffectProbabilistic>(this->m_storage->repository, std::move(alternatives));
+        data->alternatives.push_back(as_index(this->self().copy(alternative)));
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
@@ -153,18 +167,23 @@ formalism::EffectView EffectTranslator<Derived>::copy(formalism::EffectView sour
                     const auto effect = as_index(this->self().copy(arg.get_effect()));
                     if (const auto condition_or = this->self().as_or(condition))
                     {
-                        auto effects = ygg::IndexList<formalism::Effect> {};
+                        auto data = this->template checkout<formalism::EffectAnd>();
                         for (auto part : condition_or->get_conditions())
                         {
-                            const auto when = formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, part.get_index(), effect);
-                            effects.push_back(this->self().wrap_effect(when).get_index());
+                            auto when_data = this->template checkout<formalism::EffectWhen>();
+                            when_data->condition = part.get_index();
+                            when_data->effect = effect;
+                            const auto when = formalism::get_or_create(this->m_storage->repository, *when_data);
+                            data->effects.push_back(this->self().wrap_effect(when).get_index());
                         }
-                        split = this->self().wrap_effect(formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects)));
+                        split = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *data));
                     }
                     else
                     {
-                        split = this->self().wrap_effect(
-                            formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository, condition.get_index(), effect));
+                        auto data = this->template checkout<formalism::EffectWhen>();
+                        data->condition = condition.get_index();
+                        data->effect = effect;
+                        split = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *data));
                     }
                 }
             },
@@ -176,7 +195,9 @@ formalism::EffectView EffectTranslator<Derived>::copy(formalism::EffectView sour
     auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant
                             { return ygg::Data<formalism::Effect>::Variant(as_index(this->self().copy(arg))); },
                             source.get_value());
-    auto copied = formalism::get_or_create<formalism::Effect>(this->m_storage->repository, std::move(value));
+    auto data = this->template checkout<formalism::Effect>();
+    data->value = std::move(value);
+    auto copied = formalism::get_or_create(this->m_storage->repository, *data);
     if (this->m_phase == TranslationPhase::ToEffectNormalForm)
         return this->self().normalize_effect(copied);
     return copied;

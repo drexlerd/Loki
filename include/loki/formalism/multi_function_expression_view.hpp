@@ -45,9 +45,7 @@ public:
     auto get_index() const noexcept { return m_handle; }
 
     auto get_operator() const noexcept { return get_data().op; }
-    auto get_first() const noexcept { return ygg::make_view(get_data().first, *m_context); }
-    auto get_second() const noexcept { return ygg::make_view(get_data().second, *m_context); }
-    auto get_remaining() const noexcept { return ygg::make_view(get_data().remaining, *m_context); }
+    auto get_args() const noexcept { return ygg::make_view(get_data().args, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };

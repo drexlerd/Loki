@@ -37,12 +37,12 @@ public:
     {
     }
 
-    ygg::IndexList<formalism::Action> compile_conditional_effect_actions(formalism::EntityListView<formalism::Action> actions);
+    void compile_conditional_effect_actions(formalism::EntityListView<formalism::Action> actions, ygg::IndexList<formalism::Action>& result);
 };
 
 template<typename Derived>
-ygg::IndexList<formalism::Action>
-CompileConditionalEffectsTranslator<Derived>::compile_conditional_effect_actions(formalism::EntityListView<formalism::Action> actions)
+void CompileConditionalEffectsTranslator<Derived>::compile_conditional_effect_actions(formalism::EntityListView<formalism::Action> actions,
+                                                                                       ygg::IndexList<formalism::Action>& result)
 {
     struct ConditionalEffect
     {
@@ -51,12 +51,12 @@ CompileConditionalEffectsTranslator<Derived>::compile_conditional_effect_actions
         formalism::EffectView effect;
     };
 
-    auto result = ygg::IndexList<formalism::Action> {};
+    result.clear();
     auto seen = ygg::UnorderedSet<formalism::ActionView> {};
 
     for (auto action : actions)
     {
-        const auto data = action.get_data();
+        const auto& data = action.get_data();
         auto unconditional = ygg::IndexList<formalism::Effect> {};
         auto conditional = std::vector<ConditionalEffect> {};
 
@@ -120,26 +120,29 @@ CompileConditionalEffectsTranslator<Derived>::compile_conditional_effect_actions
             if (effects.size() == 1)
                 effect = effects.front();
             else if (!effects.empty())
-                effect = this->self().wrap_effect(formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects))).get_index();
+            {
+                auto effect_data = this->template checkout<formalism::EffectAnd>();
+                for (auto item : effects)
+                    effect_data->effects.push_back(item);
+                effect = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *effect_data)).get_index();
+            }
 
             auto name = std::string(data.name) + "_" + std::to_string(action.get_index().get_value());
             for (const auto& item : conditional)
                 name += "_" + std::to_string(item.when.get_index().get_value());
             name += "_" + std::to_string(mask);
 
-            this->self().push_unique(result,
-                                     seen,
-                                     formalism::get_or_create<formalism::Action>(this->m_storage->repository,
-                                                                                 std::move(name),
-                                                                                 data.original_name,
-                                                                                 data.parameters,
-                                                                                 data.original_arity,
-                                                                                 precondition,
-                                                                                 effect));
+            auto action_data = this->template checkout<formalism::Action>();
+            action_data->name = cista::offset::string(name);
+            action_data->original_name = data.original_name;
+            for (auto parameter : data.parameters)
+                action_data->parameters.push_back(parameter);
+            action_data->original_arity = data.original_arity;
+            action_data->precondition = precondition;
+            action_data->effect = effect;
+            this->self().push_unique(result, seen, formalism::get_or_create(this->m_storage->repository, *action_data));
         }
     }
-
-    return result;
 }
 
 }  // namespace loki::semantic::detail

@@ -84,47 +84,46 @@ std::string CopyTranslatorFacade<Derived>::next_generated_predicate_name(std::st
 template<typename Derived>
 formalism::DomainView CopyTranslatorFacade<Derived>::copy_domain(formalism::DomainView domain)
 {
-    auto data = domain.get_data();
-    data.index = {};
-    data.requirements = this->self().template copy_list<formalism::Requirement>(domain.get_requirements());
-    data.types = this->self().template copy_list<formalism::Type>(domain.get_types());
-    data.constants = this->self().template copy_list<formalism::Object>(domain.get_constants());
-    data.predicates = this->self().template copy_list<formalism::Predicate>(domain.get_predicates());
-    data.functions = this->self().template copy_list<formalism::FunctionSkeleton>(domain.get_functions());
-    data.actions = this->self().template copy_list<formalism::Action>(domain.get_actions());
-    data.axioms = this->self().template copy_list<formalism::Axiom>(domain.get_axioms());
+    auto data = this->template checkout<formalism::Domain>();
+    data->name = domain.get_data().name;
+    this->self().template copy_list<formalism::Requirement>(domain.get_requirements(), data->requirements);
+    this->self().template copy_list<formalism::Type>(domain.get_types(), data->types);
+    this->self().template copy_list<formalism::Object>(domain.get_constants(), data->constants);
+    this->self().template copy_list<formalism::Predicate>(domain.get_predicates(), data->predicates);
+    this->self().template copy_list<formalism::FunctionSkeleton>(domain.get_functions(), data->functions);
+    this->self().template copy_list<formalism::Action>(domain.get_actions(), data->actions);
+    this->self().template copy_list<formalism::Axiom>(domain.get_axioms(), data->axioms);
 
-    auto copied_domain = formalism::get_or_create<formalism::Domain>(this->m_storage->repository, data);
+    auto copied_domain = formalism::get_or_create(this->m_storage->repository, *data);
     this->m_storage->translated_domain = copied_domain;
-    data = copied_domain.get_data();
-    data.index = {};
+    data->index = {};
 
     switch (this->m_phase)
     {
         case TranslationPhase::RemoveUniversalQuantifiers:
-            this->self().append_generated_domain_objects(data, copied_domain.get_requirements());
-            if (!data.axioms.empty())
-                this->self().ensure_derived_predicates_requirement(copied_domain.get_requirements(), data.requirements);
+            this->self().append_generated_domain_objects(*data, copied_domain.get_requirements());
+            if (!data->axioms.empty())
+                this->self().ensure_derived_predicates_requirement(copied_domain.get_requirements(), data->requirements);
             break;
         case TranslationPhase::SplitDisjunctiveConditions:
-            data.actions = this->self().split_disjunctive_actions(copied_domain.get_actions());
-            data.axioms = this->self().split_disjunctive_axioms(copied_domain.get_axioms());
+            this->self().split_disjunctive_actions(copied_domain.get_actions(), data->actions);
+            this->self().split_disjunctive_axioms(copied_domain.get_axioms(), data->axioms);
             break;
         case TranslationPhase::CompileConditionalEffects:
-            data.actions = this->self().compile_conditional_effect_actions(copied_domain.get_actions());
-            data.requirements = this->self().strip_requirement(copied_domain.get_requirements(), formalism::RequirementKind::ConditionalEffects);
+            this->self().compile_conditional_effect_actions(copied_domain.get_actions(), data->actions);
+            this->self().strip_requirement(copied_domain.get_requirements(), formalism::RequirementKind::ConditionalEffects, data->requirements);
             break;
         case TranslationPhase::CompileTyping:
-            this->self().compile_typing_to_domain(data, copied_domain);
+            this->self().compile_typing_to_domain(*data, copied_domain);
             break;
         case TranslationPhase::MaterializeEquality:
-            this->self().add_equality_predicate_to_domain(data, copied_domain);
+            this->self().add_equality_predicate_to_domain(*data, copied_domain);
             break;
         default:
             break;
     }
 
-    auto view = formalism::get_or_create<formalism::Domain>(this->m_storage->repository, std::move(data));
+    auto view = formalism::get_or_create(this->m_storage->repository, *data);
     this->m_storage->translated_domain = view;
     remember(this->m_storage->domains, domain, view);
     return view;
@@ -133,13 +132,13 @@ formalism::DomainView CopyTranslatorFacade<Derived>::copy_domain(formalism::Doma
 template<typename Derived>
 formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView task)
 {
-    auto data = task.get_data();
-    data.index = {};
-    data.domain = this->m_storage->translated_domain->get_index();
-    data.requirements = this->self().template copy_list<formalism::Requirement>(task.get_requirements());
-    data.objects = this->self().template copy_list<formalism::Object>(task.get_objects());
-    data.initial_literals = this->self().template copy_list<formalism::Literal>(task.get_initial_literals());
-    data.initial_function_values = this->self().template copy_list<formalism::InitialFunctionValue>(task.get_initial_function_values());
+    auto data = this->template checkout<formalism::Task>();
+    data->name = task.get_data().name;
+    data->domain = this->m_storage->translated_domain->get_index();
+    this->self().template copy_list<formalism::Requirement>(task.get_requirements(), data->requirements);
+    this->self().template copy_list<formalism::Object>(task.get_objects(), data->objects);
+    this->self().template copy_list<formalism::Literal>(task.get_initial_literals(), data->initial_literals);
+    this->self().template copy_list<formalism::InitialFunctionValue>(task.get_initial_function_values(), data->initial_function_values);
 
     if (const auto goal = task.get_goal())
     {
@@ -151,70 +150,69 @@ formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView
             this->self().leave_variable_scope();
             const auto previous = this->m_renaming_enabled;
             this->m_renaming_enabled = false;
-            data.goal = as_index(this->self().copy(renamed_goal));
+            data->goal = as_index(this->self().copy(renamed_goal));
             this->m_renaming_enabled = previous;
         }
         else
         {
-            data.goal = as_index(this->self().copy(goal.value()));
+            data->goal = as_index(this->self().copy(goal.value()));
         }
     }
     else
     {
-        data.goal = {};
+        data->goal = {};
     }
 
     if (const auto metric = task.get_metric())
-        data.metric = as_index(this->self().copy(metric.value()));
+        data->metric = as_index(this->self().copy(metric.value()));
     else
-        data.metric = {};
-    data.predicates = this->self().template copy_list<formalism::Predicate>(task.get_predicates());
-    data.axioms = this->self().template copy_list<formalism::Axiom>(task.get_axioms());
+        data->metric = {};
+    this->self().template copy_list<formalism::Predicate>(task.get_predicates(), data->predicates);
+    this->self().template copy_list<formalism::Axiom>(task.get_axioms(), data->axioms);
 
-    auto copied_task = formalism::get_or_create<formalism::Task>(this->m_storage->repository, data);
-    data = copied_task.get_data();
-    data.index = {};
+    auto copied_task = formalism::get_or_create(this->m_storage->repository, *data);
+    data->index = {};
 
     switch (this->m_phase)
     {
         case TranslationPhase::RemoveUniversalQuantifiers:
         case TranslationPhase::SimplifyGoal:
         {
-            if (this->m_phase == TranslationPhase::SimplifyGoal && data.goal)
-                data.goal = as_index(this->self().simplify_goal_condition(copied_task.get_goal().value()));
+            if (this->m_phase == TranslationPhase::SimplifyGoal && data->goal)
+                data->goal = as_index(this->self().simplify_goal_condition(copied_task.get_goal().value()));
 
             auto existing_predicates = ygg::UnorderedSet<formalism::PredicateView> {};
             for (auto predicate : copied_task.get_predicates())
                 existing_predicates.insert(predicate);
             for (auto predicate : this->m_generated_predicates)
                 if (existing_predicates.insert(predicate).second)
-                    data.predicates.push_back(predicate.get_index());
+                    data->predicates.push_back(predicate.get_index());
 
             auto existing_axioms = ygg::UnorderedSet<formalism::AxiomView> {};
             for (auto axiom : copied_task.get_axioms())
                 existing_axioms.insert(axiom);
             for (auto axiom : this->m_generated_axioms)
                 if (existing_axioms.insert(axiom).second)
-                    data.axioms.push_back(axiom.get_index());
+                    data->axioms.push_back(axiom.get_index());
 
-            if (!data.axioms.empty())
-                this->self().ensure_derived_predicates_requirement(copied_task.get_requirements(), data.requirements);
+            if (!data->axioms.empty())
+                this->self().ensure_derived_predicates_requirement(copied_task.get_requirements(), data->requirements);
             break;
         }
         case TranslationPhase::SplitDisjunctiveConditions:
-            data.axioms = this->self().split_disjunctive_axioms(copied_task.get_axioms());
+            this->self().split_disjunctive_axioms(copied_task.get_axioms(), data->axioms);
             break;
         case TranslationPhase::MaterializeEquality:
-            this->self().materialize_equality(data, task);
+            this->self().materialize_equality(*data, task);
             break;
         case TranslationPhase::CompileTyping:
-            this->self().initialize_type_literals(data, task);
+            this->self().initialize_type_literals(*data, task);
             break;
         default:
             break;
     }
 
-    auto view = formalism::get_or_create<formalism::Task>(this->m_storage->repository, std::move(data));
+    auto view = formalism::get_or_create(this->m_storage->repository, *data);
     remember(this->m_storage->tasks, task, view);
     return view;
 }

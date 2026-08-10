@@ -10,32 +10,22 @@
 #ifndef LOKI_FORMALISM_BUILDER_HPP_
 #define LOKI_FORMALISM_BUILDER_HPP_
 
-#include <cista/containers/optional.h>
-#include <cista/containers/string.h>
-
 #include "loki/formalism/canonicalization.hpp"
 #include "loki/formalism/repository.hpp"
 
-#include <utility>
+#include <yggdrasil/formalism/builder.hpp>
 
 namespace loki::formalism
 {
 
+using Builder = ygg::ApplyTypeListT<ygg::formalism::BuilderStorage, SymbolRepositoryTypes>;
+
 template<typename T>
-[[nodiscard]] auto get_or_create(Repository& repository, ygg::Data<T> data)
+[[nodiscard]] auto get_or_create(Repository& repository, ygg::Data<T>& data)
 {
     canonicalize(repository, data);
     return repository.get_or_create(data).first;
 }
-
-template<typename T, typename... Args>
-[[nodiscard]] auto get_or_create(Repository& repository, Args&&... args)
-{
-    auto data = ygg::Data<T>(std::forward<Args>(args)...);
-    canonicalize(repository, data);
-    return repository.get_or_create(data).first;
-}
-
 
 }
 

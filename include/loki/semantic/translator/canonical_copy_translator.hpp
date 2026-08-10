@@ -18,7 +18,7 @@
 #ifndef LOKI_SEMANTIC_TRANSLATOR_CANONICAL_COPY_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_CANONICAL_COPY_TRANSLATOR_HPP_
 
-#include "loki/formalism/declarations.hpp"
+#include "loki/formalism/builder.hpp"
 
 #include <memory>
 
@@ -36,10 +36,14 @@ public:
     formalism::TaskView copy_task(formalism::TaskView task);
 
 private:
+    formalism::Builder m_builder;
     std::shared_ptr<TranslationStorage> m_storage;
 
     template<typename T>
-    ygg::IndexList<T> copy_list(formalism::EntityListView<T> source);
+    [[nodiscard]] auto checkout();
+
+    template<typename T>
+    void copy_list(formalism::EntityListView<T> source, ygg::IndexList<T>& target);
 
     formalism::RequirementView copy(formalism::RequirementView source);
     formalism::TypeView copy(formalism::TypeView source);
@@ -82,12 +86,18 @@ private:
 };
 
 template<typename T>
-ygg::IndexList<T> CanonicalCopyTranslator::copy_list(formalism::EntityListView<T> source)
+auto CanonicalCopyTranslator::checkout()
 {
-    auto result = ygg::IndexList<T> {};
+    auto data = m_builder.get_builder<T>();
+    data->clear();
+    return data;
+}
+
+template<typename T>
+void CanonicalCopyTranslator::copy_list(formalism::EntityListView<T> source, ygg::IndexList<T>& target)
+{
     for (auto view : source)
-        result.push_back(copy(view).get_index());
-    return result;
+        target.push_back(copy(view).get_index());
 }
 
 }  // namespace loki::semantic::detail

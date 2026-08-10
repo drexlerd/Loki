@@ -164,8 +164,8 @@ TEST(LokiPublicFacade, ViewConvenienceMethodsCoverNumericEffectsAndMetrics)
                             {
                                 saw_numeric_effect = true;
                                 EXPECT_EQ(nested_effect_node.get_operator(), loki::formalism::NumericEffectOperator::Increase);
-                                EXPECT_EQ(nested_effect_node.get_function().get_name(), "total-cost");
-                                EXPECT_EQ(nested_effect_node.get_terms().size(), 0);
+                                EXPECT_EQ(nested_effect_node.get_function().get_function().get_name(), "total-cost");
+                                EXPECT_EQ(nested_effect_node.get_function().get_terms().size(), 0);
 
                                 ygg::visit(
                                     [](const auto expression_node)

@@ -15,9 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/semantic/translator/common.hpp"
-
 #include "loki/formalism/builder.hpp"
+#include "loki/semantic/translator/common.hpp"
 
 #include <utility>
 
@@ -35,21 +34,24 @@ void compose_map(ViewMap<T>& out, const ViewMap<T>& source_to_middle, const View
     }
 }
 
-formalism::TypeView copy_type_view_for_metadata(TranslationStorage& target, formalism::TypeView source)
+formalism::TypeView copy_type_view_for_metadata(TranslationStorage& target, formalism::Builder& builder, formalism::TypeView source)
 {
     if (auto mapped = find_mapped(target.types, source))
         return *mapped;
 
-    auto bases = ygg::IndexList<formalism::Type> {};
+    auto data = builder.get_builder<formalism::Type>();
+    data->clear();
+    data->name = source.get_name();
     for (auto base : source.get_bases())
-        bases.push_back(copy_type_view_for_metadata(target, base).get_index());
+        data->bases.push_back(copy_type_view_for_metadata(target, builder, base).get_index());
 
-    auto out = formalism::get_or_create<formalism::Type>(target.repository, source.get_name(), std::move(bases));
+    auto out = formalism::get_or_create(target.repository, *data);
     remember(target.types, source, out);
     return out;
 }
 
 void remap_object_type_metadata(TranslationStorage& target,
+                                formalism::Builder& builder,
                                 const TranslationStorage& source,
                                 const ViewMap<formalism::Object>& object_map,
                                 const ViewMap<formalism::Type>& type_map)
@@ -67,7 +69,7 @@ void remap_object_type_metadata(TranslationStorage& target,
             if (auto type_it = type_map.find(type); type_it != type_map.end())
                 remapped.push_back(type_it->second);
             else
-                remapped.push_back(copy_type_view_for_metadata(target, type));
+                remapped.push_back(copy_type_view_for_metadata(target, builder, type));
         }
         target.object_type_views.emplace(object_it->second, std::move(remapped));
     }
@@ -119,7 +121,8 @@ std::shared_ptr<TranslationStorage> canonicalize_domain_storage(formalism::Domai
     const auto middle_tasks = canonical->tasks;
 
     auto middle_types = canonical->types;
-    remap_object_type_metadata(*canonical, *middle, middle_objects, middle_types);
+    auto builder = formalism::Builder {};
+    remap_object_type_metadata(*canonical, builder, *middle, middle_objects, middle_types);
     middle_types = canonical->types;
 
     canonical->translated_domain = canonical_domain;
@@ -177,7 +180,8 @@ void compose_storage_maps_from_previous(TranslationStorage& target, const Transl
 {
     const auto precompose_objects = target.objects;
     auto precompose_types = target.types;
-    remap_object_type_metadata(target, previous, precompose_objects, precompose_types);
+    auto builder = formalism::Builder {};
+    remap_object_type_metadata(target, builder, previous, precompose_objects, precompose_types);
 
     const auto requirements = target.requirements;
     const auto types = target.types;

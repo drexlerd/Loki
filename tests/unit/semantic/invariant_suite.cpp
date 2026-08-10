@@ -103,8 +103,8 @@ void expect_effect_normal_form(formalism::EffectView effect, bool top_level, con
                             using Grandchild = std::decay_t<decltype(grandchild)>;
                             if constexpr (std::is_same_v<Grandchild, formalism::EffectNumericView>)
                             {
-                                auto key = std::string(grandchild.get_function().get_name());
-                                for (auto term : grandchild.get_terms())
+                                auto key = std::string(grandchild.get_function().get_function().get_name());
+                                for (auto term : grandchild.get_function().get_terms())
                                     key += "," + std::to_string(term.get_index().get_value());
                                 EXPECT_TRUE(numeric_targets.insert(key).second) << what << ": unaggregated numeric effects on target " << key;
                             }

@@ -51,6 +51,14 @@ protected:
     Derived& self() noexcept { return static_cast<Derived&>(static_cast<Component&>(*this)); }
     const Derived& self() const noexcept { return static_cast<const Derived&>(static_cast<const Component&>(*this)); }
 
+    template<typename T>
+    [[nodiscard]] auto checkout()
+    {
+        auto data = m_context.builder.template get_builder<T>();
+        data->clear();
+        return data;
+    }
+
     CopyContext& m_context;
     std::shared_ptr<TranslationStorage>& m_storage;
     ygg::UnorderedMap<formalism::VariableView, size_t>& m_num_quantifications;

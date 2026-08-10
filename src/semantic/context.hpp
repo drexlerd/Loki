@@ -18,6 +18,7 @@
 #ifndef LOKI_SEMANTIC_CONTEXT_HPP_
 #define LOKI_SEMANTIC_CONTEXT_HPP_
 
+#include "loki/formalism/builder.hpp"
 #include "loki/formalism/domain_view.hpp"
 #include "loki/formalism/function_skeleton_view.hpp"
 #include "loki/formalism/object_view.hpp"
@@ -85,7 +86,11 @@ struct ParseContext
 void remember_requirement(ParseContext& parse_context, formalism::RequirementKind kind);
 
 formalism::TypeView
-intern_type(DomainContext& domain_context, formalism::Repository& repository, const std::string& name, ygg::IndexList<formalism::Type> bases);
+intern_type(DomainContext& domain_context,
+            formalism::Builder& builder,
+            formalism::Repository& repository,
+            const std::string& name,
+            const std::vector<formalism::TypeView>& bases);
 
 // Repopulates the symbol tables from domain_context.domain after canonicalization.
 void rebuild_domain_symbols(DomainContext& domain_context, formalism::Repository& repository);

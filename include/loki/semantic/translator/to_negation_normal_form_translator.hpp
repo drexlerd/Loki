@@ -76,9 +76,14 @@ template<typename Derived>
 formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition_node(formalism::ConditionLiteralView source)
 {
     const auto literal = source.get_literal();
-    const auto negated_literal =
-        formalism::get_or_create<formalism::Literal>(this->m_storage->repository, as_index(this->self().copy(literal.get_atom())), !literal.get_polarity());
-    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, negated_literal));
+    const auto atom = as_index(this->self().copy(literal.get_atom()));
+    auto literal_data = this->template checkout<formalism::Literal>();
+    literal_data->atom = atom;
+    literal_data->m_polarity = !literal.get_polarity();
+    const auto negated_literal = formalism::get_or_create(this->m_storage->repository, *literal_data);
+    auto condition_data = this->template checkout<formalism::ConditionLiteral>();
+    condition_data->literal = negated_literal.get_index();
+    return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *condition_data));
 }
 
 template<typename Derived>
@@ -119,12 +124,14 @@ formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_conditi
 {
     this->self().increment_quantifications(source.get_parameters());
     auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
-    auto parameters = this->self().parameter_indices(parameter_views);
     this->self().enter_scope(parameter_views);
     auto condition = as_index(this->self().negate_condition(source.get_condition()));
     this->self().leave_scope();
-    return this->self().flatten_condition(
-        this->self().wrap_condition(formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository, std::move(parameters), condition)));
+    auto data = this->template checkout<formalism::ConditionForall>();
+    for (auto parameter : parameter_views)
+        data->parameters.push_back(parameter.get_index());
+    data->condition = condition;
+    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data)));
 }
 
 template<typename Derived>
@@ -132,22 +139,28 @@ formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_conditi
 {
     this->self().increment_quantifications(source.get_parameters());
     auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
-    auto parameters = this->self().parameter_indices(parameter_views);
     this->self().enter_scope(parameter_views);
     auto condition = as_index(this->self().negate_condition(source.get_condition()));
     this->self().leave_scope();
-    return this->self().flatten_condition(
-        this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), condition)));
+    auto data = this->template checkout<formalism::ConditionExists>();
+    for (auto parameter : parameter_views)
+        data->parameters.push_back(parameter.get_index());
+    data->condition = condition;
+    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data)));
 }
 
 template<typename Derived>
 formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition_node(formalism::ConditionNumericConstraintView source)
 {
     const auto& data = source.get_data();
-    return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionNumericConstraint>(this->m_storage->repository,
-                                                                                                       this->self().negate_comparator(data.comparator),
-                                                                                                       as_index(this->self().copy(source.get_left())),
-                                                                                                       as_index(this->self().copy(source.get_right()))));
+    const auto comparator = this->self().negate_comparator(data.comparator);
+    const auto left = as_index(this->self().copy(source.get_left()));
+    const auto right = as_index(this->self().copy(source.get_right()));
+    auto result = this->template checkout<formalism::ConditionNumericConstraint>();
+    result->comparator = comparator;
+    result->left = left;
+    result->right = right;
+    return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *result));
 }
 
 template<typename Derived>

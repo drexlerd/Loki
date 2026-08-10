@@ -39,48 +39,29 @@ struct Data<::loki::formalism::MultiFunctionExpression>
 {
     ygg::Index<::loki::formalism::MultiFunctionExpression> index;
     ::loki::formalism::MultiArithmeticOperator op {};
-    ygg::Index<::loki::formalism::FunctionExpression> first;
-    ygg::Index<::loki::formalism::FunctionExpression> second;
-    ygg::IndexList<::loki::formalism::FunctionExpression> remaining;
+    ygg::IndexList<::loki::formalism::FunctionExpression> args;
 
     Data() = default;
-    Data(::loki::formalism::MultiArithmeticOperator op_,
-         ygg::Index<::loki::formalism::FunctionExpression> first_,
-         ygg::Index<::loki::formalism::FunctionExpression> second_,
-         ygg::IndexList<::loki::formalism::FunctionExpression> remaining_ = {}) :
-        index(),
-        op(op_),
-        first(first_),
-        second(second_),
-        remaining(std::move(remaining_))
+    Data(::loki::formalism::MultiArithmeticOperator op_, ygg::IndexList<::loki::formalism::FunctionExpression> args_) :
+        index(), op(op_), args(std::move(args_))
     {
     }
     template<typename C>
     Data(::loki::formalism::MultiArithmeticOperator op_,
-         ::ygg::View<ygg::Index<::loki::formalism::FunctionExpression>, C> first_,
-         ::ygg::View<ygg::Index<::loki::formalism::FunctionExpression>, C> second_,
-         const std::vector<::ygg::View<ygg::Index<::loki::formalism::FunctionExpression>, C>>& remaining_ = {}) :
-        index(),
-        op(op_),
-        first(),
-        second(),
-        remaining()
+         const std::vector<::ygg::View<ygg::Index<::loki::formalism::FunctionExpression>, C>>& args_) :
+        index(), op(op_), args()
     {
-        set(first_, first);
-        set(second_, second);
-        set(remaining_, remaining);
+        set(args_, args);
     }
 
     void clear() noexcept
     {
         ygg::clear(index);
         op = {};
-        ygg::clear(first);
-        ygg::clear(second);
-        ygg::clear(remaining);
+        ygg::clear(args);
     }
-    auto cista_members() const noexcept { return std::tie(index, op, first, second, remaining); }
-    auto identifying_members() const noexcept { return std::tie(op, first, second, remaining); }
+    auto cista_members() const noexcept { return std::tie(index, op, args); }
+    auto identifying_members() const noexcept { return std::tie(op, args); }
 };
 
 }

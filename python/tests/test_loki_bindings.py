@@ -422,7 +422,7 @@ def test_repository_constructs_numeric_function_task_bits() -> None:
     one = make_number_expression(repository, 1.0)
     numeric_node = repository.get_or_create(pypddl.ConditionNumericConstraintData(pypddl.BinaryComparator.Ge, zero, zero))
     condition = repository.get_or_create(pypddl.ConditionData(numeric_node))
-    numeric_effect_node = repository.get_or_create(pypddl.EffectNumericData(pypddl.NumericEffectOperator.Assign, fluent, [term], one))
+    numeric_effect_node = repository.get_or_create(pypddl.EffectNumericData(pypddl.NumericEffectOperator.Assign, function_term, one))
     effect = repository.get_or_create(pypddl.EffectData(numeric_effect_node))
     action = repository.get_or_create(pypddl.ActionData("refuel", [parameter], condition, effect))
     initial_value = repository.get_or_create(pypddl.InitialFunctionValueData(function_term, zero))
@@ -613,24 +613,22 @@ def test_numeric_expression_variant_views_are_inspectable() -> None:
     assert variant.get_value() == 2.0
 
 
-def test_multi_remaining_keeps_repository_alive() -> None:
-    def make_remaining() -> list[pypddl.FunctionExpression]:
+def test_multi_args_keep_repository_alive() -> None:
+    def make_args() -> list[pypddl.FunctionExpression]:
         repository = pypddl.RepositoryFactory().create()
         operands = [make_number_expression(repository, value) for value in (1.0, 2.0, 3.0)]
         multi = repository.get_or_create(
             pypddl.MultiFunctionExpressionData(
                 pypddl.MultiArithmeticOperator.Add,
-                operands[0],
-                operands[1],
-                operands[2:],
+                operands,
             )
         )
-        return cast(list[pypddl.FunctionExpression], multi.get_remaining())
+        return cast(list[pypddl.FunctionExpression], multi.get_args())
 
-    remaining = make_remaining()
+    args = make_args()
     gc.collect()
 
-    assert remaining[0].get_variant().get_value() == 3.0
+    assert args[2].get_variant().get_value() == 3.0
 
 
 def test_repository_exposes_recursive_constructors_and_accessors() -> None:
@@ -667,11 +665,12 @@ def test_repository_exposes_recursive_constructors_and_accessors() -> None:
     unary = repository.get_or_create(pypddl.FunctionExpressionData(unary_node))
     binary_node = repository.get_or_create(pypddl.BinaryFunctionExpressionData(pypddl.BinaryArithmeticOperator.Add, number, unary))
     binary = repository.get_or_create(pypddl.FunctionExpressionData(binary_node))
-    multi_node = repository.get_or_create(pypddl.MultiFunctionExpressionData(pypddl.MultiArithmeticOperator.Add, number, binary))
+    multi_node = repository.get_or_create(pypddl.MultiFunctionExpressionData(pypddl.MultiArithmeticOperator.Add, [number, binary]))
     multi = repository.get_or_create(pypddl.FunctionExpressionData(multi_node))
 
     fluent = repository.get_or_create(pypddl.FunctionSkeletonData("f", [parameter], number_type))
-    numeric_effect_node = repository.get_or_create(pypddl.EffectNumericData(pypddl.NumericEffectOperator.Assign, fluent, [term], multi))
+    function_term = repository.get_or_create(pypddl.FunctionTermData(fluent, [term]))
+    numeric_effect_node = repository.get_or_create(pypddl.EffectNumericData(pypddl.NumericEffectOperator.Assign, function_term, multi))
     numeric_effect = repository.get_or_create(pypddl.EffectData(numeric_effect_node))
     literal_effect = make_effect(repository, literal)
     effect_when_node = repository.get_or_create(pypddl.EffectWhenData(condition_forall, literal_effect))
@@ -713,7 +712,7 @@ def test_repository_exposes_recursive_constructors_and_accessors() -> None:
     numeric_effect_variant = numeric_effect.get_variant()
     assert isinstance(numeric_effect_variant, pypddl.EffectNumeric)
     assert numeric_effect_variant.get_operator() == pypddl.NumericEffectOperator.Assign
-    assert len(numeric_effect_variant.get_terms()) == 1
+    assert len(numeric_effect_variant.get_function().get_terms()) == 1
     unary_variant = unary.get_variant()
     assert isinstance(unary_variant, pypddl.UnaryFunctionExpression)
     assert unary_variant.get_operator() == pypddl.UnaryArithmeticOperator.Sub
@@ -723,7 +722,7 @@ def test_repository_exposes_recursive_constructors_and_accessors() -> None:
     multi_variant = multi.get_variant()
     assert isinstance(multi_variant, pypddl.MultiFunctionExpression)
     assert multi_variant.get_operator() == pypddl.MultiArithmeticOperator.Add
-    multi_operands = [multi_variant.get_first(), multi_variant.get_second(), *multi_variant.get_remaining()]
+    multi_operands = multi_variant.get_args()
     assert len(multi_operands) == 2
     assert number in multi_operands
     assert binary in multi_operands

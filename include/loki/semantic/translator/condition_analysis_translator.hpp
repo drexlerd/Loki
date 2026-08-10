@@ -91,7 +91,9 @@ public:
 template<typename Derived>
 formalism::TermView ConditionAnalysisTranslator<Derived>::term_from_variable(formalism::VariableView variable)
 {
-    return formalism::get_or_create<formalism::Term>(this->m_storage->repository, ygg::Data<formalism::Term>::Variant(variable.get_index()));
+    auto data = this->template checkout<formalism::Term>();
+    data->value = ygg::Data<formalism::Term>::Variant(variable.get_index());
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
@@ -167,9 +169,7 @@ void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::Mul
                                                                   ygg::UnorderedSet<formalism::VariableView>& bound,
                                                                   ygg::UnorderedSet<formalism::VariableView>& free) const
 {
-    this->self().collect_free_variables(expression.get_first(), bound, free);
-    this->self().collect_free_variables(expression.get_second(), bound, free);
-    for (auto part : expression.get_remaining())
+    for (auto part : expression.get_args())
         this->self().collect_free_variables(part, bound, free);
 }
 

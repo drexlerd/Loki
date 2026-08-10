@@ -74,18 +74,21 @@ formalism::ActionView TopLevelTranslator<Derived>::copy(formalism::ActionView so
     }
     if (this->m_phase == TranslationPhase::CompileTyping)
         this->self().prepend_type_conditions(precondition, source.get_parameters());
-    const auto parameters = this->self().parameter_indices(parameter_views);
-    const auto out_parameters = this->self().compiles_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
     auto effect = cista::optional<ygg::Index<formalism::Effect>> {};
     if (const auto effect_view = source.get_effect())
         effect = as_index(this->self().copy(effect_view.value()));
-    auto out = formalism::get_or_create<formalism::Action>(this->m_storage->repository,
-                                                           data.name,
-                                                           data.original_name,
-                                                           out_parameters,
-                                                           data.original_arity,
-                                                           precondition,
-                                                           effect);
+    auto result = this->template checkout<formalism::Action>();
+    result->name = data.name;
+    result->original_name = data.original_name;
+    if (this->self().compiles_typing_now())
+        this->self().copy_parameters_without_types(source.get_parameters(), result->parameters);
+    else
+        for (auto parameter : parameter_views)
+            result->parameters.push_back(parameter.get_index());
+    result->original_arity = data.original_arity;
+    result->precondition = precondition;
+    result->effect = effect;
+    auto out = formalism::get_or_create(this->m_storage->repository, *result);
     this->self().leave_scope();
     remember(this->m_storage->actions, source, out);
     return out;
@@ -118,13 +121,17 @@ formalism::AxiomView TopLevelTranslator<Derived>::copy(formalism::AxiomView sour
     auto condition = as_index(copied_condition);
     if (this->m_phase == TranslationPhase::CompileTyping)
         this->self().prepend_type_conditions(condition, source.get_parameters());
-    const auto parameters = this->self().parameter_indices(parameter_views);
-    const auto out_parameters = this->self().compiles_typing_now() ? this->self().copy_parameters_without_types(source.get_parameters()) : parameters;
-    auto out = formalism::get_or_create<formalism::Axiom>(this->m_storage->repository,
-                                                          out_parameters,
-                                                          data.original_arity,
-                                                          as_index(this->self().copy(source.get_head())),
-                                                          condition);
+    const auto head = as_index(this->self().copy(source.get_head()));
+    auto result = this->template checkout<formalism::Axiom>();
+    if (this->self().compiles_typing_now())
+        this->self().copy_parameters_without_types(source.get_parameters(), result->parameters);
+    else
+        for (auto parameter : parameter_views)
+            result->parameters.push_back(parameter.get_index());
+    result->original_arity = data.original_arity;
+    result->head = head;
+    result->condition = condition;
+    auto out = formalism::get_or_create(this->m_storage->repository, *result);
     this->self().leave_scope();
     remember(this->m_storage->axioms, source, out);
     return out;
@@ -135,10 +142,11 @@ formalism::MetricView TopLevelTranslator<Derived>::copy(formalism::MetricView so
 {
     if (auto mapped = find_mapped(this->m_storage->metrics, source))
         return *mapped;
-    auto out = formalism::get_or_create<formalism::Metric>(
-        this->m_storage->repository,
-        source.get_optimization_direction(),
-        as_index(this->self().copy(source.get_expression())));
+    const auto expression = as_index(this->self().copy(source.get_expression()));
+    auto data = this->template checkout<formalism::Metric>();
+    data->optimization_direction = source.get_optimization_direction();
+    data->expression = expression;
+    auto out = formalism::get_or_create(this->m_storage->repository, *data);
     remember(this->m_storage->metrics, source, out);
     return out;
 }
@@ -148,9 +156,12 @@ formalism::InitialFunctionValueView TopLevelTranslator<Derived>::copy(formalism:
 {
     if (auto mapped = find_mapped(this->m_storage->initial_function_values, source))
         return *mapped;
-    auto out = formalism::get_or_create<formalism::InitialFunctionValue>(this->m_storage->repository,
-                                                                         as_index(this->self().copy(source.get_function())),
-                                                                         as_index(this->self().copy(source.get_value())));
+    const auto function = as_index(this->self().copy(source.get_function()));
+    const auto value = as_index(this->self().copy(source.get_value()));
+    auto data = this->template checkout<formalism::InitialFunctionValue>();
+    data->function = function;
+    data->value = value;
+    auto out = formalism::get_or_create(this->m_storage->repository, *data);
     remember(this->m_storage->initial_function_values, source, out);
     return out;
 }

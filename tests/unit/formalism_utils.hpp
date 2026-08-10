@@ -191,7 +191,7 @@ inline bool writes_function_named(formalism::EffectView effect, std::string_view
         {
             using Node = std::decay_t<decltype(node)>;
             if constexpr (std::is_same_v<Node, formalism::EffectNumericView>)
-                return std::string_view(node.get_function().get_name()) == name;
+                return std::string_view(node.get_function().get_function().get_name()) == name;
             else if constexpr (std::is_same_v<Node, formalism::EffectAndView> || std::is_same_v<Node, formalism::EffectOneOfView>)
             {
                 for (auto child : node.get_effects())

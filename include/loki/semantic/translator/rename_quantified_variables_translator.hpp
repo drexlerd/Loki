@@ -34,7 +34,7 @@ public:
     void enter_variable_scope();
     void leave_variable_scope();
     formalism::ParameterView rename_parameter(formalism::ParameterView source);
-    ygg::IndexList<formalism::Parameter> rename_parameters(formalism::EntityListView<formalism::Parameter> source);
+    void rename_parameters(formalism::EntityListView<formalism::Parameter> source, ygg::IndexList<formalism::Parameter>& result);
 
     formalism::TermView rename_variables(formalism::TermView source);
     formalism::AtomView rename_variables(formalism::AtomView source);
@@ -121,7 +121,9 @@ formalism::VariableView RenameQuantifiedVariablesTranslator<Derived>::fresh_vari
         if (!taken.contains(name))
         {
             this->m_renamed_variable_names.insert(name);
-            return formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string(name));
+            auto data = this->template checkout<formalism::Variable>();
+            data->name = cista::offset::string(name);
+            return formalism::get_or_create(this->m_storage->repository, *data);
         }
     }
 }
@@ -131,18 +133,18 @@ formalism::ParameterView RenameQuantifiedVariablesTranslator<Derived>::rename_pa
 {
     const auto variable = this->self().fresh_variable(source.get_variable());
     this->m_variable_bindings.back().emplace(source.get_variable(), variable);
-    return formalism::get_or_create<formalism::Parameter>(this->m_storage->repository,
-                                                          variable.get_index(),
-                                                          this->self().template copy_list<formalism::Type>(source.get_types()));
+    auto data = this->template checkout<formalism::Parameter>();
+    data->variable = variable.get_index();
+    this->self().template copy_list<formalism::Type>(source.get_types(), data->types);
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Parameter> RenameQuantifiedVariablesTranslator<Derived>::rename_parameters(formalism::EntityListView<formalism::Parameter> source)
+void RenameQuantifiedVariablesTranslator<Derived>::rename_parameters(formalism::EntityListView<formalism::Parameter> source,
+                                                                     ygg::IndexList<formalism::Parameter>& result)
 {
-    auto result = ygg::IndexList<formalism::Parameter> {};
     for (auto parameter : source)
         result.push_back(as_index(this->self().rename_parameter(parameter)));
-    return result;
 }
 
 template<typename Derived>
@@ -158,66 +160,74 @@ formalism::TermView RenameQuantifiedVariablesTranslator<Derived>::rename_variabl
                 return as_index(this->self().copy(arg));
         },
         source.get_value());
-    return formalism::get_or_create<formalism::Term>(this->m_storage->repository, std::move(value));
+    auto data = this->template checkout<formalism::Term>();
+    data->value = std::move(value);
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::AtomView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::AtomView source)
 {
-    auto terms = ygg::IndexList<formalism::Term> {};
+    auto data = this->template checkout<formalism::Atom>();
     for (auto term : source.get_terms())
-        terms.push_back(as_index(this->self().rename_variables(term)));
-    return formalism::get_or_create<formalism::Atom>(this->m_storage->repository, as_index(this->self().copy(source.get_predicate())), std::move(terms));
+        data->terms.push_back(as_index(this->self().rename_variables(term)));
+    data->predicate = as_index(this->self().copy(source.get_predicate()));
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::LiteralView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::LiteralView source)
 {
-    return formalism::get_or_create<formalism::Literal>(this->m_storage->repository,
-                                                        as_index(this->self().rename_variables(source.get_atom())),
-                                                        source.get_data().m_polarity);
+    const auto atom = as_index(this->self().rename_variables(source.get_atom()));
+    auto data = this->template checkout<formalism::Literal>();
+    data->atom = atom;
+    data->m_polarity = source.get_data().m_polarity;
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::FunctionTermView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::FunctionTermView source)
 {
-    auto terms = ygg::IndexList<formalism::Term> {};
+    auto data = this->template checkout<formalism::FunctionTerm>();
     for (auto term : source.get_terms())
-        terms.push_back(as_index(this->self().rename_variables(term)));
-    return formalism::get_or_create<formalism::FunctionTerm>(this->m_storage->repository, as_index(this->self().copy(source.get_function())), std::move(terms));
+        data->terms.push_back(as_index(this->self().rename_variables(term)));
+    data->function = as_index(this->self().copy(source.get_function()));
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::UnaryFunctionExpressionView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::UnaryFunctionExpressionView source)
 {
     const auto& data = source.get_data();
-    return formalism::get_or_create<formalism::UnaryFunctionExpression>(this->m_storage->repository,
-                                                                        data.op,
-                                                                        as_index(this->self().rename_variables(source.get_expression())));
+    const auto expression = as_index(this->self().rename_variables(source.get_expression()));
+    auto result = this->template checkout<formalism::UnaryFunctionExpression>();
+    result->op = data.op;
+    result->expression = expression;
+    return formalism::get_or_create(this->m_storage->repository, *result);
 }
 
 template<typename Derived>
 formalism::BinaryFunctionExpressionView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::BinaryFunctionExpressionView source)
 {
     const auto& data = source.get_data();
-    return formalism::get_or_create<formalism::BinaryFunctionExpression>(this->m_storage->repository,
-                                                                         data.op,
-                                                                         as_index(this->self().rename_variables(source.get_left())),
-                                                                         as_index(this->self().rename_variables(source.get_right())));
+    const auto left = as_index(this->self().rename_variables(source.get_left()));
+    const auto right = as_index(this->self().rename_variables(source.get_right()));
+    auto result = this->template checkout<formalism::BinaryFunctionExpression>();
+    result->op = data.op;
+    result->left = left;
+    result->right = right;
+    return formalism::get_or_create(this->m_storage->repository, *result);
 }
 
 template<typename Derived>
 formalism::MultiFunctionExpressionView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::MultiFunctionExpressionView source)
 {
     const auto& data = source.get_data();
-    auto remaining = ygg::IndexList<formalism::FunctionExpression> {};
-    for (auto expression : source.get_remaining())
-        remaining.push_back(as_index(this->self().rename_variables(expression)));
-    return formalism::get_or_create<formalism::MultiFunctionExpression>(this->m_storage->repository,
-                                                                        data.op,
-                                                                        as_index(this->self().rename_variables(source.get_first())),
-                                                                        as_index(this->self().rename_variables(source.get_second())),
-                                                                        std::move(remaining));
+    auto result = this->template checkout<formalism::MultiFunctionExpression>();
+    for (auto expression : source.get_args())
+        result->args.push_back(as_index(this->self().rename_variables(expression)));
+    result->op = data.op;
+    return formalism::get_or_create(this->m_storage->repository, *result);
 }
 
 template<typename Derived>
@@ -233,37 +243,45 @@ formalism::FunctionExpressionView RenameQuantifiedVariablesTranslator<Derived>::
                 return as_index(this->self().rename_variables(arg));
         },
         source.get_value());
-    return formalism::get_or_create<formalism::FunctionExpression>(this->m_storage->repository, std::move(value));
+    auto data = this->template checkout<formalism::FunctionExpression>();
+    data->value = std::move(value);
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::ConditionLiteralView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionLiteralView source)
 {
-    return formalism::get_or_create<formalism::ConditionLiteral>(this->m_storage->repository, as_index(this->self().rename_variables(source.get_literal())));
+    const auto literal = as_index(this->self().rename_variables(source.get_literal()));
+    auto data = this->template checkout<formalism::ConditionLiteral>();
+    data->literal = literal;
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::ConditionAndView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionAndView source)
 {
-    auto conditions = ygg::IndexList<formalism::Condition> {};
+    auto data = this->template checkout<formalism::ConditionAnd>();
     for (auto condition : source.get_conditions())
-        conditions.push_back(as_index(this->self().rename_variables(condition)));
-    return formalism::get_or_create<formalism::ConditionAnd>(this->m_storage->repository, std::move(conditions));
+        data->conditions.push_back(as_index(this->self().rename_variables(condition)));
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::ConditionOrView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionOrView source)
 {
-    auto conditions = ygg::IndexList<formalism::Condition> {};
+    auto data = this->template checkout<formalism::ConditionOr>();
     for (auto condition : source.get_conditions())
-        conditions.push_back(as_index(this->self().rename_variables(condition)));
-    return formalism::get_or_create<formalism::ConditionOr>(this->m_storage->repository, std::move(conditions));
+        data->conditions.push_back(as_index(this->self().rename_variables(condition)));
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::ConditionNotView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionNotView source)
 {
-    return formalism::get_or_create<formalism::ConditionNot>(this->m_storage->repository, as_index(this->self().rename_variables(source.get_condition())));
+    const auto condition = as_index(this->self().rename_variables(source.get_condition()));
+    auto data = this->template checkout<formalism::ConditionNot>();
+    data->condition = condition;
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
@@ -273,37 +291,47 @@ formalism::ConditionImplyView RenameQuantifiedVariablesTranslator<Derived>::rena
     // evaluation order is unspecified.
     const auto left = as_index(this->self().rename_variables(source.get_left()));
     const auto right = as_index(this->self().rename_variables(source.get_right()));
-    return formalism::get_or_create<formalism::ConditionImply>(this->m_storage->repository, left, right);
+    auto data = this->template checkout<formalism::ConditionImply>();
+    data->left = left;
+    data->right = right;
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::ConditionExistsView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionExistsView source)
 {
     this->self().enter_variable_scope();
-    auto parameters = this->self().rename_parameters(source.get_parameters());
+    auto data = this->template checkout<formalism::ConditionExists>();
+    this->self().rename_parameters(source.get_parameters(), data->parameters);
     auto condition = as_index(this->self().rename_variables(source.get_condition()));
     this->self().leave_variable_scope();
-    return formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), condition);
+    data->condition = condition;
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::ConditionForallView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionForallView source)
 {
     this->self().enter_variable_scope();
-    auto parameters = this->self().rename_parameters(source.get_parameters());
+    auto data = this->template checkout<formalism::ConditionForall>();
+    this->self().rename_parameters(source.get_parameters(), data->parameters);
     auto condition = as_index(this->self().rename_variables(source.get_condition()));
     this->self().leave_variable_scope();
-    return formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository, std::move(parameters), condition);
+    data->condition = condition;
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::ConditionNumericConstraintView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionNumericConstraintView source)
 {
     const auto& data = source.get_data();
-    return formalism::get_or_create<formalism::ConditionNumericConstraint>(this->m_storage->repository,
-                                                                           data.comparator,
-                                                                           as_index(this->self().rename_variables(source.get_left())),
-                                                                           as_index(this->self().rename_variables(source.get_right())));
+    const auto left = as_index(this->self().rename_variables(source.get_left()));
+    const auto right = as_index(this->self().rename_variables(source.get_right()));
+    auto result = this->template checkout<formalism::ConditionNumericConstraint>();
+    result->comparator = data.comparator;
+    result->left = left;
+    result->right = right;
+    return formalism::get_or_create(this->m_storage->repository, *result);
 }
 
 template<typename Derived>
@@ -311,63 +339,72 @@ formalism::ConditionView RenameQuantifiedVariablesTranslator<Derived>::rename_va
 {
     auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Condition>::Variant { return as_index(this->self().rename_variables(arg)); },
                             source.get_value());
-    return formalism::get_or_create<formalism::Condition>(this->m_storage->repository, std::move(value));
+    auto data = this->template checkout<formalism::Condition>();
+    data->value = std::move(value);
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::EffectLiteralView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectLiteralView source)
 {
-    return formalism::get_or_create<formalism::EffectLiteral>(this->m_storage->repository, as_index(this->self().rename_variables(source.get_literal())));
+    const auto literal = as_index(this->self().rename_variables(source.get_literal()));
+    auto data = this->template checkout<formalism::EffectLiteral>();
+    data->literal = literal;
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::EffectAndView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectAndView source)
 {
-    auto effects = ygg::IndexList<formalism::Effect> {};
+    auto data = this->template checkout<formalism::EffectAnd>();
     for (auto effect : source.get_effects())
-        effects.push_back(as_index(this->self().rename_variables(effect)));
-    return formalism::get_or_create<formalism::EffectAnd>(this->m_storage->repository, std::move(effects));
+        data->effects.push_back(as_index(this->self().rename_variables(effect)));
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::EffectNumericView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectNumericView source)
 {
     const auto& data = source.get_data();
-    auto terms = ygg::IndexList<formalism::Term> {};
-    for (auto term : source.get_terms())
-        terms.push_back(as_index(this->self().rename_variables(term)));
-    return formalism::get_or_create<formalism::EffectNumeric>(this->m_storage->repository,
-                                                              data.op,
-                                                              as_index(this->self().copy(source.get_function())),
-                                                              std::move(terms),
-                                                              as_index(this->self().rename_variables(source.get_expression())));
+    const auto function = as_index(this->self().rename_variables(source.get_function()));
+    const auto expression = as_index(this->self().rename_variables(source.get_expression()));
+    auto result = this->template checkout<formalism::EffectNumeric>();
+    result->op = data.op;
+    result->function = function;
+    result->expression = expression;
+    return formalism::get_or_create(this->m_storage->repository, *result);
 }
 
 template<typename Derived>
 formalism::EffectForallView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectForallView source)
 {
     this->self().enter_variable_scope();
-    auto parameters = this->self().rename_parameters(source.get_parameters());
+    auto data = this->template checkout<formalism::EffectForall>();
+    this->self().rename_parameters(source.get_parameters(), data->parameters);
     auto effect = as_index(this->self().rename_variables(source.get_effect()));
     this->self().leave_variable_scope();
-    return formalism::get_or_create<formalism::EffectForall>(this->m_storage->repository, std::move(parameters), effect);
+    data->effect = effect;
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::EffectWhenView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectWhenView source)
 {
-    return formalism::get_or_create<formalism::EffectWhen>(this->m_storage->repository,
-                                                           as_index(this->self().rename_variables(source.get_condition())),
-                                                           as_index(this->self().rename_variables(source.get_effect())));
+    const auto condition = as_index(this->self().rename_variables(source.get_condition()));
+    const auto effect = as_index(this->self().rename_variables(source.get_effect()));
+    auto data = this->template checkout<formalism::EffectWhen>();
+    data->condition = condition;
+    data->effect = effect;
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 formalism::EffectOneOfView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectOneOfView source)
 {
-    auto effects = ygg::IndexList<formalism::Effect> {};
+    auto data = this->template checkout<formalism::EffectOneOf>();
     for (auto effect : source.get_effects())
-        effects.push_back(as_index(this->self().rename_variables(effect)));
-    return formalism::get_or_create<formalism::EffectOneOf>(this->m_storage->repository, std::move(effects));
+        data->effects.push_back(as_index(this->self().rename_variables(effect)));
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
@@ -375,18 +412,20 @@ formalism::EffectProbabilisticAlternativeView
 RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectProbabilisticAlternativeView source)
 {
     const auto& data = source.get_data();
-    return formalism::get_or_create<formalism::EffectProbabilisticAlternative>(this->m_storage->repository,
-                                                                               data.probability,
-                                                                               as_index(this->self().rename_variables(source.get_effect())));
+    const auto effect = as_index(this->self().rename_variables(source.get_effect()));
+    auto result = this->template checkout<formalism::EffectProbabilisticAlternative>();
+    result->probability = data.probability;
+    result->effect = effect;
+    return formalism::get_or_create(this->m_storage->repository, *result);
 }
 
 template<typename Derived>
 formalism::EffectProbabilisticView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectProbabilisticView source)
 {
-    auto alternatives = ygg::IndexList<formalism::EffectProbabilisticAlternative> {};
+    auto data = this->template checkout<formalism::EffectProbabilistic>();
     for (auto alternative : source.get_alternatives())
-        alternatives.push_back(as_index(this->self().rename_variables(alternative)));
-    return formalism::get_or_create<formalism::EffectProbabilistic>(this->m_storage->repository, std::move(alternatives));
+        data->alternatives.push_back(as_index(this->self().rename_variables(alternative)));
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
@@ -394,7 +433,9 @@ formalism::EffectView RenameQuantifiedVariablesTranslator<Derived>::rename_varia
 {
     auto value =
         ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant { return as_index(this->self().rename_variables(arg)); }, source.get_value());
-    return formalism::get_or_create<formalism::Effect>(this->m_storage->repository, std::move(value));
+    auto data = this->template checkout<formalism::Effect>();
+    data->value = std::move(value);
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
@@ -404,7 +445,8 @@ formalism::ActionView RenameQuantifiedVariablesTranslator<Derived>::rename_actio
     this->m_num_quantifications.clear();
     this->m_renamed_variable_names.clear();
     this->self().enter_variable_scope();
-    auto parameters = this->self().rename_parameters(source.get_parameters());
+    auto result = this->template checkout<formalism::Action>();
+    this->self().rename_parameters(source.get_parameters(), result->parameters);
     auto precondition = cista::optional<ygg::Index<formalism::Condition>> {};
     if (const auto condition = source.get_precondition())
         precondition = as_index(this->self().rename_variables(condition.value()));
@@ -412,13 +454,12 @@ formalism::ActionView RenameQuantifiedVariablesTranslator<Derived>::rename_actio
     if (const auto effect_view = source.get_effect())
         effect = as_index(this->self().rename_variables(effect_view.value()));
     this->self().leave_variable_scope();
-    return formalism::get_or_create<formalism::Action>(this->m_storage->repository,
-                                                       data.name,
-                                                       data.original_name,
-                                                       std::move(parameters),
-                                                       data.original_arity,
-                                                       precondition,
-                                                       effect);
+    result->name = data.name;
+    result->original_name = data.original_name;
+    result->original_arity = data.original_arity;
+    result->precondition = precondition;
+    result->effect = effect;
+    return formalism::get_or_create(this->m_storage->repository, *result);
 }
 
 template<typename Derived>
@@ -428,11 +469,15 @@ formalism::AxiomView RenameQuantifiedVariablesTranslator<Derived>::rename_axiom_
     this->m_num_quantifications.clear();
     this->m_renamed_variable_names.clear();
     this->self().enter_variable_scope();
-    auto parameters = this->self().rename_parameters(source.get_parameters());
+    auto result = this->template checkout<formalism::Axiom>();
+    this->self().rename_parameters(source.get_parameters(), result->parameters);
     auto head = as_index(this->self().rename_variables(source.get_head()));
     auto condition = as_index(this->self().rename_variables(source.get_condition()));
     this->self().leave_variable_scope();
-    return formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, std::move(parameters), data.original_arity, head, condition);
+    result->original_arity = data.original_arity;
+    result->head = head;
+    result->condition = condition;
+    return formalism::get_or_create(this->m_storage->repository, *result);
 }
 
 }  // namespace loki::semantic::detail

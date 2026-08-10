@@ -43,15 +43,18 @@ public:
 template<typename Derived>
 formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(ygg::Data<formalism::Condition>::Variant value)
 {
-    return formalism::get_or_create<formalism::Condition>(this->m_storage->repository, std::move(value));
+    auto data = this->template checkout<formalism::Condition>();
+    data->value = std::move(value);
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
 template<typename T>
 formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(formalism::EntityView<T> value)
 {
-    return formalism::get_or_create<formalism::Condition>(this->m_storage->repository,
-                                                          typename ygg::Data<formalism::Condition>::template ViewVariant<formalism::Repository>(value));
+    auto data = this->template checkout<formalism::Condition>();
+    data->value = ygg::Data<formalism::Condition>::Variant(value.get_index());
+    return formalism::get_or_create(this->m_storage->repository, *data);
 }
 
 template<typename Derived>
@@ -85,7 +88,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
             using Node = std::decay_t<decltype(node)>;
             if constexpr (std::is_same_v<Node, formalism::ConditionAndView>)
             {
-                auto parts = std::vector<formalism::ConditionView> {};
+                auto data = this->template checkout<formalism::ConditionAnd>();
                 for (auto child : node.get_conditions())
                 {
                     const auto flat = this->self().flatten_condition(child);
@@ -96,20 +99,20 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                             if constexpr (std::is_same_v<FlatNode, formalism::ConditionAndView>)
                             {
                                 for (auto part : flat_node.get_conditions())
-                                    parts.push_back(part);
+                                    data->conditions.push_back(part.get_index());
                             }
                             else
                             {
-                                parts.push_back(flat);
+                                data->conditions.push_back(flat.get_index());
                             }
                         },
                         flat.get_value());
                 }
-                return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionAnd>(this->m_storage->repository, std::move(parts)));
+                return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data));
             }
             else if constexpr (std::is_same_v<Node, formalism::ConditionOrView>)
             {
-                auto parts = std::vector<formalism::ConditionView> {};
+                auto data = this->template checkout<formalism::ConditionOr>();
                 for (auto child : node.get_conditions())
                 {
                     const auto flat = this->self().flatten_condition(child);
@@ -120,16 +123,16 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                             if constexpr (std::is_same_v<FlatNode, formalism::ConditionOrView>)
                             {
                                 for (auto part : flat_node.get_conditions())
-                                    parts.push_back(part);
+                                    data->conditions.push_back(part.get_index());
                             }
                             else
                             {
-                                parts.push_back(flat);
+                                data->conditions.push_back(flat.get_index());
                             }
                         },
                         flat.get_value());
                 }
-                return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionOr>(this->m_storage->repository, std::move(parts)));
+                return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data));
             }
             else if constexpr (std::is_same_v<Node, formalism::ConditionExistsView>)
             {
@@ -140,22 +143,21 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                         using FlatNode = std::decay_t<decltype(flat_node)>;
                         if constexpr (std::is_same_v<FlatNode, formalism::ConditionExistsView>)
                         {
-                            auto parameters = std::vector<formalism::ParameterView> {};
+                            auto data = this->template checkout<formalism::ConditionExists>();
                             for (auto parameter : node.get_parameters())
-                                parameters.push_back(parameter);
+                                data->parameters.push_back(parameter.get_index());
                             for (auto parameter : flat_node.get_parameters())
-                                parameters.push_back(parameter);
-                            return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository,
-                                                                                                                    std::move(parameters),
-                                                                                                                    flat_node.get_condition()));
+                                data->parameters.push_back(parameter.get_index());
+                            data->condition = flat_node.get_condition().get_index();
+                            return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data));
                         }
                         else
                         {
-                            auto parameters = std::vector<formalism::ParameterView> {};
+                            auto data = this->template checkout<formalism::ConditionExists>();
                             for (auto parameter : node.get_parameters())
-                                parameters.push_back(parameter);
-                            return this->self().wrap_condition(
-                                formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), flat));
+                                data->parameters.push_back(parameter.get_index());
+                            data->condition = flat.get_index();
+                            return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data));
                         }
                     },
                     flat.get_value());
@@ -169,22 +171,21 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                         using FlatNode = std::decay_t<decltype(flat_node)>;
                         if constexpr (std::is_same_v<FlatNode, formalism::ConditionForallView>)
                         {
-                            auto parameters = std::vector<formalism::ParameterView> {};
+                            auto data = this->template checkout<formalism::ConditionForall>();
                             for (auto parameter : node.get_parameters())
-                                parameters.push_back(parameter);
+                                data->parameters.push_back(parameter.get_index());
                             for (auto parameter : flat_node.get_parameters())
-                                parameters.push_back(parameter);
-                            return this->self().wrap_condition(formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository,
-                                                                                                                    std::move(parameters),
-                                                                                                                    flat_node.get_condition()));
+                                data->parameters.push_back(parameter.get_index());
+                            data->condition = flat_node.get_condition().get_index();
+                            return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data));
                         }
                         else
                         {
-                            auto parameters = std::vector<formalism::ParameterView> {};
+                            auto data = this->template checkout<formalism::ConditionForall>();
                             for (auto parameter : node.get_parameters())
-                                parameters.push_back(parameter);
-                            return this->self().wrap_condition(
-                                formalism::get_or_create<formalism::ConditionForall>(this->m_storage->repository, std::move(parameters), flat));
+                                data->parameters.push_back(parameter.get_index());
+                            data->condition = flat.get_index();
+                            return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data));
                         }
                     },
                     flat.get_value());
@@ -200,15 +201,19 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
 template<typename Derived>
 formalism::ConditionView ConditionBuilderTranslator<Derived>::make_conjunction(ygg::IndexList<formalism::Condition> conditions)
 {
-    return this->self().flatten_condition(
-        this->self().wrap_condition(formalism::get_or_create<formalism::ConditionAnd>(this->m_storage->repository, std::move(conditions))));
+    auto data = this->template checkout<formalism::ConditionAnd>();
+    for (auto condition : conditions)
+        data->conditions.push_back(condition);
+    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data)));
 }
 
 template<typename Derived>
 formalism::ConditionView ConditionBuilderTranslator<Derived>::make_disjunction(ygg::IndexList<formalism::Condition> conditions)
 {
-    return this->self().flatten_condition(
-        this->self().wrap_condition(formalism::get_or_create<formalism::ConditionOr>(this->m_storage->repository, std::move(conditions))));
+    auto data = this->template checkout<formalism::ConditionOr>();
+    for (auto condition : conditions)
+        data->conditions.push_back(condition);
+    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data)));
 }
 
 }  // namespace loki::semantic::detail

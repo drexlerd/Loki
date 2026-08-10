@@ -18,6 +18,7 @@
 #ifndef LOKI_SEMANTIC_TRANSLATOR_COPY_CONTEXT_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_COPY_CONTEXT_HPP_
 
+#include "loki/formalism/builder.hpp"
 #include "loki/semantic/translator/common.hpp"
 
 #include <yggdrasil/containers/unordered_set.hpp>
@@ -30,6 +31,7 @@ using GeneratedUniversalConditionKey = std::pair<std::vector<ScopedFreeParameter
 
 struct CopyContext
 {
+    formalism::Builder builder;
     std::shared_ptr<TranslationStorage> storage;
     ygg::UnorderedMap<formalism::VariableView, size_t> num_quantifications;
     std::vector<std::vector<formalism::ParameterView>> active_parameters;

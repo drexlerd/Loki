@@ -19,8 +19,7 @@
 
 #include <loki/formalism/effect_numeric_view.hpp>
 #include <loki/formalism/function_expression_view.hpp>
-#include <loki/formalism/function_skeleton_view.hpp>
-#include <loki/formalism/term_view.hpp>
+#include <loki/formalism/function_term_view.hpp>
 
 namespace nb = nanobind;
 using namespace nb::literals;
@@ -35,17 +34,12 @@ void bind_effect_numeric(nb::module_& m, RepositoryBinding& repository)
     {
         using V = Data<formalism::EffectNumeric>;
         bind_data<V>(m, "EffectNumericData")
-            .def(nb::init<formalism::NumericEffectOperator,
-                          formalism::FunctionSkeletonView,
-                          const std::vector<formalism::TermView>&,
-                          formalism::FunctionExpressionView>(),
+            .def(nb::init<formalism::NumericEffectOperator, formalism::FunctionTermView, formalism::FunctionExpressionView>(),
                  "operator"_a,
                  "function"_a,
-                 "terms"_a,
                  "expression"_a)
             .def_rw("operator", &V::op)
             .def_rw("function", &V::function)
-            .def_rw("terms", &V::terms)
             .def_rw("expression", &V::expression);
     }
 
@@ -55,7 +49,6 @@ void bind_effect_numeric(nb::module_& m, RepositoryBinding& repository)
         cls.def("get_index", &V::get_index)
             .def("get_operator", &V::get_operator)
             .def("get_function", &V::get_function, nb::keep_alive<0, 1>())
-            .def("get_terms", &V::get_terms)
             .def("get_expression", &V::get_expression, nb::keep_alive<0, 1>());
         ygg::add_print(cls);
         ygg::add_comparison(cls);

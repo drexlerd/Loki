@@ -102,12 +102,10 @@ public:
 
     using BasicCopyTranslator<CopyTranslator>::copy;
     using BasicCopyTranslator<CopyTranslator>::copy_list;
-    using BasicCopyTranslator<CopyTranslator>::copy_parameters;
     using BasicCopyTranslator<CopyTranslator>::increment_quantifications;
     using BasicCopyTranslator<CopyTranslator>::enter_scope;
     using BasicCopyTranslator<CopyTranslator>::leave_scope;
     using BasicCopyTranslator<CopyTranslator>::append_generated_domain_objects;
-    using BasicCopyTranslator<CopyTranslator>::update_translated_domain;
     using BasicCopyTranslator<CopyTranslator>::strip_requirement;
     using BasicCopyTranslator<CopyTranslator>::strip_typing_requirement;
     using ConditionTranslator<CopyTranslator>::copy;
@@ -164,7 +162,6 @@ public:
 
     using CompileTypingTranslator<CopyTranslator>::collect_type_hierarchy;
     using CompileTypingTranslator<CopyTranslator>::copy_type_hierarchy;
-    using CompileTypingTranslator<CopyTranslator>::maybe_strip_types;
     using CompileTypingTranslator<CopyTranslator>::copy_parameters_without_types;
     using CompileTypingTranslator<CopyTranslator>::type_predicate;
     using CompileTypingTranslator<CopyTranslator>::type_literal;

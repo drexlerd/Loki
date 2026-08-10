@@ -34,64 +34,71 @@ public:
     {
     }
 
-    ygg::IndexList<formalism::Action> split_disjunctive_actions(formalism::EntityListView<formalism::Action> actions);
-    ygg::IndexList<formalism::Axiom> split_disjunctive_axioms(formalism::EntityListView<formalism::Axiom> axioms);
+    void split_disjunctive_actions(formalism::EntityListView<formalism::Action> actions, ygg::IndexList<formalism::Action>& result);
+    void split_disjunctive_axioms(formalism::EntityListView<formalism::Axiom> axioms, ygg::IndexList<formalism::Axiom>& result);
 };
 
 template<typename Derived>
-ygg::IndexList<formalism::Action> SplitDisjunctiveConditionsTranslator<Derived>::split_disjunctive_actions(formalism::EntityListView<formalism::Action> actions)
+void SplitDisjunctiveConditionsTranslator<Derived>::split_disjunctive_actions(formalism::EntityListView<formalism::Action> actions,
+                                                                              ygg::IndexList<formalism::Action>& result)
 {
-    auto result = ygg::IndexList<formalism::Action> {};
+    result.clear();
     auto seen = ygg::UnorderedSet<formalism::ActionView> {};
     for (auto action : actions)
     {
-        const auto data = action.get_data();
+        const auto& data = action.get_data();
         if (const auto precondition_view = action.get_precondition())
         {
             const auto precondition = this->self().flatten_condition(precondition_view.value());
             if (const auto condition_or = this->self().as_or(precondition))
             {
                 for (auto part : condition_or->get_conditions())
-                    this->self().push_unique(result,
-                                             seen,
-                                             formalism::get_or_create<formalism::Action>(this->m_storage->repository,
-                                                                                         data.name,
-                                                                                         data.original_name,
-                                                                                         data.parameters,
-                                                                                         data.original_arity,
-                                                                                         part.get_index(),
-                                                                                         data.effect));
+                {
+                    auto action_data = this->template checkout<formalism::Action>();
+                    action_data->name = data.name;
+                    action_data->original_name = data.original_name;
+                    for (auto parameter : data.parameters)
+                        action_data->parameters.push_back(parameter);
+                    action_data->original_arity = data.original_arity;
+                    action_data->precondition = part.get_index();
+                    action_data->effect = data.effect;
+                    this->self().push_unique(result, seen, formalism::get_or_create(this->m_storage->repository, *action_data));
+                }
                 continue;
             }
         }
         this->self().push_unique(result, seen, action);
     }
-    return result;
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Axiom> SplitDisjunctiveConditionsTranslator<Derived>::split_disjunctive_axioms(formalism::EntityListView<formalism::Axiom> axioms)
+void SplitDisjunctiveConditionsTranslator<Derived>::split_disjunctive_axioms(formalism::EntityListView<formalism::Axiom> axioms,
+                                                                             ygg::IndexList<formalism::Axiom>& result)
 {
-    auto result = ygg::IndexList<formalism::Axiom> {};
+    result.clear();
     auto seen = ygg::UnorderedSet<formalism::AxiomView> {};
     for (auto axiom : axioms)
     {
-        const auto data = axiom.get_data();
+        const auto& data = axiom.get_data();
         const auto condition = this->self().flatten_condition(axiom.get_condition());
         if (const auto condition_or = this->self().as_or(condition))
         {
             for (auto part : condition_or->get_conditions())
-                this->self().push_unique(
-                    result,
-                    seen,
-                    formalism::get_or_create<formalism::Axiom>(this->m_storage->repository, data.parameters, data.original_arity, data.head, part.get_index()));
+            {
+                auto axiom_data = this->template checkout<formalism::Axiom>();
+                for (auto parameter : data.parameters)
+                    axiom_data->parameters.push_back(parameter);
+                axiom_data->original_arity = data.original_arity;
+                axiom_data->head = data.head;
+                axiom_data->condition = part.get_index();
+                this->self().push_unique(result, seen, formalism::get_or_create(this->m_storage->repository, *axiom_data));
+            }
         }
         else
         {
             this->self().push_unique(result, seen, axiom);
         }
     }
-    return result;
 }
 
 }  // namespace loki::semantic::detail

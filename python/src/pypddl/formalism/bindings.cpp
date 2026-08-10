@@ -19,7 +19,6 @@
 
 #include <loki/formalism/builder.hpp>
 #include <nanobind/stl/shared_ptr.h>
-#include <utility>
 
 namespace nb = nanobind;
 
@@ -85,7 +84,7 @@ void bind_formalism_enums(nb::module_& m)
 template<typename T>
 EntityView<T> get_or_create_data(Repository& repository, Data<T> data)
 {
-    return formalism::get_or_create<T>(repository, std::move(data));
+    return formalism::get_or_create(repository, data);
 }
 
 template EntityView<Requirement> get_or_create_data<Requirement>(Repository&, Data<Requirement>);

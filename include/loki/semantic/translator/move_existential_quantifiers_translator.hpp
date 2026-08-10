@@ -168,13 +168,19 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::hoist_ex
             if (!avoid.contains(name))
                 break;
         }
-        const auto fresh = formalism::get_or_create<formalism::Variable>(this->m_storage->repository, cista::offset::string(name));
+        auto variable_data = this->template checkout<formalism::Variable>();
+        variable_data->name = cista::offset::string(name);
+        const auto fresh = formalism::get_or_create(this->m_storage->repository, *variable_data);
         this->self().enter_variable_scope();
         this->m_variable_bindings.back().emplace(variable, fresh);
         condition = this->self().rename_variables(condition);
         this->self().leave_variable_scope();
         claimed.insert(name);
-        parameters.push_back(formalism::get_or_create<formalism::Parameter>(this->m_storage->repository, fresh.get_index(), parameter.get_data().types));
+        auto parameter_data = this->template checkout<formalism::Parameter>();
+        parameter_data->variable = fresh.get_index();
+        for (auto type : parameter.get_data().types)
+            parameter_data->types.push_back(type);
+        parameters.push_back(formalism::get_or_create(this->m_storage->repository, *parameter_data));
     }
     return condition;
 }
@@ -200,8 +206,11 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_exi
     auto conjunction = this->self().make_conjunction(std::move(parts));
     if (parameters.empty())
         return conjunction;
-    return this->self().flatten_condition(
-        this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, std::move(parameters), conjunction)));
+    auto data = this->template checkout<formalism::ConditionExists>();
+    for (auto parameter : parameters)
+        data->parameters.push_back(parameter.get_index());
+    data->condition = conjunction.get_index();
+    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data)));
 }
 
 template<typename Derived>
@@ -209,8 +218,11 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_exi
 {
     const auto& data = node.get_data();
     const auto condition = this->self().move_existentials(node.get_condition());
-    return this->self().flatten_condition(
-        this->self().wrap_condition(formalism::get_or_create<formalism::ConditionExists>(this->m_storage->repository, data.parameters, condition.get_index())));
+    auto result = this->template checkout<formalism::ConditionExists>();
+    for (auto parameter : data.parameters)
+        result->parameters.push_back(parameter);
+    result->condition = condition.get_index();
+    return this->self().flatten_condition(this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *result)));
 }
 
 template<typename Derived>

@@ -19,6 +19,7 @@
 #define LOKI_SEMANTIC_BUILDER_HPP_
 
 #include "loki/ast/ast_fwd.hpp"
+#include "loki/formalism/builder.hpp"
 #include "loki/formalism/condition_data.hpp"
 #include "loki/formalism/declarations.hpp"
 #include "loki/formalism/effect_data.hpp"
@@ -71,6 +72,7 @@ private:
 
     const ParserOptions& m_options;
     const DiagnosticContext& m_diagnostics;
+    formalism::Builder m_builder;
     formalism::Repository& m_repository;
     DomainContext& m_domain_context;
     ParseContext& m_parse_context;
@@ -79,7 +81,10 @@ private:
     SemanticChecks checks() const;
 
     template<typename T>
-    static ygg::IndexList<T> to_index_list(const std::vector<formalism::EntityView<T>>& views);
+    [[nodiscard]] auto checkout();
+
+    template<typename T>
+    static void append_indices(const std::vector<formalism::EntityView<T>>& views, ygg::IndexList<T>& indices);
 
     template<typename T>
     static cista::optional<ygg::Index<T>> to_optional_index(const std::optional<formalism::EntityView<T>>& view);
@@ -104,7 +109,6 @@ private:
 
     // Terms, atoms, and literals.
     formalism::TermView parse_term(const ast::Term& node);
-    std::vector<formalism::TermView> parse_terms(const std::vector<ast::Term>& nodes);
     formalism::AtomView parse_atom(const ast::Atom& node);
     formalism::LiteralView parse_literal(const ast::Literal& node);
 
@@ -160,13 +164,19 @@ private:
 };
 
 template<typename T>
-ygg::IndexList<T> AstBuilder::to_index_list(const std::vector<formalism::EntityView<T>>& views)
+auto AstBuilder::checkout()
 {
-    auto result = ygg::IndexList<T> {};
-    result.reserve(views.size());
+    auto data = m_builder.get_builder<T>();
+    data->clear();
+    return data;
+}
+
+template<typename T>
+void AstBuilder::append_indices(const std::vector<formalism::EntityView<T>>& views, ygg::IndexList<T>& indices)
+{
+    indices.reserve(indices.size() + views.size());
     for (const auto view : views)
-        result.push_back(view.get_index());
-    return result;
+        indices.push_back(view.get_index());
 }
 
 template<typename T>

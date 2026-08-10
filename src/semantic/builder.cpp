@@ -42,6 +42,7 @@ AstBuilder::AstBuilder(const ParserOptions& options,
                        ParseContext& parse_context) :
     m_options(options),
     m_diagnostics(diagnostics),
+    m_builder(),
     m_repository(repository),
     m_domain_context(domain_context),
     m_parse_context(parse_context)
@@ -65,7 +66,9 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
     {
         m_parse_context.active_action_costs = true;
         remember_requirement(m_parse_context, formalism::RequirementKind::ActionCosts);
-        const auto requirement = formalism::get_or_create<formalism::Requirement>(repo(), formalism::RequirementKind::ActionCosts);
+        auto data = checkout<formalism::Requirement>();
+        data->kind = formalism::RequirementKind::ActionCosts;
+        const auto requirement = formalism::get_or_create(repo(), *data);
         if (std::none_of(requirements.begin(), requirements.end(), [&](const auto value) { return value.get_index() == requirement.get_index(); }))
             requirements.push_back(requirement);
     }
@@ -102,15 +105,16 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
         types.push_back(type);
     std::sort(types.begin(), types.end(), [](auto lhs, auto rhs) { return lhs.get_index() < rhs.get_index(); });
 
-    auto data = ygg::Data<formalism::Domain>(to_cista(domain.name.text),
-                                             to_index_list(requirements),
-                                             to_index_list(types),
-                                             to_index_list(constants),
-                                             to_index_list(predicates),
-                                             to_index_list(functions),
-                                             to_index_list(actions),
-                                             to_index_list(axioms));
-    return formalism::get_or_create<formalism::Domain>(repo(), std::move(data));
+    auto data = checkout<formalism::Domain>();
+    data->name = to_cista(domain.name.text);
+    append_indices(requirements, data->requirements);
+    append_indices(types, data->types);
+    append_indices(constants, data->constants);
+    append_indices(predicates, data->predicates);
+    append_indices(functions, data->functions);
+    append_indices(actions, data->actions);
+    append_indices(axioms, data->axioms);
+    return formalism::get_or_create(repo(), *data);
 }
 
 formalism::TaskView AstBuilder::build_task(const ast::Task& task)
@@ -153,17 +157,17 @@ formalism::TaskView AstBuilder::build_task(const ast::Task& task)
     }
     checks().reject_unused_requirements(task.requirements);
 
-    auto data = ygg::Data<formalism::Task>(to_cista(task.name.text),
-                                           m_domain_context.domain->get_index(),
-                                           to_index_list(requirements),
-                                           to_index_list(objects),
-                                           to_index_list(initial_literals),
-                                           to_index_list(initial_function_values),
-                                           to_optional_index(goal),
-                                           to_optional_index(metric),
-                                           ygg::IndexList<formalism::Predicate> {},
-                                           to_index_list(axioms));
-    return formalism::get_or_create<formalism::Task>(repo(), std::move(data));
+    auto data = checkout<formalism::Task>();
+    data->name = to_cista(task.name.text);
+    data->domain = m_domain_context.domain->get_index();
+    append_indices(requirements, data->requirements);
+    append_indices(objects, data->objects);
+    append_indices(initial_literals, data->initial_literals);
+    append_indices(initial_function_values, data->initial_function_values);
+    data->goal = to_optional_index(goal);
+    data->metric = to_optional_index(metric);
+    append_indices(axioms, data->axioms);
+    return formalism::get_or_create(repo(), *data);
 }
 
 }  // namespace loki::semantic

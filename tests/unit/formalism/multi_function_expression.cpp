@@ -6,7 +6,7 @@
 
 #include <concepts>
 #include <gtest/gtest.h>
-#include <stdexcept>
+#include <utility>
 
 namespace f = loki::formalism;
 using Index = ygg::Index<f::MultiFunctionExpression>;
@@ -18,29 +18,83 @@ static_assert(std::totally_ordered<Index>);
 static_assert(std::totally_ordered<Data>);
 static_assert(std::totally_ordered<View>);
 static_assert(std::same_as<View, f::MultiFunctionExpressionView>);
-static_assert(std::constructible_from<Data, f::MultiArithmeticOperator, ygg::Index<f::FunctionExpression>, ygg::Index<f::FunctionExpression>>);
-static_assert(!std::constructible_from<Data, f::MultiArithmeticOperator, ygg::IndexList<f::FunctionExpression>>);
+static_assert(std::constructible_from<Data, f::MultiArithmeticOperator, ygg::IndexList<f::FunctionExpression>>);
 static_assert(requires(Data& data) {
     data.index;
     data.op;
-    data.first;
-    data.second;
-    data.remaining;
+    data.args;
     data.clear();
     { data == data } -> std::same_as<bool>;
 });
 static_assert(requires(const View& view) {
     view.get_index();
     view.get_operator();
-    view.get_first();
-    view.get_second();
-    view.get_remaining();
+    view.get_args();
     { view == view } -> std::same_as<bool>;
     { view < view } -> std::same_as<bool>;
 });
 
-TEST(LokiTests, MultiFunctionExpressionRejectsMissingRequiredOperands)
+template<typename T, typename Initialize>
+f::EntityView<T> intern(f::Repository& repository, f::Builder& builder, Initialize&& initialize)
+{
+    auto data = builder.template get_builder<T>();
+    data->clear();
+    std::forward<Initialize>(initialize)(*data);
+    return f::get_or_create(repository, *data);
+}
+
+TEST(LokiTests, MultiFunctionExpressionAllowsAnyArity)
 {
     auto repository = f::Repository(0);
-    EXPECT_THROW(static_cast<void>(f::get_or_create(repository, Data {})), std::invalid_argument);
+    auto data = Data {};
+    EXPECT_TRUE(f::get_or_create(repository, data).get_args().empty());
+}
+
+TEST(LokiTests, MultiFunctionExpressionBreaksEqualRenderTiesByIndex)
+{
+    auto repository = f::Repository(0);
+    auto builder = f::Builder {};
+    const auto wrap = [&](auto node) {
+        return intern<f::FunctionExpression>(repository,
+                                             builder,
+                                             [&](auto& data) { data.value = ygg::Data<f::FunctionExpression>::Variant(node.get_index()); });
+    };
+    const auto make_number = [&](double value) { return intern<f::FunctionExpressionNumber>(repository, builder, [&](auto& data) { data.value = value; }); };
+    const auto one = wrap(make_number(1.0));
+    const auto two = wrap(make_number(2.0));
+    const auto binary = wrap(intern<f::BinaryFunctionExpression>(repository,
+                                                                 builder,
+                                                                 [&](auto& data)
+                                                                 {
+                                                                     data.op = f::BinaryArithmeticOperator::Add;
+                                                                     data.left = one.get_index();
+                                                                     data.right = two.get_index();
+                                                                 }));
+    const auto multi = wrap(intern<f::MultiFunctionExpression>(repository,
+                                                               builder,
+                                                               [&](auto& data)
+                                                               {
+                                                                   data.op = f::MultiArithmeticOperator::Add;
+                                                                   data.args.push_back(one.get_index());
+                                                                   data.args.push_back(two.get_index());
+                                                               }));
+    ASSERT_NE(binary, multi);
+
+    const auto make_product = [&](auto left, auto right)
+    {
+        return intern<f::MultiFunctionExpression>(repository,
+                                                  builder,
+                                                  [&](auto& data)
+                                                  {
+                                                      data.op = f::MultiArithmeticOperator::Mul;
+                                                      data.args.push_back(left.get_index());
+                                                      data.args.push_back(right.get_index());
+                                                  });
+    };
+    const auto first = make_product(binary, multi);
+    const auto second = make_product(multi, binary);
+
+    EXPECT_EQ(first, second);
+    EXPECT_EQ(first.get_args().size(), 2);
+    EXPECT_NE(first.get_args()[0], first.get_args()[1]);
 }

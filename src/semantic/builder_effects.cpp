@@ -38,20 +38,25 @@ formalism::EffectView AstBuilder::parse_effect(const ast::Effect& effect)
 
 formalism::EffectView AstBuilder::wrap_effect(ygg::Data<formalism::Effect>::Variant value)
 {
-    return formalism::get_or_create<formalism::Effect>(repo(), std::move(value));
+    auto data = checkout<formalism::Effect>();
+    data->value = std::move(value);
+    return formalism::get_or_create(repo(), *data);
 }
 
 formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectLiteral& node)
 {
-    return wrap_effect(formalism::get_or_create<formalism::EffectLiteral>(repo(), parse_literal(node.literal).get_index()).get_index());
+    const auto literal = parse_literal(node.literal);
+    auto data = checkout<formalism::EffectLiteral>();
+    data->literal = literal.get_index();
+    return wrap_effect(formalism::get_or_create(repo(), *data).get_index());
 }
 
 formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectAnd& node)
 {
-    auto list = std::vector<formalism::EffectView> {};
+    auto data = checkout<formalism::EffectAnd>();
     for (const auto& child : node.effects)
-        list.push_back(parse_effect(child.get()));
-    return wrap_effect(formalism::get_or_create<formalism::EffectAnd>(repo(), to_index_list(list)).get_index());
+        data->effects.push_back(parse_effect(child.get()).get_index());
+    return wrap_effect(formalism::get_or_create(repo(), *data).get_index());
 }
 
 formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectNumeric& node)
@@ -68,13 +73,17 @@ formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectNumeric& no
     auto skeleton = function(node.function.function, node.function.terms.size());
     if (m_domain_context.declared_functions.contains(key(node.function.function.text)))
         checks().check_argument_types(key(node.function.function.text), skeleton.get_parameters(), node.function.terms, node.function.function);
-    const auto terms = parse_terms(node.function.terms);
-    return wrap_effect(formalism::get_or_create<formalism::EffectNumeric>(repo(),
-                                                                          op,
-                                                                          skeleton.get_index(),
-                                                                          to_index_list(terms),
-                                                                          parse_function_expression(node.expression.get()).get_index())
-                           .get_index());
+    auto function_data = checkout<formalism::FunctionTerm>();
+    function_data->function = skeleton.get_index();
+    for (const auto& term : node.function.terms)
+        function_data->terms.push_back(parse_term(term).get_index());
+    const auto function_term = formalism::get_or_create(repo(), *function_data);
+    const auto expression = parse_function_expression(node.expression.get());
+    auto data = checkout<formalism::EffectNumeric>();
+    data->op = op;
+    data->function = function_term.get_index();
+    data->expression = expression.get_index();
+    return wrap_effect(formalism::get_or_create(repo(), *data).get_index());
 }
 
 formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectForall& node)
@@ -83,43 +92,52 @@ formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectForall& nod
     auto scope = VariableScope(m_parse_context);
     auto parameters = parse_parameters(node.parameters);
     auto child = parse_effect(node.effect.get());
-    return wrap_effect(formalism::get_or_create<formalism::EffectForall>(repo(), to_index_list(parameters), child.get_index()).get_index());
+    auto data = checkout<formalism::EffectForall>();
+    append_indices(parameters, data->parameters);
+    data->effect = child.get_index();
+    return wrap_effect(formalism::get_or_create(repo(), *data).get_index());
 }
 
 formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectWhen& node)
 {
     checks().require_requirement(formalism::RequirementKind::ConditionalEffects, node);
-    return wrap_effect(
-        formalism::get_or_create<formalism::EffectWhen>(repo(), parse_condition(node.condition.get()).get_index(), parse_effect(node.effect.get()).get_index())
-            .get_index());
+    const auto condition = parse_condition(node.condition.get());
+    const auto effect = parse_effect(node.effect.get());
+    auto data = checkout<formalism::EffectWhen>();
+    data->condition = condition.get_index();
+    data->effect = effect.get_index();
+    return wrap_effect(formalism::get_or_create(repo(), *data).get_index());
 }
 
 formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectOneOf& node)
 {
     checks().require_requirement(formalism::RequirementKind::NonDeterministic, node);
-    auto list = std::vector<formalism::EffectView> {};
+    auto data = checkout<formalism::EffectOneOf>();
     for (const auto& child : node.effects)
-        list.push_back(parse_effect(child.get()));
-    return wrap_effect(formalism::get_or_create<formalism::EffectOneOf>(repo(), to_index_list(list)).get_index());
+        data->effects.push_back(parse_effect(child.get()).get_index());
+    return wrap_effect(formalism::get_or_create(repo(), *data).get_index());
 }
 
 formalism::EffectView AstBuilder::parse_effect_node(const ast::EffectProbabilistic& node)
 {
     checks().require_requirement(formalism::RequirementKind::ProbabilisticEffects, node);
-    auto list = std::vector<formalism::EffectProbabilisticAlternativeView> {};
     auto total = 0.0;
+    auto data = checkout<formalism::EffectProbabilistic>();
+    auto alternative_data = checkout<formalism::EffectProbabilisticAlternative>();
     for (const auto& alternative : node.alternatives)
     {
         if (!std::isfinite(alternative.probability) || alternative.probability < 0.0 || alternative.probability > 1.0)
             m_diagnostics.throw_at(alternative, InvalidProbabilisticEffectError("probability must be in [0, 1]"));
         total += alternative.probability;
-        list.push_back(formalism::get_or_create<formalism::EffectProbabilisticAlternative>(repo(),
-                                                                                           alternative.probability,
-                                                                                           parse_effect(alternative.effect.get()).get_index()));
+        const auto effect = parse_effect(alternative.effect.get());
+        alternative_data->clear();
+        alternative_data->probability = alternative.probability;
+        alternative_data->effect = effect.get_index();
+        data->alternatives.push_back(formalism::get_or_create(repo(), *alternative_data).get_index());
     }
     if (total > 1.0 + 1e-9)
         m_diagnostics.throw_at(node, InvalidProbabilisticEffectError("probabilities sum to more than 1"));
-    return wrap_effect(formalism::get_or_create<formalism::EffectProbabilistic>(repo(), to_index_list(list)).get_index());
+    return wrap_effect(formalism::get_or_create(repo(), *data).get_index());
 }
 
 formalism::ActionView AstBuilder::parse_action(const ast::Action& node)
@@ -134,30 +152,42 @@ formalism::ActionView AstBuilder::parse_action(const ast::Action& node)
     auto effect = std::optional<formalism::EffectView> {};
     if (node.effect)
         effect = parse_effect(*node.effect);
-    return formalism::get_or_create<formalism::Action>(repo(),
-                                                       to_cista(name),
-                                                       to_index_list(parameters),
-                                                       to_optional_index(precondition),
-                                                       to_optional_index(effect));
+    auto data = checkout<formalism::Action>();
+    data->name = to_cista(name);
+    data->original_name = data->name;
+    append_indices(parameters, data->parameters);
+    data->original_arity = data->parameters.size();
+    data->precondition = to_optional_index(precondition);
+    data->effect = to_optional_index(effect);
+    return formalism::get_or_create(repo(), *data);
 }
 
 formalism::AxiomView AstBuilder::parse_axiom(const ast::Axiom& node)
 {
     auto scope = VariableScope(m_parse_context);
     auto parameters = parse_parameters(node.head.parameters);
-    auto terms = std::vector<formalism::TermView> {};
+    auto pred = predicate(node.head.name, node.head.parameters.size());
+    auto atom_data = checkout<formalism::Atom>();
+    atom_data->predicate = pred.get_index();
     for (const auto& parameter : node.head.parameters)
     {
         auto term = ast::Term {};
         term.name = parameter.variable;
         term.variable = true;
-        terms.push_back(parse_term(term));
+        atom_data->terms.push_back(parse_term(term).get_index());
     }
-    auto pred = predicate(node.head.name, terms.size());
-    auto atom = formalism::get_or_create<formalism::Atom>(repo(), pred.get_index(), to_index_list(terms));
-    auto head = formalism::get_or_create<formalism::Literal>(repo(), atom.get_index(), true);
+    auto atom = formalism::get_or_create(repo(), *atom_data);
+    auto literal_data = checkout<formalism::Literal>();
+    literal_data->atom = atom.get_index();
+    literal_data->m_polarity = true;
+    auto head = formalism::get_or_create(repo(), *literal_data);
     auto condition = parse_condition(node.condition);
-    return formalism::get_or_create<formalism::Axiom>(repo(), to_index_list(parameters), head.get_index(), condition.get_index());
+    auto data = checkout<formalism::Axiom>();
+    append_indices(parameters, data->parameters);
+    data->original_arity = data->parameters.size();
+    data->head = head.get_index();
+    data->condition = condition.get_index();
+    return formalism::get_or_create(repo(), *data);
 }
 
 void AstBuilder::parse_initial_element(const ast::Literal& literal,
@@ -171,9 +201,12 @@ void AstBuilder::parse_initial_element(const ast::InitialFunctionValue& value,
                                        std::vector<formalism::LiteralView>&,
                                        std::vector<formalism::InitialFunctionValueView>& values)
 {
-    values.push_back(formalism::get_or_create<formalism::InitialFunctionValue>(repo(),
-                                                                               parse_function_term(value.function).get_index(),
-                                                                               parse_function_expression(value.value).get_index()));
+    const auto function = parse_function_term(value.function);
+    const auto expression = parse_function_expression(value.value);
+    auto data = checkout<formalism::InitialFunctionValue>();
+    data->function = function.get_index();
+    data->value = expression.get_index();
+    values.push_back(formalism::get_or_create(repo(), *data));
 }
 
 formalism::MetricView AstBuilder::parse_metric(const ast::Metric& node)
@@ -184,24 +217,31 @@ formalism::MetricView AstBuilder::parse_metric(const ast::Metric& node)
     if (optimization != "minimize" && optimization != "maximize")
         m_diagnostics.throw_at(node.optimization, InvalidMetricError(optimization));
     const auto optimization_direction = optimization == "minimize" ? formalism::OptimizationDirection::Minimize : formalism::OptimizationDirection::Maximize;
-    return formalism::get_or_create<formalism::Metric>(repo(), optimization_direction, parse_function_expression(node.expression).get_index());
+    const auto expression = parse_function_expression(node.expression);
+    auto data = checkout<formalism::Metric>();
+    data->optimization_direction = optimization_direction;
+    data->expression = expression.get_index();
+    return formalism::get_or_create(repo(), *data);
 }
 
 formalism::FunctionSkeletonView AstBuilder::total_cost_function()
 {
     if (auto it = m_domain_context.functions.find("total-cost"); it != m_domain_context.functions.end())
         return it->second;
-    auto view = formalism::get_or_create<formalism::FunctionSkeleton>(repo(),
-                                                                      cista::offset::string("total-cost"),
-                                                                      ygg::IndexList<formalism::Parameter> {},
-                                                                      m_domain_context.number_type.get_index());
+    auto data = checkout<formalism::FunctionSkeleton>();
+    data->name = cista::offset::string("total-cost");
+    data->type = m_domain_context.number_type.get_index();
+    auto view = formalism::get_or_create(repo(), *data);
     m_domain_context.functions.emplace("total-cost", view);
     return view;
 }
 
 formalism::FunctionTermView AstBuilder::total_cost_term()
 {
-    return formalism::get_or_create<formalism::FunctionTerm>(repo(), total_cost_function().get_index(), ygg::IndexList<formalism::Term> {});
+    const auto function = total_cost_function();
+    auto data = checkout<formalism::FunctionTerm>();
+    data->function = function.get_index();
+    return formalism::get_or_create(repo(), *data);
 }
 
 bool AstBuilder::writes_total_cost(formalism::EffectView effect)
@@ -211,7 +251,7 @@ bool AstBuilder::writes_total_cost(formalism::EffectView effect)
         {
             using Node = std::decay_t<decltype(arg)>;
             if constexpr (std::is_same_v<Node, formalism::EffectNumericView>)
-                return arg.get_function().get_name() == "total-cost";
+                return arg.get_function().get_function().get_name() == "total-cost";
             else if constexpr (std::is_same_v<Node, formalism::EffectAndView> || std::is_same_v<Node, formalism::EffectOneOfView>)
             {
                 for (auto child : arg.get_effects())
@@ -239,30 +279,37 @@ formalism::ActionView AstBuilder::add_unit_cost(formalism::ActionView view)
     if (const auto effect = view.get_effect(); effect && writes_total_cost(effect.value()))
         return view;
 
-    const auto one = wrap_function_expression(formalism::get_or_create<formalism::FunctionExpressionNumber>(repo(), 1.0).get_index());
-    const auto increase = wrap_effect(formalism::get_or_create<formalism::EffectNumeric>(repo(),
-                                                                                         formalism::NumericEffectOperator::Increase,
-                                                                                         total_cost_function().get_index(),
-                                                                                         ygg::IndexList<formalism::Term> {},
-                                                                                         one.get_index())
-                                          .get_index());
+    auto number_data = checkout<formalism::FunctionExpressionNumber>();
+    number_data->value = 1.0;
+    const auto one = wrap_function_expression(formalism::get_or_create(repo(), *number_data).get_index());
+    const auto total_cost = total_cost_term();
+    auto numeric_data = checkout<formalism::EffectNumeric>();
+    numeric_data->op = formalism::NumericEffectOperator::Increase;
+    numeric_data->function = total_cost.get_index();
+    numeric_data->expression = one.get_index();
+    const auto increase = wrap_effect(formalism::get_or_create(repo(), *numeric_data).get_index());
     auto combined = increase;
     if (const auto effect = view.get_effect())
-        combined = wrap_effect(
-            formalism::get_or_create<formalism::EffectAnd>(repo(), ygg::IndexList<formalism::Effect> { effect.value().get_index(), increase.get_index() })
-                .get_index());
+    {
+        auto and_data = checkout<formalism::EffectAnd>();
+        and_data->effects.push_back(effect.value().get_index());
+        and_data->effects.push_back(increase.get_index());
+        combined = wrap_effect(formalism::get_or_create(repo(), *and_data).get_index());
+    }
 
-    auto parameters = ygg::IndexList<formalism::Parameter> {};
-    for (auto parameter : view.get_parameters())
-        parameters.push_back(parameter.get_index());
     auto precondition = cista::optional<ygg::Index<formalism::Condition>> {};
     if (const auto condition = view.get_precondition())
         precondition = condition.value().get_index();
-    return formalism::get_or_create<formalism::Action>(repo(),
-                                                       to_cista(std::string(view.get_name())),
-                                                       std::move(parameters),
-                                                       precondition,
-                                                       cista::optional<ygg::Index<formalism::Effect>>(combined.get_index()));
+    auto data = checkout<formalism::Action>();
+    data->name = view.get_name();
+    data->original_name = data->name;
+    data->parameters.reserve(view.get_parameters().size());
+    for (auto parameter : view.get_parameters())
+        data->parameters.push_back(parameter.get_index());
+    data->original_arity = data->parameters.size();
+    data->precondition = precondition;
+    data->effect = combined.get_index();
+    return formalism::get_or_create(repo(), *data);
 }
 
 bool AstBuilder::has_total_cost_initial_value(const std::vector<formalism::InitialFunctionValueView>& values)
@@ -297,15 +344,24 @@ void AstBuilder::complete_action_costs(const ast::Task& task,
     if (missing_metric || missing_initial_value)
         checks().mark_requirement_used(formalism::RequirementKind::ActionCosts);
     if (missing_metric)
-        metric = formalism::get_or_create<formalism::Metric>(repo(),
-                                                             formalism::OptimizationDirection::Minimize,
-                                                             wrap_function_expression(total_cost_term().get_index()).get_index());
+    {
+        const auto total_cost = wrap_function_expression(total_cost_term().get_index());
+        auto data = checkout<formalism::Metric>();
+        data->optimization_direction = formalism::OptimizationDirection::Minimize;
+        data->expression = total_cost.get_index();
+        metric = formalism::get_or_create(repo(), *data);
+    }
     if (missing_initial_value)
     {
-        const auto zero = formalism::get_or_create<formalism::FunctionExpressionNumber>(repo(), 0.0).get_index();
+        auto number_data = checkout<formalism::FunctionExpressionNumber>();
+        number_data->value = 0.0;
+        const auto zero = formalism::get_or_create(repo(), *number_data).get_index();
         const auto zero_expression = wrap_function_expression(zero);
-        initial_function_values.push_back(
-            formalism::get_or_create<formalism::InitialFunctionValue>(repo(), total_cost_term().get_index(), zero_expression.get_index()));
+        const auto function = total_cost_term();
+        auto data = checkout<formalism::InitialFunctionValue>();
+        data->function = function.get_index();
+        data->value = zero_expression.get_index();
+        initial_function_values.push_back(formalism::get_or_create(repo(), *data));
     }
 }
 

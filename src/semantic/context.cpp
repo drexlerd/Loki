@@ -21,15 +21,30 @@
 #include "loki/semantic/translator/common.hpp"
 #include "mappings.hpp"
 
+#include <string_view>
 #include <utility>
 
 namespace loki::semantic
 {
 
+namespace
+{
+
+formalism::TypeView make_base_type(formalism::Repository& repository, std::string_view name)
+{
+    auto builder = formalism::Builder {};
+    auto data = builder.get_builder<formalism::Type>();
+    data->clear();
+    data->name = cista::offset::string(name);
+    return formalism::get_or_create(repository, *data);
+}
+
+}
+
 DomainContext::DomainContext(std::shared_ptr<detail::TranslationStorage> storage_) :
     storage(std::move(storage_)),
-    object_type(formalism::get_or_create<formalism::Type>(storage->repository, cista::offset::string("object"), ygg::IndexList<formalism::Type> {})),
-    number_type(formalism::get_or_create<formalism::Type>(storage->repository, cista::offset::string("number"), ygg::IndexList<formalism::Type> {}))
+    object_type(make_base_type(storage->repository, "object")),
+    number_type(make_base_type(storage->repository, "number"))
 {
     types.emplace("object", object_type);
     types.emplace("number", number_type);
@@ -42,12 +57,22 @@ void remember_requirement(ParseContext& parse_context, formalism::RequirementKin
 }
 
 formalism::TypeView
-intern_type(DomainContext& domain_context, formalism::Repository& repository, const std::string& name, ygg::IndexList<formalism::Type> bases)
+intern_type(DomainContext& domain_context,
+            formalism::Builder& builder,
+            formalism::Repository& repository,
+            const std::string& name,
+            const std::vector<formalism::TypeView>& bases)
 {
     auto k = key(name);
     if (auto it = domain_context.types.find(k); it != domain_context.types.end() && bases.empty())
         return it->second;
-    auto view = formalism::get_or_create<formalism::Type>(repository, to_cista(k), std::move(bases));
+    auto data = builder.get_builder<formalism::Type>();
+    data->clear();
+    data->name = to_cista(k);
+    data->bases.reserve(bases.size());
+    for (const auto base : bases)
+        data->bases.push_back(base.get_index());
+    auto view = formalism::get_or_create(repository, *data);
     if (auto [it, inserted] = domain_context.types.emplace(k, view); !inserted)
         it->second = view;
     return view;
@@ -68,6 +93,8 @@ void rebuild_domain_symbols(DomainContext& domain_context, formalism::Repository
     domain_context.numeric_fluents = false;
     if (!domain_context.domain)
         return;
+
+    auto builder = formalism::Builder {};
 
     auto remember_type = [&](auto&& self, formalism::TypeView type) -> void
     {
@@ -106,12 +133,12 @@ void rebuild_domain_symbols(DomainContext& domain_context, formalism::Repository
     if (auto it = domain_context.types.find("object"); it != domain_context.types.end())
         domain_context.object_type = it->second;
     else
-        domain_context.object_type = intern_type(domain_context, repository, "object", {});
+        domain_context.object_type = intern_type(domain_context, builder, repository, "object", {});
 
     if (auto it = domain_context.types.find("number"); it != domain_context.types.end())
         domain_context.number_type = it->second;
     else
-        domain_context.number_type = intern_type(domain_context, repository, "number", {});
+        domain_context.number_type = intern_type(domain_context, builder, repository, "number", {});
 }
 
 }  // namespace loki::semantic
