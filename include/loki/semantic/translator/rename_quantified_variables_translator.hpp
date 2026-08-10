@@ -210,10 +210,14 @@ template<typename Derived>
 formalism::MultiFunctionExpressionView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::MultiFunctionExpressionView source)
 {
     const auto& data = source.get_data();
-    auto expressions = ygg::IndexList<formalism::FunctionExpression> {};
-    for (auto expression : source.get_expressions())
-        expressions.push_back(as_index(this->self().rename_variables(expression)));
-    return formalism::get_or_create<formalism::MultiFunctionExpression>(this->m_storage->repository, data.op, std::move(expressions));
+    auto remaining = ygg::IndexList<formalism::FunctionExpression> {};
+    for (auto expression : source.get_remaining())
+        remaining.push_back(as_index(this->self().rename_variables(expression)));
+    return formalism::get_or_create<formalism::MultiFunctionExpression>(this->m_storage->repository,
+                                                                        data.op,
+                                                                        as_index(this->self().rename_variables(source.get_first())),
+                                                                        as_index(this->self().rename_variables(source.get_second())),
+                                                                        std::move(remaining));
 }
 
 template<typename Derived>

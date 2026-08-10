@@ -33,15 +33,40 @@ void bind_multi_function_expression(nb::module_& m, RepositoryBinding& repositor
     {
         using V = Data<formalism::MultiFunctionExpression>;
         bind_data<V>(m, "MultiFunctionExpressionData")
-            .def(nb::init<formalism::MultiArithmeticOperator, const std::vector<formalism::FunctionExpressionView>&>(), "operator"_a, "expressions"_a)
+            .def(nb::init<formalism::MultiArithmeticOperator,
+                          formalism::FunctionExpressionView,
+                          formalism::FunctionExpressionView,
+                          const std::vector<formalism::FunctionExpressionView>&>(),
+                 "operator"_a,
+                 "first"_a,
+                 "second"_a,
+                 "remaining"_a = std::vector<formalism::FunctionExpressionView> {})
             .def_rw("operator", &V::op)
-            .def_rw("expressions", &V::expressions);
+            .def_rw("first", &V::first)
+            .def_rw("second", &V::second)
+            .def_rw("remaining", &V::remaining);
     }
 
     {
         using V = formalism::MultiFunctionExpressionView;
         auto cls = nb::class_<V>(m, "MultiFunctionExpression");
-        cls.def("get_index", &V::get_index).def("get_operator", &V::get_operator).def("get_expressions", &V::get_expressions);
+        cls.def("get_index", &V::get_index)
+            .def("get_operator", &V::get_operator)
+            .def("get_first", &V::get_first, nb::keep_alive<0, 1>())
+            .def("get_second", &V::get_second, nb::keep_alive<0, 1>())
+            .def("get_remaining",
+                 [](const V& self)
+                 {
+                     auto result = nb::list();
+                     const auto parent = nb::find(self);
+                     for (const auto expression : self.get_remaining())
+                     {
+                         auto child = nb::cast(expression);
+                         nb::detail::keep_alive(child.ptr(), parent.ptr());
+                         result.append(child);
+                     }
+                     return result;
+                 });
         ygg::add_print(cls);
         ygg::add_comparison(cls);
         ygg::add_hash(cls);

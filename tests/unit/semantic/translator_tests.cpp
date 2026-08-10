@@ -20,11 +20,15 @@
 
 #include <algorithm>
 #include <gtest/gtest.h>
+#include <initializer_list>
 #include <loki/formalism/builder.hpp>
+#include <loki/formalism/formatter.hpp>
 #include <loki/semantic/errors.hpp>
 #include <loki/semantic/options.hpp>
 #include <loki/semantic/parser.hpp>
 #include <loki/semantic/translator.hpp>
+#include <loki/semantic/translator/copy_translator.hpp>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -62,6 +66,68 @@ std::optional<std::string> conjunct_variable(formalism::ConditionView condition,
             return result;
     }
     return std::nullopt;
+}
+
+template<typename T>
+formalism::FunctionExpressionView wrap_expression(formalism::Repository& repository, T node)
+{
+    return formalism::get_or_create<formalism::FunctionExpression>(repository, ygg::Data<formalism::FunctionExpression>::Variant(node.get_index()));
+}
+
+formalism::FunctionExpressionView number_expression(formalism::Repository& repository, double value)
+{
+    return wrap_expression(repository, formalism::get_or_create<formalism::FunctionExpressionNumber>(repository, value));
+}
+
+formalism::FunctionExpressionView binary_expression(formalism::Repository& repository,
+                                                    formalism::BinaryArithmeticOperator op,
+                                                    formalism::FunctionExpressionView left,
+                                                    formalism::FunctionExpressionView right)
+{
+    return wrap_expression(repository, formalism::get_or_create<formalism::BinaryFunctionExpression>(repository, op, left.get_index(), right.get_index()));
+}
+
+formalism::FunctionExpressionView
+multi_expression(formalism::Repository& repository, formalism::MultiArithmeticOperator op, std::initializer_list<formalism::FunctionExpressionView> expressions)
+{
+    auto it = expressions.begin();
+    const auto first = *it++;
+    const auto second = *it++;
+    auto remaining = ygg::IndexList<formalism::FunctionExpression> {};
+    for (; it != expressions.end(); ++it)
+        remaining.push_back(it->get_index());
+    return wrap_expression(
+        repository,
+        formalism::get_or_create<formalism::MultiFunctionExpression>(repository, op, first.get_index(), second.get_index(), std::move(remaining)));
+}
+
+bool contains_binary_add_or_multiply(formalism::FunctionExpressionView expression)
+{
+    return ygg::visit(
+        [](const auto& node) -> bool
+        {
+            using Node = std::decay_t<decltype(node)>;
+            if constexpr (std::is_same_v<Node, formalism::UnaryFunctionExpressionView>)
+            {
+                return contains_binary_add_or_multiply(node.get_expression());
+            }
+            else if constexpr (std::is_same_v<Node, formalism::BinaryFunctionExpressionView>)
+            {
+                if (node.get_operator() == formalism::BinaryArithmeticOperator::Add || node.get_operator() == formalism::BinaryArithmeticOperator::Mul)
+                    return true;
+                return contains_binary_add_or_multiply(node.get_left()) || contains_binary_add_or_multiply(node.get_right());
+            }
+            else if constexpr (std::is_same_v<Node, formalism::MultiFunctionExpressionView>)
+            {
+                if (contains_binary_add_or_multiply(node.get_first()) || contains_binary_add_or_multiply(node.get_second()))
+                    return true;
+                for (const auto child : node.get_remaining())
+                    if (contains_binary_add_or_multiply(child))
+                        return true;
+            }
+            return false;
+        },
+        expression.get_value());
 }
 
 }  // namespace
@@ -336,6 +402,122 @@ TEST(LokiSemanticTranslator, RenamesTaskGoalVariablesBeforeGoalSimplificationOnl
     const auto axiom = translated.get_axioms().front();
     ASSERT_EQ(axiom.get_parameters().size(), 1);
     EXPECT_EQ(std::string(axiom.get_parameters().front().get_variable().get_name()), "?x");
+}
+
+TEST(LokiSemanticTranslator, NormalizesArithmeticExpressionsModuloAcu)
+{
+    auto repository = formalism::Repository(0);
+    const auto zero = number_expression(repository, 0.0);
+    const auto one = number_expression(repository, 1.0);
+    const auto two = number_expression(repository, 2.0);
+    const auto three = number_expression(repository, 3.0);
+
+    const auto first = multi_expression(repository,
+                                        formalism::MultiArithmeticOperator::Add,
+                                        { three, binary_expression(repository, formalism::BinaryArithmeticOperator::Add, two, zero), two });
+    const auto second = binary_expression(repository,
+                                          formalism::BinaryArithmeticOperator::Add,
+                                          two,
+                                          multi_expression(repository, formalism::MultiArithmeticOperator::Add, { two, three, zero }));
+
+    auto storage = std::make_shared<semantic::detail::TranslationStorage>(1);
+    auto translator = semantic::detail::CopyTranslator(storage, true, semantic::TranslationPhase::NormalizeArithmeticExpressions);
+    const auto normalized_first = translator.copy(first);
+    const auto normalized_second = translator.copy(second);
+
+    EXPECT_EQ(normalized_first, normalized_second);
+    EXPECT_EQ(formalism::format::to_string(normalized_first), "(+ 2 2 3)");
+    EXPECT_FALSE(contains_binary_add_or_multiply(normalized_first));
+
+    const auto collapsed_product =
+        translator.copy(multi_expression(repository,
+                                         formalism::MultiArithmeticOperator::Mul,
+                                         { one, binary_expression(repository, formalism::BinaryArithmeticOperator::Mul, three, one) }));
+    EXPECT_EQ(formalism::format::to_string(collapsed_product), "3");
+
+    const auto zero_product = translator.copy(binary_expression(repository, formalism::BinaryArithmeticOperator::Mul, zero, three));
+    EXPECT_EQ(formalism::format::to_string(zero_product), "(* 0 3)");
+
+    const auto product_exposed_by_sum =
+        translator.copy(binary_expression(repository,
+                                          formalism::BinaryArithmeticOperator::Mul,
+                                          multi_expression(repository,
+                                                           formalism::MultiArithmeticOperator::Add,
+                                                           { zero, binary_expression(repository, formalism::BinaryArithmeticOperator::Mul, two, three) }),
+                                          two));
+    EXPECT_EQ(formalism::format::to_string(product_exposed_by_sum), "(* 2 2 3)");
+
+    const auto subtraction = translator.copy(binary_expression(repository,
+                                                               formalism::BinaryArithmeticOperator::Sub,
+                                                               first,
+                                                               binary_expression(repository, formalism::BinaryArithmeticOperator::Mul, three, one)));
+    EXPECT_EQ(formalism::format::to_string(subtraction), "(- (+ 2 2 3) 3)");
+    EXPECT_FALSE(contains_binary_add_or_multiply(subtraction));
+}
+
+TEST(LokiSemanticTranslator, FlattensDeepArithmeticBeforeMaterializing)
+{
+    constexpr auto operand_count = std::size_t { 256 };
+    auto repository = formalism::Repository(0);
+    const auto two = number_expression(repository, 2.0);
+    auto source = two;
+    for (auto i = std::size_t { 1 }; i < operand_count; ++i)
+        source = binary_expression(repository, formalism::BinaryArithmeticOperator::Add, source, two);
+
+    auto storage = std::make_shared<semantic::detail::TranslationStorage>(1);
+    auto translator = semantic::detail::CopyTranslator(storage, true, semantic::TranslationPhase::NormalizeArithmeticExpressions);
+    const auto normalized = translator.copy(source);
+
+    ASSERT_TRUE(normalized.get_variant().is<ygg::Index<formalism::MultiFunctionExpression>>());
+    const auto multi = normalized.get_variant().get<ygg::Index<formalism::MultiFunctionExpression>>();
+    EXPECT_EQ(2 + multi.get_remaining().size(), operand_count);
+    EXPECT_EQ(storage->repository.size<formalism::MultiFunctionExpression>(), 1);
+}
+
+TEST(LokiSemanticTranslator, AppliesArithmeticNormalizationAfterEffectNormalFormWhenEnabled)
+{
+    const auto domain_source = std::string(R"(
+(define (domain arithmetic-normalization)
+  (:requirements :strips :numeric-fluents)
+  (:functions (f) (x) (y))
+  (:action step
+    :parameters ()
+    :precondition (and)
+    :effect (and
+      (increase (f) (+ 0 (y) (x)))
+      (increase (f) (x)))))
+)");
+    const auto task_source = std::string(R"(
+(define (problem arithmetic-normalization-task)
+  (:domain arithmetic-normalization)
+  (:requirements :strips :numeric-fluents)
+  (:init (= (f) 0) (= (x) 1) (= (y) 2))
+  (:goal (> (+ (y) (+ 0 (x)) (x)) 0))
+  (:metric minimize (+ (y) (+ 0 (x)) (x))))
+)");
+    auto parser = semantic::Parser(domain_source, semantic::ParserOptions { .add_action_costs = false });
+
+    const auto defaults = semantic::TranslatorOptions {};
+    ASSERT_FALSE(defaults.normalize_arithmetic_expressions);
+    const auto unnormalized_domain = semantic::translate(parser.get_domain(), defaults);
+    const auto unnormalized_task = semantic::translate(parser.parse_task(task_source), unnormalized_domain, defaults);
+    EXPECT_NE(formalism::format::to_string(unnormalized_domain.get_translated_domain()).find("(+ (+ (x) (y) 0) (x))"), std::string::npos);
+    ASSERT_TRUE(unnormalized_task.get_translated_task().get_metric().has_value());
+    EXPECT_EQ(formalism::format::to_string(unnormalized_task.get_translated_task().get_metric().value().get_expression()), "(+ (+ (x) 0) (x) (y))");
+
+    auto options = semantic::TranslatorOptions {};
+    options.normalize_arithmetic_expressions = true;
+    const auto normalized_domain = semantic::translate(parser.get_domain(), options);
+    const auto normalized_task = semantic::translate(parser.parse_task(task_source), normalized_domain, options);
+    const auto normalized_domain_text = formalism::format::to_string(normalized_domain.get_translated_domain());
+    EXPECT_NE(normalized_domain_text.find("(increase (f) (+ (x) (x) (y)))"), std::string::npos);
+    ASSERT_TRUE(normalized_task.get_translated_task().get_goal().has_value());
+    EXPECT_EQ(formalism::format::to_string(normalized_task.get_translated_task().get_goal().value()), "(> (+ (x) (x) (y)) 0)");
+    ASSERT_TRUE(normalized_task.get_translated_task().get_metric().has_value());
+    EXPECT_EQ(formalism::format::to_string(normalized_task.get_translated_task().get_metric().value().get_expression()), "(+ (x) (x) (y))");
+
+    const auto normalized_again = semantic::translate(normalized_domain.get_translated_domain(), options);
+    EXPECT_EQ(formalism::format::to_string(normalized_again.get_translated_domain()), normalized_domain_text);
 }
 
 TEST(LokiCanonicalization, SortsSemanticFreeListsLexicographicallyBeforeInterning)

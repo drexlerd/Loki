@@ -38,7 +38,10 @@ void bind_semantic_translator(nb::module_& m)
                 "Split actions to eliminate top-level conditional effects after effect normalization.")
         .def_rw("materialize_equality",
                 &semantic::TranslatorOptions::materialize_equality,
-                "Add equality predicate and equality initial literals during translation.");
+                "Add equality predicate and equality initial literals during translation.")
+        .def_rw("normalize_arithmetic_expressions",
+                &semantic::TranslatorOptions::normalize_arithmetic_expressions,
+                "Normalize addition and multiplication modulo associativity, commutativity, and identity elements.");
 
     nb::class_<semantic::DomainTranslationResult>(m, "DomainTranslationResult", "Owns the original and translated domain views produced by translate_domain.")
         .def_prop_ro("original_domain", &semantic::DomainTranslationResult::get_original_domain, nb::keep_alive<0, 1>())

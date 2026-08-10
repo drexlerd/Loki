@@ -202,6 +202,32 @@ TEST(LokiParserCountsSuite, RawBenchmarkAstsRoundTrip)
     }
 }
 
+TEST(LokiParserCountsSuite, RawArithmeticAstPreservesEmptyAndUnaryMultiExpressions)
+{
+    struct Case
+    {
+        const char* source;
+        const char* op;
+        std::size_t arity;
+    };
+
+    for (const auto& item : { Case { "(+)", "+", 0 }, Case { "(+ 2)", "+", 1 }, Case { "(*)", "*", 0 }, Case { "(* 2)", "*", 1 } })
+    {
+        const auto source = std::string(item.source);
+        auto first = source.cbegin();
+        const auto last = source.cend();
+        parser::ErrorHandlerType error_handler(first, last, std::cerr);
+        auto expression = ast::FunctionExpression {};
+
+        ASSERT_TRUE(parser::parse_full(source, parser::function_expression(), expression, error_handler));
+        const auto* multi = boost::get<ast::FunctionExpressionMulti>(&expression.get());
+        ASSERT_NE(multi, nullptr);
+        EXPECT_EQ(multi->op, item.op);
+        EXPECT_EQ(multi->expressions.size(), item.arity);
+        EXPECT_EQ(fmt::format("{}", expression), source);
+    }
+}
+
 TEST(LokiParserCountsSuite, SemanticBenchmarkCountsStayStable)
 {
     const auto cases = load_expectations();

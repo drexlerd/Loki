@@ -109,7 +109,10 @@ add_custom_command(
 if(LOKI_BUILD_TESTS)
     add_test(
         NAME pypddl_build_tree_package
-        COMMAND "${Python_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_build_tree_package.py"
+        COMMAND
+            "${Python_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/run_build_tree_test.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_build_tree_package.py"
     )
     set_tests_properties(
         pypddl_build_tree_package PROPERTIES
@@ -118,7 +121,10 @@ if(LOKI_BUILD_TESTS)
 
     add_test(
         NAME pypddl_bindings
-        COMMAND "${Python_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_loki_bindings.py"
+        COMMAND
+            "${Python_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/run_build_tree_test.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_loki_bindings.py"
     )
     set_tests_properties(
         pypddl_bindings PROPERTIES

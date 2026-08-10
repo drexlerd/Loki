@@ -51,6 +51,7 @@ enum class TranslationPhase
     ToEffectNormalForm,
     CompileConditionalEffects,
     MaterializeEquality,
+    NormalizeArithmeticExpressions,
 };
 
 inline const std::vector<std::string_view>& domain_translation_steps()
@@ -65,6 +66,7 @@ inline const std::vector<std::string_view>& domain_translation_steps()
         "compile-typing",
         "to-effect-normal-form",
         "materialize-equality",
+        "normalize-arithmetic-expressions",
     };
     return steps;
 }
@@ -72,8 +74,17 @@ inline const std::vector<std::string_view>& domain_translation_steps()
 inline const std::vector<std::string_view>& task_translation_steps()
 {
     static const auto steps = std::vector<std::string_view> {
-        "to-negation-normal-form",      "rename-quantified-variables",  "remove-universal-quantifiers", "simplify-goal",        "to-disjunctive-normal-form",
-        "split-disjunctive-conditions", "move-existential-quantifiers", "to-effect-normal-form",        "materialize-equality", "compile-typing",
+        "to-negation-normal-form",
+        "rename-quantified-variables",
+        "remove-universal-quantifiers",
+        "simplify-goal",
+        "to-disjunctive-normal-form",
+        "split-disjunctive-conditions",
+        "move-existential-quantifiers",
+        "to-effect-normal-form",
+        "materialize-equality",
+        "compile-typing",
+        "normalize-arithmetic-expressions",
     };
     return steps;
 }

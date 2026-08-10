@@ -162,6 +162,11 @@ off individually.
 | `strict` | `false` | Strict semantic validation for requirements, arity, and type compatibility. Numeric-fluents violations error even in permissive mode: reads require `:fluents`/`:numeric-fluents`/`:action-costs`, and writes other than `(increase (total-cost) ...)` require `:fluents`/`:numeric-fluents`. |
 | `add_action_costs` | `true` | Complete missing `:action-costs` artifacts (`total-cost` function, initial value, `minimize` metric) instead of erroring. If the domain declares neither `:action-costs` nor `:fluents`/`:numeric-fluents`, additionally injects the requirement and a unit-cost effect `(increase (total-cost) 1)` into every action that does not already write `total-cost`. Genuine numeric domains are left untouched: an absent metric means unit costs. |
 
+The raw syntax AST remains permissive and preserves empty and unary `+`/`*`
+nodes. Semantic construction always maps empty addition and multiplication to
+`0` and `1`, maps unary forms to their operand, and lexicographically sorts the
+immediate operands of each remaining multi-expression.
+
 `TranslatorOptions` (second argument of `translate_domain`/`translate_task`):
 
 | Option | Default | Description |
@@ -169,6 +174,7 @@ off individually.
 | `compile_typing` | `true` | Compile typing away into type predicates and remove type annotations. |
 | `compile_conditional_effects` | `false` | Multiply conditional effects out into unconditional actions; the normalization phases re-run afterwards so preconditions stay conjunctive (quantified `when`-conditions become derived predicates). Worst case exponential in the number of conditional effects per action. |
 | `materialize_equality` | `true` | Add the `=` predicate and `(= o o)` initial literals. Turn off for consumers with native equality handling. |
+| `normalize_arithmetic_expressions` | `false` | Recursively flatten addition and multiplication, remove exact identity operands, and lexicographically sort the remaining leaves while preserving duplicates. Reassociation can change IEEE-754 evaluation order and rounding. |
 
 Pass the same `TranslatorOptions` to the domain and the task translation;
 mismatched options between the two can fail (e.g. equality materialization
@@ -182,7 +188,15 @@ translation = pddl.translate_domain(parser.domain(), options)
 
 The `loki` executable exposes the same options as opt-in flags (all off by
 default): `--strict`, `--add-action-costs`, `--compile-typing`,
-`--compile-conditional-effects`, and `--materialize-equality`.
+`--compile-conditional-effects`, `--materialize-equality`, and
+`--normalize-arithmetic-expressions`.
+
+Migration note: semantic/formalism `MultiFunctionExpression` nodes now require
+at least two operands. Replace `Data(op, expressions)` and `get_expressions()`
+with `Data(op, first, second, remaining)` and
+`get_first()`/`get_second()`/`get_remaining()` (likewise in Python). The native
+serialized layout changed, so recreate repositories serialized by older Loki
+versions.
 
 ## CMake Integration
 
@@ -229,7 +243,8 @@ enabled with `-DLOKI_BUILD_EXECUTABLES=ON`. Example PDDL inputs come straight fr
 Use `--out-domain`/`--out-problem` to write the translated PDDL to files, and
 see `./build/exe/loki --help` for the parser and translator flags
 (`--strict`, `--add-action-costs`, `--compile-typing`,
-`--compile-conditional-effects`, `--materialize-equality`).
+`--compile-conditional-effects`, `--materialize-equality`,
+`--normalize-arithmetic-expressions`).
 
 ## Citing Loki
 

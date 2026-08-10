@@ -147,16 +147,23 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
     {
         // A single expression stays as-is; only genuine aggregations get a sum, keeping
         // normalization idempotent across repeated translations.
-        const auto sum = group.expressions.size() == 1 ?
-                             group.expressions.front() :
-                             formalism::get_or_create<formalism::FunctionExpression>(
-                                 this->m_storage->repository,
-                                 ygg::Data<formalism::FunctionExpression>::Variant(
-                                     formalism::get_or_create<formalism::MultiFunctionExpression>(this->m_storage->repository,
-                                                                                                  formalism::MultiArithmeticOperator::Add,
-                                                                                                  group.expressions)
-                                         .get_index()))
-                                 .get_index();
+        auto sum = group.expressions.front();
+        if (group.expressions.size() > 1)
+        {
+            auto remaining = ygg::IndexList<formalism::FunctionExpression> {};
+            for (std::size_t i = 2; i < group.expressions.size(); ++i)
+                remaining.push_back(group.expressions[i]);
+            sum = formalism::get_or_create<formalism::FunctionExpression>(
+                      this->m_storage->repository,
+                      ygg::Data<formalism::FunctionExpression>::Variant(
+                          formalism::get_or_create<formalism::MultiFunctionExpression>(this->m_storage->repository,
+                                                                                       formalism::MultiArithmeticOperator::Add,
+                                                                                       group.expressions[0],
+                                                                                       group.expressions[1],
+                                                                                       std::move(remaining))
+                              .get_index()))
+                      .get_index();
+        }
         effects.push_back(this->self().wrap_effect(
             formalism::get_or_create<formalism::EffectNumeric>(this->m_storage->repository, group.op, group.function, group.terms, sum)));
     }

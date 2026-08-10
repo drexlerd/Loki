@@ -28,6 +28,7 @@
 #include "loki/semantic/translator/effect_translator.hpp"
 #include "loki/semantic/translator/materialize_equality_translator.hpp"
 #include "loki/semantic/translator/move_existential_quantifiers_translator.hpp"
+#include "loki/semantic/translator/normalize_arithmetic_expressions_translator.hpp"
 #include "loki/semantic/translator/remove_universal_quantifiers_translator.hpp"
 #include "loki/semantic/translator/rename_quantified_variables_translator.hpp"
 #include "loki/semantic/translator/simplify_goal_translator.hpp"
@@ -55,6 +56,7 @@ class CopyTranslator :
     public SplitDisjunctiveConditionsTranslator<CopyTranslator>,
     public EffectTranslator<CopyTranslator>,
     public ToEffectNormalFormTranslator<CopyTranslator>,
+    public NormalizeArithmeticExpressionsTranslator<CopyTranslator>,
     public MaterializeEqualityTranslator<CopyTranslator>,
     public SimplifyGoalTranslator<CopyTranslator>,
     public TopLevelTranslator<CopyTranslator>,
@@ -79,6 +81,7 @@ public:
         SplitDisjunctiveConditionsTranslator<CopyTranslator>(context()),
         EffectTranslator<CopyTranslator>(context()),
         ToEffectNormalFormTranslator<CopyTranslator>(context()),
+        NormalizeArithmeticExpressionsTranslator<CopyTranslator>(context()),
         MaterializeEqualityTranslator<CopyTranslator>(context()),
         SimplifyGoalTranslator<CopyTranslator>(context()),
         TopLevelTranslator<CopyTranslator>(context()),
@@ -154,6 +157,8 @@ public:
     using ToEffectNormalFormTranslator<CopyTranslator>::as_effect;
     using ToEffectNormalFormTranslator<CopyTranslator>::normalize_effect;
     using ToEffectNormalFormTranslator<CopyTranslator>::normalize_effect_node;
+
+    using NormalizeArithmeticExpressionsTranslator<CopyTranslator>::normalize_arithmetic_expression;
 
     using TopLevelTranslator<CopyTranslator>::copy;
 

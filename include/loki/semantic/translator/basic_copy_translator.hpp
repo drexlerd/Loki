@@ -369,15 +369,22 @@ formalism::BinaryFunctionExpressionView BasicCopyTranslator<Derived>::copy(forma
 template<typename Derived>
 formalism::MultiFunctionExpressionView BasicCopyTranslator<Derived>::copy(formalism::MultiFunctionExpressionView source)
 {
-    return formalism::get_or_create<formalism::MultiFunctionExpression>(
-        this->m_storage->repository,
-        source.get_data().op,
-        this->self().template copy_list<formalism::FunctionExpression>(source.get_expressions()));
+    auto remaining = ygg::IndexList<formalism::FunctionExpression> {};
+    for (const auto expression : source.get_remaining())
+        remaining.push_back(as_index(this->self().copy(expression)));
+    return formalism::get_or_create<formalism::MultiFunctionExpression>(this->m_storage->repository,
+                                                                        source.get_operator(),
+                                                                        as_index(this->self().copy(source.get_first())),
+                                                                        as_index(this->self().copy(source.get_second())),
+                                                                        std::move(remaining));
 }
 
 template<typename Derived>
 formalism::FunctionExpressionView BasicCopyTranslator<Derived>::copy(formalism::FunctionExpressionView source)
 {
+    if (this->m_phase == TranslationPhase::NormalizeArithmeticExpressions)
+        return this->self().normalize_arithmetic_expression(source);
+
     auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::FunctionExpression>::Variant
                             { return ygg::Data<formalism::FunctionExpression>::Variant(as_index(this->self().copy(arg))); },
                             source.get_value());

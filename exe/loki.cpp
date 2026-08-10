@@ -77,6 +77,7 @@ static int run(const argparse::ArgumentParser& program)
     translator_options.compile_typing = program.get<bool>("--compile-typing");
     translator_options.compile_conditional_effects = program.get<bool>("--compile-conditional-effects");
     translator_options.materialize_equality = program.get<bool>("--materialize-equality");
+    translator_options.normalize_arithmetic_expressions = program.get<bool>("--normalize-arithmetic-expressions");
 
     auto parser = loki::semantic::Parser(domain_filepath, parser_options);
     const auto domain = parser.get_domain();
@@ -123,7 +124,10 @@ int main(int argc, char** argv)
         .default_value(false)
         .implicit_value(true)
         .help("Complete missing :action-costs artifacts; without :action-costs, inject the requirement, total-cost, and unit-cost effects.");
-    program.add_argument("--compile-typing").default_value(false).implicit_value(true).help("Compile typing away into type predicates and remove type annotations.");
+    program.add_argument("--compile-typing")
+        .default_value(false)
+        .implicit_value(true)
+        .help("Compile typing away into type predicates and remove type annotations.");
     program.add_argument("--compile-conditional-effects")
         .default_value(false)
         .implicit_value(true)
@@ -132,6 +136,10 @@ int main(int argc, char** argv)
         .default_value(false)
         .implicit_value(true)
         .help("Add the = predicate and (= o o) initial literals for consumers without native equality handling.");
+    program.add_argument("--normalize-arithmetic-expressions")
+        .default_value(false)
+        .implicit_value(true)
+        .help("Normalize addition and multiplication modulo associativity, commutativity, and identity elements.");
 
     try
     {

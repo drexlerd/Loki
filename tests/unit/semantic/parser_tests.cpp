@@ -19,6 +19,7 @@
 
 #include <cstddef>
 #include <gtest/gtest.h>
+#include <loki/formalism/formatter.hpp>
 #include <loki/formalism/repository.hpp>
 #include <loki/formalism/views.hpp>
 #include <loki/semantic/errors.hpp>
@@ -127,6 +128,31 @@ TEST(LokiSemanticParser, PreservesComplementaryLiteralsInConjunctions)
         action.get_precondition().value().get_variant());
     // A complementary literal pair must not be canonicalized away.
     EXPECT_EQ(conjuncts, 3);
+}
+
+TEST(LokiSemanticParser, NormalizesMultiExpressionArityAndSortsOperandsWithoutDeduplicating)
+{
+    constexpr auto source = R"((define (domain arithmetic-arity)
+  (:requirements :strips :numeric-fluents)
+  (:functions (empty-add) (empty-mul) (unary-add) (unary-mul) (multi))
+  (:action a-empty-add :parameters () :effect (assign (empty-add) (+)))
+  (:action b-empty-mul :parameters () :effect (assign (empty-mul) (*)))
+  (:action c-unary-add :parameters () :effect (assign (unary-add) (+ 7)))
+  (:action d-unary-mul :parameters () :effect (assign (unary-mul) (* 8)))
+  (:action e-multi :parameters () :effect (assign (multi) (+ 3 1 2 1)))
+)
+)";
+
+    auto options = semantic::ParserOptions {};
+    options.add_action_costs = false;
+    const auto parser = semantic::Parser(std::string(source), options);
+    const auto text = formalism::format::to_string(parser.get_domain());
+
+    EXPECT_NE(text.find("(assign (empty-add) 0)"), std::string::npos);
+    EXPECT_NE(text.find("(assign (empty-mul) 1)"), std::string::npos);
+    EXPECT_NE(text.find("(assign (unary-add) 7)"), std::string::npos);
+    EXPECT_NE(text.find("(assign (unary-mul) 8)"), std::string::npos);
+    EXPECT_NE(text.find("(assign (multi) (+ 1 1 2 3))"), std::string::npos);
 }
 
 TEST(LokiSemanticParser, ParsesAndTranslatesDistinctTasksAfterOneDomain)

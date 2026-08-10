@@ -35,6 +35,8 @@ struct TranslatorOptions
     bool compile_conditional_effects = false;
     // Add the = predicate and (= o o) initial literals; turn off for consumers with native equality.
     bool materialize_equality = true;
+    // Normalize + and * expressions modulo associativity, commutativity, and their units.
+    bool normalize_arithmetic_expressions = false;
 };
 
 }  // namespace loki::semantic

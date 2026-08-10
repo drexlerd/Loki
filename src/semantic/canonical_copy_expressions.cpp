@@ -68,7 +68,11 @@ formalism::MultiFunctionExpressionView CanonicalCopyTranslator::copy(formalism::
 {
     if (auto mapped = find_mapped(m_storage->multi_expressions, source))
         return *mapped;
-    auto out = formalism::get_or_create<formalism::MultiFunctionExpression>(m_storage->repository, source.get_data().op, copy_list(source.get_expressions()));
+    auto out = formalism::get_or_create<formalism::MultiFunctionExpression>(m_storage->repository,
+                                                                            source.get_operator(),
+                                                                            as_index(copy(source.get_first())),
+                                                                            as_index(copy(source.get_second())),
+                                                                            copy_list(source.get_remaining()));
     remember(m_storage->multi_expressions, source, out);
     return out;
 }

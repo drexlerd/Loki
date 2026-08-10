@@ -167,7 +167,9 @@ void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::Mul
                                                                   ygg::UnorderedSet<formalism::VariableView>& bound,
                                                                   ygg::UnorderedSet<formalism::VariableView>& free) const
 {
-    for (auto part : expression.get_expressions())
+    this->self().collect_free_variables(expression.get_first(), bound, free);
+    this->self().collect_free_variables(expression.get_second(), bound, free);
+    for (auto part : expression.get_remaining())
         this->self().collect_free_variables(part, bound, free);
 }
 

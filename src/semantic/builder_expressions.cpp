@@ -192,8 +192,22 @@ formalism::FunctionExpressionView AstBuilder::parse_function_expression_node(con
     auto expressions = std::vector<formalism::FunctionExpressionView> {};
     for (const auto& child : node.expressions)
         expressions.push_back(parse_function_expression(child.get()));
+
+    const auto op = multi_operator(node.op);
+    if (expressions.empty())
+    {
+        const auto unit = op == formalism::MultiArithmeticOperator::Add ? 0.0 : 1.0;
+        return wrap_function_expression(formalism::get_or_create<formalism::FunctionExpressionNumber>(repo(), unit).get_index());
+    }
+    if (expressions.size() == 1)
+        return expressions.front();
+
+    auto remaining = ygg::IndexList<formalism::FunctionExpression> {};
+    for (std::size_t i = 2; i < expressions.size(); ++i)
+        remaining.push_back(expressions[i].get_index());
     return wrap_function_expression(
-        formalism::get_or_create<formalism::MultiFunctionExpression>(repo(), multi_operator(node.op), to_index_list(expressions)).get_index());
+        formalism::get_or_create<formalism::MultiFunctionExpression>(repo(), op, expressions[0].get_index(), expressions[1].get_index(), std::move(remaining))
+            .get_index());
 }
 
 }  // namespace loki::semantic

@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <fmt/format.h>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -177,6 +178,51 @@ bool is_canonical_list(const Repository& repository, const ListT& list)
     return true;
 }
 
+inline void canonicalize_multi_expression(const Repository& repository, ygg::Data<MultiFunctionExpression>& data)
+{
+    if (data.first.is_max() || data.second.is_max())
+        throw std::invalid_argument("MultiFunctionExpression requires at least two operands");
+
+    auto keyed = std::vector<std::pair<std::string, ygg::Index<FunctionExpression>>> {};
+    keyed.reserve(data.remaining.size() + 2);
+    const auto add = [&](auto expression) { keyed.emplace_back(format::to_string(ygg::make_view(expression, repository)), expression); };
+    add(data.first);
+    add(data.second);
+    for (const auto expression : data.remaining)
+        add(expression);
+
+    const auto by_key = [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; };
+    if (!std::is_sorted(keyed.begin(), keyed.end(), by_key))
+        std::sort(keyed.begin(), keyed.end(), by_key);
+
+    data.first = keyed[0].second;
+    data.second = keyed[1].second;
+    data.remaining.clear();
+    for (std::size_t i = 2; i < keyed.size(); ++i)
+        data.remaining.push_back(keyed[i].second);
+}
+
+inline bool is_canonical_multi_expression(const Repository& repository, const ygg::Data<MultiFunctionExpression>& data)
+{
+    if (data.first.is_max() || data.second.is_max())
+        return false;
+
+    auto previous = format::to_string(ygg::make_view(data.first, repository));
+    const auto follows = [&](auto expression)
+    {
+        auto current = format::to_string(ygg::make_view(expression, repository));
+        const auto result = previous <= current;
+        previous = std::move(current);
+        return result;
+    };
+    if (!follows(data.second))
+        return false;
+    for (const auto expression : data.remaining)
+        if (!follows(expression))
+            return false;
+    return true;
+}
+
 }  // namespace loki::formalism::detail
 
 namespace loki::formalism
@@ -190,7 +236,7 @@ inline void canonicalize(Repository&, ygg::Data<T>&) noexcept
 inline void canonicalize(Repository& repository, ygg::Data<Type>& data) { detail::canonicalize_list(repository, data.bases); }
 inline void canonicalize(Repository& repository, ygg::Data<Object>& data) { detail::canonicalize_list(repository, data.types); }
 inline void canonicalize(Repository& repository, ygg::Data<Parameter>& data) { detail::canonicalize_list(repository, data.types); }
-inline void canonicalize(Repository& repository, ygg::Data<MultiFunctionExpression>& data) { detail::canonicalize_list(repository, data.expressions); }
+inline void canonicalize(Repository& repository, ygg::Data<MultiFunctionExpression>& data) { detail::canonicalize_multi_expression(repository, data); }
 inline void canonicalize(Repository& repository, ygg::Data<ConditionAnd>& data) { detail::canonicalize_list(repository, data.conditions); }
 inline void canonicalize(Repository& repository, ygg::Data<ConditionOr>& data) { detail::canonicalize_list(repository, data.conditions); }
 inline void canonicalize(Repository& repository, ygg::Data<ConditionExists>& data) { detail::canonicalize_list(repository, data.parameters); }
@@ -234,7 +280,7 @@ inline bool is_canonical(const Repository& repository, const ygg::Data<Object>& 
 inline bool is_canonical(const Repository& repository, const ygg::Data<Parameter>& data) { return detail::is_canonical_list(repository, data.types); }
 inline bool is_canonical(const Repository& repository, const ygg::Data<MultiFunctionExpression>& data)
 {
-    return detail::is_canonical_list(repository, data.expressions);
+    return detail::is_canonical_multi_expression(repository, data);
 }
 inline bool is_canonical(const Repository& repository, const ygg::Data<ConditionAnd>& data) { return detail::is_canonical_list(repository, data.conditions); }
 inline bool is_canonical(const Repository& repository, const ygg::Data<ConditionOr>& data) { return detail::is_canonical_list(repository, data.conditions); }

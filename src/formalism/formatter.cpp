@@ -115,7 +115,11 @@ std::string to_string(BinaryFunctionExpressionView value)
 
 std::string to_string(MultiFunctionExpressionView value)
 {
-    return fmt::format("({}{})", loki::formalism::to_string(value.get_data().op), detail::spaced(value.get_expressions()));
+    return fmt::format("({} {} {}{})",
+                       loki::formalism::to_string(value.get_operator()),
+                       to_string(value.get_first()),
+                       to_string(value.get_second()),
+                       detail::spaced(value.get_remaining()));
 }
 
 std::string to_string(FunctionExpressionView value)

@@ -1,3 +1,4 @@
+import gc
 import json
 import operator
 from collections.abc import Iterable
@@ -222,6 +223,8 @@ def test_translation_bindings_return_translated_views() -> None:
     options = pypddl.TranslatorOptions()
     assert options.compile_typing is True
     assert options.materialize_equality is True
+    assert options.normalize_arithmetic_expressions is False
+    options.normalize_arithmetic_expressions = True
 
     domain_translation = pypddl.translate_domain(domain, options)
     problem_translation = pypddl.translate_task(task, domain_translation, options)
@@ -232,6 +235,30 @@ def test_translation_bindings_return_translated_views() -> None:
     assert problem_translation.original_task.get_name() == "facade-task"
     assert problem_translation.translated_task.get_domain().get_name() == domain_translation.translated_domain.get_name()
     assert temporary_translated_task.get_domain().get_name() == domain_translation.translated_domain.get_name()
+
+
+def test_arithmetic_normalization_binding_flattens_sorts_and_removes_units() -> None:
+    parser_options = pypddl.ParserOptions()
+    parser_options.add_action_costs = False
+    parser = pypddl.Parser(
+        """
+        (define (domain arithmetic-normalization)
+          (:requirements :strips :numeric-fluents)
+          (:functions (f))
+          (:action a
+            :parameters ()
+            :effect (assign (f) (+ 3 (+ 2 1) 0))))
+        """,
+        parser_options,
+    )
+    options = pypddl.TranslatorOptions()
+    options.compile_typing = False
+    options.materialize_equality = False
+    options.normalize_arithmetic_expressions = True
+
+    translated = pypddl.translate_domain(parser.domain(), options).translated_domain
+
+    assert "(assign (f) (+ 1 2 3))" in pypddl.format_domain(translated)
 
 
 def test_repository_view_keeps_temporary_repository_alive() -> None:
@@ -586,6 +613,26 @@ def test_numeric_expression_variant_views_are_inspectable() -> None:
     assert variant.get_value() == 2.0
 
 
+def test_multi_remaining_keeps_repository_alive() -> None:
+    def make_remaining() -> list[pypddl.FunctionExpression]:
+        repository = pypddl.RepositoryFactory().create()
+        operands = [make_number_expression(repository, value) for value in (1.0, 2.0, 3.0)]
+        multi = repository.get_or_create(
+            pypddl.MultiFunctionExpressionData(
+                pypddl.MultiArithmeticOperator.Add,
+                operands[0],
+                operands[1],
+                operands[2:],
+            )
+        )
+        return cast(list[pypddl.FunctionExpression], multi.get_remaining())
+
+    remaining = make_remaining()
+    gc.collect()
+
+    assert remaining[0].get_variant().get_value() == 3.0
+
+
 def test_repository_exposes_recursive_constructors_and_accessors() -> None:
     repository = pypddl.RepositoryFactory().create()
     object_type = repository.get_or_create(pypddl.TypeData("object"))
@@ -620,7 +667,7 @@ def test_repository_exposes_recursive_constructors_and_accessors() -> None:
     unary = repository.get_or_create(pypddl.FunctionExpressionData(unary_node))
     binary_node = repository.get_or_create(pypddl.BinaryFunctionExpressionData(pypddl.BinaryArithmeticOperator.Add, number, unary))
     binary = repository.get_or_create(pypddl.FunctionExpressionData(binary_node))
-    multi_node = repository.get_or_create(pypddl.MultiFunctionExpressionData(pypddl.MultiArithmeticOperator.Add, [number, binary]))
+    multi_node = repository.get_or_create(pypddl.MultiFunctionExpressionData(pypddl.MultiArithmeticOperator.Add, number, binary))
     multi = repository.get_or_create(pypddl.FunctionExpressionData(multi_node))
 
     fluent = repository.get_or_create(pypddl.FunctionSkeletonData("f", [parameter], number_type))
@@ -676,7 +723,10 @@ def test_repository_exposes_recursive_constructors_and_accessors() -> None:
     multi_variant = multi.get_variant()
     assert isinstance(multi_variant, pypddl.MultiFunctionExpression)
     assert multi_variant.get_operator() == pypddl.MultiArithmeticOperator.Add
-    assert len(multi_variant.get_expressions()) == 2
+    multi_operands = [multi_variant.get_first(), multi_variant.get_second(), *multi_variant.get_remaining()]
+    assert len(multi_operands) == 2
+    assert number in multi_operands
+    assert binary in multi_operands
     assert effect_probabilistic_variant.get_alternatives()[0].get_probability() == 0.4
     assert domain.get_axioms()[0].get_arity() == 1
     assert domain.get_axioms()[0].get_original_arity() == 1

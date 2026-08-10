@@ -56,6 +56,7 @@ const std::vector<PhaseStep>& domain_phase_steps()
         { TranslationPhase::SplitDisjunctiveConditions, "split-disjunctive-conditions", true },
         { TranslationPhase::MoveExistentialQuantifiers, "move-existential-quantifiers", true },
         { TranslationPhase::MaterializeEquality, "materialize-equality" },
+        { TranslationPhase::NormalizeArithmeticExpressions, "normalize-arithmetic-expressions" },
     };
     return steps;
 }
@@ -73,6 +74,7 @@ const std::vector<PhaseStep>& task_phase_steps()
         { TranslationPhase::ToEffectNormalForm, "to-effect-normal-form" },
         { TranslationPhase::MaterializeEquality, "materialize-equality" },
         { TranslationPhase::CompileTyping, "compile-typing" },
+        { TranslationPhase::NormalizeArithmeticExpressions, "normalize-arithmetic-expressions" },
     };
     return steps;
 }
@@ -122,6 +124,8 @@ DomainTranslationResult translate(formalism::DomainView domain, const Translator
             continue;
         if (step.phase == TranslationPhase::MaterializeEquality && !options.materialize_equality)
             continue;
+        if (step.phase == TranslationPhase::NormalizeArithmeticExpressions && !options.normalize_arithmetic_expressions)
+            continue;
 
         auto phase_storage = std::make_shared<detail::TranslationStorage>(phase_index++);
         auto semantic_copier = detail::CopyTranslator(phase_storage, options.compile_typing, step.phase);
@@ -148,6 +152,8 @@ ProblemTranslationResult translate(formalism::TaskView task, const DomainTransla
     for (const auto& step : detail::task_phase_steps())
     {
         if (step.phase == TranslationPhase::MaterializeEquality && !options.materialize_equality)
+            continue;
+        if (step.phase == TranslationPhase::NormalizeArithmeticExpressions && !options.normalize_arithmetic_expressions)
             continue;
 
         auto phase_storage = std::make_shared<detail::TranslationStorage>(phase_index++, &result.m_storage->repository);

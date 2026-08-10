@@ -15,21 +15,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_FORMALISM_MULTI_FUNCTION_EXPRESSION_DATA_HPP_
 #define LOKI_FORMALISM_MULTI_FUNCTION_EXPRESSION_DATA_HPP_
 
-#include <tuple>
-#include <utility>
+#include "loki/formalism/declarations.hpp"
+#include "loki/formalism/function_expression_index.hpp"
+#include "loki/formalism/multi_function_expression_index.hpp"
+
 #include <optional>
 #include <string>
+#include <tuple>
+#include <utility>
 #include <variant>
 #include <vector>
 #include <yggdrasil/core/types.hpp>
 #include <yggdrasil/core/types_utils.hpp>
-#include "loki/formalism/declarations.hpp"
-#include "loki/formalism/function_expression_index.hpp"
-#include "loki/formalism/multi_function_expression_index.hpp"
 
 namespace ygg
 {
@@ -39,19 +39,48 @@ struct Data<::loki::formalism::MultiFunctionExpression>
 {
     ygg::Index<::loki::formalism::MultiFunctionExpression> index;
     ::loki::formalism::MultiArithmeticOperator op {};
-    ygg::IndexList<::loki::formalism::FunctionExpression> expressions;
+    ygg::Index<::loki::formalism::FunctionExpression> first;
+    ygg::Index<::loki::formalism::FunctionExpression> second;
+    ygg::IndexList<::loki::formalism::FunctionExpression> remaining;
 
     Data() = default;
-    Data(::loki::formalism::MultiArithmeticOperator op_, ygg::IndexList<::loki::formalism::FunctionExpression> expressions_) : index(), op(op_), expressions(std::move(expressions_)) {}
-    template<typename C>
-    Data(::loki::formalism::MultiArithmeticOperator op_, const std::vector<::ygg::View<ygg::Index<::loki::formalism::FunctionExpression>, C>>& expressions_) : index(), op(op_), expressions()
+    Data(::loki::formalism::MultiArithmeticOperator op_,
+         ygg::Index<::loki::formalism::FunctionExpression> first_,
+         ygg::Index<::loki::formalism::FunctionExpression> second_,
+         ygg::IndexList<::loki::formalism::FunctionExpression> remaining_ = {}) :
+        index(),
+        op(op_),
+        first(first_),
+        second(second_),
+        remaining(std::move(remaining_))
     {
-        set(expressions_, expressions);
+    }
+    template<typename C>
+    Data(::loki::formalism::MultiArithmeticOperator op_,
+         ::ygg::View<ygg::Index<::loki::formalism::FunctionExpression>, C> first_,
+         ::ygg::View<ygg::Index<::loki::formalism::FunctionExpression>, C> second_,
+         const std::vector<::ygg::View<ygg::Index<::loki::formalism::FunctionExpression>, C>>& remaining_ = {}) :
+        index(),
+        op(op_),
+        first(),
+        second(),
+        remaining()
+    {
+        set(first_, first);
+        set(second_, second);
+        set(remaining_, remaining);
     }
 
-    void clear() noexcept { ygg::clear(index); op = {}; ygg::clear(expressions); }
-    auto cista_members() const noexcept { return std::tie(index, op, expressions); }
-    auto identifying_members() const noexcept { return std::tie(op, expressions); }
+    void clear() noexcept
+    {
+        ygg::clear(index);
+        op = {};
+        ygg::clear(first);
+        ygg::clear(second);
+        ygg::clear(remaining);
+    }
+    auto cista_members() const noexcept { return std::tie(index, op, first, second, remaining); }
+    auto identifying_members() const noexcept { return std::tie(op, first, second, remaining); }
 };
 
 }

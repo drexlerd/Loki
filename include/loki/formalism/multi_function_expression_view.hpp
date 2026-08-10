@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_FORMALISM_MULTI_FUNCTION_EXPRESSION_VIEW_HPP_
 #define LOKI_FORMALISM_MULTI_FUNCTION_EXPRESSION_VIEW_HPP_
 
@@ -46,7 +45,9 @@ public:
     auto get_index() const noexcept { return m_handle; }
 
     auto get_operator() const noexcept { return get_data().op; }
-    auto get_expressions() const noexcept { return ygg::make_view(get_data().expressions, *m_context); }
+    auto get_first() const noexcept { return ygg::make_view(get_data().first, *m_context); }
+    auto get_second() const noexcept { return ygg::make_view(get_data().second, *m_context); }
+    auto get_remaining() const noexcept { return ygg::make_view(get_data().remaining, *m_context); }
 
     auto identifying_members() const noexcept { return std::tie(m_handle, m_context->get_index()); }
 };
