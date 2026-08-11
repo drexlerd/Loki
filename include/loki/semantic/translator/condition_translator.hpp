@@ -52,7 +52,7 @@ template<typename Derived>
 formalism::ConditionLiteralView ConditionTranslator<Derived>::copy(formalism::ConditionLiteralView source)
 {
     const auto literal = as_index(this->self().copy(source.get_literal()));
-    auto data = this->template checkout<formalism::ConditionLiteral>();
+    auto data = formalism::checkout<formalism::ConditionLiteral>(this->m_context.builder);
     data->literal = literal;
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
@@ -60,7 +60,7 @@ formalism::ConditionLiteralView ConditionTranslator<Derived>::copy(formalism::Co
 template<typename Derived>
 formalism::ConditionAndView ConditionTranslator<Derived>::copy(formalism::ConditionAndView source)
 {
-    auto data = this->template checkout<formalism::ConditionAnd>();
+    auto data = formalism::checkout<formalism::ConditionAnd>(this->m_context.builder);
     for (auto condition : source.get_conditions())
         data->conditions.push_back(as_index(this->self().copy(condition)));
     return formalism::get_or_create(this->m_storage->repository, *data).first;
@@ -69,7 +69,7 @@ formalism::ConditionAndView ConditionTranslator<Derived>::copy(formalism::Condit
 template<typename Derived>
 formalism::ConditionOrView ConditionTranslator<Derived>::copy(formalism::ConditionOrView source)
 {
-    auto data = this->template checkout<formalism::ConditionOr>();
+    auto data = formalism::checkout<formalism::ConditionOr>(this->m_context.builder);
     for (auto condition : source.get_conditions())
         data->conditions.push_back(as_index(this->self().copy(condition)));
     return formalism::get_or_create(this->m_storage->repository, *data).first;
@@ -79,7 +79,7 @@ template<typename Derived>
 formalism::ConditionNotView ConditionTranslator<Derived>::copy(formalism::ConditionNotView source)
 {
     const auto condition = as_index(this->self().copy(source.get_condition()));
-    auto data = this->template checkout<formalism::ConditionNot>();
+    auto data = formalism::checkout<formalism::ConditionNot>(this->m_context.builder);
     data->condition = condition;
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
@@ -89,7 +89,7 @@ formalism::ConditionImplyView ConditionTranslator<Derived>::copy(formalism::Cond
 {
     const auto left = as_index(this->self().copy(source.get_left()));
     const auto right = as_index(this->self().copy(source.get_right()));
-    auto data = this->template checkout<formalism::ConditionImply>();
+    auto data = formalism::checkout<formalism::ConditionImply>(this->m_context.builder);
     data->left = left;
     data->right = right;
     return formalism::get_or_create(this->m_storage->repository, *data).first;
@@ -101,18 +101,18 @@ formalism::ConditionExistsView ConditionTranslator<Derived>::copy(formalism::Con
     this->self().increment_quantifications(source.get_parameters());
     auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
     this->self().enter_scope(parameter_views);
-    const auto condition = as_index(this->self().copy(source.get_condition()));
+    const auto condition = this->self().copy(source.get_condition());
     this->self().leave_scope();
     auto typed_condition = condition;
     if (this->m_phase == TranslationPhase::CompileTyping)
         this->self().prepend_type_conditions(typed_condition, source.get_parameters());
-    auto data = this->template checkout<formalism::ConditionExists>();
+    auto data = formalism::checkout<formalism::ConditionExists>(this->m_context.builder);
     if (this->self().compiles_typing_now())
         this->self().copy_parameters_without_types(source.get_parameters(), data->parameters);
     else
         for (auto parameter : parameter_views)
             data->parameters.push_back(parameter.get_index());
-    data->condition = typed_condition;
+    data->condition = typed_condition.get_index();
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
@@ -122,18 +122,18 @@ formalism::ConditionForallView ConditionTranslator<Derived>::copy(formalism::Con
     this->self().increment_quantifications(source.get_parameters());
     auto parameter_views = this->self().copy_parameter_views(source.get_parameters());
     this->self().enter_scope(parameter_views);
-    const auto condition = as_index(this->self().copy(source.get_condition()));
+    const auto condition = this->self().copy(source.get_condition());
     this->self().leave_scope();
     auto typed_condition = condition;
     if (this->m_phase == TranslationPhase::CompileTyping)
         this->self().prepend_type_conditions(typed_condition, source.get_parameters());
-    auto data = this->template checkout<formalism::ConditionForall>();
+    auto data = formalism::checkout<formalism::ConditionForall>(this->m_context.builder);
     if (this->self().compiles_typing_now())
         this->self().copy_parameters_without_types(source.get_parameters(), data->parameters);
     else
         for (auto parameter : parameter_views)
             data->parameters.push_back(parameter.get_index());
-    data->condition = typed_condition;
+    data->condition = typed_condition.get_index();
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
@@ -143,7 +143,7 @@ formalism::ConditionNumericConstraintView ConditionTranslator<Derived>::copy(for
     const auto& data = source.get_data();
     const auto left = as_index(this->self().copy(source.get_left()));
     const auto right = as_index(this->self().copy(source.get_right()));
-    auto result = this->template checkout<formalism::ConditionNumericConstraint>();
+    auto result = formalism::checkout<formalism::ConditionNumericConstraint>(this->m_context.builder);
     result->comparator = data.comparator;
     result->left = left;
     result->right = right;

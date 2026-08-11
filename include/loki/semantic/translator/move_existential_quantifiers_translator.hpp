@@ -168,7 +168,7 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::hoist_ex
             if (!avoid.contains(name))
                 break;
         }
-        auto variable_data = this->template checkout<formalism::Variable>();
+        auto variable_data = formalism::checkout<formalism::Variable>(this->m_context.builder);
         variable_data->name = cista::offset::string(name);
         const auto fresh = formalism::get_or_create(this->m_storage->repository, *variable_data).first;
         this->self().enter_variable_scope();
@@ -176,7 +176,7 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::hoist_ex
         condition = this->self().rename_variables(condition);
         this->self().leave_variable_scope();
         claimed.insert(name);
-        auto parameter_data = this->template checkout<formalism::Parameter>();
+        auto parameter_data = formalism::checkout<formalism::Parameter>(this->m_context.builder);
         parameter_data->variable = fresh.get_index();
         for (auto type : parameter.get_data().types)
             parameter_data->types.push_back(type);
@@ -190,23 +190,23 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_exi
 {
     auto parameters = std::vector<formalism::ParameterView> {};
     auto claimed = ygg::UnorderedSet<std::string> {};
-    auto parts = ygg::IndexList<formalism::Condition> {};
+    auto condition_data = formalism::checkout<formalism::ConditionAnd>(this->m_context.builder);
     for (auto child : node.get_conditions())
     {
         const auto moved = this->self().move_existentials(child);
         if (const auto exists = this->self().as_exists(moved))
         {
-            parts.push_back(as_index(this->self().hoist_exists(*exists, claimed, parameters)));
+            this->self().append_conjunct(*condition_data, this->self().hoist_exists(*exists, claimed, parameters));
         }
         else
         {
-            parts.push_back(moved.get_index());
+            this->self().append_conjunct(*condition_data, moved);
         }
     }
-    auto conjunction = this->self().make_conjunction(std::move(parts));
+    auto conjunction = this->self().make_conjunction(*condition_data);
     if (parameters.empty())
         return conjunction;
-    auto data = this->template checkout<formalism::ConditionExists>();
+    auto data = formalism::checkout<formalism::ConditionExists>(this->m_context.builder);
     for (auto parameter : parameters)
         data->parameters.push_back(parameter.get_index());
     data->condition = conjunction.get_index();
@@ -218,7 +218,7 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_exi
 {
     const auto& data = node.get_data();
     const auto condition = this->self().move_existentials(node.get_condition());
-    auto result = this->template checkout<formalism::ConditionExists>();
+    auto result = formalism::checkout<formalism::ConditionExists>(this->m_context.builder);
     for (auto parameter : data.parameters)
         result->parameters.push_back(parameter);
     result->condition = condition.get_index();
@@ -228,10 +228,10 @@ formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_exi
 template<typename Derived>
 formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_existentials_node(formalism::ConditionView, formalism::ConditionOrView node)
 {
-    auto parts = ygg::IndexList<formalism::Condition> {};
+    auto data = formalism::checkout<formalism::ConditionOr>(this->m_context.builder);
     for (auto child : node.get_conditions())
-        parts.push_back(this->self().move_existentials(child).get_index());
-    return this->self().make_disjunction(std::move(parts));
+        this->self().append_disjunct(*data, this->self().move_existentials(child));
+    return this->self().make_disjunction(*data);
 }
 
 template<typename Derived>

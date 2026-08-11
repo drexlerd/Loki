@@ -89,41 +89,42 @@ void CompileConditionalEffectsTranslator<Derived>::compile_conditional_effect_ac
             throw SemanticError("Too many conditional effects to compile.");
 
         const auto num_variants = size_t { 1 } << conditional.size();
+        auto condition_data = formalism::checkout<formalism::ConditionAnd>(this->m_context.builder);
+        auto effect_data = formalism::checkout<formalism::EffectAnd>(this->m_context.builder);
         for (auto mask = size_t { 0 }; mask < num_variants; ++mask)
         {
-            auto conditions = ygg::IndexList<formalism::Condition> {};
-            if (data.precondition)
-                conditions.push_back(*data.precondition);
+            condition_data->clear();
+            if (const auto precondition = action.get_precondition())
+                this->self().append_conjunct(*condition_data, *precondition);
 
-            auto effects = unconditional;
+            effect_data->clear();
+            for (auto effect : unconditional)
+                effect_data->effects.push_back(effect);
             for (auto i = size_t { 0 }; i < conditional.size(); ++i)
             {
                 const auto selected = (mask & (size_t { 1 } << i)) != 0;
                 if (selected)
                 {
-                    conditions.push_back(conditional[i].condition.get_index());
-                    effects.push_back(conditional[i].effect.get_index());
+                    this->self().append_conjunct(*condition_data, conditional[i].condition);
+                    effect_data->effects.push_back(conditional[i].effect.get_index());
                 }
                 else
                 {
-                    conditions.push_back(as_index(this->self().negate_condition(conditional[i].condition)));
+                    this->self().append_conjunct(*condition_data, this->self().negate_condition(conditional[i].condition));
                 }
             }
 
             auto precondition = cista::optional<ygg::Index<formalism::Condition>> {};
-            if (conditions.size() == 1)
-                precondition = conditions.front();
-            else if (!conditions.empty())
-                precondition = as_index(this->self().make_conjunction(std::move(conditions)));
+            if (condition_data->conditions.size() == 1)
+                precondition = condition_data->conditions.front();
+            else if (!condition_data->conditions.empty())
+                precondition = as_index(this->self().make_conjunction(*condition_data));
 
             auto effect = cista::optional<ygg::Index<formalism::Effect>> {};
-            if (effects.size() == 1)
-                effect = effects.front();
-            else if (!effects.empty())
+            if (effect_data->effects.size() == 1)
+                effect = effect_data->effects.front();
+            else if (!effect_data->effects.empty())
             {
-                auto effect_data = this->template checkout<formalism::EffectAnd>();
-                for (auto item : effects)
-                    effect_data->effects.push_back(item);
                 effect = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *effect_data).first).get_index();
             }
 
@@ -132,7 +133,7 @@ void CompileConditionalEffectsTranslator<Derived>::compile_conditional_effect_ac
                 name += "_" + std::to_string(item.when.get_index().get_value());
             name += "_" + std::to_string(mask);
 
-            auto action_data = this->template checkout<formalism::Action>();
+            auto action_data = formalism::checkout<formalism::Action>(this->m_context.builder);
             action_data->name = cista::offset::string(name);
             action_data->original_name = data.original_name;
             for (auto parameter : data.parameters)

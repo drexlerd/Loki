@@ -84,7 +84,7 @@ std::string CopyTranslatorFacade<Derived>::next_generated_predicate_name(std::st
 template<typename Derived>
 formalism::DomainView CopyTranslatorFacade<Derived>::copy_domain(formalism::DomainView domain)
 {
-    auto data = this->template checkout<formalism::Domain>();
+    auto data = formalism::checkout<formalism::Domain>(this->m_context.builder);
     data->name = domain.get_data().name;
     this->self().template copy_list<formalism::Requirement>(domain.get_requirements(), data->requirements);
     this->self().template copy_list<formalism::Type>(domain.get_types(), data->types);
@@ -132,7 +132,7 @@ formalism::DomainView CopyTranslatorFacade<Derived>::copy_domain(formalism::Doma
 template<typename Derived>
 formalism::TaskView CopyTranslatorFacade<Derived>::copy_task(formalism::TaskView task)
 {
-    auto data = this->template checkout<formalism::Task>();
+    auto data = formalism::checkout<formalism::Task>(this->m_context.builder);
     data->name = task.get_data().name;
     data->domain = this->m_storage->translated_domain->get_index();
     this->self().template copy_list<formalism::Requirement>(task.get_requirements(), data->requirements);

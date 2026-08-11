@@ -18,7 +18,7 @@
 #ifndef LOKI_SEMANTIC_TRANSLATOR_COPY_CONTEXT_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_COPY_CONTEXT_HPP_
 
-#include "loki/formalism/builder.hpp"
+#include "loki/formalism/repository.hpp"
 #include "loki/semantic/translator/common.hpp"
 
 #include <yggdrasil/containers/unordered_set.hpp>

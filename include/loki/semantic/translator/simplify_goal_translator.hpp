@@ -42,24 +42,24 @@ template<typename Derived>
 formalism::ConditionView SimplifyGoalTranslator<Derived>::make_generated_goal_condition(ygg::Index<formalism::Condition> condition)
 {
     const auto name = cista::offset::string(this->self().next_generated_predicate_name("loki-goal-"));
-    auto predicate_data = this->template checkout<formalism::Predicate>();
+    auto predicate_data = formalism::checkout<formalism::Predicate>(this->m_context.builder);
     predicate_data->name = name;
     const auto predicate = formalism::get_or_create(this->m_storage->repository, *predicate_data).first;
-    auto atom_data = this->template checkout<formalism::Atom>();
+    auto atom_data = formalism::checkout<formalism::Atom>(this->m_context.builder);
     atom_data->predicate = predicate.get_index();
     const auto atom = formalism::get_or_create(this->m_storage->repository, *atom_data).first.get_index();
-    auto literal_data = this->template checkout<formalism::Literal>();
+    auto literal_data = formalism::checkout<formalism::Literal>(this->m_context.builder);
     literal_data->atom = atom;
     literal_data->m_polarity = true;
     const auto literal = formalism::get_or_create(this->m_storage->repository, *literal_data).first.get_index();
-    auto axiom_data = this->template checkout<formalism::Axiom>();
+    auto axiom_data = formalism::checkout<formalism::Axiom>(this->m_context.builder);
     axiom_data->original_arity = 0;
     axiom_data->head = literal;
     axiom_data->condition = condition;
     const auto axiom = formalism::get_or_create(this->m_storage->repository, *axiom_data).first;
     this->m_generated_predicates.push_back(predicate);
     this->m_generated_axioms.push_back(axiom);
-    auto condition_data = this->template checkout<formalism::ConditionLiteral>();
+    auto condition_data = formalism::checkout<formalism::ConditionLiteral>(this->m_context.builder);
     condition_data->literal = literal;
     return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *condition_data).first);
 }
@@ -86,10 +86,10 @@ formalism::ConditionView SimplifyGoalTranslator<Derived>::simplify_goal_conditio
 template<typename Derived>
 formalism::ConditionView SimplifyGoalTranslator<Derived>::simplify_goal_condition_node(formalism::ConditionView, formalism::ConditionAndView node)
 {
-    auto conditions = ygg::IndexList<formalism::Condition> {};
+    auto data = formalism::checkout<formalism::ConditionAnd>(this->m_context.builder);
     for (auto child : node.get_conditions())
-        conditions.push_back(this->self().simplify_goal_condition(child).get_index());
-    return this->self().make_conjunction(std::move(conditions));
+        this->self().append_conjunct(*data, this->self().simplify_goal_condition(child));
+    return this->self().make_conjunction(*data);
 }
 
 template<typename Derived>

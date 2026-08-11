@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/formalism/builder.hpp"
+#include "loki/formalism/repository.hpp"
 #include "loki/semantic/translator/canonical_copy_translator.hpp"
 #include "loki/semantic/translator/common.hpp"
 
@@ -28,7 +28,7 @@ CanonicalCopyTranslator::CanonicalCopyTranslator(std::shared_ptr<TranslationStor
 
 formalism::DomainView CanonicalCopyTranslator::copy_domain(formalism::DomainView domain)
 {
-    auto data = checkout<formalism::Domain>();
+    auto data = formalism::checkout<formalism::Domain>(m_builder);
     data->name = domain.get_data().name;
     copy_list(domain.get_requirements(), data->requirements);
     copy_list(domain.get_types(), data->types);
@@ -45,7 +45,7 @@ formalism::DomainView CanonicalCopyTranslator::copy_domain(formalism::DomainView
 
 formalism::TaskView CanonicalCopyTranslator::copy_task(formalism::TaskView task)
 {
-    auto data = checkout<formalism::Task>();
+    auto data = formalism::checkout<formalism::Task>(m_builder);
     data->name = task.get_data().name;
     data->domain = m_storage->translated_domain ? m_storage->translated_domain->get_index() : as_index(copy_domain(task.get_domain()));
     copy_list(task.get_requirements(), data->requirements);
@@ -67,7 +67,7 @@ formalism::EffectLiteralView CanonicalCopyTranslator::copy(formalism::EffectLite
 {
     if (auto mapped = find_mapped(m_storage->effect_literals, source))
         return *mapped;
-    auto data = checkout<formalism::EffectLiteral>();
+    auto data = formalism::checkout<formalism::EffectLiteral>(m_builder);
     data->literal = as_index(copy(source.get_literal()));
     auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effect_literals, source, out);
@@ -78,7 +78,7 @@ formalism::EffectAndView CanonicalCopyTranslator::copy(formalism::EffectAndView 
 {
     if (auto mapped = find_mapped(m_storage->effect_ands, source))
         return *mapped;
-    auto data = checkout<formalism::EffectAnd>();
+    auto data = formalism::checkout<formalism::EffectAnd>(m_builder);
     copy_list(source.get_effects(), data->effects);
     auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effect_ands, source, out);
@@ -89,7 +89,7 @@ formalism::EffectNumericView CanonicalCopyTranslator::copy(formalism::EffectNume
 {
     if (auto mapped = find_mapped(m_storage->effect_numerics, source))
         return *mapped;
-    auto data = checkout<formalism::EffectNumeric>();
+    auto data = formalism::checkout<formalism::EffectNumeric>(m_builder);
     data->op = source.get_data().op;
     data->function = as_index(copy(source.get_function()));
     data->expression = as_index(copy(source.get_expression()));
@@ -102,7 +102,7 @@ formalism::EffectForallView CanonicalCopyTranslator::copy(formalism::EffectForal
 {
     if (auto mapped = find_mapped(m_storage->effect_foralls, source))
         return *mapped;
-    auto data = checkout<formalism::EffectForall>();
+    auto data = formalism::checkout<formalism::EffectForall>(m_builder);
     copy_list(source.get_parameters(), data->parameters);
     data->effect = as_index(copy(source.get_effect()));
     auto out = formalism::get_or_create(m_storage->repository, *data).first;
@@ -114,7 +114,7 @@ formalism::EffectWhenView CanonicalCopyTranslator::copy(formalism::EffectWhenVie
 {
     if (auto mapped = find_mapped(m_storage->effect_whens, source))
         return *mapped;
-    auto data = checkout<formalism::EffectWhen>();
+    auto data = formalism::checkout<formalism::EffectWhen>(m_builder);
     data->condition = as_index(copy(source.get_condition()));
     data->effect = as_index(copy(source.get_effect()));
     auto out = formalism::get_or_create(m_storage->repository, *data).first;
@@ -126,7 +126,7 @@ formalism::EffectOneOfView CanonicalCopyTranslator::copy(formalism::EffectOneOfV
 {
     if (auto mapped = find_mapped(m_storage->effect_one_ofs, source))
         return *mapped;
-    auto data = checkout<formalism::EffectOneOf>();
+    auto data = formalism::checkout<formalism::EffectOneOf>(m_builder);
     copy_list(source.get_effects(), data->effects);
     auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effect_one_ofs, source, out);
@@ -137,7 +137,7 @@ formalism::EffectProbabilisticAlternativeView CanonicalCopyTranslator::copy(form
 {
     if (auto mapped = find_mapped(m_storage->effect_probabilistic_alternatives, source))
         return *mapped;
-    auto data = checkout<formalism::EffectProbabilisticAlternative>();
+    auto data = formalism::checkout<formalism::EffectProbabilisticAlternative>(m_builder);
     data->probability = source.get_data().probability;
     data->effect = as_index(copy(source.get_effect()));
     auto out = formalism::get_or_create(m_storage->repository, *data).first;
@@ -149,7 +149,7 @@ formalism::EffectProbabilisticView CanonicalCopyTranslator::copy(formalism::Effe
 {
     if (auto mapped = find_mapped(m_storage->effect_probabilistics, source))
         return *mapped;
-    auto data = checkout<formalism::EffectProbabilistic>();
+    auto data = formalism::checkout<formalism::EffectProbabilistic>(m_builder);
     copy_list(source.get_alternatives(), data->alternatives);
     auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effect_probabilistics, source, out);
@@ -160,7 +160,7 @@ formalism::EffectView CanonicalCopyTranslator::copy(formalism::EffectView source
 {
     if (auto mapped = find_mapped(m_storage->effects, source))
         return *mapped;
-    auto data = checkout<formalism::Effect>();
+    auto data = formalism::checkout<formalism::Effect>(m_builder);
     data->value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant { return as_index(copy(arg)); }, source.get_value());
     auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->effects, source, out);
@@ -172,7 +172,7 @@ formalism::ActionView CanonicalCopyTranslator::copy(formalism::ActionView source
     if (auto mapped = find_mapped(m_storage->actions, source))
         return *mapped;
     const auto& data = source.get_data();
-    auto out_data = checkout<formalism::Action>();
+    auto out_data = formalism::checkout<formalism::Action>(m_builder);
     out_data->name = data.name;
     out_data->original_name = data.original_name;
     out_data->original_arity = data.original_arity;
@@ -190,7 +190,7 @@ formalism::AxiomView CanonicalCopyTranslator::copy(formalism::AxiomView source)
 {
     if (auto mapped = find_mapped(m_storage->axioms, source))
         return *mapped;
-    auto data = checkout<formalism::Axiom>();
+    auto data = formalism::checkout<formalism::Axiom>(m_builder);
     copy_list(source.get_parameters(), data->parameters);
     data->original_arity = source.get_data().original_arity;
     data->head = as_index(copy(source.get_head()));
@@ -204,7 +204,7 @@ formalism::MetricView CanonicalCopyTranslator::copy(formalism::MetricView source
 {
     if (auto mapped = find_mapped(m_storage->metrics, source))
         return *mapped;
-    auto data = checkout<formalism::Metric>();
+    auto data = formalism::checkout<formalism::Metric>(m_builder);
     data->optimization_direction = source.get_optimization_direction();
     data->expression = as_index(copy(source.get_expression()));
     auto out = formalism::get_or_create(m_storage->repository, *data).first;
@@ -216,7 +216,7 @@ formalism::InitialFunctionValueView CanonicalCopyTranslator::copy(formalism::Ini
 {
     if (auto mapped = find_mapped(m_storage->initial_function_values, source))
         return *mapped;
-    auto data = checkout<formalism::InitialFunctionValue>();
+    auto data = formalism::checkout<formalism::InitialFunctionValue>(m_builder);
     data->function = as_index(copy(source.get_function()));
     data->value = as_index(copy(source.get_value()));
     auto out = formalism::get_or_create(m_storage->repository, *data).first;

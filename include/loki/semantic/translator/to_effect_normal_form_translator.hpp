@@ -48,7 +48,7 @@ public:
 template<typename Derived>
 formalism::EffectView ToEffectNormalFormTranslator<Derived>::wrap_effect(ygg::Data<formalism::Effect>::Variant value)
 {
-    auto data = this->template checkout<formalism::Effect>();
+    auto data = formalism::checkout<formalism::Effect>(this->m_context.builder);
     data->value = std::move(value);
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
@@ -57,7 +57,7 @@ template<typename Derived>
 template<typename T>
 formalism::EffectView ToEffectNormalFormTranslator<Derived>::wrap_effect(formalism::EntityView<T> value)
 {
-    auto data = this->template checkout<formalism::Effect>();
+    auto data = formalism::checkout<formalism::Effect>(this->m_context.builder);
     data->value = ygg::Data<formalism::Effect>::Variant(value.get_index());
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
@@ -101,7 +101,7 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
         ygg::IndexList<formalism::FunctionExpression> expressions;
     };
 
-    auto result = this->template checkout<formalism::EffectAnd>();
+    auto result = formalism::checkout<formalism::EffectAnd>(this->m_context.builder);
     auto numeric_groups = std::vector<NumericGroup> {};
 
     auto push_effect = [&](formalism::EffectView effect)
@@ -150,16 +150,16 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
         auto sum = group.expressions.front();
         if (group.expressions.size() > 1)
         {
-            auto multi_data = this->template checkout<formalism::MultiFunctionExpression>();
+            auto multi_data = formalism::checkout<formalism::MultiFunctionExpression>(this->m_context.builder);
             multi_data->op = formalism::MultiArithmeticOperator::Add;
             for (const auto expression : group.expressions)
                 multi_data->args.push_back(expression);
             const auto multi = formalism::get_or_create(this->m_storage->repository, *multi_data).first.get_index();
-            auto expression_data = this->template checkout<formalism::FunctionExpression>();
+            auto expression_data = formalism::checkout<formalism::FunctionExpression>(this->m_context.builder);
             expression_data->value = ygg::Data<formalism::FunctionExpression>::Variant(multi);
             sum = formalism::get_or_create(this->m_storage->repository, *expression_data).first.get_index();
         }
-        auto numeric_data = this->template checkout<formalism::EffectNumeric>();
+        auto numeric_data = formalism::checkout<formalism::EffectNumeric>(this->m_context.builder);
         numeric_data->op = group.op;
         numeric_data->function = group.function;
         numeric_data->expression = sum;
@@ -176,10 +176,10 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
     const auto nested = this->self().normalize_effect(node.get_effect());
     if (const auto nested_and = this->self().template as_effect<formalism::EffectAnd>(nested))
     {
-        auto conjunction_data = this->template checkout<formalism::EffectAnd>();
+        auto conjunction_data = formalism::checkout<formalism::EffectAnd>(this->m_context.builder);
         for (auto part : nested_and->get_effects())
         {
-            auto forall_data = this->template checkout<formalism::EffectForall>();
+            auto forall_data = formalism::checkout<formalism::EffectForall>(this->m_context.builder);
             for (auto parameter : data.parameters)
                 forall_data->parameters.push_back(parameter);
             forall_data->effect = part.get_index();
@@ -191,7 +191,7 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
     }
     if (const auto nested_forall = this->self().template as_effect<formalism::EffectForall>(nested))
     {
-        auto forall_data = this->template checkout<formalism::EffectForall>();
+        auto forall_data = formalism::checkout<formalism::EffectForall>(this->m_context.builder);
         for (auto parameter : data.parameters)
             forall_data->parameters.push_back(parameter);
         for (auto parameter : nested_forall->get_parameters())
@@ -200,7 +200,7 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
         const auto wrapped = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *forall_data).first);
         return this->self().normalize_effect(wrapped);
     }
-    auto forall_data = this->template checkout<formalism::EffectForall>();
+    auto forall_data = formalism::checkout<formalism::EffectForall>(this->m_context.builder);
     for (auto parameter : data.parameters)
         forall_data->parameters.push_back(parameter);
     forall_data->effect = nested.get_index();
@@ -216,10 +216,10 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
 
     if (const auto condition_or = this->self().as_or(condition))
     {
-        auto conjunction_data = this->template checkout<formalism::EffectAnd>();
+        auto conjunction_data = formalism::checkout<formalism::EffectAnd>(this->m_context.builder);
         for (auto part : condition_or->get_conditions())
         {
-            auto when_data = this->template checkout<formalism::EffectWhen>();
+            auto when_data = formalism::checkout<formalism::EffectWhen>(this->m_context.builder);
             when_data->condition = part.get_index();
             when_data->effect = nested.get_index();
             const auto wrapped = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *when_data).first);
@@ -231,11 +231,11 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
 
     if (const auto nested_when = this->self().template as_effect<formalism::EffectWhen>(nested))
     {
-        auto conditions = ygg::IndexList<formalism::Condition> {};
-        conditions.push_back(condition.get_index());
-        conditions.push_back(nested_when->get_condition().get_index());
-        const auto combined_condition = as_index(this->self().make_conjunction(std::move(conditions)));
-        auto when_data = this->template checkout<formalism::EffectWhen>();
+        auto condition_data = formalism::checkout<formalism::ConditionAnd>(this->m_context.builder);
+        this->self().append_conjunct(*condition_data, condition);
+        this->self().append_conjunct(*condition_data, nested_when->get_condition());
+        const auto combined_condition = as_index(this->self().make_conjunction(*condition_data));
+        auto when_data = formalism::checkout<formalism::EffectWhen>(this->m_context.builder);
         when_data->condition = combined_condition;
         when_data->effect = nested_when->get_effect().get_index();
         const auto wrapped = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *when_data).first);
@@ -243,10 +243,10 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
     }
     if (const auto nested_and = this->self().template as_effect<formalism::EffectAnd>(nested))
     {
-        auto conjunction_data = this->template checkout<formalism::EffectAnd>();
+        auto conjunction_data = formalism::checkout<formalism::EffectAnd>(this->m_context.builder);
         for (auto part : nested_and->get_effects())
         {
-            auto when_data = this->template checkout<formalism::EffectWhen>();
+            auto when_data = formalism::checkout<formalism::EffectWhen>(this->m_context.builder);
             when_data->condition = condition.get_index();
             when_data->effect = part.get_index();
             const auto wrapped = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *when_data).first);
@@ -257,10 +257,10 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
     }
     if (const auto nested_forall = this->self().template as_effect<formalism::EffectForall>(nested))
     {
-        auto forall_data = this->template checkout<formalism::EffectForall>();
+        auto forall_data = formalism::checkout<formalism::EffectForall>(this->m_context.builder);
         for (auto parameter : nested_forall->get_parameters())
             forall_data->parameters.push_back(parameter.get_index());
-        auto when_data = this->template checkout<formalism::EffectWhen>();
+        auto when_data = formalism::checkout<formalism::EffectWhen>(this->m_context.builder);
         when_data->condition = condition.get_index();
         when_data->effect = nested_forall->get_effect().get_index();
         forall_data->effect = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *when_data).first).get_index();
@@ -269,10 +269,10 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
     }
     if (const auto exists = this->self().as_exists(condition))
     {
-        auto forall_data = this->template checkout<formalism::EffectForall>();
+        auto forall_data = formalism::checkout<formalism::EffectForall>(this->m_context.builder);
         for (auto parameter : exists->get_parameters())
             forall_data->parameters.push_back(parameter.get_index());
-        auto when_data = this->template checkout<formalism::EffectWhen>();
+        auto when_data = formalism::checkout<formalism::EffectWhen>(this->m_context.builder);
         when_data->condition = exists->get_condition().get_index();
         when_data->effect = nested.get_index();
         forall_data->effect = this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *when_data).first).get_index();
@@ -280,7 +280,7 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
         return this->self().normalize_effect(wrapped);
     }
 
-    auto when_data = this->template checkout<formalism::EffectWhen>();
+    auto when_data = formalism::checkout<formalism::EffectWhen>(this->m_context.builder);
     when_data->condition = condition.get_index();
     when_data->effect = nested.get_index();
     return this->self().wrap_effect(formalism::get_or_create(this->m_storage->repository, *when_data).first);

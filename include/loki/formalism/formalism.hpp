@@ -15,17 +15,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_FORMALISM_FORMALISM_HPP_
 #define LOKI_FORMALISM_FORMALISM_HPP_
 
+#include "loki/formalism/canonicalization.hpp"
 #include "loki/formalism/datas.hpp"
 #include "loki/formalism/declarations.hpp"
+#include "loki/formalism/formatter.hpp"
 #include "loki/formalism/indices.hpp"
 #include "loki/formalism/repository.hpp"
 #include "loki/formalism/views.hpp"
-#include "loki/formalism/canonicalization.hpp"
-#include "loki/formalism/builder.hpp"
-#include "loki/formalism/formatter.hpp"
 
 #endif

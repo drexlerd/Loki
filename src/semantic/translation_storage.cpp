@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "loki/formalism/builder.hpp"
+#include "loki/formalism/repository.hpp"
 #include "loki/semantic/translator/common.hpp"
 
 #include <utility>
@@ -39,8 +39,7 @@ formalism::TypeView copy_type_view_for_metadata(TranslationStorage& target, form
     if (auto mapped = find_mapped(target.types, source))
         return *mapped;
 
-    auto data = builder.get_builder<formalism::Type>();
-    data->clear();
+    auto data = formalism::checkout<formalism::Type>(builder);
     data->name = source.get_name();
     for (auto base : source.get_bases())
         data->bases.push_back(copy_type_view_for_metadata(target, builder, base).get_index());

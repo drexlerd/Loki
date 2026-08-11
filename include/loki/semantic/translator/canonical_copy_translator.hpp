@@ -18,7 +18,7 @@
 #ifndef LOKI_SEMANTIC_TRANSLATOR_CANONICAL_COPY_TRANSLATOR_HPP_
 #define LOKI_SEMANTIC_TRANSLATOR_CANONICAL_COPY_TRANSLATOR_HPP_
 
-#include "loki/formalism/builder.hpp"
+#include "loki/formalism/repository.hpp"
 
 #include <memory>
 
@@ -38,9 +38,6 @@ public:
 private:
     formalism::Builder m_builder;
     std::shared_ptr<TranslationStorage> m_storage;
-
-    template<typename T>
-    [[nodiscard]] auto checkout();
 
     template<typename T>
     void copy_list(formalism::EntityListView<T> source, ygg::IndexList<T>& target);
@@ -84,14 +81,6 @@ private:
     formalism::MetricView copy(formalism::MetricView source);
     formalism::InitialFunctionValueView copy(formalism::InitialFunctionValueView source);
 };
-
-template<typename T>
-auto CanonicalCopyTranslator::checkout()
-{
-    auto data = m_builder.get_builder<T>();
-    data->clear();
-    return data;
-}
 
 template<typename T>
 void CanonicalCopyTranslator::copy_list(formalism::EntityListView<T> source, ygg::IndexList<T>& target)

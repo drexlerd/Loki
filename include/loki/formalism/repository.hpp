@@ -15,17 +15,40 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_FORMALISM_REPOSITORY_HPP_
 #define LOKI_FORMALISM_REPOSITORY_HPP_
 
+#include "loki/formalism/canonicalization.hpp"
+#include "loki/formalism/datas.hpp"
+#include "loki/formalism/declarations.hpp"
+#include "loki/formalism/indices.hpp"
+
+#include <yggdrasil/formalism/builder.hpp>
 #include <yggdrasil/formalism/relation_repository.hpp>
 #include <yggdrasil/formalism/repository.hpp>
 #include <yggdrasil/formalism/repository_factory.hpp>
 #include <yggdrasil/formalism/symbol_repository.hpp>
 
-#include "loki/formalism/datas.hpp"
-#include "loki/formalism/declarations.hpp"
-#include "loki/formalism/indices.hpp"
+namespace loki::formalism
+{
+
+using Builder = ygg::ApplyTypeListT<ygg::formalism::BuilderStorage, SymbolRepositoryTypes>;
+
+template<typename T>
+[[nodiscard]] auto checkout(Builder& builder)
+{
+    auto data = builder.template get_builder<T>();
+    data->clear();
+    return data;
+}
+
+template<typename T>
+[[nodiscard]] auto get_or_create(Repository& repository, ygg::Data<T>& data)
+{
+    canonicalize(repository, data);
+    return repository.get_or_create(data);
+}
+
+}
 
 #endif

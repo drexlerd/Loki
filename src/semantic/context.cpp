@@ -17,7 +17,7 @@
 
 #include "context.hpp"
 
-#include "loki/formalism/builder.hpp"
+#include "loki/formalism/repository.hpp"
 #include "loki/semantic/translator/common.hpp"
 #include "mappings.hpp"
 
@@ -33,8 +33,7 @@ namespace
 formalism::TypeView make_base_type(formalism::Repository& repository, std::string_view name)
 {
     auto builder = formalism::Builder {};
-    auto data = builder.get_builder<formalism::Type>();
-    data->clear();
+    auto data = formalism::checkout<formalism::Type>(builder);
     data->name = cista::offset::string(name);
     return formalism::get_or_create(repository, *data).first;
 }
@@ -65,8 +64,7 @@ formalism::TypeView intern_type(DomainContext& domain_context,
     auto k = key(name);
     if (auto it = domain_context.types.find(k); it != domain_context.types.end() && bases.empty())
         return it->second;
-    auto data = builder.get_builder<formalism::Type>();
-    data->clear();
+    auto data = formalism::checkout<formalism::Type>(builder);
     data->name = to_cista(k);
     data->bases.reserve(bases.size());
     for (const auto base : bases)

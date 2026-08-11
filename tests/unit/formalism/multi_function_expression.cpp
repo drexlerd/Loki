@@ -1,4 +1,3 @@
-#include "loki/formalism/builder.hpp"
 #include "loki/formalism/multi_function_expression_data.hpp"
 #include "loki/formalism/multi_function_expression_index.hpp"
 #include "loki/formalism/multi_function_expression_view.hpp"
@@ -37,8 +36,7 @@ static_assert(requires(const View& view) {
 template<typename T, typename Initialize>
 f::EntityView<T> intern(f::Repository& repository, f::Builder& builder, Initialize&& initialize)
 {
-    auto data = builder.template get_builder<T>();
-    data->clear();
+    auto data = f::checkout<T>(builder);
     std::forward<Initialize>(initialize)(*data);
     return f::get_or_create(repository, *data).first;
 }

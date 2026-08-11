@@ -36,9 +36,9 @@ public:
     formalism::PredicateView type_predicate(formalism::TypeView type);
     formalism::LiteralView type_literal(formalism::TypeView type, ygg::Index<formalism::Term> term);
     formalism::ConditionView type_condition(formalism::TypeView type, formalism::VariableView variable);
-    ygg::IndexList<formalism::Condition> type_conditions_for_parameters(formalism::EntityListView<formalism::Parameter> parameters);
-    void prepend_type_conditions(cista::optional<ygg::Index<formalism::Condition>>& condition, formalism::EntityListView<formalism::Parameter> parameters);
-    void prepend_type_conditions(ygg::Index<formalism::Condition>& condition, formalism::EntityListView<formalism::Parameter> parameters);
+    void type_conditions_for_parameters(formalism::EntityListView<formalism::Parameter> parameters, ygg::Data<formalism::ConditionAnd>& data);
+    void prepend_type_conditions(std::optional<formalism::ConditionView>& condition, formalism::EntityListView<formalism::Parameter> parameters);
+    void prepend_type_conditions(formalism::ConditionView& condition, formalism::EntityListView<formalism::Parameter> parameters);
     void compile_typing_to_domain(ygg::Data<formalism::Domain>& data, formalism::DomainView domain);
     void add_type_literals_for_object(ygg::IndexList<formalism::Literal>& literals, formalism::ObjectView object);
     void initialize_type_literals(ygg::Data<formalism::Task>& data, formalism::TaskView task);
@@ -88,7 +88,7 @@ void CompileTypingTranslator<Derived>::copy_parameters_without_types(formalism::
     for (auto parameter : parameters)
     {
         const auto variable = as_index(this->self().copy(parameter.get_variable()));
-        auto data = this->template checkout<formalism::Parameter>();
+        auto data = formalism::checkout<formalism::Parameter>(this->m_context.builder);
         data->variable = variable;
         result.push_back(formalism::get_or_create(this->m_storage->repository, *data).first.get_index());
     }
@@ -100,13 +100,13 @@ formalism::PredicateView CompileTypingTranslator<Derived>::type_predicate(formal
     if (auto it = this->m_type_predicates.find(type); it != this->m_type_predicates.end())
         return it->second;
 
-    auto parameter_data = this->template checkout<formalism::Parameter>();
+    auto parameter_data = formalism::checkout<formalism::Parameter>(this->m_context.builder);
     if (!this->self().compiles_typing_now())
         parameter_data->types.push_back(as_index(this->self().copy(type)));
-    auto variable_data = this->template checkout<formalism::Variable>();
+    auto variable_data = formalism::checkout<formalism::Variable>(this->m_context.builder);
     variable_data->name = cista::offset::string("?arg");
     parameter_data->variable = formalism::get_or_create(this->m_storage->repository, *variable_data).first.get_index();
-    auto predicate_data = this->template checkout<formalism::Predicate>();
+    auto predicate_data = formalism::checkout<formalism::Predicate>(this->m_context.builder);
     predicate_data->name = type.get_name();
     predicate_data->parameters.push_back(formalism::get_or_create(this->m_storage->repository, *parameter_data).first.get_index());
     auto predicate = formalism::get_or_create(this->m_storage->repository, *predicate_data).first;
@@ -119,11 +119,11 @@ template<typename Derived>
 formalism::LiteralView CompileTypingTranslator<Derived>::type_literal(formalism::TypeView type, ygg::Index<formalism::Term> term)
 {
     const auto predicate = as_index(this->self().type_predicate(type));
-    auto atom_data = this->template checkout<formalism::Atom>();
+    auto atom_data = formalism::checkout<formalism::Atom>(this->m_context.builder);
     atom_data->predicate = predicate;
     atom_data->terms.push_back(term);
     const auto atom = formalism::get_or_create(this->m_storage->repository, *atom_data).first.get_index();
-    auto literal_data = this->template checkout<formalism::Literal>();
+    auto literal_data = formalism::checkout<formalism::Literal>(this->m_context.builder);
     literal_data->atom = atom;
     literal_data->m_polarity = true;
     return formalism::get_or_create(this->m_storage->repository, *literal_data).first;
@@ -133,49 +133,47 @@ template<typename Derived>
 formalism::ConditionView CompileTypingTranslator<Derived>::type_condition(formalism::TypeView type, formalism::VariableView variable)
 {
     const auto copied_variable = as_index(this->self().copy(variable));
-    auto term_data = this->template checkout<formalism::Term>();
+    auto term_data = formalism::checkout<formalism::Term>(this->m_context.builder);
     term_data->value = ygg::Data<formalism::Term>::Variant(copied_variable);
     const auto term = formalism::get_or_create(this->m_storage->repository, *term_data).first.get_index();
     const auto literal = as_index(this->self().type_literal(type, term));
-    auto condition_data = this->template checkout<formalism::ConditionLiteral>();
+    auto condition_data = formalism::checkout<formalism::ConditionLiteral>(this->m_context.builder);
     condition_data->literal = literal;
     return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *condition_data).first);
 }
 
 template<typename Derived>
-ygg::IndexList<formalism::Condition>
-CompileTypingTranslator<Derived>::type_conditions_for_parameters(formalism::EntityListView<formalism::Parameter> parameters)
+void CompileTypingTranslator<Derived>::type_conditions_for_parameters(formalism::EntityListView<formalism::Parameter> parameters,
+                                                                      ygg::Data<formalism::ConditionAnd>& data)
 {
-    auto result = ygg::IndexList<formalism::Condition> {};
     auto add_conditions = [&](auto&& self, formalism::TypeView type, formalism::VariableView variable) -> void
     {
-        result.push_back(as_index(this->self().type_condition(type, variable)));
+        this->self().append_conjunct(data, this->self().type_condition(type, variable));
         for (auto base : type.get_bases())
             self(self, base, variable);
     };
     for (auto parameter : parameters)
         for (auto type : parameter.get_types())
             add_conditions(add_conditions, type, parameter.get_variable());
-    return result;
 }
 
 template<typename Derived>
-void CompileTypingTranslator<Derived>::prepend_type_conditions(cista::optional<ygg::Index<formalism::Condition>>& condition,
+void CompileTypingTranslator<Derived>::prepend_type_conditions(std::optional<formalism::ConditionView>& condition,
                                                                formalism::EntityListView<formalism::Parameter> parameters)
 {
-    auto parts = this->self().type_conditions_for_parameters(parameters);
-    if (parts.empty())
+    auto data = formalism::checkout<formalism::ConditionAnd>(this->m_context.builder);
+    this->self().type_conditions_for_parameters(parameters, *data);
+    if (data->conditions.empty())
         return;
     if (condition)
-        parts.push_back(*condition);
-    condition = as_index(this->self().make_conjunction(std::move(parts)));
+        this->self().append_conjunct(*data, *condition);
+    condition = this->self().make_conjunction(*data);
 }
 
 template<typename Derived>
-void CompileTypingTranslator<Derived>::prepend_type_conditions(ygg::Index<formalism::Condition>& condition,
-                                                               formalism::EntityListView<formalism::Parameter> parameters)
+void CompileTypingTranslator<Derived>::prepend_type_conditions(formalism::ConditionView& condition, formalism::EntityListView<formalism::Parameter> parameters)
 {
-    auto optional = cista::optional<ygg::Index<formalism::Condition>>(condition);
+    auto optional = std::optional { condition };
     this->self().prepend_type_conditions(optional, parameters);
     condition = *optional;
 }
@@ -211,7 +209,7 @@ template<typename Derived>
 void CompileTypingTranslator<Derived>::add_type_literals_for_object(ygg::IndexList<formalism::Literal>& literals, formalism::ObjectView object)
 {
     const auto copied_object = this->self().copy(object);
-    auto term_data = this->template checkout<formalism::Term>();
+    auto term_data = formalism::checkout<formalism::Term>(this->m_context.builder);
     term_data->value = ygg::Data<formalism::Term>::Variant(copied_object.get_index());
     const auto term = formalism::get_or_create(this->m_storage->repository, *term_data).first.get_index();
     auto add_literal = [&](auto&& self, formalism::TypeView type) -> void

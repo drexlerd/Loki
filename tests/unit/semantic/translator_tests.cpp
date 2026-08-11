@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <initializer_list>
-#include <loki/formalism/builder.hpp>
+#include <loki/formalism/repository.hpp>
 #include <loki/formalism/formatter.hpp>
 #include <loki/semantic/errors.hpp>
 #include <loki/semantic/options.hpp>
@@ -71,8 +71,7 @@ std::optional<std::string> conjunct_variable(formalism::ConditionView condition,
 template<typename T, typename Initialize>
 formalism::EntityView<T> intern(formalism::Repository& repository, formalism::Builder& builder, Initialize&& initialize)
 {
-    auto data = builder.template get_builder<T>();
-    data->clear();
+    auto data = formalism::checkout<T>(builder);
     std::forward<Initialize>(initialize)(*data);
     return formalism::get_or_create(repository, *data).first;
 }

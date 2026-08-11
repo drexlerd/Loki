@@ -21,7 +21,7 @@
 #include "context.hpp"
 #include "diagnostics.hpp"
 #include "loki/ast/ast.hpp"
-#include "loki/formalism/builder.hpp"
+#include "loki/formalism/repository.hpp"
 #include "loki/semantic/errors.hpp"
 #include "mappings.hpp"
 
@@ -66,7 +66,7 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
     {
         m_parse_context.active_action_costs = true;
         remember_requirement(m_parse_context, formalism::RequirementKind::ActionCosts);
-        auto data = checkout<formalism::Requirement>();
+        auto data = formalism::checkout<formalism::Requirement>(m_builder);
         data->kind = formalism::RequirementKind::ActionCosts;
         const auto requirement = formalism::get_or_create(repo(), *data).first;
         if (std::none_of(requirements.begin(), requirements.end(), [&](const auto value) { return value.get_index() == requirement.get_index(); }))
@@ -105,7 +105,7 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
         types.push_back(type);
     std::sort(types.begin(), types.end(), [](auto lhs, auto rhs) { return lhs.get_index() < rhs.get_index(); });
 
-    auto data = checkout<formalism::Domain>();
+    auto data = formalism::checkout<formalism::Domain>(m_builder);
     data->name = to_cista(domain.name.text);
     append_indices(requirements, data->requirements);
     append_indices(types, data->types);
@@ -157,7 +157,7 @@ formalism::TaskView AstBuilder::build_task(const ast::Task& task)
     }
     checks().reject_unused_requirements(task.requirements);
 
-    auto data = checkout<formalism::Task>();
+    auto data = formalism::checkout<formalism::Task>(m_builder);
     data->name = to_cista(task.name.text);
     data->domain = m_domain_context.domain->get_index();
     append_indices(requirements, data->requirements);

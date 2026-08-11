@@ -20,10 +20,11 @@
 
 #include "loki/semantic/translator/copy_translator_component.hpp"
 
+#include <array>
+#include <optional>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 namespace loki::semantic::detail
 {
@@ -50,14 +51,16 @@ private:
     formalism::FunctionExpressionView normalize_node(formalism::MultiFunctionExpressionView source);
 
     formalism::FunctionExpressionView make_number(double value);
-    formalism::FunctionExpressionView normalize_associative(formalism::MultiArithmeticOperator op,
-                                                            const std::vector<formalism::FunctionExpressionView>& source_operands);
+    template<typename Range>
+    formalism::FunctionExpressionView normalize_associative(formalism::MultiArithmeticOperator op, const Range& source_operands);
     void append_source_operand(formalism::MultiArithmeticOperator op,
                                formalism::FunctionExpressionView source,
-                               std::vector<formalism::FunctionExpressionView>& operands);
+                               ygg::IndexList<formalism::FunctionExpression>& operands,
+                               std::optional<formalism::FunctionExpressionView>& first_operand);
     void append_normalized_operand(formalism::MultiArithmeticOperator op,
                                    formalism::FunctionExpressionView source,
-                                   std::vector<formalism::FunctionExpressionView>& operands);
+                                   ygg::IndexList<formalism::FunctionExpression>& operands,
+                                   std::optional<formalism::FunctionExpressionView>& first_operand);
     bool is_unit(formalism::MultiArithmeticOperator op, formalism::FunctionExpressionView expression) const;
 };
 
@@ -65,7 +68,7 @@ template<typename Derived>
 template<typename T>
 formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Derived>::wrap(T value)
 {
-    auto data = this->template checkout<formalism::FunctionExpression>();
+    auto data = formalism::checkout<formalism::FunctionExpression>(this->m_context.builder);
     data->value = ygg::Data<formalism::FunctionExpression>::Variant(value.get_index());
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
@@ -96,7 +99,7 @@ template<typename Derived>
 formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Derived>::normalize_node(formalism::UnaryFunctionExpressionView source)
 {
     const auto expression = normalize_arithmetic_expression(source.get_expression());
-    auto data = this->template checkout<formalism::UnaryFunctionExpression>();
+    auto data = formalism::checkout<formalism::UnaryFunctionExpression>(this->m_context.builder);
     data->op = source.get_operator();
     data->expression = expression.get_index();
     return wrap(formalism::get_or_create(this->m_storage->repository, *data).first);
@@ -108,15 +111,15 @@ formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Deriv
     switch (source.get_operator())
     {
         case formalism::BinaryArithmeticOperator::Add:
-            return normalize_associative(formalism::MultiArithmeticOperator::Add, { source.get_left(), source.get_right() });
+            return normalize_associative(formalism::MultiArithmeticOperator::Add, std::array { source.get_left(), source.get_right() });
         case formalism::BinaryArithmeticOperator::Mul:
-            return normalize_associative(formalism::MultiArithmeticOperator::Mul, { source.get_left(), source.get_right() });
+            return normalize_associative(formalism::MultiArithmeticOperator::Mul, std::array { source.get_left(), source.get_right() });
         case formalism::BinaryArithmeticOperator::Sub:
         case formalism::BinaryArithmeticOperator::Div:
         {
             const auto left = normalize_arithmetic_expression(source.get_left());
             const auto right = normalize_arithmetic_expression(source.get_right());
-            auto data = this->template checkout<formalism::BinaryFunctionExpression>();
+            auto data = formalism::checkout<formalism::BinaryFunctionExpression>(this->m_context.builder);
             data->op = source.get_operator();
             data->left = left.get_index();
             data->right = right.get_index();
@@ -129,46 +132,41 @@ formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Deriv
 template<typename Derived>
 formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Derived>::normalize_node(formalism::MultiFunctionExpressionView source)
 {
-    auto operands = std::vector<formalism::FunctionExpressionView> {};
-    operands.reserve(source.get_args().size());
-    for (const auto expression : source.get_args())
-        operands.push_back(expression);
-    return normalize_associative(source.get_operator(), operands);
+    return normalize_associative(source.get_operator(), source.get_args());
 }
 
 template<typename Derived>
 formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Derived>::make_number(double value)
 {
-    auto data = this->template checkout<formalism::FunctionExpressionNumber>();
+    auto data = formalism::checkout<formalism::FunctionExpressionNumber>(this->m_context.builder);
     data->value = value;
     return wrap(formalism::get_or_create(this->m_storage->repository, *data).first);
 }
 
 template<typename Derived>
-formalism::FunctionExpressionView
-NormalizeArithmeticExpressionsTranslator<Derived>::normalize_associative(formalism::MultiArithmeticOperator op,
-                                                                         const std::vector<formalism::FunctionExpressionView>& source_operands)
+template<typename Range>
+formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Derived>::normalize_associative(formalism::MultiArithmeticOperator op,
+                                                                                                           const Range& source_operands)
 {
-    auto operands = std::vector<formalism::FunctionExpressionView> {};
+    auto data = formalism::checkout<formalism::MultiFunctionExpression>(this->m_context.builder);
+    auto first_operand = std::optional<formalism::FunctionExpressionView> {};
     for (const auto operand : source_operands)
-        append_source_operand(op, operand, operands);
+        append_source_operand(op, operand, data->args, first_operand);
 
-    if (operands.empty())
+    if (data->args.empty())
         return make_number(op == formalism::MultiArithmeticOperator::Add ? 0.0 : 1.0);
-    if (operands.size() == 1)
-        return operands.front();
+    if (data->args.size() == 1)
+        return first_operand.value();
 
-    auto data = this->template checkout<formalism::MultiFunctionExpression>();
     data->op = op;
-    for (const auto operand : operands)
-        data->args.push_back(operand.get_index());
     return wrap(formalism::get_or_create(this->m_storage->repository, *data).first);
 }
 
 template<typename Derived>
 void NormalizeArithmeticExpressionsTranslator<Derived>::append_source_operand(formalism::MultiArithmeticOperator op,
                                                                               formalism::FunctionExpressionView source,
-                                                                              std::vector<formalism::FunctionExpressionView>& operands)
+                                                                              ygg::IndexList<formalism::FunctionExpression>& operands,
+                                                                              std::optional<formalism::FunctionExpressionView>& first_operand)
 {
     const auto variant = source.get_variant();
     if (variant.template is<ygg::Index<formalism::BinaryFunctionExpression>>())
@@ -177,8 +175,8 @@ void NormalizeArithmeticExpressionsTranslator<Derived>::append_source_operand(fo
         if ((op == formalism::MultiArithmeticOperator::Add && binary.get_operator() == formalism::BinaryArithmeticOperator::Add)
             || (op == formalism::MultiArithmeticOperator::Mul && binary.get_operator() == formalism::BinaryArithmeticOperator::Mul))
         {
-            append_source_operand(op, binary.get_left(), operands);
-            append_source_operand(op, binary.get_right(), operands);
+            append_source_operand(op, binary.get_left(), operands, first_operand);
+            append_source_operand(op, binary.get_right(), operands, first_operand);
             return;
         }
     }
@@ -188,17 +186,18 @@ void NormalizeArithmeticExpressionsTranslator<Derived>::append_source_operand(fo
         if (multi.get_operator() == op)
         {
             for (const auto expression : multi.get_args())
-                append_source_operand(op, expression, operands);
+                append_source_operand(op, expression, operands, first_operand);
             return;
         }
     }
-    append_normalized_operand(op, source, operands);
+    append_normalized_operand(op, source, operands, first_operand);
 }
 
 template<typename Derived>
 void NormalizeArithmeticExpressionsTranslator<Derived>::append_normalized_operand(formalism::MultiArithmeticOperator op,
                                                                                   formalism::FunctionExpressionView source,
-                                                                                  std::vector<formalism::FunctionExpressionView>& operands)
+                                                                                  ygg::IndexList<formalism::FunctionExpression>& operands,
+                                                                                  std::optional<formalism::FunctionExpressionView>& first_operand)
 {
     const auto normalized = normalize_arithmetic_expression(source);
     const auto variant = normalized.get_variant();
@@ -208,12 +207,20 @@ void NormalizeArithmeticExpressionsTranslator<Derived>::append_normalized_operan
         if (multi.get_operator() == op)
         {
             for (const auto expression : multi.get_args())
-                operands.push_back(expression);
+            {
+                if (operands.empty())
+                    first_operand = expression;
+                operands.push_back(expression.get_index());
+            }
             return;
         }
     }
     if (!is_unit(op, normalized))
-        operands.push_back(normalized);
+    {
+        if (operands.empty())
+            first_operand = normalized;
+        operands.push_back(normalized.get_index());
+    }
 }
 
 template<typename Derived>

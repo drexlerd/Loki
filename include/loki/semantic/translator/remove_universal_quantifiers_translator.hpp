@@ -53,8 +53,8 @@ formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::make_gen
     if (auto it = this->m_generated_universal_conditions.find(key); it != this->m_generated_universal_conditions.end())
         return it->second;
 
-    auto predicate_data = this->template checkout<formalism::Predicate>();
-    auto atom_data = this->template checkout<formalism::Atom>();
+    auto predicate_data = formalism::checkout<formalism::Predicate>(this->m_context.builder);
+    auto atom_data = formalism::checkout<formalism::Atom>(this->m_context.builder);
     for (auto [parameter, variable] : free_parameters)
     {
         predicate_data->parameters.push_back(parameter.get_index());
@@ -65,7 +65,7 @@ formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::make_gen
     const auto predicate = formalism::get_or_create(this->m_storage->repository, *predicate_data).first;
     atom_data->predicate = predicate.get_index();
     const auto atom = formalism::get_or_create(this->m_storage->repository, *atom_data).first.get_index();
-    auto literal_data = this->template checkout<formalism::Literal>();
+    auto literal_data = formalism::checkout<formalism::Literal>(this->m_context.builder);
     literal_data->atom = atom;
     literal_data->m_polarity = true;
     const auto positive_head = formalism::get_or_create(this->m_storage->repository, *literal_data).first.get_index();
@@ -73,7 +73,7 @@ formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::make_gen
     literal_data->atom = atom;
     literal_data->m_polarity = false;
     const auto negative_literal = formalism::get_or_create(this->m_storage->repository, *literal_data).first.get_index();
-    auto axiom_data = this->template checkout<formalism::Axiom>();
+    auto axiom_data = formalism::checkout<formalism::Axiom>(this->m_context.builder);
     for (auto parameter : predicate_data->parameters)
         axiom_data->parameters.push_back(parameter);
     axiom_data->original_arity = axiom_data->parameters.size();
@@ -83,7 +83,7 @@ formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::make_gen
 
     this->m_generated_predicates.push_back(predicate);
     this->m_generated_axioms.push_back(axiom);
-    auto condition_data = this->template checkout<formalism::ConditionLiteral>();
+    auto condition_data = formalism::checkout<formalism::ConditionLiteral>(this->m_context.builder);
     condition_data->literal = negative_literal;
     auto result = this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *condition_data).first);
     this->m_generated_universal_conditions.emplace(key, result);
@@ -99,26 +99,26 @@ formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::remove_u
 template<typename Derived>
 formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionAndView source)
 {
-    auto conditions = ygg::IndexList<formalism::Condition> {};
+    auto data = formalism::checkout<formalism::ConditionAnd>(this->m_context.builder);
     for (auto condition : source.get_conditions())
-        conditions.push_back(as_index(this->self().remove_universal_quantifiers(condition)));
-    return this->self().make_conjunction(std::move(conditions));
+        this->self().append_conjunct(*data, this->self().remove_universal_quantifiers(condition));
+    return this->self().make_conjunction(*data);
 }
 
 template<typename Derived>
 formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionOrView source)
 {
-    auto conditions = ygg::IndexList<formalism::Condition> {};
+    auto data = formalism::checkout<formalism::ConditionOr>(this->m_context.builder);
     for (auto condition : source.get_conditions())
-        conditions.push_back(as_index(this->self().remove_universal_quantifiers(condition)));
-    return this->self().make_disjunction(std::move(conditions));
+        this->self().append_disjunct(*data, this->self().remove_universal_quantifiers(condition));
+    return this->self().make_disjunction(*data);
 }
 
 template<typename Derived>
 formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::remove_universal_quantifiers_node(formalism::ConditionNotView source)
 {
     const auto condition = as_index(this->self().remove_universal_quantifiers(source.get_condition()));
-    auto data = this->template checkout<formalism::ConditionNot>();
+    auto data = formalism::checkout<formalism::ConditionNot>(this->m_context.builder);
     data->condition = condition;
     return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first);
 }
@@ -130,7 +130,7 @@ formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::remove_u
     // evaluation order is unspecified.
     const auto left = as_index(this->self().remove_universal_quantifiers(source.get_left()));
     const auto right = as_index(this->self().remove_universal_quantifiers(source.get_right()));
-    auto data = this->template checkout<formalism::ConditionImply>();
+    auto data = formalism::checkout<formalism::ConditionImply>(this->m_context.builder);
     data->left = left;
     data->right = right;
     return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first);
@@ -144,7 +144,7 @@ formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::remove_u
     this->self().enter_scope(parameter_views);
     auto condition = as_index(this->self().remove_universal_quantifiers(source.get_condition()));
     this->self().leave_scope();
-    auto data = this->template checkout<formalism::ConditionExists>();
+    auto data = formalism::checkout<formalism::ConditionExists>(this->m_context.builder);
     for (auto parameter : parameter_views)
         data->parameters.push_back(parameter.get_index());
     data->condition = condition;
@@ -159,7 +159,7 @@ formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::remove_u
     this->self().enter_scope(parameter_views);
     auto negated = as_index(this->self().negate_condition(source.get_condition()));
     this->self().leave_scope();
-    auto data = this->template checkout<formalism::ConditionExists>();
+    auto data = formalism::checkout<formalism::ConditionExists>(this->m_context.builder);
     for (auto parameter : parameter_views)
         data->parameters.push_back(parameter.get_index());
     data->condition = negated;

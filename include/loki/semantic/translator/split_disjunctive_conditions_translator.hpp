@@ -54,7 +54,7 @@ void SplitDisjunctiveConditionsTranslator<Derived>::split_disjunctive_actions(fo
             {
                 for (auto part : condition_or->get_conditions())
                 {
-                    auto action_data = this->template checkout<formalism::Action>();
+                    auto action_data = formalism::checkout<formalism::Action>(this->m_context.builder);
                     action_data->name = data.name;
                     action_data->original_name = data.original_name;
                     for (auto parameter : data.parameters)
@@ -85,7 +85,7 @@ void SplitDisjunctiveConditionsTranslator<Derived>::split_disjunctive_axioms(for
         {
             for (auto part : condition_or->get_conditions())
             {
-                auto axiom_data = this->template checkout<formalism::Axiom>();
+                auto axiom_data = formalism::checkout<formalism::Axiom>(this->m_context.builder);
                 for (auto parameter : data.parameters)
                     axiom_data->parameters.push_back(parameter);
                 axiom_data->original_arity = data.original_arity;

@@ -19,7 +19,7 @@
 #define LOKI_SEMANTIC_BUILDER_HPP_
 
 #include "loki/ast/ast_fwd.hpp"
-#include "loki/formalism/builder.hpp"
+#include "loki/formalism/repository.hpp"
 #include "loki/formalism/condition_data.hpp"
 #include "loki/formalism/declarations.hpp"
 #include "loki/formalism/effect_data.hpp"
@@ -79,9 +79,6 @@ private:
 
     formalism::Repository& repo() noexcept;
     SemanticChecks checks() const;
-
-    template<typename T>
-    [[nodiscard]] auto checkout();
 
     template<typename T>
     static void append_indices(const std::vector<formalism::EntityView<T>>& views, ygg::IndexList<T>& indices);
@@ -162,14 +159,6 @@ private:
                                std::vector<formalism::InitialFunctionValueView>& initial_function_values,
                                std::optional<formalism::MetricView>& metric);
 };
-
-template<typename T>
-auto AstBuilder::checkout()
-{
-    auto data = m_builder.get_builder<T>();
-    data->clear();
-    return data;
-}
 
 template<typename T>
 void AstBuilder::append_indices(const std::vector<formalism::EntityView<T>>& views, ygg::IndexList<T>& indices)

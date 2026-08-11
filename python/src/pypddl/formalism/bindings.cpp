@@ -17,7 +17,7 @@
 
 #include "bindings.hpp"
 
-#include <loki/formalism/builder.hpp>
+#include <loki/formalism/repository.hpp>
 #include <nanobind/stl/shared_ptr.h>
 
 namespace nb = nanobind;

@@ -77,11 +77,11 @@ formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_conditi
 {
     const auto literal = source.get_literal();
     const auto atom = as_index(this->self().copy(literal.get_atom()));
-    auto literal_data = this->template checkout<formalism::Literal>();
+    auto literal_data = formalism::checkout<formalism::Literal>(this->m_context.builder);
     literal_data->atom = atom;
     literal_data->m_polarity = !literal.get_polarity();
     const auto negated_literal = formalism::get_or_create(this->m_storage->repository, *literal_data).first;
-    auto condition_data = this->template checkout<formalism::ConditionLiteral>();
+    auto condition_data = formalism::checkout<formalism::ConditionLiteral>(this->m_context.builder);
     condition_data->literal = negated_literal.get_index();
     return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *condition_data).first);
 }
@@ -89,19 +89,19 @@ formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_conditi
 template<typename Derived>
 formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition_node(formalism::ConditionAndView source)
 {
-    auto conditions = ygg::IndexList<formalism::Condition> {};
+    auto data = formalism::checkout<formalism::ConditionOr>(this->m_context.builder);
     for (auto condition : source.get_conditions())
-        conditions.push_back(as_index(this->self().negate_condition(condition)));
-    return this->self().make_disjunction(std::move(conditions));
+        this->self().append_disjunct(*data, this->self().negate_condition(condition));
+    return this->self().make_disjunction(*data);
 }
 
 template<typename Derived>
 formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition_node(formalism::ConditionOrView source)
 {
-    auto conditions = ygg::IndexList<formalism::Condition> {};
+    auto data = formalism::checkout<formalism::ConditionAnd>(this->m_context.builder);
     for (auto condition : source.get_conditions())
-        conditions.push_back(as_index(this->self().negate_condition(condition)));
-    return this->self().make_conjunction(std::move(conditions));
+        this->self().append_conjunct(*data, this->self().negate_condition(condition));
+    return this->self().make_conjunction(*data);
 }
 
 template<typename Derived>
@@ -113,10 +113,10 @@ formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_conditi
 template<typename Derived>
 formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition_node(formalism::ConditionImplyView source)
 {
-    auto conditions = ygg::IndexList<formalism::Condition> {};
-    conditions.push_back(as_index(this->self().copy(source.get_left())));
-    conditions.push_back(as_index(this->self().negate_condition(source.get_right())));
-    return this->self().make_conjunction(std::move(conditions));
+    auto data = formalism::checkout<formalism::ConditionAnd>(this->m_context.builder);
+    this->self().append_conjunct(*data, this->self().copy(source.get_left()));
+    this->self().append_conjunct(*data, this->self().negate_condition(source.get_right()));
+    return this->self().make_conjunction(*data);
 }
 
 template<typename Derived>
@@ -127,7 +127,7 @@ formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_conditi
     this->self().enter_scope(parameter_views);
     auto condition = as_index(this->self().negate_condition(source.get_condition()));
     this->self().leave_scope();
-    auto data = this->template checkout<formalism::ConditionForall>();
+    auto data = formalism::checkout<formalism::ConditionForall>(this->m_context.builder);
     for (auto parameter : parameter_views)
         data->parameters.push_back(parameter.get_index());
     data->condition = condition;
@@ -142,7 +142,7 @@ formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_conditi
     this->self().enter_scope(parameter_views);
     auto condition = as_index(this->self().negate_condition(source.get_condition()));
     this->self().leave_scope();
-    auto data = this->template checkout<formalism::ConditionExists>();
+    auto data = formalism::checkout<formalism::ConditionExists>(this->m_context.builder);
     for (auto parameter : parameter_views)
         data->parameters.push_back(parameter.get_index());
     data->condition = condition;
@@ -156,7 +156,7 @@ formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_conditi
     const auto comparator = this->self().negate_comparator(data.comparator);
     const auto left = as_index(this->self().copy(source.get_left()));
     const auto right = as_index(this->self().copy(source.get_right()));
-    auto result = this->template checkout<formalism::ConditionNumericConstraint>();
+    auto result = formalism::checkout<formalism::ConditionNumericConstraint>(this->m_context.builder);
     result->comparator = comparator;
     result->left = left;
     result->right = right;
@@ -172,10 +172,10 @@ formalism::ConditionView ToNegationNormalFormTranslator<Derived>::copy_condition
 template<typename Derived>
 formalism::ConditionView ToNegationNormalFormTranslator<Derived>::copy_condition_node(formalism::ConditionImplyView source)
 {
-    auto conditions = ygg::IndexList<formalism::Condition> {};
-    conditions.push_back(as_index(this->self().negate_condition(source.get_left())));
-    conditions.push_back(as_index(this->self().copy(source.get_right())));
-    return this->self().make_disjunction(std::move(conditions));
+    auto data = formalism::checkout<formalism::ConditionOr>(this->m_context.builder);
+    this->self().append_disjunct(*data, this->self().negate_condition(source.get_left()));
+    this->self().append_disjunct(*data, this->self().copy(source.get_right()));
+    return this->self().make_disjunction(*data);
 }
 
 template<typename Derived>

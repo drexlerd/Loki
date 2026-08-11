@@ -21,7 +21,6 @@
 #include "loki/formalism/datas.hpp"
 #include "loki/formalism/declarations.hpp"
 #include "loki/formalism/formatter.hpp"
-#include "loki/formalism/repository.hpp"
 #include "loki/formalism/views.hpp"
 
 #include <algorithm>
@@ -30,6 +29,9 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <yggdrasil/formalism/relation_repository.hpp>
+#include <yggdrasil/formalism/repository.hpp>
+#include <yggdrasil/formalism/symbol_repository.hpp>
 #include <yggdrasil/semantics/canonicalization.hpp>
 
 namespace ygg
