@@ -32,7 +32,7 @@ def native_prefix() -> Path:
     if (native_dir / "include" / "loki").is_dir():
         return native_dir
     for parent in package_dir.parents:
-        if (parent / "include" / "loki").is_dir():
+        if (parent / "include" / "loki").is_dir() and any((parent / name / "cmake" / "loki").is_dir() for name in ("lib", "lib64")):
             return parent
     return native_dir
 
