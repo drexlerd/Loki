@@ -1,8 +1,9 @@
+from importlib import import_module as _import_module
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
-# Load public native dependency packages before this package loads native extensions.
-import pyyggdrasil as pyyggdrasil
+# Load native dependency packages before this package loads native extensions.
+_import_module("pyyggdrasil")
 
 from . import formalism as formalism
 
