@@ -33,7 +33,7 @@ jobs:
           uv pip install --system --no-cache -r pyproject.toml --extra test
         env:
           PIP_NO_CACHE_DIR: 1
-          PYYGGDRASIL_JOBS: 2
+          YGGDRASIL_JOBS: 2
 
       - name: Install CMake on Linux
         if: runner.os == 'Linux'

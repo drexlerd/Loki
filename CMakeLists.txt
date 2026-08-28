@@ -90,7 +90,7 @@ endif()
 
 # Dependencies
 
-set(LOKI_YGGDRASIL_REQUIRED_VERSION 0.0.27)
+set(LOKI_YGGDRASIL_REQUIRED_VERSION 0.1.0)
 
 include("${PROJECT_SOURCE_DIR}/cmake/bootstrap_pyyggdrasil.cmake")
 

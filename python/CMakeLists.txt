@@ -1,5 +1,5 @@
 find_package(
-    Python 3.9 REQUIRED
+    Python 3.10 REQUIRED
     COMPONENTS Interpreter Development.Module
     OPTIONAL_COMPONENTS Development.SABIModule
 )
@@ -16,9 +16,10 @@ file(
 )
 
 nanobind_add_module(
-    _pypddl NB_SHARED
+    _pypddl
     src/module.cpp
     ${PYPDDL_FORMALISM_SOURCES}
+    BACKEND_MODULE nanobind_backend
 )
 
 target_link_libraries(_pypddl PRIVATE loki::parsers)

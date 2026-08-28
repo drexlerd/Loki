@@ -6,11 +6,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-find_package(Python 3.9 REQUIRED COMPONENTS Interpreter Development.Module)
+find_package(Python 3.10 REQUIRED COMPONENTS Interpreter Development.Module)
 find_package(nanobind CONFIG REQUIRED)
 find_package(loki CONFIG REQUIRED COMPONENTS parsers)
 
-nanobind_add_module(_downstream_loki NB_SHARED src/downstream_loki_user/_downstream_loki.cpp)
+nanobind_add_module(
+    _downstream_loki
+    src/downstream_loki_user/_downstream_loki.cpp
+    BACKEND_MODULE nanobind_backend
+)
 target_link_libraries(_downstream_loki PRIVATE loki::parsers)
 
 if(DOWNSTREAM_RUNTIME_LIBRARY_DIRS)

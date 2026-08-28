@@ -42,19 +42,18 @@ void bind_multi_function_expression(nb::module_& m, RepositoryBinding& repositor
 
     {
         using V = formalism::MultiFunctionExpressionView;
+        const auto attach_owner = nb::cpp_function([](nb::object child, nb::object) { return child; }, nb::keep_alive<0, 2>());
         auto cls = nb::class_<V>(m, "MultiFunctionExpression");
         cls.def("get_index", &V::get_index)
             .def("get_operator", &V::get_operator)
             .def("get_args",
-                 [](const V& self)
+                 [attach_owner](const V& self)
                  {
                      auto result = nb::list();
                      const auto parent = nb::find(self);
                      for (const auto expression : self.get_args())
                      {
-                         auto child = nb::cast(expression);
-                         nb::detail::keep_alive(child.ptr(), parent.ptr());
-                         result.append(child);
+                         result.append(attach_owner(nb::cast(expression), parent));
                      }
                      return result;
                  });

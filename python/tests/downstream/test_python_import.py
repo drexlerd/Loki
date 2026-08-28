@@ -36,9 +36,6 @@ def test_downstream_python_binding_links_installed_loki(tmp_path: Path) -> None:
     if not (loki_cmake_dir / "lokiConfig.cmake").exists():
         pytest.skip("pypddl was not installed with Loki CMake package files")
 
-    if not (pyyggdrasil_prefix / "lib" / "cmake" / "nanobind").exists():
-        pytest.skip("nanobind CMake package was not found in the pyyggdrasil installation prefix")
-
     project_dir = tmp_path / "minimal_downstream_package"
     shutil.copytree(DOWNSTREAM_PACKAGE_DIR, project_dir)
 

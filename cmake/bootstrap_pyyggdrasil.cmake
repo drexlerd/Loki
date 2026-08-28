@@ -10,7 +10,7 @@ if(NOT Python_EXECUTABLE AND Python3_EXECUTABLE)
 endif()
 
 if(NOT YGGDRASIL_NATIVE_PREFIX)
-    find_package(Python 3.9 QUIET COMPONENTS Interpreter)
+    find_package(Python 3.10 QUIET COMPONENTS Interpreter)
     if(Python_Interpreter_FOUND)
         execute_process(
             COMMAND "${Python_EXECUTABLE}" -c
