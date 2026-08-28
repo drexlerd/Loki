@@ -2,4 +2,9 @@
 
 from pyyggdrasil.build_support import ProviderBackend
 
-ProviderBackend(package="pypddl", providers=("pyyggdrasil",)).install_hooks(globals())
+ProviderBackend(
+    package="pypddl",
+    providers=("pyyggdrasil",),
+    jobs_env="LOKI_JOBS",
+    strip_env="LOKI_STRIP_WHEEL",
+).install_hooks(globals())
