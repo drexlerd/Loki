@@ -78,7 +78,7 @@ formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Deriv
 {
     if (const auto mapped = find_mapped(this->m_storage->function_expressions, source))
         return *mapped;
-    const auto normalized = ygg::visit([this](const auto& node) { return normalize_node(node); }, source.get_value());
+    const auto normalized = ygg::visit([this](const auto& node) { return this->normalize_node(node); }, source.get_value());
     remember(this->m_storage->function_expressions, source, normalized);
     return normalized;
 }
