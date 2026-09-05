@@ -13,7 +13,7 @@ version = "1.1.0"
 description = "Python-distributed native package for the Loki PDDL parser library"
 readme = "README.md"
 license = "GPL-3.0-or-later"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [
     {name = "Dominik Drexler", email = "dominik.drexler@liu.se"},
 ]
@@ -25,7 +25,7 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest",
-    "pypddl-datasets>=0.0.9,<0.1; python_version >= '3.10'",
+    "pypddl-datasets>=0.0.9,<0.1",
 ]
 
 [project.urls]
@@ -39,7 +39,7 @@ build.targets = ["pypddl_wheel"]
 cmake.build-type = "Release"
 install.components = ["pypddl"]
 wheel.packages = []
-wheel.py-api = "cp310"
+wheel.py-api = "cp311"
 
 [tool.scikit-build.sdist]
 include = [
@@ -68,7 +68,7 @@ LOKI_ENABLE_LTO = {env = "LOKI_ENABLE_LTO", default = false}
 CMAKE_INSTALL_LIBDIR = "lib"
 
 [tool.cibuildwheel]
-build = "cp310-*"
+build = "cp311-*"
 container-engine = "docker"
 # Build in the cibuildwheel environment (not a fresh isolated env) so the
 # provider install below — which retries to absorb TestPyPI index-propagation

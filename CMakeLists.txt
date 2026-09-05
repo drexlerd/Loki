@@ -129,7 +129,7 @@ endif()
 if(LOKI_BUILD_TESTS)
     # Benchmark PDDL comes from the pypddl-datasets cache, resolved (and
     # downloaded on demand) at configure time.
-    find_package(Python 3.10 REQUIRED COMPONENTS Interpreter)
+    find_package(Python 3.11 REQUIRED COMPONENTS Interpreter)
     execute_process(
         COMMAND
             "${Python_EXECUTABLE}"

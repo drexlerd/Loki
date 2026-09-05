@@ -101,6 +101,8 @@ cmake --install build --prefix=<path/to/installation-directory>
 
 ## Build Python
 
+The Python package requires Python 3.11 or newer.
+
 ```console
 python -m pip install .
 ```

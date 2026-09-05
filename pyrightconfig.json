@@ -4,7 +4,7 @@
   // first (`uv sync` or `uv pip install -e .`) and rebuild after C++/binding changes
   // so the stubs regenerate; otherwise pyright reports the bindings as unresolved or untyped.
   "typeCheckingMode": "strict",
-  "pythonVersion": "3.13",
+  "pythonVersion": "3.11",
   "venvPath": ".",
   "venv": ".venv",
   "stubPath": "typings",
