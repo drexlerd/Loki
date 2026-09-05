@@ -171,8 +171,8 @@ TEST(LokiSemanticNegativeSuite, ReportsExpectedSemanticErrors)
             }
             if (item.expected_column)
             {
-                const auto pointer = "\n" + std::string(*item.expected_column - 1, '_') + "^_";
-                EXPECT_NE(message.find(pointer), std::string::npos) << message;
+                ASSERT_TRUE(error.diagnostic().location) << message;
+                EXPECT_EQ(error.diagnostic().location->column(), *item.expected_column) << message;
             }
         }
     }

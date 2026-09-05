@@ -20,33 +20,10 @@
 
 #include "loki/parser/config.hpp"
 
-#include <string>
-
 namespace loki::parser
 {
-namespace x3 = boost::spirit::x3;
 
-struct ErrorHandlerBase
-{
-    template<typename Iterator, typename Ast, typename Context>
-    void on_success(Iterator const& first, Iterator const& last, Ast& ast, Context const& context)
-    {
-        auto& error_handler = x3::get<ErrorHandlerTag>(context).get();
-        error_handler.tag(ast, first, last);
-    }
-
-    template<typename Iterator, typename Exception, typename Context>
-    x3::error_handler_result on_error(Iterator& /*first*/, Iterator const& /*last*/, Exception const& x, Context const& context)
-    {
-        auto which = std::string(x.which());
-
-        auto message = "Error! Expecting: " + which + " here:";
-        auto& error_handler = x3::get<ErrorHandlerTag>(context).get();
-        error_handler.record_error(x.where(), message);
-        error_handler(x.where(), message);
-        return x3::error_handler_result::fail;
-    }
-};
+using ygg::diagnostics::ErrorHandlerBase;
 
 }  // namespace loki::parser
 

@@ -121,7 +121,7 @@ bool parse_ast(Iterator& first, Iterator last, const Parser& parser, Node& out, 
     error_handler.clear_error();
     out = Node {};
     auto wrapped = x3::with<ErrorHandlerTag>(std::ref(error_handler))[parser];
-    return phrase_parse(first, last, wrapped, pddl_skipper(), out);
+    return phrase_parse(first, last, wrapped, pddl_skipper(), out) && !error_handler.last_error();
 }
 
 template<typename Parser, typename Node>
@@ -134,10 +134,10 @@ bool parse_ast(const std::string& source, const Parser& parser, Node& out, Error
 template<typename Iterator, typename Parser, typename Node>
 bool parse_full(Iterator& first, Iterator last, const Parser& parser, Node& out, ErrorHandler<Iterator>& error_handler)
 {
-    error_handler.clear_error();
-    out = Node {};
-    auto wrapped = x3::with<ErrorHandlerTag>(std::ref(error_handler))[parser >> x3::eoi];
-    return phrase_parse(first, last, wrapped, pddl_skipper(), out);
+    const auto success = parse_ast(first, last, parser, out, error_handler);
+    if (success && first != last)
+        error_handler.record_error(first, "Unexpected trailing input.");
+    return success && first == last;
 }
 
 template<typename Parser, typename Node>

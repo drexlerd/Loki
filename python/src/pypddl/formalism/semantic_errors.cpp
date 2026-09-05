@@ -18,6 +18,7 @@
 #include "module.hpp"
 
 #include <loki/semantic/errors.hpp>
+#include <yggdrasil/python/diagnostics.hpp>
 
 namespace nb = nanobind;
 
@@ -26,39 +27,39 @@ namespace loki::formalism
 
 void bind_semantic_errors(nb::module_& m)
 {
-    auto semantic_error = nb::exception<semantic::SemanticError>(m, "SemanticError");
+    auto semantic_error = ygg::bind_diagnostic_exception<semantic::SemanticError>(m, "SemanticError");
 
-    nb::exception<semantic::ParseError>(m, "ParseError", semantic_error.ptr());
-    nb::exception<semantic::MissingDomainError>(m, "MissingDomainError", semantic_error.ptr());
-    nb::exception<semantic::MismatchedDomainError>(m, "MismatchedDomainError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::ParseError>(m, "ParseError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::MissingDomainError>(m, "MissingDomainError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::MismatchedDomainError>(m, "MismatchedDomainError", semantic_error.ptr());
 
-    nb::exception<semantic::UnsupportedRequirementError>(m, "UnsupportedRequirementError", semantic_error.ptr());
-    nb::exception<semantic::MissingRequirementError>(m, "MissingRequirementError", semantic_error.ptr());
-    nb::exception<semantic::UnusedRequirementError>(m, "UnusedRequirementError", semantic_error.ptr());
-    nb::exception<semantic::AggregateRequirementError>(m, "AggregateRequirementError", semantic_error.ptr());
-    nb::exception<semantic::RedundantRequirementError>(m, "RedundantRequirementError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::UnsupportedRequirementError>(m, "UnsupportedRequirementError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::MissingRequirementError>(m, "MissingRequirementError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::UnusedRequirementError>(m, "UnusedRequirementError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::AggregateRequirementError>(m, "AggregateRequirementError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::RedundantRequirementError>(m, "RedundantRequirementError", semantic_error.ptr());
 
-    nb::exception<semantic::UndefinedTypeError>(m, "UndefinedTypeError", semantic_error.ptr());
-    nb::exception<semantic::UndefinedPredicateError>(m, "UndefinedPredicateError", semantic_error.ptr());
-    nb::exception<semantic::UndefinedObjectError>(m, "UndefinedObjectError", semantic_error.ptr());
-    nb::exception<semantic::UndefinedVariableError>(m, "UndefinedVariableError", semantic_error.ptr());
-    nb::exception<semantic::UndefinedFunctionError>(m, "UndefinedFunctionError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::UndefinedTypeError>(m, "UndefinedTypeError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::UndefinedPredicateError>(m, "UndefinedPredicateError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::UndefinedObjectError>(m, "UndefinedObjectError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::UndefinedVariableError>(m, "UndefinedVariableError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::UndefinedFunctionError>(m, "UndefinedFunctionError", semantic_error.ptr());
 
-    auto duplicate_error = nb::exception<semantic::DuplicateDefinitionError>(m, "DuplicateDefinitionError", semantic_error.ptr());
-    nb::exception<semantic::DuplicateTypeError>(m, "DuplicateTypeError", duplicate_error.ptr());
-    nb::exception<semantic::DuplicatePredicateError>(m, "DuplicatePredicateError", duplicate_error.ptr());
-    nb::exception<semantic::DuplicateObjectError>(m, "DuplicateObjectError", duplicate_error.ptr());
-    nb::exception<semantic::DuplicateVariableError>(m, "DuplicateVariableError", duplicate_error.ptr());
-    nb::exception<semantic::DuplicateFunctionError>(m, "DuplicateFunctionError", duplicate_error.ptr());
+    auto duplicate_error = ygg::bind_diagnostic_exception<semantic::DuplicateDefinitionError>(m, "DuplicateDefinitionError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::DuplicateTypeError>(m, "DuplicateTypeError", duplicate_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::DuplicatePredicateError>(m, "DuplicatePredicateError", duplicate_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::DuplicateObjectError>(m, "DuplicateObjectError", duplicate_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::DuplicateVariableError>(m, "DuplicateVariableError", duplicate_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::DuplicateFunctionError>(m, "DuplicateFunctionError", duplicate_error.ptr());
 
-    nb::exception<semantic::ArityMismatchError>(m, "ArityMismatchError", semantic_error.ptr());
-    nb::exception<semantic::TypeMismatchError>(m, "TypeMismatchError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::ArityMismatchError>(m, "ArityMismatchError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::TypeMismatchError>(m, "TypeMismatchError", semantic_error.ptr());
 
-    nb::exception<semantic::InvalidMetricError>(m, "InvalidMetricError", semantic_error.ptr());
-    nb::exception<semantic::InvalidNumericConstraintError>(m, "InvalidNumericConstraintError", semantic_error.ptr());
-    nb::exception<semantic::InvalidNumericEffectError>(m, "InvalidNumericEffectError", semantic_error.ptr());
-    nb::exception<semantic::InvalidProbabilisticEffectError>(m, "InvalidProbabilisticEffectError", semantic_error.ptr());
-    nb::exception<semantic::InvalidEqualityError>(m, "InvalidEqualityError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::InvalidMetricError>(m, "InvalidMetricError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::InvalidNumericConstraintError>(m, "InvalidNumericConstraintError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::InvalidNumericEffectError>(m, "InvalidNumericEffectError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::InvalidProbabilisticEffectError>(m, "InvalidProbabilisticEffectError", semantic_error.ptr());
+    ygg::bind_diagnostic_exception<semantic::InvalidEqualityError>(m, "InvalidEqualityError", semantic_error.ptr());
 }
 
 }  // namespace loki::formalism

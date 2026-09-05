@@ -32,14 +32,7 @@ DiagnosticContext::Scope::~Scope() { diagnostics.active = previous; }
 ParseError DiagnosticContext::parse_error(const parser::ErrorHandlerType& error_handler, const std::string& fallback, parser::Iterator position)
 {
     auto error = ParseError(fallback);
-    auto error_position = position;
-    if (const auto& diagnostic = error_handler.last_error())
-    {
-        error = ParseError(diagnostic->message);
-        error_position = diagnostic->position;
-    }
-
-    error.set_display_message(parser::format_error_at(error_handler, error_position, error.what()));
+    error.set_diagnostic(error_handler.diagnostic(fallback, position));
     return error;
 }
 

@@ -42,6 +42,7 @@ using x3::lit;
 using x3::no_case;
 using x3::omit;
 using x3::string;
+using ygg::diagnostics::context;
 
 identifier_type const identifier = "identifier";
 type_expression_type const type_expression = "type_expression";
@@ -190,12 +191,14 @@ x3::rule<ConstantSectionClass, std::vector<ast::TypedName>> const constant_secti
 x3::rule<PredicateSectionClass, std::vector<ast::PredicateDeclaration>> const predicate_section = "predicate_section";
 x3::rule<FunctionSectionClass, std::vector<ast::FunctionDeclaration>> const function_section = "function_section";
 x3::rule<ObjectSectionClass, std::vector<ast::TypedName>> const object_section = "object_section";
-x3::rule<InitialSectionClass, std::vector<ast::InitialElement>> const initial_section = "initial_section";
+x3::rule<InitialSectionClass, std::vector<ast::InitialElement>> const initial_section = "init section";
 
-inline const auto symbol = lexeme[+(char_ - '(' - ')' - ';' - ascii::space)];
-inline const auto keyword = [](char const* text) { return no_case[lit(text)]; };
-inline const auto operator_symbol = lexeme[string("scale-down") | string("scale-up") | string("increase") | string("decrease") | string("assign")
-                                           | string("minus") | char_("+-*/=<>!") >> -char_('=')];
+inline const auto symbol_character = char_ - '(' - ')' - ';' - ascii::space;
+inline const auto symbol = lexeme[+symbol_character];
+inline const auto keyword = [](char const* text) { return x3::rule<class KeywordClass> { text } = lexeme[no_case[lit(text)] >> !symbol_character]; };
+inline const auto operator_symbol =
+    lexeme[(string("scale-down") | string("scale-up") | string("increase") | string("decrease") | string("assign") | string("minus")) >> !symbol_character
+           | char_("+-*/=<>!") >> -char_('=')];
 }  // namespace detail
 
 namespace d = detail;
@@ -343,29 +346,35 @@ auto const typed_variable_group = x3::rule<class TypedVariableGroupClass, std::v
 auto const typed_name_list_def = *typed_name_group;
 auto const typed_variable_list_def = *typed_variable_group;
 auto const term_def = (d::variable_identifier >> attr(true)) | (identifier >> attr(false));
-auto const atom_def = '(' >> identifier >> *term >> ')';
-auto const literal_def = ('(' >> d::keyword("not") >> atom >> ')' >> attr(false)) | (atom >> attr(true));
-auto const function_term_def = '(' >> identifier >> *term >> ')';
-auto const function_expression_def = d::function_expression_number | d::function_expression_unary | d::function_expression_binary | d::function_expression_multi
+auto const atom_def = context("atom")['(' >> identifier >> *term > ')'];
+auto const literal_def = (context("negated literal")['(' >> d::keyword("not") > atom > ')'] >> attr(false)) | (atom >> attr(true));
+auto const function_term_def = context("function term")['(' >> identifier >> *term > ')'];
+auto const function_expression_def = d::function_expression_number | d::function_expression_binary | d::function_expression_unary | d::function_expression_multi
                                      | d::function_expression_function;
 auto const condition_empty = x3::rule<class ConditionEmptyClass, ast::Condition> { "condition_empty" } = lit('(') >> lit(')') >> attr(ast::ConditionAnd {});
 auto const condition_def = condition_empty | d::condition_and | d::condition_or | d::condition_not | d::condition_imply | d::condition_exists
                            | d::condition_forall | d::condition_numeric_constraint | d::condition_literal;
 auto const effect_def = d::effect_and | d::effect_forall | d::effect_when | d::effect_one_of | d::effect_probabilistic | d::effect_numeric | d::effect_literal;
-auto const predicate_declaration_def = '(' >> identifier >> typed_variable_list >> ')';
-auto const function_declaration_def = '(' >> identifier >> typed_variable_list >> ')' >> -(lit('-') >> type_expression);
-auto const action_def = '(' >> d::keyword(":action") >> identifier >> d::keyword(":parameters") >> '(' >> typed_variable_list >> ')'
-                        >> -(d::keyword(":precondition") >> condition) >> -(d::keyword(":effect") >> effect) >> ')';
-auto const axiom_def = '(' >> d::keyword(":derived") >> predicate_declaration >> condition >> ')';
-auto const metric_def = '(' >> d::keyword(":metric") >> identifier >> function_expression >> ')';
-auto const initial_function_value_def = '(' >> lit('=') >> function_term >> function_expression >> ')';
-auto const domain_def = '(' >> d::keyword("define") >> '(' >> d::keyword("domain") >> identifier[set_domain_name {}] >> ')'
-                        >> -(d::requirement_section[set_domain_requirements {}]) >> -(d::type_section[set_domain_types {}])
-                        >> -(d::constant_section[set_domain_constants {}]) >> -(d::predicate_section[set_domain_predicates {}])
-                        >> -(d::function_section[set_domain_functions {}]) >> *((axiom[push_domain_axiom {}]) | (action[push_domain_action {}])) >> ')';
-auto const task_def = '(' >> d::keyword("define") >> '(' >> d::keyword("problem") >> identifier >> ')' >> '(' >> d::keyword(":domain") >> identifier >> ')'
-                      >> (d::requirement_section | attr(std::vector<ast::Requirement> {})) >> (d::object_section | attr(std::vector<ast::TypedName> {}))
-                      >> d::initial_section >> -('(' >> d::keyword(":goal") >> condition >> ')') >> -metric >> *axiom >> ')';
+auto const predicate_declaration_def = context("predicate declaration")['(' >> identifier >> typed_variable_list > ')'];
+auto const function_declaration_def = context("function declaration")['(' >> identifier >> typed_variable_list > ')'] >> -(lit('-') >> type_expression);
+auto const action_def =
+    context("action")[('(' >> d::keyword(":action") > identifier > d::keyword(":parameters") > context("action parameters")['(' >> typed_variable_list > ')'])
+                      >> -(d::keyword(":precondition") > condition) >> -(d::keyword(":effect") > effect) > ')'];
+auto const axiom_def = context("derived predicate")['(' >> d::keyword(":derived") > predicate_declaration > condition > ')'];
+auto const metric_def = context("metric")['(' >> d::keyword(":metric") > identifier > function_expression > ')'];
+// '=' also introduces object equality; a function term distinguishes a numeric initial value.
+auto const initial_function_value_def = context("initial function value")['(' >> d::keyword("=") >> function_term > function_expression > ')'];
+auto const domain_def = context(
+    "domain definition")['(' >> d::keyword("define")
+                         >> context("domain header")['(' >> d::keyword("domain") >> x3::expect[identifier][set_domain_name {}] > ')']
+                         >> -(d::requirement_section[set_domain_requirements {}]) >> -(d::type_section[set_domain_types {}])
+                         >> -(d::constant_section[set_domain_constants {}]) >> -(d::predicate_section[set_domain_predicates {}])
+                         >> -(d::function_section[set_domain_functions {}]) >> *((axiom[push_domain_axiom {}]) | (action[push_domain_action {}])) > ')'];
+auto const task_def = context(
+    "problem definition")[('(' >> d::keyword("define") >> context("problem header")['(' >> d::keyword("problem") > identifier > ')']
+                           > context("problem domain")['(' >> d::keyword(":domain") > identifier > ')'])
+                          >> (d::requirement_section | attr(std::vector<ast::Requirement> {})) >> (d::object_section | attr(std::vector<ast::TypedName> {}))
+                          >> x3::expect[d::initial_section] >> -context("goal")['(' >> d::keyword(":goal") > condition > ')'] >> -metric >> *axiom > ')'];
 auto const file_def = domain | task;
 
 BOOST_SPIRIT_DEFINE(identifier,
@@ -393,35 +402,43 @@ namespace detail
 {
 auto const variable_identifier_def = x3::raw['?' >> identifier];
 auto const type_reference_def = identifier;
-auto const either_type_def = '(' >> keyword("either") >> +type_expression >> ')';
+auto const type_expressions = x3::rule<class TypeExpressionsClass, std::vector<ast::TypeExpression>> { "one or more type expressions" } = +type_expression;
+auto const either_type_def = context("either type")['(' >> keyword("either") > type_expressions > ')'];
 auto const function_expression_number_def = double_;
 auto const function_expression_function_def = function_term;
-auto const function_expression_unary_def = '(' >> (string("minus") | string("-")) >> function_expression >> ')';
-auto const function_expression_binary_def = '(' >> (string("-") | string("/")) >> function_expression >> function_expression >> ')';
-auto const function_expression_multi_def = '(' >> (string("+") | string("*")) >> *function_expression >> ')';
+auto const function_expression_unary_def =
+    context("unary expression")['(' >> (lexeme[string("minus") >> !symbol_character] | string("-")) > function_expression > ')'];
+// Binary '-' is tried first; only a parsed second operand distinguishes it from unary '-'.
+auto const function_expression_binary_def = context("binary expression")[('(' >> string("-") >> function_expression >> function_expression > ')')
+                                                                         | ('(' >> string("/") > function_expression > function_expression > ')')];
+auto const function_expression_multi_def = context("arithmetic expression")['(' >> (string("+") | string("*")) >> *function_expression > ')'];
 auto const condition_literal_def = literal;
-auto const condition_and_def = '(' >> keyword("and") >> *condition >> ')';
-auto const condition_or_def = '(' >> keyword("or") >> *condition >> ')';
-auto const condition_not_def = '(' >> keyword("not") >> condition >> ')';
-auto const condition_imply_def = '(' >> keyword("imply") >> condition >> condition >> ')';
-auto const condition_exists_def = '(' >> keyword("exists") >> '(' >> typed_variable_list >> ')' >> condition >> ')';
-auto const condition_forall_def = '(' >> keyword("forall") >> '(' >> typed_variable_list >> ')' >> condition >> ')';
-auto const condition_numeric_constraint_def = '(' >> operator_symbol >> function_expression >> function_expression >> ')';
+auto const condition_and_def = context("and condition")['(' >> keyword("and") >> *condition > ')'];
+auto const condition_or_def = context("or condition")['(' >> keyword("or") >> *condition > ')'];
+auto const condition_not_def = context("not condition")['(' >> keyword("not") > condition > ')'];
+auto const condition_imply_def = context("imply condition")['(' >> keyword("imply") > condition > condition > ')'];
+auto const condition_exists_def =
+    context("exists condition")['(' >> keyword("exists") > context("exists parameters")['(' >> typed_variable_list > ')'] > condition > ')'];
+auto const condition_forall_def =
+    context("forall condition")['(' >> keyword("forall") > context("forall parameters")['(' >> typed_variable_list > ')'] > condition > ')'];
+// A numeric first operand distinguishes numeric '=' from an ordinary equality literal.
+auto const condition_numeric_constraint_def = context("numeric constraint")['(' >> operator_symbol >> function_expression > function_expression > ')'];
 auto const effect_literal_def = literal;
-auto const effect_and_def = '(' >> keyword("and") >> *effect >> ')';
-auto const effect_numeric_def = '(' >> operator_symbol >> function_term >> function_expression >> ')';
-auto const effect_forall_def = '(' >> keyword("forall") >> '(' >> typed_variable_list >> ')' >> effect >> ')';
-auto const effect_when_def = '(' >> keyword("when") >> condition >> effect >> ')';
-auto const effect_one_of_def = '(' >> keyword("oneof") >> *effect >> ')';
+auto const effect_and_def = context("and effect")['(' >> keyword("and") >> *effect > ')'];
+auto const effect_numeric_def = context("numeric effect")['(' >> operator_symbol > function_term > function_expression > ')'];
+auto const effect_forall_def =
+    context("forall effect")['(' >> keyword("forall") > context("forall parameters")['(' >> typed_variable_list > ')'] > effect > ')'];
+auto const effect_when_def = context("when effect")['(' >> keyword("when") > condition > effect > ')'];
+auto const effect_one_of_def = context("oneof effect")['(' >> keyword("oneof") >> *effect > ')'];
 auto const probabilistic_effect_alternative_def = double_ >> effect;
-auto const effect_probabilistic_def = '(' >> keyword("probabilistic") >> *probabilistic_effect_alternative >> ')';
-auto const requirement_section_def = '(' >> keyword(":requirements") >> *identifier >> ')';
-auto const type_section_def = '(' >> keyword(":types") >> typed_name_list >> ')';
-auto const constant_section_def = '(' >> keyword(":constants") >> typed_name_list >> ')';
-auto const predicate_section_def = '(' >> keyword(":predicates") >> *predicate_declaration >> ')';
-auto const function_section_def = '(' >> keyword(":functions") >> *function_declaration >> ')';
-auto const object_section_def = '(' >> keyword(":objects") >> typed_name_list >> ')';
-auto const initial_section_def = '(' >> keyword(":init") >> *((initial_function_value | literal)) >> ')';
+auto const effect_probabilistic_def = context("probabilistic effect")['(' >> keyword("probabilistic") >> *probabilistic_effect_alternative > ')'];
+auto const requirement_section_def = context("requirements section")['(' >> keyword(":requirements") >> *identifier > ')'];
+auto const type_section_def = context("types section")['(' >> keyword(":types") > typed_name_list > ')'];
+auto const constant_section_def = context("constants section")['(' >> keyword(":constants") > typed_name_list > ')'];
+auto const predicate_section_def = context("predicates section")['(' >> keyword(":predicates") >> *predicate_declaration > ')'];
+auto const function_section_def = context("functions section")['(' >> keyword(":functions") >> *function_declaration > ')'];
+auto const object_section_def = context("objects section")['(' >> keyword(":objects") > typed_name_list > ')'];
+auto const initial_section_def = context("init section")['(' >> keyword(":init") >> *((initial_function_value | literal)) > ')'];
 
 BOOST_SPIRIT_DEFINE(variable_identifier,
                     type_reference,

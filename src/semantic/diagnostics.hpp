@@ -39,6 +39,9 @@ struct DiagnosticContext
 
         Scope(DiagnosticContext& diagnostics, const parser::ErrorHandlerType& error_handler);
         ~Scope();
+
+        Scope(const Scope&) = delete;
+        Scope& operator=(const Scope&) = delete;
     };
 
     static ParseError parse_error(const parser::ErrorHandlerType& error_handler, const std::string& fallback, parser::Iterator position);
@@ -47,7 +50,7 @@ struct DiagnosticContext
     [[noreturn]] void throw_at(const Node& node, Error error) const
     {
         if (active)
-            error.set_display_message(parser::format_error_at(active->get(), node, error.what()));
+            error.set_diagnostic(active->get().make_diagnostic(node, error.message()));
         throw error;
     }
 };

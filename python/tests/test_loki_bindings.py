@@ -7,6 +7,7 @@ from typing import Any, cast
 
 from pypddl import formalism as pypddl
 import pypddl_datasets
+from pyyggdrasil.diagnostics import Diagnostic, format_diagnostic
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -62,9 +63,156 @@ def test_negative_fixture_suite_replays() -> None:
                 assert f"In line {expected_line}:" in message, case["name"]
             expected_column = cast(int | None, case.get("expected_column"))
             if expected_column is not None:
-                assert "\n" + "_" * (expected_column - 1) + "^_" in message, case["name"]
+                assert error.diagnostic.location is not None, case["name"]
+                assert error.diagnostic.location.column == expected_column, case["name"]
         else:
             raise AssertionError(f"{case['name']}: expected semantic error")
+
+
+def test_parse_error_keeps_owned_diagnostic_context_and_filename() -> None:
+    path = fixture_path("broken-syntax")
+    try:
+        pypddl.Parser(path, pypddl.ParserOptions())
+    except pypddl.ParseError as error:
+        assert type(error) is pypddl.ParseError
+        assert isinstance(error, pypddl.SemanticError)
+        diagnostic = error.diagnostic
+        rendered = str(error)
+        try:
+            setattr(error, "diagnostic", diagnostic)
+        except AttributeError:
+            pass
+        else:
+            raise AssertionError("diagnostic must be read-only")
+    else:
+        raise AssertionError("expected ParseError")
+
+    gc.collect()
+    assert isinstance(diagnostic, Diagnostic)
+    assert diagnostic.location is not None
+    assert diagnostic.location.source.filename == str(path)
+    assert diagnostic.location.source.text == path.read_text(encoding="utf-8")
+    assert diagnostic.location.line == 4
+    assert diagnostic.location.column == 1
+    assert diagnostic.location.begin == len(diagnostic.location.source.text.encode("utf-8"))
+    assert "while parsing domain definition" in diagnostic.message
+    assert len(diagnostic.notes) == 1
+    assert diagnostic.notes[0].message == "domain definition starts here"
+    assert diagnostic.notes[0].location is not None
+    assert diagnostic.notes[0].location.begin == 0
+    assert rendered == format_diagnostic(diagnostic)
+
+
+def test_parser_distinguishes_comments_trailing_tokens_and_missing_close() -> None:
+    cases = [
+        ("(define (domain sample)) ; ) not extra input\n", None),
+        ("(define (domain sample)) ; comment\nextra", "extra"),
+        ("(define (domain sample) ; ) not a close\n", ""),
+    ]
+    for source, offending_token in cases:
+        try:
+            pypddl.Parser(source, pypddl.ParserOptions())
+        except pypddl.ParseError as error:
+            assert offending_token is not None
+            diagnostic = error.diagnostic
+            assert diagnostic.location is not None
+            expected_offset = source.index(offending_token) if offending_token else len(source)
+            assert diagnostic.location.begin == expected_offset
+            if offending_token:
+                assert diagnostic.message == "Unexpected trailing input."
+            else:
+                assert "while parsing domain definition" in diagnostic.message
+                assert diagnostic.notes[0].message == "domain definition starts here"
+        else:
+            assert offending_token is None, "invalid source unexpectedly parsed"
+
+
+def test_semantic_error_keeps_typed_category_and_owned_identifier_range() -> None:
+    source = "(define (domain sample) (:requirements :strips)\n (:predicates (p))\n (:action a :parameters () :precondition (missing) :effect (p)))"
+    options = pypddl.ParserOptions()
+    options.strict = True
+    options.add_action_costs = False
+    try:
+        pypddl.Parser(source, options)
+    except pypddl.UndefinedPredicateError as error:
+        assert type(error) is pypddl.UndefinedPredicateError
+        assert isinstance(error, pypddl.SemanticError)
+        diagnostic = error.diagnostic
+        rendered = str(error)
+    else:
+        raise AssertionError("expected UndefinedPredicateError")
+    del source
+    gc.collect()
+    assert isinstance(diagnostic, Diagnostic)
+    assert diagnostic.message == "Undefined predicate: missing"
+    assert diagnostic.location is not None
+    span = diagnostic.location
+    assert span.line == 3
+    assert span.source.text.encode("utf-8")[span.begin:span.end] == b"missing"
+    assert rendered == format_diagnostic(diagnostic)
+
+
+def test_syntax_error_belongs_to_the_deepest_identified_construct() -> None:
+    cases = [
+        ("(:action a :parameters bare)", "action", "(:action"),
+        ("(:action a :parameters (bare))", "action parameters", "(bare"),
+        ("(:action a :parameters () :precondition bare)", "action", "(:action"),
+        ("(:action a :parameters () :precondition (not bare))", "not condition", "(not"),
+        ("(:action a :parameters () :precondition (and (not bare)))", "not condition", "(not"),
+        ("(:action a :parameters () :effect (when bare (p)))", "when effect", "(when"),
+        ("(:action a :parameters () :effect (when (not bare) (p)))", "not condition", "(not"),
+    ]
+    for action, owner, opening in cases:
+        source = f"(define (domain sample) (:predicates (p)) {action})"
+        try:
+            pypddl.Parser(source, pypddl.ParserOptions())
+        except pypddl.ParseError as error:
+            diagnostic = error.diagnostic
+            assert f"while parsing {owner}" in diagnostic.message, action
+            assert diagnostic.location is not None
+            assert diagnostic.location.begin == source.index("bare"), action
+            assert len(diagnostic.notes) == 1
+            assert diagnostic.notes[0].message == f"{owner} starts here"
+            assert diagnostic.notes[0].location is not None
+            assert diagnostic.notes[0].location.begin == source.index(opening), action
+        else:
+            raise AssertionError(f"malformed construct was accepted as an atom: {action}")
+
+
+def test_manually_created_exception_has_locationless_diagnostic() -> None:
+    error = pypddl.MissingDomainError("no domain")
+    assert isinstance(error.diagnostic, Diagnostic)
+    assert error.diagnostic.message == "no domain"
+    assert error.diagnostic.location is None
+    assert not error.diagnostic.notes
+
+
+def test_expected_grammar_subjects_are_readable() -> None:
+    cases = [
+        ("(define (domain))", "Expected identifier while parsing domain header"),
+        ("(define (domain d) (:action a))", "Expected :parameters while parsing action"),
+        ("(define (domain d) (:action a :parameters bare))", "Expected action parameters while parsing action"),
+        ("(define (domain d) (:types a - (either)))", "Expected one or more type expressions while parsing either type"),
+    ]
+    for source, expected in cases:
+        try:
+            pypddl.Parser(source, pypddl.ParserOptions())
+        except pypddl.ParseError as error:
+            assert error.diagnostic.message == expected
+        else:
+            raise AssertionError(f"expected syntax error: {source}")
+
+    parser = pypddl.Parser("(define (domain d))", pypddl.ParserOptions())
+    for source, expected in [
+        ("(define (problem p) (:init))", "Expected problem domain while parsing problem definition"),
+        ("(define (problem p) (:domain d))", "Expected init section while parsing problem definition"),
+    ]:
+        try:
+            parser.parse_task(source)
+        except pypddl.ParseError as error:
+            assert error.diagnostic.message == expected
+        else:
+            raise AssertionError(f"expected syntax error: {source}")
 
 
 def test_parser_count_fixture_suite_replays() -> None:
