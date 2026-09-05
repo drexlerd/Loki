@@ -45,7 +45,7 @@ cista::offset::string to_cista(const std::string& text) { return cista::offset::
 
 formalism::RequirementKind requirement_kind(const ast::Requirement& node, const DiagnosticContext& diagnostics)
 {
-    auto name = key(node.name.text);
+    const auto& name = node.name.text;
     if (name == "strips")
         return formalism::RequirementKind::Strips;
     if (name == "typing")

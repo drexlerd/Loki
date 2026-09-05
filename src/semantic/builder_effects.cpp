@@ -166,16 +166,17 @@ formalism::AxiomView AstBuilder::parse_axiom(const ast::Axiom& node)
 {
     auto scope = VariableScope(m_parse_context);
     auto parameters = parse_parameters(node.head.parameters);
-    auto pred = predicate(node.head.name, node.head.parameters.size());
+    auto pred = predicate(node.head.name, parameters.size());
     auto atom_data = formalism::checkout<formalism::Atom>(m_builder);
     atom_data->predicate = pred.get_index();
-    for (const auto& parameter : node.head.parameters)
-    {
-        auto term = ast::Term {};
-        term.name = parameter.variable;
-        term.variable = true;
-        atom_data->terms.push_back(parse_term(term).get_index());
-    }
+    for (const auto& group : node.head.parameters)
+        for (const auto& identifier : group.names)
+        {
+            auto term = ast::Term {};
+            term.name = identifier;
+            term.variable = true;
+            atom_data->terms.push_back(parse_term(term).get_index());
+        }
     auto atom = formalism::get_or_create(repo(), *atom_data).first;
     auto literal_data = formalism::checkout<formalism::Literal>(m_builder);
     literal_data->atom = atom.get_index();

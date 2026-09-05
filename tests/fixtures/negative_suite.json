@@ -45,7 +45,7 @@
             "expected_message": "Unused PDDL requirement: :typing",
             "strict": true,
             "expected_line": 2,
-            "expected_column": 26,
+            "expected_column": 27,
             "domain_file": "strict-unused-typing-requirement/domain.pddl"
         },
         {

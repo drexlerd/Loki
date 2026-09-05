@@ -28,8 +28,7 @@ struct Identifier;
 struct TypeExpression;
 struct TypeReference;
 struct EitherType;
-struct TypedName;
-struct TypedVariable;
+struct TypedGroup;
 struct Requirement;
 struct Term;
 struct Atom;
@@ -68,6 +67,7 @@ struct InitialFunctionValue;
 struct InitialElement;
 struct Task;
 
+using DomainDeclaration = x3::variant<Axiom, Action>;
 using File = x3::variant<Domain, Task>;
 }
 

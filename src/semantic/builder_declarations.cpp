@@ -111,7 +111,7 @@ std::vector<formalism::RequirementView> AstBuilder::parse_requirements(const std
     auto data = formalism::checkout<formalism::Requirement>(m_builder);
     for (const auto& node : nodes)
     {
-        const auto name = key(node.name.text);
+        const auto& name = node.name.text;
         // Aggregates hide which capabilities a model needs; strict mode demands the atomic
         // requirements, and the MissingRequirementError checks then enumerate the right ones.
         if (m_options.strict && (name == "adl" || name == "fluents" || name == "quantified-preconditions"))
@@ -130,21 +130,22 @@ std::vector<formalism::RequirementView> AstBuilder::parse_requirements(const std
     return result;
 }
 
-std::vector<formalism::TypeView> AstBuilder::parse_types(const std::vector<ast::TypedName>& nodes)
+std::vector<formalism::TypeView> AstBuilder::parse_types(const std::vector<ast::TypedGroup>& groups)
 {
-    if (!nodes.empty())
-        checks().require_requirement(formalism::RequirementKind::Typing, nodes.front().name);
+    if (!groups.empty())
+        checks().require_requirement(formalism::RequirementKind::Typing, groups.front().names.front());
 
-    auto declarations = ygg::UnorderedMap<std::string, const ast::TypedName*> {};
-    for (const auto& node : nodes)
-    {
-        const auto name = key(node.name.text);
-        checks().ensure_new<DuplicateTypeError>(m_domain_context.declared_types, name, node.name);
-        declarations.emplace(name, &node);
-    }
+    auto declarations = ygg::UnorderedMap<std::string, std::pair<const ast::Identifier*, const ast::TypedGroup*>> {};
+    for (const auto& group : groups)
+        for (const auto& identifier : group.names)
+        {
+            const auto name = key(identifier.text);
+            checks().ensure_new<DuplicateTypeError>(m_domain_context.declared_types, name, identifier);
+            declarations.emplace(name, std::pair { &identifier, &group });
+        }
 
     auto resolving = ygg::UnorderedSet<std::string> {};
-    auto build_type = std::function<formalism::TypeView(const ast::TypedName&)> {};
+    auto build_type = std::function<formalism::TypeView(const ast::Identifier&, const ast::TypedGroup&)> {};
     auto resolve_type_expression = std::function<std::vector<formalism::TypeView>(const ast::TypeExpression&)> {};
 
     // A type may inherit from another type declared later in the same :types section.
@@ -160,7 +161,10 @@ std::vector<formalism::TypeView> AstBuilder::parse_types(const std::vector<ast::
                     if (const auto it = m_domain_context.types.find(name); it != m_domain_context.types.end())
                         return { it->second };
                     if (const auto it = declarations.find(name); it != declarations.end())
-                        return { build_type(*it->second) };
+                    {
+                        const auto& [identifier, group] = it->second;
+                        return { build_type(*identifier, *group) };
+                    }
                     return parse_type_expression_node(node);
                 }
                 else
@@ -177,22 +181,23 @@ std::vector<formalism::TypeView> AstBuilder::parse_types(const std::vector<ast::
             expression);
     };
 
-    build_type = [&](const ast::TypedName& node)
+    build_type = [&](const ast::Identifier& identifier, const ast::TypedGroup& group)
     {
-        const auto name = key(node.name.text);
+        const auto name = key(identifier.text);
         if (const auto it = m_domain_context.types.find(name); it != m_domain_context.types.end())
             return it->second;
         if (!resolving.insert(name).second)
-            m_diagnostics.throw_at(node.name, SemanticError("Cyclic type hierarchy involving " + name));
+            m_diagnostics.throw_at(identifier, SemanticError("Cyclic type hierarchy involving " + name));
 
-        auto bases = node.type ? resolve_type_expression(*node.type) : std::vector<formalism::TypeView> { m_domain_context.object_type };
+        auto bases = group.type ? resolve_type_expression(*group.type) : std::vector<formalism::TypeView> { m_domain_context.object_type };
         resolving.erase(name);
         return intern_type(m_domain_context, m_builder, repo(), name, bases);
     };
 
     auto result = std::vector<formalism::TypeView> {};
-    for (const auto& node : nodes)
-        result.push_back(build_type(node));
+    for (const auto& group : groups)
+        for (const auto& identifier : group.names)
+            result.push_back(build_type(identifier, group));
     return result;
 }
 
@@ -230,49 +235,51 @@ std::vector<formalism::TypeView> AstBuilder::parse_type_expression_node(const as
     return result;
 }
 
-std::vector<formalism::ObjectView> AstBuilder::parse_objects(const std::vector<ast::TypedName>& nodes,
+std::vector<formalism::ObjectView> AstBuilder::parse_objects(const std::vector<ast::TypedGroup>& groups,
                                                              ygg::UnorderedMap<std::string, formalism::ObjectView>& table,
                                                              ygg::UnorderedSet<std::string>& declared_objects)
 {
     auto result = std::vector<formalism::ObjectView> {};
-    for (const auto& node : nodes)
-    {
-        const auto name = key(node.name.text);
-        checks().ensure_new<DuplicateObjectError>(declared_objects, name, node.name);
-        checks().require_typing_if_needed(node.type, node.name);
-        auto types = node.type ? parse_type_expression(*node.type) : std::vector<formalism::TypeView> { m_domain_context.object_type };
-        auto data = formalism::checkout<formalism::Object>(m_builder);
-        data->name = to_cista(name);
-        append_indices(types, data->types);
-        auto view = formalism::get_or_create(repo(), *data).first;
-        table.emplace(name, view);
-        result.push_back(view);
-    }
+    for (const auto& group : groups)
+        for (const auto& identifier : group.names)
+        {
+            const auto name = key(identifier.text);
+            checks().ensure_new<DuplicateObjectError>(declared_objects, name, identifier);
+            checks().require_typing_if_needed(group.type, identifier);
+            auto types = group.type ? parse_type_expression(*group.type) : std::vector<formalism::TypeView> { m_domain_context.object_type };
+            auto data = formalism::checkout<formalism::Object>(m_builder);
+            data->name = to_cista(name);
+            append_indices(types, data->types);
+            auto view = formalism::get_or_create(repo(), *data).first;
+            table.emplace(name, view);
+            result.push_back(view);
+        }
     return result;
 }
 
-std::vector<formalism::ParameterView> AstBuilder::parse_parameters(const std::vector<ast::TypedVariable>& nodes)
+std::vector<formalism::ParameterView> AstBuilder::parse_parameters(const std::vector<ast::TypedGroup>& groups)
 {
     auto result = std::vector<formalism::ParameterView> {};
-    for (const auto& node : nodes)
-    {
-        const auto name = key(node.variable.text);
-        if (!m_parse_context.variable_scopes.empty() && m_parse_context.variable_scopes.back().contains(name))
-            m_diagnostics.throw_at(node.variable, DuplicateVariableError(name));
-        auto variable_data = formalism::checkout<formalism::Variable>(m_builder);
-        variable_data->name = to_cista(name);
-        auto variable = formalism::get_or_create(repo(), *variable_data).first;
-        if (!m_parse_context.variable_scopes.empty())
-            m_parse_context.variable_scopes.back().emplace(name, variable);
-        checks().require_typing_if_needed(node.type, node.variable);
-        auto types = node.type ? parse_type_expression(*node.type) : std::vector<formalism::TypeView> { m_domain_context.object_type };
-        auto parameter_data = formalism::checkout<formalism::Parameter>(m_builder);
-        parameter_data->variable = variable.get_index();
-        append_indices(types, parameter_data->types);
-        if (auto [it, inserted] = m_parse_context.variable_types.emplace(variable, types); !inserted)
-            it->second = std::move(types);
-        result.push_back(formalism::get_or_create(repo(), *parameter_data).first);
-    }
+    for (const auto& group : groups)
+        for (const auto& identifier : group.names)
+        {
+            const auto name = key(identifier.text);
+            if (!m_parse_context.variable_scopes.empty() && m_parse_context.variable_scopes.back().contains(name))
+                m_diagnostics.throw_at(identifier, DuplicateVariableError(name));
+            auto variable_data = formalism::checkout<formalism::Variable>(m_builder);
+            variable_data->name = to_cista(name);
+            auto variable = formalism::get_or_create(repo(), *variable_data).first;
+            if (!m_parse_context.variable_scopes.empty())
+                m_parse_context.variable_scopes.back().emplace(name, variable);
+            checks().require_typing_if_needed(group.type, identifier);
+            auto types = group.type ? parse_type_expression(*group.type) : std::vector<formalism::TypeView> { m_domain_context.object_type };
+            auto parameter_data = formalism::checkout<formalism::Parameter>(m_builder);
+            parameter_data->variable = variable.get_index();
+            append_indices(types, parameter_data->types);
+            if (auto [it, inserted] = m_parse_context.variable_types.emplace(variable, types); !inserted)
+                it->second = std::move(types);
+            result.push_back(formalism::get_or_create(repo(), *parameter_data).first);
+        }
     return result;
 }
 

@@ -15,7 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_PARSER_AST_ADAPTED_HPP_
 #define LOKI_PARSER_AST_ADAPTED_HPP_
 
@@ -26,8 +25,7 @@
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Identifier, text)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::TypeReference, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::EitherType, alternatives)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::TypedName, name, type)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::TypedVariable, variable, type)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::TypedGroup, names, type)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Requirement, name)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Term, name, variable)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Atom, predicate, terms)
@@ -60,7 +58,7 @@ BOOST_FUSION_ADAPT_STRUCT(loki::ast::Action, name, parameters, precondition, eff
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Axiom, head, condition)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Metric, optimization, expression)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::InitialFunctionValue, function, value)
-BOOST_FUSION_ADAPT_STRUCT(loki::ast::Domain, name, requirements, types, constants, predicates, functions, axioms, actions)
+BOOST_FUSION_ADAPT_STRUCT(loki::ast::Domain, name, requirements, types, constants, predicates, functions, declarations)
 BOOST_FUSION_ADAPT_STRUCT(loki::ast::Task, name, domain_name, requirements, objects, initial, goal, metric, axioms)
 
 #endif

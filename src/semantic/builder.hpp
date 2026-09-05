@@ -93,14 +93,14 @@ private:
 
     // Domain and task sections.
     std::vector<formalism::RequirementView> parse_requirements(const std::vector<ast::Requirement>& nodes);
-    std::vector<formalism::TypeView> parse_types(const std::vector<ast::TypedName>& nodes);
+    std::vector<formalism::TypeView> parse_types(const std::vector<ast::TypedGroup>& groups);
     std::vector<formalism::TypeView> parse_type_expression(const ast::TypeExpression& type);
     std::vector<formalism::TypeView> parse_type_expression_node(const ast::TypeReference& node);
     std::vector<formalism::TypeView> parse_type_expression_node(const ast::EitherType& node);
-    std::vector<formalism::ObjectView> parse_objects(const std::vector<ast::TypedName>& nodes,
+    std::vector<formalism::ObjectView> parse_objects(const std::vector<ast::TypedGroup>& groups,
                                                      ygg::UnorderedMap<std::string, formalism::ObjectView>& table,
                                                      ygg::UnorderedSet<std::string>& declared_objects);
-    std::vector<formalism::ParameterView> parse_parameters(const std::vector<ast::TypedVariable>& nodes);
+    std::vector<formalism::ParameterView> parse_parameters(const std::vector<ast::TypedGroup>& groups);
     std::vector<formalism::PredicateView> parse_predicates(const std::vector<ast::PredicateDeclaration>& nodes);
     std::vector<formalism::FunctionSkeletonView> parse_functions(const std::vector<ast::FunctionDeclaration>& nodes);
 

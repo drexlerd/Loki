@@ -82,10 +82,10 @@ struct SemanticChecks
             return;
         for (const auto& node : nodes)
         {
-            if (key(node.name.text) == "strips")  // baseline: mandatory in strict mode, never audited as unused
+            if (node.name.text == "strips")  // baseline: mandatory in strict mode, never audited as unused
                 continue;
             if (!uses_declared_requirement(node))
-                diagnostics.throw_at(node.name, UnusedRequirementError(key(node.name.text)));
+                diagnostics.throw_at(node.name, UnusedRequirementError(node.name.text));
         }
     }
 

@@ -79,27 +79,15 @@ struct formatter<loki::ast::TypeExpression, char>
 };
 
 template<>
-struct formatter<loki::ast::TypedName, char>
+struct formatter<loki::ast::TypedGroup, char>
 {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
     template<typename FormatContext>
-    auto format(const loki::ast::TypedName& value, FormatContext& ctx) const
+    auto format(const loki::ast::TypedGroup& value, FormatContext& ctx) const
     {
-        auto out = fmt::format_to(ctx.out(), fmt::runtime("{}"), value.name);
-        if (value.type)
-            out = fmt::format_to(out, fmt::runtime(" - {}"), *value.type);
-        return out;
-    }
-};
-
-template<>
-struct formatter<loki::ast::TypedVariable, char>
-{
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
-    template<typename FormatContext>
-    auto format(const loki::ast::TypedVariable& value, FormatContext& ctx) const
-    {
-        auto out = fmt::format_to(ctx.out(), fmt::runtime("{}"), value.variable);
+        auto out = ctx.out();
+        for (std::size_t i = 0; i < value.names.size(); ++i)
+            out = fmt::format_to(out, fmt::runtime("{}{}"), i == 0 ? "" : " ", value.names[i]);
         if (value.type)
             out = fmt::format_to(out, fmt::runtime(" - {}"), *value.type);
         return out;
@@ -656,15 +644,10 @@ struct formatter<loki::ast::Domain, char>
                 }
                 os << ')';
             }
-            for (const auto& axiom : value.axioms)
+            for (const auto& declaration : value.declarations)
             {
                 os << '\n' << ygg::print_indent;
-                fmt::print(os, fmt::runtime("{}"), axiom);
-            }
-            for (const auto& action : value.actions)
-            {
-                os << '\n' << ygg::print_indent;
-                fmt::print(os, fmt::runtime("{}"), action);
+                boost::apply_visitor([&](const auto& node) { fmt::print(os, fmt::runtime("{}"), node); }, declaration);
             }
         }
         os << "\n)";

@@ -216,6 +216,70 @@ TEST(LokiSemanticDiagnostics, ExpectedSubjectsHaveReadableGrammarNames)
     }
 }
 
+TEST(LokiSemanticDiagnostics, RequirementPrefixesAreSyntaxRatherThanNameCleanup)
+{
+    for (const auto& [entry, expected] : {
+             std::pair { std::string("typing"), "')'" },
+             std::pair { std::string(":"), "requirement name" },
+             std::pair { std::string("::typing"), "requirement name" },
+             std::pair { std::string(": typing"), "requirement name" },
+             std::pair { std::string(":\ttyping"), "requirement name" },
+             std::pair { std::string(":; comment\ntyping"), "requirement name" },
+             std::pair { std::string(":ty:ping"), "requirement name" },
+             std::pair { std::string(":typing:"), "requirement name" },
+         })
+        for (const auto& source :
+             { "(define (domain d) (:requirements " + entry + "))", "(define (problem p) (:domain d) (:requirements " + entry + ") (:init))" })
+        {
+            SCOPED_TRACE(source);
+            auto output = std::ostringstream {};
+            auto handler = parser::ErrorHandlerType(source.cbegin(), source.cend(), output);
+            auto file = ast::File {};
+            EXPECT_FALSE(parser::parse_file(source, file, handler));
+            ASSERT_TRUE(handler.last_error());
+            const auto diagnostic = handler.diagnostic("fallback", source.cbegin());
+            EXPECT_EQ(diagnostic.message, std::string("Expected ") + expected + " while parsing requirements section");
+            ASSERT_EQ(diagnostic.notes.size(), 1);
+            ASSERT_TRUE(diagnostic.notes.front().location);
+            EXPECT_EQ(diagnostic.notes.front().location->begin(), source.find("(:requirements"));
+        }
+}
+
+TEST(LokiSemanticDiagnostics, UnknownRequirementKeepsItsCategoryAndBareNameSpan)
+{
+    for (const bool strict : { false, true })
+        for (const bool task : { false, true })
+        {
+            SCOPED_TRACE(strict);
+            SCOPED_TRACE(task);
+            const auto options = semantic::ParserOptions { .strict = strict, .add_action_costs = false };
+            const auto source = task ? std::string("(define (problem p) (:domain d) (:requirements :future-feature) (:init))") :
+                                       std::string("(define (domain d) (:requirements :strips :future-feature))");
+            try
+            {
+                if (task)
+                {
+                    auto parser = semantic::Parser(std::string("(define (domain d) (:requirements :strips))"), options);
+                    parser.parse_task(source);
+                }
+                else
+                {
+                    auto parser = semantic::Parser(source, options);
+                }
+                FAIL() << "Expected unsupported requirement";
+            }
+            catch (const semantic::UnsupportedRequirementError& error)
+            {
+                EXPECT_EQ(error.message(), "Unsupported requirement: :future-feature");
+                ASSERT_TRUE(error.diagnostic().location);
+                const auto& span = *error.diagnostic().location;
+                EXPECT_EQ(span.begin(), source.find(":future-feature") + 1);
+                EXPECT_EQ(span.end(), span.begin() + std::string("future-feature").size());
+                EXPECT_EQ(span.source()->text().substr(span.begin(), span.end() - span.begin()), "future-feature");
+            }
+        }
+}
+
 TEST(LokiSemanticDiagnostics, UnexpectedAndTrailingInputPointAtTheOffendingToken)
 {
     for (const auto& source : { std::string("(define (domain sample)\n  (:unknown))"), std::string("(define (domain sample)) ; comment\nextra") })

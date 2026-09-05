@@ -53,8 +53,8 @@ struct FileClass : ErrorHandlerBase {};
 
 using identifier_type = x3::rule<IdentifierClass, ast::Identifier>;
 using type_expression_type = x3::rule<TypeExpressionClass, ast::TypeExpression>;
-using typed_name_list_type = x3::rule<TypedNameListClass, std::vector<ast::TypedName>>;
-using typed_variable_list_type = x3::rule<TypedVariableListClass, std::vector<ast::TypedVariable>>;
+using typed_name_list_type = x3::rule<TypedNameListClass, std::vector<ast::TypedGroup>>;
+using typed_variable_list_type = x3::rule<TypedVariableListClass, std::vector<ast::TypedGroup>>;
 using term_type = x3::rule<TermClass, ast::Term>;
 using atom_type = x3::rule<AtomClass, ast::Atom>;
 using literal_type = x3::rule<LiteralClass, ast::Literal>;

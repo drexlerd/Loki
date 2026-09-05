@@ -26,9 +26,11 @@
 #include <loki/semantic/options.hpp>
 #include <loki/semantic/parser.hpp>
 #include <loki/semantic/translator.hpp>
+#include <map>
 #include <set>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 namespace loki::tests
 {
@@ -199,6 +201,111 @@ TEST(LokiSemanticParser, FailedTaskDoesNotLeakVariableScopes)
 
     const auto task = parser.parse_task(fixture_path("task-isolation", "task.pddl"));
     EXPECT_EQ(task.get_name(), "good");
+}
+
+TEST(LokiSemanticParser, FlattensTypedGroupsAndInterleavedDeclarations)
+{
+    const auto source = std::string(R"((define (domain grouped)
+  (:requirements :strips :typing :derived-predicates)
+  (:types child sibling - parent parent)
+  (:constants one two - child loose)
+  (:predicates (p ?x ?y - child ?z - parent ?tail) (q ?x ?y - child) (r ?x - parent))
+  (:action first :parameters (?x ?y - child ?z - parent ?tail)
+    :precondition (q ?x ?y) :effect (p ?x ?y ?z ?tail))
+  (:derived (q ?x ?y - child) (and))
+  (:action second :parameters () :effect (and))
+  (:derived (r ?x - parent) (and))))");
+    const auto options = semantic::ParserOptions { .strict = true, .add_action_costs = false };
+    auto parser = semantic::Parser(source, options);
+    const auto domain = parser.get_domain();
+    ASSERT_EQ(domain.get_actions().size(), 2);
+    ASSERT_EQ(domain.get_axioms().size(), 2);
+    const auto object_types = [](const auto& objects)
+    {
+        auto result = std::map<std::string, std::set<std::string>> {};
+        for (const auto object : objects)
+            for (const auto type : object.get_types())
+                result[std::string(object.get_name())].insert(std::string(type.get_name()));
+        return result;
+    };
+    const auto expected_constants = std::map<std::string, std::set<std::string>> { { "one", { "child" } }, { "two", { "child" } }, { "loose", { "object" } } };
+    EXPECT_EQ(object_types(domain.get_constants()), expected_constants);
+    auto type_bases = std::map<std::string, std::string> {};
+    for (const auto type : domain.get_types())
+        if (type.get_bases().size() == 1)
+            type_bases.emplace(std::string(type.get_name()), std::string(type.get_bases()[0].get_name()));
+    EXPECT_EQ(type_bases.at("child"), "parent");
+    EXPECT_EQ(type_bases.at("sibling"), "parent");
+    EXPECT_EQ(type_bases.at("parent"), "object");
+    for (const auto action : domain.get_actions())
+        if (action.get_name() == "first")
+        {
+            auto parameters = std::vector<std::pair<std::string, std::string>> {};
+            for (const auto parameter : action.get_parameters())
+            {
+                ASSERT_EQ(parameter.get_types().size(), 1);
+                parameters.emplace_back(std::string(parameter.get_variable().get_name()), std::string(parameter.get_types()[0].get_name()));
+            }
+            const auto expected =
+                std::vector<std::pair<std::string, std::string>> { { "?x", "child" }, { "?y", "child" }, { "?z", "parent" }, { "?tail", "object" } };
+            EXPECT_EQ(parameters, expected);
+        }
+    auto found_grouped_axiom = false;
+    for (const auto axiom : domain.get_axioms())
+        if (axiom.get_head().get_atom().get_predicate().get_name() == "q")
+        {
+            found_grouped_axiom = true;
+            EXPECT_EQ(axiom.get_arity(), 2);
+            EXPECT_EQ(axiom.get_original_arity(), 2);
+            ASSERT_EQ(axiom.get_parameters().size(), 2);
+            EXPECT_EQ(axiom.get_parameters()[0].get_variable().get_name(), "?x");
+            EXPECT_EQ(axiom.get_parameters()[1].get_variable().get_name(), "?y");
+            EXPECT_EQ(axiom.get_head().get_atom().get_terms().size(), 2);
+        }
+    EXPECT_TRUE(found_grouped_axiom);
+    const auto task = parser.parse_task(std::string("(define (problem grouped-task) (:domain grouped) "
+                                                    "(:objects a b - child tail) (:init) (:goal (q a b)))"));
+    const auto expected_objects = std::map<std::string, std::set<std::string>> { { "a", { "child" } }, { "b", { "child" } }, { "tail", { "object" } } };
+    EXPECT_EQ(object_types(task.get_objects()), expected_objects);
+}
+
+TEST(LokiSemanticParser, GroupedDuplicatesAndCyclesRetainIdentifierDiagnostics)
+{
+    const auto options = semantic::ParserOptions { .strict = true, .add_action_costs = false };
+    const auto prefix = std::string("(define (domain grouped) (:requirements :strips :typing) ");
+    const auto expect_duplicate = [&]<typename Error>(const std::string& suffix, const std::string& name)
+    {
+        const auto source = prefix + suffix;
+        try
+        {
+            const auto parser = semantic::Parser(source, options);
+            FAIL() << "Expected grouped duplicate to be rejected";
+        }
+        catch (const Error& error)
+        {
+            const auto& diagnostic = error.diagnostic();
+            ASSERT_TRUE(diagnostic.location);
+            EXPECT_EQ(diagnostic.location->begin(), source.rfind(name));
+            EXPECT_EQ(diagnostic.location->end(), source.rfind(name) + name.size());
+            EXPECT_EQ(diagnostic.location->source()->text(), source);
+        }
+    };
+    expect_duplicate.template operator()<semantic::DuplicateTypeError>("(:types child sibling - parent parent child))", "child");
+    expect_duplicate.template operator()<semantic::DuplicateObjectError>("(:types child) (:constants one two one - child))", "one");
+    expect_duplicate.template operator()<semantic::DuplicateVariableError>("(:types child) (:action a :parameters (?x ?y - child ?x) :effect (and)))", "?x");
+    const auto cycle = prefix + "(:types a b - c c - a))";
+    try
+    {
+        const auto parser = semantic::Parser(cycle, options);
+        FAIL() << "Expected grouped type cycle to be rejected";
+    }
+    catch (const semantic::SemanticError& error)
+    {
+        EXPECT_NE(error.message().find("Cyclic type hierarchy"), std::string::npos);
+        ASSERT_TRUE(error.diagnostic().location);
+        EXPECT_EQ(error.diagnostic().location->begin(), cycle.find("a b"));
+        EXPECT_EQ(error.diagnostic().location->end(), cycle.find("a b") + 1);
+    }
 }
 
 }  // namespace loki::tests

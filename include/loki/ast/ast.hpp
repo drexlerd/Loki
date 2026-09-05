@@ -15,14 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOKI_AST_AST_HPP_
 #define LOKI_AST_AST_HPP_
 
 #include <boost/optional.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
-
 #include <string>
 #include <vector>
 
@@ -54,15 +52,9 @@ struct TypeExpression : x3::position_tagged, x3::variant<TypeReference, EitherTy
     using base_type::operator=;
 };
 
-struct TypedName : x3::position_tagged
+struct TypedGroup : x3::position_tagged
 {
-    Identifier name;
-    boost::optional<TypeExpression> type;
-};
-
-struct TypedVariable : x3::position_tagged
-{
-    Identifier variable;
+    std::vector<Identifier> names;
     boost::optional<TypeExpression> type;
 };
 
@@ -127,12 +119,9 @@ struct FunctionExpressionMulti : x3::position_tagged
     std::vector<FunctionExpressionPtr> expressions;
 };
 
-struct FunctionExpression : x3::position_tagged,
-                            x3::variant<FunctionExpressionNumber,
-                                        FunctionExpressionFunction,
-                                        FunctionExpressionUnary,
-                                        FunctionExpressionBinary,
-                                        FunctionExpressionMulti>
+struct FunctionExpression :
+    x3::position_tagged,
+    x3::variant<FunctionExpressionNumber, FunctionExpressionFunction, FunctionExpressionUnary, FunctionExpressionBinary, FunctionExpressionMulti>
 {
     using base_type::base_type;
     using base_type::operator=;
@@ -169,13 +158,13 @@ struct ConditionImply : x3::position_tagged
 
 struct ConditionExists : x3::position_tagged
 {
-    std::vector<TypedVariable> parameters;
+    std::vector<TypedGroup> parameters;
     ConditionPtr condition;
 };
 
 struct ConditionForall : x3::position_tagged
 {
-    std::vector<TypedVariable> parameters;
+    std::vector<TypedGroup> parameters;
     ConditionPtr condition;
 };
 
@@ -186,15 +175,9 @@ struct ConditionNumericConstraint : x3::position_tagged
     FunctionExpressionPtr right;
 };
 
-struct Condition : x3::position_tagged,
-                   x3::variant<ConditionLiteral,
-                               ConditionAnd,
-                               ConditionOr,
-                               ConditionNot,
-                               ConditionImply,
-                               ConditionExists,
-                               ConditionForall,
-                               ConditionNumericConstraint>
+struct Condition :
+    x3::position_tagged,
+    x3::variant<ConditionLiteral, ConditionAnd, ConditionOr, ConditionNot, ConditionImply, ConditionExists, ConditionForall, ConditionNumericConstraint>
 {
     using base_type::base_type;
     using base_type::operator=;
@@ -222,7 +205,7 @@ struct EffectNumeric : x3::position_tagged
 
 struct EffectForall : x3::position_tagged
 {
-    std::vector<TypedVariable> parameters;
+    std::vector<TypedGroup> parameters;
     EffectPtr effect;
 };
 
@@ -248,14 +231,7 @@ struct EffectProbabilistic : x3::position_tagged
     std::vector<ProbabilisticEffectAlternative> alternatives;
 };
 
-struct Effect : x3::position_tagged,
-                x3::variant<EffectLiteral,
-                            EffectAnd,
-                            EffectNumeric,
-                            EffectForall,
-                            EffectWhen,
-                            EffectOneOf,
-                            EffectProbabilistic>
+struct Effect : x3::position_tagged, x3::variant<EffectLiteral, EffectAnd, EffectNumeric, EffectForall, EffectWhen, EffectOneOf, EffectProbabilistic>
 {
     using base_type::base_type;
     using base_type::operator=;
@@ -264,20 +240,20 @@ struct Effect : x3::position_tagged,
 struct PredicateDeclaration : x3::position_tagged
 {
     Identifier name;
-    std::vector<TypedVariable> parameters;
+    std::vector<TypedGroup> parameters;
 };
 
 struct FunctionDeclaration : x3::position_tagged
 {
     Identifier name;
-    std::vector<TypedVariable> parameters;
+    std::vector<TypedGroup> parameters;
     boost::optional<TypeExpression> type;
 };
 
 struct Action : x3::position_tagged
 {
     Identifier name;
-    std::vector<TypedVariable> parameters;
+    std::vector<TypedGroup> parameters;
     boost::optional<Condition> precondition;
     boost::optional<Effect> effect;
 };
@@ -306,16 +282,17 @@ struct InitialElement : x3::position_tagged, x3::variant<Literal, InitialFunctio
     using base_type::operator=;
 };
 
+using DomainDeclaration = x3::variant<Axiom, Action>;
+
 struct Domain : x3::position_tagged
 {
     Identifier name;
     std::vector<Requirement> requirements;
-    std::vector<TypedName> types;
-    std::vector<TypedName> constants;
+    std::vector<TypedGroup> types;
+    std::vector<TypedGroup> constants;
     std::vector<PredicateDeclaration> predicates;
     std::vector<FunctionDeclaration> functions;
-    std::vector<Axiom> axioms;
-    std::vector<Action> actions;
+    std::vector<DomainDeclaration> declarations;
 };
 
 struct Task : x3::position_tagged
@@ -323,7 +300,7 @@ struct Task : x3::position_tagged
     Identifier name;
     Identifier domain_name;
     std::vector<Requirement> requirements;
-    std::vector<TypedName> objects;
+    std::vector<TypedGroup> objects;
     std::vector<InitialElement> initial;
     boost::optional<Condition> goal;
     boost::optional<Metric> metric;

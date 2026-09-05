@@ -56,8 +56,7 @@ SemanticChecks AstBuilder::checks() const { return SemanticChecks { m_options, m
 formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
 {
     auto requirements = parse_requirements(domain.requirements);
-    if (m_options.strict
-        && std::none_of(domain.requirements.begin(), domain.requirements.end(), [](const auto& node) { return key(node.name.text) == "strips"; }))
+    if (m_options.strict && std::none_of(domain.requirements.begin(), domain.requirements.end(), [](const auto& node) { return node.name.text == "strips"; }))
         m_diagnostics.throw_at(domain.name, MissingRequirementError("strips"));
     // Genuine numeric domains keep their own cost structure; a planner interprets an absent
     // metric as unit costs, so grafting total-cost onto :numeric-fluents would be wrong.
@@ -87,14 +86,16 @@ formalism::DomainView AstBuilder::build_domain(const ast::Domain& domain)
         functions.push_back(total_cost_function());
     }
     auto axioms = std::vector<formalism::AxiomView> {};
-    for (const auto& axiom : domain.axioms)
-    {
-        checks().require_requirement(formalism::RequirementKind::DerivedPredicates, axiom);
-        axioms.push_back(parse_axiom(axiom));
-    }
+    for (const auto& declaration : domain.declarations)
+        if (const auto* axiom = boost::get<ast::Axiom>(&declaration))
+        {
+            checks().require_requirement(formalism::RequirementKind::DerivedPredicates, *axiom);
+            axioms.push_back(parse_axiom(*axiom));
+        }
     auto actions = std::vector<formalism::ActionView> {};
-    for (const auto& action : domain.actions)
-        actions.push_back(parse_action(action));
+    for (const auto& declaration : domain.declarations)
+        if (const auto* action = boost::get<ast::Action>(&declaration))
+            actions.push_back(parse_action(*action));
     if (inject_unit_costs)
         for (auto& action : actions)
             action = add_unit_cost(action);
@@ -131,7 +132,7 @@ formalism::TaskView AstBuilder::build_task(const ast::Task& task)
             const auto kind = requirement_kind(node, m_diagnostics);
             for (const auto domain_requirement : m_domain_context.domain->get_requirements())
                 if (domain_requirement.get_kind() == kind)
-                    m_diagnostics.throw_at(node.name, RedundantRequirementError(key(node.name.text)));
+                    m_diagnostics.throw_at(node.name, RedundantRequirementError(node.name.text));
         }
     }
     auto objects = parse_objects(task.objects, m_parse_context.task_objects, m_parse_context.declared_objects);

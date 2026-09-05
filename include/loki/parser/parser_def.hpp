@@ -21,7 +21,6 @@
 #include "loki/parser/ast_adapted.hpp"
 #include "loki/parser/parser.hpp"
 
-#include <boost/fusion/include/at_c.hpp>
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 #include <string>
@@ -32,15 +31,12 @@ namespace loki::parser::rules
 namespace x3 = boost::spirit::x3;
 namespace ascii = boost::spirit::x3::ascii;
 
-using x3::_attr;
-using x3::_val;
 using x3::attr;
 using x3::char_;
 using x3::double_;
 using x3::lexeme;
 using x3::lit;
 using x3::no_case;
-using x3::omit;
 using x3::string;
 using ygg::diagnostics::context;
 
@@ -186,11 +182,11 @@ x3::rule<EffectOneOfClass, ast::EffectOneOf> const effect_one_of = "effect_one_o
 x3::rule<EffectProbabilisticClass, ast::EffectProbabilistic> const effect_probabilistic = "effect_probabilistic";
 x3::rule<ProbabilisticEffectAlternativeClass, ast::ProbabilisticEffectAlternative> const probabilistic_effect_alternative = "probabilistic_effect_alternative";
 x3::rule<RequirementSectionClass, std::vector<ast::Requirement>> const requirement_section = "requirement_section";
-x3::rule<TypeSectionClass, std::vector<ast::TypedName>> const type_section = "type_section";
-x3::rule<ConstantSectionClass, std::vector<ast::TypedName>> const constant_section = "constant_section";
+x3::rule<TypeSectionClass, std::vector<ast::TypedGroup>> const type_section = "type_section";
+x3::rule<ConstantSectionClass, std::vector<ast::TypedGroup>> const constant_section = "constant_section";
 x3::rule<PredicateSectionClass, std::vector<ast::PredicateDeclaration>> const predicate_section = "predicate_section";
 x3::rule<FunctionSectionClass, std::vector<ast::FunctionDeclaration>> const function_section = "function_section";
-x3::rule<ObjectSectionClass, std::vector<ast::TypedName>> const object_section = "object_section";
+x3::rule<ObjectSectionClass, std::vector<ast::TypedGroup>> const object_section = "object_section";
 x3::rule<InitialSectionClass, std::vector<ast::InitialElement>> const initial_section = "init section";
 
 inline const auto symbol_character = char_ - '(' - ')' - ';' - ascii::space;
@@ -234,115 +230,18 @@ using d::type_reference;
 using d::type_section;
 using d::variable_identifier;
 
-struct set_domain_name
-{
-    template<typename Context>
-    void operator()(Context const& ctx) const
-    {
-        _val(ctx).name = _attr(ctx);
-    }
-};
-struct set_domain_requirements
-{
-    template<typename Context>
-    void operator()(Context const& ctx) const
-    {
-        _val(ctx).requirements = _attr(ctx);
-    }
-};
-struct set_domain_types
-{
-    template<typename Context>
-    void operator()(Context const& ctx) const
-    {
-        _val(ctx).types = _attr(ctx);
-    }
-};
-struct set_domain_constants
-{
-    template<typename Context>
-    void operator()(Context const& ctx) const
-    {
-        _val(ctx).constants = _attr(ctx);
-    }
-};
-struct set_domain_predicates
-{
-    template<typename Context>
-    void operator()(Context const& ctx) const
-    {
-        _val(ctx).predicates = _attr(ctx);
-    }
-};
-struct set_domain_functions
-{
-    template<typename Context>
-    void operator()(Context const& ctx) const
-    {
-        _val(ctx).functions = _attr(ctx);
-    }
-};
-struct push_domain_axiom
-{
-    template<typename Context>
-    void operator()(Context const& ctx) const
-    {
-        _val(ctx).axioms.push_back(_attr(ctx));
-    }
-};
-struct push_domain_action
-{
-    template<typename Context>
-    void operator()(Context const& ctx) const
-    {
-        _val(ctx).actions.push_back(_attr(ctx));
-    }
-};
-
-struct append_typed_names
-{
-    template<typename Context>
-    void operator()(Context const& ctx) const
-    {
-        const auto& attr = _attr(ctx);
-        const auto& names = boost::fusion::at_c<0>(attr);
-        const auto& type = boost::fusion::at_c<1>(attr);
-        auto& out = _val(ctx);
-        for (const auto& name : names)
-        {
-            auto item = ast::TypedName {};
-            item.name = name;
-            item.type = type;
-            out.push_back(std::move(item));
-        }
-    }
-};
-
-struct append_typed_variables
-{
-    template<typename Context>
-    void operator()(Context const& ctx) const
-    {
-        const auto& attr = _attr(ctx);
-        const auto& variables = boost::fusion::at_c<0>(attr);
-        const auto& type = boost::fusion::at_c<1>(attr);
-        auto& out = _val(ctx);
-        for (const auto& variable : variables)
-        {
-            auto item = ast::TypedVariable {};
-            item.variable = variable;
-            item.type = type;
-            out.push_back(std::move(item));
-        }
-    }
-};
-
 auto const identifier_def = d::symbol;
 auto const type_expression_def = d::type_reference | d::either_type;
-auto const typed_name_group = x3::rule<class TypedNameGroupClass, std::vector<ast::TypedName>> { "typed_name_group" } =
-    (+(!lit('-') >> identifier) >> -(lit('-') >> type_expression))[append_typed_names {}];
-auto const typed_variable_group = x3::rule<class TypedVariableGroupClass, std::vector<ast::TypedVariable>> { "typed_variable_group" } =
-    (+(!lit('-') >> d::variable_identifier) >> -(lit('-') >> type_expression))[append_typed_variables {}];
+struct TypedNameGroupClass : x3::annotate_on_success
+{
+};
+struct TypedVariableGroupClass : x3::annotate_on_success
+{
+};
+auto const typed_name_group = x3::rule<TypedNameGroupClass, ast::TypedGroup> { "typed name group" } = +(!lit('-') >> identifier)
+                                                                                                      >> -(lit('-') >> type_expression);
+auto const typed_variable_group = x3::rule<TypedVariableGroupClass, ast::TypedGroup> { "typed variable group" } = +(!lit('-') >> d::variable_identifier)
+                                                                                                                  >> -(lit('-') >> type_expression);
 auto const typed_name_list_def = *typed_name_group;
 auto const typed_variable_list_def = *typed_variable_group;
 auto const term_def = (d::variable_identifier >> attr(true)) | (identifier >> attr(false));
@@ -364,16 +263,16 @@ auto const axiom_def = context("derived predicate")['(' >> d::keyword(":derived"
 auto const metric_def = context("metric")['(' >> d::keyword(":metric") > identifier > function_expression > ')'];
 // '=' also introduces object equality; a function term distinguishes a numeric initial value.
 auto const initial_function_value_def = context("initial function value")['(' >> d::keyword("=") >> function_term > function_expression > ')'];
-auto const domain_def = context(
-    "domain definition")['(' >> d::keyword("define")
-                         >> context("domain header")['(' >> d::keyword("domain") >> x3::expect[identifier][set_domain_name {}] > ')']
-                         >> -(d::requirement_section[set_domain_requirements {}]) >> -(d::type_section[set_domain_types {}])
-                         >> -(d::constant_section[set_domain_constants {}]) >> -(d::predicate_section[set_domain_predicates {}])
-                         >> -(d::function_section[set_domain_functions {}]) >> *((axiom[push_domain_axiom {}]) | (action[push_domain_action {}])) > ')'];
+auto const domain_def =
+    context("domain definition")['(' >> d::keyword("define") >> context("domain header")['(' >> d::keyword("domain") > identifier > ')']
+                                 >> (d::requirement_section | attr(std::vector<ast::Requirement> {}))
+                                 >> (d::type_section | attr(std::vector<ast::TypedGroup> {})) >> (d::constant_section | attr(std::vector<ast::TypedGroup> {}))
+                                 >> (d::predicate_section | attr(std::vector<ast::PredicateDeclaration> {}))
+                                 >> (d::function_section | attr(std::vector<ast::FunctionDeclaration> {})) >> *(axiom | action) > ')'];
 auto const task_def = context(
     "problem definition")[('(' >> d::keyword("define") >> context("problem header")['(' >> d::keyword("problem") > identifier > ')']
                            > context("problem domain")['(' >> d::keyword(":domain") > identifier > ')'])
-                          >> (d::requirement_section | attr(std::vector<ast::Requirement> {})) >> (d::object_section | attr(std::vector<ast::TypedName> {}))
+                          >> (d::requirement_section | attr(std::vector<ast::Requirement> {})) >> (d::object_section | attr(std::vector<ast::TypedGroup> {}))
                           >> x3::expect[d::initial_section] >> -context("goal")['(' >> d::keyword(":goal") > condition > ')'] >> -metric >> *axiom > ')'];
 auto const file_def = domain | task;
 
@@ -432,7 +331,11 @@ auto const effect_when_def = context("when effect")['(' >> keyword("when") > con
 auto const effect_one_of_def = context("oneof effect")['(' >> keyword("oneof") >> *effect > ')'];
 auto const probabilistic_effect_alternative_def = double_ >> effect;
 auto const effect_probabilistic_def = context("probabilistic effect")['(' >> keyword("probabilistic") >> *probabilistic_effect_alternative > ')'];
-auto const requirement_section_def = context("requirements section")['(' >> keyword(":requirements") >> *identifier > ')'];
+struct RequirementNameClass : x3::annotate_on_success
+{
+};
+auto const requirement_name = x3::rule<RequirementNameClass, ast::Identifier> { "requirement name" } = +(symbol_character - ':') >> !symbol_character;
+auto const requirement_section_def = context("requirements section")['(' >> keyword(":requirements") >> *lexeme[lit(':') > requirement_name] > ')'];
 auto const type_section_def = context("types section")['(' >> keyword(":types") > typed_name_list > ')'];
 auto const constant_section_def = context("constants section")['(' >> keyword(":constants") > typed_name_list > ')'];
 auto const predicate_section_def = context("predicates section")['(' >> keyword(":predicates") >> *predicate_declaration > ')'];

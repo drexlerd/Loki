@@ -25,6 +25,7 @@
 #include <loki/formalism/repository.hpp>
 #include <loki/formalism/task_view.hpp>
 #include <loki/parser/parser.hpp>
+#include <loki/parser/parser_def.hpp>
 #include <loki/semantic/options.hpp>
 #include <loki/semantic/parser.hpp>
 #include <set>
@@ -38,6 +39,76 @@ namespace loki::tests
 namespace fs = std::filesystem;
 namespace
 {
+
+// A named X3 rule hides its definition's has_action flag, so check each RHS.
+template<typename... Parsers>
+constexpr bool no_semantic_actions(const Parsers&...)
+{
+    return (!Parsers::has_action && ...);
+}
+
+namespace r = parser::rules;
+namespace d = parser::rules::detail;
+static_assert(no_semantic_actions(r::identifier_def,
+                                  r::type_expression_def,
+                                  r::typed_name_group.rhs,
+                                  r::typed_variable_group.rhs,
+                                  r::typed_name_list_def,
+                                  r::typed_variable_list_def,
+                                  r::term_def,
+                                  r::atom_def,
+                                  r::literal_def,
+                                  r::function_term_def,
+                                  r::function_expression_def,
+                                  r::condition_empty.rhs,
+                                  r::condition_def,
+                                  r::effect_def,
+                                  r::predicate_declaration_def,
+                                  r::function_declaration_def,
+                                  r::action_def,
+                                  r::axiom_def,
+                                  r::metric_def,
+                                  r::initial_function_value_def,
+                                  r::domain_def,
+                                  r::task_def,
+                                  r::file_def,
+                                  d::symbol_character,
+                                  d::symbol,
+                                  d::operator_symbol,
+                                  d::variable_identifier_def,
+                                  d::type_reference_def,
+                                  d::type_expressions.rhs,
+                                  d::either_type_def,
+                                  d::function_expression_number_def,
+                                  d::function_expression_function_def,
+                                  d::function_expression_unary_def,
+                                  d::function_expression_binary_def,
+                                  d::function_expression_multi_def,
+                                  d::condition_literal_def,
+                                  d::condition_and_def,
+                                  d::condition_or_def,
+                                  d::condition_not_def,
+                                  d::condition_imply_def,
+                                  d::condition_exists_def,
+                                  d::condition_forall_def,
+                                  d::condition_numeric_constraint_def,
+                                  d::effect_literal_def,
+                                  d::effect_and_def,
+                                  d::effect_numeric_def,
+                                  d::effect_forall_def,
+                                  d::effect_when_def,
+                                  d::effect_one_of_def,
+                                  d::probabilistic_effect_alternative_def,
+                                  d::effect_probabilistic_def,
+                                  d::requirement_name.rhs,
+                                  d::requirement_section_def,
+                                  d::type_section_def,
+                                  d::constant_section_def,
+                                  d::predicate_section_def,
+                                  d::function_section_def,
+                                  d::object_section_def,
+                                  d::initial_section_def));
+static_assert(!decltype(d::keyword("keyword").rhs)::has_action);
 
 struct DomainExpectation
 {
@@ -245,6 +316,123 @@ TEST(LokiParserCountsSuite, SemanticBenchmarkCountsStayStable)
             expect_counts(domain, task, expected);
         }
     }
+}
+
+TEST(LokiParserCountsSuite, GroupedAstRetainsNamesTypesSpansAndDeclarationOrder)
+{
+    const auto source = std::string(R"((define (domain grouped)
+  (:requirements :strips :typing :derived-predicates)
+  (:types child sibling - parent parent)
+  (:constants one two - child loose)
+  (:predicates (p ?x ?y - child ?z - parent ?tail))
+  (:functions (cost ?x ?y - child ?tail) - number)
+  (:action first :parameters (?x ?y - child ?z - parent ?tail) :effect (and))
+  (:derived (q ?x ?y - child ?tail) (and))
+  (:action second :parameters () :effect (and))
+  (:derived (r ?x - parent) (and))))");
+    parser::ErrorHandlerType handler(source.cbegin(), source.cend(), std::cerr);
+    auto domain = ast::Domain {};
+    ASSERT_TRUE(parser::parse_domain(source, domain, handler));
+    auto expect_span = [&](const parser::x3::position_tagged& node, const std::string& expected)
+    {
+        const auto diagnostic = handler.make_diagnostic(node, "span");
+        ASSERT_TRUE(diagnostic.location);
+        const auto& span = *diagnostic.location;
+        EXPECT_EQ(span.source()->text().substr(span.begin(), span.end() - span.begin()), expected);
+    };
+    expect_span(domain.name, "grouped");
+    ASSERT_EQ(domain.requirements.size(), 3);
+    const auto& requirement = domain.requirements[0];
+    EXPECT_EQ(requirement.name.text, "strips");
+    expect_span(requirement.name, "strips");
+    EXPECT_EQ(fmt::format("{}", requirement), ":strips");
+    ASSERT_EQ(domain.types.size(), 2);
+    ASSERT_EQ(domain.types[0].names.size(), 2);
+    EXPECT_EQ(domain.types[0].names[0].text, "child");
+    EXPECT_EQ(domain.types[0].names[1].text, "sibling");
+    ASSERT_TRUE(domain.types[0].type);
+    expect_span(*domain.types[0].type, "parent");
+    expect_span(domain.types[0], "child sibling - parent");
+    EXPECT_FALSE(domain.types[1].type);
+    ASSERT_EQ(domain.constants.size(), 2);
+    ASSERT_EQ(domain.constants[0].names.size(), 2);
+    expect_span(domain.constants[0].names[1], "two");
+    EXPECT_FALSE(domain.constants[1].type);
+    ASSERT_EQ(domain.predicates.size(), 1);
+    ASSERT_EQ(domain.predicates[0].parameters.size(), 3);
+    ASSERT_EQ(domain.functions.size(), 1);
+    ASSERT_EQ(domain.functions[0].parameters.size(), 2);
+    ASSERT_TRUE(domain.functions[0].type);
+    expect_span(*domain.functions[0].type, "number");
+
+    ASSERT_EQ(domain.declarations.size(), 4);
+    const auto* first = boost::get<ast::Action>(&domain.declarations[0].get());
+    const auto* first_axiom = boost::get<ast::Axiom>(&domain.declarations[1].get());
+    const auto* second = boost::get<ast::Action>(&domain.declarations[2].get());
+    const auto* second_axiom = boost::get<ast::Axiom>(&domain.declarations[3].get());
+    ASSERT_NE(first, nullptr);
+    ASSERT_NE(first_axiom, nullptr);
+    ASSERT_NE(second, nullptr);
+    ASSERT_NE(second_axiom, nullptr);
+    EXPECT_EQ(first->name.text, "first");
+    EXPECT_EQ(first_axiom->head.name.text, "q");
+    EXPECT_EQ(second->name.text, "second");
+    EXPECT_EQ(second_axiom->head.name.text, "r");
+    ASSERT_EQ(first->parameters.size(), 3);
+    const auto& group = first->parameters[0];
+    ASSERT_EQ(group.names.size(), 2);
+    EXPECT_EQ(group.names[0].text, "?x");
+    EXPECT_EQ(group.names[1].text, "?y");
+    expect_span(group.names[0], "?x");
+    expect_span(group.names[1], "?y");
+    expect_span(group, "?x ?y - child");
+    ASSERT_TRUE(group.type);
+    const auto* type = boost::get<ast::TypeReference>(&group.type->get());
+    ASSERT_NE(type, nullptr);
+    expect_span(*group.type, "child");
+    expect_span(type->name, "child");
+    EXPECT_FALSE(first->parameters[2].type);
+    expect_span(first->parameters[2].names[0], "?tail");
+    expect_span(first->name, "first");
+    expect_span(first_axiom->head.name, "q");
+
+    const auto printed = fmt::format("{}", domain);
+    EXPECT_LT(printed.find("(:action first"), printed.find("(:derived (q"));
+    EXPECT_LT(printed.find("(:derived (q"), printed.find("(:action second"));
+    EXPECT_LT(printed.find("(:action second"), printed.find("(:derived (r"));
+    parser::ErrorHandlerType printed_handler(printed.cbegin(), printed.cend(), std::cerr);
+    auto reparsed = ast::Domain {};
+    ASSERT_TRUE(parser::parse_domain(printed, reparsed, printed_handler));
+    EXPECT_EQ(fmt::format("{}", reparsed), printed);
+    EXPECT_EQ(reparsed.declarations.size(), domain.declarations.size());
+    EXPECT_EQ(reparsed.types.size(), domain.types.size());
+}
+
+TEST(LokiParserCountsSuite, TaskObjectGroupsAndTaskAxiomsRoundTrip)
+{
+    const auto source = std::string(R"((define (problem grouped-task) (:domain grouped)
+  (:requirements :strips :typing)
+  (:objects one two - child loose) (:init) (:goal (and))
+  (:derived (q ?x ?y - child ?tail) (and))))");
+    parser::ErrorHandlerType handler(source.cbegin(), source.cend(), std::cerr);
+    auto task = ast::Task {};
+    ASSERT_TRUE(parser::parse_task(source, task, handler));
+    ASSERT_EQ(task.requirements.size(), 2);
+    EXPECT_EQ(task.requirements[0].name.text, "strips");
+    EXPECT_EQ(task.requirements[1].name.text, "typing");
+    EXPECT_EQ(fmt::format("{}", task.requirements[1]), ":typing");
+    ASSERT_EQ(task.objects.size(), 2);
+    ASSERT_EQ(task.objects[0].names.size(), 2);
+    ASSERT_TRUE(task.objects[0].type);
+    EXPECT_FALSE(task.objects[1].type);
+    ASSERT_EQ(task.axioms.size(), 1);
+    ASSERT_EQ(task.axioms[0].head.parameters.size(), 2);
+    const auto printed = fmt::format("{}", task);
+    parser::ErrorHandlerType printed_handler(printed.cbegin(), printed.cend(), std::cerr);
+    auto reparsed = ast::Task {};
+    ASSERT_TRUE(parser::parse_task(printed, reparsed, printed_handler));
+    EXPECT_EQ(fmt::format("{}", reparsed), printed);
+    EXPECT_EQ(reparsed.axioms.size(), task.axioms.size());
 }
 
 }  // namespace loki::tests
