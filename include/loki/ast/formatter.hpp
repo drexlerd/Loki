@@ -651,7 +651,7 @@ struct formatter<loki::ast::Domain, char>
             }
         }
         os << "\n)";
-        return fmt::format_to(ctx.out(), fmt::runtime("{}"), os.str());
+        return fmt::format_to(ctx.out(), fmt::runtime("{}"), os.view());
     }
 };
 
@@ -708,7 +708,7 @@ struct formatter<loki::ast::Task, char>
             }
         }
         os << "\n)";
-        return fmt::format_to(ctx.out(), fmt::runtime("{}"), os.str());
+        return fmt::format_to(ctx.out(), fmt::runtime("{}"), os.view());
     }
 };
 
