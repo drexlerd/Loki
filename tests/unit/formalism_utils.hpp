@@ -181,7 +181,7 @@ inline bool is_conjunctive(formalism::ConditionView condition)
             else
                 return false;
         },
-        condition.get_value());
+        condition.get_variant());
 }
 
 inline bool writes_function_named(formalism::EffectView effect, std::string_view name)
@@ -211,7 +211,7 @@ inline bool writes_function_named(formalism::EffectView effect, std::string_view
             else
                 return false;
         },
-        effect.get_value());
+        effect.get_variant());
 }
 
 inline bool has_predicate_named(formalism::DomainView domain, std::string_view name)

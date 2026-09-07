@@ -60,16 +60,16 @@ struct Data<::loki::formalism::Effect>
                                      ::ygg::View<ygg::Index<::loki::formalism::EffectProbabilistic>, C>>;
 
     ygg::Index<::loki::formalism::Effect> index;
-    Variant value;
+    Variant variant;
 
     Data() = default;
-    explicit Data(Variant value_) : index(), value(std::move(value_)) {}
+    explicit Data(Variant variant_) : index(), variant(std::move(variant_)) {}
     template<typename C>
-    explicit Data(ViewVariant<C> value_) : index(), value(std::visit([](const auto& view) -> Variant { return Variant(view.get_index()); }, value_)) {}
+    explicit Data(ViewVariant<C> variant_) : index(), variant(std::visit([](const auto& view) -> Variant { return Variant(view.get_index()); }, variant_)) {}
 
-    void clear() noexcept { ygg::clear(index); ygg::clear(value); }
-    auto cista_members() const noexcept { return std::tie(index, value); }
-    auto identifying_members() const noexcept { return std::tie(value); }
+    void clear() noexcept { ygg::clear(index); ygg::clear(variant); }
+    auto cista_members() const noexcept { return std::tie(index, variant); }
+    auto identifying_members() const noexcept { return std::tie(variant); }
 };
 
 }

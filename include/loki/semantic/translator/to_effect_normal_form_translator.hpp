@@ -49,7 +49,7 @@ template<typename Derived>
 formalism::EffectView ToEffectNormalFormTranslator<Derived>::wrap_effect(ygg::Data<formalism::Effect>::Variant value)
 {
     auto data = formalism::checkout<formalism::Effect>(this->m_context.builder);
-    data->value = std::move(value);
+    data->variant = std::move(value);
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
@@ -58,7 +58,7 @@ template<typename T>
 formalism::EffectView ToEffectNormalFormTranslator<Derived>::wrap_effect(formalism::EntityView<T> value)
 {
     auto data = formalism::checkout<formalism::Effect>(this->m_context.builder);
-    data->value = ygg::Data<formalism::Effect>::Variant(value.get_index());
+    data->variant = ygg::Data<formalism::Effect>::Variant(value.get_index());
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
@@ -74,14 +74,14 @@ std::optional<formalism::EntityView<T>> ToEffectNormalFormTranslator<Derived>::a
             if constexpr (std::is_same_v<Node, formalism::EntityView<T>>)
                 result = node;
         },
-        effect.get_value());
+        effect.get_variant());
     return result;
 }
 
 template<typename Derived>
 formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect(formalism::EffectView effect)
 {
-    return ygg::visit([&](const auto& node) { return this->self().normalize_effect_node(effect, node); }, effect.get_value());
+    return ygg::visit([&](const auto& node) { return this->self().normalize_effect_node(effect, node); }, effect.get_variant());
 }
 
 template<typename Derived>
@@ -156,7 +156,7 @@ formalism::EffectView ToEffectNormalFormTranslator<Derived>::normalize_effect_no
                 multi_data->args.push_back(expression);
             const auto multi = formalism::get_or_create(this->m_storage->repository, *multi_data).first.get_index();
             auto expression_data = formalism::checkout<formalism::FunctionExpression>(this->m_context.builder);
-            expression_data->value = ygg::Data<formalism::FunctionExpression>::Variant(multi);
+            expression_data->variant = ygg::Data<formalism::FunctionExpression>::Variant(multi);
             sum = formalism::get_or_create(this->m_storage->repository, *expression_data).first.get_index();
         }
         auto numeric_data = formalism::checkout<formalism::EffectNumeric>(this->m_context.builder);

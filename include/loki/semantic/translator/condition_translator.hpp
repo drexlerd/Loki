@@ -156,17 +156,17 @@ formalism::ConditionView ConditionTranslator<Derived>::copy(formalism::Condition
     switch (this->m_phase)
     {
         case TranslationPhase::ToNegationNormalForm:
-            return this->self().flatten_condition(ygg::visit([&](const auto& arg) { return this->self().copy_condition_node(arg); }, source.get_value()));
+            return this->self().flatten_condition(ygg::visit([&](const auto& arg) { return this->self().copy_condition_node(arg); }, source.get_variant()));
         case TranslationPhase::RemoveUniversalQuantifiers:
             return this->self().remove_universal_quantifiers(source);
         case TranslationPhase::ToDisjunctiveNormalForm:
         {
-            const auto copied = ygg::visit([&](const auto& arg) { return this->self().wrap_condition(this->self().copy(arg)); }, source.get_value());
+            const auto copied = ygg::visit([&](const auto& arg) { return this->self().wrap_condition(this->self().copy(arg)); }, source.get_variant());
             return this->self().flatten_condition(this->self().to_dnf(copied));
         }
         default:
             return this->self().flatten_condition(
-                ygg::visit([&](const auto& arg) { return this->self().wrap_condition(this->self().copy(arg)); }, source.get_value()));
+                ygg::visit([&](const auto& arg) { return this->self().wrap_condition(this->self().copy(arg)); }, source.get_variant()));
     }
 }
 

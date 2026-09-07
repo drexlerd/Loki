@@ -305,9 +305,9 @@ formalism::TermView BasicCopyTranslator<Derived>::copy(formalism::TermView sourc
 {
     auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Term>::Variant
                             { return ygg::Data<formalism::Term>::Variant(as_index(this->self().copy(arg))); },
-                            source.get_value());
+                            source.get_variant());
     auto data = formalism::checkout<formalism::Term>(this->m_context.builder);
-    data->value = std::move(value);
+    data->variant = std::move(value);
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
@@ -397,9 +397,9 @@ formalism::FunctionExpressionView BasicCopyTranslator<Derived>::copy(formalism::
 
     auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::FunctionExpression>::Variant
                             { return ygg::Data<formalism::FunctionExpression>::Variant(as_index(this->self().copy(arg))); },
-                            source.get_value());
+                            source.get_variant());
     auto data = formalism::checkout<formalism::FunctionExpression>(this->m_context.builder);
-    data->value = std::move(value);
+    data->variant = std::move(value);
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 

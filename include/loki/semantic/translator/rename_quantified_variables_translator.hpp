@@ -159,9 +159,9 @@ formalism::TermView RenameQuantifiedVariablesTranslator<Derived>::rename_variabl
             else
                 return as_index(this->self().copy(arg));
         },
-        source.get_value());
+        source.get_variant());
     auto data = formalism::checkout<formalism::Term>(this->m_context.builder);
-    data->value = std::move(value);
+    data->variant = std::move(value);
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
@@ -242,9 +242,9 @@ formalism::FunctionExpressionView RenameQuantifiedVariablesTranslator<Derived>::
             else
                 return as_index(this->self().rename_variables(arg));
         },
-        source.get_value());
+        source.get_variant());
     auto data = formalism::checkout<formalism::FunctionExpression>(this->m_context.builder);
-    data->value = std::move(value);
+    data->variant = std::move(value);
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
@@ -338,9 +338,9 @@ template<typename Derived>
 formalism::ConditionView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::ConditionView source)
 {
     auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Condition>::Variant { return as_index(this->self().rename_variables(arg)); },
-                            source.get_value());
+                            source.get_variant());
     auto data = formalism::checkout<formalism::Condition>(this->m_context.builder);
-    data->value = std::move(value);
+    data->variant = std::move(value);
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
@@ -432,9 +432,9 @@ template<typename Derived>
 formalism::EffectView RenameQuantifiedVariablesTranslator<Derived>::rename_variables(formalism::EffectView source)
 {
     auto value =
-        ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant { return as_index(this->self().rename_variables(arg)); }, source.get_value());
+        ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant { return as_index(this->self().rename_variables(arg)); }, source.get_variant());
     auto data = formalism::checkout<formalism::Effect>(this->m_context.builder);
-    data->value = std::move(value);
+    data->variant = std::move(value);
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 

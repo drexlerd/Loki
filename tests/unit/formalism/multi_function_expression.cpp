@@ -57,7 +57,7 @@ TEST(LokiTests, MultiFunctionExpressionBreaksEqualRenderTiesByIndex)
     const auto wrap = [&](auto node) {
         return intern<f::FunctionExpression>(repository,
                                              builder,
-                                             [&](auto& data) { data.value = ygg::Data<f::FunctionExpression>::Variant(node.get_index()); });
+                                             [&](auto& data) { data.variant = ygg::Data<f::FunctionExpression>::Variant(node.get_index()); });
     };
     const auto make_number = [&](double value) { return intern<f::FunctionExpressionNumber>(repository, builder, [&](auto& data) { data.value = value; }); };
     const auto one = wrap(make_number(1.0));

@@ -46,7 +46,7 @@ template<typename Derived>
 formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(ygg::Data<formalism::Condition>::Variant value)
 {
     auto data = formalism::checkout<formalism::Condition>(this->m_context.builder);
-    data->value = std::move(value);
+    data->variant = std::move(value);
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
@@ -55,7 +55,7 @@ template<typename T>
 formalism::ConditionView ConditionBuilderTranslator<Derived>::wrap_condition(formalism::EntityView<T> value)
 {
     auto data = formalism::checkout<formalism::Condition>(this->m_context.builder);
-    data->value = ygg::Data<formalism::Condition>::Variant(value.get_index());
+    data->variant = ygg::Data<formalism::Condition>::Variant(value.get_index());
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
@@ -77,7 +77,7 @@ std::optional<formalism::ConditionOrView> ConditionBuilderTranslator<Derived>::a
             if constexpr (std::is_same_v<Node, formalism::ConditionOrView>)
                 result = node;
         },
-        condition.get_value());
+        condition.get_variant());
     return result;
 }
 
@@ -108,7 +108,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                                 data->conditions.push_back(flat.get_index());
                             }
                         },
-                        flat.get_value());
+                        flat.get_variant());
                 }
                 return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first);
             }
@@ -132,7 +132,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                                 data->conditions.push_back(flat.get_index());
                             }
                         },
-                        flat.get_value());
+                        flat.get_variant());
                 }
                 return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first);
             }
@@ -162,7 +162,7 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                             return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first);
                         }
                     },
-                    flat.get_value());
+                    flat.get_variant());
             }
             else if constexpr (std::is_same_v<Node, formalism::ConditionForallView>)
             {
@@ -190,14 +190,14 @@ formalism::ConditionView ConditionBuilderTranslator<Derived>::flatten_condition(
                             return this->self().wrap_condition(formalism::get_or_create(this->m_storage->repository, *data).first);
                         }
                     },
-                    flat.get_value());
+                    flat.get_variant());
             }
             else
             {
                 return condition;
             }
         },
-        condition.get_value());
+        condition.get_variant());
 }
 
 template<typename Derived>
@@ -217,7 +217,7 @@ void ConditionBuilderTranslator<Derived>::append_conjunct(ygg::Data<formalism::C
                 data.conditions.push_back(this->self().flatten_condition(condition).get_index());
             }
         },
-        condition.get_value());
+        condition.get_variant());
 }
 
 template<typename Derived>
@@ -237,7 +237,7 @@ void ConditionBuilderTranslator<Derived>::append_disjunct(ygg::Data<formalism::C
                 data.conditions.push_back(this->self().flatten_condition(condition).get_index());
             }
         },
-        condition.get_value());
+        condition.get_variant());
 }
 
 template<typename Derived>

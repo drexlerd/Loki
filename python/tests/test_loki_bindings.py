@@ -459,17 +459,17 @@ def make_literal(repository: pypddl.Repository, predicate: pypddl.Predicate, ter
 
 def make_condition(repository: pypddl.Repository, predicate: pypddl.Predicate, terms: Iterable[pypddl.Term], positive: bool = True) -> pypddl.Condition:
     condition_literal = repository.get_or_create(pypddl.ConditionLiteralData(make_literal(repository, predicate, terms, positive)))
-    return repository.get_or_create(pypddl.ConditionData(condition_literal))
+    return repository.get_or_create(pypddl.ConditionData(variant=condition_literal))
 
 
 def make_effect(repository: pypddl.Repository, literal: pypddl.Literal) -> pypddl.Effect:
     effect_literal = repository.get_or_create(pypddl.EffectLiteralData(literal))
-    return repository.get_or_create(pypddl.EffectData(effect_literal))
+    return repository.get_or_create(pypddl.EffectData(variant=effect_literal))
 
 
 def make_number_expression(repository: pypddl.Repository, value: float) -> pypddl.FunctionExpression:
     number = repository.get_or_create(pypddl.FunctionExpressionNumberData(value))
-    return repository.get_or_create(pypddl.FunctionExpressionData(number))
+    return repository.get_or_create(pypddl.FunctionExpressionData(variant=number))
 
 
 def test_builders_expose_defaulted_mutable_fields() -> None:
@@ -479,7 +479,7 @@ def test_builders_expose_defaulted_mutable_fields() -> None:
     variable = repository.get_or_create(pypddl.VariableData("?x"))
     parameter = repository.get_or_create(pypddl.ParameterData(variable))
     predicate = repository.get_or_create(pypddl.PredicateData("p"))
-    term = repository.get_or_create(pypddl.TermData(variable))
+    term = repository.get_or_create(pypddl.TermData(variant=variable))
     literal = make_literal(repository, predicate, [term])
     condition = make_condition(repository, predicate, [term])
     effect = make_effect(repository, literal)
@@ -564,7 +564,7 @@ def test_repository_constructs_numeric_function_task_bits() -> None:
     parameter = repository.get_or_create(pypddl.ParameterData(variable, [object_type]))
     location = repository.get_or_create(pypddl.ObjectData("l1", [object_type]))
     fluent = repository.get_or_create(pypddl.FunctionSkeletonData("fuel", [parameter], number_type))
-    term = repository.get_or_create(pypddl.TermData(variable))
+    term = repository.get_or_create(pypddl.TermData(variant=variable))
     function_term = repository.get_or_create(pypddl.FunctionTermData(fluent, [term]))
     zero = make_number_expression(repository, 0.0)
     one = make_number_expression(repository, 1.0)
@@ -740,9 +740,6 @@ def test_recursive_variant_views_are_inspectable() -> None:
     assert action_effect is not None
     effect = action_effect.get_variant()
     assert isinstance(effect, pypddl.EffectWhen)
-    effect_value = action_effect.get_value()
-    assert isinstance(effect_value, pypddl.EffectWhen)
-    assert effect_value == effect
     or_condition = effect.get_condition().get_variant()
     assert isinstance(or_condition, pypddl.ConditionOr)
     assert len(or_condition.get_conditions()) == 2
@@ -753,11 +750,8 @@ def test_numeric_expression_variant_views_are_inspectable() -> None:
     repository = pypddl.RepositoryFactory().create()
     number = make_number_expression(repository, 2.0)
 
-    value = number.get_value()
     variant = number.get_variant()
-    assert isinstance(value, pypddl.FunctionExpressionNumber)
     assert isinstance(variant, pypddl.FunctionExpressionNumber)
-    assert value == variant
     assert variant.get_value() == 2.0
 
 
@@ -786,13 +780,10 @@ def test_repository_exposes_recursive_constructors_and_accessors() -> None:
     variable = repository.get_or_create(pypddl.VariableData("?x"))
     parameter = repository.get_or_create(pypddl.ParameterData(variable, [object_type]))
     predicate = repository.get_or_create(pypddl.PredicateData("p", [parameter]))
-    term = repository.get_or_create(pypddl.TermData(variable))
-    term_value = term.get_value()
+    term = repository.get_or_create(pypddl.TermData(variant=variable))
     term_variant = term.get_variant()
-    assert isinstance(term_value, pypddl.Variable)
     assert isinstance(term_variant, pypddl.Variable)
-    assert term_value == term_variant
-    assert term_value.get_name() == "?x"
+    assert term_variant.get_name() == "?x"
     literal = make_literal(repository, predicate, [term])
     base_condition = make_condition(repository, predicate, [term])
     condition_not_node = repository.get_or_create(pypddl.ConditionNotData(base_condition))

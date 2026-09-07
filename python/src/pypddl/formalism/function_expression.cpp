@@ -37,14 +37,14 @@ void bind_function_expression(nb::module_& m, RepositoryBinding& repository)
     {
         using V = Data<formalism::FunctionExpression>;
         bind_data<V>(m, "FunctionExpressionData")
-            .def(nb::init<typename V::template ViewVariant<formalism::Repository>>(), "value"_a)
-            .def_rw("value", &V::value);
+            .def(nb::init<typename V::template ViewVariant<formalism::Repository>>(), "variant"_a)
+            .def_rw("variant", &V::variant);
     }
 
     {
         using V = formalism::FunctionExpressionView;
         auto cls = nb::class_<V>(m, "FunctionExpression");
-        cls.def("get_index", &V::get_index).def("get_value", &V::get_value, nb::keep_alive<0, 1>()).def("get_variant", &V::get_value, nb::keep_alive<0, 1>());
+        cls.def("get_index", &V::get_index).def("get_variant", &V::get_variant, nb::keep_alive<0, 1>());
         ygg::add_print(cls);
         ygg::add_comparison(cls);
         ygg::add_hash(cls);

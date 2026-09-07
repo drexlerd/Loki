@@ -17,13 +17,12 @@ static_assert(std::totally_ordered<View>);
 static_assert(std::same_as<View, f::EffectView>);
 static_assert(requires(Data& data) {
     data.index;
-    data.value;
+    data.variant;
     data.clear();
     { data == data } -> std::same_as<bool>;
 });
 static_assert(requires(const View& view) {
     view.get_index();
-    view.get_value();
     view.get_variant();
     { view == view } -> std::same_as<bool>;
     { view < view } -> std::same_as<bool>;

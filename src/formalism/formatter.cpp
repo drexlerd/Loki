@@ -89,7 +89,7 @@ std::string to_string(FunctionSkeletonView value)
 std::string to_string(TermView value)
 {
     auto result = std::string {};
-    visit([&](const auto& node) { result = to_string(node); }, value.get_value());
+    visit([&](const auto& node) { result = to_string(node); }, value.get_variant());
     return result;
 }
 
@@ -121,7 +121,7 @@ std::string to_string(MultiFunctionExpressionView value)
 std::string to_string(FunctionExpressionView value)
 {
     auto result = std::string {};
-    visit([&](const auto& node) { result = to_string(node); }, value.get_value());
+    visit([&](const auto& node) { result = to_string(node); }, value.get_variant());
     return result;
 }
 
@@ -168,7 +168,7 @@ std::string to_string(ConditionNumericConstraintView value)
 std::string to_string(ConditionView value)
 {
     auto result = std::string {};
-    visit([&](const auto& node) { result = to_string(node); }, value.get_value());
+    visit([&](const auto& node) { result = to_string(node); }, value.get_variant());
     return result;
 }
 
@@ -197,7 +197,7 @@ std::string to_string(EffectProbabilisticView value) { return fmt::format("(prob
 std::string to_string(EffectView value)
 {
     auto result = std::string {};
-    visit([&](const auto& node) { result = to_string(node); }, value.get_value());
+    visit([&](const auto& node) { result = to_string(node); }, value.get_variant());
     return result;
 }
 
@@ -222,7 +222,7 @@ std::string to_string(AxiomView value)
                 if constexpr (std::same_as<T, VariableView>)
                     head_variables.insert(node);
             },
-            term.get_value());
+            term.get_variant());
     }
 
     auto existential_parameters = std::vector<ParameterView> {};

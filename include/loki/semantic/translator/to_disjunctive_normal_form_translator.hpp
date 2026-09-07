@@ -41,7 +41,7 @@ public:
 template<typename Derived>
 formalism::ConditionView ToDisjunctiveNormalFormTranslator<Derived>::to_dnf(formalism::ConditionView condition)
 {
-    return ygg::visit([&](const auto& node) { return this->self().to_dnf_node(condition, node); }, condition.get_value());
+    return ygg::visit([&](const auto& node) { return this->self().to_dnf_node(condition, node); }, condition.get_variant());
 }
 
 template<typename Derived>

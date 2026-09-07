@@ -92,7 +92,7 @@ template<typename Derived>
 formalism::TermView ConditionAnalysisTranslator<Derived>::term_from_variable(formalism::VariableView variable)
 {
     auto data = formalism::checkout<formalism::Term>(this->m_context.builder);
-    data->value = ygg::Data<formalism::Term>::Variant(variable.get_index());
+    data->variant = ygg::Data<formalism::Term>::Variant(variable.get_index());
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
@@ -111,7 +111,7 @@ void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::Ter
                     free.insert(value);
             }
         },
-        term.get_value());
+        term.get_variant());
 }
 
 template<typename Derived>
@@ -178,7 +178,7 @@ void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::Fun
                                                                   ygg::UnorderedSet<formalism::VariableView>& bound,
                                                                   ygg::UnorderedSet<formalism::VariableView>& free) const
 {
-    ygg::visit([&](const auto& node) { this->self().collect_free_variables(node, bound, free); }, expression.get_value());
+    ygg::visit([&](const auto& node) { this->self().collect_free_variables(node, bound, free); }, expression.get_variant());
 }
 
 template<typename Derived>
@@ -186,7 +186,7 @@ void ConditionAnalysisTranslator<Derived>::collect_free_variables(formalism::Con
                                                                   ygg::UnorderedSet<formalism::VariableView>& bound,
                                                                   ygg::UnorderedSet<formalism::VariableView>& free) const
 {
-    ygg::visit([&](const auto& node) { this->self().collect_free_variables(node, bound, free); }, condition.get_value());
+    ygg::visit([&](const auto& node) { this->self().collect_free_variables(node, bound, free); }, condition.get_variant());
 }
 
 template<typename Derived>

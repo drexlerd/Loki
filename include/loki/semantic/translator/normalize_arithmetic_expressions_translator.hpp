@@ -69,7 +69,7 @@ template<typename T>
 formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Derived>::wrap(T value)
 {
     auto data = formalism::checkout<formalism::FunctionExpression>(this->m_context.builder);
-    data->value = ygg::Data<formalism::FunctionExpression>::Variant(value.get_index());
+    data->variant = ygg::Data<formalism::FunctionExpression>::Variant(value.get_index());
     return formalism::get_or_create(this->m_storage->repository, *data).first;
 }
 
@@ -78,7 +78,7 @@ formalism::FunctionExpressionView NormalizeArithmeticExpressionsTranslator<Deriv
 {
     if (const auto mapped = find_mapped(this->m_storage->function_expressions, source))
         return *mapped;
-    const auto normalized = ygg::visit([this](const auto& node) { return this->normalize_node(node); }, source.get_value());
+    const auto normalized = ygg::visit([this](const auto& node) { return this->normalize_node(node); }, source.get_variant());
     remember(this->m_storage->function_expressions, source, normalized);
     return normalized;
 }
@@ -234,7 +234,7 @@ bool NormalizeArithmeticExpressionsTranslator<Derived>::is_unit(formalism::Multi
             if constexpr (std::is_same_v<Node, formalism::FunctionExpressionNumberView>)
                 unit = node.get_value() == (op == formalism::MultiArithmeticOperator::Add ? 0.0 : 1.0);
         },
-        expression.get_value());
+        expression.get_variant());
     return unit;
 }
 

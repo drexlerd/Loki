@@ -39,7 +39,7 @@ formalism::EffectView AstBuilder::parse_effect(const ast::Effect& effect)
 formalism::EffectView AstBuilder::wrap_effect(ygg::Data<formalism::Effect>::Variant value)
 {
     auto data = formalism::checkout<formalism::Effect>(m_builder);
-    data->value = std::move(value);
+    data->variant = std::move(value);
     return formalism::get_or_create(repo(), *data).first;
 }
 
@@ -272,7 +272,7 @@ bool AstBuilder::writes_total_cost(formalism::EffectView effect)
             else
                 return false;
         },
-        effect.get_value());
+        effect.get_variant());
 }
 
 formalism::ActionView AstBuilder::add_unit_cost(formalism::ActionView view)

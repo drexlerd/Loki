@@ -93,7 +93,7 @@ formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::make_gen
 template<typename Derived>
 formalism::ConditionView RemoveUniversalQuantifiersTranslator<Derived>::remove_universal_quantifiers(formalism::ConditionView condition)
 {
-    return ygg::visit([&](const auto& node) { return this->self().remove_universal_quantifiers_node(node); }, condition.get_value());
+    return ygg::visit([&](const auto& node) { return this->self().remove_universal_quantifiers_node(node); }, condition.get_variant());
 }
 
 template<typename Derived>

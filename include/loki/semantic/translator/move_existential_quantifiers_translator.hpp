@@ -66,14 +66,14 @@ std::optional<formalism::ConditionExistsView> MoveExistentialQuantifiersTranslat
             if constexpr (std::is_same_v<Node, formalism::ConditionExistsView>)
                 result = node;
         },
-        condition.get_value());
+        condition.get_variant());
     return result;
 }
 
 template<typename Derived>
 formalism::ConditionView MoveExistentialQuantifiersTranslator<Derived>::move_existentials(formalism::ConditionView condition)
 {
-    return ygg::visit([&](const auto& node) { return this->self().move_existentials_node(condition, node); }, condition.get_value());
+    return ygg::visit([&](const auto& node) { return this->self().move_existentials_node(condition, node); }, condition.get_variant());
 }
 
 template<typename Derived>
@@ -104,7 +104,7 @@ void MoveExistentialQuantifiersTranslator<Derived>::collect_binder_names(formali
                 collect_binder_names(node.get_right(), names);
             }
         },
-        condition.get_value());
+        condition.get_variant());
 }
 
 template<typename Derived>
@@ -136,7 +136,7 @@ void MoveExistentialQuantifiersTranslator<Derived>::collect_binder_names(formali
                     collect_binder_names(alternative.get_effect(), names);
             }
         },
-        effect.get_value());
+        effect.get_variant());
 }
 
 template<typename Derived>

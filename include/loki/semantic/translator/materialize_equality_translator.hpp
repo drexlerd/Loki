@@ -91,7 +91,7 @@ bool MaterializeEqualityTranslator<Derived>::condition_uses_equality(formalism::
                 return false;
             }
         },
-        condition.get_value());
+        condition.get_variant());
 }
 
 template<typename Derived>
@@ -134,7 +134,7 @@ bool MaterializeEqualityTranslator<Derived>::effect_uses_equality(formalism::Eff
                 return false;
             }
         },
-        effect.get_value());
+        effect.get_variant());
 }
 
 template<typename Derived>
@@ -161,7 +161,7 @@ template<typename Derived>
 formalism::LiteralView MaterializeEqualityTranslator<Derived>::equality_literal(formalism::PredicateView predicate, ygg::Index<formalism::Object> object)
 {
     auto term_data = formalism::checkout<formalism::Term>(this->m_context.builder);
-    term_data->value = ygg::Data<formalism::Term>::Variant(object);
+    term_data->variant = ygg::Data<formalism::Term>::Variant(object);
     const auto term = formalism::get_or_create(this->m_storage->repository, *term_data).first.get_index();
     auto atom_data = formalism::checkout<formalism::Atom>(this->m_context.builder);
     atom_data->predicate = predicate.get_index();

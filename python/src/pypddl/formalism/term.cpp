@@ -33,13 +33,13 @@ void bind_term(nb::module_& m, RepositoryBinding& repository)
 
     {
         using V = Data<formalism::Term>;
-        bind_data<V>(m, "TermData").def(nb::init<typename V::template ViewVariant<formalism::Repository>>(), "value"_a).def_rw("value", &V::value);
+        bind_data<V>(m, "TermData").def(nb::init<typename V::template ViewVariant<formalism::Repository>>(), "variant"_a).def_rw("variant", &V::variant);
     }
 
     {
         using V = formalism::TermView;
         auto cls = nb::class_<V>(m, "Term");
-        cls.def("get_index", &V::get_index).def("get_value", &V::get_value, nb::keep_alive<0, 1>()).def("get_variant", &V::get_value, nb::keep_alive<0, 1>());
+        cls.def("get_index", &V::get_index).def("get_variant", &V::get_variant, nb::keep_alive<0, 1>());
         ygg::add_print(cls);
         ygg::add_comparison(cls);
         ygg::add_hash(cls);

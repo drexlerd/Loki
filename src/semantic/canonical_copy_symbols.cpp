@@ -112,7 +112,7 @@ formalism::TermView CanonicalCopyTranslator::copy(formalism::TermView source)
     if (auto mapped = find_mapped(m_storage->terms, source))
         return *mapped;
     auto data = formalism::checkout<formalism::Term>(m_builder);
-    data->value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Term>::Variant { return as_index(copy(arg)); }, source.get_value());
+    data->variant = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Term>::Variant { return as_index(copy(arg)); }, source.get_variant());
     auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->terms, source, out);
     return out;

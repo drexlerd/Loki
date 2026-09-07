@@ -67,7 +67,7 @@ formalism::ConditionView SimplifyGoalTranslator<Derived>::make_generated_goal_co
 template<typename Derived>
 formalism::ConditionView SimplifyGoalTranslator<Derived>::simplify_goal_condition(formalism::ConditionView condition)
 {
-    return ygg::visit([&](const auto& node) { return this->self().simplify_goal_condition_node(condition, node); }, condition.get_value());
+    return ygg::visit([&](const auto& node) { return this->self().simplify_goal_condition_node(condition, node); }, condition.get_variant());
 }
 
 template<typename Derived>

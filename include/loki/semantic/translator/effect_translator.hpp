@@ -188,16 +188,16 @@ formalism::EffectView EffectTranslator<Derived>::copy(formalism::EffectView sour
                     }
                 }
             },
-            source.get_value());
+            source.get_variant());
         if (split)
             return *split;
     }
 
     auto value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Effect>::Variant
                             { return ygg::Data<formalism::Effect>::Variant(as_index(this->self().copy(arg))); },
-                            source.get_value());
+                            source.get_variant());
     auto data = formalism::checkout<formalism::Effect>(this->m_context.builder);
-    data->value = std::move(value);
+    data->variant = std::move(value);
     auto copied = formalism::get_or_create(this->m_storage->repository, *data).first;
     if (this->m_phase == TranslationPhase::ToEffectNormalForm)
         return this->self().normalize_effect(copied);

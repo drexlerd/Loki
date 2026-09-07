@@ -134,7 +134,7 @@ formalism::ConditionView CompileTypingTranslator<Derived>::type_condition(formal
 {
     const auto copied_variable = as_index(this->self().copy(variable));
     auto term_data = formalism::checkout<formalism::Term>(this->m_context.builder);
-    term_data->value = ygg::Data<formalism::Term>::Variant(copied_variable);
+    term_data->variant = ygg::Data<formalism::Term>::Variant(copied_variable);
     const auto term = formalism::get_or_create(this->m_storage->repository, *term_data).first.get_index();
     const auto literal = as_index(this->self().type_literal(type, term));
     auto condition_data = formalism::checkout<formalism::ConditionLiteral>(this->m_context.builder);
@@ -210,7 +210,7 @@ void CompileTypingTranslator<Derived>::add_type_literals_for_object(ygg::IndexLi
 {
     const auto copied_object = this->self().copy(object);
     auto term_data = formalism::checkout<formalism::Term>(this->m_context.builder);
-    term_data->value = ygg::Data<formalism::Term>::Variant(copied_object.get_index());
+    term_data->variant = ygg::Data<formalism::Term>::Variant(copied_object.get_index());
     const auto term = formalism::get_or_create(this->m_storage->repository, *term_data).first.get_index();
     auto add_literal = [&](auto&& self, formalism::TypeView type) -> void
     {

@@ -32,7 +32,7 @@ formalism::TermView AstBuilder::parse_term(const ast::Term& node)
     auto value = node.variable ? ygg::Data<formalism::Term>::Variant(lookup_variable(m_parse_context, m_diagnostics, node.name).get_index()) :
                                  ygg::Data<formalism::Term>::Variant(lookup_object(m_domain_context, m_parse_context, m_diagnostics, node.name).get_index());
     auto data = formalism::checkout<formalism::Term>(m_builder);
-    data->value = std::move(value);
+    data->variant = std::move(value);
     return formalism::get_or_create(repo(), *data).first;
 }
 
@@ -67,7 +67,7 @@ formalism::ConditionView AstBuilder::parse_condition(const ast::Condition& condi
 formalism::ConditionView AstBuilder::wrap_condition(ygg::Data<formalism::Condition>::Variant value)
 {
     auto data = formalism::checkout<formalism::Condition>(m_builder);
-    data->value = std::move(value);
+    data->variant = std::move(value);
     return formalism::get_or_create(repo(), *data).first;
 }
 
@@ -177,7 +177,7 @@ formalism::FunctionExpressionView AstBuilder::parse_function_expression(const as
 formalism::FunctionExpressionView AstBuilder::wrap_function_expression(ygg::Data<formalism::FunctionExpression>::Variant value)
 {
     auto data = formalism::checkout<formalism::FunctionExpression>(m_builder);
-    data->value = std::move(value);
+    data->variant = std::move(value);
     return formalism::get_or_create(repo(), *data).first;
 }
 

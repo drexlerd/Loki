@@ -69,7 +69,7 @@ formalism::BinaryComparator ToNegationNormalFormTranslator<Derived>::negate_comp
 template<typename Derived>
 formalism::ConditionView ToNegationNormalFormTranslator<Derived>::negate_condition(formalism::ConditionView source)
 {
-    return ygg::visit([&](const auto& arg) { return this->self().negate_condition_node(arg); }, source.get_value());
+    return ygg::visit([&](const auto& arg) { return this->self().negate_condition_node(arg); }, source.get_variant());
 }
 
 template<typename Derived>

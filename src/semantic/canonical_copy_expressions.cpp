@@ -89,7 +89,7 @@ formalism::FunctionExpressionView CanonicalCopyTranslator::copy(formalism::Funct
     if (auto mapped = find_mapped(m_storage->function_expressions, source))
         return *mapped;
     auto data = formalism::checkout<formalism::FunctionExpression>(m_builder);
-    data->value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::FunctionExpression>::Variant { return as_index(copy(arg)); }, source.get_value());
+    data->variant = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::FunctionExpression>::Variant { return as_index(copy(arg)); }, source.get_variant());
     auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->function_expressions, source, out);
     return out;
@@ -193,7 +193,7 @@ formalism::ConditionView CanonicalCopyTranslator::copy(formalism::ConditionView 
     if (auto mapped = find_mapped(m_storage->conditions, source))
         return *mapped;
     auto data = formalism::checkout<formalism::Condition>(m_builder);
-    data->value = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Condition>::Variant { return as_index(copy(arg)); }, source.get_value());
+    data->variant = ygg::visit([&](const auto& arg) -> ygg::Data<formalism::Condition>::Variant { return as_index(copy(arg)); }, source.get_variant());
     auto out = formalism::get_or_create(m_storage->repository, *data).first;
     remember(m_storage->conditions, source, out);
     return out;

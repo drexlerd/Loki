@@ -81,7 +81,7 @@ formalism::FunctionExpressionView wrap_expression(formalism::Repository& reposit
 {
     return intern<formalism::FunctionExpression>(repository,
                                                  builder,
-                                                 [&](auto& data) { data.value = ygg::Data<formalism::FunctionExpression>::Variant(node.get_index()); });
+                                                 [&](auto& data) { data.variant = ygg::Data<formalism::FunctionExpression>::Variant(node.get_index()); });
 }
 
 formalism::FunctionExpressionView number_expression(formalism::Repository& repository, formalism::Builder& builder, double value)
@@ -148,7 +148,7 @@ bool contains_binary_add_or_multiply(formalism::FunctionExpressionView expressio
             }
             return false;
         },
-        expression.get_value());
+        expression.get_variant());
 }
 
 }  // namespace
@@ -584,7 +584,7 @@ TEST(LokiCanonicalization, SortsSemanticFreeListsLexicographicallyBeforeInternin
     const auto make_condition = [&](auto literal)
     {
         const auto condition_literal = intern<formalism::ConditionLiteral>(repository, builder, [&](auto& data) { data.literal = literal; }).get_index();
-        return intern<formalism::Condition>(repository, builder, [&](auto& data) { data.value = ygg::Data<formalism::Condition>::Variant(condition_literal); });
+        return intern<formalism::Condition>(repository, builder, [&](auto& data) { data.variant = ygg::Data<formalism::Condition>::Variant(condition_literal); });
     };
     const auto p_condition_view = make_condition(p_literal);
     const auto q_condition_view = make_condition(q_literal);
