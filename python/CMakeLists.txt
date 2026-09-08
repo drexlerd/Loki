@@ -90,11 +90,6 @@ configure_file(
     COPYONLY
 )
 configure_file(
-    "${PYPDDL_GENERATED_VERSION_FILE}"
-    "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/_version.py"
-    COPYONLY
-)
-configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/src/pypddl/formalism/__init__.py"
     "${PYPDDL_BUILD_TREE_PACKAGE_DIR}/formalism/__init__.py"
     COPYONLY

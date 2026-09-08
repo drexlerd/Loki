@@ -323,6 +323,64 @@ TEST(LokiSemanticTranslator, CompilesTypingWhenEnabled)
     EXPECT_TRUE(initial_literals_use_predicate(translated_task.get_initial_literals(), "thing", *thing_predicate));
 }
 
+TEST(LokiSemanticTranslator, ComposesMappingsAfterRecoveringObjectTypeMetadata)
+{
+    auto original = formalism::Repository(0);
+    auto previous = semantic::detail::TranslationStorage(1);
+    auto target = semantic::detail::TranslationStorage(2);
+    auto builder = formalism::Builder {};
+    const auto original_base = intern<formalism::Type>(original, builder, [](auto& data) { data.name = "parent"; });
+    const auto original_type = intern<formalism::Type>(original, builder, [&](auto& data)
+    {
+        data.name = "child";
+        data.bases.push_back(original_base.get_index());
+    });
+    const auto middle_base = intern<formalism::Type>(previous.repository, builder, [](auto& data) { data.name = "parent"; });
+    const auto middle_type = intern<formalism::Type>(previous.repository, builder, [&](auto& data)
+    {
+        data.name = "child";
+        data.bases.push_back(middle_base.get_index());
+    });
+    const auto final_base = intern<formalism::Type>(target.repository, builder, [](auto& data) { data.name = "parent"; });
+    const auto object = [&](formalism::Repository& repository, const char* name)
+    {
+        return intern<formalism::Object>(repository, builder, [&](auto& data) { data.name = name; });
+    };
+    const auto original_object = object(original, "kept");
+    const auto middle_object = object(previous.repository, "kept");
+    const auto final_object = object(target.repository, "kept");
+    const auto original_removed = object(original, "removed");
+    const auto middle_removed = object(previous.repository, "removed");
+
+    previous.types.emplace(original_base, middle_base);
+    previous.types.emplace(original_type, middle_type);
+    target.types.emplace(middle_base, final_base);
+    previous.objects.emplace(original_object, middle_object);
+    previous.objects.emplace(original_removed, middle_removed);
+    target.objects.emplace(middle_object, final_object);
+    previous.object_type_views.emplace(middle_object, std::vector { middle_type });
+    previous.object_type_views.emplace(middle_removed, std::vector { middle_base });
+
+    // The child type exists only in metadata; its final mapping must be created before composition.
+    semantic::detail::compose_storage_maps_from_previous(target, previous);
+
+    ASSERT_EQ(target.objects.size(), 1);
+    EXPECT_EQ(target.objects.at(original_object), final_object);
+    EXPECT_FALSE(target.objects.contains(original_removed));
+    EXPECT_FALSE(target.objects.contains(middle_object));
+    ASSERT_EQ(target.types.size(), 2);
+    EXPECT_EQ(target.types.at(original_base), final_base);
+    const auto final_type = target.types.at(original_type);
+    EXPECT_EQ(final_type.get_context().get_index(), target.repository.get_index());
+    EXPECT_EQ(std::string(final_type.get_name()), "child");
+    ASSERT_EQ(final_type.get_bases().size(), 1);
+    EXPECT_EQ(final_type.get_bases().front(), final_base);
+    ASSERT_EQ(target.object_type_views.size(), 1);
+    EXPECT_EQ(target.object_type_views.at(final_object), std::vector { final_type });
+    EXPECT_EQ(previous.objects.at(original_object), middle_object);
+    EXPECT_EQ(previous.types.at(original_type), middle_type);
+}
+
 TEST(LokiSemanticTranslator, PreservesTaskObjectTypesAfterDomainCanonicalization)
 {
     semantic::Parser parser(fixture_path("task-object-types"));

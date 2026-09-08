@@ -1,4 +1,5 @@
 from pathlib import Path
+import tomllib
 
 import pypddl
 import pypddl._pypddl
@@ -6,10 +7,7 @@ import pypddl._pypddl
 
 def project_version():
     pyproject = Path(__file__).resolve().parents[2] / "pyproject.toml"
-    for line in pyproject.read_text(encoding="utf-8").splitlines():
-        if line.startswith("version"):
-            return line.split("=", maxsplit=1)[1].strip().strip("\"")
-    raise AssertionError("project version not found")
+    return tomllib.loads(pyproject.read_text(encoding="utf-8"))["project"]["version"]
 
 
 def test_build_tree_package_exposes_current_extension_and_version():

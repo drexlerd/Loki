@@ -1,5 +1,6 @@
 import importlib.util
 from pathlib import Path
+from unittest.mock import patch
 import pypddl
 
 
@@ -11,6 +12,15 @@ def test_top_level_package_exports_public_helpers_and_formalism_module():
     assert callable(pypddl.native_lib_dir)
     assert pypddl.formalism.Parser is not None
     assert pypddl.formalism.RepositoryFactory is not None
+
+
+def test_source_version_reads_the_project_table(tmp_path: Path):
+    (tmp_path / "pyproject.toml").write_text(
+        "[tool.other]\nversion = 'unrelated'\n[project]\nversion = '1.2.3' # comment\n",
+        encoding="utf-8",
+    )
+    with patch.object(pypddl, "__file__", str(tmp_path / "pypddl" / "__init__.py")):
+        assert pypddl._source_version() == "1.2.3"
 
 
 def test_public_stubs_describe_public_api():
